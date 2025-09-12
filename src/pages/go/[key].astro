@@ -1,0 +1,49 @@
+---
+// src/pages/go/[key].astro
+export const prerender = true;
+import fs from 'node:fs';
+
+export async function getStaticPaths() {
+  let items: any[] = [];
+  try {
+    const raw = fs.readFileSync('./content/products.json', 'utf8');
+    const data = JSON.parse(raw);
+    items = Array.isArray(data.products) ? data.products : [];
+  } catch {
+    items = [];
+  }
+  return items.map((p: any) => ({
+    params: { key: String(p.key || '') },
+    props: { p }
+  }));
+}
+
+const { p } = Astro.props as { p: any };
+const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
+
+function withUtm(url: string, utm: string) {
+  if (!url) return '/';
+  if (!utm) return url;
+  return url.includes('?') ? `${url}&${utm}` : `${url}?${utm}`;
+}
+
+const href = withUtm(String(p?.url || '').trim(), String(p?.utm || '').trim());
+const key  = String(p?.key || '');
+const canon = `${String(settings.siteUrl || 'https://example.com').replace(/\/$/,'')}/go/${key}`;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    {href && <meta http-equiv="refresh" content={`0;url=${href}`} />}
+    <meta name="robots" content="noindex" />
+    <title>Redirecting…</title>
+    <link rel="canonical" href={canon} />
+  </head>
+  <body>
+    <p>Redirecting… <a href={href || '/'} rel="nofollow sponsored">continue</a></p>
+    <script is:inline>
+      {href && `window.location.replace(${JSON.stringify(href)});`}
+    </script>
+  </body>
+</html>

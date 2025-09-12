@@ -1,0 +1,160 @@
+
+
+---
+// src/pages/admin/index.astro
+import Base from '../../layouts/Base.astro';
+import fs from 'node:fs';
+const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
+---
+<Base title="WitchClick — Admin" description="Prompt, preview, ingest, publish." canon={`${settings.siteUrl}/admin`} wide={true}>
+  <Fragment slot="head">
+    <meta name="robots" content="noindex" />
+  </Fragment>
+
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+    <!-- LEFT: Prompt builder -->
+    <section class="lg:col-span-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+      <h1 class="mb-3 text-xl font-semibold">1) Build Post Generator Prompt</h1>
+      <div class="grid gap-3">
+        <label class="block">
+          <span class="text-xs font-medium">Topic</span>
+          <input id="topic" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="tea ritual for focus" />
+        </label>
+        <label class="block">
+          <span class="text-xs font-medium">Word count</span>
+          <input id="words" type="number" class="mt-1 w-full rounded-lg border px-3 py-2" value="1200" />
+        </label>
+        <div class="flex gap-4 text-sm">
+          <label class="inline-flex items-center gap-2">
+            <input type="checkbox" id="ads" /> <span>Include ads</span>
+          </label>
+          <label class="inline-flex items-center gap-2">
+            <input type="checkbox" id="kofi" checked /> <span>Include Ko-fi</span>
+          </label>
+        </div>
+        <div class="flex gap-2">
+          <button id="genPrompt" class="rounded-lg bg-purple-700 px-3 py-2 text-white hover:bg-purple-800">Generate Prompt</button>
+          <button id="copyPrompt" class="rounded-lg border px-3 py-2">Copy</button>
+        </div>
+        <textarea id="promptOut" class="mt-2 h-64 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder="Prompt will appear here…"></textarea>
+        <p class="text-xs text-gray-600">Paste this into ChatGPT → get JSON → paste into the box on the right.</p>
+      </div>
+    </section>
+
+    <!-- RIGHT: JSON preview / ingest / publish -->
+    <section class="lg:col-span-7 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+      <h2 class="mb-3 text-xl font-semibold">2) Paste PostSpec JSON → Preview → Ingest → Publish</h2>
+
+      <textarea id="spec" class="h-56 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder='Paste the PostSpec v2 JSON here'></textarea>
+
+      <div class="mt-3 flex flex-wrap gap-2">
+        <button id="validateBtn" class="rounded-lg border px-3 py-2 text-sm">Validate</button>
+        <button id="previewBtn" class="rounded-lg border px-3 py-2 text-sm">Preview</button>
+        <button id="ingestBtn" class="rounded-lg bg-green-600 px-3 py-2 text-sm text-white hover:bg-green-700">Ingest</button>
+        <button id="ingestPublishBtn" class="rounded-lg bg-indigo-600 px-3 py-2 text-sm text-white hover:bg-indigo-700">Ingest + Publish</button>
+        <button id="clearBtn" class="rounded-lg border px-3 py-2 text-sm">Clear</button>
+        <span id="status" class="self-center text-sm"></span>
+      </div>
+
+      <div id="preview" class="prose prose-neutral mt-4 max-w-none border-t pt-4"></div>
+    </section>
+  </div>
+
+  <script is:inline>
+    (function(){
+      var DEV_API = 'http://localhost:8787';
+      var $ = function(id){ return document.getElementById(id); };
+      function setStatus(msg, ok){ var el=$('status'); el.textContent=msg; el.style.color = ok===false ? '#7f1d1d' : '#065f46'; }
+
+      // Build prompt
+      $('genPrompt').addEventListener('click', async function(){
+        try{
+          setStatus('Generating prompt...');
+          var body = {
+            topic: $('topic').value || 'tea ritual for focus',
+            words: Number($('words').value || 1200),
+            ads: $('ads').checked ? 'on' : 'off',
+            kofi: $('kofi').checked ? 'on' : 'off'
+          };
+          var res = await fetch(DEV_API + '/genprompt', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+          var data = await res.json();
+          if (!data.ok) throw new Error(data.error || 'gen failed');
+          $('promptOut').value = data.prompt || '';
+          setStatus('Prompt ready ✓');
+        }catch(e){ setStatus('Prompt error: ' + (e.message||String(e)), false); }
+      });
+      $('copyPrompt').addEventListener('click', function(){
+        $('promptOut').select(); document.execCommand('copy'); setStatus('Copied ✓');
+      });
+
+      // Validate JSON
+      function parseSpec(){
+        var txt = $('spec').value;
+        if (!txt.trim()) throw new Error('No JSON provided.');
+        try { return JSON.parse(txt); } catch(e){ throw new Error('Invalid JSON: ' + e.message); }
+      }
+      function basicCheck(spec){
+        if (spec.specVersion !== 2) throw new Error('specVersion must be 2');
+        if (!spec.title || !spec.slug) throw new Error('title/slug required');
+        if (!Array.isArray(spec.sections) || spec.sections.length === 0) throw new Error('sections[] required');
+        if (!Array.isArray(spec.tags) || spec.tags.length < 4 || spec.tags.length > 7) throw new Error('tags must be 4–7');
+      }
+      $('validateBtn').addEventListener('click', function(){
+        try{ var s=parseSpec(); basicCheck(s); setStatus('Looks valid ✓'); }catch(e){ setStatus(e.message, false); }
+      });
+
+      // Preview (simple: headings + markdown blocks)
+      function renderPreview(spec){
+        var el = $('preview'); el.innerHTML = '';
+        var h1 = document.createElement('h1'); h1.textContent = spec.title || '(untitled)'; el.appendChild(h1);
+        if (Array.isArray(spec.tags)){ var p = document.createElement('p'); p.className='text-sm text-gray-600'; p.textContent='Tags: ' + spec.tags.join(', '); el.appendChild(p); }
+        for (var i=0;i<(spec.sections||[]).length;i++){
+          var sec = spec.sections[i];
+          var h2 = document.createElement('h2'); h2.textContent = sec.heading || 'Section'; el.appendChild(h2);
+          var div = document.createElement('div');
+          // naive newline→<br> for preview; final rendering happens on the post page
+          div.innerHTML = (String(sec.markdown||'').trim()).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+          el.appendChild(div);
+        }
+      }
+      $('previewBtn').addEventListener('click', function(){
+        try{ var s=parseSpec(); basicCheck(s); renderPreview(s); setStatus('Preview updated ✓'); }catch(e){ setStatus(e.message, false); }
+      });
+
+      // Ingest (writes markdown file)
+      async function ingest(spec){
+        var res = await fetch(DEV_API + '/ingest', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(spec) });
+        var data = await res.json();
+        if (!data.ok) throw new Error(data.error || 'ingest failed');
+        return data;
+      }
+
+      // Buttons
+      $('ingestBtn').addEventListener('click', async function(){
+        try{
+          setStatus('Ingesting…');
+          var spec = parseSpec(); basicCheck(spec);
+          var data = await ingest(spec);
+          setStatus('Ingested → ' + data.path + '  Open: /post/' + data.slug);
+        }catch(e){ setStatus(e.message, false); }
+      });
+
+      $('ingestPublishBtn').addEventListener('click', async function(){
+        try{
+          setStatus('Ingesting…');
+          var spec = parseSpec(); basicCheck(spec);
+          var data = await ingest(spec);
+          setStatus('Ingested. Publishing…');
+          var res = await fetch(DEV_API + '/bundle', { method:'POST' });
+          var b = await res.json();
+          if (!b.ok) throw new Error((b.steps && b.steps.map(function(s){return s.err;}).join('\\n')) || b.error || 'bundle failed');
+          setStatus('Published ✓  Open post: /post/' + data.slug);
+        }catch(e){ setStatus(e.message, false); }
+      });
+
+      $('clearBtn').addEventListener('click', function(){
+        $('spec').value=''; $('preview').innerHTML=''; setStatus('Cleared');
+      });
+    })();
+  </script>
+</Base>

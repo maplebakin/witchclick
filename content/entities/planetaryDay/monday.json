@@ -1,0 +1,8 @@
+{
+  "type": "planetaryDay",
+  "name": "monday",
+  "slug": "monday",
+  "summary": "monday — stub entity",
+  "properties": {},
+  "related": []
+}

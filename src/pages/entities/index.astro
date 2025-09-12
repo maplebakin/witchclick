@@ -1,0 +1,62 @@
+---
+// src/pages/entities/index.astro
+import Base from '../../layouts/Base.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
+const root = './content/entities';
+
+type Item = { type: string; name: string; slug: string; summary?: string };
+const items: Record<string, Item[]> = {};
+
+if (fs.existsSync(root)) {
+  const types = fs.readdirSync(root).filter((d) => {
+    const p = path.join(root, d);
+    try { return fs.statSync(p).isDirectory(); } catch { return false; }
+  });
+  for (const t of types) {
+    const dir = path.join(root, t);
+    let arr: Item[] = [];
+    try {
+      const files = fs.readdirSync(dir).filter((f) => f.endsWith('.json'));
+      for (const f of files) {
+        try {
+          const data = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
+          arr.push({
+            type: data.type || t,
+            name: data.name || data.slug || f.replace(/\.json$/,''),
+            slug: data.slug || f.replace(/\.json$/,''),
+            summary: data.summary || ''
+          });
+        } catch {}
+      }
+    } catch {}
+    if (arr.length) {
+      arr.sort((a,b)=> a.name.localeCompare(b.name));
+      items[t] = arr;
+    }
+  }
+}
+---
+<Base title="Entities" description="Crystals, herbs, moon phases, and more." canon={`${settings.siteUrl.replace(/\/$/,'')}/entities`}>
+  <section class="prose prose-neutral max-w-none">
+    <h1>Entities</h1>
+    {Object.keys(items).length === 0 && (
+      <p>No entities yet. Ingest a post that references entities to create stubs under <code>content/entities</code>.</p>
+    )}
+    {Object.entries(items).map(([type, arr]) => (
+      <>
+        <h2 class="capitalize">{type}</h2>
+        <ul>
+          {arr.map((it) => (
+            <li>
+              <a class="underline text-purple-700" href={`/entities/${type}/${it.slug}`}>{it.name}</a>
+              {it.summary && <span class="text-gray-600 text-sm"> — {it.summary}</span>}
+            </li>
+          ))}
+        </ul>
+      </>
+    ))}
+  </section>
+</Base>

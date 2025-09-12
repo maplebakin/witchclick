@@ -1,0 +1,10 @@
+---
+import fs from 'node:fs';
+const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
+const user = settings.kofiUsername || '';
+if (!user) return;
+---
+<div class="my-8 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+  If this was helpful, you can fuel the tea kettle on Ko-fi:
+  <a class="ml-1 underline" href={`https://ko-fi.com/${user}`} target="_blank" rel="noopener">ko-fi.com/{user}</a>.
+</div>

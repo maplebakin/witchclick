@@ -1,0 +1,22 @@
+# Node
+node_modules/
+npm-debug.log*
+pnpm-lock.yaml
+yarn.lock
+
+# Build artifacts
+dist/
+.tmp/
+.tmp-*
+tmp/
+
+# Tool outputs
+tools/_compiled/
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*

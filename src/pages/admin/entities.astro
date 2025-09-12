@@ -1,0 +1,258 @@
+
+---
+// src/pages/admin/entities.astro
+import Base from '../../layouts/Base.astro';
+import fs from 'node:fs';
+
+const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
+const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'];
+---
+<Base title="WitchClick — Entities Admin" description="Create and edit entity JSON files." canon={`${settings.siteUrl}/admin/entities`} wide={true}>
+  <Fragment slot="head">
+    <meta name="robots" content="noindex" />
+  </Fragment>
+
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+    <!-- Left: list -->
+    <section class="lg:col-span-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div class="mb-3 flex items-center justify-between gap-2">
+        <h1 class="text-xl font-semibold">Entities</h1>
+        <button id="newBtn" class="rounded-lg border px-3 py-1 text-sm">New</button>
+      </div>
+      <input id="search" placeholder="Search..." class="mb-3 w-full rounded-lg border px-3 py-2 text-sm" />
+      <div id="list" class="max-h-[70vh] overflow-auto text-sm"></div>
+    </section>
+
+    <!-- Right: editor -->
+    <section class="lg:col-span-8 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+      <h2 class="mb-3 text-lg font-semibold">Editor</h2>
+
+      <div class="grid gap-3 md:grid-cols-2">
+        <label class="block">
+          <span class="text-xs font-medium">Type</span>
+          <select id="type" class="mt-1 w-full rounded-lg border px-3 py-2">
+            {TYPES.map(t => <option value={t}>{t}</option>)}
+          </select>
+        </label>
+        <label class="block">
+          <span class="text-xs font-medium">Slug</span>
+          <input id="slug" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="peppermint" />
+        </label>
+        <label class="block md:col-span-2">
+          <span class="text-xs font-medium">Name</span>
+          <input id="name" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Peppermint" />
+        </label>
+        <label class="block md:col-span-2">
+          <span class="text-xs font-medium">Summary</span>
+          <textarea id="summary" class="mt-1 h-20 w-full rounded-lg border px-3 py-2"></textarea>
+        </label>
+      </div>
+
+      <h3 class="mt-4 text-sm font-semibold">Properties</h3>
+      <div id="props" class="mt-2 space-y-2"></div>
+      <div class="mt-2 flex gap-2">
+        <button id="addProp" class="rounded-lg border px-3 py-1 text-sm">Add property</button>
+        <button id="suggest" class="rounded-lg border px-3 py-1 text-sm">Add suggestions</button>
+      </div>
+
+      <label class="mt-4 block">
+        <span class="text-xs font-medium">Related (comma-separated slugs)</span>
+        <input id="related" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="fluorite,new-moon" />
+      </label>
+
+      <div class="mt-4 flex gap-3">
+        <button id="save" class="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700">Save</button>
+        <span id="status" class="self-center text-sm text-gray-700"></span>
+      </div>
+    </section>
+  </div>
+
+  <script is:inline>
+    (function () {
+      var $ = function(id){ return document.getElementById(id); };
+      var DEV_API = 'http://localhost:8787';
+
+      var SUGGEST = {
+        crystal: [['color','green'],['chakra','heart,third-eye'],['intentions','focus,clarity'],['cleansing','moonlight,smoke']],
+        herb: [['partUsed','leaf'],['intentions','focus,clarity'],['cautions','']],
+        moonPhase: [['phase','New Moon'],['bestFor','intentions,new-beginnings'],['cautions','']],
+        tarot: [['keywords','clarity,focus'],['upright',''],['reversed','']],
+        planetaryDay: [['planet','Mercury'],['themes','communication,study'],['cautions','']],
+        ritual: [['duration','5 minutes'],['tools','candle,tea'],['steps','breathe,intent,begin']]
+      };
+
+      function setStatus(msg, ok) {
+        if (ok === void 0) ok = true;
+        var el = $('status');
+        if (!el) return;
+        el.textContent = msg;
+        el.style.color = ok ? '#065f46' : '#7f1d1d';
+      }
+
+      function propRow(key, value) {
+        var wrap = document.createElement('div');
+        wrap.className = 'grid grid-cols-5 gap-2';
+        var k = document.createElement('input');
+        k.className = 'col-span-2 rounded-lg border px-2 py-1 text-sm key';
+        k.placeholder = 'key';
+        k.value = key || '';
+        var v = document.createElement('input');
+        v.className = 'col-span-3 rounded-lg border px-2 py-1 text-sm val';
+        v.placeholder = 'value (comma -> array)';
+        v.value = value || '';
+        wrap.appendChild(k);
+        wrap.appendChild(v);
+        return wrap;
+      }
+
+      function collectProps() {
+        var rows = Array.prototype.slice.call(document.querySelectorAll('#props > div'));
+        var out = {};
+        for (var i=0;i<rows.length;i++) {
+          var r = rows[i];
+          var k = r.querySelector('.key').value.trim();
+          var v = r.querySelector('.val').value.trim();
+          if (!k) continue;
+          if (!v) { out[k] = ''; continue; }
+          if (v.charAt(0) === '[' && v.charAt(v.length-1) === ']') {
+            try { out[k] = JSON.parse(v); continue; } catch (e) {}
+          }
+          if (v.indexOf(',') !== -1) {
+            out[k] = v.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+          } else {
+            out[k] = v;
+          }
+        }
+        return out;
+      }
+
+      function slugify(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+      }
+
+      async function refreshList() {
+        try {
+          var res = await fetch(DEV_API + '/entities/list', { method: 'POST' });
+          var data = await res.json();
+          if (!data.ok) { setStatus('List error: ' + (data.error || 'unknown'), false); return; }
+          var q = ($('search').value || '').toLowerCase().trim();
+          var list = $('list');
+          list.innerHTML = '';
+          var items = data.items || {};
+          var types = Object.keys(items).sort();
+          if (types.length === 0) {
+            list.innerHTML = '<p class="text-gray-600">No entities yet.</p>';
+            return;
+          }
+          for (var ti=0; ti<types.length; ti++) {
+            var t = types[ti];
+            var h = document.createElement('h4');
+            h.className = 'mt-3 mb-1 text-xs uppercase tracking-wide text-gray-500';
+            h.textContent = t;
+            list.appendChild(h);
+            var arr = items[t];
+            for (var ai=0; ai<arr.length; ai++) {
+              var it = arr[ai];
+              var name = String(it.name || '').toLowerCase();
+              var slug = String(it.slug || '').toLowerCase();
+              if (q && name.indexOf(q) === -1 && slug.indexOf(q) === -1) continue;
+              var a = document.createElement('a');
+              a.href = '#';
+              a.className = 'block rounded px-2 py-1 hover:bg-purple-50';
+              a.textContent = (it.name || '') + ' (' + (it.slug || '') + ')';
+              (function(t2, s2){
+                a.addEventListener('click', function(ev){ ev.preventDefault(); loadEntity(t2, s2); });
+              })(it.type, it.slug);
+              list.appendChild(a);
+            }
+          }
+        } catch (e) {
+          setStatus('List error: ' + (e.message || String(e)), false);
+        }
+      }
+
+      async function loadEntity(type, slug) {
+        try {
+          var res = await fetch(DEV_API + '/entities/get', {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json' },
+            body: JSON.stringify({ type: type, slug: slug })
+          });
+          var data = await res.json();
+          if (!data.ok) throw new Error(data.error || 'get failed');
+          var ent = data.data || {};
+          $('type').value = ent.type || type || 'herb';
+          $('slug').value = ent.slug || slug || '';
+          $('name').value = ent.name || '';
+          $('summary').value = ent.summary || '';
+          $('related').value = Array.isArray(ent.related) ? ent.related.join(',') : '';
+          var props = ent.properties || {};
+          var holder = $('props'); holder.innerHTML = '';
+          var keys = Object.keys(props);
+          if (keys.length === 0) holder.appendChild(propRow());
+          for (var i=0; i<keys.length; i++) {
+            var k = keys[i];
+            var v = Array.isArray(props[k]) ? props[k].join(',') : String(props[k]);
+            holder.appendChild(propRow(k, v));
+          }
+          setStatus('Loaded ' + type + '/' + slug);
+        } catch (e) {
+          setStatus('Load error: ' + (e.message || String(e)), false);
+        }
+      }
+
+      $('addProp').addEventListener('click', function(){ $('props').appendChild(propRow()); });
+
+      $('suggest').addEventListener('click', function(){
+        var t = $('type').value;
+        var rows = SUGGEST[t] || [];
+        var holder = $('props');
+        for (var i=0;i<rows.length;i++) {
+          var kv = rows[i];
+          holder.appendChild(propRow(kv[0], kv[1]));
+        }
+        setStatus('Added suggestions for ' + t);
+      });
+
+      $('newBtn').addEventListener('click', function(){
+        $('type').value = 'herb';
+        $('slug').value = '';
+        $('name').value = '';
+        $('summary').value = '';
+        $('related').value = '';
+        $('props').innerHTML = '';
+        $('props').appendChild(propRow());
+        setStatus('New entity draft');
+      });
+
+      $('save').addEventListener('click', async function(){
+        try {
+          var payload = {
+            type: $('type').value,
+            slug: slugify($('slug').value),
+            name: $('name').value,
+            summary: $('summary').value,
+            properties: collectProps(),
+            related: ($('related').value || '').split(',').map(function(s){ return s.trim(); }).filter(Boolean)
+          };
+          var res = await fetch(DEV_API + '/entities/save', {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json' },
+            body: JSON.stringify(payload)
+          });
+          var data = await res.json();
+          if (!data.ok) throw new Error(data.error || 'save failed');
+          setStatus('Saved -> ' + data.path);
+          refreshList();
+        } catch (e) {
+          setStatus('Save error: ' + (e.message || String(e)), false);
+        }
+      });
+
+      $('search').addEventListener('input', refreshList);
+
+      // init
+      refreshList();
+    })();
+  </script>
+</Base>

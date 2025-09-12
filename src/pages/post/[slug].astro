@@ -1,0 +1,113 @@
+---
+// src/pages/post/[slug].astro
+import Base from '../../layouts/Base.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import Disclosure from '../../components/Disclosure.astro';
+import KofiBlock from '../../components/KofiBlock.astro';
+import DownloadCard from '../../components/DownloadCard.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+import matter from 'gray-matter';
+import { marked } from 'marked';
+
+// Build-time: enumerate posts and pass their data+content in props
+export async function getStaticPaths() {
+  const dir = './content/posts';
+  if (!fs.existsSync(dir)) return [];
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.md'));
+
+  return files.map((file) => {
+    const raw = fs.readFileSync(path.join(dir, file), 'utf8');
+    const { data, content } = matter(raw);
+    const slug = (data && data.slug) ? String(data.slug) : file.replace(/\.md$/, '');
+    return { params: { slug }, props: { data, content } };
+  });
+}
+
+const { data = {}, content = '' } = Astro.props;
+const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
+const productsFile = fs.existsSync('./content/products.json')
+  ? JSON.parse(fs.readFileSync('./content/products.json','utf8'))
+  : { products: [] };
+
+const title = data.title ?? 'Untitled';
+const description = data.metaDescription ?? data.excerpt ?? '';
+const canonical = `${String(settings.siteUrl || 'https://example.com').replace(/\/$/,'')}/post/${data.slug ?? ''}`;
+const downloadId = data.downloadId || (data.cta && data.cta.id);
+const includeAds = !!data.includeAds; // sidebar + end ads
+const includeKofi = !!data.includeKofi;
+const affiliateAnchors: Array<{key:string; text:string}> = Array.isArray(data.affiliateAnchors) ? data.affiliateAnchors : [];
+const allowedKeys = new Set((productsFile.products || []).map((p:any) => String(p.key)));
+
+// Convert Markdown → HTML
+const rawHtml = marked.parse(content || '');
+
+// ---- Auto-link affiliates (first natural occurrence of each anchor) ----
+function escapeRegExp(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Split outside of existing <a>, <code>, <pre> so we never nest links or touch code blocks.
+const SPLIT_RE = /(<a\b[^>]*>.*?<\/a>|<code\b[^>]*>.*?<\/code>|<pre\b[^>]*>.*?<\/pre>)/gis;
+
+function linkOnceOutsideAnchors(html: string, anchorText: string, key: string) {
+  if (!anchorText || !key) return html;
+  const re = new RegExp(escapeRegExp(anchorText), 'i'); // first, case-insensitive
+  const parts = html.split(SPLIT_RE);
+  let linked = false;
+
+  for (let i = 0; i < parts.length; i++) {
+    // Skip tag chunks (captured by SPLIT_RE)
+    if (i % 2 === 1) continue;
+    if (!linked && re.test(parts[i])) {
+      parts[i] = parts[i].replace(re, (m) =>
+        `<a href="/go/${key}" rel="sponsored nofollow" data-analytics="aff_click" data-analytics-meta="${key}">${m}</a>`
+      );
+      linked = true;
+    }
+  }
+  return parts.join('');
+}
+
+function autoLink(html: string, anchors: Array<{key:string; text:string}>) {
+  let out = html;
+  for (const a of anchors) {
+    if (!a || !a.text || !a.key) continue;
+    if (!allowedKeys.has(String(a.key))) continue; // skip unknown keys
+    out = linkOnceOutsideAnchors(out, String(a.text), String(a.key));
+  }
+  return out;
+}
+
+const html = autoLink(String(rawHtml), affiliateAnchors);
+const hasAffiliates = affiliateAnchors.length > 0;
+---
+<Base title={title} description={description} canon={canonical} wide={true}>
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
+    <article class="prose prose-neutral max-w-none lg:col-span-8">
+      <h1 class="mb-2">{title}</h1>
+      <p class="mt-0 mb-4 text-sm text-gray-600">
+        {data.publishedAt && <time datetime={data.publishedAt}>
+          {new Date(data.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+        </time>}
+        {data.publishedAt && data.readingMinutes && <span> · </span>}
+        {data.readingMinutes && <span>{data.readingMinutes} min read</span>}
+      </p>
+
+      <Disclosure show={includeAds || hasAffiliates} />
+
+      <div set:html={html} />
+{downloadId && <DownloadCard id={downloadId} />}
+{includeAds && <AdSlot slot="end" class="mt-8" />}
+{includeKofi && <KofiBlock />}
+    </article>
+
+    {includeAds && (
+      <aside class="hidden lg:block lg:col-span-4">
+        <div class="sticky top-24">
+          <AdSlot slot="side" />
+        </div>
+      </aside>
+    )}
+  </div>
+</Base>

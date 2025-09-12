@@ -1,0 +1,51 @@
+---
+import fs from 'node:fs';
+interface Props { id?: string }
+const { id = '' } = Astro.props as Props;
+if (!id) { return; }
+
+const dir = './content/downloads';
+let data: any = null;
+try {
+  const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
+  for (const f of files) {
+    const j = JSON.parse(fs.readFileSync(`${dir}/${f}`,'utf8'));
+    if (j.id === id || j.slug === id) { data = j; break; }
+  }
+} catch {}
+
+if (!data) { return; }
+const hasExternal = !!(data.url && data.url.trim());
+const href = hasExternal ? data.url : (data.file || '#');
+const target = hasExternal ? '_blank' : undefined;
+const rel = hasExternal ? 'noopener' : undefined;
+---
+<aside class="my-8 rounded-2xl border border-purple-200 bg-purple-50 p-4">
+  <div class="flex gap-4">
+    {data.cover && <img src={data.cover} alt={`${data.name} cover`} class="h-24 w-24 rounded-lg object-cover" loading="lazy" />}
+    <div class="min-w-0">
+      <h3 class="m-0 text-lg font-semibold">{data.name}</h3>
+      {data.summary && <p class="mt-1 mb-2 text-sm text-purple-900">{data.summary}</p>}
+      {Array.isArray(data.features) && data.features.length > 0 && (
+        <ul class="mb-3 list-disc pl-5 text-sm">
+          {data.features.slice(0,3).map((f:string)=><li>{f}</li>)}
+        </ul>
+      )}
+      <div class="flex items-center gap-3">
+        {(data.price && data.currency) ? (
+          <span class="rounded bg-white px-2 py-1 text-sm font-medium text-purple-900">
+            {new Intl.NumberFormat(undefined, { style:'currency', currency:data.currency }).format(parseFloat(data.price))}
+          </span>
+        ) : (
+          <span class="rounded bg-white px-2 py-1 text-sm font-medium text-purple-900">Free</span>
+        )}
+        <a href={href} target={target} rel={rel}
+           class="rounded-lg bg-purple-700 px-3 py-2 text-sm font-medium text-white hover:bg-purple-800"
+           data-analytics="download_click" data-analytics-meta={data.id}>
+          {hasExternal ? 'Buy now' : 'Download'}
+        </a>
+        <a href={`/downloads/${data.slug}`} class="text-sm underline text-purple-700">Details</a>
+      </div>
+    </div>
+  </div>
+</aside>

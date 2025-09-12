@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import fs from 'node:fs';
+const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
+---
+<Base title="Contact" description="How to reach the WitchClick team." canon={`${settings.siteUrl.replace(/\/$/,'')}/contact`}>
+  <article class="prose prose-neutral max-w-none">
+    <h1>Contact</h1>
+    <p>Questions or collaboration ideas? Email <a href="streamthreadsystems@gmail.com">streamthreadsystems@gmail.com</a>.</p>
+    <p>We read every message and reply when we can.</p>
+  </article>
+</Base>

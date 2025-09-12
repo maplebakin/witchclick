@@ -1,0 +1,6 @@
+/admin      /404  404
+/admin/*    /404  404
+/go/journal    https://example.com/journal?utm_source=witchclick&utm_medium=affiliate   302
+/go/crystals    https://example.com/crystals?utm_source=witchclick&utm_medium=affiliate   302
+/go/cozy-games    https://example.com/game?utm_source=witchclick&utm_medium=affiliate   302
+/go/notebooks    https://example.com/notebook?utm_source=witchclick&utm_medium=affiliate   302

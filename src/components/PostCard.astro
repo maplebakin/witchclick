@@ -1,0 +1,40 @@
+---
+// src/components/PostCard.astro
+// Expects: <PostCard post={frontmatterData} />
+const { post } = Astro.props;
+const p = post && typeof post === 'object' ? post : {};
+
+const title = p.title ?? 'Untitled';
+const slug = p.slug ?? '';
+const excerpt = p.excerpt ?? '';
+const tags = Array.isArray(p.tags) ? p.tags : [];
+const readingMinutes = Number(p.readingMinutes ?? 3);
+const publishedAt = p.publishedAt ? new Date(p.publishedAt) : null;
+
+const href = slug ? `/post/${slug}` : '#';
+---
+<article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+  <h2 class="mb-2 text-xl font-semibold">
+    <a href={href} class="text-purple-700 underline decoration-2 underline-offset-4 hover:no-underline">
+      {title}
+    </a>
+  </h2>
+
+  {excerpt && <p class="mb-3 text-sm text-gray-700">{excerpt}</p>}
+
+  <div class="mb-2 text-xs text-gray-600">
+    {publishedAt && <time datetime={publishedAt.toISOString()}>
+      {publishedAt.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+    </time>}
+    {publishedAt && <span> · </span>}
+    <span>{readingMinutes} min read</span>
+  </div>
+
+  {tags.length > 0 && (
+    <ul class="mt-2 flex flex-wrap gap-2">
+      {tags.slice(0, 4).map((t) => (
+        <li class="rounded-full bg-purple-50 px-2 py-0.5 text-xs text-purple-700 border border-purple-200">{t}</li>
+      ))}
+    </ul>
+  )}
+</article>

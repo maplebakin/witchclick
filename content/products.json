@@ -1,0 +1,9 @@
+
+{
+  "products": [
+    { "key": "journal", "name": "Linen Journal", "url": "https://example.com/journal", "utm": "utm_source=witchclick&utm_medium=affiliate", "rel": "sponsored nofollow" },
+    { "key": "crystals", "name": "Starter Crystal Set", "url": "https://example.com/crystals", "utm": "utm_source=witchclick&utm_medium=affiliate", "rel": "sponsored nofollow" },
+    { "key": "cozy-games", "name": "Cozy Game", "url": "https://example.com/game", "utm": "utm_source=witchclick&utm_medium=affiliate", "rel": "sponsored nofollow" },
+    { "key": "notebooks", "name": "Dotted Notebook", "url": "https://example.com/notebook", "utm": "utm_source=witchclick&utm_medium=affiliate", "rel": "sponsored nofollow" }
+  ]
+}

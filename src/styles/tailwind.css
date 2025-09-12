@@ -1,0 +1,8 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.prose {
+  font-family: Literata, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+}

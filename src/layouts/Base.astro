@@ -1,0 +1,122 @@
+---
+// src/layouts/Base.astro
+import "../styles/tailwind.css";
+import fs from "node:fs";
+
+type Props = {
+  title?: string;
+  description?: string;
+  canon?: string;
+  wide?: boolean; // set true on wide pages (e.g., post with sidebar)
+};
+
+const {
+  title = "WitchClick",
+  description = "",
+  canon = "",
+  wide = false
+} = Astro.props as Props;
+
+const settings = JSON.parse(fs.readFileSync("./content/settings.json", "utf8"));
+const analyticsEnabled = !!settings.analytics?.enabled;
+const ads = settings.ads || { provider: "none" };
+const mainWidthClass = wide ? "max-w-6xl" : "max-w-3xl";
+
+// Dev flag for showing admin links only in dev
+const isDev = import.meta.env.DEV;
+
+// Nav
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/entities", label: "Entities" },
+  { href: "/downloads", label: "Downloads" },
+  ...(isDev ? [
+    { href: "/admin", label: "Post Generator", rel: "nofollow" },
+    { href: "/admin/write", label: "Write", rel: "nofollow" },
+    { href: "/admin/entities", label: "Entities Admin", rel: "nofollow" },
+    { href: "/admin/downloads", label: "Downloads Admin", rel: "nofollow" }
+  ] : [])
+];
+
+const here = (Astro.url && Astro.url.pathname) || "/";
+---
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    {ads.provider === "adsense" && ads.adsenseClientId && (
+      <script
+        async
+        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ads.adsenseClientId}`}
+        crossorigin="anonymous"
+      ></script>
+    )}
+
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    {canon && <link rel="canonical" href={canon} />}
+
+    <slot name="head" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,300;7..72,400;7..72,700&family=Parisienne&display=swap"
+    >
+  </head>
+  <body class="min-h-screen bg-[#faf7f5] text-gray-900">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 rounded bg-black px-3 py-2 text-white"
+    >Skip to content</a>
+
+    <header class={`mx-auto ${wide ? 'max-w-6xl' : 'max-w-4xl'} px-4 py-6`}>
+      <div class="flex items-center justify-between gap-4">
+        <a href="/" class="text-2xl font-serif" style="font-family: Parisienne, cursive;">
+          {settings.brandName}
+        </a>
+        <nav class="text-sm">
+          <ul class="flex items-center gap-4">
+            {links.map((l) => {
+              const active = here === l.href || (l.href !== "/" && here.startsWith(l.href + "/"));
+              return (
+                <li>
+                  <a
+                    href={l.href}
+                    rel={l.rel}
+                    aria-current={active ? "page" : undefined}
+                    class={`underline-offset-4 hover:underline ${active ? "text-purple-800 font-semibold" : "text-purple-700"}`}
+                  >
+                    {l.label}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class={`mx-auto ${mainWidthClass} px-4 pb-16`}>
+      <slot />
+    </main>
+
+    {analyticsEnabled && (
+      <script is:inline>
+        (function () {
+          var q = [];
+          // @ts-ignore
+          window.__wcq = q;
+          document.addEventListener('click', function (e) {
+            // @ts-ignore
+            var el = e.target && e.target.closest ? e.target.closest('[data-analytics]') : null;
+            if (!el) return;
+            var type = el.getAttribute('data-analytics') || '';
+            var meta = el.getAttribute('data-analytics-meta') || '';
+            q.push({ type: type, ts: Date.now(), meta: meta });
+          });
+        })();
+      </script>
+    )}
+  </body>
+</html>

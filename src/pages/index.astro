@@ -1,0 +1,23 @@
+---
+// src/pages/index.astro
+import Base from '../layouts/Base.astro';
+import PostCard from '../components/PostCard.astro';
+import fs from 'node:fs';
+import matter from 'gray-matter';
+
+const postsDir = './content/posts';
+const files = fs.existsSync(postsDir) ? fs.readdirSync(postsDir).filter(f => f.endsWith('.md')) : [];
+const posts = files.map(file => {
+  const raw = fs.readFileSync(`${postsDir}/${file}`, 'utf8');
+  const { data } = matter(raw);
+  return data;
+}).sort((a: any, b: any) => (b.publishedAt || '').localeCompare(a.publishedAt || ''));
+const settings = JSON.parse(fs.readFileSync('./content/settings.json', 'utf8'));
+---
+<Base title={settings.brandName} description="Cozy metaphysical guides with gentle, practical vibes." canon={`${settings.siteUrl}/`}>
+  <h1 class="mb-6 text-3xl font-bold">Latest posts</h1>
+  <div class="grid gap-6">
+    {posts.map((p: any) => (<PostCard post={p} />))}
+    {posts.length === 0 && <p class="text-gray-700">No posts yet. Use <code>node tools/wc.js ingest</code> to create one.</p>}
+  </div>
+</Base>
