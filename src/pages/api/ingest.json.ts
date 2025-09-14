@@ -2,6 +2,7 @@
 export const prerender = false;
 
 import fs from 'node:fs';
+import path from 'node:path';
 
 type EntityType = 'crystal'|'herb'|'moonPhase'|'tarot'|'planetaryDay'|'ritual';
 
@@ -23,36 +24,153 @@ interface PostSpecV2 {
   adPlacements: ('lead'|'mid'|'end')[];
 }
 
-function slugify(s: string){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); }
-function ensureUniqueSlug(base: string){
-  const dir = './content/posts'; let slug = base, n = 2;
-  while (fs.existsSync(`${dir}/${slug}.md`)) slug = `${base}-${n++}`;
+/* ---------- helpers ---------- */
+
+function safeReadJSON<T=any>(p:string, fallback:T): T {
+  try { return JSON.parse(fs.readFileSync(p,'utf8')); } catch { return fallback; }
+}
+
+function ensureDirSync(dir:string){ fs.mkdirSync(dir, { recursive: true }); }
+
+function slugify(s:string){
+  return String(s||'')
+    .normalize('NFKD').replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+}
+
+function ensureUniqueSlug(base:string, postsDir:string){
+  const safe = slugify(base) || 'post';
+  let slug = safe, n = 2;
+  while (fs.existsSync(path.join(postsDir, `${slug}.md`))) slug = `${safe}-${n++}`;
   return slug;
 }
-function wordCount(md: string){ return (md.replace(/[`*_#>\-\n]/g,' ').match(/\b[\w’']+\b/g)||[]).length; }
-function readingMinutes(words: number){ const wpm = 200; return Math.max(1, Math.round(words / wpm)); }
+
+function wordCount(md:string){
+  const withoutCode = md.replace(/```[\s\S]*?```/g,' ').replace(/`[^`]*`/g,' ');
+  const withoutMd = withoutCode.replace(/<[^>]+>/g,' ').replace(/[\\*_#>~\\-]+/g,' ');
+  const m = withoutMd.match(/\b[\p{L}\p{N}’']+\b/gu);
+  return m ? m.length : 0;
+}
+
+function readingMinutes(words:number){ return Math.max(1, Math.round(words / 200)); }
+
 function ensureEntityStubs(entities: {type:EntityType; slug:string}[]){
-  for (const e of entities) {
-    const p = `./content/entities/${e.type}/${e.slug}.json`;
+  const root = path.join(process.cwd(), 'content', 'entities');
+  for (const e of entities||[]) {
+    const dir = path.join(root, e.type);
+    ensureDirSync(dir);
+    const p = path.join(dir, `${e.slug}.json`);
     if (!fs.existsSync(p)) {
-      fs.mkdirSync(`./content/entities/${e.type}`, { recursive: true });
       fs.writeFileSync(p, JSON.stringify({
         type: e.type, name: e.slug.replace(/-/g,' '), slug: e.slug,
         summary: `${e.slug.replace(/-/g,' ')} — stub entity`,
         properties: {}, related: []
-      }, null, 2));
+      }, null, 2), 'utf8');
     }
   }
 }
+
 function toFrontmatterYAML(obj: Record<string, any>) {
   const lines: string[] = [];
   for (const [k, v] of Object.entries(obj)) {
-    if (Array.isArray(v)) lines.push(`${k}: ${JSON.stringify(v)}`);
-    else if (typeof v === 'string') lines.push(`${k}: ${v.includes(':') || v.includes('- ') ? JSON.stringify(v) : v}`);
-    else lines.push(`${k}: ${JSON.stringify(v)}`);
+    if (v === undefined) continue;
+    if (v === null) { lines.push(`${k}: null`); continue; }
+    if (typeof v === 'string') { lines.push(`${k}: ${JSON.stringify(v)}`); continue; }
+    if (typeof v === 'number' || typeof v === 'boolean') { lines.push(`${k}: ${v}`); continue; }
+    lines.push(`${k}: ${JSON.stringify(v)}`);
   }
   return lines.join('\n');
 }
+
+function normalizeCta(cta:any): { type:'kofi'|'download'|'none'; id?:string }{
+  if (!cta || typeof cta !== 'object') return { type:'none' };
+  const t = String(cta.type||'').toLowerCase();
+  if (t==='kofi') return { type:'kofi', id: cta.id || undefined };
+  if (t==='download') return { type:'download', id: cta.id || undefined };
+  return { type:'none' };
+}
+
+function needsSafetyNote(sections: {heading:string; markdown:string}[]){
+  const text = sections.map(s => `${s.heading}\n${s.markdown}`).join('\n').toLowerCase();
+  return /candle|open flame|fire|smoke|incense|knife|scissors|burn|trauma|panic|anxiety|depression/.test(text);
+}
+
+function hasSafetySection(sections: {heading:string; markdown:string}[]){
+  return sections.some(sec => /safety|note|disclaimer/i.test(sec.heading));
+}
+
+function validateStructure(spec: PostSpecV2, contentWords:number){
+  const errors:string[] = [];
+  const warnings:string[] = [];
+
+  const missing = ['specVersion','title','slug','metaDescription','tags','excerpt','outline','sections','affiliateHints','internalLinkHints','cta','adPlacements']
+    .filter(k => (spec as any)[k] === undefined);
+  if (missing.length) errors.push(`Missing fields: ${missing.join(', ')}`);
+
+  if (spec.specVersion !== 2) errors.push('specVersion must be 2');
+  if (!Array.isArray(spec.tags) || spec.tags.length < 4 || spec.tags.length > 7) errors.push('tags must be 4–7');
+
+  const mdLen = (spec.metaDescription||'').length;
+  if (mdLen < 150 || mdLen > 160) warnings.push(`metaDescription length ≈${mdLen} (target 150–160)`);
+
+  // Required sections
+  const heads = (spec.sections||[]).map(s => String(s.heading||'').toLowerCase());
+  const body = (spec.sections||[]).map(s => s.markdown||'').join('\n').toLowerCase();
+
+  const hasOpening =
+    heads.includes('opening reflection') ||
+    heads.some(h => /^opening/.test(h) && /reflection|scene|note/.test(h));
+  if (!hasOpening) errors.push('Missing section: Opening Reflection');
+
+  const hasQuick = heads.some(h => /quick|low[- ]?energy|5[- ]?minute/.test(h)) || /quick|low[- ]?energy/.test(body);
+  const hasDeep  = heads.some(h => /deep( dive)?|long(er)?/.test(h)) || /deep( dive)?/.test(body);
+  if (!(hasQuick && hasDeep)) errors.push('Ritual variants required: Quick/Low-Energy and Deep');
+
+  const hasChecklist = heads.some(h => /checklist|summary|at a glance/.test(h));
+  if (!hasChecklist) errors.push('Missing section: Checklist/Summary');
+
+  const hasReflect = heads.some(h => /reflection prompt|journal|reflection/.test(h)) || /prompt|question/.test(body);
+  if (!hasReflect) errors.push('Missing section: Reflection Prompt');
+
+  // heroImagePrompt type
+  if (!(typeof spec.heroImagePrompt === 'string' || spec.heroImagePrompt === null)) {
+    errors.push('heroImagePrompt must be string or null');
+  }
+
+  // internal link hints count (soft)
+  if (!Array.isArray(spec.internalLinkHints) || spec.internalLinkHints.length < 3) {
+    warnings.push('internalLinkHints are sparse (aim 5–8).');
+  }
+
+  // anchors-in-prose check (soft)
+  const prose = body.toLowerCase();
+  const missingAnchors = (spec.internalLinkHints||[])
+    .map(h => String(h.anchor||'').toLowerCase())
+    .filter(a => a && !prose.includes(a));
+  if (missingAnchors.length) {
+    warnings.push(`Some internalLinkHints anchors not found verbatim in prose: ${missingAnchors.slice(0,5).join(', ')}${missingAnchors.length>5?'…':''}`);
+  }
+
+  // affiliate density (soft)
+  const maxAnchors = Math.floor(contentWords/250) + 1;
+  const affCount = Array.isArray(spec.affiliateHints) ? spec.affiliateHints.length : 0;
+  if (affCount > maxAnchors) warnings.push(`Affiliate density high (${affCount} > ${maxAnchors}); aim ≤ ~1 per 250 words.`);
+
+  // safety note heuristic (soft)
+  if (needsSafetyNote(spec.sections) && !hasSafetySection(spec.sections)) {
+    warnings.push('Content looks like it needs a safety note, but none was found.');
+  }
+
+  // image alt texts (soft)
+  const imagesMentioned = (spec.sections||[]).some(s => /!\[[^\]]*\]\([^)]+\)/.test(s.markdown));
+  if (imagesMentioned && (!Array.isArray(spec.altTexts) || spec.altTexts.length === 0)) {
+    warnings.push('Images appear in markdown but altTexts is empty.');
+  }
+
+  return { errors, warnings };
+}
+
+/* ---------- handler ---------- */
 
 export async function POST({ request }: { request: Request }) {
   try {
@@ -80,20 +198,26 @@ export async function POST({ request }: { request: Request }) {
 
     if (!spec) return json({ ok:false, error:'No JSON body provided. Paste a PostSpec v2 object.' }, 400);
 
-    // Basic validation
-    const missing = ['specVersion','title','slug','metaDescription','tags','excerpt','outline','sections','affiliateHints','internalLinkHints','cta','adPlacements']
-      .filter(k => (spec as any)[k] === undefined);
-    if (missing.length) return json({ ok:false, error:`Missing fields: ${missing.join(', ')}` }, 400);
-    if (spec.specVersion !== 2) return json({ ok:false, error:'specVersion must be 2' }, 400);
-    if (!Array.isArray(spec.tags) || spec.tags.length < 4 || spec.tags.length > 7) return json({ ok:false, error:'tags must be 4–7' }, 400);
+    // Compute word count upfront for density checks
+    const contentWords = (spec.sections||[]).reduce((n,s)=> n + wordCount(s.markdown||''), 0);
 
-    // Compute slug and counts
+    // Structural + soft validation
+    const { errors, warnings } = validateStructure(spec, contentWords);
+    if (errors.length) return json({ ok:false, error: errors[0], errors, warnings }, 400);
+
+    // Paths & settings
+    const CWD = process.cwd();
+    const POSTS_DIR = path.join(CWD, 'content', 'posts');
+    const SETTINGS_PATH = path.join(CWD, 'content', 'settings.json');
+    ensureDirSync(POSTS_DIR);
+
+    const settings = safeReadJSON(SETTINGS_PATH, { siteUrl: 'https://example.com' });
+
+    // Slug + counts
     const baseSlug = slugify(spec.slug || spec.title);
-    const slug = ensureUniqueSlug(baseSlug);
-    const totalWords = spec.sections.reduce((n, s) => n + wordCount(s.markdown), 0);
+    const slug = ensureUniqueSlug(baseSlug, POSTS_DIR);
 
     // Frontmatter
-    const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
     const fm = {
       title: spec.title,
       slug,
@@ -102,27 +226,30 @@ export async function POST({ request }: { request: Request }) {
       metaDescription: spec.metaDescription,
       tags: spec.tags,
       outline: spec.outline.map(o=>o.heading),
-      wordCount: totalWords,
-      readingMinutes: readingMinutes(totalWords),
+      wordCount: contentWords,
+      readingMinutes: readingMinutes(contentWords),
       entities: spec.entities || [],
       includeAds: !!(spec.adPlacements && spec.adPlacements.length),
-      includeKofi: spec.cta?.type === 'kofi',
+      includeKofi: normalizeCta(spec.cta).type === 'kofi',
       affiliateAnchors: (spec.affiliateHints||[]).map(h=>({ key:h.key, text:h.anchor, insertedCount:0 })),
       internalLinks: [],
       publishedAt: new Date().toISOString(),
-      canonicalUrl: `${settings.siteUrl.replace(/\/$/,'')}/post/${slug}`,
+      canonicalUrl: `${String(settings.siteUrl||'').replace(/\/$/,'')}/post/${slug}`,
       specVersion: 2 as const
     };
 
     ensureEntityStubs(fm.entities);
 
-    const body = spec.sections.map(s => `## ${s.heading}\n\n${s.markdown.trim()}\n`).join('\n');
+    const body = (spec.sections||[])
+      .map(s => `## ${s.heading}\n\n${String(s.markdown||'').trim()}\n`)
+      .join('\n');
+
     const file = `---\n${toFrontmatterYAML(fm)}\n---\n\n${body}\n`;
 
-    fs.mkdirSync('./content/posts', { recursive: true });
-    fs.writeFileSync(`./content/posts/${slug}.md`, file);
+    const outPath = path.join(POSTS_DIR, `${slug}.md`);
+    fs.writeFileSync(outPath, file, 'utf8');
 
-    return json({ ok:true, slug, path:`content/posts/${slug}.md`, words: totalWords });
+    return json({ ok:true, slug, path:`content/posts/${slug}.md`, words: contentWords, warnings });
   } catch (e: any) {
     return json({ ok:false, error: e?.message || String(e) }, 500);
   }

@@ -2,24 +2,39 @@
 // src/layouts/Base.astro
 import "../styles/tailwind.css";
 import fs from "node:fs";
+import path from "node:path";
 
 type Props = {
   title?: string;
   description?: string;
   canon?: string;
-  wide?: boolean; // set true on wide pages (e.g., post with sidebar)
+  wide?: boolean;     // set true on wide pages (e.g., post with sidebar)
+  ogImage?: string;   // optional social image
+  noindex?: boolean;  // optional robots noindex
 };
 
 const {
   title = "WitchClick",
   description = "",
   canon = "",
-  wide = false
+  wide = false,
+  ogImage = "",
+  noindex = false,
 } = Astro.props as Props;
 
-const settings = JSON.parse(fs.readFileSync("./content/settings.json", "utf8"));
+// Safe settings read with fallbacks
+let settings: any = { brandName: "WitchClick", siteUrl: "https://example.com", analytics: { enabled: false, endpoint: "/api/ping.json" }, ads: { provider: "none" } };
+try {
+  const p = path.join(process.cwd(), "content", "settings.json");
+  settings = JSON.parse(fs.readFileSync(p, "utf8"));
+} catch {}
+
 const analyticsEnabled = !!settings.analytics?.enabled;
+const analyticsEndpoint = String(settings.analytics?.endpoint || "/api/ping.json");
 const ads = settings.ads || { provider: "none" };
+
+// unified widths
+const headerWidthClass = wide ? "max-w-6xl" : "max-w-4xl";
 const mainWidthClass = wide ? "max-w-6xl" : "max-w-3xl";
 
 // Dev flag for showing admin links only in dev
@@ -45,6 +60,8 @@ const here = (Astro.url && Astro.url.pathname) || "/";
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    {noindex && <meta name="robots" content="noindex" />}
+
     {ads.provider === "adsense" && ads.adsenseClientId && (
       <script
         async
@@ -57,8 +74,20 @@ const here = (Astro.url && Astro.url.pathname) || "/";
     {description && <meta name="description" content={description} />}
     {canon && <link rel="canonical" href={canon} />}
 
+    {/* Social defaults */}
+    <meta property="og:site_name" content={settings.brandName} />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    {canon && <meta property="og:url" content={canon} />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#6b21a8" />
+
     <slot name="head" />
+
+    {/* Fonts perf */}
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,300;7..72,400;7..72,700&family=Parisienne&display=swap"
@@ -70,7 +99,7 @@ const here = (Astro.url && Astro.url.pathname) || "/";
       class="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 rounded bg-black px-3 py-2 text-white"
     >Skip to content</a>
 
-    <header class={`mx-auto ${wide ? 'max-w-6xl' : 'max-w-4xl'} px-4 py-6`}>
+    <header class={`mx-auto ${headerWidthClass} px-4 py-6`}>
       <div class="flex items-center justify-between gap-4">
         <a href="/" class="text-2xl font-serif" style="font-family: Parisienne, cursive;">
           {settings.brandName}
@@ -103,19 +132,34 @@ const here = (Astro.url && Astro.url.pathname) || "/";
 
     {analyticsEnabled && (
       <script is:inline>
+        {`
         (function () {
-          var q = [];
-          // @ts-ignore
-          window.__wcq = q;
+          var q = (window.__wcq = window.__wcq || []);
           document.addEventListener('click', function (e) {
-            // @ts-ignore
             var el = e.target && e.target.closest ? e.target.closest('[data-analytics]') : null;
             if (!el) return;
             var type = el.getAttribute('data-analytics') || '';
             var meta = el.getAttribute('data-analytics-meta') || '';
-            q.push({ type: type, ts: Date.now(), meta: meta });
+            q.push({ type: type, ts: Date.now(), meta: meta, path: location.pathname });
           });
+
+          function flush(){
+            if (!q.length) return;
+            var payload = { events: q.splice(0, q.length), path: location.pathname, ts: Date.now() };
+            try {
+              if (navigator.sendBeacon) {
+                var blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+                navigator.sendBeacon('${analyticsEndpoint}', blob);
+              } else {
+                fetch('${analyticsEndpoint}', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+              }
+            } catch {}
+          }
+
+          window.addEventListener('pagehide', flush, { once: false });
+          document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden') flush(); });
         })();
+        `}
       </script>
     )}
   </body>

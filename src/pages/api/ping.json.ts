@@ -1,44 +1,150 @@
 // src/pages/api/ping.json.ts
 export const prerender = false;
 
-export async function POST({ request }: { request: Request }) {
-  let bodyStr: string | null = null;
-  let parseMode = 'none';
+const MAX_BYTES = 1_000_000; // ~1MB; tweak as you like
 
-  // Try JSON first (some setups only allow .json())
+export async function ALL({ request }: { request: Request }) {
+  const method = request.method.toUpperCase();
+
+  // Basic CORS
+  if (method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: corsHeaders(request, {
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      }),
+    });
+  }
+
+  if (method !== 'POST') {
+    return json(
+      { ok: false, error: 'Method not allowed' },
+      405,
+      { Allow: 'POST, OPTIONS' },
+      request
+    );
+  }
+
+  // Soft size guard (best-effort using Content-Length)
+  const cl = Number(request.headers.get('content-length') || '0');
+  if (Number.isFinite(cl) && cl > MAX_BYTES) {
+    return json({ ok: false, error: 'Payload too large' }, 413, {}, request);
+  }
+
+  let mode: 'json' | 'form' | 'text' = 'text';
+  let parsed: any = null;
+  let raw: string | null = null;
+
   try {
-    const obj = await request.json();
-    bodyStr = JSON.stringify(obj);
-    parseMode = 'json';
-  } catch {}
+    const ct = (request.headers.get('content-type') || '').toLowerCase();
 
-  // Fallback to text()
-  if (!bodyStr) {
-    try {
+    if (ct.includes('application/json')) {
+      // Prefer json(); on parse error, fall back to text
+      try {
+        parsed = await request.json();
+        raw = safeStringify(parsed);
+        mode = 'json';
+      } catch {
+        raw = await request.text();
+        mode = 'text';
+      }
+    } else if (ct.includes('multipart/form-data')) {
+      const fd = await request.formData();
+      parsed = formDataToObject(fd);
+      raw = safeStringify(parsed);
+      mode = 'form';
+    } else if (ct.includes('application/x-www-form-urlencoded')) {
       const txt = await request.text();
-      if (txt && txt.trim()) {
-        bodyStr = txt;
-        parseMode = 'text';
-      }
-    } catch {}
-  }
+      const params = new URLSearchParams(txt);
+      parsed = Object.fromEntries(params.entries());
+      raw = safeStringify(parsed);
+      mode = 'form';
+    } else {
+      raw = await request.text();
+      mode = 'text';
+    }
 
-  // Last resort: multipart/form-data
-  if (!bodyStr) {
-    try {
-      const form = await request.formData();
-      const raw = (form.get('json') || form.get('body') || '') as string;
-      if (typeof raw === 'string' && raw.trim()) {
-        bodyStr = raw;
-        parseMode = 'form';
-      }
-    } catch {}
-  }
+    // Compute byte size if we didn’t get Content-Length
+    const bytes =
+      cl > 0 ? cl : raw != null ? new TextEncoder().encode(raw).length : undefined;
 
-  return new Response(JSON.stringify({
-    ok: true,
-    mode: parseMode,
-    got: bodyStr ?? null,
-    ct: request.headers.get('content-type') || null
-  }), { headers: { 'Content-Type': 'application/json' }});
+    return json(
+      {
+        ok: true,
+        mode,
+        got: raw != null ? truncate(raw, 2000) : null,
+        data: parsed ?? null,
+        ct: request.headers.get('content-type') || null,
+        bytes: typeof bytes === 'number' ? bytes : null,
+      },
+      200,
+      {},
+      request
+    );
+  } catch (e: any) {
+    return json(
+      { ok: false, error: e?.message || String(e) },
+      500,
+      {},
+      request
+    );
+  }
+}
+
+/* ---------------- helpers ---------------- */
+
+function corsHeaders(req: Request, extra: Record<string, string> = {}) {
+  // For dev tools, a permissive policy is fine; scope it if you deploy this public.
+  return {
+    'Access-Control-Allow-Origin': '*',
+    'Vary': 'Origin',
+    ...extra,
+  };
+}
+
+function json(
+  obj: any,
+  status = 200,
+  extraHeaders: Record<string, string> = {},
+  req?: Request
+) {
+  return new Response(JSON.stringify(obj), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+      ...corsHeaders(req!, extraHeaders),
+    },
+  });
+}
+
+function truncate(s: string, max: number) {
+  return s.length > max ? s.slice(0, max) + '…' : s;
+}
+
+function safeStringify(v: any) {
+  try {
+    return JSON.stringify(v);
+  } catch {
+    // circular or non-serializable entries → coarse fallback
+    return String(v);
+  }
+}
+
+function formDataToObject(fd: FormData) {
+  const obj: Record<string, any> = {};
+  for (const [k, v] of fd.entries()) {
+    if (typeof v === 'string') {
+      obj[k] = v;
+    } else {
+      // File/Blob: don’t stream the body; just describe it
+      obj[k] = {
+        _file: true,
+        name: (v as File).name,
+        size: (v as File).size,
+        type: (v as File).type,
+      };
+    }
+  }
+  return obj;
 }

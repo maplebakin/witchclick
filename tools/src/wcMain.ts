@@ -1,8 +1,12 @@
 // tools/src/wcMain.ts
 // Tiny CLI entry for WitchClick (ESM). Commands:
 //   node tools/wc.js genprompt --topic "..." --words 1200 --ads on|off --kofi on|off
-//   node tools/wc.js go:build
+//   node tools/wc.js ingest --from-file drafts/latest.json
 //   node tools/wc.js linker
+//   node tools/wc.js seo --slug my-post [--apply]
+//   node tools/wc.js export --slug my-post --format html
+//   node tools/wc.js go:build
+//   node tools/wc.js health
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -49,11 +53,13 @@ function readJSON<T = any>(p: string): T | null {
   }
 }
 
-function withUtm(url: string, utm: string) {
+function withUtm(url: string, utm?: string) {
   if (!url) return '/';
   if (!utm) return url;
   return url.includes('?') ? `${url}&${utm}` : `${url}?${utm}`;
 }
+
+// ---- Commands ----
 
 async function cmdGenprompt(flags: Flags) {
   const topic = String(flags.topic ?? flags.t ?? 'tea ritual for focus');
@@ -61,19 +67,56 @@ async function cmdGenprompt(flags: Flags) {
   const ads = String(flags.ads ?? 'off') === 'on' ? 'on' : 'off';
   const kofi = String(flags.kofi ?? 'on') === 'on' ? 'on' : 'off';
 
-  // Lazy import so other commands don't require this file to exist
-  const mod = await import('./genprompt.js');
+  const mod = await import('./genprompt.js'); // ESM dynamic import
   const { prompt } = mod.genprompt({ topic, words, ads, kofi });
 
-  ensureDir(path.join(process.cwd(), 'tmp'));
-  fs.writeFileSync(path.join(process.cwd(), 'tmp', 'generator_prompt.txt'), prompt);
+  const outDir = path.join(process.cwd(), 'tmp');
+  ensureDir(outDir);
+  fs.writeFileSync(path.join(outDir, 'generator_prompt.txt'), prompt, 'utf8');
   console.log(prompt);
+}
+
+async function cmdIngest(flags: Flags) {
+  const fromFile = String(flags['from-file'] ?? '');
+  const mod = await import('./ingest.js');
+  const args: string[] = [];
+  if (fromFile) args.push('--from-file', fromFile);
+  await mod.ingest(args);
+}
+
+async function cmdLinker() {
+  // Use the real linker (no stub)
+  const mod = await import('./linker.js');
+  await mod.linkerCmd();
+}
+
+async function cmdSEO(flags: Flags) {
+  const slug = String(flags.slug ?? '');
+  if (!slug) {
+    console.error('Usage: seo --slug my-post [--apply]');
+    process.exitCode = 1;
+    return;
+  }
+  const mod = await import('./seo.js');
+  await mod.seoCmd(['--slug', slug, ...(flags.apply ? ['--apply'] : [])]);
+}
+
+async function cmdExport(flags: Flags) {
+  const slug = String(flags.slug ?? '');
+  const format = String(flags.format ?? 'html');
+  if (!slug) {
+    console.error('Usage: export --slug my-post [--format html]');
+    process.exitCode = 1;
+    return;
+  }
+  const mod = await import('./export.js');
+  await mod.exportCmd(['--slug', slug, '--format', format]);
 }
 
 async function cmdGoBuild() {
   const CWD = process.cwd();
   const products = readJSON<{ products: Array<{ key: string; url?: string; utm?: string }> }>(
-    path.join(CWD, 'content', 'products.json')
+    path.join(CWD, 'content', 'products.json'),
   );
 
   if (!products || !Array.isArray(products.products)) {
@@ -83,8 +126,7 @@ async function cmdGoBuild() {
   }
 
   const lines: string[] = [];
-
-  // Hide admin in prod via Netlify redirects (priority at top)
+  // Hide admin in prod (Netlify)
   lines.push('/admin      /404  404');
   lines.push('/admin/*    /404  404');
 
@@ -98,23 +140,20 @@ async function cmdGoBuild() {
 
   const outDir = path.join(CWD, 'public');
   ensureDir(outDir);
-  fs.writeFileSync(path.join(outDir, '_redirects'), lines.join('\n') + '\n');
+  fs.writeFileSync(path.join(outDir, '_redirects'), lines.join('\n') + '\n', 'utf8');
 
-  console.log(`[go:build] wrote ${path.join('public', '_redirects')} with ${products.products.length} entries`);
+  console.log(
+    `[go:build] wrote ${path.join('public', '_redirects')} with ${products.products.length} entries`,
+  );
 }
 
-async function cmdLinker() {
-  // Minimal OK stub so dev-api "bundle" succeeds.
-  const CWD = process.cwd();
-  const postsDir = path.join(CWD, 'content', 'posts');
-  let count = 0;
-  if (fs.existsSync(postsDir)) {
-    for (const f of fs.readdirSync(postsDir).filter(x => x.endsWith('.md'))) count++;
-  }
-  console.log(JSON.stringify({ ok: true, notes: `linker stub ran; ${count} post(s) scanned` }, null, 2));
+async function cmdHealth() {
+  const mod = await import('./healthLinks.js');
+  await mod.healthLinks();
 }
 
-// Exported entry point so tools/wc.js can call it.
+// ---- Main ----
+
 export async function main(argv: string[] = process.argv.slice(2)) {
   const { positional, flags } = parseArgv(argv);
   const cmd = positional[0] || 'help';
@@ -122,10 +161,18 @@ export async function main(argv: string[] = process.argv.slice(2)) {
   switch (cmd) {
     case 'genprompt':
       return cmdGenprompt(flags);
-    case 'go:build':
-      return cmdGoBuild();
+    case 'ingest':
+      return cmdIngest(flags);
     case 'linker':
       return cmdLinker();
+    case 'seo':
+      return cmdSEO(flags);
+    case 'export':
+      return cmdExport(flags);
+    case 'go:build':
+      return cmdGoBuild();
+    case 'health':
+      return cmdHealth();
     case 'help':
     default:
       console.log(
@@ -134,10 +181,14 @@ export async function main(argv: string[] = process.argv.slice(2)) {
           '',
           'Usage:',
           '  node tools/wc.js genprompt --topic "..." --words 1200 --ads on|off --kofi on|off',
-          '  node tools/wc.js go:build',
+          '  node tools/wc.js ingest --from-file drafts/latest.json',
           '  node tools/wc.js linker',
-          ''
-        ].join('\n')
+          '  node tools/wc.js seo --slug my-post [--apply]',
+          '  node tools/wc.js export --slug my-post --format html',
+          '  node tools/wc.js go:build',
+          '  node tools/wc.js health',
+          '',
+        ].join('\n'),
       );
   }
 }

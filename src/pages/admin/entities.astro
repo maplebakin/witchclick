@@ -1,18 +1,24 @@
-
 ---
 // src/pages/admin/entities.astro
 import Base from '../../layouts/Base.astro';
 import fs from 'node:fs';
+import path from 'node:path';
 
-const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
-const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'];
+// Safe settings read
+function safeReadJSON(p:string, fallback:any=null){
+  try { return JSON.parse(fs.readFileSync(p,'utf8')); } catch { return fallback; }
+}
+const ROOT = process.cwd();
+const settings = safeReadJSON(path.join(ROOT, 'content', 'settings.json'), { siteUrl: 'https://example.com' });
+
+const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as const;
 ---
-<Base title="WitchClick — Entities Admin" description="Create and edit entity JSON files." canon={`${settings.siteUrl}/admin/entities`} wide={true}>
+<Base title="WitchClick — Entities Admin" description="Create and edit entity JSON files." canon={`${String(settings.siteUrl||'').replace(/\/$/,'')}/admin/entities`} wide={true}>
   <Fragment slot="head">
     <meta name="robots" content="noindex" />
   </Fragment>
 
-  <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-12" data-dev-api={import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787'}>
     <!-- Left: list -->
     <section class="lg:col-span-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
       <div class="mb-3 flex items-center justify-between gap-2">
@@ -37,6 +43,7 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'];
         <label class="block">
           <span class="text-xs font-medium">Slug</span>
           <input id="slug" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="peppermint" />
+          <p class="mt-1 text-xs text-gray-500">Leave blank to auto-fill from Name.</p>
         </label>
         <label class="block md:col-span-2">
           <span class="text-xs font-medium">Name</span>
@@ -69,9 +76,11 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'];
 
   <script is:inline>
     (function () {
+      var root = document.querySelector('[data-dev-api]');
+      var DEV_API = root?.getAttribute('data-dev-api') || 'http://localhost:8787';
       var $ = function(id){ return document.getElementById(id); };
-      var DEV_API = 'http://localhost:8787';
 
+      var TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'];
       var SUGGEST = {
         crystal: [['color','green'],['chakra','heart,third-eye'],['intentions','focus,clarity'],['cleansing','moonlight,smoke']],
         herb: [['partUsed','leaf'],['intentions','focus,clarity'],['cautions','']],
@@ -82,11 +91,22 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'];
       };
 
       function setStatus(msg, ok) {
-        if (ok === void 0) ok = true;
         var el = $('status');
         if (!el) return;
         el.textContent = msg;
-        el.style.color = ok ? '#065f46' : '#7f1d1d';
+        el.style.color = ok===false ? '#7f1d1d' : '#065f46';
+      }
+      function busy(on){
+        ['newBtn','addProp','suggest','save'].forEach(function(id){
+          var b=$(id); if(b){ b.disabled=!!on; b.style.opacity = on? .6 : 1; }
+        });
+      }
+
+      // accent-safe slugify
+      function slugify(s) {
+        return String(s || '')
+          .normalize('NFKD').replace(/[\u0300-\u036f]/g,'')
+          .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
       }
 
       function propRow(key, value) {
@@ -98,11 +118,27 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'];
         k.value = key || '';
         var v = document.createElement('input');
         v.className = 'col-span-3 rounded-lg border px-2 py-1 text-sm val';
-        v.placeholder = 'value (comma -> array)';
+        v.placeholder = 'value (JSON, comma-list, number, boolean)';
         v.value = value || '';
-        wrap.appendChild(k);
-        wrap.appendChild(v);
+        wrap.appendChild(k); wrap.appendChild(v);
         return wrap;
+      }
+
+      function parseValue(v) {
+        if (!v) return '';
+        // JSON object/array explicit
+        if ((v[0]==='[' && v[v.length-1]===']') || (v[0]==='{' && v[v.length-1]==='}')) {
+          try { return JSON.parse(v); } catch {}
+        }
+        // comma-list
+        if (v.indexOf(',') !== -1) {
+          return v.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+        }
+        // number / boolean
+        if (/^-?\d+(\.\d+)?$/.test(v)) return Number(v);
+        if (v === 'true') return true;
+        if (v === 'false') return false;
+        return v;
       }
 
       function collectProps() {
@@ -113,21 +149,34 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'];
           var k = r.querySelector('.key').value.trim();
           var v = r.querySelector('.val').value.trim();
           if (!k) continue;
-          if (!v) { out[k] = ''; continue; }
-          if (v.charAt(0) === '[' && v.charAt(v.length-1) === ']') {
-            try { out[k] = JSON.parse(v); continue; } catch (e) {}
-          }
-          if (v.indexOf(',') !== -1) {
-            out[k] = v.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
-          } else {
-            out[k] = v;
-          }
+          out[k] = parseValue(v);
         }
         return out;
       }
 
-      function slugify(s) {
-        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+      // Auto-fill slug from name if blank or previously auto
+      var autoSlug = true;
+      $('name').addEventListener('input', function(){
+        if (!autoSlug) return;
+        var s = slugify($('name').value);
+        $('slug').value = s;
+      });
+      $('slug').addEventListener('input', function(){
+        // user typed a custom slug → stop auto updates
+        autoSlug = $('slug').value.trim().length === 0;
+      });
+
+      // de-dup suggestions by key
+      function addSuggestionsFor(type){
+        var rows = SUGGEST[type] || [];
+        var holder = $('props');
+        var existing = {};
+        Array.prototype.forEach.call(holder.querySelectorAll('.key'), function(inp){ existing[inp.value.trim()] = true; });
+        for (var i=0;i<rows.length;i++) {
+          var kv = rows[i];
+          if (existing[kv[0]]) continue;
+          holder.appendChild(propRow(kv[0], kv[1]));
+        }
       }
 
       async function refreshList() {
@@ -173,6 +222,7 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'];
 
       async function loadEntity(type, slug) {
         try {
+          busy(true);
           var res = await fetch(DEV_API + '/entities/get', {
             method: 'POST',
             headers: { 'Content-Type':'application/json' },
@@ -186,32 +236,28 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'];
           $('name').value = ent.name || '';
           $('summary').value = ent.summary || '';
           $('related').value = Array.isArray(ent.related) ? ent.related.join(',') : '';
+          autoSlug = ($('slug').value || '') === slugify($('name').value || '');
           var props = ent.properties || {};
           var holder = $('props'); holder.innerHTML = '';
           var keys = Object.keys(props);
           if (keys.length === 0) holder.appendChild(propRow());
           for (var i=0; i<keys.length; i++) {
             var k = keys[i];
-            var v = Array.isArray(props[k]) ? props[k].join(',') : String(props[k]);
+            var v = Array.isArray(props[k]) ? props[k].join(',') : (typeof props[k]==='object' ? JSON.stringify(props[k]) : String(props[k]));
             holder.appendChild(propRow(k, v));
           }
           setStatus('Loaded ' + type + '/' + slug);
         } catch (e) {
           setStatus('Load error: ' + (e.message || String(e)), false);
+        } finally {
+          busy(false);
         }
       }
 
       $('addProp').addEventListener('click', function(){ $('props').appendChild(propRow()); });
-
       $('suggest').addEventListener('click', function(){
-        var t = $('type').value;
-        var rows = SUGGEST[t] || [];
-        var holder = $('props');
-        for (var i=0;i<rows.length;i++) {
-          var kv = rows[i];
-          holder.appendChild(propRow(kv[0], kv[1]));
-        }
-        setStatus('Added suggestions for ' + t);
+        addSuggestionsFor($('type').value);
+        setStatus('Added suggestions for ' + $('type').value);
       });
 
       $('newBtn').addEventListener('click', function(){
@@ -222,19 +268,34 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'];
         $('related').value = '';
         $('props').innerHTML = '';
         $('props').appendChild(propRow());
+        autoSlug = true;
         setStatus('New entity draft');
       });
 
       $('save').addEventListener('click', async function(){
         try {
+          busy(true);
+          var t = $('type').value;
+          if (TYPES.indexOf(t) === -1) throw new Error('Invalid type');
+          var slug = slugify($('slug').value || $('name').value);
+          if (!slug) throw new Error('Slug required (or type a Name to auto-fill)');
           var payload = {
-            type: $('type').value,
-            slug: slugify($('slug').value),
-            name: $('name').value,
+            type: t,
+            slug: slug,
+            name: $('name').value.trim(),
             summary: $('summary').value,
             properties: collectProps(),
             related: ($('related').value || '').split(',').map(function(s){ return s.trim(); }).filter(Boolean)
           };
+
+          // duplicate guard (client side)
+          try {
+            var existing = await (await fetch(DEV_API + '/entities/get', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type: t, slug }) })).json();
+            if (existing && existing.ok && existing.data && !confirm('An entity with this slug exists. Overwrite?')) {
+              setStatus('Save cancelled', false); busy(false); return;
+            }
+          } catch {}
+
           var res = await fetch(DEV_API + '/entities/save', {
             method: 'POST',
             headers: { 'Content-Type':'application/json' },
@@ -242,17 +303,23 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'];
           });
           var data = await res.json();
           if (!data.ok) throw new Error(data.error || 'save failed');
-          setStatus('Saved -> ' + data.path);
+          $('slug').value = slug; // reflect final slug
+          setStatus('Saved → ' + data.path);
           refreshList();
         } catch (e) {
           setStatus('Save error: ' + (e.message || String(e)), false);
+        } finally {
+          busy(false);
         }
       });
 
       $('search').addEventListener('input', refreshList);
 
       // init
-      refreshList();
+      (function init(){
+        $('props').appendChild(propRow());
+        refreshList();
+      })();
     })();
   </script>
 </Base>

@@ -1,5 +1,6 @@
 // tools/src/types.ts
 export type EntityType = 'crystal'|'herb'|'moonPhase'|'tarot'|'planetaryDay'|'ritual';
+export type AdSlot = 'lead'|'mid'|'end';
 
 export interface PostSpecV2 {
   specVersion: 2;
@@ -16,7 +17,7 @@ export interface PostSpecV2 {
   internalLinkHints: { anchor: string; rationale: string }[];
   affiliateHints: { key: string; anchor: string; rationale: string }[];
   cta: { type: 'kofi'|'download'|'none'; id?: string };
-  adPlacements: ('lead'|'mid'|'end')[];
+  adPlacements: AdSlot[];
 }
 
 export interface Frontmatter {
@@ -33,7 +34,8 @@ export interface Frontmatter {
   includeAds: boolean;
   includeKofi: boolean;
   affiliateAnchors: { key: string; text: string; insertedCount: number }[];
-  internalLinks: { title: string; slug: string; anchor: string }[];
+  /** renderer+export only need slug+anchor; title is optional for back-compat */
+  internalLinks: { slug: string; anchor: string; title?: string }[];
   publishedAt: string;
   canonicalUrl: string;
   specVersion: 2;

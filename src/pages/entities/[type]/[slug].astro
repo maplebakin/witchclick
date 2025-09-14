@@ -4,39 +4,51 @@ import Base from '../../../layouts/Base.astro';
 import fs from 'node:fs';
 import path from 'node:path';
 
+function safeReadJSON(p:string, fallback:any=null){
+  try { return JSON.parse(fs.readFileSync(p,'utf8')); } catch { return fallback; }
+}
+
 export async function getStaticPaths() {
-  const root = './content/entities';
-  const paths = [];
-  if (fs.existsSync(root)) {
-    const types = fs.readdirSync(root).filter((d) => {
-      try { return fs.statSync(path.join(root, d)).isDirectory(); } catch { return false; }
+  const ROOT = process.cwd();
+  const ENT_ROOT = path.join(ROOT, 'content', 'entities');
+
+  const paths: Array<{ params: { type: string; slug: string }, props: { data: any } }> = [];
+
+  if (fs.existsSync(ENT_ROOT)) {
+    const types = fs.readdirSync(ENT_ROOT).filter((d) => {
+      const p = path.join(ENT_ROOT, d);
+      try { return fs.statSync(p).isDirectory(); } catch { return false; }
     });
+
     for (const t of types) {
-      const dir = path.join(root, t);
+      const dir = path.join(ENT_ROOT, t);
       let files: string[] = [];
       try { files = fs.readdirSync(dir).filter((f) => f.endsWith('.json')); } catch {}
       for (const f of files) {
-        try {
-          const data = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
-          const slug = String(data.slug || f.replace(/\.json$/,''));
-          paths.push({ params: { type: t, slug }, props: { data } });
-        } catch {}
+        const full = path.join(dir, f);
+        const data = safeReadJSON(full, null);
+        if (!data) continue;
+        const slug = String(data.slug || f.replace(/\.json$/,''));
+        paths.push({ params: { type: t, slug }, props: { data: { ...data, type: data.type || t, slug } } });
       }
     }
   }
-  console.log('[entities:getStaticPaths] built', paths.length, 'paths');
+
+  // optional: console.log('[entities:getStaticPaths] built', paths.length, 'paths');
   return paths;
 }
 
 const { data } = Astro.props;
-const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
+
+const ROOT = process.cwd();
+const settings = safeReadJSON(path.join(ROOT, 'content', 'settings.json'), { siteUrl: 'https://example.com' });
 
 const title = data?.name || data?.slug || 'Entity';
 const description = data?.summary || '';
 const canon = `${String(settings.siteUrl||'https://example.com').replace(/\/$/,'')}/entities/${data?.type}/${data?.slug}`;
 ---
 <Base title={title} description={description} canon={canon}>
-  <article class="prose prose-neutral max-w-none">
+  <article class="prose-witch max-w-none">
     <h1 class="mb-2">{title}</h1>
     {description && <p class="mt-0 text-sm text-gray-600">{description}</p>}
 
@@ -60,5 +72,7 @@ const canon = `${String(settings.siteUrl||'https://example.com').replace(/\/$/,'
         </ul>
       </>
     )}
+
+    {!data && <p class="text-sm text-red-700">Entity not found.</p>}
   </article>
 </Base>

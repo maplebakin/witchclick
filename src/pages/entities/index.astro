@@ -4,30 +4,40 @@ import Base from '../../layouts/Base.astro';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
-const root = './content/entities';
+// Safe JSON read
+function safeReadJSON(p:string, fallback:any=null){
+  try { return JSON.parse(fs.readFileSync(p,'utf8')); } catch { return fallback; }
+}
 
+const ROOT = process.cwd();
+const SETTINGS_PATH = path.join(ROOT, 'content', 'settings.json');
+const ENT_DIR = path.join(ROOT, 'content', 'entities');
+
+const settings = safeReadJSON(SETTINGS_PATH, { siteUrl: 'https://example.com' });
+
+// Grouped items by type
 type Item = { type: string; name: string; slug: string; summary?: string };
 const items: Record<string, Item[]> = {};
 
-if (fs.existsSync(root)) {
-  const types = fs.readdirSync(root).filter((d) => {
-    const p = path.join(root, d);
+if (fs.existsSync(ENT_DIR)) {
+  const types = fs.readdirSync(ENT_DIR).filter((d) => {
+    const p = path.join(ENT_DIR, d);
     try { return fs.statSync(p).isDirectory(); } catch { return false; }
   });
   for (const t of types) {
-    const dir = path.join(root, t);
-    let arr: Item[] = [];
+    const dir = path.join(ENT_DIR, t);
+    const arr: Item[] = [];
     try {
       const files = fs.readdirSync(dir).filter((f) => f.endsWith('.json'));
       for (const f of files) {
         try {
-          const data = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
+          const data = safeReadJSON(path.join(dir, f), null);
+          if (!data) continue;
           arr.push({
-            type: data.type || t,
-            name: data.name || data.slug || f.replace(/\.json$/,''),
-            slug: data.slug || f.replace(/\.json$/,''),
-            summary: data.summary || ''
+            type: String(data.type || t),
+            name: String(data.name || data.slug || f.replace(/\.json$/,'')),
+            slug: String(data.slug || f.replace(/\.json$/,'')),
+            summary: String(data.summary || '')
           });
         } catch {}
       }
@@ -38,14 +48,18 @@ if (fs.existsSync(root)) {
     }
   }
 }
+
+const canon = `${String(settings.siteUrl || '').replace(/\/$/,'')}/entities`;
 ---
-<Base title="Entities" description="Crystals, herbs, moon phases, and more." canon={`${settings.siteUrl.replace(/\/$/,'')}/entities`}>
-  <section class="prose prose-neutral max-w-none">
+<Base title="Entities" description="Crystals, herbs, moon phases, and more." canon={canon}>
+  <section class="prose-witch">
     <h1>Entities</h1>
     {Object.keys(items).length === 0 && (
       <p>No entities yet. Ingest a post that references entities to create stubs under <code>content/entities</code>.</p>
     )}
-    {Object.entries(items).map(([type, arr]) => (
+    {Object.entries(items)
+      .sort(([a],[b]) => a.localeCompare(b)) /* stable type order */
+      .map(([type, arr]) => (
       <>
         <h2 class="capitalize">{type}</h2>
         <ul>

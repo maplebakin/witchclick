@@ -1,17 +1,20 @@
-
-
 ---
 // src/pages/admin/index.astro
 import Base from '../../layouts/Base.astro';
 import fs from 'node:fs';
-const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
+
+// Safe settings read
+let settings = { siteUrl: 'https://example.com' };
+try { settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8')); } catch {}
+
+const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 ---
 <Base title="WitchClick — Admin" description="Prompt, preview, ingest, publish." canon={`${settings.siteUrl}/admin`} wide={true}>
   <Fragment slot="head">
     <meta name="robots" content="noindex" />
   </Fragment>
 
-  <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-12" data-dev-api={DEV_API}>
     <!-- LEFT: Prompt builder -->
     <section class="lg:col-span-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
       <h1 class="mb-3 text-xl font-semibold">1) Build Post Generator Prompt</h1>
@@ -37,7 +40,7 @@ const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
           <button id="copyPrompt" class="rounded-lg border px-3 py-2">Copy</button>
         </div>
         <textarea id="promptOut" class="mt-2 h-64 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder="Prompt will appear here…"></textarea>
-        <p class="text-xs text-gray-600">Paste this into ChatGPT → get JSON → paste into the box on the right.</p>
+        <p class="text-xs text-gray-600">Paste this into your LLM → get JSON → paste into the box on the right.</p>
       </div>
     </section>
 
@@ -56,20 +59,29 @@ const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
         <span id="status" class="self-center text-sm"></span>
       </div>
 
-      <div id="preview" class="prose prose-neutral mt-4 max-w-none border-t pt-4"></div>
+      <div id="preview" class="prose prose-witch mt-4 max-w-none border-t pt-4"></div>
     </section>
   </div>
 
   <script is:inline>
     (function(){
-      var DEV_API = 'http://localhost:8787';
+      var root = document.querySelector('[data-dev-api]');
+      var DEV_API = root?.getAttribute('data-dev-api') || 'http://localhost:8787';
       var $ = function(id){ return document.getElementById(id); };
-      function setStatus(msg, ok){ var el=$('status'); el.textContent=msg; el.style.color = ok===false ? '#7f1d1d' : '#065f46'; }
+      function setStatus(msg, ok){
+        var el=$('status');
+        el.textContent=msg;
+        el.style.color = ok===false ? '#7f1d1d' : '#065f46';
+      }
+      function busy(on){
+        ['genPrompt','validateBtn','previewBtn','ingestBtn','ingestPublishBtn','copyPrompt']
+          .forEach(id => { var b=$(id); if(b){ b.disabled = !!on; b.style.opacity = on ? .6 : 1; }});
+      }
 
       // Build prompt
       $('genPrompt').addEventListener('click', async function(){
         try{
-          setStatus('Generating prompt...');
+          busy(true); setStatus('Generating prompt...');
           var body = {
             topic: $('topic').value || 'tea ritual for focus',
             words: Number($('words').value || 1200),
@@ -77,51 +89,123 @@ const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
             kofi: $('kofi').checked ? 'on' : 'off'
           };
           var res = await fetch(DEV_API + '/genprompt', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+          if(!res.ok) throw new Error('gen failed ('+res.status+')');
           var data = await res.json();
           if (!data.ok) throw new Error(data.error || 'gen failed');
           $('promptOut').value = data.prompt || '';
           setStatus('Prompt ready ✓');
         }catch(e){ setStatus('Prompt error: ' + (e.message||String(e)), false); }
+        finally{ busy(false); }
       });
-      $('copyPrompt').addEventListener('click', function(){
-        $('promptOut').select(); document.execCommand('copy'); setStatus('Copied ✓');
+      $('copyPrompt').addEventListener('click', async function(){
+        try{
+          await navigator.clipboard.writeText($('promptOut').value || '');
+          setStatus('Copied ✓');
+        } catch {
+          $('promptOut').select(); document.execCommand('copy'); setStatus('Copied ✓');
+        }
       });
 
-      // Validate JSON
+      // Spec parsing
       function parseSpec(){
         var txt = $('spec').value;
         if (!txt.trim()) throw new Error('No JSON provided.');
         try { return JSON.parse(txt); } catch(e){ throw new Error('Invalid JSON: ' + e.message); }
       }
-      function basicCheck(spec){
-        if (spec.specVersion !== 2) throw new Error('specVersion must be 2');
-        if (!spec.title || !spec.slug) throw new Error('title/slug required');
-        if (!Array.isArray(spec.sections) || spec.sections.length === 0) throw new Error('sections[] required');
-        if (!Array.isArray(spec.tags) || spec.tags.length < 4 || spec.tags.length > 7) throw new Error('tags must be 4–7');
+
+      // Structural validation (mirrors server-side checks)
+      function checkSpec(s){
+        var errors = [], warnings = [];
+
+        if (s.specVersion !== 2) errors.push('specVersion must be 2');
+        if (!s.title || !s.slug) errors.push('title and slug are required');
+
+        if (!Array.isArray(s.sections) || s.sections.length === 0) errors.push('sections[] required');
+        if (!Array.isArray(s.tags) || s.tags.length < 4 || s.tags.length > 7) errors.push('tags must be 4–7');
+
+        var mdLen = (s.metaDescription || '').length;
+        if (mdLen < 150 || mdLen > 160) warnings.push('metaDescription length ~'+mdLen+' (target 150–160)');
+
+        // Required sections by heading (case-insensitive)
+        var heads = (s.sections||[]).map(x => String(x.heading||'').toLowerCase());
+        var body = (s.sections||[]).map(x => x.markdown||'').join('\n').toLowerCase();
+
+        var hasOpening = heads.some(h => h.includes('opening reflection')) ||
+                         heads.some(h => /^opening/.test(h) && /reflection|scene|note/.test(h));
+        if (!hasOpening) errors.push('Missing section: Opening Reflection');
+
+        var hasQuick = heads.some(h => /quick|low[- ]?energy|5[- ]?minute/.test(h)) || /quick|low[- ]?energy/.test(body);
+        var hasDeep  = heads.some(h => /deep( dive)?|long(er)?/.test(h)) || /deep( dive)?/.test(body);
+        if (!(hasQuick && hasDeep)) errors.push('Ritual variants required: Quick/Low-Energy and Deep');
+
+        var hasChecklist = heads.some(h => /checklist|summary|at a glance/.test(h));
+        if (!hasChecklist) errors.push('Missing section: Checklist/Summary');
+
+        var hasReflect = heads.some(h => /reflection prompt|journal|reflection/.test(h)) || /prompt|question/.test(body);
+        if (!hasReflect) errors.push('Missing section: Reflection Prompt');
+
+        // heroImagePrompt string|null
+        if (!(typeof s.heroImagePrompt === 'string' || s.heroImagePrompt === null)) {
+          errors.push('heroImagePrompt must be string or null');
+        }
+
+        // internal link hints (soft target)
+        if (!Array.isArray(s.internalLinkHints) || s.internalLinkHints.length < 3) {
+          warnings.push('internalLinkHints are sparse (aim 5–8).');
+        }
+
+        return { ok: errors.length===0, errors, warnings };
       }
+
       $('validateBtn').addEventListener('click', function(){
-        try{ var s=parseSpec(); basicCheck(s); setStatus('Looks valid ✓'); }catch(e){ setStatus(e.message, false); }
+        try{
+          var s=parseSpec();
+          var res = checkSpec(s);
+          if (!res.ok) throw new Error(res.errors[0]);
+          setStatus(res.warnings.length ? ('Valid ✓ — ' + res.warnings.join(' · ')) : 'Valid ✓');
+        }catch(e){ setStatus(e.message, false); }
       });
 
-      // Preview (simple: headings + markdown blocks)
+      // Simple preview (escaped, newline→<br>)
+      function wordCount(md){
+        var text = String(md||'')
+          .replace(/```[\\s\\S]*?```/g,' ')
+          .replace(/`[^`]*`/g,' ')
+          .replace(/<[^>]+>/g,' ')
+          .replace(/[\\*_#>~\\-]+/g,' ');
+        var m = text.match(/\\b[\\p{L}\\p{N}’']+\\b/gu);
+        return m ? m.length : 0;
+      }
       function renderPreview(spec){
         var el = $('preview'); el.innerHTML = '';
         var h1 = document.createElement('h1'); h1.textContent = spec.title || '(untitled)'; el.appendChild(h1);
         if (Array.isArray(spec.tags)){ var p = document.createElement('p'); p.className='text-sm text-gray-600'; p.textContent='Tags: ' + spec.tags.join(', '); el.appendChild(p); }
+        var totalWords = 0;
         for (var i=0;i<(spec.sections||[]).length;i++){
           var sec = spec.sections[i];
           var h2 = document.createElement('h2'); h2.textContent = sec.heading || 'Section'; el.appendChild(h2);
           var div = document.createElement('div');
-          // naive newline→<br> for preview; final rendering happens on the post page
-          div.innerHTML = (String(sec.markdown||'').trim()).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+          var safe = String(sec.markdown||'').trim().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\\n/g,'<br>');
+          div.innerHTML = safe;
           el.appendChild(div);
+          totalWords += wordCount(sec.markdown||'');
         }
+        var meta = document.createElement('p');
+        meta.className='text-xs text-gray-500 mt-4';
+        meta.textContent = '~' + totalWords + ' words • ~' + Math.max(1, Math.round(totalWords/200)) + ' min read';
+        el.appendChild(meta);
       }
+
       $('previewBtn').addEventListener('click', function(){
-        try{ var s=parseSpec(); basicCheck(s); renderPreview(s); setStatus('Preview updated ✓'); }catch(e){ setStatus(e.message, false); }
+        try{
+          var s=parseSpec(); var res=checkSpec(s);
+          if(!res.ok) throw new Error(res.errors[0]);
+          renderPreview(s);
+          setStatus(res.warnings.length ? ('Preview ✓ — ' + res.warnings.join(' · ')) : 'Preview ✓');
+        }catch(e){ setStatus(e.message, false); }
       });
 
-      // Ingest (writes markdown file)
+      // Ingest
       async function ingest(spec){
         var res = await fetch(DEV_API + '/ingest', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(spec) });
         var data = await res.json();
@@ -129,27 +213,28 @@ const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
         return data;
       }
 
-      // Buttons
       $('ingestBtn').addEventListener('click', async function(){
         try{
-          setStatus('Ingesting…');
-          var spec = parseSpec(); basicCheck(spec);
+          busy(true); setStatus('Ingesting…');
+          var spec = parseSpec(); var res=checkSpec(spec); if(!res.ok) throw new Error(res.errors[0]);
           var data = await ingest(spec);
           setStatus('Ingested → ' + data.path + '  Open: /post/' + data.slug);
         }catch(e){ setStatus(e.message, false); }
+        finally{ busy(false); }
       });
 
       $('ingestPublishBtn').addEventListener('click', async function(){
         try{
-          setStatus('Ingesting…');
-          var spec = parseSpec(); basicCheck(spec);
+          busy(true); setStatus('Ingesting…');
+          var spec = parseSpec(); var res=checkSpec(spec); if(!res.ok) throw new Error(res.errors[0]);
           var data = await ingest(spec);
           setStatus('Ingested. Publishing…');
-          var res = await fetch(DEV_API + '/bundle', { method:'POST' });
-          var b = await res.json();
-          if (!b.ok) throw new Error((b.steps && b.steps.map(function(s){return s.err;}).join('\\n')) || b.error || 'bundle failed');
+          var r = await fetch(DEV_API + '/bundle', { method:'POST' });
+          var b = await r.json();
+          if (!b.ok) throw new Error((b.steps && b.steps.map(function(s){return s.err;}).filter(Boolean).join('\\n')) || b.error || 'bundle failed');
           setStatus('Published ✓  Open post: /post/' + data.slug);
         }catch(e){ setStatus(e.message, false); }
+        finally{ busy(false); }
       });
 
       $('clearBtn').addEventListener('click', function(){
