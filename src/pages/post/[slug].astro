@@ -1,148 +1,178 @@
 ---
 // src/pages/post/[slug].astro
-import Base from '../../layouts/Base.astro';
-import AdSlot from '../../components/AdSlot.astro';
-import Disclosure from '../../components/Disclosure.astro';
-import KofiBlock from '../../components/KofiBlock.astro';
-import DownloadCard from '../../components/DownloadCard.astro';
-import fs from 'node:fs';
-import path from 'node:path';
-import matter from 'gray-matter';
-import { marked } from 'marked';
+import Base from "../../layouts/Base.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import Disclosure from "../../components/Disclosure.astro";
+import KofiBlock from "../../components/KofiBlock.astro";
+import DownloadCard from "../../components/DownloadCard.astro";
 
-// Build-time: enumerate posts and pass their data+content in props
+import fs from "node:fs";
+import path from "node:path";
+import matter from "gray-matter";
+import { marked } from "marked";
+
+// NEW: auto affiliate helper
+import { autoLinkAffiliates } from "../../../tools/src/auto-affiliate";
+
+export const prerender = true;
+
+type PostData = Record<string, any>;
+type PrevNext = { slug: string; title: string } | null;
+
 export async function getStaticPaths() {
-  const dir = './content/posts';
+  const dir = "./content/posts";
   if (!fs.existsSync(dir)) return [];
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.md'));
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".md"));
 
-  return files.map((file) => {
-    const raw = fs.readFileSync(path.join(dir, file), 'utf8');
+  const parsed = files.map((file) => {
+    const full = path.join(dir, file);
+    const raw = fs.readFileSync(full, "utf8");
     const { data, content } = matter(raw);
-    const slug = (data && data.slug) ? String(data.slug) : file.replace(/\.md$/, '');
-    return { params: { slug }, props: { data, content } };
+    const slug = (data?.slug ? String(data.slug) : file.replace(/\.md$/, "")).toLowerCase();
+
+    const frontDates = [data?.publishedAt, data?.pubDate, data?.date, data?.updatedAt].filter(Boolean) as string[];
+    let date = new Date(frontDates[0] || 0);
+    if (isNaN(+date)) date = fs.statSync(full).mtime;
+
+    return { slug, title: String(data?.title || "Untitled"), date, data, content };
+  });
+
+  parsed.sort((a, b) => +b.date - +a.date);
+  const indexBySlug = new Map(parsed.map((p, i) => [p.slug, i]));
+
+  return parsed.map((p) => {
+    const i = indexBySlug.get(p.slug)!;
+    const prev = parsed[i - 1] ? { slug: parsed[i - 1].slug, title: parsed[i - 1].title } : null;
+    const next = parsed[i + 1] ? { slug: parsed[i + 1].slug, title: parsed[i + 1].title } : null;
+    return {
+      params: { slug: p.slug },
+      props: { data: p.data, content: p.content, effectiveSlug: p.slug, prev, next },
+    };
   });
 }
 
-const { data = {}, content = '' } = Astro.props;
-const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
-const productsFile = fs.existsSync('./content/products.json')
-  ? JSON.parse(fs.readFileSync('./content/products.json','utf8'))
+const {
+  data = {} as PostData,
+  content = "",
+  effectiveSlug = Astro.params.slug as string,
+  prev = null as PrevNext,
+  next = null as PrevNext,
+} = Astro.props;
+
+// Settings (fallbacks ok)
+let settings: any = { brandName: "WitchClick", siteUrl: "https://example.com" };
+try {
+  const s = fs.readFileSync("./content/settings.json", "utf8");
+  settings = { ...settings, ...JSON.parse(s) };
+} catch {}
+
+const siteOrigin = String(settings.siteUrl || "https://example.com").replace(/\/$/, "");
+const title = data.title ?? "Untitled";
+const description =
+  data.metaDescription ?? data.description ?? data.excerpt ?? firstSentence(content) ?? "";
+
+const publishedAt = data.publishedAt || data.pubDate || data.date || undefined;
+const modifiedAt = data.updatedAt || publishedAt || undefined;
+const canonical = `${siteOrigin}/post/${effectiveSlug}`;
+
+const readingMinutes =
+  data.readingMinutes ?? Math.max(1, Math.ceil(wordCount(content) / 200));
+
+const htmlRaw = marked.parse(content || "");
+const htmlSafe = stripInlineHandlers(stripScripts(String(htmlRaw)));
+let html = String(htmlSafe);
+
+// Load products (either {products: []} or [] shape)
+const productsFilePath = "./content/products.json";
+const productsDoc = fs.existsSync(productsFilePath)
+  ? JSON.parse(fs.readFileSync(productsFilePath, "utf8"))
   : { products: [] };
+const allProducts = Array.isArray(productsDoc) ? productsDoc : (productsDoc.products || []);
 
-const title = data.title ?? 'Untitled';
-const description = data.metaDescription ?? data.excerpt ?? '';
-const canonical = `${String(settings.siteUrl || 'https://example.com').replace(/\/$/,'')}/post/${data.slug ?? ''}`;
-const downloadId = data.downloadId || (data.cta && data.cta.id);
-const includeAds = !!data.includeAds;
-const includeKofi = !!data.includeKofi;
+// OG candidate image
+const ogCandidate = path.join(process.cwd(), "public", "og", `${effectiveSlug}.jpg`);
+const ogImage = fs.existsSync(ogCandidate) ? `${siteOrigin}/og/${effectiveSlug}.jpg` : "";
 
-// ---- avoid angle-bracket generics in .astro frontmatter
-type AffAnchor = { key: string; text: string };
-type Product  = { key: string; url?: string; utm?: string };
-type InternalLink = { slug: string; anchor: string };
+// Start with manual frontmatter anchors if present
+let hasAffiliates = false;
 
-const affiliateAnchors: AffAnchor[] =
-  Array.isArray(data.affiliateAnchors) ? data.affiliateAnchors : [];
-const allowedKeys = new Set((productsFile.products || []).map((p: any) => String(p.key)));
+const frontAnchors = Array.isArray(data.affiliateAnchors) ? data.affiliateAnchors : [];
+if (frontAnchors.length > 0) {
+  // Use the shared linker pipeline via autoLinkAffiliates but freeze to declared anchors by
+  // temporarily mapping products to only those keys/texts.
+  const declared = frontAnchors
+    .map((a: any) => ({ key: String(a.key || ""), text: String(a.text || "") }))
+    .filter((a: any) => a.key && a.text);
 
-// Convert Markdown → HTML
-const htmlRaw = marked.parse(content || '');
-
-// -------- internal link injection (first natural occurrence per anchor) --------
-const internalLinks: InternalLink[] = Array.isArray(data.internalLinks)
-  ? data.internalLinks.map((l: any) => ({ slug: String(l.slug || ''), anchor: String(l.anchor || '') }))
-  : [];
-
-function escRe(s: string) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
-
-// Avoid touching existing anchors/code/pre blocks
-const CHUNK_RE = /(<a\b[^>]*>.*?<\/a>|<code\b[^>]*>.*?<\/code>|<pre\b[^>]*>.*?<\/pre>)/gis;
-
-function linkInternalOnce(html: string, anchor: string, slug: string) {
-  if (!anchor || !slug) return html;
-  const re = new RegExp(escRe(anchor), 'i');
-  const parts = html.split(CHUNK_RE);
-  let linked = false;
-  for (let i = 0; i < parts.length; i++) {
-    if (i % 2 === 1) continue; // skip captured tags
-    if (!linked && re.test(parts[i])) {
-      parts[i] = parts[i].replace(re, (m) => `<a href="/post/${slug}">${m}</a>`);
-      linked = true;
+  for (const d of declared) {
+    const prod = allProducts.find((p: any) => String(p.key) === d.key);
+    if (!prod || !prod.url) continue;
+    const { html: next, count } = autoLinkAffiliates(html, [{ ...prod }], { maxLinksPerPost: 1 });
+    if (count > 0 && next !== html) {
+      html = next;
+      hasAffiliates = true;
     }
   }
-  return parts.join('');
-}
-
-function applyInternalLinks(html: string, links: InternalLink[]) {
-  let out = html;
-  for (const l of links) out = linkInternalOnce(out, l.anchor || '', l.slug || '');
-  return out;
-}
-
-// -------- affiliate linking (first natural occurrence per allowed anchor) --------
-const products: Product[] = productsFile.products || [];
-
-function withUtm(u?: string, utm?: string) {
-  if (!u) return '';
-  if (!utm) return u;
-  return u.includes('?') ? `${u}&${utm}` : `${u}?${utm}`;
-}
-
-function linkAffiliateOnce(html: string, text: string, href: string) {
-  if (!text || !href) return html;
-  const re = new RegExp(escRe(text), 'i');
-  const parts = html.split(CHUNK_RE);
-  let linked = false;
-  for (let i = 0; i < parts.length; i++) {
-    if (i % 2 === 1) continue; // skip existing anchors/code/pre
-    if (!linked && re.test(parts[i])) {
-      parts[i] = parts[i].replace(
-        re,
-        (m) => `<a href="${href}" rel="nofollow sponsored" target="_blank" data-analytics="aff_click">${m}</a>`
-      );
-      linked = true;
-    }
+} else {
+  // AUTO MODE: derive anchors from product names/tags and link up to 3 total
+  const { html: next, count } = autoLinkAffiliates(html, allProducts, { maxLinksPerPost: 3 });
+  if (count > 0) {
+    html = next;
+    hasAffiliates = true;
   }
-  return parts.join('');
 }
-
-let html = String(htmlRaw);
-let hasAffiliates = false; // used by <Disclosure/>
-
-for (const a of affiliateAnchors) {
-  if (!allowedKeys.has(String(a.key))) continue;
-  const prod = products.find((p) => String(p.key) === String(a.key));
-  if (!prod || !prod.url) continue;
-  const target = withUtm(String(prod.url).trim(), String(prod.utm || '').trim());
-  const next = linkAffiliateOnce(html, String(a.text || ''), target);
-  if (next !== html) hasAffiliates = true;
-  html = next;
-}
-
-// Internal links after affiliates
-html = applyInternalLinks(html, internalLinks);
-
-// ---- ogImage (optional for JSON-LD)
-const site = String(settings.siteUrl || 'https://example.com').replace(/\/$/, '');
-const candidateOg = path.join(process.cwd(), 'public', 'og', `${data.slug || 'default'}.jpg`);
-const ogImage = fs.existsSync(candidateOg) ? `${site}/og/${data.slug}.jpg` : '';
 
 const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'BlogPosting',
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
   headline: title,
   description,
-  datePublished: data.publishedAt || undefined,
-  dateModified: data.publishedAt || undefined,
-  url: `${site}/post/${data.slug || ''}`,
+  datePublished: publishedAt ? new Date(publishedAt).toISOString() : undefined,
+  dateModified: modifiedAt ? new Date(modifiedAt).toISOString() : undefined,
+  url: canonical,
   image: ogImage ? [ogImage] : undefined,
-  author: { '@type': 'Organization', name: settings.brandName || 'WitchClick' },
-  publisher: { '@type': 'Organization', name: settings.brandName || 'WitchClick' }
+  author: { "@type": "Organization", name: settings.brandName || "WitchClick" },
+  publisher: { "@type": "Organization", name: settings.brandName || "WitchClick" },
 };
+
+function wordCount(md: string): number {
+  return md
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/[#>*_`~\-]+/g, " ")
+    .split(/\s+/)
+    .filter(Boolean).length;
+}
+
+function firstSentence(md: string): string | null {
+  const asText = md
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/[#>*_`~\-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const m = asText.match(/^(.{40,200}?[.!?])\s/);
+  return m ? m[1] : null;
+}
+
+function stripScripts(html: string) {
+  return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
+}
+function stripInlineHandlers(html: string) {
+  return html
+    .replace(/\s(on\w+)\s*=\s*"[^"]*"/gi, "")
+    .replace(/\s(on\w+)\s*=\s*'[^']*'/gi, "");
+}
 ---
-<Base title={title} description={description} canon={canonical} wide={true}>
+
+<Base title={title} description={description} canon={canonical} wide={true} ogImage={ogImage}>
   <Fragment slot="head">
+    <meta property="og:type" content="article" />
+    {publishedAt && (
+      <meta property="article:published_time" content={new Date(publishedAt).toISOString()} />
+    )}
+    {modifiedAt && (
+      <meta property="article:modified_time" content={new Date(modifiedAt).toISOString()} />
+    )}
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </Fragment>
 
@@ -150,25 +180,52 @@ const jsonLd = {
     <article class="prose prose-neutral max-w-none lg:col-span-8">
       <h1 class="mb-2">{title}</h1>
       <p class="mt-0 mb-4 text-sm text-gray-600">
-        {data.publishedAt && <time datetime={data.publishedAt}>
-          {new Date(data.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
-        </time>}
-        {data.publishedAt && data.readingMinutes && <span> · </span>}
-        {data.readingMinutes && <span>{data.readingMinutes} min read</span>}
+        {publishedAt && (
+          <time datetime={new Date(publishedAt).toISOString()}>
+            {new Date(publishedAt).toLocaleDateString(undefined, {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })}
+          </time>
+        )}
+        {(publishedAt || readingMinutes) && <span> · </span>}
+        {readingMinutes && <span>{readingMinutes} min read</span>}
       </p>
 
-      <Disclosure show={includeAds || hasAffiliates} />
+      <Disclosure show={hasAffiliates || !!data.includeAds} />
 
       <div set:html={html} />
 
-      {downloadId && <DownloadCard id={downloadId} />}
+      {data.downloadId && <DownloadCard id={data.downloadId} />}
 
-      {includeAds && <AdSlot slot="end" class="mt-8" />}
+      {data.includeAds && <AdSlot slot="end" class="mt-8" />}
 
-      {includeKofi && <KofiBlock />}
+      {data.includeKofi && <KofiBlock />}
+
+      {(prev || next) && (
+        <nav class="mt-10 border-t border-purple-100/60 pt-6 text-sm" aria-label="Post navigation">
+          <ul class="flex flex-col gap-2 sm:flex-row sm:justify-between">
+            <li>
+              {prev && (
+                <a class="underline underline-offset-4 hover:no-underline" href={`/post/${prev.slug}`}>
+                  ← {prev.title}
+                </a>
+              )}
+            </li>
+            <li class="text-right">
+              {next && (
+                <a class="underline underline-offset-4 hover:no-underline" href={`/post/${next.slug}`}>
+                  {next.title} →
+                </a>
+              )}
+            </li>
+          </ul>
+        </nav>
+      )}
     </article>
 
-    {includeAds && (
+    {data.includeAds && (
       <aside class="hidden lg:block lg:col-span-4">
         <div class="sticky top-24">
           <AdSlot slot="side" />
