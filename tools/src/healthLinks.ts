@@ -4,10 +4,10 @@ import { readFileSync, existsSync } from 'node:fs';
 import { fetch } from 'undici';
 
 /* minimal local JSON reader */
-function readJSON(p: string) {
+function readJSON<T>(p: string) {
   try {
     if (!existsSync(p)) return null;
-    return JSON.parse(readFileSync(p, 'utf8'));
+    return JSON.parse(readFileSync(p, 'utf8')) as T;
   } catch {
     return null;
   }
@@ -18,8 +18,10 @@ type Product = { key?: string; url?: string; utm?: string };
 export async function healthLinks() {
   const CWD = process.cwd();
   const settings =
-    readJSON(path.join(CWD, 'content', 'settings.json')) || { siteUrl: 'https://example.com' };
-  const productsJson = readJSON(path.join(CWD, 'content', 'products.json')) || { products: [] };
+    readJSON<{ siteUrl?: string }>(path.join(CWD, 'content', 'settings.json')) || { siteUrl: 'https://example.com' };
+  const productsJson = readJSON<{ products?: Product[] }>(path.join(CWD, 'content', 'products.json')) || {
+    products: [],
+  };
   const products: Product[] = Array.isArray(productsJson.products) ? productsJson.products : [];
 
   const siteUrl = String(settings.siteUrl || '').trim();
@@ -35,7 +37,7 @@ export async function healthLinks() {
   const urls = Array.from(targets);
 
   const CONCURRENCY = 5;
-  const results = await mapLimit(urls, CONCURRENCY, (u) => checkUrl(u));
+  const results = await mapLimit<string, Awaited<ReturnType<typeof checkUrl>>>(urls, CONCURRENCY, (u) => checkUrl(u));
 
   process.stdout.write(
     JSON.stringify(
@@ -64,7 +66,7 @@ function safeBase(u?: string) {
   }
 }
 
-function normalizeUrl(u: unknown, base?: string, utm?: string) {
+function normalizeUrl(u?: unknown, base?: string, utm?: string) {
   try {
     if (!u) return '';
     const src = String(u);
@@ -180,20 +182,18 @@ function blocksHead(code: number) {
 }
 
 // simple promise pool
-async function mapLimit<T, R>(
-  items: T[],
-  limit: number,
-  worker: (t: T) => Promise<R>,
-): Promise<R[]> {
+async function mapLimit<T, R>(items: T[], limit: number, worker: (t: T) => Promise<R>): Promise<R[]> {
   const results: R[] = new Array(items.length);
   let i = 0;
+
   async function run() {
     while (i < items.length) {
       const idx = i++;
       try {
         results[idx] = await worker(items[idx]);
       } catch (e: any) {
-        results[idx] = {
+        // keep shape stable
+        (results as any)[idx] = {
           url: String((items[idx] as any) || ''),
           ok: false,
           status: 0,
@@ -201,10 +201,11 @@ async function mapLimit<T, R>(
           finalUrl: String((items[idx] as any) || ''),
           timeMs: 0,
           error: e?.message || String(e),
-        } as any;
+        };
       }
     }
   }
+
   await Promise.all(Array.from({ length: Math.min(limit, items.length) }, () => run()));
   return results;
 }

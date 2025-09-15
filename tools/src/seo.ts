@@ -26,7 +26,7 @@ export function seoCmd(args: string[]) {
 
   const errors: string[] = [];
   const warnings: string[] = [];
-  const fixes: Record<string, any> = {};
+  const fixes: Record<string, string> = {};
 
   /* ---------- Title/meta ---------- */
   const titleInput = String(data.metaTitle || data.title || '');
@@ -80,7 +80,11 @@ export function seoCmd(args: string[]) {
     .map((l: any) => String(l.anchor || '').toLowerCase())
     .filter((a: string) => a && !prose.includes(a));
   if (missingAnchors.length) {
-    warnings.push(`Some internal link anchors not found verbatim in prose: ${uniq(missingAnchors).slice(0, 5).join(', ')}${missingAnchors.length > 5 ? '…' : ''}`);
+    warnings.push(
+      `Some internal link anchors not found verbatim in prose: ${uniq(missingAnchors)
+        .slice(0, 5)
+        .join(', ')}${missingAnchors.length > 5 ? '…' : ''}`,
+    );
   }
 
   /* ---------- Hero image presence ---------- */
@@ -107,9 +111,7 @@ export function seoCmd(args: string[]) {
     const nextData = { ...data, ...fixes };
     const nextRaw = matter.stringify(file.content, nextData);
     fs.writeFileSync(mdPath, nextRaw, 'utf8');
-    process.stdout.write(
-      JSON.stringify({ ...out, applied: Object.keys(fixes) }, null, 2) + '\n',
-    );
+    process.stdout.write(JSON.stringify({ ...out, applied: Object.keys(fixes) }, null, 2) + '\n');
   } else {
     process.stdout.write(JSON.stringify(out, null, 2) + '\n');
   }
@@ -150,7 +152,7 @@ function clampToWords(s: string, min: number, max: number) {
   return trimmed.replace(/[ \-–—]+$/,'');
 }
 
-function uniq<T>(arr: T[]) {
+function uniq<T>(arr: T[]): T[] {
   return Array.from(new Set(arr));
 }
 

@@ -1,17 +1,10 @@
 // tools/src/wcMain.ts
-// Tiny CLI entry for WitchClick (ESM). Commands:
-//   node tools/wc.js genprompt --topic "..." --words 1200 --ads on|off --kofi on|off
-//   node tools/wc.js ingest --from-file drafts/latest.json
-//   node tools/wc.js linker
-//   node tools/wc.js seo --slug my-post [--apply]
-//   node tools/wc.js export --slug my-post --format html
-//   node tools/wc.js go:build
-//   node tools/wc.js health
+// WitchClick CLI entry (TypeScript). Compiles to JS and is invoked via tools/wc.js.
 
 import fs from 'node:fs';
 import path from 'node:path';
 
-type Flags = Record<string, string | number | boolean>;
+type Flags = Record<string, string | boolean>;
 
 function parseArgv(argv: string[]) {
   const positional: string[] = [];
@@ -45,9 +38,9 @@ function ensureDir(p: string) {
   fs.mkdirSync(p, { recursive: true });
 }
 
-function readJSON<T = any>(p: string): T | null {
+function readJSON<T>(p: string): T | null {
   try {
-    return JSON.parse(fs.readFileSync(p, 'utf8'));
+    return JSON.parse(fs.readFileSync(p, 'utf8')) as T;
   } catch {
     return null;
   }
@@ -67,8 +60,8 @@ async function cmdGenprompt(flags: Flags) {
   const ads = String(flags.ads ?? 'off') === 'on' ? 'on' : 'off';
   const kofi = String(flags.kofi ?? 'on') === 'on' ? 'on' : 'off';
 
-  const mod = await import('./genprompt.js'); // ESM dynamic import
-  const { prompt } = mod.genprompt({ topic, words, ads, kofi });
+  const mod = await import('./genprompt.js'); // compiled neighbor
+  const { prompt } = (mod as any).genprompt({ topic, words, ads, kofi });
 
   const outDir = path.join(process.cwd(), 'tmp');
   ensureDir(outDir);
@@ -77,17 +70,27 @@ async function cmdGenprompt(flags: Flags) {
 }
 
 async function cmdIngest(flags: Flags) {
-  const fromFile = String(flags['from-file'] ?? '');
+  const fromFile = String((flags['from-file'] as string) ?? '');
   const mod = await import('./ingest.js');
   const args: string[] = [];
   if (fromFile) args.push('--from-file', fromFile);
-  await mod.ingest(args);
+  await (mod as any).ingest(args);
 }
 
 async function cmdLinker() {
-  // Use the real linker (no stub)
   const mod = await import('./linker.js');
-  await mod.linkerCmd();
+  // Be tolerant: linker may be exported as linkerCmd, linker, or default
+  const fn: any =
+    (mod as any).linkerCmd ??
+    (mod as any).linker ??
+    (typeof (mod as any).default === 'function' ? (mod as any).default : undefined);
+
+  if (typeof fn !== 'function') {
+    console.error('[linker] No callable export found (expected linkerCmd | linker | default).');
+    process.exitCode = 1;
+    return;
+  }
+  await fn();
 }
 
 async function cmdSEO(flags: Flags) {
@@ -98,7 +101,7 @@ async function cmdSEO(flags: Flags) {
     return;
   }
   const mod = await import('./seo.js');
-  await mod.seoCmd(['--slug', slug, ...(flags.apply ? ['--apply'] : [])]);
+  await (mod as any).seoCmd(['--slug', slug, ...(flags.apply ? ['--apply'] : [])]);
 }
 
 async function cmdExport(flags: Flags) {
@@ -110,7 +113,7 @@ async function cmdExport(flags: Flags) {
     return;
   }
   const mod = await import('./export.js');
-  await mod.exportCmd(['--slug', slug, '--format', format]);
+  await (mod as any).exportCmd(['--slug', slug, '--format', format]);
 }
 
 async function cmdGoBuild() {
@@ -126,7 +129,7 @@ async function cmdGoBuild() {
   }
 
   const lines: string[] = [];
-  // Hide admin in prod (Netlify)
+  // Hide admin in prod (e.g., Netlify)
   lines.push('/admin      /404  404');
   lines.push('/admin/*    /404  404');
 
@@ -149,7 +152,7 @@ async function cmdGoBuild() {
 
 async function cmdHealth() {
   const mod = await import('./healthLinks.js');
-  await mod.healthLinks();
+  await (mod as any).healthLinks();
 }
 
 // ---- Main ----
@@ -192,3 +195,5 @@ export async function main(argv: string[] = process.argv.slice(2)) {
       );
   }
 }
+
+export default { main };

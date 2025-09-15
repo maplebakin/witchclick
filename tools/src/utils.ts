@@ -4,7 +4,7 @@ import path from 'node:path';
 
 export function readJSON<T = any>(p: string, fallback?: T): T {
   try {
-    return JSON.parse(fs.readFileSync(p, 'utf8'));
+    return JSON.parse(fs.readFileSync(p, 'utf8')) as T;
   } catch {
     return fallback as T;
   }
