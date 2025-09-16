@@ -6,14 +6,12 @@ import path from 'node:path';
 
 export const prerender = false; // never emit in static builds
 
-// Safe settings read (fallbacks keep dev happy)
-function safeReadJSON(p, fallback = {}) {
-  try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return fallback; }
-}
-const settings = safeReadJSON(path.join(process.cwd(), 'content', 'settings.json'), {
-  siteUrl: 'https://example.com',
-  brandName: 'WitchClick',
-});
+// ---- Safe settings read (inline, no helper needed)
+const settingsPath = path.join(process.cwd(), 'content', 'settings.json');
+let settings: { siteUrl: string; brandName: string } = { siteUrl: 'https://example.com', brandName: 'WitchClick' };
+try {
+  settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+} catch { /* keep defaults */ }
 
 // Gate: dev OR query ?key=PUBLIC_ADMIN_KEY (useful if you later switch to a server adapter)
 const isDev = import.meta.env.DEV;
@@ -22,6 +20,7 @@ const url = new URL(Astro.request.url);
 const keyOk = ADMIN_KEY && url.searchParams.get('key') === ADMIN_KEY;
 const canUse = isDev || !!keyOk;
 
+// Dev API base (falls back to localhost if not set)
 const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 ---
 <Base title="WitchClick — Admin" description="Prompt, preview, ingest, publish." canon={`${String(settings.siteUrl).replace(/\/$/,'')}/admin`} wide={true} noindex={true}>
@@ -31,7 +30,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
   {canUse ? (
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-12" data-dev-api={DEV_API}>
-      <!-- LEFT: Prompt builder -->
+      {/* LEFT: Prompt builder */}
       <section class="lg:col-span-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
         <h1 class="mb-3 text-xl font-semibold">1) Build Post Generator Prompt</h1>
         <div class="grid gap-3">
@@ -60,7 +59,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         </div>
       </section>
 
-      <!-- RIGHT: JSON preview / ingest / publish -->
+      {/* RIGHT: JSON preview / ingest / publish */}
       <section class="lg:col-span-7 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
         <h2 class="mb-3 text-xl font-semibold">2) Paste PostSpec JSON → Preview → Ingest → Publish</h2>
 
@@ -130,11 +129,88 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           catch { $('promptOut').select(); document.execCommand('copy'); setStatus('Copied ✓'); }
         });
 
-        function parseSpec(){
-          var txt = $('spec').value;
-          if (!txt.trim()) throw new Error('No JSON provided.');
-          try { return JSON.parse(txt); } catch(e){ throw new Error('Invalid JSON: ' + e.message); }
+        // --- JSON paste sanitizer: remove illegal backslashes before []{} when OUTSIDE strings
+        function deBackslashOutsideStrings(s){
+          var out='', inStr=false, esc=false;
+          for (var i=0;i<s.length;i++){
+            var ch=s[i];
+            if (inStr){
+              out+=ch;
+              if (esc){ esc=false; }
+              else if (ch==='\\'){ esc=true; }
+              else if (ch==='"'){ inStr=false; }
+            } else {
+              if (ch === '"'){ inStr=true; out+=ch; }
+              else if (ch === '\\'){
+                var next=s[i+1];
+                if (next==='[' || next===']' || next==='{' || next==='}'){ continue; } // drop stray backslash
+                out+=ch;
+              } else { out+=ch; }
+            }
+          }
+          return out;
         }
+
+        function parseSpec(){
+  function stripCodeFences(s){
+    // remove leading/trailing ``` or ```json fences
+    return s
+      .replace(/^\s*```(?:json)?\s*/i, '')
+      .replace(/\s*```\s*$/, '');
+  }
+  function normalizeQuotes(s){
+    return s
+      .replace(/[\u201C\u201D]/g, '"') // smart double
+      .replace(/[\u2018\u2019]/g, "'"); // smart single
+  }
+  function stripInvisible(s){
+    // BOM + zero-width + NBSP + CR
+    return s.replace(/[\uFEFF\u200B-\u200F\u202A-\u202E\u00A0\r]/g, '');
+  }
+  // remove stray backslashes before []{} only when OUTSIDE strings
+  function deBackslashOutsideStrings(s){
+    var out='', inStr=false, esc=false;
+    for (var i=0;i<s.length;i++){
+      var ch=s[i];
+      if (inStr){
+        out+=ch;
+        if (esc){ esc=false; }
+        else if (ch==='\\'){ esc=true; }
+        else if (ch==='"'){ inStr=false; }
+      } else {
+        if (ch === '"'){ inStr=true; out+=ch; }
+        else if (ch === '\\'){
+          var next=s[i+1];
+          if (next==='[' || next===']' || next==='{' || next==='}'){ continue; } // drop
+          out+=ch;
+        } else { out+=ch; }
+      }
+    }
+    return out;
+  }
+
+  var raw = document.getElementById('spec').value;
+  if (!raw.trim()) throw new Error('No JSON provided.');
+
+  // Stage 0: trim code fences & normalize quotes & strip invisibles
+  var base = stripInvisible(normalizeQuotes(stripCodeFences(raw)));
+
+  // Try as-is
+  try { return JSON.parse(base); } catch(_e){}
+
+  // Try with stray top-level backslashes removed
+  var fixed = deBackslashOutsideStrings(base);
+  try { return JSON.parse(fixed); } catch(_e){}
+
+  // If body is a quoted JSON string → parse twice
+  try {
+    var maybe = JSON.parse(base);
+    if (typeof maybe === 'string') return JSON.parse(maybe);
+  } catch(_e){}
+
+  throw new Error('Invalid JSON — cleaned for fences/quotes, but structure still fails. Save to a file and validate with jq.');
+}
+
 
         function checkSpec(s){
           var errors = [], warnings = [];
@@ -144,20 +220,20 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           if (!Array.isArray(s.tags) || s.tags.length < 4 || s.tags.length > 7) errors.push('tags must be 4–7');
           var mdLen = (s.metaDescription || '').length;
           if (mdLen < 150 || mdLen > 160) warnings.push('metaDescription length ~'+mdLen+' (target 150–160)');
-          var heads = (s.sections||[]).map(x => String(x.heading||'').toLowerCase());
-          var body = (s.sections||[]).map(x => x.markdown||'').join('\n').toLowerCase();
-          var hasOpening = heads.some(h => h.includes('opening reflection')) || heads.some(h => /^opening/.test(h) && /reflection|scene|note/.test(h));
+          var heads = (s.sections||[]).map(function(x){ return String(x.heading||'').toLowerCase(); });
+          var body = (s.sections||[]).map(function(x){ return x.markdown||''; }).join('\n').toLowerCase();
+          var hasOpening = heads.some(function(h){ return h === 'opening reflection' || (h.startsWith('opening') && /reflection|scene|note/.test(h)); });
           if (!hasOpening) errors.push('Missing section: Opening Reflection');
-          var hasQuick = heads.some(h => /quick|low[- ]?energy|5[- ]?minute/.test(h)) || /quick|low[- ]?energy/.test(body);
-          var hasDeep  = heads.some(h => /deep( dive)?|long(er)?/.test(h)) || /deep( dive)?/.test(body);
+          var hasQuick = heads.some(function(h){ return /quick|low[- ]?energy|5[- ]?minute/.test(h); }) || /quick|low[- ]?energy/.test(body);
+          var hasDeep  = heads.some(function(h){ return /deep( dive)?|long(er)?/.test(h); }) || /deep( dive)?/.test(body);
           if (!(hasQuick && hasDeep)) errors.push('Ritual variants required: Quick/Low-Energy and Deep');
-          var hasChecklist = heads.some(h => /checklist|summary|at a glance/.test(h));
+          var hasChecklist = heads.some(function(h){ return /checklist|summary|at a glance/.test(h); });
           if (!hasChecklist) errors.push('Missing section: Checklist/Summary');
-          var hasReflect = heads.some(h => /reflection prompt|journal|reflection/.test(h)) || /prompt|question/.test(body);
+          var hasReflect = heads.some(function(h){ return /reflection prompt|journal|reflection/.test(h); }) || /prompt|question/.test(body);
           if (!hasReflect) errors.push('Missing section: Reflection Prompt');
           if (!(typeof s.heroImagePrompt === 'string' || s.heroImagePrompt === null)) errors.push('heroImagePrompt must be string or null');
           if (!Array.isArray(s.internalLinkHints) || s.internalLinkHints.length < 3) warnings.push('internalLinkHints are sparse (aim 5–8).');
-          return { ok: errors.length===0, errors, warnings };
+          return { ok: errors.length===0, errors: errors, warnings: warnings };
         }
 
         $('validateBtn').addEventListener('click', function(){

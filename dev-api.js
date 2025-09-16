@@ -41,15 +41,59 @@ function parseBody(req) {
     req.on('data', (c) => { buf += c; });
     req.on('end', () => {
       if (!buf.trim()) return resolve(null);
-      try {
-        const cleaned = buf.replace(/^\uFEFF/, '').replace(/,\s*([}\]])/g, '$1'); // strip BOM + trailing commas
-        resolve(JSON.parse(cleaned));
-      } catch (e) {
-        reject(e);
+
+      // Helper: remove backslashes before []{} only when OUTSIDE strings
+      function deBackslashOutsideStrings(s) {
+        let out = '', inStr = false, esc = false;
+        for (let i = 0; i < s.length; i++) {
+          const ch = s[i];
+          if (inStr) {
+            out += ch;
+            if (esc) { esc = false; }
+            else if (ch === '\\') { esc = true; }
+            else if (ch === '"') { inStr = false; }
+          } else {
+            if (ch === '"') {
+              inStr = true; out += ch;
+            } else if (ch === '\\') {
+              const next = s[i + 1];
+              if (next === '[' || next === ']' || next === '{' || next === '}') {
+                // drop this backslash (it shouldn't be here at top level)
+                continue;
+              }
+              out += ch;
+            } else {
+              out += ch;
+            }
+          }
+        }
+        return out;
       }
+
+      // Existing cleanups: BOM + trailing commas (keep these)
+      const base = buf.replace(/^\uFEFF/, '').replace(/,\s*([}\]])/g, '$1');
+
+      // Strategy 1: normal parse
+      try { return resolve(JSON.parse(base)); } catch {}
+
+      // Strategy 2: fix stray backslashes outside strings (e.g. "tags":\[)
+      const fixed = deBackslashOutsideStrings(base);
+      try { return resolve(JSON.parse(fixed)); } catch {}
+
+      // Strategy 3: double-encoded body (JSON string containing JSON)
+      try {
+        const maybe = JSON.parse(base);
+        if (typeof maybe === 'string') {
+          return resolve(JSON.parse(maybe));
+        }
+      } catch {}
+
+      // Last resort: show a concise preview to help debug
+      return reject(new Error('Invalid JSON after cleanup. Starts with: ' + base.slice(0, 120)));
     });
   });
 }
+
 
 // ---------- YAML-ish helpers ----------
 const yq = (v) => JSON.stringify(String(v ?? '').replace(/\r\n?/g, '\n')); // JSON string literal (YAML 1.2-valid)

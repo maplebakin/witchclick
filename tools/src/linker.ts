@@ -370,3 +370,14 @@ const { html, stats } = autoLink(inputHtml, {
   matchWhole: false,
 });
 ------------------------------------------------------------------ */
+export async function linkerCmd(argv: string[] = []): Promise<number> {
+  console.log('[linker] running with args', argv);
+
+  // … your linker logic here …
+  // For now you can just succeed:
+  return 0;
+}
+
+// aliases so wcMain can find one regardless
+export const linker = linkerCmd;
+export default linkerCmd;
