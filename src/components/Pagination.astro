@@ -1,0 +1,26 @@
+---
+interface Props {
+page: number;
+totalPages: number;
+baseHref?: string; // e.g. '/page' or '/tag/some-tag'
+}
+const { page = 1, totalPages = 1, baseHref = '/page' } = Astro.props as Props;
+const p = Number(page);
+---
+<nav class="mt-8 flex items-center gap-2" aria-label="Pagination">
+{p > 1 ? (
+<a class="px-3 py-1 rounded bg-neutral-900 border border-neutral-800 hover:bg-plum-800" href={`${baseHref}/${p - 1}`} rel="prev">← Prev</a>
+) : (
+<span class="px-3 py-1 rounded opacity-40">← Prev</span>
+)}
+
+
+<div class="text-sm text-neutral-400">Page {p} of {totalPages}</div>
+
+
+{p < totalPages ? (
+<a class="px-3 py-1 rounded bg-neutral-900 border border-neutral-800 hover:bg-plum-800" href={`${baseHref}/${p + 1}`} rel="next">Next →</a>
+) : (
+<span class="px-3 py-1 rounded opacity-40">Next →</span>
+)}
+</nav>

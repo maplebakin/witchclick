@@ -1,11 +1,15 @@
+// tsconfig.json
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] },
+    "types": ["node", "astro/client"],
     "module": "ES2022",
     "target": "ES2022",
     "moduleResolution": "Bundler",
-    "types": ["node"],
     "jsx": "react-jsx",
     "skipLibCheck": true
   },
-  "include": ["src/**/*", "tools/src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules","tools/_compiled","dist"]
 }

@@ -1,0 +1,61 @@
+---
+// Featherweight client-side search (no deps). Fetches /search.json at runtime
+---
+<div class="relative w-full max-w-xs" data-search>
+  <input
+    type="search"
+    placeholder="Search posts…"
+    class="w-full rounded-full border border-purple-200 bg-white/70 px-4 py-1.5 text-sm outline-none placeholder:text-purple-400 focus:border-purple-400"
+  />
+  <div class="absolute left-0 right-0 z-50 mt-2 hidden overflow-hidden rounded-xl border border-purple-200 bg-white shadow-lg" data-results></div>
+</div>
+
+<script>
+(() => {
+  const root = document.currentScript?.previousElementSibling?.closest('[data-search]');
+  if (!root) { return void 0; }
+  const input = root.querySelector('input');
+  const results = root.querySelector('[data-results]');
+  let data = [];
+  let loaded = false;
+
+  async function ensure(){
+    if (loaded) return;
+    try {
+      const r = await fetch('/search.json', { cache: 'no-store' });
+      data = await r.json();
+      loaded = true;
+    } catch { /* ignore */ }
+  }
+
+  function render(items){
+    if (!items.length){ results.classList.add('hidden'); results.innerHTML = ''; return; }
+    results.classList.remove('hidden');
+    results.innerHTML = items.slice(0,8).map(item => `
+      <a class="block px-3 py-2 text-sm hover:bg-purple-50" href="/post/${escapeHtml(item.slug)}">
+        <div class="font-medium text-purple-900">${escapeHtml(item.title)}</div>
+        ${item.excerpt ? `<div class=\"text-xs text-purple-600 line-clamp-2\">${escapeHtml(item.excerpt)}</div>` : ''}
+      </a>
+    `).join('');
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  input.addEventListener('input', async () => {
+    const q = input.value.trim().toLowerCase();
+    if (!q){ render([]); return; }
+    await ensure();
+    const items = data.filter(item => {
+      const hay = `${item.title} ${item.excerpt} ${(item.tags||[]).join(' ')}`.toLowerCase();
+      return hay.includes(q);
+    });
+    render(items);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!results.contains(e.target) && e.target !== input) results.classList.add('hidden');
+  });
+})();
+</script>

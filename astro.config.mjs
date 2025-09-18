@@ -1,9 +1,10 @@
-// astro.config.mjs
+// astro.config.mjs — drop‑in with '@' alias preserved around your existing config
 import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 import sitemap from "@astrojs/sitemap";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from 'node:url';
 
 /** -------- Read settings with safe fallback -------- */
 function readSettings() {
@@ -37,7 +38,6 @@ function normalizeSite(u) {
 // Server in DEV so /api routes accept POST; Static in BUILD so deploys stay simple.
 export default defineConfig(({ command }) => {
   const output = command === "dev" ? "server" : "static";
-  // Keep the friendly log you had
   console.log("[astro.config] command =", command, "→ output =", output);
 
   const site = normalizeSite(settings.siteUrl);
@@ -45,8 +45,6 @@ export default defineConfig(({ command }) => {
   return {
     site,
     output,
-
-    // Keep URLs clean on a static site
     trailingSlash: "never",
     compressHTML: true,
 
@@ -54,7 +52,6 @@ export default defineConfig(({ command }) => {
       tailwind(),
       sitemap({
         filter: (page) => {
-          // Skip admin, api, and 404 pages from sitemap
           if (/\/admin(\/|$)/.test(page)) return false;
           if (/\/api\//.test(page)) return false;
           if (/\/404(\.html)?$/.test(page)) return false;
@@ -64,28 +61,30 @@ export default defineConfig(({ command }) => {
     ],
 
     markdown: {
-      syntaxHighlight: false, // lighter, faster
-      gfm: true,              // GitHub-flavored markdown (tables, etc.)
-      smartypants: true,      // nicer punctuation
+      syntaxHighlight: false,
+      gfm: true,
+      smartypants: true,
     },
 
-    // Handy shortcut redirects (optional)
     redirects: {
       "/rss": "/rss.xml",
       "/feed": "/rss.xml",
     },
 
-    // Dev niceties
     server: {
-      host: true, // allow LAN testing
-      // port: 4321, // uncomment to pin the port
+      host: true,
+      // port: 4321,
     },
 
-    // Vite tweaks if/when needed
+    // ✅ Vite alias so `@/…` resolves to `src/…`
     vite: {
-      // Define a build timestamp if you want cache-busting fingerprints in templates
       define: {
         __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+      },
+      resolve: {
+        alias: {
+          '@': fileURLToPath(new URL('./src', import.meta.url)),
+        },
       },
       // optimizeDeps: { include: [] },
       // ssr: { external: [] },

@@ -1,76 +1,26 @@
 ---
-// src/pages/entities/index.astro
-import Base from '../../layouts/Base.astro';
-import fs from 'node:fs';
-import path from 'node:path';
+import Base from "../../layouts/Base.astro";
+import EntityCard from "../../components/EntityCard.astro";
+import { readAllEntities } from "../../utils/entities";
 
-// Safe JSON read
-function safeReadJSON(p:string, fallback:any=null){
-  try { return JSON.parse(fs.readFileSync(p,'utf8')); } catch { return fallback; }
-}
 
-const ROOT = process.cwd();
-const SETTINGS_PATH = path.join(ROOT, 'content', 'settings.json');
-const ENT_DIR = path.join(ROOT, 'content', 'entities');
-
-const settings = safeReadJSON(SETTINGS_PATH, { siteUrl: 'https://example.com' });
-
-// Grouped items by type
-type Item = { type: string; name: string; slug: string; summary?: string };
-const items: Record<string, Item[]> = {};
-
-if (fs.existsSync(ENT_DIR)) {
-  const types = fs.readdirSync(ENT_DIR).filter((d) => {
-    const p = path.join(ENT_DIR, d);
-    try { return fs.statSync(p).isDirectory(); } catch { return false; }
-  });
-  for (const t of types) {
-    const dir = path.join(ENT_DIR, t);
-    const arr: Item[] = [];
-    try {
-      const files = fs.readdirSync(dir).filter((f) => f.endsWith('.json'));
-      for (const f of files) {
-        try {
-          const data = safeReadJSON(path.join(dir, f), null);
-          if (!data) continue;
-          arr.push({
-            type: String(data.type || t),
-            name: String(data.name || data.slug || f.replace(/\.json$/,'')),
-            slug: String(data.slug || f.replace(/\.json$/,'')),
-            summary: String(data.summary || '')
-          });
-        } catch {}
-      }
-    } catch {}
-    if (arr.length) {
-      arr.sort((a,b)=> a.name.localeCompare(b.name));
-      items[t] = arr;
-    }
-  }
-}
-
-const canon = `${String(settings.siteUrl || '').replace(/\/$/,'')}/entities`;
+const all = readAllEntities();
+const typeNames = Object.keys(all).sort();
 ---
-<Base title="Entities" description="Crystals, herbs, moon phases, and more." canon={canon}>
-  <section class="prose-witch">
-    <h1>Entities</h1>
-    {Object.keys(items).length === 0 && (
-      <p>No entities yet. Ingest a post that references entities to create stubs under <code>content/entities</code>.</p>
-    )}
-    {Object.entries(items)
-      .sort(([a],[b]) => a.localeCompare(b)) /* stable type order */
-      .map(([type, arr]) => (
-      <>
-        <h2 class="capitalize">{type}</h2>
-        <ul>
-          {arr.map((it) => (
-            <li>
-              <a class="underline text-purple-700" href={`/entities/${type}/${it.slug}`}>{it.name}</a>
-              {it.summary && <span class="text-gray-600 text-sm"> — {it.summary}</span>}
-            </li>
-          ))}
-        </ul>
-      </>
-    ))}
-  </section>
+<Base title="Entities — WitchClick">
+<h1 class="mb-6">Entities</h1>
+{typeNames.length === 0 ? (
+<p class="text-neutral-400">No entities yet. They are created automatically when you ingest a post that references them, or via your admin endpoint.</p>
+) : (
+typeNames.map((type) => (
+<section class="mb-10">
+<h2 class="text-xl font-semibold mb-3">{type}</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+{all[type].map((e) => (
+<EntityCard type={e.type} slug={e.slug} name={e.name} summary={e.summary} />
+))}
+</div>
+</section>
+))
+)}
 </Base>

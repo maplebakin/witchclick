@@ -1,10 +1,12 @@
 ---
-// src/pages/post/[slug].astro
+// src/pages/post/[slug].astro — drop‑in replacement with Entities sidebar
 import Base from "../../layouts/Base.astro";
 import AdSlot from "../../components/AdSlot.astro";
 import Disclosure from "../../components/Disclosure.astro";
 import KofiBlock from "../../components/KofiBlock.astro";
 import DownloadCard from "../../components/DownloadCard.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+import { readEntity } from "../../utils/entities";
 
 import fs from "node:fs";
 import path from "node:path";
@@ -122,6 +124,12 @@ if (frontAnchors.length > 0) {
   }
 }
 
+// ==== Entities referenced (from post frontmatter) ====
+const entList = Array.isArray(data.entities) ? data.entities : [];
+const resolvedEntities = entList
+  .map((e: any) => readEntity(String(e.type || ""), String(e.slug || "")))
+  .filter(Boolean);
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
@@ -199,6 +207,21 @@ function stripInlineHandlers(html: string) {
 
       {data.downloadId && <DownloadCard id={data.downloadId} />}
 
+      {resolvedEntities.length > 0 ? (
+        <aside class="mt-8 border-t border-purple-100/60 pt-6">
+          <h2 class="text-lg font-semibold mb-2">Entities referenced</h2>
+          <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {resolvedEntities.map((e: any) => (
+              <li>
+                <a class="underline underline-offset-4 hover:no-underline" href={`/entities/${e.type}/${e.slug}`}>
+                  {e.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      ) : null}
+
       {data.includeAds && <AdSlot slot="end" class="mt-8" />}
 
       {data.includeKofi && <KofiBlock />}
@@ -223,6 +246,8 @@ function stripInlineHandlers(html: string) {
           </ul>
         </nav>
       )}
+
+      <RelatedPosts currentSlug={effectiveSlug} tags={data.tags || []} />
     </article>
 
     {data.includeAds && (

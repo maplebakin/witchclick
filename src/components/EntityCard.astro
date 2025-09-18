@@ -1,0 +1,14 @@
+---
+export interface Props {
+type: string;
+slug: string;
+name: string;
+summary?: string;
+}
+const { type, slug, name, summary = '' } = Astro.props as Props;
+---
+<a href={`/entities/${type}/${slug}`} class="card block p-5 group">
+<div class="text-xs uppercase tracking-wider text-neutral-400 mb-2">{type}</div>
+<h3 class="text-lg font-semibold group-hover:text-plum-300">{name}</h3>
+{summary && <p class="mt-2 text-neutral-300 text-sm">{summary}</p>}
+</a>

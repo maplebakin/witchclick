@@ -1,0 +1,51 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import matter from 'gray-matter';
+import PostCard from './PostCard.astro';
+
+
+interface Props {
+currentSlug: string; // e.g. 'tea-ritual-for-focus'
+tags?: string[]; // current post's tags
+limit?: number; // default 3
+}
+const { currentSlug, tags = [], limit = 3 } = Astro.props as Props;
+
+
+const postsDir = path.join(process.cwd(), 'content', 'posts');
+const files = fs.existsSync(postsDir) ? fs.readdirSync(postsDir).filter(f => f.endsWith('.md')) : [];
+
+
+const all = files.map(file => {
+const raw = fs.readFileSync(path.join(postsDir, file), 'utf8');
+const { data } = matter(raw);
+const slug = (data?.slug ? String(data.slug) : file.replace(/\.md$/, '')).toLowerCase();
+const date = new Date(data?.publishedAt || data?.pubDate || data?.date || 0);
+const tagSet = new Set((Array.isArray(data?.tags) ? data.tags : []).map((t:any)=>String(t).toLowerCase()));
+return { slug, data, date, tagSet };
+}).filter(p => p.slug !== currentSlug);
+
+
+// score by shared tags (desc), then by date (newest first)
+function score(post){
+let s = 0;
+for (const t of tags.map(x=>String(x).toLowerCase())) if (post.tagSet.has(t)) s++;
+return s;
+}
+const ranked = all
+.map(p => ({ ...p, _score: score(p) }))
+.filter(p => p._score > 0)
+.sort((a,b) => b._score - a._score || (+b.date - +a.date))
+.slice(0, limit);
+---
+{ranked.length > 0 ? (
+<section class="mt-12">
+<h2 class="mb-3 text-lg font-semibold">You might also enjoy</h2>
+<div class="grid gap-4 sm:grid-cols-2">
+{ranked.map((p) => (
+<PostCard post={p.data} />
+))}
+</div>
+</section>
+) : null}

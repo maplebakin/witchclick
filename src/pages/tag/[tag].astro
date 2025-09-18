@@ -1,0 +1,65 @@
+---
+import Base from "../../layouts/Base.astro";
+import PostCard from "../../components/PostCard.astro";
+import fs from "node:fs";
+import path from "node:path";
+import matter from "gray-matter";
+
+
+export const prerender = true;
+
+
+export async function getStaticPaths(){
+const dir = path.join(process.cwd(), 'content', 'posts');
+const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f=>f.endsWith('.md')) : [];
+const posts = files.map((file) => {
+const full = path.join(dir, file);
+const raw = fs.readFileSync(full, 'utf8');
+const { data } = matter(raw);
+const slug = (data?.slug ? String(data.slug) : file.replace(/\.md$/, '')).toLowerCase();
+const tags = Array.isArray(data?.tags) ? data.tags.map((t:any)=>String(t).toLowerCase()) : [];
+const dateFront = [data?.publishedAt, data?.pubDate, data?.date, data?.updatedAt].filter(Boolean);
+let date = new Date(dateFront[0] || 0); if (isNaN(+date)) date = fs.statSync(full).mtime;
+return { slug, data: { ...data, tags }, date };
+});
+
+
+const tagSet = new Set<string>();
+posts.forEach(p => p.data.tags?.forEach((t:string)=> tagSet.add(t)));
+const tags = Array.from(tagSet).sort();
+
+
+return tags.map((t) => ({ params: { tag: t }, props: { tag: t } }));
+}
+
+
+const { tag } = Astro.props as { tag: string };
+
+
+// Build the filtered list for this tag
+const dir = path.join(process.cwd(), 'content', 'posts');
+const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f=>f.endsWith('.md')) : [];
+const pagePosts = files.map((file) => {
+const full = path.join(dir, file);
+const raw = fs.readFileSync(full, 'utf8');
+const { data } = matter(raw);
+const slug = (data?.slug ? String(data.slug) : file.replace(/\.md$/, '')).toLowerCase();
+const tags = Array.isArray(data?.tags) ? data.tags.map((t:any)=>String(t).toLowerCase()) : [];
+const dateFront = [data?.publishedAt, data?.pubDate, data?.date, data?.updatedAt].filter(Boolean);
+let date = new Date(dateFront[0] || 0); if (isNaN(+date)) date = fs.statSync(full).mtime;
+return { slug, data: { ...data, tags }, date };
+}).filter(p => p.data.tags.includes(tag.toLowerCase()))
+.sort((a,b)=> +b.date - +a.date);
+---
+<Base title={`Tag: ${tag} — WitchClick`}>
+<h1 class="mb-6">Tag: {tag}</h1>
+{pagePosts.length === 0 ? (
+<p class="text-neutral-400">No posts found for this tag yet. <a class="underline" href="/">Back to home</a>.</p>
+) : (
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+{pagePosts.map((p) => (
+<PostCard post={{ ...p.data, slug: p.slug }} href={`/post/${p.slug}`} />
+))}
+</div>
+)}
+</Base>

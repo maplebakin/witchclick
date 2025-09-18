@@ -3,6 +3,7 @@
 import "../styles/tailwind.css";
 import fs from "node:fs";
 import path from "node:path";
+import SearchBox from "../components/SearchBox.astro";
 
 type Props = {
   title?: string;
@@ -195,6 +196,9 @@ const links = [
             })}
           </ul>
         </nav>
+        <div class="hidden sm:block">
+<SearchBox />
+</div>
       </div>
     </header>
 
