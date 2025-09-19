@@ -1,11 +1,11 @@
 ---
-// src/pages/post/[slug].astro — drop‑in replacement with Entities sidebar
+// src/pages/post/[slug].astro — drop‑in replacement with Entities sidebar + Ko‑fi CTA randomizer
 import Base from "../../layouts/Base.astro";
 import AdSlot from "../../components/AdSlot.astro";
 import Disclosure from "../../components/Disclosure.astro";
-import KofiBlock from "../../components/KofiBlock.astro";
 import DownloadCard from "../../components/DownloadCard.astro";
 import RelatedPosts from "../../components/RelatedPosts.astro";
+import CtaFooter from "../../components/CtaFooter.astro"; // ← randomizes cozy Ko‑fi text
 import { readEntity } from "../../utils/entities";
 
 import fs from "node:fs";
@@ -146,8 +146,8 @@ const jsonLd = {
 function wordCount(md: string): number {
   return md
     .replace(/```[\s\S]*?```/g, " ")
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-    .replace(/[#>*_`~\-]+/g, " ")
+    .replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1")
+    .replace(/[#$>*_`~\-]+/g, " ")
     .split(/\s+/)
     .filter(Boolean).length;
 }
@@ -155,7 +155,7 @@ function wordCount(md: string): number {
 function firstSentence(md: string): string | null {
   const asText = md
     .replace(/```[\s\S]*?```/g, " ")
-    .replace(/[#>*_`~\-]+/g, " ")
+    .replace(/[#$>*_`~\-]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
   const m = asText.match(/^(.{40,200}?[.!?])\s/);
@@ -224,8 +224,6 @@ function stripInlineHandlers(html: string) {
 
       {data.includeAds && <AdSlot slot="end" class="mt-8" />}
 
-      {data.includeKofi && <KofiBlock />}
-
       {(prev || next) && (
         <nav class="mt-10 border-t border-purple-100/60 pt-6 text-sm" aria-label="Post navigation">
           <ul class="flex flex-col gap-2 sm:flex-row sm:justify-between">
@@ -248,6 +246,11 @@ function stripInlineHandlers(html: string) {
       )}
 
       <RelatedPosts currentSlug={effectiveSlug} tags={data.tags || []} />
+
+      {/* Ko‑fi CTA randomizer (build‑time pick) */}
+      <div class="mt-10">
+        <CtaFooter type={data.includeKofi ? 'kofi' : 'none'} />
+      </div>
     </article>
 
     {data.includeAds && (

@@ -5,6 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 import SearchBox from "../components/SearchBox.astro";
 
+
 type Props = {
   title?: string;
   description?: string;
@@ -205,6 +206,14 @@ const links = [
     <main id="main" class={`mx-auto ${mainWidthClass} px-4 pb-16`}>
       <slot />
     </main>
+<main id="main" class={`mx-auto ${mainWidthClass} px-4 pb-16`}>
+  <slot />
+</main>
+
+<!-- CTA slot (filled only on posts) -->
+<slot name="cta" />
+
+<footer class="mt-auto border-t border-purple-100/60 bg-white/50">
 
     <footer class="mt-auto border-t border-purple-100/60 bg-white/50">
       <div class={`mx-auto ${mainWidthClass} px-4 py-8 text-sm leading-relaxed text-gray-700`}>

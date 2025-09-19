@@ -1,0 +1,40 @@
+---
+// src/components/CtaFooter.astro — fixed
+// Astro frontmatter is server-side script; don't return JSX from here.
+// We compute text/href, then render conditionally in the template below.
+import { KO_FI_URL, KOFI_CTA_VARIANTS } from "./cta";
+
+export interface Props {
+  type: 'kofi' | 'download' | 'none';
+  id?: string;
+}
+
+const { type, id } = Astro.props as Props;
+
+let text = '';
+let href = '';
+
+if (type === 'kofi') {
+  const idx = Math.floor(Math.random() * KOFI_CTA_VARIANTS.length);
+  text = KOFI_CTA_VARIANTS[idx];
+  href = KO_FI_URL;
+} else if (type === 'download' && id) {
+  text = 'Grab the printable that goes with this post.';
+  href = `/download/${id}`;
+}
+---
+{type !== 'none' && text && href && (
+  <section class="mt-10 rounded-2xl border border-neutral-200/60 bg-neutral-50 p-5 dark:border-neutral-800 dark:bg-neutral-900">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <p class="text-base leading-relaxed text-neutral-800 dark:text-neutral-200">{text}</p>
+      <a
+        href={href}
+        class="inline-flex shrink-0 items-center justify-center rounded-xl px-4 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-0"
+        style="background: linear-gradient(135deg, #7c4dff, #e91e63);"
+        rel="noopener noreferrer"
+      >
+        {type === 'kofi' ? 'Support on Ko‑fi' : 'Download'}
+      </a>
+    </div>
+  </section>
+)}
