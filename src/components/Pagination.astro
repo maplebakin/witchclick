@@ -2,16 +2,25 @@
 interface Props {
 page: number;
 totalPages: number;
-baseHref?: string; // e.g. '/page' or '/tag/some-tag'
+/** base href without trailing slash, e.g. '/page' or '/tag/some-tag' */
+baseHref?: string;
 }
 const { page = 1, totalPages = 1, baseHref = '/page' } = Astro.props as Props;
 const p = Number(page);
 ---
+
+
 <nav class="mt-8 flex items-center gap-2" aria-label="Pagination">
 {p > 1 ? (
-<a class="px-3 py-1 rounded bg-neutral-900 border border-neutral-800 hover:bg-plum-800" href={`${baseHref}/${p - 1}`} rel="prev">← Prev</a>
+<a
+class="px-3 py-1 rounded bg-neutral-900 border border-neutral-800 hover:bg-plum-800"
+href={`${baseHref}/${p - 1}`}
+rel="prev"
+>
+← Prev
+</a>
 ) : (
-<span class="px-3 py-1 rounded opacity-40">← Prev</span>
+<span class="px-3 py-1 rounded opacity-40" aria-disabled="true">← Prev</span>
 )}
 
 
@@ -19,8 +28,14 @@ const p = Number(page);
 
 
 {p < totalPages ? (
-<a class="px-3 py-1 rounded bg-neutral-900 border border-neutral-800 hover:bg-plum-800" href={`${baseHref}/${p + 1}`} rel="next">Next →</a>
+<a
+class="px-3 py-1 rounded bg-neutral-900 border border-neutral-800 hover:bg-plum-800"
+href={`${baseHref}/${p + 1}`}
+rel="next"
+>
+Next →
+</a>
 ) : (
-<span class="px-3 py-1 rounded opacity-40">Next →</span>
+<span class="px-3 py-1 rounded opacity-40" aria-disabled="true">Next →</span>
 )}
 </nav>

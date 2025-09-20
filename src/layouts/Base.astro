@@ -1,105 +1,46 @@
+
 ---
-/* src/layouts/Base.astro */
+/* src/layouts/Base.astro — JS-only frontmatter, trimmed & HTML-safe */
 import "../styles/tailwind.css";
-import fs from "node:fs";
-import path from "node:path";
 import SearchBox from "../components/SearchBox.astro";
 
+const props = Astro.props || {};
+const title = props.title ?? "WitchClick";
+const description = props.description ?? "";
+const canon = props.canon ?? "";
+const wide = !!props.wide;
+const ogImage = props.ogImage ?? "";
+const noindex = !!props.noindex;
 
-type Props = {
-  title?: string;
-  description?: string;
-  canon?: string;     // absolute canonical URL; will auto-fallback if omitted
-  wide?: boolean;     // true on wider pages (posts w/ sidebar etc.)
-  ogImage?: string;   // absolute social image URL
-  noindex?: boolean;  // set on admin or throwaway pages
-};
+// Minimal site settings (can wire back to settings.json later)
+const brandName = "WitchClick";
+const siteUrl = "https://example.com";
 
-const {
-  title = "WitchClick",
-  description = "",
-  canon = "",
-  wide = false,
-  ogImage = "",
-  noindex = false,
-} = Astro.props as Props;
-
-/** ---------- Safe settings read (with fallbacks) ---------- */
-let settings: {
-  brandName?: string;
-  siteUrl?: string;               // e.g., "https://witchclick.space"
-  analytics?: { enabled?: boolean; endpoint?: string };
-  ads?: { provider?: string; adsenseClientId?: string };
-  twitter?: string;               // e.g., "@witchclick"
-  disclosure?: string;            // affiliate disclosure copy
-} = {
-  brandName: "WitchClick",
-  siteUrl: "https://example.com",
-  analytics: { enabled: false, endpoint: "/api/ping.json" },
-  ads: { provider: "none" },
-  twitter: "",
-  disclosure:
-    "As an affiliate, we may earn a small commission if you purchase through our links. We only share tools we find cozy and useful.",
-};
-
-try {
-  const p = path.join(process.cwd(), "content", "settings.json");
-  const raw = fs.readFileSync(p, "utf8");
-  const json = JSON.parse(raw);
-  settings = { ...settings, ...json };
-} catch {
-  // non-fatal: fall back to defaults
-}
-
-/** ---------- Helpers ---------- */
 const isDev = import.meta.env.DEV;
 const here = (Astro.url && Astro.url.pathname) || "/";
 
-const siteUrl = String(settings.siteUrl || "").replace(/\/+$/g, "");
-const abs = (u: string) => {
+function abs(u){
   if (!u) return "";
-  try {
-    return new URL(u, siteUrl || "http://localhost").toString();
-  } catch {
-    return u;
-  }
-};
+  try { return new URL(u, siteUrl || "http://localhost").toString(); } catch { return u; }
+}
 
-const computedCanonical =
-  canon?.startsWith("http")
-    ? canon
-    : siteUrl
-    ? abs(here)
-    : ""; // only emit canonical when we can form an absolute URL
+const computedCanonical = canon && canon.startsWith("http") ? canon : (siteUrl ? abs(here) : "");
+const pageTitle = title && title !== brandName ? `${title} — ${brandName}` : brandName;
+const ogImg = ogImage ? abs(ogImage) : (siteUrl ? `${siteUrl}/og-default.png` : "");
 
-const pageTitle =
-  title && title !== settings.brandName
-    ? `${title} — ${settings.brandName}`
-    : settings.brandName || title;
-
-const ogImg = ogImage
-  ? abs(ogImage)
-  : siteUrl
-  ? `${siteUrl}/og-default.png`
-  : "";
-
-/** widths */
 const headerWidthClass = wide ? "max-w-6xl" : "max-w-4xl";
 const mainWidthClass = wide ? "max-w-6xl" : "max-w-3xl";
 
-/** nav (dev-only admin links) */
 const links = [
   { href: "/", label: "Home" },
   { href: "/entities", label: "Entities" },
   { href: "/downloads", label: "Downloads" },
-  ...(isDev
-    ? [
-        { href: "/admin", label: "Post Generator", rel: "nofollow" },
-        { href: "/admin/write", label: "Write", rel: "nofollow" },
-        { href: "/admin/entities", label: "Entities Admin", rel: "nofollow" },
-        { href: "/admin/downloads", label: "Downloads Admin", rel: "nofollow" },
-      ]
-    : []),
+  ...(isDev ? [
+    { href: "/admin", label: "Post Generator", rel: "nofollow" },
+    { href: "/admin/write", label: "Write", rel: "nofollow" },
+    { href: "/admin/entities", label: "Entities Admin", rel: "nofollow" },
+    { href: "/admin/downloads", label: "Downloads Admin", rel: "nofollow" },
+  ] : []),
 ];
 ---
 <html lang="en" class="scroll-smooth">
@@ -109,87 +50,47 @@ const links = [
 
     {noindex && <meta name="robots" content="noindex" />}
 
-    {/* Ads (optional) */}
-    {settings.ads?.provider === "adsense" && settings.ads?.adsenseClientId && (
-      <script
-        async
-        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${settings.ads.adsenseClientId}`}
-        crossorigin="anonymous"
-      ></script>
-    )}
-
     <title>{pageTitle}</title>
     {description && <meta name="description" content={description} />}
     {computedCanonical && <link rel="canonical" href={computedCanonical} />}
 
     {/* Social defaults */}
-    <meta property="og:site_name" content={settings.brandName || "WitchClick"} />
+    <meta property="og:site_name" content={brandName} />
     <meta property="og:title" content={title} />
     {description && <meta property="og:description" content={description} />}
     {computedCanonical && <meta property="og:url" content={computedCanonical} />}
     {ogImg && <meta property="og:image" content={ogImg} />}
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    {settings.twitter && <meta name="twitter:site" content={settings.twitter} />}
     <meta name="theme-color" content="#6b21a8" />
 
     {/* Discoverability helpers */}
     <link rel="alternate" type="application/rss+xml" title="WitchClick RSS" href="/rss.xml" />
     <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
 
+    {/* Fonts perf */}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,300;7..72,400;7..72,700&family=Parisienne&display=swap" />
+
     {/* Page-level head slot */}
     <slot name="head" />
-
-    {/* Fonts perf */}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,300;7..72,400;7..72,700&family=Parisienne&display=swap"
-    >
-
-    {/* Website JSON-LD */}
-    {siteUrl && (
-      <script type="application/ld+json" is:inline>
-        {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: settings.brandName || "WitchClick",
-          url: siteUrl,
-          potentialAction: {
-            "@type": "SearchAction",
-            target: `${siteUrl}/?q={search_term_string}`,
-            "query-input": "required name=search_term_string",
-          },
-        })}
-      </script>
-    )}
   </head>
 
   <body class="min-h-screen bg-[#faf7f5] text-gray-900">
     {/* Skip link for a11y */}
-    <a
-      href="#main"
-      class="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 rounded bg-black px-3 py-2 text-white"
-    >Skip to content</a>
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 rounded bg-black px-3 py-2 text-white">Skip to content</a>
 
     <header class={`mx-auto ${headerWidthClass} px-4 py-6`}>
       <div class="flex items-center justify-between gap-4">
-        <a href="/" class="text-2xl font-serif" style="font-family: Parisienne, cursive;">
-          {settings.brandName || "WitchClick"}
-        </a>
+        <a href="/" class="text-2xl font-serif" style="font-family: Parisienne, cursive;">{brandName}</a>
         <nav class="text-sm" aria-label="Primary">
           <ul class="flex items-center gap-4">
             {links.map((l) => {
               const active = here === l.href || (l.href !== "/" && here.startsWith(l.href + "/"));
               return (
                 <li>
-                  <a
-                    href={l.href}
-                    rel={l.rel}
-                    aria-current={active ? "page" : undefined}
-                    class={`underline-offset-4 hover:underline ${active ? "text-purple-800 font-semibold" : "text-purple-700"}`}
-                  >
+                  <a href={l.href} rel={l.rel} aria-current={active ? "page" : undefined} class={`underline-offset-4 hover:underline ${active ? "text-purple-800 font-semibold" : "text-purple-700"}`}>
                     {l.label}
                   </a>
                 </li>
@@ -197,99 +98,37 @@ const links = [
             })}
           </ul>
         </nav>
-        <div class="hidden sm:block">
-<SearchBox />
-</div>
+        <div class="hidden sm:block"><SearchBox /></div>
       </div>
     </header>
 
     <main id="main" class={`mx-auto ${mainWidthClass} px-4 pb-16`}>
       <slot />
     </main>
-<main id="main" class={`mx-auto ${mainWidthClass} px-4 pb-16`}>
-  <slot />
-</main>
 
-<!-- CTA slot (filled only on posts) -->
-<slot name="cta" />
-
-<footer class="mt-auto border-t border-purple-100/60 bg-white/50">
+    {/* CTA slot (filled only on posts) */}
+    <slot name="cta" />
 
     <footer class="mt-auto border-t border-purple-100/60 bg-white/50">
       <div class={`mx-auto ${mainWidthClass} px-4 py-8 text-sm leading-relaxed text-gray-700`}>
-        <p class="mb-2">
-          {settings.disclosure}
-        </p>
+        <p class="mb-2">As an affiliate, we may earn a small commission if you purchase through our links. We only share tools we find cozy and useful.</p>
         <p class="flex flex-wrap items-center gap-3">
           <a class="underline underline-offset-4 hover:no-underline" href="/rss.xml">RSS</a>
           <span aria-hidden="true">•</span>
           <a class="underline underline-offset-4 hover:no-underline" href="/sitemap-index.xml">Sitemap</a>
           {computedCanonical && (
-            <>
+            <span class="inline-flex items-center gap-3">
               <span aria-hidden="true">•</span>
               <a class="underline underline-offset-4 hover:no-underline" href={computedCanonical}>Permalink</a>
-            </>
+            </span>
           )}
         </p>
-        <p class="mt-3 text-gray-500">© {new Date().getFullYear()} {settings.brandName || "WitchClick"}.</p>
+        <p class="mt-3 text-gray-500">© {new Date().getFullYear()} {brandName}.</p>
       </div>
     </footer>
-
-    {/* Minimal analytics (privacy-safe, respects DNT) */}
-    {settings.analytics?.enabled && (
-      <script is:inline>
-        {`
-          (function () {
-            try {
-              if (navigator.doNotTrack == "1" || window.doNotTrack == "1") return;
-            } catch (e) {}
-
-            var ENDPOINT = ${JSON.stringify(settings.analytics?.endpoint || "/api/ping.json")};
-            var q = (window.__wcq = window.__wcq || []);
-
-            // Clicks on marked elements
-            document.addEventListener('click', function (e) {
-              var el = e.target && e.target.closest ? e.target.closest('[data-analytics]') : null;
-              if (!el) return;
-              var type = el.getAttribute('data-analytics') || '';
-              var meta = el.getAttribute('data-analytics-meta') || '';
-              q.push({ type: type, ts: Date.now(), meta: meta, path: location.pathname });
-            }, { capture: true });
-
-            // Outbound link tracking
-            document.addEventListener('click', function (e) {
-              var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
-              if (!a) return;
-              var href = a.getAttribute('href') || '';
-              try {
-                var url = new URL(href, location.href);
-                if (url.origin !== location.origin) {
-                  q.push({ type: 'outbound', ts: Date.now(), meta: url.href, path: location.pathname });
-                }
-              } catch {}
-            }, { capture: true });
-
-            function flush(){
-              if (!q.length) return;
-              var payload = { events: q.splice(0, q.length), path: location.pathname, ts: Date.now() };
-              try {
-                if (navigator.sendBeacon) {
-                  var blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-                  navigator.sendBeacon(ENDPOINT, blob);
-                } else {
-                  fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), keepalive: true });
-                }
-              } catch {}
-            }
-
-            window.addEventListener('pagehide', flush);
-            document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden') flush(); });
-          })();
-        `}
-      </script>
-    )}
 
     {/* Optional page-tail slot for per-page scripts */}
     <slot name="foot" />
   </body>
 </html>
+```
