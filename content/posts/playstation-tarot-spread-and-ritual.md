@@ -1,21 +1,99 @@
 ---
-title: "PlayStation Tarot: Cozy Game-Night Spread & Ritual"
+title: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
 slug: playstation-tarot-spread-and-ritual
-excerpt: Blend controller-in-hand comfort with a simple tarot ritual. This spread tracks energy, obstacles, and reset moments so you can enjoy game night with focus and ease.
-metaTitle: "PlayStation Tarot: Cozy Game-Night Spread & Ritual"
-metaDescription: Turn game night into a gentle ritual with a PlayStation-themed tarot spread. Set the vibe, map momentum, and enjoy mindful breaks. Step-by-step guide plus a short checklist.
-tags: ["tarot","PlayStation","gaming","ritual","game night","cozy"]
-outline: ["Why tarot + PlayStation works","Gather your tools","The Controller Spread: 7 cards for game night","Ritual steps (pre-game to post-game)","Variations, timing, and cozy resets","Quick Checklist","Safety, accessibility, and ethics","Wrap-up"]
+excerpt: >-
+  Blend controller-in-hand comfort with a simple tarot ritual. This spread
+  tracks energy, obstacles, and reset moments so you can enjoy game night with
+  focus and ease.
+metaTitle: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
+metaDescription: >-
+  Turn game night into a gentle ritual with a PlayStation-themed tarot spread.
+  Set the vibe, map momentum, and enjoy mindful breaks. Step-by-step guide plus
+  a short checklist.
+tags:
+  - tarot
+  - PlayStation
+  - gaming
+  - ritual
+  - game night
+  - cozy
+outline:
+  - Why tarot + PlayStation works
+  - Gather your tools
+  - 'The Controller Spread: 7 cards for game night'
+  - Ritual steps (pre-game to post-game)
+  - 'Variations, timing, and cozy resets'
+  - Quick Checklist
+  - 'Safety, accessibility, and ethics'
+  - Wrap-up
 wordCount: 655
 readingMinutes: 3
-entities: [{"type":"tarot","slug":"the-sun"},{"type":"tarot","slug":"strength"},{"type":"tarot","slug":"the-hermit"},{"type":"tarot","slug":"justice"},{"type":"planetaryDay","slug":"friday"},{"type":"planetaryDay","slug":"saturday"},{"type":"planetaryDay","slug":"wednesday"},{"type":"moonPhase","slug":"new-moon"},{"type":"moonPhase","slug":"first-quarter"},{"type":"moonPhase","slug":"full-moon"},{"type":"ritual","slug":"controller-spread"},{"type":"ritual","slug":"game-night-ritual"},{"type":"crystal","slug":"hematite"},{"type":"crystal","slug":"fluorite"}]
+entities:
+  - type: tarot
+    slug: the-sun
+  - type: tarot
+    slug: strength
+  - type: tarot
+    slug: the-hermit
+  - type: tarot
+    slug: justice
+  - type: planetaryDay
+    slug: friday
+  - type: planetaryDay
+    slug: saturday
+  - type: planetaryDay
+    slug: wednesday
+  - type: moonPhase
+    slug: new-moon
+  - type: moonPhase
+    slug: first-quarter
+  - type: moonPhase
+    slug: full-moon
+  - type: ritual
+    slug: controller-spread
+  - type: ritual
+    slug: game-night-ritual
+  - type: crystal
+    slug: hematite
+  - type: crystal
+    slug: fluorite
 includeAds: true
 includeKofi: true
-affiliateAnchors: [{"key":"journal","text":"journal","insertedCount":0},{"key":"notebooks","text":"notebooks","insertedCount":0},{"key":"crystals","text":"crystals","insertedCount":0},{"key":"cozy-games","text":"cozy games","insertedCount":0}]
-internalLinks: []
-publishedAt: "2025-09-11T23:13:26.058Z"
-canonicalUrl: "https://example.com/post/playstation-tarot-spread-and-ritual"
+affiliateAnchors:
+  - key: journal
+    text: journal
+    insertedCount: 0
+  - key: notebooks
+    text: notebooks
+    insertedCount: 0
+  - key: crystals
+    text: crystals
+    insertedCount: 0
+  - key: cozy-games
+    text: cozy games
+    insertedCount: 0
+internalLinks:
+  - text: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
+    href: /post/sunday-football-tarot-spread-and-ritual
+  - text: 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore'
+    href: /post/worldbuilding-tarot-spread-and-ritual
+  - text: Tarot Ritual for When Creativity Feels Pointless
+    href: /post/creativity-tarot-ritual
+  - text: 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions'
+    href: /post/tarot-as-a-secular-tool
+  - text: 'Create a Calm Space During Political Unrest: A Gentle Guide'
+    href: /post/calm-space-during-political-unrest-2
+publishedAt: '2025-09-11T23:13:26.058Z'
+canonicalUrl: 'https://example.com/post/playstation-tarot-spread-and-ritual'
 specVersion: 2
+internalLinkHints:
+  - 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
+  - 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore'
+  - Tarot Ritual for When Creativity Feels Pointless
+  - 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions'
+  - 'Create a Calm Space During Political Unrest: A Gentle Guide'
+heroImageSrc: /hero-images/playstation-tarot-spread-and-ritual.png
+heroImageAlt: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual — hero image'
 ---
 
 ## Why tarot + PlayStation works

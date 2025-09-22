@@ -1,20 +1,64 @@
 ---
-title: "Tarot Ritual for When Creativity Feels Pointless"
+title: Tarot Ritual for When Creativity Feels Pointless
 slug: creativity-tarot-ritual
-excerpt: "When your creativity feels pointless, this gentle tarot and journaling ritual helps you reconnect with your spark—no pressure, just presence."
-metaTitle: "Tarot Ritual for When Creativity Feels Pointless"
-metaDescription: "Feeling uninspired or like your creativity doesn’t matter? Try this cozy tarot ritual and reflection practice to gently reconnect with your spark."
-tags: ["creativity", "tarot", "ritual", "self-care", "burnout", "reflection"]
-outline: ["Opening Reflection", "Quick Ritual: The Five-Minute Spark", "Deep Dive Ritual: Reclaiming the Ember", "Making It Your Own: Accessibility and Adaptation", "Safety and Gentle Ethics", "Reflection Prompt", "Checklist Summary"]
+excerpt: >-
+  When your creativity feels pointless, this gentle tarot and journaling ritual
+  helps you reconnect with your spark—no pressure, just presence.
+metaTitle: Tarot Ritual for When Creativity Feels Pointless
+metaDescription: >-
+  Feeling uninspired or like your creativity doesn’t matter? Try this cozy tarot
+  ritual and reflection practice to gently reconnect with your spark.
+tags:
+  - creativity
+  - tarot
+  - ritual
+  - self-care
+  - burnout
+  - reflection
+outline:
+  - Opening Reflection
+  - 'Quick Ritual: The Five-Minute Spark'
+  - 'Deep Dive Ritual: Reclaiming the Ember'
+  - 'Making It Your Own: Accessibility and Adaptation'
+  - Safety and Gentle Ethics
+  - Reflection Prompt
+  - Checklist Summary
 wordCount: 538
 readingMinutes: 3
 includeAds: true
 includeKofi: false
-affiliateAnchors: [{"key":"crystals","text":"carnelian","insertedCount":0},{"key":"notebooks","text":"journal","insertedCount":0},{"key":"cozy-games","text":"game controller","insertedCount":0}]
-internalLinks: []
-publishedAt: "2025-09-15T15:04:22.849Z"
-canonicalUrl: "https://witchclick.space/post/creativity-tarot-ritual"
+affiliateAnchors:
+  - key: crystals
+    text: carnelian
+    insertedCount: 0
+  - key: notebooks
+    text: journal
+    insertedCount: 0
+  - key: cozy-games
+    text: game controller
+    insertedCount: 0
+internalLinks:
+  - text: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
+    href: /post/playstation-tarot-spread-and-ritual
+  - text: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
+    href: /post/sunday-football-tarot-spread-and-ritual
+  - text: 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore'
+    href: /post/worldbuilding-tarot-spread-and-ritual
+  - text: 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions'
+    href: /post/tarot-as-a-secular-tool
+  - text: 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
+    href: /post/when-everything-feels-pointless
+publishedAt: '2025-09-15T15:04:22.849Z'
+canonicalUrl: 'https://witchclick.space/post/creativity-tarot-ritual'
 specVersion: 2
+internalLinkHints:
+  - 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
+  - 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
+  - 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore'
+  - 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions'
+  - 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
+heroImageSrc: /hero-images/creativity-tarot-ritual.png
+heroImageAlt: Tarot Ritual for When Creativity Feels Pointless — hero image
 ---
 ## Opening Reflection
 

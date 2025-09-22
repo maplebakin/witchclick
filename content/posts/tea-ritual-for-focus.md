@@ -1,21 +1,89 @@
 ---
-title: "Brew a Tea Ritual for Focus: Simple Steps That Stick"
+title: 'Brew a Tea Ritual for Focus: Simple Steps That Stick'
 slug: tea-ritual-for-focus
-excerpt: A warm mug, a few mindful steps, and a tiny altar on your desk—this simple tea ritual helps you settle, choose one clear intention, and ease into focused work without pressure.
-metaTitle: "Brew a Tea Ritual for Focus: Simple Steps That Stick"
-metaDescription: Create a gentle tea ritual for focus with easy steps, cozy tools, and mindful cues. Learn herbs to try, timing tips, a quick checklist, and safety notes for a calm, clear work session.
-tags: ["tea ritual","focus","witchcraft","mindfulness","productivity","cozy"]
-outline: ["Why a tea ritual helps your attention","Gather your tools","Brew the focus tea","The ritual: focus in three minutes","Variations and timing magic","Quick Checklist","Safety, accessibility, and ethics","Wrap-up and cozy sign-off"]
+excerpt: >-
+  A warm mug, a few mindful steps, and a tiny altar on your desk—this simple tea
+  ritual helps you settle, choose one clear intention, and ease into focused
+  work without pressure.
+metaTitle: 'Brew a Tea Ritual for Focus: Simple Steps That Stick'
+metaDescription: >-
+  Create a gentle tea ritual for focus with easy steps, cozy tools, and mindful
+  cues. Learn herbs to try, timing tips, a quick checklist, and safety notes for
+  a calm, clear work session.
+tags:
+  - tea ritual
+  - focus
+  - witchcraft
+  - mindfulness
+  - productivity
+  - cozy
+outline:
+  - Why a tea ritual helps your attention
+  - Gather your tools
+  - Brew the focus tea
+  - 'The ritual: focus in three minutes'
+  - Variations and timing magic
+  - Quick Checklist
+  - 'Safety, accessibility, and ethics'
+  - Wrap-up and cozy sign-off
 wordCount: 779
 readingMinutes: 4
-entities: [{"type":"herb","slug":"rosemary"},{"type":"herb","slug":"peppermint"},{"type":"herb","slug":"lemon-balm"},{"type":"crystal","slug":"fluorite"},{"type":"crystal","slug":"clear-quartz"},{"type":"moonPhase","slug":"waxing-crescent"},{"type":"tarot","slug":"ace-of-swords"},{"type":"planetaryDay","slug":"wednesday"},{"type":"ritual","slug":"tea-ritual"}]
+entities:
+  - type: herb
+    slug: rosemary
+  - type: herb
+    slug: peppermint
+  - type: herb
+    slug: lemon-balm
+  - type: crystal
+    slug: fluorite
+  - type: crystal
+    slug: clear-quartz
+  - type: moonPhase
+    slug: waxing-crescent
+  - type: tarot
+    slug: ace-of-swords
+  - type: planetaryDay
+    slug: wednesday
+  - type: ritual
+    slug: tea-ritual
 includeAds: false
 includeKofi: true
-affiliateAnchors: [{"key":"journal","text":"journal","insertedCount":0},{"key":"notebooks","text":"notebooks","insertedCount":0},{"key":"crystals","text":"crystals","insertedCount":0},{"key":"cozy-games","text":"cozy games","insertedCount":0}]
-internalLinks: []
-publishedAt: "2025-09-11T22:25:55.286Z"
-canonicalUrl: "https://example.com/post/tea-ritual-for-focus"
+affiliateAnchors:
+  - key: journal
+    text: journal
+    insertedCount: 0
+  - key: notebooks
+    text: notebooks
+    insertedCount: 0
+  - key: crystals
+    text: crystals
+    insertedCount: 0
+  - key: cozy-games
+    text: cozy games
+    insertedCount: 0
+internalLinks:
+  - text: 'Create a Calm Space During Political Unrest: A Gentle Guide'
+    href: /post/calm-space-during-political-unrest-2
+  - text: 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore'
+    href: /post/worldbuilding-tarot-spread-and-ritual
+  - text: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
+    href: /post/playstation-tarot-spread-and-ritual
+  - text: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
+    href: /post/sunday-football-tarot-spread-and-ritual
+  - text: 'Pre-Interview Grounding Ritual: Quick and Deep Guide'
+    href: /post/pre-interview-grounding-ritual
+publishedAt: '2025-09-11T22:25:55.286Z'
+canonicalUrl: 'https://example.com/post/tea-ritual-for-focus'
 specVersion: 2
+internalLinkHints:
+  - 'Create a Calm Space During Political Unrest: A Gentle Guide'
+  - 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore'
+  - 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
+  - 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
+  - 'Pre-Interview Grounding Ritual: Quick and Deep Guide'
+heroImageSrc: /hero-images/tea-ritual-for-focus.png
+heroImageAlt: 'Brew a Tea Ritual for Focus: Simple Steps That Stick — hero image'
 ---
 
 ## Why a tea ritual helps your attention

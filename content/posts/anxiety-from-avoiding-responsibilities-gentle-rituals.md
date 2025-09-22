@@ -1,20 +1,81 @@
 ---
-title: "When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day"
+title: 'When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day'
 slug: anxiety-from-avoiding-responsibilities-gentle-rituals
-excerpt: "Avoiding a task can make the anxiety louder. This guide offers tiny, kind moves—rituals, checklists, and cozy supports—that help you re-enter your day without bullying yourself."
-metaTitle: "When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day"
-metaDescription: "Stuck in the anxiety–avoidance loop? Use tiny rituals, cozy tools, and kind structure to take the next small step without harsh self-talk."
-tags: ["anxiety", "avoidance", "gentle productivity", "rituals", "ADHD-friendly", "witchcraft"]
-outline: ["You’re Not Broken: Why Avoiding Feels Safer", "Tiny Reset: 90 Seconds to Re-Enter", "The Bowl and the Pebbles: A Soft Planning Trick", "Pocket Ritual: Tea + Timer", "Bravery Ladder: Make Steps Laughably Small", "Body First: Quick Calmers", "Optional Allies: Crystal or Herb", "When It’s All Too Much: The 10–10–10 Reset", "Micro Tarot: Permission + Next Step", "Make It Light: Cozy Game Breaks", "FAQ: Am I Lazy? What if I Mess Up?", "Checklist: Try This Flow Today", "Closing: You’re Not Behind"]
+excerpt: >-
+  Avoiding a task can make the anxiety louder. This guide offers tiny, kind
+  moves—rituals, checklists, and cozy supports—that help you re-enter your day
+  without bullying yourself.
+metaTitle: 'When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day'
+metaDescription: >-
+  Stuck in the anxiety–avoidance loop? Use tiny rituals, cozy tools, and kind
+  structure to take the next small step without harsh self-talk.
+tags:
+  - anxiety
+  - avoidance
+  - gentle productivity
+  - rituals
+  - ADHD-friendly
+  - witchcraft
+outline:
+  - 'You’re Not Broken: Why Avoiding Feels Safer'
+  - 'Tiny Reset: 90 Seconds to Re-Enter'
+  - 'The Bowl and the Pebbles: A Soft Planning Trick'
+  - 'Pocket Ritual: Tea + Timer'
+  - 'Bravery Ladder: Make Steps Laughably Small'
+  - 'Body First: Quick Calmers'
+  - 'Optional Allies: Crystal or Herb'
+  - 'When It’s All Too Much: The 10–10–10 Reset'
+  - 'Micro Tarot: Permission + Next Step'
+  - 'Make It Light: Cozy Game Breaks'
+  - 'FAQ: Am I Lazy? What if I Mess Up?'
+  - 'Checklist: Try This Flow Today'
+  - 'Closing: You’re Not Behind'
 wordCount: 889
 readingMinutes: 4
 includeAds: true
 includeKofi: false
-affiliateAnchors: [{"key":"journal","text":"undated daily planner (two-page spread)","insertedCount":0},{"key":"notebooks","text":"A5 dot-grid notebook","insertedCount":0},{"key":"crystals","text":"grounding palm stones (black tourmaline, amethyst)","insertedCount":0},{"key":"cozy-games","text":"low-stakes cozy farming or adventure games","insertedCount":0}]
-internalLinks: []
-publishedAt: "2025-09-13T16:56:07.981Z"
-canonicalUrl: "https://witchclick.space/post/anxiety-from-avoiding-responsibilities-gentle-rituals"
+affiliateAnchors:
+  - key: journal
+    text: undated daily planner (two-page spread)
+    insertedCount: 0
+  - key: notebooks
+    text: A5 dot-grid notebook
+    insertedCount: 0
+  - key: crystals
+    text: 'grounding palm stones (black tourmaline, amethyst)'
+    insertedCount: 0
+  - key: cozy-games
+    text: low-stakes cozy farming or adventure games
+    insertedCount: 0
+internalLinks:
+  - text: >-
+      When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the
+      Room
+    href: /post/calming-strategies-when-partner-pisses-you-off
+  - text: 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
+    href: /post/when-everything-feels-pointless
+  - text: 'Knowing When to Give Up: A Gentle Quitter''s Guide'
+    href: /post/knowing-when-to-give-up
+  - text: 'Secular Tarot in Psychological Practice: A Gentle Guide'
+    href: /post/secular-tarot-in-psychological-practice
+  - text: 'Brew a Tea Ritual for Focus: Simple Steps That Stick'
+    href: /post/tea-ritual-for-focus
+publishedAt: '2025-09-13T16:56:07.981Z'
+canonicalUrl: >-
+  https://witchclick.space/post/anxiety-from-avoiding-responsibilities-gentle-rituals
 specVersion: 2
+internalLinkHints:
+  - >-
+    When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the
+    Room
+  - 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
+  - 'Knowing When to Give Up: A Gentle Quitter''s Guide'
+  - 'Secular Tarot in Psychological Practice: A Gentle Guide'
+  - 'Brew a Tea Ritual for Focus: Simple Steps That Stick'
+heroImageSrc: /hero-images/anxiety-from-avoiding-responsibilities-gentle-rituals.png
+heroImageAlt: >-
+  When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day — hero
+  image
 ---
 ## You’re Not Broken: Why Avoiding Feels Safer
 

@@ -1,20 +1,71 @@
 ---
-title: "Create a Calm Space During Political Unrest: A Gentle Guide"
+title: 'Create a Calm Space During Political Unrest: A Gentle Guide'
 slug: calm-space-during-political-unrest-2
-excerpt: "When news is heavy, a small ritualized corner can help you pause without shutting down. Here’s a simple, cozy framework you can adapt to your home and needs."
-metaTitle: "Create a Calm Space During Political Unrest: A Gentle Guide"
-metaDescription: "Create a refuge at home when the world feels loud. Step-by-step setup, sensory anchors, and a checklist to make a calm corner you can return to anytime."
-tags: ["calm space", "ritual", "grounding", "political unrest", "mindfulness", "cozy"]
-outline: ["Why a calm space helps when the world feels loud", "Choose a corner and make it safe", "Sensory anchors that settle attention", "The doorway ritual (3-minute reset)", "News boundaries and tech hygiene", "Timing color: planetary timing and moon phase check-in", "Variations for tiny spaces, kids, and tight budgets", "Quick Checklist", "Safety, accessibility, and ethics", "Wrap-up"]
+excerpt: >-
+  When news is heavy, a small ritualized corner can help you pause without
+  shutting down. Here’s a simple, cozy framework you can adapt to your home and
+  needs.
+metaTitle: 'Create a Calm Space During Political Unrest: A Gentle Guide'
+metaDescription: >-
+  Create a refuge at home when the world feels loud. Step-by-step setup, sensory
+  anchors, and a checklist to make a calm corner you can return to anytime.
+tags:
+  - calm space
+  - ritual
+  - grounding
+  - political unrest
+  - mindfulness
+  - cozy
+outline:
+  - Why a calm space helps when the world feels loud
+  - Choose a corner and make it safe
+  - Sensory anchors that settle attention
+  - The doorway ritual (3-minute reset)
+  - News boundaries and tech hygiene
+  - 'Timing color: planetary timing and moon phase check-in'
+  - 'Variations for tiny spaces, kids, and tight budgets'
+  - Quick Checklist
+  - 'Safety, accessibility, and ethics'
+  - Wrap-up
 wordCount: 1137
 readingMinutes: 6
 includeAds: true
 includeKofi: false
-affiliateAnchors: [{"key":"journal","text":"journal","insertedCount":0},{"key":"notebooks","text":"notebooks","insertedCount":0},{"key":"crystals","text":"crystals","insertedCount":0},{"key":"cozy-games","text":"cozy games","insertedCount":0}]
-internalLinks: []
-publishedAt: "2025-09-12T20:04:07.992Z"
-canonicalUrl: "https://witchclick.space/post/calm-space-during-political-unrest-2"
+affiliateAnchors:
+  - key: journal
+    text: journal
+    insertedCount: 0
+  - key: notebooks
+    text: notebooks
+    insertedCount: 0
+  - key: crystals
+    text: crystals
+    insertedCount: 0
+  - key: cozy-games
+    text: cozy games
+    insertedCount: 0
+internalLinks:
+  - text: 'Pre-Interview Grounding Ritual: Quick and Deep Guide'
+    href: /post/pre-interview-grounding-ritual
+  - text: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
+    href: /post/sunday-football-tarot-spread-and-ritual
+  - text: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
+    href: /post/playstation-tarot-spread-and-ritual
+  - text: 'Brew a Tea Ritual for Focus: Simple Steps That Stick'
+    href: /post/tea-ritual-for-focus
+  - text: 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
+    href: /post/when-everything-feels-pointless
+publishedAt: '2025-09-12T20:04:07.992Z'
+canonicalUrl: 'https://witchclick.space/post/calm-space-during-political-unrest-2'
 specVersion: 2
+internalLinkHints:
+  - 'Pre-Interview Grounding Ritual: Quick and Deep Guide'
+  - 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
+  - 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
+  - 'Brew a Tea Ritual for Focus: Simple Steps That Stick'
+  - 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
+heroImageSrc: /hero-images/calm-space-during-political-unrest-2.png
+heroImageAlt: 'Create a Calm Space During Political Unrest: A Gentle Guide — hero image'
 ---
 ## Why a calm space helps when the world feels loud
 

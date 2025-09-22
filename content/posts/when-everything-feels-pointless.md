@@ -1,20 +1,75 @@
 ---
-title: "When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning"
+title: 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
 slug: when-everything-feels-pointless
-excerpt: "When the fog rolls in and your brain whispers what’s the point, shrink the problem. Reset your body, name one thing that still matters, and pick a tiny next step."
-metaTitle: "When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning"
-metaDescription: "Feeling an overwhelming sense of what’s the point? Use tiny body resets, a meaning-breadcrumb method, and a 3-card secular spread to find one doable next step."
-tags: ["mental-overwhelm", "gentle-rituals", "secular-tarot", "journaling", "motivation", "self-kindness", "cozy"]
-outline: ["Opening Reflection", "Quick Reset (Low-Energy)", "Deep Ritual", "Checklist", "Safety Note & Ethics", "Reflection Prompt", "If-Then plan for the next slump", "Journal template: keep the thread", "Quick FAQ", "Related reads & gentle next step"]
+excerpt: >-
+  When the fog rolls in and your brain whispers what’s the point, shrink the
+  problem. Reset your body, name one thing that still matters, and pick a tiny
+  next step.
+metaTitle: 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
+metaDescription: >-
+  Feeling an overwhelming sense of what’s the point? Use tiny body resets, a
+  meaning-breadcrumb method, and a 3-card secular spread to find one doable next
+  step.
+tags:
+  - mental-overwhelm
+  - gentle-rituals
+  - secular-tarot
+  - journaling
+  - motivation
+  - self-kindness
+  - cozy
+outline:
+  - Opening Reflection
+  - Quick Reset (Low-Energy)
+  - Deep Ritual
+  - Checklist
+  - Safety Note & Ethics
+  - Reflection Prompt
+  - If-Then plan for the next slump
+  - 'Journal template: keep the thread'
+  - Quick FAQ
+  - Related reads & gentle next step
 wordCount: 575
 readingMinutes: 3
 includeAds: true
 includeKofi: false
-affiliateAnchors: [{"key":"journal","text":"undated daily journal with checkbox layout","insertedCount":0},{"key":"notebooks","text":"pocket notebook","insertedCount":0},{"key":"crystals","text":"smooth grounding stone","insertedCount":0},{"key":"cozy-games","text":"cozy game","insertedCount":0}]
-internalLinks: []
-publishedAt: "2025-09-14T12:05:00.588Z"
-canonicalUrl: "https://witchclick.space/post/when-everything-feels-pointless"
+affiliateAnchors:
+  - key: journal
+    text: undated daily journal with checkbox layout
+    insertedCount: 0
+  - key: notebooks
+    text: pocket notebook
+    insertedCount: 0
+  - key: crystals
+    text: smooth grounding stone
+    insertedCount: 0
+  - key: cozy-games
+    text: cozy game
+    insertedCount: 0
+internalLinks:
+  - text: 'Knowing When to Give Up: A Gentle Quitter''s Guide'
+    href: /post/knowing-when-to-give-up
+  - text: 'When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day'
+    href: /post/anxiety-from-avoiding-responsibilities-gentle-rituals
+  - text: Tarot Ritual for When Creativity Feels Pointless
+    href: /post/creativity-tarot-ritual
+  - text: 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions'
+    href: /post/tarot-as-a-secular-tool
+  - text: 'Secular Tarot in Psychological Practice: A Gentle Guide'
+    href: /post/secular-tarot-in-psychological-practice
+publishedAt: '2025-09-14T12:05:00.588Z'
+canonicalUrl: 'https://witchclick.space/post/when-everything-feels-pointless'
 specVersion: 2
+internalLinkHints:
+  - 'Knowing When to Give Up: A Gentle Quitter''s Guide'
+  - 'When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day'
+  - Tarot Ritual for When Creativity Feels Pointless
+  - 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions'
+  - 'Secular Tarot in Psychological Practice: A Gentle Guide'
+heroImageSrc: /hero-images/when-everything-feels-pointless.png
+heroImageAlt: >-
+  When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning — hero
+  image
 ---
 ## Opening Reflection
 

@@ -1,21 +1,101 @@
 ---
-title: "Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore"
+title: 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore'
 slug: worldbuilding-tarot-spread-and-ritual
-excerpt: Use tarot as a friendly world-design engine. This spread and ritual help you sketch setting, power, and conflict while keeping your lore grounded and playable.
-metaTitle: "Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore"
-metaDescription: Design richer worlds with a tarot spread and mini ritual that map your setting, stakes, and tone. Step-by-step prompts, timing tips, and a short checklist.
-tags: ["tarot","worldbuilding","writing ritual","creative prompts","story design","cozy"]
-outline: ["Why tarot works for worldbuilding","The World Loom: a 7-card spread","Step-by-step ritual setup","Reading the results: suits and majors","Timing and pacing magic","Quick Checklist","Safety, accessibility, and ethics","Wrap-up"]
+excerpt: >-
+  Use tarot as a friendly world-design engine. This spread and ritual help you
+  sketch setting, power, and conflict while keeping your lore grounded and
+  playable.
+metaTitle: 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore'
+metaDescription: >-
+  Design richer worlds with a tarot spread and mini ritual that map your
+  setting, stakes, and tone. Step-by-step prompts, timing tips, and a short
+  checklist.
+tags:
+  - tarot
+  - worldbuilding
+  - writing ritual
+  - creative prompts
+  - story design
+  - cozy
+outline:
+  - Why tarot works for worldbuilding
+  - 'The World Loom: a 7-card spread'
+  - Step-by-step ritual setup
+  - 'Reading the results: suits and majors'
+  - Timing and pacing magic
+  - Quick Checklist
+  - 'Safety, accessibility, and ethics'
+  - Wrap-up
 wordCount: 826
 readingMinutes: 4
-entities: [{"type":"tarot","slug":"the-world"},{"type":"tarot","slug":"the-emperor"},{"type":"tarot","slug":"the-magician"},{"type":"tarot","slug":"the-hermit"},{"type":"tarot","slug":"the-tower"},{"type":"tarot","slug":"the-star"},{"type":"planetaryDay","slug":"wednesday"},{"type":"planetaryDay","slug":"saturday"},{"type":"moonPhase","slug":"new-moon"},{"type":"moonPhase","slug":"first-quarter"},{"type":"moonPhase","slug":"full-moon"},{"type":"ritual","slug":"worldbuilding-spread"},{"type":"ritual","slug":"desk-altar"},{"type":"crystal","slug":"fluorite"},{"type":"crystal","slug":"labradorite"}]
+entities:
+  - type: tarot
+    slug: the-world
+  - type: tarot
+    slug: the-emperor
+  - type: tarot
+    slug: the-magician
+  - type: tarot
+    slug: the-hermit
+  - type: tarot
+    slug: the-tower
+  - type: tarot
+    slug: the-star
+  - type: planetaryDay
+    slug: wednesday
+  - type: planetaryDay
+    slug: saturday
+  - type: moonPhase
+    slug: new-moon
+  - type: moonPhase
+    slug: first-quarter
+  - type: moonPhase
+    slug: full-moon
+  - type: ritual
+    slug: worldbuilding-spread
+  - type: ritual
+    slug: desk-altar
+  - type: crystal
+    slug: fluorite
+  - type: crystal
+    slug: labradorite
 includeAds: true
 includeKofi: false
-affiliateAnchors: [{"key":"journal","text":"journal","insertedCount":0},{"key":"notebooks","text":"notebooks","insertedCount":0},{"key":"crystals","text":"crystals","insertedCount":0},{"key":"cozy-games","text":"cozy games","insertedCount":0}]
-internalLinks: []
-publishedAt: "2025-09-11T22:36:55.713Z"
-canonicalUrl: "https://example.com/post/worldbuilding-tarot-spread-and-ritual"
+affiliateAnchors:
+  - key: journal
+    text: journal
+    insertedCount: 0
+  - key: notebooks
+    text: notebooks
+    insertedCount: 0
+  - key: crystals
+    text: crystals
+    insertedCount: 0
+  - key: cozy-games
+    text: cozy games
+    insertedCount: 0
+internalLinks:
+  - text: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
+    href: /post/sunday-football-tarot-spread-and-ritual
+  - text: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
+    href: /post/playstation-tarot-spread-and-ritual
+  - text: 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions'
+    href: /post/tarot-as-a-secular-tool
+  - text: Tarot Ritual for When Creativity Feels Pointless
+    href: /post/creativity-tarot-ritual
+  - text: 'Brew a Tea Ritual for Focus: Simple Steps That Stick'
+    href: /post/tea-ritual-for-focus
+publishedAt: '2025-09-11T22:36:55.713Z'
+canonicalUrl: 'https://example.com/post/worldbuilding-tarot-spread-and-ritual'
 specVersion: 2
+internalLinkHints:
+  - 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
+  - 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
+  - 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions'
+  - Tarot Ritual for When Creativity Feels Pointless
+  - 'Brew a Tea Ritual for Focus: Simple Steps That Stick'
+heroImageSrc: /hero-images/worldbuilding-tarot-spread-and-ritual.png
+heroImageAlt: 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore — hero image'
 ---
 
 ## Why tarot works for worldbuilding

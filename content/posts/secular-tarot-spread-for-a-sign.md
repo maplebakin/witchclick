@@ -1,20 +1,67 @@
 ---
-title: "Secular Tarot Spread When You're Seeking a Clear Sign"
+title: Secular Tarot Spread When You're Seeking a Clear Sign
 slug: secular-tarot-spread-for-a-sign
-excerpt: "Looking for a nudge without the mystique? This secular spread helps you notice patterns, name options, and choose one small, testable next step."
-metaTitle: "Secular Tarot Spread When You're Seeking a Clear Sign"
-metaDescription: "A gentle, secular tarot spread for when you're seeking a sign. Quick low‑energy steps and a deeper version, plus accessibility tips, ethics, and a simple checklist."
-tags: ["secular tarot", "tarot spreads", "mindfulness", "journaling", "decision-making", "gentle rituals"]
-outline: ["Opening Reflection", "Steps: Quick & Deep", "Variations & Accessibility", "Safety & Ethics", "Checklist / Summary", "Wrap-Up with Reflection Prompt"]
+excerpt: >-
+  Looking for a nudge without the mystique? This secular spread helps you notice
+  patterns, name options, and choose one small, testable next step.
+metaTitle: Secular Tarot Spread When You're Seeking a Clear Sign
+metaDescription: >-
+  A gentle, secular tarot spread for when you're seeking a sign. Quick
+  low‑energy steps and a deeper version, plus accessibility tips, ethics, and a
+  simple checklist.
+tags:
+  - secular tarot
+  - tarot spreads
+  - mindfulness
+  - journaling
+  - decision-making
+  - gentle rituals
+outline:
+  - Opening Reflection
+  - 'Steps: Quick & Deep'
+  - Variations & Accessibility
+  - Safety & Ethics
+  - Checklist / Summary
+  - Wrap-Up with Reflection Prompt
 wordCount: 955
 readingMinutes: 5
 includeAds: false
 includeKofi: true
-affiliateAnchors: [{"key":"notebooks","text":"softcover dot-grid notebook","insertedCount":0},{"key":"journal","text":"pocket journal","insertedCount":0},{"key":"crystals","text":"beginner crystal set","insertedCount":0},{"key":"cozy-games","text":"cozy games for gentle nights","insertedCount":0}]
-internalLinks: []
-publishedAt: "2025-09-18T12:19:21.811Z"
-canonicalUrl: "https://witchclick.space/post/secular-tarot-spread-for-a-sign"
+affiliateAnchors:
+  - key: notebooks
+    text: softcover dot-grid notebook
+    insertedCount: 0
+  - key: journal
+    text: pocket journal
+    insertedCount: 0
+  - key: crystals
+    text: beginner crystal set
+    insertedCount: 0
+  - key: cozy-games
+    text: cozy games for gentle nights
+    insertedCount: 0
+internalLinks:
+  - text: 'Secular Tarot in Psychological Practice: A Gentle Guide'
+    href: /post/secular-tarot-in-psychological-practice
+  - text: 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions'
+    href: /post/tarot-as-a-secular-tool
+  - text: First-Day New Job Secular Tarot Spread and Journal
+    href: /post/first-day-new-job-secular-tarot-spread-journal
+  - text: 'Knowing When to Give Up: A Gentle Quitter''s Guide'
+    href: /post/knowing-when-to-give-up
+  - text: 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
+    href: /post/when-everything-feels-pointless
+publishedAt: '2025-09-18T12:19:21.811Z'
+canonicalUrl: 'https://witchclick.space/post/secular-tarot-spread-for-a-sign'
 specVersion: 2
+internalLinkHints:
+  - 'Secular Tarot in Psychological Practice: A Gentle Guide'
+  - 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions'
+  - First-Day New Job Secular Tarot Spread and Journal
+  - 'Knowing When to Give Up: A Gentle Quitter''s Guide'
+  - 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
+heroImageSrc: /hero-images/secular-tarot-spread-for-a-sign.png
+heroImageAlt: Secular Tarot Spread When You're Seeking a Clear Sign — hero image
 ---
 ## Opening Reflection
 

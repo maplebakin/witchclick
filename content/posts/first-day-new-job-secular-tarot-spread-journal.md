@@ -1,20 +1,80 @@
 ---
-title: "First-Day New Job Secular Tarot Spread and Journal"
+title: First-Day New Job Secular Tarot Spread and Journal
 slug: first-day-new-job-secular-tarot-spread-journal
-excerpt: "A calm-first, secular tarot and journaling guide for day one. Includes a 5-minute quick ritual, a deeper spread, accessibility tweaks, a summary checklist, and a single reflective prompt."
-metaTitle: "First-Day New Job Secular Tarot Spread and Journal"
-metaDescription: "A gentle, secular tarot spread and journal guide for your first day at a new job. Quick and deep versions, accessibility tweaks, checklist, and calm-first tips."
-tags: ["secular-tarot", "new-job", "first-day", "ritual", "journal-prompts", "work-anxiety"]
-outline: ["Opening Reflection", "Steps: Quick & Deep", "Variations & Accessibility", "Checklist / Summary", "Safety & Ethics", "Wrap-up: Reflection Prompt"]
+excerpt: >-
+  A calm-first, secular tarot and journaling guide for day one. Includes a
+  5-minute quick ritual, a deeper spread, accessibility tweaks, a summary
+  checklist, and a single reflective prompt.
+metaTitle: First-Day New Job Secular Tarot Spread and Journal
+metaDescription: >-
+  A gentle, secular tarot spread and journal guide for your first day at a new
+  job. Quick and deep versions, accessibility tweaks, checklist, and calm-first
+  tips.
+tags:
+  - secular-tarot
+  - new-job
+  - first-day
+  - ritual
+  - journal-prompts
+  - work-anxiety
+outline:
+  - Opening Reflection
+  - 'Steps: Quick & Deep'
+  - Variations & Accessibility
+  - Checklist / Summary
+  - Safety & Ethics
+  - 'Wrap-up: Reflection Prompt'
 wordCount: 1219
 readingMinutes: 6
 includeAds: true
 includeKofi: true
-affiliateAnchors: [{"key":"notebooks","text":"pocket notebook","insertedCount":0},{"key":"journal","text":"soft-cover bullet journal","insertedCount":0},{"key":"notebooks","text":"undated planner","insertedCount":0},{"key":"journal","text":"desk-friendly journal","insertedCount":0},{"key":"crystals","text":"grounding crystals","insertedCount":0},{"key":"crystals","text":"calming stone","insertedCount":0},{"key":"cozy-games","text":"stress-free cozy game break","insertedCount":0},{"key":"notebooks","text":"notebook set with tabs","insertedCount":0}]
-internalLinks: []
-publishedAt: "2025-09-19T13:31:56.580Z"
-canonicalUrl: "https://witchclick.space/post/first-day-new-job-secular-tarot-spread-journal"
+affiliateAnchors:
+  - key: notebooks
+    text: pocket notebook
+    insertedCount: 0
+  - key: journal
+    text: soft-cover bullet journal
+    insertedCount: 0
+  - key: notebooks
+    text: undated planner
+    insertedCount: 0
+  - key: journal
+    text: desk-friendly journal
+    insertedCount: 0
+  - key: crystals
+    text: grounding crystals
+    insertedCount: 0
+  - key: crystals
+    text: calming stone
+    insertedCount: 0
+  - key: cozy-games
+    text: stress-free cozy game break
+    insertedCount: 0
+  - key: notebooks
+    text: notebook set with tabs
+    insertedCount: 0
+internalLinks:
+  - text: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
+    href: /post/sunday-football-tarot-spread-and-ritual
+  - text: 'Pre-Interview Grounding Ritual: Quick and Deep Guide'
+    href: /post/pre-interview-grounding-ritual
+  - text: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
+    href: /post/playstation-tarot-spread-and-ritual
+  - text: Secular Tarot Spread When You're Seeking a Clear Sign
+    href: /post/secular-tarot-spread-for-a-sign
+  - text: Tarot Ritual for When Creativity Feels Pointless
+    href: /post/creativity-tarot-ritual
+publishedAt: '2025-09-19T13:31:56.580Z'
+canonicalUrl: 'https://witchclick.space/post/first-day-new-job-secular-tarot-spread-journal'
 specVersion: 2
+internalLinkHints:
+  - 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
+  - 'Pre-Interview Grounding Ritual: Quick and Deep Guide'
+  - 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
+  - Secular Tarot Spread When You're Seeking a Clear Sign
+  - Tarot Ritual for When Creativity Feels Pointless
+heroImageSrc: /hero-images/first-day-new-job-secular-tarot-spread-journal.png
+heroImageAlt: First-Day New Job Secular Tarot Spread and Journal — hero image
 ---
 ## Opening Reflection
 

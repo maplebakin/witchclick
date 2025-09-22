@@ -1,20 +1,82 @@
 ---
-title: "When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the Room"
+title: >-
+  When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the
+  Room
 slug: calming-strategies-when-partner-pisses-you-off
-excerpt: "You can be mad and still be kind to your nervous system. These calm-first strategies help you cool down, speak clearly, and repair without bulldozing your needs."
-metaTitle: "When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the Room"
-metaDescription: "Angry and activated? Use gentle, practical rituals to cool down, name the real need, and repair without losing yourself. Scripts, checklists, and cozy resets inside."
-tags: ["relationships", "conflict", "calming rituals", "communication", "ADHD-friendly", "self-care", "witchcraft"]
-outline: ["Body Before Story: Why You’re Heated", "90-Second Cooldown (with Walkaway Script)", "Name the Need, Not the Blame", "Pick a Channel: Talk, Text, or Timer", "Micro-Rituals to Lower the Volume", "Four Red Flags: Pause If These Appear", "Repair Map: From ‘I’m Mad’ to ‘We’re Okay’", "Scripts for Common Moments", "Tiny Checklists (You / Them / Together)", "When to Take Space vs. Engage", "Cozy Reset Breaks: Games, Tea, and Tidying", "FAQ: What if They Won’t Meet Me Halfway?", "Closing: Anger Can Be Honest and Loving"]
+excerpt: >-
+  You can be mad and still be kind to your nervous system. These calm-first
+  strategies help you cool down, speak clearly, and repair without bulldozing
+  your needs.
+metaTitle: >-
+  When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the
+  Room
+metaDescription: >-
+  Angry and activated? Use gentle, practical rituals to cool down, name the real
+  need, and repair without losing yourself. Scripts, checklists, and cozy resets
+  inside.
+tags:
+  - relationships
+  - conflict
+  - calming rituals
+  - communication
+  - ADHD-friendly
+  - self-care
+  - witchcraft
+outline:
+  - 'Body Before Story: Why You’re Heated'
+  - 90-Second Cooldown (with Walkaway Script)
+  - 'Name the Need, Not the Blame'
+  - 'Pick a Channel: Talk, Text, or Timer'
+  - Micro-Rituals to Lower the Volume
+  - 'Four Red Flags: Pause If These Appear'
+  - 'Repair Map: From ‘I’m Mad’ to ‘We’re Okay’'
+  - Scripts for Common Moments
+  - Tiny Checklists (You / Them / Together)
+  - When to Take Space vs. Engage
+  - 'Cozy Reset Breaks: Games, Tea, and Tidying'
+  - 'FAQ: What if They Won’t Meet Me Halfway?'
+  - 'Closing: Anger Can Be Honest and Loving'
 wordCount: 1024
 readingMinutes: 5
 includeAds: true
 includeKofi: false
-affiliateAnchors: [{"key":"journal","text":"conflict repair journal (simple prompts)","insertedCount":0},{"key":"notebooks","text":"A5 dot-grid notebook","insertedCount":0},{"key":"crystals","text":"soothing palm stones (rose quartz, blue lace agate)","insertedCount":0},{"key":"cozy-games","text":"low-stress cozy co-op or solo games","insertedCount":0}]
-internalLinks: []
-publishedAt: "2025-09-13T17:04:16.524Z"
-canonicalUrl: "https://witchclick.space/post/calming-strategies-when-partner-pisses-you-off"
+affiliateAnchors:
+  - key: journal
+    text: conflict repair journal (simple prompts)
+    insertedCount: 0
+  - key: notebooks
+    text: A5 dot-grid notebook
+    insertedCount: 0
+  - key: crystals
+    text: 'soothing palm stones (rose quartz, blue lace agate)'
+    insertedCount: 0
+  - key: cozy-games
+    text: low-stress cozy co-op or solo games
+    insertedCount: 0
+internalLinks:
+  - text: 'When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day'
+    href: /post/anxiety-from-avoiding-responsibilities-gentle-rituals
+  - text: Tarot Ritual for When Creativity Feels Pointless
+    href: /post/creativity-tarot-ritual
+  - text: 'Brew a Tea Ritual for Focus: Simple Steps That Stick'
+    href: /post/tea-ritual-for-focus
+  - text: Secular Tarot Spread When You're Seeking a Clear Sign
+    href: /post/secular-tarot-spread-for-a-sign
+  - text: 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
+    href: /post/when-everything-feels-pointless
+publishedAt: '2025-09-13T17:04:16.524Z'
+canonicalUrl: 'https://witchclick.space/post/calming-strategies-when-partner-pisses-you-off'
 specVersion: 2
+internalLinkHints:
+  - 'When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day'
+  - Tarot Ritual for When Creativity Feels Pointless
+  - 'Brew a Tea Ritual for Focus: Simple Steps That Stick'
+  - Secular Tarot Spread When You're Seeking a Clear Sign
+  - 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
+heroImageSrc: /hero-images/calming-strategies-when-partner-pisses-you-off.png
+heroImageAlt: >-
+  When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the
+  Room — hero image
 ---
 ## Body Before Story: Why You’re Heated
 

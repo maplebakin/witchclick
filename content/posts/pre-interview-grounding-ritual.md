@@ -1,20 +1,69 @@
 ---
-title: "Pre-Interview Grounding Ritual: Quick and Deep Guide"
+title: 'Pre-Interview Grounding Ritual: Quick and Deep Guide'
 slug: pre-interview-grounding-ritual
-excerpt: "A simple, secular grounding ritual for the hour before an interview. Includes a 5-minute quick path, a deeper option, a checklist, and one clear reflection prompt."
-metaTitle: "Pre-Interview Grounding Ritual: Quick and Deep Guide"
-metaDescription: "Calm nerves and focus fast before your interview. A secular grounding ritual with a 5-minute path and a deeper option, plus a checklist and gentle safety notes to keep things practical."
-tags: ["grounding", "interview-prep", "anxiety", "ritual", "secular-tarot", "mindfulness", "job-search"]
-outline: ["Opening Reflection", "Steps: Quick & Deep", "Checklist / Summary", "Variations & Accessibility", "Safety & Ethics", "Wrap-up with Reflection Prompt"]
+excerpt: >-
+  A simple, secular grounding ritual for the hour before an interview. Includes
+  a 5-minute quick path, a deeper option, a checklist, and one clear reflection
+  prompt.
+metaTitle: 'Pre-Interview Grounding Ritual: Quick and Deep Guide'
+metaDescription: >-
+  Calm nerves and focus fast before your interview. A secular grounding ritual
+  with a 5-minute path and a deeper option, plus a checklist and gentle safety
+  notes to keep things practical.
+tags:
+  - grounding
+  - interview-prep
+  - anxiety
+  - ritual
+  - secular-tarot
+  - mindfulness
+  - job-search
+outline:
+  - Opening Reflection
+  - 'Steps: Quick & Deep'
+  - Checklist / Summary
+  - Variations & Accessibility
+  - Safety & Ethics
+  - Wrap-up with Reflection Prompt
 wordCount: 1187
 readingMinutes: 6
 includeAds: true
 includeKofi: false
-affiliateAnchors: [{"key":"journal","text":"pocket interview journal","insertedCount":0},{"key":"notebooks","text":"interview prep notebook","insertedCount":0},{"key":"crystals","text":"small black tourmaline palm stone","insertedCount":0},{"key":"cozy-games","text":"gentle cozy games for nerves","insertedCount":0}]
-internalLinks: []
-publishedAt: "2025-09-17T13:29:06.238Z"
-canonicalUrl: "https://witchclick.space/post/pre-interview-grounding-ritual"
+affiliateAnchors:
+  - key: journal
+    text: pocket interview journal
+    insertedCount: 0
+  - key: notebooks
+    text: interview prep notebook
+    insertedCount: 0
+  - key: crystals
+    text: small black tourmaline palm stone
+    insertedCount: 0
+  - key: cozy-games
+    text: gentle cozy games for nerves
+    insertedCount: 0
+internalLinks:
+  - text: 'Create a Calm Space During Political Unrest: A Gentle Guide'
+    href: /post/calm-space-during-political-unrest-2
+  - text: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
+    href: /post/sunday-football-tarot-spread-and-ritual
+  - text: First-Day New Job Secular Tarot Spread and Journal
+    href: /post/first-day-new-job-secular-tarot-spread-journal
+  - text: 'Knowing When to Give Up: A Gentle Quitter''s Guide'
+    href: /post/knowing-when-to-give-up
+  - text: Tarot Ritual for When Creativity Feels Pointless
+    href: /post/creativity-tarot-ritual
+publishedAt: '2025-09-17T13:29:06.238Z'
+canonicalUrl: 'https://witchclick.space/post/pre-interview-grounding-ritual'
 specVersion: 2
+internalLinkHints:
+  - 'Create a Calm Space During Political Unrest: A Gentle Guide'
+  - 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
+  - First-Day New Job Secular Tarot Spread and Journal
+  - 'Knowing When to Give Up: A Gentle Quitter''s Guide'
+  - Tarot Ritual for When Creativity Feels Pointless
+heroImageSrc: /hero-images/pre-interview-grounding-ritual.png
+heroImageAlt: 'Pre-Interview Grounding Ritual: Quick and Deep Guide — hero image'
 ---
 ## Opening Reflection
 

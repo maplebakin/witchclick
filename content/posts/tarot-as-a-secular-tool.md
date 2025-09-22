@@ -1,20 +1,72 @@
 ---
-title: "Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions"
+title: 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions'
 slug: tarot-as-a-secular-tool
-excerpt: "Tarot can be a map for your thoughts, no dogma required. Use the cards as prompts, capture what you notice, and choose a next step you can actually do."
-metaTitle: "Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions"
-metaDescription: "A practical, secular guide to using tarot without supernatural claims—use pattern-reading, reflection, and simple rituals to find clarity, plan small next steps, and keep calm."
-tags: ["tarot", "secular", "self-reflection", "journaling", "decision-making", "beginner-friendly", "cozy"]
-outline: ["Opening Reflection", "Why it works without belief", "Quick Reset (Low-Energy): Map-My-Moment (3 cards)", "Deep Ritual", "Checklist", "Safety Note & Ethics", "Reflection Prompt", "When to use it and when to skip it", "Quick FAQ for curious brains", "Keep going: related reads and gentle next step"]
+excerpt: >-
+  Tarot can be a map for your thoughts, no dogma required. Use the cards as
+  prompts, capture what you notice, and choose a next step you can actually do.
+metaTitle: 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions'
+metaDescription: >-
+  A practical, secular guide to using tarot without supernatural claims—use
+  pattern-reading, reflection, and simple rituals to find clarity, plan small
+  next steps, and keep calm.
+tags:
+  - tarot
+  - secular
+  - self-reflection
+  - journaling
+  - decision-making
+  - beginner-friendly
+  - cozy
+outline:
+  - Opening Reflection
+  - Why it works without belief
+  - 'Quick Reset (Low-Energy): Map-My-Moment (3 cards)'
+  - Deep Ritual
+  - Checklist
+  - Safety Note & Ethics
+  - Reflection Prompt
+  - When to use it and when to skip it
+  - Quick FAQ for curious brains
+  - 'Keep going: related reads and gentle next step'
 wordCount: 597
 readingMinutes: 3
 includeAds: false
 includeKofi: true
-affiliateAnchors: [{"key":"journal","text":"journal","insertedCount":0},{"key":"notebooks","text":"pocket notebook","insertedCount":0},{"key":"crystals","text":"smooth stone","insertedCount":0},{"key":"cozy-games","text":"cozy game","insertedCount":0}]
-internalLinks: []
-publishedAt: "2025-09-14T11:48:53.822Z"
-canonicalUrl: "https://witchclick.space/post/tarot-as-a-secular-tool"
+affiliateAnchors:
+  - key: journal
+    text: journal
+    insertedCount: 0
+  - key: notebooks
+    text: pocket notebook
+    insertedCount: 0
+  - key: crystals
+    text: smooth stone
+    insertedCount: 0
+  - key: cozy-games
+    text: cozy game
+    insertedCount: 0
+internalLinks:
+  - text: 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore'
+    href: /post/worldbuilding-tarot-spread-and-ritual
+  - text: Secular Tarot Spread When You're Seeking a Clear Sign
+    href: /post/secular-tarot-spread-for-a-sign
+  - text: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
+    href: /post/playstation-tarot-spread-and-ritual
+  - text: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
+    href: /post/sunday-football-tarot-spread-and-ritual
+  - text: 'Secular Tarot in Psychological Practice: A Gentle Guide'
+    href: /post/secular-tarot-in-psychological-practice
+publishedAt: '2025-09-14T11:48:53.822Z'
+canonicalUrl: 'https://witchclick.space/post/tarot-as-a-secular-tool'
 specVersion: 2
+internalLinkHints:
+  - 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore'
+  - Secular Tarot Spread When You're Seeking a Clear Sign
+  - 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
+  - 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
+  - 'Secular Tarot in Psychological Practice: A Gentle Guide'
+heroImageSrc: /hero-images/tarot-as-a-secular-tool.png
+heroImageAlt: 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions — hero image'
 ---
 ## Opening Reflection
 

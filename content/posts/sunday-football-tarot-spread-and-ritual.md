@@ -1,21 +1,91 @@
 ---
-title: "Sunday Football Tarot: A Game-Day Spread and Ritual Guide"
+title: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
 slug: sunday-football-tarot-spread-and-ritual
-excerpt: "A cozy, sports-night twist on tarot: use this 7-card spread and tiny ritual to track momentum, read defenses, and spot turning points—without pressure or predictions."
-metaTitle: "Sunday Football Tarot: A Game-Day Spread and Ritual Guide"
-metaDescription: Blend game-day vibes with a playful tarot spread and simple ritual for Sunday football. Map momentum, defense, and turning points with clear steps, timing tips, and a short checklist.
-tags: ["tarot","football","ritual","game day","creative prompts","cozy"]
-outline: ["Why tarot + football works","Gather your tools","The Sunday Drive: a 7-card spread","Ritual steps (pregame to final whistle)","Variations, timing, and party play","Quick Checklist","Safety, accessibility, and ethics","Wrap-up"]
+excerpt: >-
+  A cozy, sports-night twist on tarot: use this 7-card spread and tiny ritual to
+  track momentum, read defenses, and spot turning points—without pressure or
+  predictions.
+metaTitle: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
+metaDescription: >-
+  Blend game-day vibes with a playful tarot spread and simple ritual for Sunday
+  football. Map momentum, defense, and turning points with clear steps, timing
+  tips, and a short checklist.
+tags:
+  - tarot
+  - football
+  - ritual
+  - game day
+  - creative prompts
+  - cozy
+outline:
+  - Why tarot + football works
+  - Gather your tools
+  - 'The Sunday Drive: a 7-card spread'
+  - Ritual steps (pregame to final whistle)
+  - 'Variations, timing, and party play'
+  - Quick Checklist
+  - 'Safety, accessibility, and ethics'
+  - Wrap-up
 wordCount: 682
 readingMinutes: 3
-entities: [{"type":"tarot","slug":"the-sun"},{"type":"tarot","slug":"strength"},{"type":"tarot","slug":"the-chariot"},{"type":"tarot","slug":"wheel-of-fortune"},{"type":"tarot","slug":"justice"},{"type":"tarot","slug":"the-tower"},{"type":"planetaryDay","slug":"sunday"},{"type":"moonPhase","slug":"new-moon"},{"type":"moonPhase","slug":"full-moon"},{"type":"ritual","slug":"game-day-spread"}]
+entities:
+  - type: tarot
+    slug: the-sun
+  - type: tarot
+    slug: strength
+  - type: tarot
+    slug: the-chariot
+  - type: tarot
+    slug: wheel-of-fortune
+  - type: tarot
+    slug: justice
+  - type: tarot
+    slug: the-tower
+  - type: planetaryDay
+    slug: sunday
+  - type: moonPhase
+    slug: new-moon
+  - type: moonPhase
+    slug: full-moon
+  - type: ritual
+    slug: game-day-spread
 includeAds: true
 includeKofi: true
-affiliateAnchors: [{"key":"journal","text":"journal","insertedCount":0},{"key":"notebooks","text":"notebooks","insertedCount":0},{"key":"crystals","text":"crystals","insertedCount":0},{"key":"cozy-games","text":"cozy games","insertedCount":0}]
-internalLinks: []
-publishedAt: "2025-09-11T22:42:33.694Z"
-canonicalUrl: "https://example.com/post/sunday-football-tarot-spread-and-ritual"
+affiliateAnchors:
+  - key: journal
+    text: journal
+    insertedCount: 0
+  - key: notebooks
+    text: notebooks
+    insertedCount: 0
+  - key: crystals
+    text: crystals
+    insertedCount: 0
+  - key: cozy-games
+    text: cozy games
+    insertedCount: 0
+internalLinks:
+  - text: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
+    href: /post/playstation-tarot-spread-and-ritual
+  - text: 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore'
+    href: /post/worldbuilding-tarot-spread-and-ritual
+  - text: Tarot Ritual for When Creativity Feels Pointless
+    href: /post/creativity-tarot-ritual
+  - text: First-Day New Job Secular Tarot Spread and Journal
+    href: /post/first-day-new-job-secular-tarot-spread-journal
+  - text: 'Create a Calm Space During Political Unrest: A Gentle Guide'
+    href: /post/calm-space-during-political-unrest-2
+publishedAt: '2025-09-11T22:42:33.694Z'
+canonicalUrl: 'https://example.com/post/sunday-football-tarot-spread-and-ritual'
 specVersion: 2
+internalLinkHints:
+  - 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
+  - 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore'
+  - Tarot Ritual for When Creativity Feels Pointless
+  - First-Day New Job Secular Tarot Spread and Journal
+  - 'Create a Calm Space During Political Unrest: A Gentle Guide'
+heroImageSrc: /hero-images/sunday-football-tarot-spread-and-ritual.png
+heroImageAlt: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide — hero image'
 ---
 
 ## Why tarot + football works

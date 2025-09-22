@@ -1,20 +1,87 @@
 ---
-title: "Knowing When to Give Up: A Gentle Quitter's Guide"
+title: 'Knowing When to Give Up: A Gentle Quitter''s Guide'
 slug: knowing-when-to-give-up
-excerpt: "When is quitting the kindest, smartest move? This gentle, secular guide offers a 5-minute triage ritual and a deeper closure practice, plus an easy checklist and one clean question."
-metaTitle: "Knowing When to Give Up: A Gentle Quitter's Guide"
-metaDescription: "A cozy, secular guide to knowing when to give up. Try a 5-minute triage ritual or a deeper closure practice, with accessibility tweaks, a checklist, and one clean question."
-tags: ["self-kindness", "decision-making", "secular-tarot", "rituals", "neurodivergent-friendly", "boundaries"]
-outline: ["Opening Reflection", "Steps: Quick Triage Ritual (5 Minutes)", "Steps: Deep Closure Ritual (Take Your Time)", "Variations & Accessibility", "Checklist: Healthy Quit Signals", "Safety & Ethics", "Wrap-up: Reflection Prompt"]
+excerpt: >-
+  When is quitting the kindest, smartest move? This gentle, secular guide offers
+  a 5-minute triage ritual and a deeper closure practice, plus an easy checklist
+  and one clean question.
+metaTitle: 'Knowing When to Give Up: A Gentle Quitter''s Guide'
+metaDescription: >-
+  A cozy, secular guide to knowing when to give up. Try a 5-minute triage ritual
+  or a deeper closure practice, with accessibility tweaks, a checklist, and one
+  clean question.
+tags:
+  - self-kindness
+  - decision-making
+  - secular-tarot
+  - rituals
+  - neurodivergent-friendly
+  - boundaries
+outline:
+  - Opening Reflection
+  - 'Steps: Quick Triage Ritual (5 Minutes)'
+  - 'Steps: Deep Closure Ritual (Take Your Time)'
+  - Variations & Accessibility
+  - 'Checklist: Healthy Quit Signals'
+  - Safety & Ethics
+  - 'Wrap-up: Reflection Prompt'
 wordCount: 1350
 readingMinutes: 7
 includeAds: true
 includeKofi: false
-affiliateAnchors: [{"key":"notebooks","text":"pocket notebook","insertedCount":0},{"key":"notebooks","text":"tear-out notepad","insertedCount":0},{"key":"journal","text":"undated guided journal","insertedCount":0},{"key":"journal","text":"refillable leather journal","insertedCount":0},{"key":"crystals","text":"smoky quartz palm stone","insertedCount":0},{"key":"crystals","text":"labradorite worry stone","insertedCount":0},{"key":"notebooks","text":"grid notebook","insertedCount":0},{"key":"journal","text":"hardcover reflection journal","insertedCount":0},{"key":"cozy-games","text":"gentle cozy game break","insertedCount":0},{"key":"cozy-games","text":"low-stakes farming sim","insertedCount":0}]
-internalLinks: []
-publishedAt: "2025-09-16T14:55:54.350Z"
-canonicalUrl: "https://witchclick.space/post/knowing-when-to-give-up"
+affiliateAnchors:
+  - key: notebooks
+    text: pocket notebook
+    insertedCount: 0
+  - key: notebooks
+    text: tear-out notepad
+    insertedCount: 0
+  - key: journal
+    text: undated guided journal
+    insertedCount: 0
+  - key: journal
+    text: refillable leather journal
+    insertedCount: 0
+  - key: crystals
+    text: smoky quartz palm stone
+    insertedCount: 0
+  - key: crystals
+    text: labradorite worry stone
+    insertedCount: 0
+  - key: notebooks
+    text: grid notebook
+    insertedCount: 0
+  - key: journal
+    text: hardcover reflection journal
+    insertedCount: 0
+  - key: cozy-games
+    text: gentle cozy game break
+    insertedCount: 0
+  - key: cozy-games
+    text: low-stakes farming sim
+    insertedCount: 0
+internalLinks:
+  - text: 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
+    href: /post/when-everything-feels-pointless
+  - text: 'Secular Tarot in Psychological Practice: A Gentle Guide'
+    href: /post/secular-tarot-in-psychological-practice
+  - text: 'When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day'
+    href: /post/anxiety-from-avoiding-responsibilities-gentle-rituals
+  - text: Secular Tarot Spread When You're Seeking a Clear Sign
+    href: /post/secular-tarot-spread-for-a-sign
+  - text: 'Pre-Interview Grounding Ritual: Quick and Deep Guide'
+    href: /post/pre-interview-grounding-ritual
+publishedAt: '2025-09-16T14:55:54.350Z'
+canonicalUrl: 'https://witchclick.space/post/knowing-when-to-give-up'
 specVersion: 2
+internalLinkHints:
+  - 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
+  - 'Secular Tarot in Psychological Practice: A Gentle Guide'
+  - 'When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day'
+  - Secular Tarot Spread When You're Seeking a Clear Sign
+  - 'Pre-Interview Grounding Ritual: Quick and Deep Guide'
+heroImageSrc: /hero-images/knowing-when-to-give-up.png
+heroImageAlt: 'Knowing When to Give Up: A Gentle Quitter''s Guide — hero image'
 ---
 ## Opening Reflection
 

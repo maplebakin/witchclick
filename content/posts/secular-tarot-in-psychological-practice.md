@@ -1,20 +1,79 @@
 ---
-title: "Secular Tarot in Psychological Practice: A Gentle Guide"
+title: 'Secular Tarot in Psychological Practice: A Gentle Guide'
 slug: secular-tarot-in-psychological-practice
-excerpt: "A cozy, ethics-first guide to using tarot as a secular reflection tool beside therapy or personal growth work. Includes a 5-minute check-in, a deeper spread, accessibility tweaks, and a simple checklist."
-metaTitle: "Secular Tarot in Psychological Practice: A Gentle Guide"
-metaDescription: "How to use secular tarot as a reflective tool alongside therapy or self-care. Two versions (5-minute and deep dive), plus accessibility tips and ethics."
-tags: ["secular tarot", "psychology", "journaling", "rituals", "accessibility", "ethics"]
-outline: ["Opening Reflection", "Steps: Quick & Deep", "Variations & Accessibility", "Checklist / Summary Box", "Safety & Ethics", "Wrap-Up with Reflection Prompt"]
+excerpt: >-
+  A cozy, ethics-first guide to using tarot as a secular reflection tool beside
+  therapy or personal growth work. Includes a 5-minute check-in, a deeper
+  spread, accessibility tweaks, and a simple checklist.
+metaTitle: 'Secular Tarot in Psychological Practice: A Gentle Guide'
+metaDescription: >-
+  How to use secular tarot as a reflective tool alongside therapy or self-care.
+  Two versions (5-minute and deep dive), plus accessibility tips and ethics.
+tags:
+  - secular tarot
+  - psychology
+  - journaling
+  - rituals
+  - accessibility
+  - ethics
+outline:
+  - Opening Reflection
+  - 'Steps: Quick & Deep'
+  - Variations & Accessibility
+  - Checklist / Summary Box
+  - Safety & Ethics
+  - Wrap-Up with Reflection Prompt
 wordCount: 1128
 readingMinutes: 6
 includeAds: true
 includeKofi: false
-affiliateAnchors: [{"key":"journal","text":"softcover reflection journal","insertedCount":0},{"key":"notebooks","text":"pocket dot-grid notebook","insertedCount":0},{"key":"notebooks","text":"simple bullet journal notebook","insertedCount":0},{"key":"journal","text":"hardcover guided journal","insertedCount":0},{"key":"crystals","text":"calm-toned crystal set for décor","insertedCount":0},{"key":"crystals","text":"tiny palm stone for fidgeting","insertedCount":0},{"key":"cozy-games","text":"cozy narrative game night","insertedCount":0},{"key":"cozy-games","text":"low-stakes cozy game for cooldowns","insertedCount":0}]
-internalLinks: []
-publishedAt: "2025-09-16T15:17:05.670Z"
-canonicalUrl: "https://witchclick.space/post/secular-tarot-in-psychological-practice"
+affiliateAnchors:
+  - key: journal
+    text: softcover reflection journal
+    insertedCount: 0
+  - key: notebooks
+    text: pocket dot-grid notebook
+    insertedCount: 0
+  - key: notebooks
+    text: simple bullet journal notebook
+    insertedCount: 0
+  - key: journal
+    text: hardcover guided journal
+    insertedCount: 0
+  - key: crystals
+    text: calm-toned crystal set for décor
+    insertedCount: 0
+  - key: crystals
+    text: tiny palm stone for fidgeting
+    insertedCount: 0
+  - key: cozy-games
+    text: cozy narrative game night
+    insertedCount: 0
+  - key: cozy-games
+    text: low-stakes cozy game for cooldowns
+    insertedCount: 0
+internalLinks:
+  - text: Secular Tarot Spread When You're Seeking a Clear Sign
+    href: /post/secular-tarot-spread-for-a-sign
+  - text: 'Knowing When to Give Up: A Gentle Quitter''s Guide'
+    href: /post/knowing-when-to-give-up
+  - text: 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions'
+    href: /post/tarot-as-a-secular-tool
+  - text: 'When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day'
+    href: /post/anxiety-from-avoiding-responsibilities-gentle-rituals
+  - text: 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
+    href: /post/when-everything-feels-pointless
+publishedAt: '2025-09-16T15:17:05.670Z'
+canonicalUrl: 'https://witchclick.space/post/secular-tarot-in-psychological-practice'
 specVersion: 2
+internalLinkHints:
+  - Secular Tarot Spread When You're Seeking a Clear Sign
+  - 'Knowing When to Give Up: A Gentle Quitter''s Guide'
+  - 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions'
+  - 'When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day'
+  - 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
+heroImageSrc: /hero-images/secular-tarot-in-psychological-practice.png
+heroImageAlt: 'Secular Tarot in Psychological Practice: A Gentle Guide — hero image'
 ---
 ## Opening Reflection
 
