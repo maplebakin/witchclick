@@ -1,21 +1,36 @@
----
 // Featherweight client-side search (no deps). Fetches /search.json at runtime
+const uid = `search-${globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2)}`;
+const resultsId = `${uid}-results`;
 ---
 <div class="relative w-full max-w-xs" data-search>
+  <label class="sr-only" for={uid}>Search posts</label>
   <input
+    id={uid}
     type="search"
     placeholder="Search posts…"
     class="w-full rounded-full border border-purple-200 bg-white/70 px-4 py-1.5 text-sm outline-none placeholder:text-purple-400 focus:border-purple-400"
+    role="combobox"
+    aria-autocomplete="list"
+    aria-expanded="false"
+    aria-controls={resultsId}
   />
-  <div class="absolute left-0 right-0 z-50 mt-2 hidden overflow-hidden rounded-xl border border-purple-200 bg-white shadow-lg" data-results></div>
+  <div
+    id={resultsId}
+    class="absolute left-0 right-0 z-50 mt-2 hidden overflow-hidden rounded-xl border border-purple-200 bg-white shadow-lg"
+    role="listbox"
+    data-results
+  ></div>
 </div>
 
 <script>
 (() => {
   const root = document.currentScript?.previousElementSibling?.closest('[data-search]');
-  if (!root) { return void 0; }
+  if (!root) return;
+
   const input = root.querySelector('input');
   const results = root.querySelector('[data-results]');
+  if (!input || !results) return;
+
   let data = [];
   let loaded = false;
 
@@ -25,37 +40,74 @@
       const r = await fetch('/search.json', { cache: 'no-store' });
       data = await r.json();
       loaded = true;
-    } catch { /* ignore */ }
+    } catch (error) {
+      if (typeof console !== 'undefined') {
+        console.warn('[search] Failed to load search index', error);
+      }
+    }
+  }
+
+  function escapeHtml(value){
+    return String(value).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
   function render(items){
-    if (!items.length){ results.classList.add('hidden'); results.innerHTML = ''; return; }
+    if (!items.length){
+      results.classList.add('hidden');
+      results.innerHTML = '';
+      input.setAttribute('aria-expanded', 'false');
+      return;
+    }
+
+    input.setAttribute('aria-expanded', 'true');
     results.classList.remove('hidden');
     results.innerHTML = items.slice(0,8).map(item => `
-      <a class="block px-3 py-2 text-sm hover:bg-purple-50" href="/post/${escapeHtml(item.slug)}">
+      <a class="block px-3 py-2 text-sm hover:bg-purple-50 focus:bg-purple-100 focus:outline-none" href="/post/${escapeHtml(item.slug)}" role="option">
         <div class="font-medium text-purple-900">${escapeHtml(item.title)}</div>
         ${item.excerpt ? `<div class=\"text-xs text-purple-600 line-clamp-2\">${escapeHtml(item.excerpt)}</div>` : ''}
       </a>
     `).join('');
   }
 
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
+  async function handleSearch(){
+    const query = input.value.trim().toLowerCase();
+    if (!query){
+      render([]);
+      return;
+    }
 
-  input.addEventListener('input', async () => {
-    const q = input.value.trim().toLowerCase();
-    if (!q){ render([]); return; }
+    input.setAttribute('aria-busy', 'true');
     await ensure();
+    input.removeAttribute('aria-busy');
+
     const items = data.filter(item => {
       const hay = `${item.title} ${item.excerpt} ${(item.tags||[]).join(' ')}`.toLowerCase();
-      return hay.includes(q);
+      return hay.includes(query);
     });
+
     render(items);
+  }
+
+  let timerId: number | undefined;
+
+  input.addEventListener('input', () => {
+    if (timerId) {
+      window.clearTimeout(timerId);
+    }
+    timerId = window.setTimeout(handleSearch, 120);
   });
 
-  document.addEventListener('click', (e) => {
-    if (!results.contains(e.target) && e.target !== input) results.classList.add('hidden');
+  input.addEventListener('focus', async () => {
+    if (input.value.trim()) {
+      await handleSearch();
+    }
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!results.contains(event.target) && event.target !== input) {
+      results.classList.add('hidden');
+      input.setAttribute('aria-expanded', 'false');
+    }
   });
 })();
 </script>

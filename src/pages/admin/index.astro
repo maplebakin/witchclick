@@ -1,17 +1,12 @@
 ---
 /* Admin: Prompt → JSON → Preview → Ingest */
-import Base from '../../layouts/Base.astro';
-import fs from 'node:fs';
-import path from 'node:path';
+import Base from "../../layouts/Base.astro";
+import { readSettings, getSiteOrigin } from "../../utils/settings";
 
 export const prerender = false; // never emit in static builds
 
-// ---- Safe settings read (inline, no helper needed)
-const settingsPath = path.join(process.cwd(), 'content', 'settings.json');
-let settings: { siteUrl: string; brandName: string } = { siteUrl: 'https://example.com', brandName: 'WitchClick' };
-try {
-  settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
-} catch { /* keep defaults */ }
+const settings = readSettings();
+const site = getSiteOrigin(settings) || "https://example.com";
 
 // Gate: dev OR query ?key=PUBLIC_ADMIN_KEY (useful if you later switch to a server adapter)
 const isDev = import.meta.env.DEV;
@@ -23,7 +18,13 @@ const canUse = isDev || !!keyOk;
 // Dev API base (falls back to localhost if not set)
 const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 ---
-<Base title="WitchClick — Admin" description="Prompt, preview, ingest, publish." canon={`${String(settings.siteUrl).replace(/\/$/,'')}/admin`} wide={true} noindex={true}>
+<Base
+  title="WitchClick — Admin"
+  description="Prompt, preview, ingest, publish."
+  canon={`${site}/admin`}
+  wide={true}
+  noindex={true}
+>
   <Fragment slot="head">
     <meta name="robots" content="noindex" />
   </Fragment>

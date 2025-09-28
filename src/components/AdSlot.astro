@@ -1,16 +1,22 @@
 ---
 // src/components/AdSlot.astro
-import fs from 'node:fs';
+import { readSettings } from "../utils/settings";
 
 interface Props { slot?: 'side'|'end'|'lead'; class?: string }
 const { slot = 'end', class: className = '' } = Astro.props as Props;
 
-const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
+const settings = readSettings();
 const ads = settings.ads || {};
 const provider = ads.provider || 'none';
-const isAdsense = provider === 'adsense' && ads.adsenseClientId;
+const slotMap = {
+  side: ads.sidebarSlotId,
+  end: ads.endSlotId,
+  lead: ads.leadSlotId,
+  ...(ads.slots || {}),
+};
+const slotId = slotMap?.[slot] || '';
+const isAdsense = provider === 'adsense' && ads.adsenseClientId && slotId;
 const isHouse = provider === 'house';
-const slotId = (ads.slots && ads.slots[slot]) || '';
 const baseClass = `ad ad--${slot} ${className}`;
 ---
 {isAdsense && (

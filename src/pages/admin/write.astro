@@ -1,14 +1,11 @@
 ---
-import Base from '../../layouts/Base.astro';
-import fs from 'node:fs';
-import path from 'node:path';
+import Base from "../../layouts/Base.astro";
+import { readSettings, getSiteOrigin } from "../../utils/settings";
 
 export const prerender = false; // never emit in static builds
 
-function safeReadJSON(p, fallback = {}) {
-  try { return JSON.parse(fs.readFileSync(p,'utf8')); } catch { return fallback; }
-}
-const settings = safeReadJSON(path.join(process.cwd(), 'content', 'settings.json'), { siteUrl: 'https://example.com' });
+const settings = readSettings();
+const site = getSiteOrigin(settings) || "https://example.com";
 
 const isDev = import.meta.env.DEV;
 const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
@@ -18,7 +15,13 @@ const canUse = isDev || !!keyOk;
 
 const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 ---
-<Base title="WitchClick — Write" description="Compose a post in Markdown." canon={`${String(settings.siteUrl).replace(/\/$/,'')}/admin/write`} wide={true} noindex={true}>
+<Base
+  title="WitchClick — Write"
+  description="Compose a post in Markdown."
+  canon={`${site}/admin/write`}
+  wide={true}
+  noindex={true}
+>
   <Fragment slot="head">
     <meta name="robots" content="noindex" />
   </Fragment>
