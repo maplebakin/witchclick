@@ -1,6 +1,6 @@
 ---
-import fs from 'node:fs';
-const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
+import { readSettings } from "../utils/settings";
+const settings = readSettings();
 const user = settings.kofiUsername || '';
 if (!user) return;
 ---

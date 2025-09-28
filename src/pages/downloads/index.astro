@@ -1,31 +1,62 @@
 ---
-import Base from '../../layouts/Base.astro';
-import fs from 'node:fs';
-import path from 'node:path';
-const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
-const dir = './content/downloads';
-const items:any[] = [];
+import Base from "../../layouts/Base.astro";
+import fs from "node:fs";
+import path from "node:path";
+import { readSettings, getSiteOrigin } from "../../utils/settings";
+
+const settings = readSettings();
+const site = getSiteOrigin(settings);
+const dir = "./content/downloads";
+const items: any[] = [];
+
 if (fs.existsSync(dir)) {
-  for (const f of fs.readdirSync(dir).filter(x=>x.endsWith('.json'))) {
-    try { items.push(JSON.parse(fs.readFileSync(path.join(dir,f),'utf8'))); } catch {}
+  for (const file of fs.readdirSync(dir).filter((name) => name.endsWith(".json"))) {
+    try {
+      const parsed = JSON.parse(fs.readFileSync(path.join(dir, file), "utf8"));
+      items.push(parsed);
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.warn(`[downloads] Failed to parse ${file}:`, error);
+      }
+    }
   }
 }
-items.sort((a,b)=> (a.name||'').localeCompare(b.name||''));
+
+items.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
 ---
-<Base title="Downloads" description="Printable planners and cozy tools." canon={`${settings.siteUrl.replace(/\/$/,'')}/downloads`}>
+<Base
+  title="Downloads"
+  description="Printable planners and cozy tools."
+  canon={site ? `${site}/downloads` : ""}
+>
   <section class="prose prose-neutral max-w-none">
     <h1>Downloads</h1>
-    {items.length===0 && <p>No downloads yet.</p>}
-    <div class="mt-4 grid gap-6 md:grid-cols-2">
-      {items.map((it)=>(
-        <a href={`/downloads/${it.slug}`} class="block rounded-2xl border border-purple-200 bg-purple-50 p-4 hover:bg-purple-100">
+    {items.length === 0 && <p>No downloads yet.</p>}
+    <div class="mt-6 grid gap-6 md:grid-cols-2">
+      {items.map((item) => (
+        <a
+          href={`/downloads/${item.slug}`}
+          class="block rounded-2xl border border-purple-200 bg-purple-50 p-4 transition hover:bg-purple-100"
+        >
           <div class="flex gap-4">
-            {it.cover && <img src={it.cover} alt={`${it.name} cover`} class="h-20 w-20 rounded-lg object-cover" loading="lazy" />}
+            {item.cover && (
+              <img
+                src={item.cover}
+                alt={`${item.name} cover`}
+                class="h-20 w-20 rounded-lg object-cover"
+                loading="lazy"
+              />
+            )}
             <div>
-              <h2 class="m-0 text-lg font-semibold">{it.name}</h2>
-              <p class="m-0 text-sm text-purple-900">{it.summary}</p>
-              <p class="m-0 mt-1 text-sm">
-                {(it.price && it.currency) ? new Intl.NumberFormat(undefined,{style:'currency',currency:it.currency}).format(parseFloat(it.price)) : 'Free'}
+              <h2 class="m-0 text-lg font-semibold text-purple-900">{item.name}</h2>
+              <p class="m-0 text-sm text-purple-800/90">{item.summary}</p>
+              <p class="m-0 mt-1 text-sm text-purple-700">
+                {item.price && item.currency
+                  ? new Intl.NumberFormat(undefined, {
+                      style: "currency",
+                      currency: item.currency,
+                    }).format(parseFloat(item.price))
+                  : "Free"}
               </p>
             </div>
           </div>

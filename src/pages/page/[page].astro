@@ -1,40 +1,22 @@
 ---
-// STATIC PAGINATION (FS-based). Scope PAGE_SIZE inside getStaticPaths to avoid bundler hoisting quirks.
 import Base from "../../layouts/Base.astro";
 import PostCard from "../../components/PostCard.astro";
 import Pagination from "../../components/Pagination.astro";
-import fs from "node:fs";
-import path from "node:path";
-import matter from "gray-matter";
+import { loadAllPosts, paginatePosts, estimateReadingMinutes, firstParagraph } from "../../utils/posts";
 
 export const prerender = true;
 
 export async function getStaticPaths() {
-  const PAGE_SIZE = 12; // 👈 scoped here
-
-  const dir = path.join(process.cwd(), 'content', 'posts');
-  const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => f.endsWith('.md')) : [];
-
-  const posts = files.map((file) => {
-    const full = path.join(dir, file);
-    const raw = fs.readFileSync(full, 'utf8');
-    const { data } = matter(raw);
-    const slug = (data?.slug ? String(data.slug) : file.replace(/\.md$/, '')).toLowerCase();
-    const fronts = [data?.publishedAt, data?.pubDate, data?.date, data?.updatedAt].filter(Boolean);
-    let date = new Date(fronts[0] || 0);
-    if (isNaN(+date)) date = fs.statSync(full).mtime;
-    return { slug, data, date };
-  }).sort((a,b) => +b.date - +a.date);
-
+  const PAGE_SIZE = 12;
+  const posts = loadAllPosts();
   const totalPages = Math.max(1, Math.ceil(posts.length / PAGE_SIZE));
 
   return Array.from({ length: totalPages }, (_, i) => {
     const page = i + 1;
-    const start = (page - 1) * PAGE_SIZE;
-    const pagePosts = posts.slice(start, start + PAGE_SIZE);
+    const { items } = paginatePosts(page, PAGE_SIZE);
     return {
       params: { page: String(page) },
-      props: { page, totalPages, pagePosts }
+      props: { page, totalPages, pagePosts: items },
     };
   });
 }
@@ -42,21 +24,40 @@ export async function getStaticPaths() {
 const { page, totalPages, pagePosts } = Astro.props as {
   page: number;
   totalPages: number;
-  pagePosts: Array<{ slug: string; data: any }>
+  pagePosts: ReturnType<typeof loadAllPosts>;
 };
+
+function toCard(post) {
+  const fm = post.data ?? {};
+  return {
+    slug: post.slug,
+    title: fm.title ?? post.title,
+    excerpt: fm.excerpt ?? fm.description ?? fm.metaDescription ?? firstParagraph(post.content),
+    tags: Array.isArray(fm.tags) ? fm.tags : [],
+    readingMinutes: fm.readingMinutes ?? estimateReadingMinutes(post.content),
+    publishedAt: fm.publishedAt ?? fm.pubDate ?? fm.date ?? undefined,
+  };
+}
 ---
 <Base title={`WitchClick — Page ${page}`}>
-  <h1 class="mb-6">Latest posts — page {page}</h1>
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    {pagePosts.map((p) => (
-      <PostCard
-        href={`/post/${p.slug}`}
-        title={p.data.title}
-        excerpt={p.data.excerpt || p.data.description || ''}
-        tags={p.data.tags || []}
-        readingMinutes={p.data.readingMinutes}
-      />
-    ))}
+  <h1 class="mb-6 text-2xl font-semibold text-purple-900">Latest posts — page {page}</h1>
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    {pagePosts.map((post) => {
+      const card = toCard(post);
+      return (
+        <PostCard
+          post={{
+            slug: card.slug,
+            title: card.title,
+            excerpt: card.excerpt,
+            tags: card.tags,
+            readingMinutes: card.readingMinutes,
+            publishedAt: card.publishedAt,
+          }}
+          href={`/post/${card.slug}`}
+        />
+      );
+    })}
   </div>
 
   <Pagination page={page} totalPages={totalPages} baseHref="/page" />

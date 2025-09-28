@@ -1,14 +1,23 @@
 ---
-import Base from '../layouts/Base.astro';
-import fs from 'node:fs';
-const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
+import Base from "../layouts/Base.astro";
+import { readSettings, getSiteOrigin } from "../utils/settings";
+
+const settings = readSettings();
+const site = getSiteOrigin(settings);
 ---
-<Base title="Privacy Policy" description="How we handle your data." canon={`${settings.siteUrl.replace(/\/$/,'')}/privacy`}>
+<Base
+  title="Privacy Policy"
+  description="How we handle your data."
+  canon={site ? `${site}/privacy` : ""}
+>
   <article class="prose prose-neutral max-w-none">
     <h1>Privacy Policy</h1>
-    <p><em>Last updated: {new Date().toISOString().slice(0,10)}</em></p>
+    <p><em>Last updated: {new Date().toISOString().slice(0, 10)}</em></p>
     <h2>What we collect</h2>
-    <p>This site is mostly static. We may collect basic analytics (page views, clicks) to improve the site. We don’t sell personal data.</p>
+    <p>
+      This site is mostly static. We may collect basic analytics (page views, clicks) to improve the site. We don’t sell personal
+      data.
+    </p>
     <h2>Cookies</h2>
     <p>If ads or analytics are enabled, third parties may set cookies to measure performance.</p>
     <h2>Contact</h2>

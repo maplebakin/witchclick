@@ -1,32 +1,35 @@
-
 ---
-/* src/layouts/Base.astro — JS-only frontmatter, trimmed & HTML-safe */
+/* src/layouts/Base.astro */
 import "../styles/tailwind.css";
 import SearchBox from "../components/SearchBox.astro";
+import { readSettings, getSiteOrigin, toAbsoluteUrl, getTheme } from "../utils/settings";
 
 const props = Astro.props || {};
-const title = props.title ?? "WitchClick";
-const description = props.description ?? "";
-const canon = props.canon ?? "";
-const wide = !!props.wide;
-const ogImage = props.ogImage ?? "";
-const noindex = !!props.noindex;
+const {
+  title = "WitchClick",
+  description = "",
+  canon = "",
+  wide = false,
+  ogImage = "",
+  noindex = false,
+} = props;
 
-// Minimal site settings (can wire back to settings.json later)
-const brandName = "WitchClick";
-const siteUrl = "https://example.com";
+const settings = readSettings();
+const brandName = settings.brandName ?? "WitchClick";
+const siteOrigin = getSiteOrigin(settings);
+const here = Astro.url?.pathname ?? "/";
 
-const isDev = import.meta.env.DEV;
-const here = (Astro.url && Astro.url.pathname) || "/";
+const canonicalUrl = canon
+  ? canon.startsWith("http")
+    ? canon
+    : toAbsoluteUrl(canon, settings)
+  : siteOrigin
+    ? `${siteOrigin}${here}`
+    : "";
 
-function abs(u){
-  if (!u) return "";
-  try { return new URL(u, siteUrl || "http://localhost").toString(); } catch { return u; }
-}
-
-const computedCanonical = canon && canon.startsWith("http") ? canon : (siteUrl ? abs(here) : "");
 const pageTitle = title && title !== brandName ? `${title} — ${brandName}` : brandName;
-const ogImg = ogImage ? abs(ogImage) : (siteUrl ? `${siteUrl}/og-default.png` : "");
+const ogImg = ogImage ? toAbsoluteUrl(ogImage, settings) : (siteOrigin ? `${siteOrigin}/og-default.png` : "");
+const theme = getTheme(settings);
 
 const headerWidthClass = wide ? "max-w-6xl" : "max-w-4xl";
 const mainWidthClass = wide ? "max-w-6xl" : "max-w-3xl";
@@ -35,13 +38,24 @@ const links = [
   { href: "/", label: "Home" },
   { href: "/entities", label: "Entities" },
   { href: "/downloads", label: "Downloads" },
-  ...(isDev ? [
-    { href: "/admin", label: "Post Generator", rel: "nofollow" },
-    { href: "/admin/write", label: "Write", rel: "nofollow" },
-    { href: "/admin/entities", label: "Entities Admin", rel: "nofollow" },
-    { href: "/admin/downloads", label: "Downloads Admin", rel: "nofollow" },
-  ] : []),
+  ...(import.meta.env.DEV
+    ? [
+        { href: "/admin", label: "Post Generator", rel: "nofollow" },
+        { href: "/admin/write", label: "Write", rel: "nofollow" },
+        { href: "/admin/entities", label: "Entities Admin", rel: "nofollow" },
+        { href: "/admin/downloads", label: "Downloads Admin", rel: "nofollow" },
+      ]
+    : []),
 ];
+
+const bodyStyle = `
+  --color-primary: ${theme.primary};
+  --color-accent: ${theme.accent};
+  --color-background: ${theme.background};
+  --font-serif: '${theme.fontSerif}', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+  --font-script: '${theme.fontScript}', cursive;
+  background: ${theme.background};
+`;
 ---
 <html lang="en" class="scroll-smooth">
   <head>
@@ -52,45 +66,75 @@ const links = [
 
     <title>{pageTitle}</title>
     {description && <meta name="description" content={description} />}
-    {computedCanonical && <link rel="canonical" href={computedCanonical} />}
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 
     {/* Social defaults */}
     <meta property="og:site_name" content={brandName} />
     <meta property="og:title" content={title} />
     {description && <meta property="og:description" content={description} />}
-    {computedCanonical && <meta property="og:url" content={computedCanonical} />}
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
     {ogImg && <meta property="og:image" content={ogImg} />}
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#6b21a8" />
+    <meta name="theme-color" content={theme.primary} />
+    <meta name="color-scheme" content="light" />
 
     {/* Discoverability helpers */}
-    <link rel="alternate" type="application/rss+xml" title="WitchClick RSS" href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${brandName} RSS`} href="/rss.xml" />
     <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
 
     {/* Fonts perf */}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,300;7..72,400;7..72,700&family=Parisienne&display=swap" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,300;7..72,400;7..72,700&family=Parisienne&display=swap"
+    />
+
+    <style is:inline>
+      :root {
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      h1, h2, h3, .font-serif {
+        font-family: var(--font-serif);
+      }
+
+      .font-script {
+        font-family: var(--font-script);
+      }
+    </style>
 
     {/* Page-level head slot */}
     <slot name="head" />
   </head>
 
-  <body class="min-h-screen bg-[#faf7f5] text-gray-900">
+  <body class="min-h-screen text-gray-900" style={bodyStyle}>
     {/* Skip link for a11y */}
-    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 rounded bg-black px-3 py-2 text-white">Skip to content</a>
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 rounded bg-black px-3 py-2 text-white"
+    >
+      Skip to content
+    </a>
 
-    <header class={`mx-auto ${headerWidthClass} px-4 py-6`}>
-      <div class="flex items-center justify-between gap-4">
-        <a href="/" class="text-2xl font-serif" style="font-family: Parisienne, cursive;">{brandName}</a>
+    <header class={`mx-auto ${headerWidthClass} px-4 pb-4 pt-6`}> 
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <a href="/" class="text-3xl font-script text-[var(--color-primary)]">{brandName}</a>
         <nav class="text-sm" aria-label="Primary">
-          <ul class="flex items-center gap-4">
+          <ul class="flex flex-wrap items-center gap-4">
             {links.map((l) => {
               const active = here === l.href || (l.href !== "/" && here.startsWith(l.href + "/"));
               return (
                 <li>
-                  <a href={l.href} rel={l.rel} aria-current={active ? "page" : undefined} class={`underline-offset-4 hover:underline ${active ? "text-purple-800 font-semibold" : "text-purple-700"}`}>
+                  <a
+                    href={l.href}
+                    rel={l.rel}
+                    aria-current={active ? "page" : undefined}
+                    class={`rounded-full px-3 py-1 text-sm transition-colors hover:bg-purple-50 ${
+                      active ? "bg-purple-100 text-purple-900" : "text-purple-700"
+                    }`}
+                  >
                     {l.label}
                   </a>
                 </li>
@@ -103,23 +147,24 @@ const links = [
     </header>
 
     <main id="main" class={`mx-auto ${mainWidthClass} px-4 pb-16`}>
+      <div class="sm:hidden mb-6"><SearchBox /></div>
       <slot />
     </main>
 
     {/* CTA slot (filled only on posts) */}
     <slot name="cta" />
 
-    <footer class="mt-auto border-t border-purple-100/60 bg-white/50">
+    <footer class="mt-auto border-t border-purple-100/60 bg-white/70">
       <div class={`mx-auto ${mainWidthClass} px-4 py-8 text-sm leading-relaxed text-gray-700`}>
-        <p class="mb-2">As an affiliate, we may earn a small commission if you purchase through our links. We only share tools we find cozy and useful.</p>
+        {settings.disclosure && <p class="mb-2">{settings.disclosure}</p>}
         <p class="flex flex-wrap items-center gap-3">
           <a class="underline underline-offset-4 hover:no-underline" href="/rss.xml">RSS</a>
           <span aria-hidden="true">•</span>
           <a class="underline underline-offset-4 hover:no-underline" href="/sitemap-index.xml">Sitemap</a>
-          {computedCanonical && (
+          {canonicalUrl && (
             <span class="inline-flex items-center gap-3">
               <span aria-hidden="true">•</span>
-              <a class="underline underline-offset-4 hover:no-underline" href={computedCanonical}>Permalink</a>
+              <a class="underline underline-offset-4 hover:no-underline" href={canonicalUrl}>Permalink</a>
             </span>
           )}
         </p>
@@ -131,4 +176,3 @@ const links = [
     <slot name="foot" />
   </body>
 </html>
-```
