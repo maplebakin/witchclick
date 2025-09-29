@@ -121,7 +121,16 @@ if (frontAnchors.length > 0) {
 
 const entList = Array.isArray(data.entities) ? data.entities : [];
 const resolvedEntities = entList
-  .map((e: any) => readEntity(String(e.type || ""), String(e.slug || "")))
+  .map((e: any) => {
+    const entity = readEntity(String(e.type || ""), String(e.slug || ""));
+    if (!entity) return null;
+
+    return {
+      ...entity,
+      href: `/entities/${entity.type}/${entity.slug}`,
+      description: entity.summary,
+    };
+  })
   .filter(Boolean);
 
 const jsonLd = {
