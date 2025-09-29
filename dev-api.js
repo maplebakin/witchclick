@@ -343,6 +343,28 @@ function pickFirstString(...candidates) {
   return '';
 }
 
+function normalizeEOL(s) {
+  if (s == null) return '';
+  return String(s).replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+}
+
+function startsWithHeading(markdown, heading) {
+  if (!heading) return false;
+  const normalizedHeading = String(heading).trim();
+  if (!normalizedHeading) return false;
+  const lines = normalizeEOL(markdown).split('\n');
+  for (const rawLine of lines) {
+    if (!rawLine.trim()) continue;
+    const line = rawLine.trim();
+    const match = line.match(/^#{1,6}\s*(.*?)\s*$/);
+    if (!match) return false;
+    let text = match[1];
+    text = text.replace(/\s+#+\s*$/, '').trim();
+    return text.toLowerCase() === normalizedHeading.toLowerCase();
+  }
+  return false;
+}
+
 function normalizeCta(rawCta, report) {
   const CTA_TYPES = new Set(['kofi', 'download', 'none']);
   if (typeof rawCta === 'string') {
@@ -447,8 +469,8 @@ function normalizeLooseSpec(rawSpec) {
     if (!section || typeof section !== 'object') continue;
     const heading = pickFirstString(section.heading, section.title, section.name);
     const rawMarkdown = section.markdown ?? section.content ?? section.body ?? '';
-    const markdown = typeof rawMarkdown === 'string' ? rawMarkdown.trim() : '';
-    if (!heading && !markdown) continue;
+    const markdown = typeof rawMarkdown === 'string' ? String(rawMarkdown) : '';
+    if (!heading && !markdown.trim()) continue;
     normalizedSections.push({
       heading,
       markdown
@@ -535,6 +557,43 @@ function normalizeLooseSpec(rawSpec) {
   return { spec, report };
 }
 
+function buildMarkdownFromSpec(spec) {
+  const sections = Array.isArray(spec && spec.sections) ? spec.sections : [];
+  const chunks = [];
+
+  for (const section of sections) {
+    if (!section || typeof section !== 'object') continue;
+    const heading = section.heading ? String(section.heading).trim() : '';
+    const normalizedMarkdown = normalizeEOL(section.markdown);
+    const cleanedMarkdown = normalizedMarkdown
+      ? normalizedMarkdown.replace(/[ \t]+$/gm, '')
+      : '';
+    const body = cleanedMarkdown
+      ? cleanedMarkdown.replace(/^\n+/, '').replace(/\n+$/, '')
+      : '';
+    const hasBody = !!body;
+
+    if (!heading && !hasBody) continue;
+
+    const parts = [];
+    if (heading) {
+      if (!startsWithHeading(cleanedMarkdown, heading)) {
+        parts.push(`## ${heading}`);
+        if (hasBody) parts.push('');
+      }
+    }
+
+    if (hasBody) parts.push(body);
+
+    const chunk = parts.join('\n');
+    if (chunk) chunks.push(chunk);
+  }
+
+  const doc = chunks.join('\n\n');
+  if (!doc) return '';
+  return doc.endsWith('\n') ? doc : `${doc}\n`;
+}
+
 function prepareNormalizedSpec(rawSpec) {
   const { spec, report } = normalizeLooseSpec(rawSpec);
 
@@ -565,19 +624,8 @@ function prepareNormalizedSpec(rawSpec) {
     spec.outline = fallbackOutline.map(h => ({ heading: h, id: slugify(h) }));
   }
 
-  const body = spec.sections
-    .map(section => {
-      const heading = pickFirstString(section.heading);
-      const markdown = pickFirstString(section.markdown);
-      const headingBlock = heading ? `## ${heading}\n\n` : '';
-      const trimmed = markdown ? markdown.trim() : '';
-      const chunk = `${headingBlock}${trimmed}`.trim();
-      return chunk ? chunk : '';
-    })
-    .filter(Boolean)
-    .join('\n\n');
-
-  const words = wordCount(body);
+  const markdownBody = buildMarkdownFromSpec(spec);
+  const words = wordCount(markdownBody);
   const readingMinutes = Math.max(1, Math.round(words / 200));
   const includeAds = spec.adPlacements.length > 0;
   const includeKofi = spec.cta && spec.cta.type === 'kofi';
@@ -610,7 +658,7 @@ function prepareNormalizedSpec(rawSpec) {
   ].join('\n');
 
   const postFilePath = path.join(CWD, 'content', 'posts', `${uniqueSlug}.md`);
-  const postContents = fm + '\n' + (body ? body : '') + '\n';
+  const postContents = fm + '\n' + (markdownBody || '');
 
   const entityStubs = spec.entities.map(entity => {
     const entityFile = path.join(CWD, 'content', 'entities', entity.type, `${entity.slug}.json`);
