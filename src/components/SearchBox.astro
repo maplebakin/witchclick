@@ -46,7 +46,7 @@ const resultsId = `${uid}-results`;
   ></div>
 </div>
 
-<script>
+<script lang="ts">
 (() => {
   const root = document.currentScript?.previousElementSibling?.closest('[data-search]');
   if (!root) return;
@@ -55,14 +55,22 @@ const resultsId = `${uid}-results`;
   const results = root.querySelector('[data-results]');
   if (!input || !results) return;
 
-  let data = [];
+  type SearchEntry = {
+    title: string;
+    excerpt?: string;
+    slug: string;
+    tags?: string[];
+  };
+
+  let data: SearchEntry[] = [];
   let loaded = false;
 
   async function ensure(){
     if (loaded) return;
     try {
       const r = await fetch('/search.json', { cache: 'no-store' });
-      data = await r.json();
+      const json = (await r.json()) as SearchEntry[];
+      data = Array.isArray(json) ? json : [];
       loaded = true;
     } catch (error) {
       if (typeof console !== 'undefined') {
@@ -75,7 +83,7 @@ const resultsId = `${uid}-results`;
     return String(value).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
-  function render(items){
+  function render(items: SearchEntry[]){
     if (!items.length){
       results.classList.add('hidden');
       results.innerHTML = '';
@@ -116,7 +124,7 @@ const resultsId = `${uid}-results`;
     render(items);
   }
 
-  let timerId;
+  let timerId: ReturnType<typeof window.setTimeout> | undefined;
 
   input.addEventListener('input', () => {
     if (timerId) {
