@@ -1,0 +1,890 @@
+---
+import fs from "node:fs";
+import path from "node:path";
+import Base from "../../layouts/Base.astro";
+import { readSettings, getSiteOrigin } from "../../utils/settings";
+import { loadAllPosts, type LoadedPost } from "../../utils/posts";
+
+export const prerender = false;
+
+const settings = readSettings();
+const site = getSiteOrigin(settings) || "https://example.com";
+
+const posts: LoadedPost[] = loadAllPosts();
+
+const heroDir = path.join(process.cwd(), "public", "hero-images");
+let heroFiles: string[] = [];
+try {
+  heroFiles = fs
+    .readdirSync(heroDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => entry.name)
+    .filter((file) => /\.(png|jpe?g|webp|gif|avif)$/i.test(file));
+} catch {
+  heroFiles = [];
+}
+
+const heroFileSet = new Set(heroFiles.map((file) => `hero-images/${file}`));
+
+interface HeroAdminPost {
+  slug: string;
+  title: string;
+  heroPrompt: string | null;
+  heroAlt: string;
+  heroSrc: string | null;
+  heroFile: string | null;
+  heroExt: string;
+  publishedAt: string | null;
+  context: {
+    excerpt: string;
+    metaDescription: string;
+    tags: string[];
+    tone: string;
+  };
+  status: {
+    hasPrompt: boolean;
+    hasImage: boolean;
+    hasAlt: boolean;
+  };
+}
+
+function sanitizeHeroString(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+const heroPosts: HeroAdminPost[] = posts.map((post) => {
+  const rawPrompt = sanitizeHeroString(post.data?.heroImagePrompt);
+  const heroPrompt = rawPrompt.length ? rawPrompt : null;
+
+  const rawSrc = sanitizeHeroString(post.data?.heroImageSrc);
+  const heroSrc = rawSrc.length ? rawSrc : null;
+  const normalizedSrc = heroSrc ? heroSrc.replace(/^\/+/, "") : null;
+
+  const inferredFile = heroFileSet.has(`hero-images/${post.slug}.png`)
+    ? `hero-images/${post.slug}.png`
+    : null;
+
+  const heroFile = normalizedSrc && heroFileSet.has(normalizedSrc)
+    ? normalizedSrc
+    : inferredFile;
+
+  const rawAlt = sanitizeHeroString(post.data?.heroImageAlt);
+  const heroAlt = rawAlt;
+
+  const publishedCandidate =
+    (post.data?.publishedAt ?? post.data?.pubDate ?? post.data?.date ?? null) as
+      | string
+      | number
+      | Date
+      | null;
+
+  let publishedAt: string | null = null;
+  if (publishedCandidate) {
+    const asDate = new Date(publishedCandidate);
+    if (!Number.isNaN(+asDate)) {
+      publishedAt = asDate.toISOString();
+    }
+  }
+
+  const heroExt = heroFile ? path.extname(heroFile) || ".png" : ".png";
+  const tags = Array.isArray(post.data?.tags)
+    ? (post.data.tags as unknown[])
+        .map((tag) => String(tag || "").trim())
+        .filter(Boolean)
+    : [];
+  const excerpt = sanitizeHeroString(post.data?.excerpt);
+  const metaDescription = sanitizeHeroString(post.data?.metaDescription);
+  const tone = sanitizeHeroString(post.data?.tone || post.data?.mood || "");
+
+  return {
+    slug: post.slug,
+    title: post.title,
+    heroPrompt,
+    heroAlt,
+    heroSrc,
+    heroFile,
+    heroExt,
+    publishedAt,
+    context: {
+      excerpt,
+      metaDescription,
+      tags,
+      tone,
+    },
+    status: {
+      hasPrompt: Boolean(heroPrompt),
+      hasImage: Boolean(heroFile),
+      hasAlt: Boolean(heroAlt),
+    },
+  } satisfies HeroAdminPost;
+});
+
+const clientJson = JSON.stringify(heroPosts).replace(/</g, "\\u003c");
+
+const isDev = import.meta.env.DEV;
+const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
+const url = new URL(Astro.request.url);
+const keyOk = ADMIN_KEY && url.searchParams.get("key") === ADMIN_KEY;
+const canUse = isDev || !!keyOk;
+---
+<Base
+  title="WitchClick — Hero Images"
+  description="Generate prompts, upload hero art, and wire metadata."
+  canon={`${site}/admin/hero`}
+  wide={true}
+  noindex={true}
+>
+  <Fragment slot="head">
+    <meta name="robots" content="noindex" />
+  </Fragment>
+
+  {canUse ? (
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      <section class="lg:col-span-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center justify-between">
+          <h1 class="text-xl font-semibold">Hero image workflow</h1>
+          <span class="rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700">
+            {heroPosts.length} post{heroPosts.length === 1 ? "" : "s"}
+          </span>
+        </div>
+        <p class="mt-2 text-sm text-gray-700">
+          Choose a post, generate a fresh hero prompt, drop the artwork into the repo, then copy the
+          frontmatter snippet.
+        </p>
+        <label class="mt-4 block text-xs font-medium text-gray-600">
+          Search posts
+          <input
+            id="search"
+            class="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+            placeholder="tea ritual, grounding, cozy games"
+            disabled={heroPosts.length === 0}
+          />
+        </label>
+        <div
+          id="postList"
+          class="mt-4 max-h-[70vh] overflow-auto rounded-xl border border-gray-200 bg-gray-50"
+        >
+          {heroPosts.length === 0 ? (
+            <p class="px-4 py-6 text-sm text-gray-600">
+              No posts yet. Ingest a PostSpec to populate this list.
+            </p>
+          ) : (
+            <p class="px-4 py-6 text-sm text-gray-600">
+              Loading posts…
+            </p>
+          )}
+        </div>
+      </section>
+
+      <section class="lg:col-span-8 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <h2 class="text-lg font-semibold">Prompt → file → upload → metadata</h2>
+        <p class="mt-1 text-sm text-gray-700">
+          Follow the loop: craft a vivid prompt, select the exported image, upload it into
+          <code class="rounded bg-gray-100 px-1 py-0.5 text-[11px]">public/hero-images</code>, then wire the
+          hero fields in frontmatter.
+        </p>
+
+        <div
+          id="emptyState"
+          class="mt-6 rounded-xl border border-dashed border-purple-200 bg-purple-50/40 p-6 text-center text-sm text-purple-700"
+        >
+          Select a post from the list to get started.
+        </div>
+
+        <div id="workflow" class="mt-6 hidden space-y-5">
+          <div class="rounded-xl border border-gray-200 bg-white/80 p-4">
+            <div class="flex flex-wrap items-baseline justify-between gap-3">
+              <div>
+                <h3 id="postTitle" class="text-lg font-semibold text-gray-900"></h3>
+                <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-600">
+                  <span>
+                    Slug:
+                    <code
+                      id="postSlug"
+                      class="rounded bg-gray-100 px-1 py-0.5 text-[11px]"
+                    ></code>
+                  </span>
+                  <span id="postPublishedWrap" class="hidden">
+                    Published
+                    <span id="postPublished"></span>
+                  </span>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-1 text-xs" id="statusBadges"></div>
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-gray-200 bg-white/80 p-4">
+            <h4 class="text-sm font-semibold text-gray-900">Step 1 — Generate the hero prompt</h4>
+            <p id="promptNotice" class="mt-1 text-xs text-gray-600"></p>
+            <textarea
+              id="promptText"
+              class="mt-3 h-40 w-full rounded-lg border px-3 py-2 font-mono text-xs"
+              placeholder="Generate or paste a hero image prompt for this post."
+            ></textarea>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <button
+                id="generatePrompt"
+                type="button"
+                class="rounded-lg border border-purple-200 bg-purple-50 px-3 py-2 text-sm text-purple-700 hover:bg-purple-100"
+              >
+                Generate prompt
+              </button>
+              <button
+                id="copyPrompt"
+                type="button"
+                class="rounded-lg border px-3 py-2 text-sm"
+              >
+                Copy prompt
+              </button>
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-gray-200 bg-white/80 p-4">
+            <h4 class="text-sm font-semibold text-gray-900">Step 2 — Choose the hero image file</h4>
+            <p class="mt-1 text-xs text-gray-600">
+              Pick the exported artwork from your image tool. We will rename it to match the post slug.
+            </p>
+            <label class="mt-3 block text-xs font-medium text-gray-600">
+              Hero image file
+              <input
+                id="fileInput"
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
+                class="mt-1 block w-full cursor-pointer rounded-lg border px-3 py-2 text-sm"
+              />
+            </label>
+            <p id="fileHelp" class="mt-2 text-xs text-gray-600"></p>
+            <p id="fileStatus" class="mt-2 text-sm text-gray-700"></p>
+            <img
+              id="localPreview"
+              class="mt-3 hidden max-h-48 w-full rounded-lg border object-cover"
+              alt=""
+            />
+          </div>
+
+          <div class="rounded-xl border border-gray-200 bg-white/80 p-4">
+            <h4 class="text-sm font-semibold text-gray-900">Step 3 — Upload & preview</h4>
+            <p class="mt-1 text-xs text-gray-600">
+              Uploading saves the file into
+              <code class="rounded bg-gray-100 px-1 py-0.5 text-[11px]">public/hero-images</code> and refreshes the
+              preview.
+            </p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <button
+                id="uploadButton"
+                type="button"
+                class="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700 hover:bg-emerald-100"
+              >
+                Upload image
+              </button>
+            </div>
+            <p id="uploadStatus" class="mt-2 text-sm text-gray-700"></p>
+            <img
+              id="heroPreview"
+              class="mt-3 hidden max-h-64 w-full rounded-lg border object-cover"
+              loading="lazy"
+              alt=""
+            />
+          </div>
+
+          <div class="rounded-xl border border-gray-200 bg-white/80 p-4">
+            <h4 class="text-sm font-semibold text-gray-900">Step 4 — Frontmatter metadata</h4>
+            <p class="mt-1 text-xs text-gray-600">
+              Keep the alt text human-friendly and focused on what appears in the image.
+            </p>
+            <label class="mt-3 block text-xs font-medium text-gray-600">
+              Hero alt text
+              <input
+                id="altInput"
+                class="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                placeholder="Describe the scene for screen readers"
+              />
+            </label>
+            <p id="altNotice" class="mt-1 text-xs text-gray-600"></p>
+            <label class="mt-3 block text-xs font-medium text-gray-600">
+              Frontmatter snippet
+              <textarea
+                id="snippet"
+                class="mt-1 h-32 w-full rounded-lg border px-3 py-2 font-mono text-xs"
+                readonly
+              ></textarea>
+            </label>
+            <div class="mt-2 flex gap-2">
+              <button
+                id="copySnippet"
+                type="button"
+                class="rounded-lg border px-3 py-2 text-sm"
+              >
+                Copy snippet
+              </button>
+            </div>
+          </div>
+
+          <p id="actionStatus" class="text-sm text-gray-700"></p>
+        </div>
+      </section>
+    </div>
+  ) : (
+    <section class="mx-auto max-w-3xl rounded-2xl border border-purple-100 bg-white p-6 text-center shadow-sm">
+      <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
+      <p class="text-gray-700">
+        These tools only run in <strong>development</strong> (or with a temporary key when hosted on a server adapter).
+      </p>
+      <ol class="mx-auto mt-4 list-decimal space-y-2 text-left text-sm text-gray-700">
+        <li>Run <code>npm run dev</code> locally.</li>
+        <li>Use the ingestion CLI: <code>npm run ingest ./path/to/post.json</code>.</li>
+        <li>If you later switch to serverless, set <code>PUBLIC_ADMIN_KEY</code> and visit <code>/admin?key=…</code>.</li>
+      </ol>
+    </section>
+  )}
+
+  {canUse && (
+    <>
+      <script type="application/json" id="heroData">{clientJson}</script>
+      <script is:inline>
+        (function () {
+          var dataEl = document.getElementById('heroData');
+          if (!dataEl) return;
+          var raw = dataEl.textContent || '[]';
+          var posts;
+          try {
+            posts = JSON.parse(raw);
+          } catch (err) {
+            console.error('Failed to parse hero admin data', err);
+            posts = [];
+          }
+          dataEl.remove();
+
+          var listEl = document.getElementById('postList');
+          var searchEl = document.getElementById('search');
+          var emptyState = document.getElementById('emptyState');
+          var workflow = document.getElementById('workflow');
+          var titleEl = document.getElementById('postTitle');
+          var slugEl = document.getElementById('postSlug');
+          var publishedWrap = document.getElementById('postPublishedWrap');
+          var publishedEl = document.getElementById('postPublished');
+          var badgesEl = document.getElementById('statusBadges');
+          var promptNotice = document.getElementById('promptNotice');
+          var promptArea = document.getElementById('promptText');
+          var generatePromptBtn = document.getElementById('generatePrompt');
+          var copyPromptBtn = document.getElementById('copyPrompt');
+          var fileInput = document.getElementById('fileInput');
+          var fileHelp = document.getElementById('fileHelp');
+          var fileStatus = document.getElementById('fileStatus');
+          var localPreview = document.getElementById('localPreview');
+          var uploadBtn = document.getElementById('uploadButton');
+          var uploadStatus = document.getElementById('uploadStatus');
+          var heroPreview = document.getElementById('heroPreview');
+          var altInput = document.getElementById('altInput');
+          var altNotice = document.getElementById('altNotice');
+          var snippetArea = document.getElementById('snippet');
+          var copySnippetBtn = document.getElementById('copySnippet');
+          var statusBar = document.getElementById('actionStatus');
+
+          var selected = null;
+          var pendingFile = null;
+          var pendingPreviewUrl = null;
+          var adminKey = '';
+          try {
+            adminKey = new URL(window.location.href).searchParams.get('key') || '';
+          } catch (err) {
+            adminKey = '';
+          }
+
+          function escapeHtml(value) {
+            return String(value || '')
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&#39;');
+          }
+
+          function ensureLeadingSlash(value) {
+            var v = String(value || '').trim();
+            if (!v) return '';
+            return v.charAt(0) === '/' ? v : '/' + v;
+          }
+
+          function formatDate(iso) {
+            if (!iso) return '';
+            var date = new Date(iso);
+            if (isNaN(+date)) return '';
+            return date.toLocaleDateString(undefined, {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            });
+          }
+
+          function badge(label, ok) {
+            var classes = ok
+              ? 'bg-emerald-100 text-emerald-700'
+              : 'bg-amber-100 text-amber-700';
+            var icon = ok ? '✓' : '!';
+            return '<span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ' + classes + '\'>' + icon + ' ' + escapeHtml(label) + '</span>';
+          }
+
+          function resetPendingPreview() {
+            if (pendingPreviewUrl) {
+              URL.revokeObjectURL(pendingPreviewUrl);
+              pendingPreviewUrl = null;
+            }
+            if (localPreview) {
+              localPreview.classList.add('hidden');
+              localPreview.removeAttribute('src');
+            }
+          }
+
+          function updateBadges(post) {
+            if (!badgesEl) return;
+            badgesEl.innerHTML =
+              badge('Prompt', post.status && post.status.hasPrompt) +
+              badge('Image', post.status && post.status.hasImage) +
+              badge('Alt', post.status && post.status.hasAlt);
+          }
+
+          function showStatus(message, isError) {
+            if (!statusBar) return;
+            statusBar.textContent = message;
+            statusBar.style.color = isError ? '#7f1d1d' : '#065f46';
+          }
+
+          function buildPromptFromContext(post) {
+            if (!post) return '';
+            var context = post.context || {};
+            var parts = [];
+            parts.push('Cozy digital illustration for WitchClick article "' + post.title + '".');
+            if (context.metaDescription) {
+              parts.push(context.metaDescription);
+            } else if (context.excerpt) {
+              parts.push(context.excerpt);
+            }
+            if (context.tags && context.tags.length) {
+              parts.push('Motifs inspired by: ' + context.tags.slice(0, 5).join(', ') + '.');
+            }
+            if (context.tone) {
+              parts.push('Tone: ' + context.tone + '.');
+            }
+            parts.push('Warm, inclusive, high-detail digital painting, soft lighting, rich textures, no text, 3:2 aspect ratio.');
+            return parts.join(' ');
+          }
+
+          function renderList() {
+            if (!listEl) return;
+            if (!posts.length) {
+              listEl.innerHTML = '<p class="px-4 py-6 text-sm text-gray-600">No posts yet. Ingest a PostSpec to populate this list.</p>';
+              return;
+            }
+            var query = (searchEl && searchEl.value ? searchEl.value : '').toLowerCase().trim();
+            var filtered = posts.filter(function (post) {
+              if (!query) return true;
+              return post.title.toLowerCase().includes(query) || post.slug.toLowerCase().includes(query);
+            });
+            if (!filtered.length) {
+              listEl.innerHTML = '<p class="px-4 py-6 text-sm text-gray-600">No matches for "' + escapeHtml(query) + '".</p>';
+              return;
+            }
+            var html = filtered
+              .map(function (post) {
+                var isActive = selected && selected.slug === post.slug;
+                var base = 'w-full text-left transition border rounded-xl px-3 py-3 mb-2 last:mb-0';
+                var classes = isActive
+                  ? base + ' border-purple-300 bg-purple-50'
+                  : base + ' border-transparent bg-white hover:border-purple-200 hover:bg-purple-50';
+                return (
+                  '<button type="button" data-slug="' + escapeHtml(post.slug) + '" class="' + classes + '">' +
+                  '<div class="flex items-start justify-between gap-3">' +
+                  '<div>' +
+                  '<div class="text-sm font-semibold text-gray-900">' + escapeHtml(post.title) + '</div>' +
+                  '<div class="text-xs text-gray-600">' + escapeHtml(post.slug) + '</div>' +
+                  '<div class="mt-1 flex flex-wrap gap-1">' +
+                  badge('Prompt', post.status && post.status.hasPrompt) +
+                  badge('Image', post.status && post.status.hasImage) +
+                  badge('Alt', post.status && post.status.hasAlt) +
+                  '</div>' +
+                  '</div>' +
+                  '<div class="text-[11px] text-gray-500">' + (post.publishedAt ? formatDate(post.publishedAt) : 'Draft') + '</div>' +
+                  '</div>' +
+                  '</button>'
+                );
+              })
+              .join('');
+            listEl.innerHTML = html;
+            var buttons = listEl.querySelectorAll('button[data-slug]');
+            buttons.forEach(function (btn) {
+              btn.addEventListener('click', function () {
+                var slug = this.getAttribute('data-slug');
+                select(slug);
+              });
+            });
+          }
+
+          function inferHeroPath(post) {
+            if (!post) return '';
+            if (post.heroSrc && post.heroSrc.trim()) {
+              return ensureLeadingSlash(post.heroSrc);
+            }
+            var ext = post.heroExt || '.png';
+            if (ext.charAt(0) !== '.') {
+              ext = '.' + ext;
+            }
+            return '/hero-images/' + post.slug + ext;
+          }
+
+          function updateSnippet() {
+            if (!selected || !snippetArea) return;
+            var promptValue = (promptArea && promptArea.value ? promptArea.value : '').trim();
+            var alt = (altInput && altInput.value ? altInput.value : '').trim();
+            if (!alt) {
+              alt = promptValue || selected.title + ' — hero image';
+            }
+            var safeAlt = alt.replace(/'/g, "''");
+            var heroPath = inferHeroPath(selected);
+            var snippet = '';
+            if (promptValue) {
+              var lines = promptValue.split(/\r?\n/);
+              snippet += 'heroImagePrompt: |\n';
+              snippet += lines.map(function (line) { return '  ' + line; }).join('\n');
+              snippet += '\n';
+            } else {
+              snippet += "heroImagePrompt: ''\n";
+            }
+            snippet += 'heroImageSrc: ' + heroPath + '\n';
+            snippet += "heroImageAlt: '" + safeAlt + "'";
+            snippetArea.value = snippet;
+
+            selected.heroPrompt = promptValue || null;
+            selected.heroAlt = alt;
+            selected.heroSrc = heroPath;
+            selected.heroFile = heroPath.replace(/^\/+/, '');
+            selected.status.hasPrompt = promptValue.length > 0;
+            selected.status.hasAlt = alt.trim().length > 0;
+            updateBadges(selected);
+            renderList();
+          }
+
+          function resetFileUI(post) {
+            pendingFile = null;
+            if (fileInput) {
+              fileInput.value = '';
+            }
+            resetPendingPreview();
+            if (fileStatus) {
+              fileStatus.textContent = 'No file selected yet.';
+            }
+            if (uploadStatus) {
+              if (post && post.status && post.status.hasImage) {
+                uploadStatus.textContent = 'Hero image already present.';
+                uploadStatus.style.color = '#065f46';
+              } else {
+                uploadStatus.textContent = 'Upload pending.';
+                uploadStatus.style.color = '#374151';
+              }
+            }
+            if (fileHelp) {
+              var ext = post ? post.heroExt : '.png';
+              if (ext.charAt(0) !== '.') ext = '.' + ext;
+              fileHelp.textContent = 'File will save as public/hero-images/' + (post ? post.slug : 'slug') + ext;
+            }
+          }
+
+          function updatePreview(post) {
+            if (!heroPreview) return;
+            if (post && post.status && post.status.hasImage) {
+              var src = ensureLeadingSlash(post.heroSrc || ('/hero-images/' + post.slug + post.heroExt));
+              heroPreview.src = src;
+              heroPreview.alt = post.heroAlt || post.title + ' — hero image';
+              heroPreview.classList.remove('hidden');
+            } else {
+              heroPreview.classList.add('hidden');
+              heroPreview.removeAttribute('src');
+            }
+          }
+
+          function handlePromptInput() {
+            if (!selected || !promptArea) return;
+            var value = promptArea.value.trim();
+            selected.heroPrompt = value.length ? value : null;
+            selected.status.hasPrompt = value.length > 0;
+            if (copyPromptBtn) {
+              copyPromptBtn.disabled = value.length === 0;
+            }
+            if (promptNotice) {
+              promptNotice.textContent = value.length
+                ? 'Tweak as needed, then copy into your image tool.'
+                : 'Generate a prompt to describe the hero artwork you plan to create.';
+            }
+            updateSnippet();
+          }
+
+          function select(slug) {
+            if (!slug) return;
+            var post = posts.find(function (item) { return item.slug === slug; });
+            if (!post) return;
+            selected = post;
+            if (emptyState) emptyState.classList.add('hidden');
+            if (workflow) workflow.classList.remove('hidden');
+            if (titleEl) titleEl.textContent = post.title;
+            if (slugEl) slugEl.textContent = post.slug;
+            if (publishedWrap && publishedEl) {
+              if (post.publishedAt) {
+                publishedWrap.classList.remove('hidden');
+                publishedEl.textContent = formatDate(post.publishedAt);
+              } else {
+                publishedWrap.classList.add('hidden');
+                publishedEl.textContent = '';
+              }
+            }
+            updateBadges(post);
+
+            if (promptArea) {
+              promptArea.value = post.heroPrompt || '';
+              handlePromptInput();
+            }
+
+            if (promptNotice) {
+              promptNotice.textContent = post.heroPrompt
+                ? 'Tweak as needed, then copy into your image tool.'
+                : 'Generate a prompt to describe the hero artwork you plan to create.';
+            }
+
+            resetFileUI(post);
+            updatePreview(post);
+
+            if (altInput) {
+              var initialAlt = post.heroAlt && post.heroAlt.trim()
+                ? post.heroAlt.trim()
+                : (post.heroPrompt ? post.heroPrompt : post.title + ' — hero image');
+              altInput.value = initialAlt;
+              altInput.disabled = false;
+            }
+            if (altNotice) {
+              altNotice.textContent = 'We pre-fill from existing alt text or the generated prompt. Adjust it so it clearly describes the uploaded art.';
+            }
+            if (statusBar) {
+              statusBar.textContent = '';
+              statusBar.style.color = '#374151';
+            }
+
+            updateSnippet();
+            renderList();
+          }
+
+          function copyToClipboard(text, onSuccess, onError) {
+            if (!text) {
+              if (onError) onError(new Error('Nothing to copy'));
+              return;
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(text).then(onSuccess, onError);
+              return;
+            }
+            try {
+              var temp = document.createElement('textarea');
+              temp.value = text;
+              temp.style.position = 'fixed';
+              temp.style.top = '-1000px';
+              document.body.appendChild(temp);
+              temp.focus();
+              temp.select();
+              var ok = document.execCommand('copy');
+              document.body.removeChild(temp);
+              if (ok) {
+                if (onSuccess) onSuccess();
+              } else if (onError) {
+                onError(new Error('Copy command failed'));
+              }
+            } catch (err) {
+              if (onError) onError(err);
+            }
+          }
+
+          if (promptArea) {
+            promptArea.addEventListener('input', function () {
+              handlePromptInput();
+            });
+          }
+
+          if (generatePromptBtn) {
+            generatePromptBtn.addEventListener('click', function () {
+              if (!selected || !promptArea) return;
+              var generated = buildPromptFromContext(selected);
+              promptArea.value = generated;
+              handlePromptInput();
+              showStatus('Prompt generated ✓');
+            });
+          }
+
+          if (copyPromptBtn) {
+            copyPromptBtn.addEventListener('click', function () {
+              if (!selected || !promptArea) return;
+              var value = promptArea.value.trim();
+              if (!value) {
+                showStatus('Nothing to copy — generate a prompt first.', true);
+                return;
+              }
+              copyToClipboard(value, function () {
+                showStatus('Hero prompt copied to clipboard ✓');
+              }, function (err) {
+                console.error(err);
+                showStatus('Copy failed. Select the text and copy manually.', true);
+              });
+            });
+          }
+
+          if (fileInput) {
+            fileInput.addEventListener('change', function () {
+              if (!selected) return;
+              var files = fileInput.files;
+              if (files && files.length) {
+                pendingFile = files[0];
+                selected.heroExt = ('.' + (pendingFile.name.split('.').pop() || 'png')).toLowerCase();
+                if (selected.heroExt === '.jpeg') selected.heroExt = '.jpg';
+                if (fileStatus) {
+                  fileStatus.textContent = 'Ready to upload: ' + pendingFile.name + ' (' + Math.round(pendingFile.size / 1024) + ' KB)';
+                }
+                if (fileHelp) {
+                  fileHelp.textContent = 'File will save as public/hero-images/' + selected.slug + selected.heroExt;
+                }
+                resetPendingPreview();
+                try {
+                  pendingPreviewUrl = URL.createObjectURL(pendingFile);
+                  if (localPreview) {
+                    localPreview.src = pendingPreviewUrl;
+                    localPreview.classList.remove('hidden');
+                  }
+                } catch (err) {
+                  console.warn('Preview failed', err);
+                }
+                if (uploadStatus) {
+                  uploadStatus.textContent = 'Ready to upload.';
+                  uploadStatus.style.color = '#374151';
+                }
+              } else {
+                pendingFile = null;
+                if (fileStatus) {
+                  fileStatus.textContent = 'No file selected yet.';
+                }
+                if (fileHelp) {
+                  var ext = selected.heroExt || '.png';
+                  if (ext.charAt(0) !== '.') ext = '.' + ext;
+                  fileHelp.textContent = 'File will save as public/hero-images/' + selected.slug + ext;
+                }
+                resetPendingPreview();
+              }
+            });
+          }
+
+          if (uploadBtn) {
+            uploadBtn.addEventListener('click', function () {
+              if (!selected) return;
+              if (!pendingFile) {
+                showStatus('Select a file to upload first.', true);
+                return;
+              }
+              var form = new FormData();
+              form.append('slug', selected.slug);
+              form.append('file', pendingFile);
+              form.append('fileName', pendingFile.name || '');
+              var headers = {};
+              if (adminKey) {
+                headers['x-admin-key'] = adminKey;
+              }
+              uploadBtn.disabled = true;
+              uploadBtn.style.opacity = '0.6';
+              if (uploadStatus) {
+                uploadStatus.textContent = 'Uploading…';
+                uploadStatus.style.color = '#374151';
+              }
+              fetch('/api/admin/hero-upload.json', {
+                method: 'POST',
+                body: form,
+                headers: headers,
+              })
+                .then(function (res) {
+                  if (!res.ok) {
+                    throw new Error('Upload failed (' + res.status + ')');
+                  }
+                  return res.json();
+                })
+                .then(function (data) {
+                  if (!data.ok) {
+                    throw new Error(data.error || 'Upload failed');
+                  }
+                  selected.heroFile = data.heroPath;
+                  selected.heroSrc = data.heroSrc;
+                  selected.heroExt = (data.fileName && data.fileName.includes('.'))
+                    ? ('.' + data.fileName.split('.').pop()).toLowerCase()
+                    : selected.heroExt;
+                  selected.status.hasImage = true;
+                  updatePreview(selected);
+                  updateSnippet();
+                  if (uploadStatus) {
+                    uploadStatus.textContent = 'Hero image uploaded ✓';
+                    uploadStatus.style.color = '#065f46';
+                  }
+                  showStatus('Hero image uploaded ✓');
+                  resetPendingPreview();
+                  pendingFile = null;
+                  if (fileInput) {
+                    fileInput.value = '';
+                  }
+                  if (fileStatus) {
+                    fileStatus.textContent = 'Upload complete. You can choose another file to replace it.';
+                  }
+                })
+                .catch(function (err) {
+                  console.error(err);
+                  if (uploadStatus) {
+                    uploadStatus.textContent = err.message || 'Upload failed.';
+                    uploadStatus.style.color = '#7f1d1d';
+                  }
+                  showStatus('Upload failed. Check the console for details.', true);
+                })
+                .finally(function () {
+                  uploadBtn.disabled = false;
+                  uploadBtn.style.opacity = '1';
+                });
+            });
+          }
+
+          if (altInput) {
+            altInput.addEventListener('input', function () {
+              updateSnippet();
+            });
+          }
+
+          if (copySnippetBtn) {
+            copySnippetBtn.addEventListener('click', function () {
+              if (!selected || !snippetArea) return;
+              var value = snippetArea.value;
+              if (!value.trim()) {
+                showStatus('Snippet is empty.', true);
+                return;
+              }
+              copyToClipboard(value, function () {
+                showStatus('Frontmatter snippet copied ✓');
+              }, function (err) {
+                console.error(err);
+                showStatus('Copy failed. Select the text and copy manually.', true);
+              });
+            });
+          }
+
+          if (searchEl) {
+            searchEl.addEventListener('input', function () {
+              renderList();
+            });
+          }
+
+          renderList();
+          if (posts.length) {
+            select(posts[0].slug);
+          }
+        })();
+      </script>
+    </>
+  )}
+</Base>
