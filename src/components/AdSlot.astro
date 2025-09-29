@@ -1,20 +1,26 @@
 ---
 // src/components/AdSlot.astro
-import fs from 'node:fs';
+import { readSettings } from "../utils/settings";
 
 interface Props { slot?: 'side'|'end'|'lead'; class?: string }
 const { slot = 'end', class: className = '' } = Astro.props as Props;
 
-const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
+const settings = readSettings();
 const ads = settings.ads || {};
 const provider = ads.provider || 'none';
-const isAdsense = provider === 'adsense' && ads.adsenseClientId;
+const slotMap = {
+  side: ads.sidebarSlotId,
+  end: ads.endSlotId,
+  lead: ads.leadSlotId,
+  ...(ads.slots || {}),
+};
+const slotId = slotMap?.[slot] || '';
+const isAdsense = provider === 'adsense' && ads.adsenseClientId && slotId;
 const isHouse = provider === 'house';
-const slotId = (ads.slots && ads.slots[slot]) || '';
-const baseClass = `ad ad--${slot} ${className}`;
+const baseClass = `ad ad--${slot} ${className}`.trim();
 ---
 {isAdsense && (
-  <div class={baseClass} data-slot={slot} aria-label={`Advertisement ${slot}`}>
+  <div class={`${baseClass} surface-card`} data-slot={slot} aria-label={`Advertisement ${slot}`}>
     <ins class="adsbygoogle"
          style="display:block"
          data-ad-client={ads.adsenseClientId}
@@ -28,23 +34,23 @@ const baseClass = `ad ad--${slot} ${className}`;
 )}
 
 {isHouse && slot === 'side' && (
-  <aside class={`${baseClass} my-6 rounded-xl border border-purple-200 bg-purple-50 p-4`} role="complementary" aria-label="Sponsored sidebar">
-    <p class="m-0 text-sm text-purple-900">Cozy tools that support this guide:</p>
-    <ul class="mt-2 space-y-1 text-sm">
-      <li>• <a class="underline" href="/go/journal" rel="sponsored nofollow">linen journal</a></li>
-      <li>• <a class="underline" href="/go/notebooks" rel="sponsored nofollow">dotted notebook</a></li>
-      <li>• <a class="underline" href="/go/crystals" rel="sponsored nofollow">starter crystals</a></li>
+  <aside class={`${baseClass} surface-card`} role="complementary" aria-label="Sponsored sidebar">
+    <p class="text-sm font-medium text-purple-900">Cozy tools that support this guide:</p>
+    <ul class="mt-3 space-y-2 text-sm text-purple-700">
+      <li>• <a class="underline-offset-4 transition hover:text-purple-900 hover:underline" href="/go/journal" rel="sponsored nofollow">linen journal</a></li>
+      <li>• <a class="underline-offset-4 transition hover:text-purple-900 hover:underline" href="/go/notebooks" rel="sponsored nofollow">dotted notebook</a></li>
+      <li>• <a class="underline-offset-4 transition hover:text-purple-900 hover:underline" href="/go/crystals" rel="sponsored nofollow">starter crystals</a></li>
     </ul>
   </aside>
 )}
 
 {isHouse && slot !== 'side' && (
-  <aside class={`${baseClass} my-6 rounded-xl border border-purple-200 bg-purple-50 p-4`} role="complementary" aria-label="Sponsored">
-    <p class="m-0 text-sm text-purple-900">
+  <aside class={`${baseClass} surface-card`} role="complementary" aria-label="Sponsored">
+    <p class="text-sm text-purple-800">
       Thanks for reading. Support WitchClick with a
-      <a class="ml-1 underline" href="/go/notebooks" rel="sponsored nofollow">dotted notebook</a>
+      <a class="ml-1 underline-offset-4 transition hover:text-purple-900 hover:underline" href="/go/notebooks" rel="sponsored nofollow">dotted notebook</a>
       or a
-      <a class="ml-1 underline" href="/go/journal" rel="sponsored nofollow">linen journal</a>.
+      <a class="ml-1 underline-offset-4 transition hover:text-purple-900 hover:underline" href="/go/journal" rel="sponsored nofollow">linen journal</a>.
     </p>
   </aside>
 )}

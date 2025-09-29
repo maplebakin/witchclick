@@ -1,17 +1,12 @@
 ---
 /* Admin: Prompt → JSON → Preview → Ingest */
-import Base from '../../layouts/Base.astro';
-import fs from 'node:fs';
-import path from 'node:path';
+import Base from "../../layouts/Base.astro";
+import { readSettings, getSiteOrigin } from "../../utils/settings";
 
 export const prerender = false; // never emit in static builds
 
-// ---- Safe settings read (inline, no helper needed)
-const settingsPath = path.join(process.cwd(), 'content', 'settings.json');
-let settings: { siteUrl: string; brandName: string } = { siteUrl: 'https://example.com', brandName: 'WitchClick' };
-try {
-  settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
-} catch { /* keep defaults */ }
+const settings = readSettings();
+const site = getSiteOrigin(settings) || "https://example.com";
 
 // Gate: dev OR query ?key=PUBLIC_ADMIN_KEY (useful if you later switch to a server adapter)
 const isDev = import.meta.env.DEV;
@@ -23,7 +18,13 @@ const canUse = isDev || !!keyOk;
 // Dev API base (falls back to localhost if not set)
 const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 ---
-<Base title="WitchClick — Admin" description="Prompt, preview, ingest, publish." canon={`${String(settings.siteUrl).replace(/\/$/,'')}/admin`} wide={true} noindex={true}>
+<Base
+  title="WitchClick — Admin"
+  description="Prompt, preview, ingest, publish."
+  canon={`${site}/admin`}
+  wide={true}
+  noindex={true}
+>
   <Fragment slot="head">
     <meta name="robots" content="noindex" />
   </Fragment>
@@ -93,19 +94,110 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
     <script is:inline>
       (function(){
         var root = document.querySelector('[data-dev-api]');
-        var DEV_API = root?.getAttribute('data-dev-api') || 'http://localhost:8787';
+        if (!root) return;
+
+        var DEV_API = root.getAttribute('data-dev-api') || 'http://localhost:8787';
         var $ = function(id){ return document.getElementById(id); };
+
+        var statusEl = $('status');
+        if (!statusEl) return;
+
+        var controlIds = ['genPrompt','validateBtn','previewBtn','ingestBtn','ingestPublishBtn','copyPrompt'];
+        var controls = controlIds
+          .map(function(id){ return $(id); })
+          .filter(function(el){ return !!el; });
+
         function setStatus(msg, ok){
-          var el=$('status');
-          el.textContent=msg;
-          el.style.color = ok===false ? '#7f1d1d' : '#065f46';
-        }
-        function busy(on){
-          ['genPrompt','validateBtn','previewBtn','ingestBtn','ingestPublishBtn','copyPrompt']
-            .forEach(function(id){ var b=$(id); if(b){ b.disabled=!!on; b.style.opacity = on ? .6 : 1; }});
+          statusEl.textContent = msg;
+          statusEl.style.color = ok === false ? '#7f1d1d' : '#065f46';
         }
 
-        $('genPrompt').addEventListener('click', async function(){
+        function busy(on){
+          controls.forEach(function(btn){
+            btn.disabled = !!on;
+            btn.style.opacity = on ? '0.6' : '1';
+          });
+        }
+
+        function stripCodeFences(s){
+          return s
+            .replace(/^\s*```(?:json)?\s*/i, '')
+            .replace(/\s*```\s*$/, '');
+        }
+
+        function normalizeQuotes(s){
+          return s
+            .replace(/[\u201C\u201D]/g, '"')
+            .replace(/[\u2018\u2019]/g, "'");
+        }
+
+        function stripInvisible(s){
+          return s.replace(/[\uFEFF\u200B-\u200F\u202A-\u202E\u00A0\r]/g, '');
+        }
+
+        function deBackslashOutsideStrings(s){
+          var out = '';
+          var inStr = false;
+          var esc = false;
+          for (var i = 0; i < s.length; i++){
+            var ch = s[i];
+            if (inStr){
+              out += ch;
+              if (esc){
+                esc = false;
+              } else if (ch === '\\'){
+                esc = true;
+              } else if (ch === '"'){
+                inStr = false;
+              }
+            } else {
+              if (ch === '"'){
+                inStr = true;
+                out += ch;
+              } else if (ch === '\\'){
+                var next = s[i + 1];
+                if (next === '[' || next === ']' || next === '{' || next === '}'){
+                  continue;
+                }
+                out += ch;
+              } else {
+                out += ch;
+              }
+            }
+          }
+          return out;
+        }
+
+        function parseSpec(){
+          var textarea = $('spec');
+          if (!textarea) throw new Error('Spec textarea missing.');
+
+          var raw = textarea.value;
+          if (!raw.trim()) throw new Error('No JSON provided.');
+
+          var base = stripInvisible(normalizeQuotes(stripCodeFences(raw)));
+
+          try { return JSON.parse(base); } catch(_a){}
+
+          try { return JSON.parse(deBackslashOutsideStrings(base)); } catch(_b){}
+
+          try {
+            var maybe = JSON.parse(base);
+            if (typeof maybe === 'string') return JSON.parse(maybe);
+          } catch(_c){}
+
+          throw new Error('Invalid JSON — cleaned for fences/quotes, but structure still fails. Save to a file and validate with jq.');
+        }
+
+        var genPromptBtn = $('genPrompt');
+        var copyPromptBtn = $('copyPrompt');
+        var validateBtn = $('validateBtn');
+        var previewBtn = $('previewBtn');
+        var ingestBtn = $('ingestBtn');
+        var ingestPublishBtn = $('ingestPublishBtn');
+        var clearBtn = $('clearBtn');
+
+        if (genPromptBtn) genPromptBtn.addEventListener('click', async function(){
           try{
             busy(true); setStatus('Generating prompt...');
             var body = {
@@ -124,93 +216,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           finally{ busy(false); }
         });
 
-        $('copyPrompt').addEventListener('click', async function(){
+        if (copyPromptBtn) copyPromptBtn.addEventListener('click', async function(){
           try{ await navigator.clipboard.writeText($('promptOut').value || ''); setStatus('Copied ✓'); }
           catch { $('promptOut').select(); document.execCommand('copy'); setStatus('Copied ✓'); }
         });
-
-        // --- JSON paste sanitizer: remove illegal backslashes before []{} when OUTSIDE strings
-        function deBackslashOutsideStrings(s){
-          var out='', inStr=false, esc=false;
-          for (var i=0;i<s.length;i++){
-            var ch=s[i];
-            if (inStr){
-              out+=ch;
-              if (esc){ esc=false; }
-              else if (ch==='\\'){ esc=true; }
-              else if (ch==='"'){ inStr=false; }
-            } else {
-              if (ch === '"'){ inStr=true; out+=ch; }
-              else if (ch === '\\'){
-                var next=s[i+1];
-                if (next==='[' || next===']' || next==='{' || next==='}'){ continue; } // drop stray backslash
-                out+=ch;
-              } else { out+=ch; }
-            }
-          }
-          return out;
-        }
-
-        function parseSpec(){
-  function stripCodeFences(s){
-    // remove leading/trailing ``` or ```json fences
-    return s
-      .replace(/^\s*```(?:json)?\s*/i, '')
-      .replace(/\s*```\s*$/, '');
-  }
-  function normalizeQuotes(s){
-    return s
-      .replace(/[\u201C\u201D]/g, '"') // smart double
-      .replace(/[\u2018\u2019]/g, "'"); // smart single
-  }
-  function stripInvisible(s){
-    // BOM + zero-width + NBSP + CR
-    return s.replace(/[\uFEFF\u200B-\u200F\u202A-\u202E\u00A0\r]/g, '');
-  }
-  // remove stray backslashes before []{} only when OUTSIDE strings
-  function deBackslashOutsideStrings(s){
-    var out='', inStr=false, esc=false;
-    for (var i=0;i<s.length;i++){
-      var ch=s[i];
-      if (inStr){
-        out+=ch;
-        if (esc){ esc=false; }
-        else if (ch==='\\'){ esc=true; }
-        else if (ch==='"'){ inStr=false; }
-      } else {
-        if (ch === '"'){ inStr=true; out+=ch; }
-        else if (ch === '\\'){
-          var next=s[i+1];
-          if (next==='[' || next===']' || next==='{' || next==='}'){ continue; } // drop
-          out+=ch;
-        } else { out+=ch; }
-      }
-    }
-    return out;
-  }
-
-  var raw = document.getElementById('spec').value;
-  if (!raw.trim()) throw new Error('No JSON provided.');
-
-  // Stage 0: trim code fences & normalize quotes & strip invisibles
-  var base = stripInvisible(normalizeQuotes(stripCodeFences(raw)));
-
-  // Try as-is
-  try { return JSON.parse(base); } catch(_e){}
-
-  // Try with stray top-level backslashes removed
-  var fixed = deBackslashOutsideStrings(base);
-  try { return JSON.parse(fixed); } catch(_e){}
-
-  // If body is a quoted JSON string → parse twice
-  try {
-    var maybe = JSON.parse(base);
-    if (typeof maybe === 'string') return JSON.parse(maybe);
-  } catch(_e){}
-
-  throw new Error('Invalid JSON — cleaned for fences/quotes, but structure still fails. Save to a file and validate with jq.');
-}
-
 
         function checkSpec(s){
           var errors = [], warnings = [];
@@ -236,7 +245,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           return { ok: errors.length===0, errors: errors, warnings: warnings };
         }
 
-        $('validateBtn').addEventListener('click', function(){
+        if (validateBtn) validateBtn.addEventListener('click', function(){
           try{
             var s=parseSpec();
             var res = checkSpec(s);
@@ -274,7 +283,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           el.appendChild(meta);
         }
 
-        $('previewBtn').addEventListener('click', function(){
+        if (previewBtn) previewBtn.addEventListener('click', function(){
           try{
             var s=parseSpec(); var res=checkSpec(s);
             if(!res.ok) throw new Error(res.errors[0]);
@@ -290,7 +299,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           return data;
         }
 
-        $('ingestBtn').addEventListener('click', async function(){
+        if (ingestBtn) ingestBtn.addEventListener('click', async function(){
           try{
             busy(true); setStatus('Ingesting…');
             var spec = parseSpec(); var res=checkSpec(spec); if(!res.ok) throw new Error(res.errors[0]);
@@ -300,7 +309,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           finally{ busy(false); }
         });
 
-        $('ingestPublishBtn').addEventListener('click', async function(){
+        if (ingestPublishBtn) ingestPublishBtn.addEventListener('click', async function(){
           try{
             busy(true); setStatus('Ingesting…');
             var spec = parseSpec(); var res=checkSpec(spec); if(!res.ok) throw new Error(res.errors[0]);
@@ -314,7 +323,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           finally{ busy(false); }
         });
 
-        $('clearBtn').addEventListener('click', function(){
+        if (clearBtn) clearBtn.addEventListener('click', function(){
           $('spec').value=''; $('preview').innerHTML=''; setStatus('Cleared');
         });
       })();

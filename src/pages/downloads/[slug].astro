@@ -1,61 +1,96 @@
 ---
-import Base from '../../layouts/Base.astro';
-import fs from 'node:fs';
-import path from 'node:path';
+import Base from "../../layouts/Base.astro";
+import fs from "node:fs";
+import path from "node:path";
+import { readSettings, getSiteOrigin } from "../../utils/settings";
 
 export async function getStaticPaths() {
-  const dir = './content/downloads';
+  const dir = "./content/downloads";
   if (!fs.existsSync(dir)) return [];
-  const files = fs.readdirSync(dir).filter(f=>f.endsWith('.json'));
-  return files.map(f=>{
-    const data = JSON.parse(fs.readFileSync(path.join(dir,f),'utf8'));
+
+  const files = fs.readdirSync(dir).filter((file) => file.endsWith(".json"));
+  return files.map((file) => {
+    const data = JSON.parse(fs.readFileSync(path.join(dir, file), "utf8"));
     return { params: { slug: data.slug || data.id }, props: { data } };
   });
 }
 
 const { data } = Astro.props;
-const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
-const title = data?.name || 'Download';
-const description = data?.summary || '';
-const canon = `${String(settings.siteUrl||'https://example.com').replace(/\/$/,'')}/downloads/${data?.slug}`;
-const hasExternal = !!(data?.url && data.url.trim());
-const href = hasExternal ? data.url : (data?.file || '#');
-const target = hasExternal ? '_blank' : undefined;
-const rel = hasExternal ? 'noopener' : undefined;
+const settings = readSettings();
+const site = getSiteOrigin(settings) || "https://example.com";
+const title = data?.name || "Download";
+const description = data?.summary || "";
+const canon = `${site}/downloads/${data?.slug}`;
+const hasExternal = !!(data?.url && String(data.url).trim());
+const href = hasExternal ? data.url : data?.file || "#";
+const target = hasExternal ? "_blank" : undefined;
+const rel = hasExternal ? "noopener" : undefined;
 ---
 <Base title={title} description={description} canon={canon}>
-  <article class="prose prose-neutral max-w-none">
-    <h1 class="mb-2">{title}</h1>
-    {description && <p class="mt-0 text-sm text-gray-600">{description}</p>}
-
-    <div class="my-6 grid gap-6 md:grid-cols-3">
-      <div class="md:col-span-2">
-        {data.cover && <img src={data.cover} alt={`${data.name} cover`} class="w-full rounded-xl border object-cover" loading="lazy" />}
-        {Array.isArray(data.features) && data.features.length > 0 && (
-          <>
-            <h2 class="mt-6">What’s inside</h2>
-            <ul>
-              {data.features.map((f:string)=><li>{f}</li>)}
-            </ul>
-          </>
-        )}
+  <section class="glass-panel">
+    <div class="flex flex-wrap items-baseline justify-between gap-3">
+      <div>
+        <p class="eyebrow text-purple-400/90">Download</p>
+        <h1 class="text-3xl font-semibold text-purple-900">{title}</h1>
       </div>
-      <aside class="md:col-span-1">
-        <div class="sticky top-24 rounded-2xl border border-purple-200 bg-purple-50 p-4">
-          {(data.price && data.currency) ? (
-            <p class="m-0 text-lg font-semibold">
-              {new Intl.NumberFormat(undefined, { style:'currency', currency:data.currency }).format(parseFloat(data.price))}
+      {description && <p class="text-sm text-purple-700/80 max-w-sm">{description}</p>}
+    </div>
+
+    <div class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+      <article class="space-y-6">
+        {data.cover && (
+          <img
+            src={data.cover}
+            alt={`${data.name} cover`}
+            class="w-full rounded-3xl border border-purple-200/70 object-cover shadow-lg shadow-purple-200/50"
+            loading="lazy"
+          />
+        )}
+        {Array.isArray(data.features) && data.features.length > 0 && (
+          <div class="prose max-w-none">
+            <h2>What’s inside</h2>
+            <ul>
+              {data.features.map((feature: string) => (
+                <li>{feature}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {data.description && typeof data.description === "string" && (
+          <div class="prose max-w-none" set:html={data.description} />
+        )}
+      </article>
+
+      <aside class="lg:pl-4">
+        <div class="surface-card sticky top-28 space-y-4">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.3em] text-purple-400">Includes</p>
+            <p class="mt-2 text-3xl font-semibold text-purple-900">
+              {data.price && data.currency
+                ? new Intl.NumberFormat(undefined, {
+                    style: "currency",
+                    currency: data.currency,
+                  }).format(parseFloat(data.price))
+                : "Free"}
             </p>
-          ) : <p class="m-0 text-lg font-semibold">Free</p>}
-          <p class="mt-1 text-sm text-purple-900">Instant digital download.</p>
-          <a href={href} target={target} rel={rel}
-             class="mt-3 inline-block rounded-lg bg-purple-700 px-4 py-2 font-medium text-white hover:bg-purple-800"
-             data-analytics="download_click" data-analytics-meta={data.id}>
-            {hasExternal ? 'Buy now' : 'Download PDF'}
+            <p class="text-sm text-purple-700/90">Instant digital download.</p>
+          </div>
+          <a
+            href={href}
+            target={target}
+            rel={rel}
+            class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-purple-700 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-300/40 transition hover:-translate-y-0.5 hover:bg-purple-800"
+            data-analytics="download_click"
+            data-analytics-meta={data.id}
+          >
+            {hasExternal ? "Buy now" : "Download PDF"}
+            <span aria-hidden="true">→</span>
           </a>
-          {data.file && !hasExternal && <p class="mt-2 text-xs text-purple-900">Opens a PDF. Save to keep.</p>}
+          {data.file && !hasExternal && (
+            <p class="text-xs text-purple-600/90">Opens a PDF in a new tab. Save it to keep a copy.</p>
+          )}
         </div>
       </aside>
     </div>
-  </article>
+  </section>
 </Base>

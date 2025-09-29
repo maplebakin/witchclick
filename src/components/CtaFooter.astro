@@ -13,28 +13,31 @@ const { type, id } = Astro.props as Props;
 
 let text = '';
 let href = '';
+let target: string | undefined;
+let relAttr: string | undefined;
 
 if (type === 'kofi') {
   const idx = Math.floor(Math.random() * KOFI_CTA_VARIANTS.length);
   text = KOFI_CTA_VARIANTS[idx];
   href = KO_FI_URL;
+  target = '_blank';
+  relAttr = 'noopener noreferrer';
 } else if (type === 'download' && id) {
   text = 'Grab the printable that goes with this post.';
   href = `/download/${id}`;
 }
 ---
 {type !== 'none' && text && href && (
-  <section class="mt-10 rounded-2xl border border-neutral-200/60 bg-neutral-50 p-5 dark:border-neutral-800 dark:bg-neutral-900">
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-      <p class="text-base leading-relaxed text-neutral-800 dark:text-neutral-200">{text}</p>
-      <a
-        href={href}
-        class="inline-flex shrink-0 items-center justify-center rounded-xl px-4 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-0"
-        style="background: linear-gradient(135deg, #7c4dff, #e91e63);"
-        rel="noopener noreferrer"
-      >
-        {type === 'kofi' ? 'Support on Ko‑fi' : 'Download'}
-      </a>
-    </div>
+  <section class="flex flex-col gap-4">
+    <p class="text-base leading-relaxed text-purple-800">{text}</p>
+    <a
+      href={href}
+      target={target}
+      rel={relAttr}
+      class="inline-flex w-fit items-center gap-2 rounded-full bg-purple-700 px-5 py-2 text-sm font-semibold text-white shadow-md shadow-purple-300/40 transition hover:-translate-y-0.5 hover:bg-purple-800"
+    >
+      {type === 'kofi' ? 'Support on Ko‑fi' : 'Download'}
+      <span aria-hidden="true">→</span>
+    </a>
   </section>
 )}

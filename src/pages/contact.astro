@@ -1,12 +1,24 @@
 ---
-import Base from '../layouts/Base.astro';
-import fs from 'node:fs';
-const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
+import Base from "../layouts/Base.astro";
+import { readSettings, getSiteOrigin } from "../utils/settings";
+
+const settings = readSettings();
+const site = getSiteOrigin(settings);
 ---
-<Base title="Contact" description="How to reach the WitchClick team." canon={`${settings.siteUrl.replace(/\/$/,'')}/contact`}>
-  <article class="prose prose-neutral max-w-none">
-    <h1>Contact</h1>
-    <p>Questions or collaboration ideas? Email <a href="streamthreadsystems@gmail.com">streamthreadsystems@gmail.com</a>.</p>
-    <p>We read every message and reply when we can.</p>
-  </article>
+<Base
+  title="Contact"
+  description="How to reach the WitchClick team."
+  canon={site ? `${site}/contact` : ""}
+>
+  <section class="glass-panel">
+    <article class="prose max-w-none">
+      <p class="eyebrow text-purple-400/90">Say hello</p>
+      <h1>Contact</h1>
+      <p>
+        Questions, collaboration ideas, or resource requests? Email
+        <a href="mailto:streamthreadsystems@gmail.com">streamthreadsystems@gmail.com</a> and we’ll get back to you soon.
+      </p>
+      <p>We read every message and reply when we can. Thanks for your patience!</p>
+    </article>
+  </section>
 </Base>

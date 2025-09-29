@@ -1,8 +1,78 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-.prose {
-  font-family: Literata, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply min-h-screen bg-[var(--color-background,_#f7f3f0)] text-slate-900 antialiased;
+  }
+
+  ::selection {
+    @apply bg-purple-200 text-purple-900;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply relative overflow-hidden rounded-3xl border border-purple-200/60 bg-white/80 p-8 shadow-xl shadow-purple-200/40 backdrop-blur;
+  }
+
+  .surface-card {
+    @apply rounded-2xl border border-purple-200/60 bg-white/80 p-6 shadow-md shadow-purple-200/30 backdrop-blur transition-transform duration-200 ease-out;
+  }
+
+  .tag-pill {
+    @apply inline-flex items-center rounded-full border border-purple-200/70 bg-purple-50/80 px-3 py-1 text-xs font-medium tracking-wide text-purple-600;
+  }
+
+  .eyebrow {
+    @apply text-[0.65rem] font-semibold uppercase tracking-[0.4em] text-purple-500;
+  }
+
+  .prose {
+    font-family: var(--font-serif, Literata, ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif);
+  }
+
+  .prose :where(p) {
+    @apply text-[1.05rem] leading-relaxed text-slate-700;
+  }
+
+  .prose :where(h1) {
+    @apply text-4xl font-semibold text-purple-900;
+  }
+
+  .prose :where(h2) {
+    @apply mt-10 text-2xl font-semibold text-purple-900;
+  }
+
+  .prose :where(h3) {
+    @apply mt-6 text-xl font-semibold text-purple-900;
+  }
+
+  .prose :where(a) {
+    @apply text-purple-700 underline-offset-4 transition hover:text-purple-900 hover:underline;
+  }
+
+  .prose :where(blockquote) {
+    @apply border-l-4 border-purple-200/80 bg-purple-50/70 p-4 text-purple-900/80;
+  }
+
+  .prose :where(code) {
+    @apply rounded bg-purple-100 px-1.5 py-0.5 text-[0.85rem] font-medium text-purple-800;
+  }
+}
+
+@layer utilities {
+  .bg-grid-soft {
+    background-image: radial-gradient(circle at 1px 1px, rgba(124, 58, 237, 0.12) 1px, transparent 0);
+    background-size: 40px 40px;
+  }
+}
+
+a {
+  color: inherit;
 }

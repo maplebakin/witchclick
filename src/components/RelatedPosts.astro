@@ -1,51 +1,89 @@
 ---
-import fs from 'node:fs';
-import path from 'node:path';
-import matter from 'gray-matter';
-import PostCard from './PostCard.astro';
-
+import PostCard from "./PostCard.astro";
+import { loadAllPosts, estimateReadingMinutes, firstParagraph } from "../utils/posts";
 
 interface Props {
-currentSlug: string; // e.g. 'tea-ritual-for-focus'
-tags?: string[]; // current post's tags
-limit?: number; // default 3
+  currentSlug: string;
+  tags?: string[];
+  limit?: number;
 }
+
 const { currentSlug, tags = [], limit = 3 } = Astro.props as Props;
 
+const normalizedTags = tags
+  .map((tag) => String(tag).toLowerCase().trim())
+  .filter(Boolean);
 
-const postsDir = path.join(process.cwd(), 'content', 'posts');
-const files = fs.existsSync(postsDir) ? fs.readdirSync(postsDir).filter(f => f.endsWith('.md')) : [];
+const posts = loadAllPosts().filter((post) => post.slug !== currentSlug);
 
-
-const all = files.map(file => {
-const raw = fs.readFileSync(path.join(postsDir, file), 'utf8');
-const { data } = matter(raw);
-const slug = (data?.slug ? String(data.slug) : file.replace(/\.md$/, '')).toLowerCase();
-const date = new Date(data?.publishedAt || data?.pubDate || data?.date || 0);
-const tagSet = new Set((Array.isArray(data?.tags) ? data.tags : []).map((t:any)=>String(t).toLowerCase()));
-return { slug, data, date, tagSet };
-}).filter(p => p.slug !== currentSlug);
-
-
-// score by shared tags (desc), then by date (newest first)
-function score(post){
-let s = 0;
-for (const t of tags.map(x=>String(x).toLowerCase())) if (post.tagSet.has(t)) s++;
-return s;
+function scorePost(postTags: string[]): number {
+  if (normalizedTags.length === 0) return 0;
+  const tagSet = new Set(postTags.map((tag) => tag.toLowerCase()));
+  let score = 0;
+  for (const tag of normalizedTags) {
+    if (tagSet.has(tag)) score += 1;
+  }
+  return score;
 }
-const ranked = all
-.map(p => ({ ...p, _score: score(p) }))
-.filter(p => p._score > 0)
-.sort((a,b) => b._score - a._score || (+b.date - +a.date))
-.slice(0, limit);
+
+const ranked = posts
+  .map((post) => {
+    const fm = post.data ?? {};
+    const postTags = Array.isArray(fm.tags) ? fm.tags.map((tag: any) => String(tag)) : [];
+    const score = scorePost(postTags);
+    return {
+      post,
+      fm,
+      postTags,
+      score,
+    };
+  })
+  .filter((entry) => entry.score > 0)
+  .sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return +b.post.date - +a.post.date;
+  })
+  .slice(0, limit)
+  .map((entry) => {
+    const { post, fm, postTags } = entry;
+    const excerpt =
+      fm.excerpt ?? fm.description ?? fm.metaDescription ?? firstParagraph(post.content);
+    const readingMinutes = fm.readingMinutes ?? estimateReadingMinutes(post.content);
+    const publishedAt =
+      fm.publishedAt ?? fm.pubDate ?? fm.date ?? (post.date ? post.date.toISOString() : undefined);
+
+    return {
+      slug: post.slug,
+      title: fm.title ?? post.title,
+      excerpt,
+      tags: postTags,
+      readingMinutes,
+      publishedAt,
+    };
+  });
 ---
 {ranked.length > 0 ? (
-<section class="mt-12">
-<h2 class="mb-3 text-lg font-semibold">You might also enjoy</h2>
-<div class="grid gap-4 sm:grid-cols-2">
-{ranked.map((p) => (
-<PostCard post={p.data} />
-))}
-</div>
-</section>
+  <section class="glass-panel">
+    <div class="flex flex-wrap items-baseline justify-between gap-2">
+      <div>
+        <p class="eyebrow text-purple-400/90">Keep reading</p>
+        <h2 class="mt-2 text-2xl font-semibold text-purple-900">You might also enjoy</h2>
+      </div>
+    </div>
+    <div class="mt-6 grid gap-5 sm:grid-cols-2">
+      {ranked.map((card) => (
+        <PostCard
+          post={{
+            slug: card.slug,
+            title: card.title,
+            excerpt: card.excerpt,
+            tags: card.tags,
+            readingMinutes: card.readingMinutes,
+            publishedAt: card.publishedAt,
+          }}
+          href={`/post/${card.slug}`}
+        />
+      ))}
+    </div>
+  </section>
 ) : null}

@@ -18,23 +18,39 @@ export interface Props {
   excerpt?: string
   tags?: string[]
   readingMinutes?: number
+  publishedAt?: string
 }
 
-const { post, href, title, excerpt, tags, readingMinutes } = Astro.props as Props
+const { post, href, title, excerpt, tags, readingMinutes, publishedAt } = Astro.props as Props;
 
-const link = href || (post?.slug ? `/post/${post.slug}` : '#')
-const _title = (title ?? post?.title ?? 'Untitled')
-const _excerpt = (excerpt ?? post?.excerpt ?? post?.description ?? post?.metaDescription ?? '')
-const _tags: string[] = Array.isArray(tags ?? post?.tags) ? (tags ?? post?.tags) as string[] : []
-const _mins = (readingMinutes ?? post?.readingMinutes) as number | undefined
+const link = href || (post?.slug ? `/post/${post.slug}` : '#');
+const _title = title ?? post?.title ?? 'Untitled';
+const _excerpt = excerpt ?? post?.excerpt ?? post?.description ?? post?.metaDescription ?? '';
+const _tags: string[] = Array.isArray(tags ?? post?.tags) ? ((tags ?? post?.tags) as string[]) : [];
+const _mins = (readingMinutes ?? post?.readingMinutes) as number | undefined;
+const _publishedAt = (publishedAt ?? post?.publishedAt ?? post?.date) as string | undefined;
+const _dateLabel = formatDate(_publishedAt);
+
+function formatDate(value?: string) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(+date)) return '';
+  return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+}
 ---
-<a href={link} class="block rounded-2xl border border-purple-100/60 bg-white/70 p-5 shadow-sm hover:shadow transition">
-  <h3 class="text-lg font-semibold text-purple-900">{_title}</h3>
-  {_excerpt && <p class="mt-2 text-sm text-purple-700">{_excerpt}</p>}
-  <div class="mt-3 flex flex-wrap gap-2 text-xs">
-    {_mins && <span class="rounded-full bg-purple-50 px-2 py-0.5 border border-purple-200">⏱️ {_mins} min</span>}
-    {_tags.slice(0, 6).map((t) => (
-      <span class="rounded-full bg-purple-50 px-2 py-0.5 border border-purple-200">#{String(t).toLowerCase()}</span>
-    ))}
+<a
+  href={link}
+  class="surface-card group block h-full transform transition hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-200/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-300"
+>
+  <div class="flex flex-col gap-4">
+    {_dateLabel && <p class="eyebrow text-purple-500/80">{_dateLabel}</p>}
+    <h3 class="text-xl font-semibold text-purple-900 transition group-hover:text-purple-950">{_title}</h3>
+    {_excerpt && <p class="text-sm leading-relaxed text-purple-700/90 line-clamp-3">{_excerpt}</p>}
+    <div class="mt-2 flex flex-wrap items-center gap-2 text-xs text-purple-600/90">
+      {_mins && <span class="tag-pill bg-purple-100/80 text-purple-700">⏱️ {_mins} min read</span>}
+      {_tags.slice(0, 5).map((t) => (
+        <span class="tag-pill">#{String(t).toLowerCase()}</span>
+      ))}
+    </div>
   </div>
 </a>

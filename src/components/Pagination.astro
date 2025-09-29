@@ -1,41 +1,48 @@
 ---
 interface Props {
-page: number;
-totalPages: number;
-/** base href without trailing slash, e.g. '/page' or '/tag/some-tag' */
-baseHref?: string;
+  page: number;
+  totalPages: number;
+  /** base href without trailing slash, e.g. '/page' or '/tag/some-tag' */
+  baseHref?: string;
 }
-const { page = 1, totalPages = 1, baseHref = '/page' } = Astro.props as Props;
+
+const { page = 1, totalPages = 1, baseHref = "/page" } = Astro.props as Props;
 const p = Number(page);
 ---
+<nav class="mt-12 flex flex-wrap items-center justify-center gap-3 text-sm" aria-label="Pagination">
+  {p > 1 ? (
+    <a
+      class="inline-flex items-center gap-2 rounded-full border border-purple-300/60 bg-white/90 px-4 py-2 font-medium text-purple-700 shadow-sm transition hover:-translate-y-0.5 hover:border-purple-400 hover:shadow-md"
+      href={`${baseHref}/${p - 1}`}
+      rel="prev"
+    >
+      <span aria-hidden="true">←</span>
+      Previous
+    </a>
+  ) : (
+    <span class="inline-flex items-center gap-2 rounded-full border border-purple-100 px-4 py-2 text-purple-300" aria-disabled="true">
+      <span aria-hidden="true">←</span>
+      Previous
+    </span>
+  )}
 
+  <span class="rounded-full border border-purple-100/80 bg-white/80 px-4 py-2 text-purple-700/80">
+    Page {p} of {totalPages}
+  </span>
 
-<nav class="mt-8 flex items-center gap-2" aria-label="Pagination">
-{p > 1 ? (
-<a
-class="px-3 py-1 rounded bg-neutral-900 border border-neutral-800 hover:bg-plum-800"
-href={`${baseHref}/${p - 1}`}
-rel="prev"
->
-← Prev
-</a>
-) : (
-<span class="px-3 py-1 rounded opacity-40" aria-disabled="true">← Prev</span>
-)}
-
-
-<div class="text-sm text-neutral-400">Page {p} of {totalPages}</div>
-
-
-{p < totalPages ? (
-<a
-class="px-3 py-1 rounded bg-neutral-900 border border-neutral-800 hover:bg-plum-800"
-href={`${baseHref}/${p + 1}`}
-rel="next"
->
-Next →
-</a>
-) : (
-<span class="px-3 py-1 rounded opacity-40" aria-disabled="true">Next →</span>
-)}
+  {p < totalPages ? (
+    <a
+      class="inline-flex items-center gap-2 rounded-full border border-purple-300/60 bg-white/90 px-4 py-2 font-medium text-purple-700 shadow-sm transition hover:-translate-y-0.5 hover:border-purple-400 hover:shadow-md"
+      href={`${baseHref}/${p + 1}`}
+      rel="next"
+    >
+      Next
+      <span aria-hidden="true">→</span>
+    </a>
+  ) : (
+    <span class="inline-flex items-center gap-2 rounded-full border border-purple-100 px-4 py-2 text-purple-300" aria-disabled="true">
+      Next
+      <span aria-hidden="true">→</span>
+    </span>
+  )}
 </nav>

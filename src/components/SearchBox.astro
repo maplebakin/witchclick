@@ -1,21 +1,60 @@
----
 // Featherweight client-side search (no deps). Fetches /search.json at runtime
+const uid = `search-${globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2)}`;
+const resultsId = `${uid}-results`;
 ---
-<div class="relative w-full max-w-xs" data-search>
-  <input
-    type="search"
-    placeholder="Search posts…"
-    class="w-full rounded-full border border-purple-200 bg-white/70 px-4 py-1.5 text-sm outline-none placeholder:text-purple-400 focus:border-purple-400"
-  />
-  <div class="absolute left-0 right-0 z-50 mt-2 hidden overflow-hidden rounded-xl border border-purple-200 bg-white shadow-lg" data-results></div>
+<div class="relative w-full max-w-sm" data-search>
+  <label class="sr-only" for={uid}>Search posts</label>
+  <div class="group relative flex items-center overflow-hidden rounded-full border border-purple-200/70 bg-white/80 px-4 shadow-sm transition focus-within:border-purple-300 focus-within:shadow-md">
+    <svg
+      class="mr-2 h-4 w-4 flex-none text-purple-400 transition group-focus-within:text-purple-500"
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M13.5 12.5L17 16"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <circle
+        cx="9"
+        cy="9"
+        r="5.25"
+        stroke="currentColor"
+        stroke-width="1.5"
+      />
+    </svg>
+    <input
+      id={uid}
+      type="search"
+      placeholder="Search guides and planners…"
+      class="peer w-full bg-transparent py-2 text-sm text-purple-900 placeholder:text-purple-400 focus:outline-none"
+      role="combobox"
+      aria-autocomplete="list"
+      aria-expanded="false"
+      aria-controls={resultsId}
+    />
+    <kbd class="hidden rounded-full border border-purple-100 bg-purple-50 px-2 py-1 text-[0.65rem] font-medium text-purple-500 sm:block" aria-hidden="true">⌘K</kbd>
+  </div>
+  <div
+    id={resultsId}
+    class="absolute left-0 right-0 z-50 mt-3 hidden overflow-hidden rounded-3xl border border-purple-200/70 bg-white/95 p-2 shadow-2xl shadow-purple-200/60 backdrop-blur"
+    role="listbox"
+    data-results
+  ></div>
 </div>
 
 <script>
 (() => {
   const root = document.currentScript?.previousElementSibling?.closest('[data-search]');
-  if (!root) { return void 0; }
+  if (!root) return;
+
   const input = root.querySelector('input');
   const results = root.querySelector('[data-results]');
+  if (!input || !results) return;
+
   let data = [];
   let loaded = false;
 
@@ -25,37 +64,97 @@
       const r = await fetch('/search.json', { cache: 'no-store' });
       data = await r.json();
       loaded = true;
-    } catch { /* ignore */ }
+    } catch (error) {
+      if (typeof console !== 'undefined') {
+        console.warn('[search] Failed to load search index', error);
+      }
+    }
+  }
+
+  function escapeHtml(value){
+    return String(value).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
   function render(items){
-    if (!items.length){ results.classList.add('hidden'); results.innerHTML = ''; return; }
+    if (!items.length){
+      results.classList.add('hidden');
+      results.innerHTML = '';
+      input.setAttribute('aria-expanded', 'false');
+      return;
+    }
+
+    input.setAttribute('aria-expanded', 'true');
     results.classList.remove('hidden');
     results.innerHTML = items.slice(0,8).map(item => `
-      <a class="block px-3 py-2 text-sm hover:bg-purple-50" href="/post/${escapeHtml(item.slug)}">
-        <div class="font-medium text-purple-900">${escapeHtml(item.title)}</div>
-        ${item.excerpt ? `<div class=\"text-xs text-purple-600 line-clamp-2\">${escapeHtml(item.excerpt)}</div>` : ''}
+      <a
+        class="group block rounded-2xl px-4 py-3 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-300 hover:bg-purple-50/80"
+        href="/post/${escapeHtml(item.slug)}"
+        role="option"
+      >
+        <div class="text-sm font-semibold text-purple-900 group-hover:text-purple-900">${escapeHtml(item.title)}</div>
+        ${item.excerpt ? `<div class=\"mt-1 text-xs text-purple-600/90 line-clamp-2\">${escapeHtml(item.excerpt)}</div>` : ''}
       </a>
     `).join('');
   }
 
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
+  async function handleSearch(){
+    const query = input.value.trim().toLowerCase();
+    if (!query){
+      render([]);
+      return;
+    }
 
-  input.addEventListener('input', async () => {
-    const q = input.value.trim().toLowerCase();
-    if (!q){ render([]); return; }
+    input.setAttribute('aria-busy', 'true');
     await ensure();
+    input.removeAttribute('aria-busy');
+
     const items = data.filter(item => {
       const hay = `${item.title} ${item.excerpt} ${(item.tags||[]).join(' ')}`.toLowerCase();
-      return hay.includes(q);
+      return hay.includes(query);
     });
+
     render(items);
+  }
+
+  let timerId;
+
+  input.addEventListener('input', () => {
+    if (timerId) {
+      window.clearTimeout(timerId);
+    }
+    timerId = window.setTimeout(handleSearch, 120);
   });
 
-  document.addEventListener('click', (e) => {
-    if (!results.contains(e.target) && e.target !== input) results.classList.add('hidden');
+  input.addEventListener('focus', async () => {
+    if (input.value.trim()) {
+      await handleSearch();
+    }
+  });
+
+  document.addEventListener('click', (event) => {
+    const target = event.target;
+    const withinResults = target instanceof Node && results.contains(target);
+    if (!withinResults && target !== input) {
+      results.classList.add('hidden');
+      input.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+      const active = event.target;
+      const tagName = active && active instanceof HTMLElement ? active.tagName.toLowerCase() : '';
+      if (tagName && ['input', 'textarea'].includes(tagName)) return;
+      event.preventDefault();
+      input.focus();
+      input.select();
+    }
+
+    if (event.key === 'Escape') {
+      results.classList.add('hidden');
+      input.setAttribute('aria-expanded', 'false');
+      input.blur();
+    }
   });
 })();
 </script>
