@@ -299,6 +299,42 @@ async function savePostFromWrite(payload) {
         .map(s=>s.trim())
         .filter(Boolean);
 
+  const entitiesInput = payload.entities;
+  const entities = [];
+  let invalidEntities = 0;
+  if (typeof entitiesInput === 'string') {
+    for (const chunk of entitiesInput.split(',')) {
+      const part = chunk.trim();
+      if (!part) continue;
+      const colon = part.indexOf(':');
+      if (colon === -1) {
+        invalidEntities++;
+        continue;
+      }
+      const rawType = part.slice(0, colon).trim();
+      const rawSlug = part.slice(colon + 1).trim();
+      const type = rawType;
+      const slug = slugify(rawSlug);
+      if (!type || !slug) {
+        invalidEntities++;
+        continue;
+      }
+      entities.push({ type, slug });
+    }
+  } else if (entitiesInput != null && entitiesInput !== '') {
+    invalidEntities++;
+  }
+
+  const serializeEntities = (list) => {
+    if (!Array.isArray(list) || !list.length) return 'entities: []';
+    const lines = ['entities:'];
+    for (const item of list) {
+      lines.push(`  - type: ${JSON.stringify(String(item.type))}`);
+      lines.push(`    slug: ${JSON.stringify(String(item.slug))}`);
+    }
+    return lines.join('\n');
+  };
+
   const includeAds = !!payload.includeAds;
   const includeKofi = !!payload.includeKofi;
   const excerpt = String(payload.excerpt||'').trim();
@@ -316,6 +352,7 @@ async function savePostFromWrite(payload) {
     `metaDescription: ${yq(metaDescription)}`,
     `tags: ${ya(tags)}`,
     `readingMinutes: ${readingMinutes}`,
+    serializeEntities(entities),
     `includeAds: ${includeAds ? 'true' : 'false'}`,
     `includeKofi: ${includeKofi ? 'true' : 'false'}`,
     `affiliateAnchors: []`,
@@ -329,7 +366,14 @@ async function savePostFromWrite(payload) {
   const filePath = path.join(postsDir, `${slug}.md`);
   await fsp.writeFile(filePath, fm + '\n' + markdown + '\n', 'utf8');
 
-  return { slug, path: `content/posts/${slug}.md` };
+  const result = { slug, path: `content/posts/${slug}.md` };
+  if (entities.length) {
+    result.entities = entities;
+  }
+  if (invalidEntities) {
+    result.warnings = [`Dropped ${invalidEntities} invalid entity entr${invalidEntities === 1 ? 'y' : 'ies'}.`];
+  }
+  return result;
 }
 
 // ---------- INGEST (PostSpec v2) ----------
