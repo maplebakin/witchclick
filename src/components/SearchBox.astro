@@ -116,7 +116,7 @@ const resultsId = `${uid}-results`;
     render(items);
   }
 
-  let timerId: number | undefined;
+  let timerId;
 
   input.addEventListener('input', () => {
     if (timerId) {
@@ -132,7 +132,9 @@ const resultsId = `${uid}-results`;
   });
 
   document.addEventListener('click', (event) => {
-    if (!results.contains(event.target) && event.target !== input) {
+    const target = event.target;
+    const withinResults = target instanceof Node && results.contains(target);
+    if (!withinResults && target !== input) {
       results.classList.add('hidden');
       input.setAttribute('aria-expanded', 'false');
     }
@@ -140,8 +142,9 @@ const resultsId = `${uid}-results`;
 
   document.addEventListener('keydown', (event) => {
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
-      const activeTag = (event.target as HTMLElement | null)?.tagName?.toLowerCase();
-      if (activeTag && ['input', 'textarea'].includes(activeTag)) return;
+      const active = event.target;
+      const tagName = active && active instanceof HTMLElement ? active.tagName.toLowerCase() : '';
+      if (tagName && ['input', 'textarea'].includes(tagName)) return;
       event.preventDefault();
       input.focus();
       input.select();
