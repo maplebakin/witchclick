@@ -173,7 +173,7 @@ function stripInlineHandlers(html: string) {
 
       <div class="prose prose-neutral max-w-none" set:html={html} />
 
-      {hasAffiliates && <Disclosure />}
+      <Disclosure show={hasAffiliates} />
 
       {Array.isArray(data.downloadId) ? null : data.downloadId ? (
         <DownloadCard slug={String(data.downloadId)} />
