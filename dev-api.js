@@ -709,6 +709,62 @@ function run(cmd, args, cwd = CWD) {
   });
 }
 
+// ---------- DOWNLOADS ----------
+async function listDownloads() {
+  const base = path.join(CWD, 'content', 'downloads');
+  const items = [];
+  if (!fs.existsSync(base)) return { items };
+
+  const files = fs.readdirSync(base).filter(f => f.endsWith('.json'));
+  for (const f of files) {
+    try {
+      const data = JSON.parse(fs.readFileSync(path.join(base, f), 'utf8'));
+      const slug = data.slug || f.replace(/\.json$/, '');
+      const name = data.name || slug.replace(/-/g, ' ').replace(/\b\w/g, m => m.toUpperCase());
+      items.push({
+        ...data,
+        slug,
+        name
+      });
+    } catch { /* ignore malformed download */ }
+  }
+
+  items.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+  return { items };
+}
+
+async function getDownload({ slug }) {
+  if (!slug) throw new Error('slug is required');
+  const file = path.join(CWD, 'content', 'downloads', `${String(slug)}.json`);
+  if (!fs.existsSync(file)) throw new Error('not found');
+  const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+  return { data };
+}
+
+async function saveDownload({ slug, name, price, currency, summary, cover, file, url, features, tags }) {
+  if (!slug && !name) throw new Error('slug or name required');
+  const s = slugify(slug || name);
+  if (!s) throw new Error('invalid slug');
+  const filePath = path.join(CWD, 'content', 'downloads', `${s}.json`);
+  ensureDir(path.dirname(filePath));
+
+  const payload = {
+    slug: s,
+    name: String(name || '').trim() || s.replace(/-/g, ' ').replace(/\b\w/g, m => m.toUpperCase()),
+    price: price == null ? '' : String(price),
+    currency: String(currency || 'USD').trim() || 'USD',
+    summary: String(summary || ''),
+    cover: String(cover || ''),
+    file: String(file || ''),
+    url: String(url || ''),
+    features: Array.isArray(features) ? features.map(v => String(v)).filter(Boolean) : [],
+    tags: Array.isArray(tags) ? tags.map(v => String(v)).filter(Boolean) : []
+  };
+
+  await fsp.writeFile(filePath, JSON.stringify(payload, null, 2), 'utf8');
+  return { path: `content/downloads/${s}.json`, slug: s };
+}
+
 // ---------- ENTITIES ----------
 async function listEntities() {
   const base = path.join(CWD, 'content', 'entities');
@@ -868,6 +924,36 @@ const server = http.createServer(async (req, res) => {
         ok,
         steps: steps.map(s => ({ cmd: s.cmd, code: s.code, out: s.out, err: s.err }))
       });
+    }
+
+    // ---- Downloads
+    if (req.method === 'POST' && req.url === '/downloads/list') {
+      try {
+        const data = await listDownloads();
+        return send(res, 200, { ok: true, ...data });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/downloads/get') {
+      try {
+        const body = await parseBody(req);
+        const data = await getDownload({ slug: body?.slug });
+        return send(res, 200, { ok: true, ...data });
+      } catch (e) {
+        return send(res, 404, { ok: false, error: e.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/downloads/save') {
+      try {
+        const body = await parseBody(req);
+        const data = await saveDownload(body || {});
+        return send(res, 200, { ok: true, ...data });
+      } catch (e) {
+        return send(res, 400, { ok: false, error: e.message || String(e) });
+      }
     }
 
     // ---- Entities
