@@ -11,10 +11,15 @@ import { readEntity } from "../../utils/entities";
 import fs from "node:fs";
 import path from "node:path";
 import { marked } from "marked";
+import createDOMPurify from "dompurify";
+import { JSDOM } from "jsdom";
 
 import { autoLinkAffiliates } from "../../../tools/src/auto-affiliate";
 import { readSettings, getSiteOrigin, toAbsoluteUrl } from "../../utils/settings";
 import { loadAllPosts, estimateReadingMinutes, firstParagraph } from "../../utils/posts";
+
+const dom = new JSDOM("<body></body>");
+const DOMPurify = createDOMPurify(dom.window);
 
 export const prerender = true;
 
@@ -66,8 +71,7 @@ const canonical = `${siteOrigin}/post/${effectiveSlug}`;
 const readingMinutes = data.readingMinutes ?? estimateReadingMinutes(content);
 
 const htmlRaw = marked.parse(content || "");
-const htmlSafe = stripInlineHandlers(stripScripts(String(htmlRaw)));
-let html = String(htmlSafe);
+let html = DOMPurify.sanitize(String(htmlRaw), { USE_PROFILES: { html: true } });
 
 let ctaType: "kofi" | "download" | "none" = "none";
 let ctaId: string | undefined;
@@ -145,15 +149,6 @@ const jsonLd = {
   author: { "@type": "Organization", name: settings.brandName || "WitchClick" },
   publisher: { "@type": "Organization", name: settings.brandName || "WitchClick" },
 };
-
-function stripScripts(html: string) {
-  return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
-}
-function stripInlineHandlers(html: string) {
-  return html
-    .replace(/\s(on\w+)\s*=\s*"[^"]*"/gi, "")
-    .replace(/\s(on\w+)\s*=\s*'[^']*'/gi, "");
-}
 ---
 
 <Base title={title} description={description} canon={canonical} wide={true} ogImage={ogImage}>

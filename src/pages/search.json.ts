@@ -1,14 +1,19 @@
-import { loadAllPosts } from "../utils/posts";
+import { loadAllPosts, firstParagraph } from "../utils/posts";
+
+export const prerender = true;
 
 export async function GET() {
   const posts = loadAllPosts();
   const items = posts.map((post) => {
     const data = post.data ?? {};
     const slug = post.slug;
+    const rawExcerpt =
+      data.excerpt ?? data.description ?? data.metaDescription ?? firstParagraph(post.content ?? "");
+
     return {
       slug,
       title: String(data.title ?? post.title ?? slug),
-      excerpt: String(data.excerpt ?? data.description ?? data.metaDescription ?? ""),
+      excerpt: String(rawExcerpt ?? ""),
       tags: Array.isArray(data.tags) ? data.tags : [],
     };
   });
