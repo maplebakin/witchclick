@@ -1,43 +1,174 @@
 ---
-// Home = Page 1 using filesystem (no astro:content). Mirrors /page/1 logic.
 import Base from "../layouts/Base.astro";
 import PostCard from "../components/PostCard.astro";
 import Pagination from "../components/Pagination.astro";
-import fs from "node:fs";
-import path from "node:path";
-import matter from "gray-matter";
+import { loadAllPosts, estimateReadingMinutes, firstParagraph } from "../utils/posts";
+import { readSettings } from "../utils/settings";
 
 export const prerender = true;
 
-const dir = path.join(process.cwd(), 'content', 'posts');
-const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => f.endsWith('.md')) : [];
-
-const posts = files.map((file) => {
-  const full = path.join(dir, file);
-  const raw = fs.readFileSync(full, 'utf8');
-  const { data } = matter(raw);
-  const slug = (data?.slug ? String(data.slug) : file.replace(/\.md$/, '')).toLowerCase();
-  const fronts = [data?.publishedAt, data?.pubDate, data?.date, data?.updatedAt].filter(Boolean);
-  let date = new Date(fronts[0] || 0);
-  if (isNaN(+date)) date = fs.statSync(full).mtime;
-  return { slug, data, date };
-}).sort((a,b) => +b.date - +a.date);
+const settings = readSettings();
+const posts = loadAllPosts();
 
 const PAGE_SIZE = 12;
 const totalPages = Math.max(1, Math.ceil(posts.length / PAGE_SIZE));
 const pagePosts = posts.slice(0, PAGE_SIZE);
+
+const heroPost = pagePosts[0] ?? null;
+const hero = heroPost ? toViewModel(heroPost) : null;
+const gridPosts = heroPost ? pagePosts.slice(1) : pagePosts;
+const hasPosts = pagePosts.length > 0;
+
+const tagline =
+  settings.disclosure && settings.disclosure.includes("affiliate")
+    ? "Mindful routines, gentle rituals, and tools we genuinely love."
+    : "Mindful routines, secular rituals, and cozy planning guides.";
+
+function toViewModel(post) {
+  const fm = post.data ?? {};
+  const excerpt = fm.excerpt ?? fm.description ?? fm.metaDescription ?? firstParagraph(post.content);
+  const date = resolveDate(fm);
+  const tags = Array.isArray(fm.tags) ? fm.tags : [];
+  const readingMinutes = fm.readingMinutes ?? estimateReadingMinutes(post.content);
+  return {
+    slug: post.slug,
+    title: fm.title ?? post.title,
+    excerpt,
+    tags,
+    readingMinutes,
+    publishedAt: date,
+    href: `/post/${post.slug}`,
+  };
+}
+
+function resolveDate(data) {
+  const value = data?.publishedAt ?? data?.pubDate ?? data?.date ?? null;
+  if (!value) return undefined;
+  const date = new Date(value);
+  if (Number.isNaN(+date)) return undefined;
+  return date.toISOString();
+}
 ---
-<Base title="WitchClick — Cozy secular rituals & tools">
-  <h1 class="mb-6">Latest posts</h1>
-  {pagePosts.length === 0 ? (
-    <p class="text-neutral-500">No posts found in <code>content/posts</code>. Add a Markdown file and rebuild.</p>
-  ) : (
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {pagePosts.map((p) => (
-        <PostCard post={{ ...p.data, slug: p.slug }} href={`/post/${p.slug}`} />
-      ))}
+<Base title={`${settings.brandName ?? "WitchClick"} — Cozy secular rituals & tools`} description={tagline}>
+  <section class="glass-panel overflow-hidden">
+    <div class="pointer-events-none absolute inset-y-0 right-0 hidden w-2/5 bg-gradient-to-bl from-purple-200/40 via-transparent to-transparent blur-3xl lg:block"></div>
+    <div class="relative flex flex-col gap-6">
+      <p class="eyebrow">Fresh from the coven</p>
+      <h1 class="text-3xl font-semibold text-purple-900 sm:text-4xl lg:text-5xl">
+        {hero?.title ?? "Cozy secular rituals for modern life"}
+      </h1>
+      <p class="max-w-2xl text-base leading-relaxed text-purple-800/90 sm:text-lg">
+        {hero?.excerpt ?? tagline}
+      </p>
+      <div class="flex flex-wrap gap-3">
+        {hero && (
+          <a
+            class="inline-flex items-center gap-2 rounded-full bg-purple-700 px-5 py-2 text-sm font-medium text-white shadow-lg shadow-purple-300/40 transition hover:-translate-y-0.5 hover:bg-purple-800"
+            href={hero.href}
+          >
+            Read the latest guide
+            <span aria-hidden="true">→</span>
+          </a>
+        )}
+        <a
+          class="inline-flex items-center gap-2 rounded-full border border-purple-300/70 bg-white/60 px-5 py-2 text-sm font-medium text-purple-800 transition hover:-translate-y-0.5 hover:border-purple-400 hover:bg-purple-50"
+          href="/downloads"
+        >
+          Explore printable tools
+        </a>
+        <a
+          class="inline-flex items-center gap-2 rounded-full border border-purple-300/70 bg-white/60 px-5 py-2 text-sm font-medium text-purple-800 transition hover:-translate-y-0.5 hover:border-purple-400 hover:bg-purple-50"
+          href="/entities"
+        >
+          Browse correspondences
+        </a>
+      </div>
     </div>
-  )}
+  </section>
+
+  <section class="glass-panel">
+    <div class="flex flex-wrap items-baseline justify-between gap-4">
+      <div>
+        <p class="eyebrow text-purple-400/90">Latest rituals &amp; planners</p>
+        <h2 class="mt-2 text-2xl font-semibold text-purple-900 sm:text-3xl">Grounded guidance for gentle days</h2>
+      </div>
+      {totalPages > 1 && (
+        <a class="inline-flex items-center gap-2 text-sm font-medium text-purple-700 underline-offset-4 transition hover:text-purple-900 hover:underline" href="/page/2">
+          Browse the archive
+          <span aria-hidden="true">→</span>
+        </a>
+      )}
+    </div>
+
+    {hero && (
+      <div class="mt-8 grid gap-6 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)]">
+        <article class="surface-card flex flex-col justify-between">
+          <div>
+            <p class="eyebrow text-purple-400/90">Featured guide</p>
+            <h3 class="mt-3 text-2xl font-semibold text-purple-900">{hero.title}</h3>
+            <p class="mt-4 text-sm leading-relaxed text-purple-700/90">{hero.excerpt}</p>
+            <div class="mt-4 flex flex-wrap items-center gap-2 text-xs">
+              {hero.readingMinutes && (
+                <span class="tag-pill bg-purple-100/80 text-purple-700">⏱️ {hero.readingMinutes} min read</span>
+              )}
+              {hero.tags.slice(0, 4).map((tag) => (
+                <span class="tag-pill">#{String(tag).toLowerCase()}</span>
+              ))}
+            </div>
+          </div>
+          <a
+            class="mt-6 inline-flex w-fit items-center gap-2 text-sm font-medium text-purple-700 underline-offset-4 transition hover:text-purple-900 hover:underline"
+            href={hero.href}
+          >
+            Dive into the ritual
+            <span aria-hidden="true">→</span>
+          </a>
+        </article>
+        <div class="surface-card">
+          <h3 class="text-lg font-semibold text-purple-900">Need a cozy starting place?</h3>
+          <p class="mt-3 text-sm leading-relaxed text-purple-700/90">
+            Browse guided spreads, gentle accountability planners, and grounding prompts to keep your routines soft and sustainable.
+          </p>
+          <ul class="mt-4 space-y-2 text-sm text-purple-700">
+            <li>• <a class="underline-offset-4 transition hover:text-purple-900 hover:underline" href="/downloads">Printable downloads</a></li>
+            <li>• <a class="underline-offset-4 transition hover:text-purple-900 hover:underline" href="/entities">Entity library &amp; correspondences</a></li>
+            <li>• <a class="underline-offset-4 transition hover:text-purple-900 hover:underline" href="/post/pre-interview-grounding-ritual">Pre-interview grounding ritual</a></li>
+          </ul>
+        </div>
+      </div>
+    )}
+
+    {hasPosts ? (
+      gridPosts.length > 0 ? (
+        <div class="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2">
+          {gridPosts.map((post) => {
+            const card = toViewModel(post);
+            return (
+              <PostCard
+                post={{
+                  slug: card.slug,
+                  title: card.title,
+                  excerpt: card.excerpt,
+                  tags: card.tags,
+                  readingMinutes: card.readingMinutes,
+                  publishedAt: card.publishedAt,
+                }}
+                href={card.href}
+              />
+            );
+          })}
+        </div>
+      ) : (
+        <div class="mt-10 rounded-2xl border border-purple-200/70 bg-white/70 p-6 text-sm text-purple-700/80">
+          More guides are brewing. Check back soon or explore the archive above.
+        </div>
+      )
+    ) : (
+      <div class="mt-10 rounded-2xl border border-purple-200/70 bg-white/70 p-6 text-sm text-purple-700/80">
+        No posts found yet. Add a Markdown file to <code>content/posts</code> to get started.
+      </div>
+    )}
+  </section>
 
   {totalPages > 1 ? (
     <Pagination page={1} totalPages={totalPages} baseHref="/page" />

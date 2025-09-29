@@ -1,10 +1,16 @@
 
 ---
-import Base from '../../layouts/Base.astro';
-import fs from 'node:fs';
-const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
+import Base from "../../layouts/Base.astro";
+import { readSettings, getSiteOrigin } from "../../utils/settings";
+const settings = readSettings();
+const site = getSiteOrigin(settings) || "https://example.com";
 ---
-<Base title="WitchClick — Downloads Admin" description="Create and edit download products." canon={`${settings.siteUrl}/admin/downloads`} wide={true}>
+<Base
+  title="WitchClick — Downloads Admin"
+  description="Create and edit download products."
+  canon={`${site}/admin/downloads`}
+  wide={true}
+>
   <Fragment slot="head"><meta name="robots" content="noindex" /></Fragment>
 
   <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">

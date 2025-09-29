@@ -40,12 +40,17 @@ const ranked = all
 .slice(0, limit);
 ---
 {ranked.length > 0 ? (
-<section class="mt-12">
-<h2 class="mb-3 text-lg font-semibold">You might also enjoy</h2>
-<div class="grid gap-4 sm:grid-cols-2">
-{ranked.map((p) => (
-<PostCard post={p.data} />
-))}
-</div>
-</section>
+  <section class="glass-panel">
+    <div class="flex flex-wrap items-baseline justify-between gap-2">
+      <div>
+        <p class="eyebrow text-purple-400/90">Keep reading</p>
+        <h2 class="mt-2 text-2xl font-semibold text-purple-900">You might also enjoy</h2>
+      </div>
+    </div>
+    <div class="mt-6 grid gap-5 sm:grid-cols-2">
+      {ranked.map((p) => (
+        <PostCard post={p.data} />
+      ))}
+    </div>
+  </section>
 ) : null}

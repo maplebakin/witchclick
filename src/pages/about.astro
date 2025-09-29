@@ -1,12 +1,30 @@
 ---
-import Base from '../layouts/Base.astro';
-import fs from 'node:fs';
-const settings = JSON.parse(fs.readFileSync('./content/settings.json','utf8'));
+import Base from "../layouts/Base.astro";
+import { readSettings, getSiteOrigin } from "../utils/settings";
+
+const settings = readSettings();
+const site = getSiteOrigin(settings);
 ---
-<Base title="About" description="About the WitchClick project." canon={`${settings.siteUrl.replace(/\/$/,'')}/about`}>
-  <article class="prose prose-neutral max-w-none">
-    <h1>About WitchClick</h1>
-    <p>WitchClick is a cozy corner for planners, gentle magic, and mindful routines. We share practical, low-pressure ideas.</p>
-    <p>Nothing here is medical advice. Always do what feels safe and good for you.</p>
-  </article>
+<Base
+  title="About"
+  description="About the WitchClick project."
+  canon={site ? `${site}/about` : ""}
+>
+  <section class="glass-panel">
+    <article class="prose max-w-none">
+      <p class="eyebrow text-purple-400/90">Our vibe</p>
+      <h1>About WitchClick</h1>
+      <p>
+        WitchClick is a cozy corner for planners, gentle magic, and mindful routines. Every guide is created to feel accessible,
+        secular-friendly, and supportive of soft habits.
+      </p>
+      <p>
+        Nothing here is medical advice. Always do what feels safe and good for you, and adapt any ritual to your own needs.
+      </p>
+      <p>
+        We publish practical walkthroughs, printable planners, and research-backed reflections to help you stay grounded without
+        burning out.
+      </p>
+    </article>
+  </section>
 </Base>

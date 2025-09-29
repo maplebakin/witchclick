@@ -8,19 +8,30 @@ const all = readAllEntities();
 const typeNames = Object.keys(all).sort();
 ---
 <Base title="Entities — WitchClick">
-<h1 class="mb-6">Entities</h1>
-{typeNames.length === 0 ? (
-<p class="text-neutral-400">No entities yet. They are created automatically when you ingest a post that references them, or via your admin endpoint.</p>
-) : (
-typeNames.map((type) => (
-<section class="mb-10">
-<h2 class="text-xl font-semibold mb-3">{type}</h2>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-{all[type].map((e) => (
-<EntityCard type={e.type} slug={e.slug} name={e.name} summary={e.summary} />
-))}
-</div>
-</section>
-))
-)}
+  <section class="glass-panel">
+    <div class="flex flex-wrap items-baseline justify-between gap-3">
+      <div>
+        <p class="eyebrow text-purple-400/90">Reference library</p>
+        <h1 class="mt-2 text-3xl font-semibold text-purple-900">Entities</h1>
+      </div>
+      <p class="text-sm text-purple-700/80">Correspondences and notes that appear inside rituals.</p>
+    </div>
+
+    {typeNames.length === 0 ? (
+      <div class="mt-8 rounded-2xl border border-purple-200/70 bg-white/70 p-6 text-sm text-purple-700/80">
+        No entities yet. They are created automatically when you ingest a post that references them or via the admin endpoint.
+      </div>
+    ) : (
+      typeNames.map((type) => (
+        <section class="mt-10">
+          <h2 class="text-xl font-semibold text-purple-900">{type}</h2>
+          <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {all[type].map((e) => (
+              <EntityCard type={e.type} slug={e.slug} name={e.name} summary={e.summary} />
+            ))}
+          </div>
+        </section>
+      ))
+    )}
+  </section>
 </Base>

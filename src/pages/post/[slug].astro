@@ -5,16 +5,16 @@ import AdSlot from "../../components/AdSlot.astro";
 import Disclosure from "../../components/Disclosure.astro";
 import DownloadCard from "../../components/DownloadCard.astro";
 import RelatedPosts from "../../components/RelatedPosts.astro";
-import CtaFooter from "../../components/CtaFooter.astro"; // ← randomizes cozy Ko‑fi text
+import CtaFooter from "../../components/CtaFooter.astro";
 import { readEntity } from "../../utils/entities";
 
 import fs from "node:fs";
 import path from "node:path";
-import matter from "gray-matter";
 import { marked } from "marked";
 
-// NEW: auto affiliate helper
 import { autoLinkAffiliates } from "../../../tools/src/auto-affiliate";
+import { readSettings, getSiteOrigin, toAbsoluteUrl } from "../../utils/settings";
+import { loadAllPosts, estimateReadingMinutes, firstParagraph } from "../../utils/posts";
 
 export const prerender = true;
 
@@ -22,33 +22,25 @@ type PostData = Record<string, any>;
 type PrevNext = { slug: string; title: string } | null;
 
 export async function getStaticPaths() {
-  const dir = "./content/posts";
-  if (!fs.existsSync(dir)) return [];
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".md"));
+  const posts = loadAllPosts();
 
-  const parsed = files.map((file) => {
-    const full = path.join(dir, file);
-    const raw = fs.readFileSync(full, "utf8");
-    const { data, content } = matter(raw);
-    const slug = (data?.slug ? String(data.slug) : file.replace(/\.md$/, "")).toLowerCase();
+  return posts.map((post, index) => {
+    const prev = posts[index - 1]
+      ? { slug: posts[index - 1].slug, title: posts[index - 1].title }
+      : null;
+    const next = posts[index + 1]
+      ? { slug: posts[index + 1].slug, title: posts[index + 1].title }
+      : null;
 
-    const frontDates = [data?.publishedAt, data?.pubDate, data?.date, data?.updatedAt].filter(Boolean) as string[];
-    let date = new Date(frontDates[0] || 0);
-    if (isNaN(+date)) date = fs.statSync(full).mtime;
-
-    return { slug, title: String(data?.title || "Untitled"), date, data, content };
-  });
-
-  parsed.sort((a, b) => +b.date - +a.date);
-  const indexBySlug = new Map(parsed.map((p, i) => [p.slug, i]));
-
-  return parsed.map((p) => {
-    const i = indexBySlug.get(p.slug)!;
-    const prev = parsed[i - 1] ? { slug: parsed[i - 1].slug, title: parsed[i - 1].title } : null;
-    const next = parsed[i + 1] ? { slug: parsed[i + 1].slug, title: parsed[i + 1].title } : null;
     return {
-      params: { slug: p.slug },
-      props: { data: p.data, content: p.content, effectiveSlug: p.slug, prev, next },
+      params: { slug: post.slug },
+      props: {
+        data: post.data,
+        content: post.content,
+        effectiveSlug: post.slug,
+        prev,
+        next,
+      },
     };
   });
 }
@@ -61,47 +53,39 @@ const {
   next = null as PrevNext,
 } = Astro.props;
 
-// Settings (fallbacks ok)
-let settings: any = { brandName: "WitchClick", siteUrl: "https://example.com" };
-try {
-  const s = fs.readFileSync("./content/settings.json", "utf8");
-  settings = { ...settings, ...JSON.parse(s) };
-} catch {}
-
-const siteOrigin = String(settings.siteUrl || "https://example.com").replace(/\/$/, "");
+const settings = readSettings();
+const siteOrigin = getSiteOrigin(settings) || "https://example.com";
 const title = data.title ?? "Untitled";
 const description =
-  data.metaDescription ?? data.description ?? data.excerpt ?? firstSentence(content) ?? "";
+  data.metaDescription ?? data.description ?? data.excerpt ?? firstParagraph(content);
 
-const publishedAt = data.publishedAt || data.pubDate || data.date || undefined;
-const modifiedAt = data.updatedAt || publishedAt || undefined;
+const publishedAt = data.publishedAt ?? data.pubDate ?? data.date ?? undefined;
+const modifiedAt = data.updatedAt ?? publishedAt ?? undefined;
 const canonical = `${siteOrigin}/post/${effectiveSlug}`;
 
-const readingMinutes =
-  data.readingMinutes ?? Math.max(1, Math.ceil(wordCount(content) / 200));
+const readingMinutes = data.readingMinutes ?? estimateReadingMinutes(content);
 
 const htmlRaw = marked.parse(content || "");
 const htmlSafe = stripInlineHandlers(stripScripts(String(htmlRaw)));
 let html = String(htmlSafe);
 
-// Load products (either {products: []} or [] shape)
 const productsFilePath = "./content/products.json";
 const productsDoc = fs.existsSync(productsFilePath)
   ? JSON.parse(fs.readFileSync(productsFilePath, "utf8"))
   : { products: [] };
-const allProducts = Array.isArray(productsDoc) ? productsDoc : (productsDoc.products || []);
+const allProducts = Array.isArray(productsDoc) ? productsDoc : productsDoc.products || [];
 
-// OG candidate image
 const ogCandidate = path.join(process.cwd(), "public", "og", `${effectiveSlug}.jpg`);
-const ogImage = fs.existsSync(ogCandidate) ? `${siteOrigin}/og/${effectiveSlug}.jpg` : "";
+const ogImage = data.ogImage
+  ? toAbsoluteUrl(data.ogImage, settings)
+  : fs.existsSync(ogCandidate)
+    ? `${siteOrigin}/og/${effectiveSlug}.jpg`
+    : "";
 
-// Start with manual frontmatter anchors if present
 let hasAffiliates = false;
 
 const frontAnchors = Array.isArray(data.affiliateAnchors) ? data.affiliateAnchors : [];
 if (frontAnchors.length > 0) {
-  // Use the shared linker pipeline via autoLinkAffiliates but freeze to declared anchors by
-  // temporarily mapping products to only those keys/texts.
   const declared = frontAnchors
     .map((a: any) => ({ key: String(a.key || ""), text: String(a.text || "") }))
     .filter((a: any) => a.key && a.text);
@@ -109,22 +93,20 @@ if (frontAnchors.length > 0) {
   for (const d of declared) {
     const prod = allProducts.find((p: any) => String(p.key) === d.key);
     if (!prod || !prod.url) continue;
-    const { html: next, count } = autoLinkAffiliates(html, [{ ...prod }], { maxLinksPerPost: 1 });
-    if (count > 0 && next !== html) {
-      html = next;
+    const { html: nextHtml, count } = autoLinkAffiliates(html, [{ ...prod }], { maxLinksPerPost: 1 });
+    if (count > 0 && nextHtml !== html) {
+      html = nextHtml;
       hasAffiliates = true;
     }
   }
 } else {
-  // AUTO MODE: derive anchors from product names/tags and link up to 3 total
-  const { html: next, count } = autoLinkAffiliates(html, allProducts, { maxLinksPerPost: 3 });
+  const { html: nextHtml, count } = autoLinkAffiliates(html, allProducts, { maxLinksPerPost: 3 });
   if (count > 0) {
-    html = next;
+    html = nextHtml;
     hasAffiliates = true;
   }
 }
 
-// ==== Entities referenced (from post frontmatter) ====
 const entList = Array.isArray(data.entities) ? data.entities : [];
 const resolvedEntities = entList
   .map((e: any) => readEntity(String(e.type || ""), String(e.slug || "")))
@@ -142,25 +124,6 @@ const jsonLd = {
   author: { "@type": "Organization", name: settings.brandName || "WitchClick" },
   publisher: { "@type": "Organization", name: settings.brandName || "WitchClick" },
 };
-
-function wordCount(md: string): number {
-  return md
-    .replace(/```[\s\S]*?```/g, " ")
-    .replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1")
-    .replace(/[#$>*_`~\-]+/g, " ")
-    .split(/\s+/)
-    .filter(Boolean).length;
-}
-
-function firstSentence(md: string): string | null {
-  const asText = md
-    .replace(/```[\s\S]*?```/g, " ")
-    .replace(/[#$>*_`~\-]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-  const m = asText.match(/^(.{40,200}?[.!?])\s/);
-  return m ? m[1] : null;
-}
 
 function stripScripts(html: string) {
   return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
@@ -184,81 +147,81 @@ function stripInlineHandlers(html: string) {
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </Fragment>
 
-  <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
-    <article class="prose prose-neutral max-w-none lg:col-span-8">
-      <h1 class="mb-2">{title}</h1>
-      <p class="mt-0 mb-4 text-sm text-gray-600">
-        {publishedAt && (
-          <time datetime={new Date(publishedAt).toISOString()}>
-            {new Date(publishedAt).toLocaleDateString(undefined, {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })}
-          </time>
-        )}
-        {(publishedAt || readingMinutes) && <span> · </span>}
-        {readingMinutes && <span>{readingMinutes} min read</span>}
-      </p>
-
-      <Disclosure show={hasAffiliates || !!data.includeAds} />
-
-      <div set:html={html} />
-
-      {data.downloadId && <DownloadCard id={data.downloadId} />}
-
-      {resolvedEntities.length > 0 ? (
-        <aside class="mt-8 border-t border-purple-100/60 pt-6">
-          <h2 class="text-lg font-semibold mb-2">Entities referenced</h2>
-          <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {resolvedEntities.map((e: any) => (
-              <li>
-                <a class="underline underline-offset-4 hover:no-underline" href={`/entities/${e.type}/${e.slug}`}>
-                  {e.name}
-                </a>
-              </li>
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)]">
+    <section class="glass-panel space-y-8">
+      <header class="not-prose border-b border-purple-100/60 pb-6">
+        <p class="eyebrow text-purple-400/90">Guide</p>
+        <h1 class="mt-3 text-4xl font-semibold text-purple-900">{title}</h1>
+        <div class="mt-4 flex flex-wrap items-center gap-3 text-sm text-purple-700/80">
+          {publishedAt && (
+            <time datetime={new Date(publishedAt).toISOString()} class="inline-flex items-center gap-2">
+              <span class="h-1.5 w-1.5 rounded-full bg-purple-400"></span>
+              {new Date(publishedAt).toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </time>
+          )}
+          {readingMinutes && (
+            <span class="inline-flex items-center gap-2">
+              <span class="h-1.5 w-1.5 rounded-full bg-purple-400"></span>
+              {readingMinutes} minute read
+            </span>
+          )}
+        </div>
+        {Array.isArray(data.tags) && data.tags.length > 0 && (
+          <div class="mt-4 flex flex-wrap gap-2">
+            {data.tags.map((tag: any) => (
+              <span class="tag-pill">#{String(tag).toLowerCase()}</span>
             ))}
-          </ul>
-        </aside>
-      ) : null}
+          </div>
+        )}
+      </header>
 
-      {data.includeAds && <AdSlot slot="end" class="mt-8" />}
+      <div class="prose max-w-none" set:html={html} />
 
-      {(prev || next) && (
-        <nav class="mt-10 border-t border-purple-100/60 pt-6 text-sm" aria-label="Post navigation">
-          <ul class="flex flex-col gap-2 sm:flex-row sm:justify-between">
-            <li>
-              {prev && (
-                <a class="underline underline-offset-4 hover:no-underline" href={`/post/${prev.slug}`}>
-                  ← {prev.title}
-                </a>
-              )}
-            </li>
-            <li class="text-right">
-              {next && (
-                <a class="underline underline-offset-4 hover:no-underline" href={`/post/${next.slug}`}>
-                  {next.title} →
-                </a>
-              )}
-            </li>
-          </ul>
-        </nav>
+      {hasAffiliates && (
+        <div class="not-prose">
+          <Disclosure />
+        </div>
       )}
 
-      <RelatedPosts currentSlug={effectiveSlug} tags={data.tags || []} />
-
-      {/* Ko‑fi CTA randomizer (build‑time pick) */}
-      <div class="mt-10">
-        <CtaFooter type={data.includeKofi ? 'kofi' : 'none'} />
-      </div>
-    </article>
-
-    {data.includeAds && (
-      <aside class="hidden lg:block lg:col-span-4">
-        <div class="sticky top-24">
-          <AdSlot slot="side" />
+      {Array.isArray(data.downloadId) ? null : data.downloadId ? (
+        <div class="not-prose">
+          <DownloadCard slug={String(data.downloadId)} />
         </div>
-      </aside>
-    )}
+      ) : null}
+
+      <div class="not-prose">
+        <AdSlot slot="end" class="mt-6" />
+      </div>
+    </section>
+
+    <aside class="lg:pl-2">
+      <div class="sticky top-24 space-y-6">
+        <AdSlot slot="side" />
+        <div class="surface-card">
+          <CtaFooter />
+        </div>
+        {resolvedEntities.length > 0 && (
+          <section class="surface-card">
+            <h2 class="text-sm font-semibold uppercase tracking-[0.3em] text-purple-500">Referenced entities</h2>
+            <ul class="mt-4 space-y-3 text-sm text-purple-800">
+              {resolvedEntities.map((entity: any) => (
+                <li>
+                  <a class="font-medium text-purple-700 underline-offset-4 transition hover:text-purple-900 hover:underline" href={entity.href}>
+                    {entity.name}
+                  </a>
+                  {entity.description && <p class="mt-1 text-xs text-purple-600">{entity.description}</p>}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+    </aside>
   </div>
+
+  <RelatedPosts currentSlug={effectiveSlug} tags={data.tags || []} prev={prev} next={next} />
 </Base>

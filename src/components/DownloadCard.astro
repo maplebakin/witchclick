@@ -20,31 +20,49 @@ const href = hasExternal ? data.url : (data.file || '#');
 const target = hasExternal ? '_blank' : undefined;
 const rel = hasExternal ? 'noopener' : undefined;
 ---
-<aside class="my-8 rounded-2xl border border-purple-200 bg-purple-50 p-4">
-  <div class="flex gap-4">
-    {data.cover && <img src={data.cover} alt={`${data.name} cover`} class="h-24 w-24 rounded-lg object-cover" loading="lazy" />}
-    <div class="min-w-0">
-      <h3 class="m-0 text-lg font-semibold">{data.name}</h3>
-      {data.summary && <p class="mt-1 mb-2 text-sm text-purple-900">{data.summary}</p>}
+<aside class="surface-card">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+    {data.cover && (
+      <img
+        src={data.cover}
+        alt={`${data.name} cover`}
+        class="h-24 w-24 flex-none rounded-xl object-cover shadow-sm"
+        loading="lazy"
+      />
+    )}
+    <div class="min-w-0 space-y-3">
+      <div>
+        <p class="eyebrow text-purple-400/90">Companion download</p>
+        <h3 class="text-lg font-semibold text-purple-900">{data.name}</h3>
+      </div>
+      {data.summary && <p class="text-sm leading-relaxed text-purple-700/90">{data.summary}</p>}
       {Array.isArray(data.features) && data.features.length > 0 && (
-        <ul class="mb-3 list-disc pl-5 text-sm">
-          {data.features.slice(0,3).map((f:string)=><li>{f}</li>)}
+        <ul class="list-disc space-y-1 pl-5 text-sm text-purple-700/90">
+          {data.features.slice(0, 3).map((f: string) => (
+            <li>{f}</li>
+          ))}
         </ul>
       )}
-      <div class="flex items-center gap-3">
-        {(data.price && data.currency) ? (
-          <span class="rounded bg-white px-2 py-1 text-sm font-medium text-purple-900">
-            {new Intl.NumberFormat(undefined, { style:'currency', currency:data.currency }).format(parseFloat(data.price))}
-          </span>
-        ) : (
-          <span class="rounded bg-white px-2 py-1 text-sm font-medium text-purple-900">Free</span>
-        )}
-        <a href={href} target={target} rel={rel}
-           class="rounded-lg bg-purple-700 px-3 py-2 text-sm font-medium text-white hover:bg-purple-800"
-           data-analytics="download_click" data-analytics-meta={data.id}>
+      <div class="flex flex-wrap items-center gap-3 text-sm">
+        <span class="rounded-full border border-purple-200/70 bg-white/90 px-3 py-1 font-medium text-purple-700">
+          {(data.price && data.currency)
+            ? new Intl.NumberFormat(undefined, { style: 'currency', currency: data.currency }).format(parseFloat(data.price))
+            : 'Free'}
+        </span>
+        <a
+          href={href}
+          target={target}
+          rel={rel}
+          class="inline-flex items-center gap-2 rounded-full bg-purple-700 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-purple-300/40 transition hover:-translate-y-0.5 hover:bg-purple-800"
+          data-analytics="download_click"
+          data-analytics-meta={data.id}
+        >
           {hasExternal ? 'Buy now' : 'Download'}
+          <span aria-hidden="true">→</span>
         </a>
-        <a href={`/downloads/${data.slug}`} class="text-sm underline text-purple-700">Details</a>
+        <a href={`/downloads/${data.slug}`} class="text-sm font-medium text-purple-700 underline-offset-4 transition hover:text-purple-900 hover:underline">
+          Details
+        </a>
       </div>
     </div>
   </div>
