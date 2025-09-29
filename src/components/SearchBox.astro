@@ -67,6 +67,51 @@ const resultsId = `${uid}-results`;
   let data = [];
   let loaded = false;
 
+  const MAX_VISIBLE_RESULTS = 8;
+
+  /** @type {SearchEntry[]} */
+  let visibleItems = [];
+  let activeIndex = -1;
+
+  /**
+   * @param {string} slug
+   */
+  function resolveHref(slug){
+    if (typeof slug !== 'string') return '/';
+    const normalized = slug.trim();
+    if (!normalized) return '/';
+    return normalized.startsWith('/') ? normalized : `/post/${normalized.replace(/^\/+/, '')}`;
+  }
+
+  function hideResults(){
+    visibleItems = [];
+    activeIndex = -1;
+    results.classList.add('hidden');
+    results.innerHTML = '';
+    input.setAttribute('aria-expanded', 'false');
+    input.removeAttribute('aria-activedescendant');
+  }
+
+  function syncActiveOption(){
+    const options = results.querySelectorAll('[data-result-option]');
+    if (!options.length || activeIndex < 0){
+      input.removeAttribute('aria-activedescendant');
+    }
+
+    options.forEach((option, index) => {
+      const isActive = index === activeIndex && activeIndex >= 0;
+      option.setAttribute('data-active', String(isActive));
+      option.setAttribute('aria-selected', String(isActive));
+      if (isActive){
+        const optionId = option.getAttribute('id');
+        if (optionId){
+          input.setAttribute('aria-activedescendant', optionId);
+        }
+        option.scrollIntoView({ block: 'nearest' });
+      }
+    });
+  }
+
   async function ensure(){
     if (loaded) return;
     try {
@@ -89,25 +134,37 @@ const resultsId = `${uid}-results`;
    * @param {SearchEntry[]} items
    */
   function render(items){
-    if (!items.length){
-      results.classList.add('hidden');
-      results.innerHTML = '';
-      input.setAttribute('aria-expanded', 'false');
+    visibleItems = items.slice(0, MAX_VISIBLE_RESULTS);
+
+    if (!visibleItems.length){
+      hideResults();
       return;
     }
 
+    activeIndex = 0;
+
     input.setAttribute('aria-expanded', 'true');
     results.classList.remove('hidden');
-    results.innerHTML = items.slice(0,8).map(item => `
+    results.innerHTML = visibleItems
+      .map((item, index) => `
       <a
-        class="group block rounded-2xl px-4 py-3 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-300 hover:bg-purple-50/80"
-        href="/post/${escapeHtml(item.slug)}"
+        class="group block rounded-2xl px-4 py-3 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-300 hover:bg-purple-50/80 data-[active=true]:bg-purple-50/80 data-[active=true]:ring-1 data-[active=true]:ring-purple-200/80"
+        href="${escapeHtml(resolveHref(item.slug))}"
         role="option"
+        data-result-option
+        data-index="${index}"
+        data-active="${index === activeIndex}"
+        aria-selected="${index === activeIndex}"
+        tabindex="-1"
+        id="${resultsId}-option-${index}"
       >
         <div class="text-sm font-semibold text-purple-900 group-hover:text-purple-900">${escapeHtml(item.title)}</div>
         ${item.excerpt ? `<div class=\"mt-1 text-xs text-purple-600/90 line-clamp-2\">${escapeHtml(item.excerpt)}</div>` : ''}
       </a>
-    `).join('');
+    `)
+      .join('');
+
+    syncActiveOption();
   }
 
   async function handleSearch(){
@@ -129,6 +186,7 @@ const resultsId = `${uid}-results`;
     render(items);
   }
 
+  /** @type {ReturnType<typeof setTimeout> | undefined} */
   let timerId;
 
   input.addEventListener('input', () => {
@@ -148,8 +206,7 @@ const resultsId = `${uid}-results`;
     const target = event.target;
     const withinResults = target instanceof Node && results.contains(target);
     if (!withinResults && target !== input) {
-      results.classList.add('hidden');
-      input.setAttribute('aria-expanded', 'false');
+      hideResults();
     }
   });
 
@@ -164,9 +221,48 @@ const resultsId = `${uid}-results`;
     }
 
     if (event.key === 'Escape') {
-      results.classList.add('hidden');
-      input.setAttribute('aria-expanded', 'false');
+      hideResults();
       input.blur();
+    }
+  });
+
+  input.addEventListener('keydown', (event) => {
+    if (!visibleItems.length) return;
+
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      const delta = event.key === 'ArrowDown' ? 1 : -1;
+      activeIndex = (activeIndex + delta + visibleItems.length) % visibleItems.length;
+      syncActiveOption();
+      return;
+    }
+
+    if (event.key === 'Enter' && activeIndex >= 0) {
+      event.preventDefault();
+      const target = resolveHref(visibleItems[activeIndex].slug);
+      window.location.href = target;
+    }
+  });
+
+  results.addEventListener('mouseover', (event) => {
+    const target = event.target instanceof Element ? event.target.closest('[data-result-option]') : null;
+    if (!target) return;
+    const indexAttr = target.getAttribute('data-index');
+    const index = Number(indexAttr);
+    if (Number.isInteger(index) && index !== activeIndex) {
+      activeIndex = index;
+      syncActiveOption();
+    }
+  });
+
+  results.addEventListener('focusin', (event) => {
+    const target = event.target instanceof Element ? event.target.closest('[data-result-option]') : null;
+    if (!target) return;
+    const indexAttr = target.getAttribute('data-index');
+    const index = Number(indexAttr);
+    if (Number.isInteger(index) && index !== activeIndex) {
+      activeIndex = index;
+      syncActiveOption();
     }
   });
 })();
