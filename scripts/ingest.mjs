@@ -41,35 +41,44 @@ async function main() {
     die("Usage: node scripts/ingest.mjs <spec.json> [--dry] [--dir <outDir>]");
   }
   const raw = await fs.readFile(opts.input, "utf8");
-  let spec;
+  let parsed;
   try {
-    spec = JSON.parse(raw);
+    parsed = JSON.parse(raw);
   } catch (e) {
     die(`Could not parse JSON: ${e?.message || e}`);
   }
 
-  // Normalize / defaults
-  const title = str(spec.title) || "Untitled";
-  const slug = (str(spec.slug) || slugify(title)).toLowerCase();
-  const description = str(spec.description) || "";
-  const tags = Array.isArray(spec.tags) ? spec.tags.map(String) : [];
-  const draft = !!spec.draft;
-  const pubDate = iso(spec.pubDate) || new Date().toISOString();
-  const updatedAt = iso(spec.updatedAt);
-  const canonical = urlish(spec.canonical);
-  const ogImage = str(spec.ogImage);
-  const includeAds = !!spec.includeAds;
-  const includeKofi = !!spec.includeKofi;
-  const downloadId = str(spec.downloadId);
+  const { value: spec, errors } = validateSpec(parsed);
+  if (errors.length > 0) {
+    console.error("Spec validation failed:");
+    for (const err of errors) {
+      console.error(` • ${err}`);
+    }
+    process.exit(1);
+  }
 
-  const affiliateAnchors = Array.isArray(spec.affiliateAnchors) ? spec.affiliateAnchors : [];
-  const internalLinks = Array.isArray(spec.internalLinks) ? spec.internalLinks : [];
-  const entities = Array.isArray(spec.entities) ? spec.entities : [];
+  // Normalize / defaults using validated data
+  const title = spec.title || "Untitled";
+  const slug = (spec.slug || slugify(title)).toLowerCase();
+  const description = spec.description || "";
+  const tags = spec.tags ?? [];
+  const draft = spec.draft ?? false;
+  const pubDate = spec.pubDate || new Date().toISOString();
+  const updatedAt = spec.updatedAt;
+  const canonical = spec.canonical;
+  const ogImage = spec.ogImage;
+  const includeAds = spec.includeAds ?? false;
+  const includeKofi = spec.includeKofi ?? false;
+  const downloadId = spec.downloadId;
 
-  const body = str(spec.body) ?? "";
+  const affiliateAnchors = spec.affiliateAnchors ?? [];
+  const internalLinks = spec.internalLinks ?? [];
+  const entities = spec.entities ?? [];
+
+  const body = spec.body ?? "";
 
   // Compute reading minutes if not provided
-  const readingMinutes = num(spec.readingMinutes) || Math.max(1, Math.ceil(wordCount(body) / 200));
+  const readingMinutes = spec.readingMinutes ?? Math.max(1, Math.ceil(wordCount(body) / 200));
 
   // Where to write?
   const defaultDir = await pickOutDir(opts.dir);
@@ -182,10 +191,234 @@ function wordCount(md) {
     .split(/\s+/)
     .filter(Boolean).length;
 }
-function str(x) { return typeof x === "string" ? x : undefined; }
-function num(x) { return typeof x === "number" && isFinite(x) ? x : undefined; }
-function iso(x) { if (!x) return undefined; const d = new Date(x); return isNaN(+d) ? undefined : d.toISOString(); }
-function urlish(x) { if (!x) return undefined; return String(x); }
 function rel(p) { return path.relative(ROOT, p); }
 function bytes(n) { return `${n} bytes`; }
 function die(msg) { console.error(msg); process.exit(1); }
+
+function validateSpec(input) {
+  const errors = [];
+  const value = {};
+
+  const title = optionalNonEmptyString(input.title, "title", errors, { allowEmpty: false, optional: true });
+  if (title) value.title = title;
+
+  const slugRaw = optionalNonEmptyString(input.slug, "slug", errors, { allowEmpty: false, optional: true });
+  if (slugRaw) {
+    if (!isValidSlug(slugRaw)) {
+      errors.push("slug must contain only lowercase letters, numbers, or hyphen separators");
+    } else {
+      value.slug = slugRaw.toLowerCase();
+    }
+  }
+
+  const description = optionalNonEmptyString(input.description, "description", errors, { optional: true, allowEmpty: true });
+  if (description !== undefined) value.description = description;
+
+  const canonical = optionalNonEmptyString(input.canonical, "canonical", errors, { optional: true });
+  if (canonical) {
+    if (!looksLikeUrl(canonical)) {
+      errors.push("canonical must be an absolute URL or start with '/'");
+    } else {
+      value.canonical = canonical;
+    }
+  }
+
+  const ogImage = optionalNonEmptyString(input.ogImage, "ogImage", errors, { optional: true });
+  if (ogImage) value.ogImage = ogImage;
+
+  const downloadId = optionalNonEmptyString(input.downloadId, "downloadId", errors, { optional: true });
+  if (downloadId) value.downloadId = downloadId;
+
+  value.tags = normalizeStringArray(input.tags, "tags", errors);
+
+  const draft = optionalBoolean(input.draft, "draft", errors);
+  if (draft !== undefined) value.draft = draft;
+
+  const includeAds = optionalBoolean(input.includeAds, "includeAds", errors);
+  if (includeAds !== undefined) value.includeAds = includeAds;
+
+  const includeKofi = optionalBoolean(input.includeKofi, "includeKofi", errors);
+  if (includeKofi !== undefined) value.includeKofi = includeKofi;
+
+  const pubDate = optionalIsoDate(input.pubDate, "pubDate", errors);
+  if (pubDate) value.pubDate = pubDate;
+
+  const updatedAt = optionalIsoDate(input.updatedAt, "updatedAt", errors);
+  if (updatedAt) value.updatedAt = updatedAt;
+
+  const readingMinutes = optionalPositiveInteger(input.readingMinutes, "readingMinutes", errors);
+  if (readingMinutes !== undefined) value.readingMinutes = readingMinutes;
+
+  value.affiliateAnchors = normalizeAnchorArray(input.affiliateAnchors, "affiliateAnchors", errors);
+  value.internalLinks = normalizeInternalLinks(input.internalLinks, errors);
+  value.entities = normalizeEntities(input.entities, errors);
+
+  const body = readBody(input.body, errors);
+  if (body) value.body = body;
+
+  if (!value.title && !value.slug) {
+    errors.push("Provide at least a title or slug");
+  }
+
+  return { value, errors };
+}
+
+function optionalNonEmptyString(value, field, errors, { optional = false, allowEmpty = false } = {}) {
+  if (value === undefined || value === null) {
+    if (optional) return undefined;
+    errors.push(`${field} is required`);
+    return undefined;
+  }
+  if (typeof value !== "string") {
+    errors.push(`${field} must be a string`);
+    return undefined;
+  }
+  const trimmed = value.trim();
+  if (!allowEmpty && trimmed.length === 0) {
+    errors.push(`${field} cannot be empty`);
+    return undefined;
+  }
+  return allowEmpty ? value : trimmed;
+}
+
+function optionalBoolean(value, field, errors) {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== "boolean") {
+    errors.push(`${field} must be a boolean`);
+    return undefined;
+  }
+  return value;
+}
+
+function optionalIsoDate(value, field, errors) {
+  if (value === undefined || value === null || value === "") return undefined;
+  const date = new Date(value);
+  if (Number.isNaN(+date)) {
+    errors.push(`${field} must be a valid date`);
+    return undefined;
+  }
+  return date.toISOString();
+}
+
+function optionalPositiveInteger(value, field, errors) {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
+    errors.push(`${field} must be a positive number`);
+    return undefined;
+  }
+  return Math.round(value);
+}
+
+function normalizeStringArray(value, field, errors) {
+  if (value === undefined || value === null) return [];
+  if (!Array.isArray(value)) {
+    errors.push(`${field} must be an array of strings`);
+    return [];
+  }
+  const out = [];
+  value.forEach((item, index) => {
+    if (typeof item !== "string") {
+      errors.push(`${field}[${index}] must be a string`);
+      return;
+    }
+    const trimmed = item.trim();
+    if (!trimmed) {
+      errors.push(`${field}[${index}] cannot be empty`);
+      return;
+    }
+    out.push(trimmed);
+  });
+  return out;
+}
+
+function normalizeAnchorArray(value, field, errors) {
+  if (value === undefined || value === null) return [];
+  if (!Array.isArray(value)) {
+    errors.push(`${field} must be an array`);
+    return [];
+  }
+  const out = [];
+  value.forEach((item, index) => {
+    if (!item || typeof item !== "object") {
+      errors.push(`${field}[${index}] must be an object with key and text`);
+      return;
+    }
+    const key = optionalNonEmptyString(item.key, `${field}[${index}].key`, errors);
+    const text = optionalNonEmptyString(item.text, `${field}[${index}].text`, errors);
+    if (key && text) {
+      out.push({ key, text });
+    }
+  });
+  return out;
+}
+
+function normalizeInternalLinks(value, errors) {
+  if (value === undefined || value === null) return [];
+  if (!Array.isArray(value)) {
+    errors.push("internalLinks must be an array");
+    return [];
+  }
+  const out = [];
+  value.forEach((item, index) => {
+    if (!item || typeof item !== "object") {
+      errors.push(`internalLinks[${index}] must be an object`);
+      return;
+    }
+    const slug = optionalNonEmptyString(item.slug, `internalLinks[${index}].slug`, errors);
+    const anchor = optionalNonEmptyString(item.anchor, `internalLinks[${index}].anchor`, errors);
+    if (slug && anchor) {
+      out.push({ slug: slug.toLowerCase(), anchor });
+    }
+  });
+  return out;
+}
+
+function normalizeEntities(value, errors) {
+  if (value === undefined || value === null) return [];
+  if (!Array.isArray(value)) {
+    errors.push("entities must be an array");
+    return [];
+  }
+  const out = [];
+  value.forEach((item, index) => {
+    if (!item || typeof item !== "object") {
+      errors.push(`entities[${index}] must be an object`);
+      return;
+    }
+    const type = optionalNonEmptyString(item.type, `entities[${index}].type`, errors);
+    const slug = optionalNonEmptyString(item.slug, `entities[${index}].slug`, errors);
+    if (type && slug) {
+      out.push({ type, slug: slug.toLowerCase() });
+    }
+  });
+  return out;
+}
+
+function readBody(value, errors) {
+  if (value === undefined || value === null) {
+    errors.push("body is required");
+    return "";
+  }
+  if (typeof value !== "string") {
+    errors.push("body must be a string");
+    return "";
+  }
+  if (!value.trim()) {
+    errors.push("body cannot be empty");
+    return "";
+  }
+  return value;
+}
+
+function looksLikeUrl(value) {
+  try {
+    new URL(value);
+    return true;
+  } catch (err) {
+    return value.startsWith("/");
+  }
+}
+
+function isValidSlug(value) {
+  return /^[a-z0-9]+(?:[a-z0-9-]*[a-z0-9])?$/i.test(value);
+}
