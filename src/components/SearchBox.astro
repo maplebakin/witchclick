@@ -42,6 +42,7 @@ const resultsId = `${uid}-results`;
     id={resultsId}
     class="absolute left-0 right-0 z-50 mt-3 hidden overflow-hidden rounded-3xl border border-purple-200/70 bg-white/95 p-2 shadow-2xl shadow-purple-200/60 backdrop-blur"
     role="listbox"
+    aria-live="polite"
     data-results
   ></div>
 </div>
@@ -57,11 +58,16 @@ const resultsId = `${uid}-results`;
 
   let data = [];
   let loaded = false;
+  let visibleItems = [];
+  let activeIndex = -1;
 
   async function ensure(){
     if (loaded) return;
     try {
       const r = await fetch('/search.json', { cache: 'no-store' });
+      if (!r.ok) {
+        throw new Error(`Request failed with status ${r.status}`);
+      }
       data = await r.json();
       loaded = true;
     } catch (error) {
@@ -75,32 +81,85 @@ const resultsId = `${uid}-results`;
     return String(value).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
-  function render(items){
-    if (!items.length){
-      results.classList.add('hidden');
-      results.innerHTML = '';
-      input.setAttribute('aria-expanded', 'false');
+  function hideResults(){
+    visibleItems = [];
+    activeIndex = -1;
+    results.classList.add('hidden');
+    results.innerHTML = '';
+    input.setAttribute('aria-expanded', 'false');
+    input.removeAttribute('aria-activedescendant');
+  }
+
+  function updateActive(){
+    const options = results.querySelectorAll('[data-index]');
+    if (!options.length) {
+      input.removeAttribute('aria-activedescendant');
+      return;
+    }
+
+    options.forEach((option, index) => {
+      const isActive = index === activeIndex;
+      option.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      option.classList.toggle('search-option-active', isActive);
+      if (isActive) {
+        const id = option.getAttribute('id');
+        if (id) {
+          input.setAttribute('aria-activedescendant', id);
+        }
+        if ('scrollIntoView' in option) {
+          option.scrollIntoView({ block: 'nearest' });
+        }
+      }
+    });
+
+    if (activeIndex === -1) {
+      input.removeAttribute('aria-activedescendant');
+    }
+  }
+
+  function render(items, query){
+    visibleItems = items.slice(0,8);
+
+    if (!visibleItems.length){
+      activeIndex = -1;
+      input.removeAttribute('aria-activedescendant');
+      input.setAttribute('aria-expanded', 'true');
+      results.classList.remove('hidden');
+      results.innerHTML = `
+        <div class="search-option-empty" role="status">
+          No matches for “${escapeHtml(query)}” yet. Try another keyword.
+        </div>
+      `;
       return;
     }
 
     input.setAttribute('aria-expanded', 'true');
     results.classList.remove('hidden');
-    results.innerHTML = items.slice(0,8).map(item => `
-      <a
-        class="group block rounded-2xl px-4 py-3 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-300 hover:bg-purple-50/80"
-        href="/post/${escapeHtml(item.slug)}"
-        role="option"
-      >
-        <div class="text-sm font-semibold text-purple-900 group-hover:text-purple-900">${escapeHtml(item.title)}</div>
-        ${item.excerpt ? `<div class=\"mt-1 text-xs text-purple-600/90 line-clamp-2\">${escapeHtml(item.excerpt)}</div>` : ''}
-      </a>
-    `).join('');
+    results.innerHTML = visibleItems.map((item, index) => {
+      const optionId = `${resultsId}-option-${index}`;
+      return `
+        <a
+          id="${optionId}"
+          data-index="${index}"
+          class="search-option group"
+          href="/post/${escapeHtml(item.slug)}"
+          role="option"
+          aria-selected="false"
+        >
+          <div class="text-sm font-semibold text-purple-900 group-hover:text-purple-900">${escapeHtml(item.title)}</div>
+          ${item.excerpt ? `<div class=\"mt-1 text-xs text-purple-600/90 line-clamp-2\">${escapeHtml(item.excerpt)}</div>` : ''}
+        </a>
+      `;
+    }).join('');
+
+    activeIndex = 0;
+    updateActive();
   }
 
   async function handleSearch(){
     const query = input.value.trim().toLowerCase();
     if (!query){
-      render([]);
+      hideResults();
       return;
     }
 
@@ -113,7 +172,7 @@ const resultsId = `${uid}-results`;
       return hay.includes(query);
     });
 
-    render(items);
+    render(items, query);
   }
 
   let timerId;
@@ -131,12 +190,37 @@ const resultsId = `${uid}-results`;
     }
   });
 
+  input.addEventListener('keydown', async (event) => {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      if (!visibleItems.length) {
+        await handleSearch();
+      }
+
+      if (!visibleItems.length) return;
+
+      event.preventDefault();
+      if (event.key === 'ArrowDown') {
+        activeIndex = (activeIndex + 1) % visibleItems.length;
+      } else {
+        activeIndex = (activeIndex - 1 + visibleItems.length) % visibleItems.length;
+      }
+      updateActive();
+    }
+
+    if (event.key === 'Enter' && visibleItems.length && activeIndex >= 0) {
+      const option = results.querySelector(`[data-index="${activeIndex}"]`);
+      if (option instanceof HTMLAnchorElement) {
+        event.preventDefault();
+        option.click();
+      }
+    }
+  });
+
   document.addEventListener('click', (event) => {
     const target = event.target;
     const withinResults = target instanceof Node && results.contains(target);
     if (!withinResults && target !== input) {
-      results.classList.add('hidden');
-      input.setAttribute('aria-expanded', 'false');
+      hideResults();
     }
   });
 
@@ -151,10 +235,20 @@ const resultsId = `${uid}-results`;
     }
 
     if (event.key === 'Escape') {
-      results.classList.add('hidden');
-      input.setAttribute('aria-expanded', 'false');
+      hideResults();
       input.blur();
     }
+  });
+
+  results.addEventListener('mousemove', (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const option = target.closest('[data-index]');
+    if (!option) return;
+    const index = Number(option.getAttribute('data-index'));
+    if (Number.isNaN(index) || index === activeIndex) return;
+    activeIndex = index;
+    updateActive();
   });
 })();
 </script>

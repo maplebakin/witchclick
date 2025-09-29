@@ -25,6 +25,18 @@
     @apply rounded-2xl border border-purple-200/60 bg-white/80 p-6 shadow-md shadow-purple-200/30 backdrop-blur transition-transform duration-200 ease-out;
   }
 
+  .search-option {
+    @apply block rounded-2xl px-4 py-3 text-left text-purple-800 no-underline transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-300 hover:bg-purple-50/80;
+  }
+
+  .search-option-active {
+    @apply bg-purple-100/80 ring-2 ring-purple-300;
+  }
+
+  .search-option-empty {
+    @apply rounded-2xl border border-purple-200/70 bg-white/80 px-4 py-3 text-sm text-purple-600;
+  }
+
   .tag-pill {
     @apply inline-flex items-center rounded-full border border-purple-200/70 bg-purple-50/80 px-3 py-1 text-xs font-medium tracking-wide text-purple-600;
   }
