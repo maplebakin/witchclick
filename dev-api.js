@@ -16,6 +16,8 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 
+import generatorPresets from './server/lib/generatorPresets.js';
+
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8787;
 const CWD = process.cwd();
 
@@ -236,6 +238,28 @@ function buildGenprompt({ topic, words, ads, kofi }) {
     'GOLDEN JSON EXAMPLE (minimally valid shape — copy the structure, not the content):',
     '{"specVersion":2,"title":"t","slug":"t","metaDescription":"t","tags":["a","b","c","d"],"excerpt":"t","outline":[{"heading":"Opening Reflection","id":"opening-reflection"}],"sections":[{"heading":"Opening Reflection","markdown":"M"}],"entities":[],"heroImagePrompt":null,"altTexts":[],"internalLinkHints":[{"anchor":"a","rationale":"r"}],"affiliateHints":[{"key":"journal","anchor":"a","rationale":"r"}],"cta":{"type":"none"},"adPlacements":[]}'
   ];
+  lines.push('');
+  lines.push('Note: If the model returns relaxed keys (e.g., description, sections[].content), the server will normalize them to PostSpec v2 by default (strict=false). Set strict=true to require exact PostSpec v2.');
+  return lines.join('\n');
+}
+
+function buildPresetPrompt({ preset, topic, strict }) {
+  const lines = [
+    `SYSTEM ROLE: ${preset.system}`,
+    `Goal: ${preset.goal}`,
+    '',
+    `Topic: ${topic}`,
+    ''
+  ];
+
+  if (strict) {
+    lines.push('STRICT JSON CONTRACT:');
+    lines.push(preset.strictOutputContract.join('\n'));
+  } else {
+    lines.push('LOOSE JSON CONTRACT:');
+    lines.push(preset.looseOutputContract.join('\n'));
+  }
+
   return lines.join('\n');
 }
 
@@ -487,13 +511,19 @@ const server = http.createServer(async (req, res) => {
       const words = Number.isFinite(rawWords) ? Math.max(600, Math.min(4000, Math.round(rawWords))) : 1200;
       const ads = String(body.ads || 'off') === 'on' ? 'on' : 'off';
       const kofi = String(body.kofi || 'on') === 'on' ? 'on' : 'off';
-      const prompt = buildGenprompt({ topic, words, ads, kofi });
+      const rawMode = typeof body.mode === 'string' ? body.mode.trim() : '';
+      const modeKey = rawMode.toLowerCase();
+      const strict = body.strict === true || body.strict === 'true';
+      const preset = modeKey ? generatorPresets[modeKey] : undefined;
+      const prompt = preset
+        ? buildPresetPrompt({ preset, topic, strict })
+        : buildGenprompt({ topic, words, ads, kofi });
 
       // loud guard so stale prompts never slip through
-      if (!prompt.includes('opening-reflection') || !prompt.includes('The FIRST outline item must be exactly {"heading":"Opening Reflection","id":"opening-reflection"}')) {
+      if (!preset && (!prompt.includes('opening-reflection') || !prompt.includes('The FIRST outline item must be exactly {"heading":"Opening Reflection","id":"opening-reflection"}'))) {
         return send(res, 500, { ok: false, error: 'Stale prompt detected (missing Opening Reflection guards). Check dev-api.js.' });
       }
-      return send(res, 200, { ok: true, prompt });
+      return send(res, 200, { ok: true, prompt, options: { topic, mode: rawMode || null, strict } });
     }
 
     if (req.method === 'POST' && req.url === '/ingest') {
