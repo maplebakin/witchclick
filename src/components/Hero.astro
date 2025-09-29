@@ -1,0 +1,81 @@
+---
+interface CTAButton {
+  href: string;
+  label: string;
+  variant?: "primary" | "secondary";
+  ariaLabel?: string;
+  rel?: string;
+  target?: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  description: string;
+  backgroundImage?: string;
+  imageAlt?: string;
+  ctaButtons?: CTAButton[];
+}
+
+const {
+  eyebrow = "Fresh from the coven",
+  title,
+  description,
+  backgroundImage,
+  imageAlt = title,
+  ctaButtons = [],
+} = Astro.props as Props;
+
+const hasImage = Boolean(backgroundImage);
+---
+<section
+  class={`flex flex-col gap-8 overflow-hidden rounded-3xl border border-purple-200/70 bg-gradient-to-br from-purple-50 via-white to-amber-50 p-6 shadow-sm sm:p-8 ${
+    hasImage ? "lg:flex-row lg:items-center" : ""
+  }`}
+>
+  <div class="flex-1">
+    {eyebrow && <p class="text-xs uppercase tracking-[0.3em] text-purple-500">{eyebrow}</p>}
+    <h1 class="mt-3 text-3xl font-semibold text-purple-900 sm:text-4xl">{title}</h1>
+    <p class="mt-4 max-w-2xl text-lg text-purple-800/80">{description}</p>
+    {ctaButtons.length > 0 && (
+      <div class="mt-6 flex flex-wrap gap-3">
+        {ctaButtons.map((button) => {
+          const variant = button.variant ?? "primary";
+          const baseClasses =
+            "inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition";
+          const variantClasses =
+            variant === "secondary"
+              ? "border border-purple-300 text-purple-800 hover:border-purple-400 hover:bg-purple-50"
+              : "bg-purple-700 text-white hover:bg-purple-800";
+          return (
+            <a
+              href={button.href}
+              aria-label={button.ariaLabel ?? undefined}
+              target={button.target ?? undefined}
+              rel={button.rel ?? undefined}
+              class={`${baseClasses} ${variantClasses}`}
+            >
+              {button.label}
+              {variant !== "secondary" && <span aria-hidden="true">→</span>}
+            </a>
+          );
+        })}
+      </div>
+    )}
+  </div>
+  {hasImage && backgroundImage && (
+    <div class="flex-1 overflow-hidden rounded-2xl border border-purple-100 bg-white/60 p-2 sm:p-3 lg:max-w-sm">
+      <picture>
+        <source media="(min-width: 1024px)" srcset={backgroundImage} />
+        <source media="(min-width: 640px)" srcset={backgroundImage} />
+        <img
+          src={backgroundImage}
+          alt={imageAlt}
+          loading="lazy"
+          decoding="async"
+          class="h-48 w-full rounded-xl object-cover shadow-inner sm:h-64 lg:h-80"
+        />
+      </picture>
+    </div>
+  )}
+</section>
