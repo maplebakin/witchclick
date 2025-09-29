@@ -17,6 +17,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 
 import generatorPresets from './server/lib/generatorPresets.js';
+import generatorStyles from './server/lib/generatorStyles.js';
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8787;
 const CWD = process.cwd();
@@ -243,14 +244,14 @@ function buildGenprompt({ topic, words, ads, kofi }) {
   return lines.join('\n');
 }
 
-function buildPresetPrompt({ preset, topic, strict }) {
-  const lines = [
-    `SYSTEM ROLE: ${preset.system}`,
-    `Goal: ${preset.goal}`,
-    '',
-    `Topic: ${topic}`,
-    ''
-  ];
+function buildPresetPrompt({ preset, topic, strict, styleDirective }) {
+  const lines = [`SYSTEM ROLE: ${preset.system}`];
+
+  if (styleDirective) {
+    lines.push(`STYLE DIRECTIVE: ${styleDirective}`);
+  }
+
+  lines.push(`Goal: ${preset.goal}`, '', `Topic: ${topic}`, '');
 
   if (strict) {
     lines.push('STRICT JSON CONTRACT:');
@@ -732,17 +733,25 @@ const server = http.createServer(async (req, res) => {
       const kofi = String(body.kofi || 'on') === 'on' ? 'on' : 'off';
       const rawMode = typeof body.mode === 'string' ? body.mode.trim() : '';
       const modeKey = rawMode.toLowerCase();
+      const rawStyle = typeof body.style === 'string' ? body.style.trim() : '';
+      const styleKey = rawStyle.toLowerCase();
+      const styleDirective = generatorStyles[styleKey] || generatorStyles.cozy;
+      const resolvedStyleKey = generatorStyles[styleKey] ? styleKey : 'cozy';
       const strict = body.strict === true || body.strict === 'true';
       const preset = modeKey ? generatorPresets[modeKey] : undefined;
       const prompt = preset
-        ? buildPresetPrompt({ preset, topic, strict })
+        ? buildPresetPrompt({ preset, topic, strict, styleDirective })
         : buildGenprompt({ topic, words, ads, kofi });
 
       // loud guard so stale prompts never slip through
       if (!preset && (!prompt.includes('opening-reflection') || !prompt.includes('The FIRST outline item must be exactly {"heading":"Opening Reflection","id":"opening-reflection"}'))) {
         return send(res, 500, { ok: false, error: 'Stale prompt detected (missing Opening Reflection guards). Check dev-api.js.' });
       }
-      return send(res, 200, { ok: true, prompt, options: { topic, mode: rawMode || null, strict } });
+      return send(res, 200, {
+        ok: true,
+        prompt,
+        options: { topic, mode: rawMode || null, style: resolvedStyleKey, strict }
+      });
     }
 
     if (req.method === 'POST') {
