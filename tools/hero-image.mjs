@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
-import sharp from 'sharp';
+import { fetch } from 'undici';
 
 const argv = process.argv.slice(2);
 const ALL = argv.includes('--all');
@@ -25,6 +25,23 @@ function readDirRecursive(dir){
 const slugFromFile=(fp)=>path.basename(fp).replace(/\.(md|mdx)$/i,'');
 const toTitle=(s)=>{ const t=String(s||'').trim(); return t.length>120?t.slice(0,117)+'…':t; };
 
+let falClientPromise = null;
+let falConfigured = false;
+
+async function loadFalClient(){
+  if (!falClientPromise) {
+    falClientPromise = import('@fal-ai/client')
+      .then((mod) => mod.default ?? mod)
+      .catch((err) => {
+        falClientPromise = null;
+        throw err;
+      });
+  }
+  return falClientPromise;
+}
+
+const FAL_MODEL_ID = 'fal-ai/flux/dev';
+
 function svgTemplate({ title, brand='WitchClick' }){
   const bg1='#f7f4f2', bg2='#efe7eb', accent='#7c6a80';
   const esc=(x)=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -44,11 +61,48 @@ function svgTemplate({ title, brand='WitchClick' }){
 }
 
 async function ensureDir(p){ await fs.promises.mkdir(p,{recursive:true}); }
-async function createHero({ slug, title, brandName }){
-  await ensureDir(OUT_DIR);
+async function fallbackSvg({ slug, title, brandName, outPath }){
   const svg = svgTemplate({ title: toTitle(title), brand: brandName || 'WitchClick' });
-  const outPath = path.join(OUT_DIR, `${slug}.png`);
+  const { default: sharp } = await import('sharp');
   await sharp(Buffer.from(svg,'utf8')).png({ quality: 90 }).toFile(outPath);
+  console.warn(`[hero] Fallback SVG generated for ${slug}`);
+}
+
+async function generateWithFal({ prompt, slug, outPath }){
+  if (!process.env.FAL_KEY) {
+    throw new Error('FAL_KEY is not set');
+  }
+  const normalizedPrompt = String(prompt ?? '').trim();
+  if (!normalizedPrompt) {
+    throw new Error('Prompt is empty');
+  }
+  const fal = await loadFalClient();
+  if (typeof fal.config === 'function' && !falConfigured) {
+    fal.config({ credentials: process.env.FAL_KEY });
+    falConfigured = true;
+  }
+  const result = await fal.run(FAL_MODEL_ID, { input: { prompt: normalizedPrompt } });
+  const firstImage = result?.images?.[0];
+  if (!firstImage?.url) {
+    throw new Error('Fal client did not return an image URL');
+  }
+  const response = await fetch(firstImage.url);
+  if (!response.ok) {
+    throw new Error(`Image download failed with status ${response.status}`);
+  }
+  const arrayBuffer = await response.arrayBuffer();
+  await fs.promises.writeFile(outPath, Buffer.from(arrayBuffer));
+}
+
+async function createHero({ slug, title, brandName, prompt }){
+  await ensureDir(OUT_DIR);
+  const outPath = path.join(OUT_DIR, `${slug}.png`);
+  try {
+    await generateWithFal({ prompt, slug, outPath });
+  } catch (err) {
+    console.warn(`[hero] AI generation failed for ${slug}: ${err.message}`);
+    await fallbackSvg({ slug, title, brandName, outPath });
+  }
   return outPath;
 }
 function loadPost(fp){
@@ -67,7 +121,8 @@ function saveFrontMatter(post, imageRel){
 }
 async function processOne(fp){
   const p = loadPost(fp);
-  await createHero({ slug: p.slug, title: p.title, brandName: 'WitchClick' });
+  const prompt = p.fm.data.heroImagePrompt ?? p.title;
+  await createHero({ slug: p.slug, title: p.title, brandName: 'WitchClick', prompt });
   const rel = `/hero-images/${p.slug}.png`;
   saveFrontMatter(p, rel);
   console.log(`[hero] wrote ${rel} ← ${path.relative(process.cwd(), fp)}`);
