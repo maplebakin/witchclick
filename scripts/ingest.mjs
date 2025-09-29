@@ -27,6 +27,7 @@ export class IngestValidationError extends Error {
 }
 
 export async function ingestFromFile(filePath, options = {}) {
+  const { logger, ...rest } = options;
   const raw = await fs.readFile(filePath, "utf8");
   let parsed;
   try {
@@ -34,13 +35,25 @@ export async function ingestFromFile(filePath, options = {}) {
   } catch (e) {
     throw new Error(`Could not parse JSON: ${e?.message || e}`);
   }
-  return ingestFromSpec(parsed, { ...options, inputPath: filePath });
+  return ingestFromSpec(parsed, { ...rest, inputPath: filePath, logger });
 }
 
 export async function ingestFromSpec(input, options = {}) {
-  const { dir, dry = false, inputPath } = options;
+  const { dir, dry = false, inputPath, logger } = options;
+  const emitLog = createIngestLogger(logger);
   const { value: spec, errors } = validateSpec(input);
+  const sourceSlug = deriveLoggingSlug(spec, input);
   if (errors.length > 0) {
+    emitLog?.({
+      event: "ingest.post",
+      path: null,
+      bytesWritten: 0,
+      slug: sourceSlug,
+      validationStatus: "failed",
+      dryRun: Boolean(dry),
+      source: inputPath || null,
+      errors,
+    });
     throw new IngestValidationError(errors);
   }
 
@@ -92,7 +105,7 @@ export async function ingestFromSpec(input, options = {}) {
   const size = Buffer.byteLength(fileContent, "utf8");
 
   if (dry) {
-    return {
+    const result = {
       dryRun: true,
       path: outPath,
       slug,
@@ -101,10 +114,20 @@ export async function ingestFromSpec(input, options = {}) {
       content: fileContent,
       source: inputPath || null,
     };
+    emitLog?.({
+      event: "ingest.post",
+      path: outPath,
+      bytesWritten: size,
+      slug,
+      validationStatus: "passed",
+      dryRun: Boolean(dry),
+      source: inputPath || null,
+    });
+    return result;
   }
 
   await fs.writeFile(outPath, fileContent, "utf8");
-  return {
+  const result = {
     dryRun: false,
     path: outPath,
     slug,
@@ -112,6 +135,16 @@ export async function ingestFromSpec(input, options = {}) {
     frontmatter: fmData,
     source: inputPath || null,
   };
+  emitLog?.({
+    event: "ingest.post",
+    path: outPath,
+    bytesWritten: size,
+    slug,
+    validationStatus: "passed",
+    dryRun: Boolean(dry),
+    source: inputPath || null,
+  });
+  return result;
 }
 
 /*
@@ -171,6 +204,60 @@ if (process.argv[1] === __filename) {
 }
 
 // ---------- helpers ----------
+function createIngestLogger(loggerOption) {
+  const emitter = resolveLogEmitter(loggerOption);
+  if (!emitter) return null;
+  return (event) => {
+    const payload = { timestamp: new Date().toISOString(), ...event };
+    try {
+      emitter(payload);
+    } catch (err) {
+      console.error(`[ingest] Failed to emit log: ${err?.message || err}`);
+    }
+  };
+}
+
+function resolveLogEmitter(loggerOption) {
+  if (!loggerOption) return null;
+  if (typeof loggerOption === "function") return loggerOption;
+  if (loggerOption === console) {
+    return (payload) => console.log(JSON.stringify(payload));
+  }
+  if (typeof loggerOption !== "object") return null;
+  if (typeof loggerOption.emit === "function") {
+    return (payload) => loggerOption.emit(payload);
+  }
+  const method =
+    typeof loggerOption.info === "function"
+      ? loggerOption.info.bind(loggerOption)
+      : typeof loggerOption.log === "function"
+        ? loggerOption.log.bind(loggerOption)
+        : null;
+  if (!method) return null;
+  return (payload) => method(payload);
+}
+
+function deriveLoggingSlug(spec, rawInput) {
+  const candidates = [
+    spec?.slug,
+    rawInput && typeof rawInput === "object" ? rawInput.slug : null,
+    spec?.title,
+    rawInput && typeof rawInput === "object" ? rawInput.title : null,
+  ];
+  for (const candidate of candidates) {
+    const normalized = normalizeSlugCandidate(candidate);
+    if (normalized) return normalized;
+  }
+  return null;
+}
+
+function normalizeSlugCandidate(candidate) {
+  if (typeof candidate !== "string") return null;
+  const trimmed = candidate.trim();
+  if (!trimmed) return null;
+  return slugify(trimmed).toLowerCase();
+}
+
 function parseArgs(a) {
   const out = { input: null, dry: false, dir: null };
   for (let i = 0; i < a.length; i++) {
