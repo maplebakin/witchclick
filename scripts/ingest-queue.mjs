@@ -41,6 +41,11 @@ async function main() {
   let processed = 0;
   let successes = 0;
   let failures = 0;
+  let validationErrors = 0;
+  let readErrors = 0;
+  let unexpectedErrors = 0;
+  const ingestionEvents = [];
+  const emitIngestLog = createBatchLogger(ingestionEvents);
 
   for (const file of files) {
     if (processed >= limit) {
@@ -57,13 +62,19 @@ async function main() {
       spec = JSON.parse(raw);
     } catch (err) {
       failures += 1;
+      readErrors += 1;
       console.error(`  ✖ Failed to read ${file}: ${err?.message || err}`);
       await handleFailure(fullPath, failedDir, opts.dry);
       continue;
     }
 
     try {
-      const result = await ingestFromSpec(spec, { dir: opts.dir, dry: opts.dry, inputPath: fullPath });
+      const result = await ingestFromSpec(spec, {
+        dir: opts.dir,
+        dry: opts.dry,
+        inputPath: fullPath,
+        logger: emitIngestLog,
+      });
       if (result.dryRun) {
         console.log(`  [dry] ${rel(fullPath)} -> ${rel(result.path)}`);
       } else {
@@ -74,11 +85,13 @@ async function main() {
     } catch (err) {
       failures += 1;
       if (err instanceof IngestValidationError) {
+        validationErrors += 1;
         console.error(`  ✖ Spec validation failed for ${file}:`);
         for (const message of err.errors) {
           console.error(`    • ${message}`);
         }
       } else {
+        unexpectedErrors += 1;
         console.error(`  ✖ Unexpected error for ${file}: ${err?.stack || err}`);
       }
       await handleFailure(fullPath, failedDir, opts.dry);
@@ -86,7 +99,21 @@ async function main() {
   }
 
   console.log(`Summary: ${successes} succeeded, ${failures} failed, ${processed - successes - failures} skipped.`);
-  if (failures > 0) {
+
+  if (ingestionEvents.length > 0) {
+    const summaryEvent = buildSummaryEvent({
+      processed,
+      successes,
+      failures,
+      validationErrors,
+      readErrors,
+      unexpectedErrors,
+      events: ingestionEvents,
+    });
+    console.log(JSON.stringify(summaryEvent));
+  }
+
+  if (validationErrors > 0 || readErrors > 0 || unexpectedErrors > 0) {
     process.exitCode = 1;
   }
 }
@@ -159,4 +186,35 @@ function rel(p) {
 
 function formatBytes(n) {
   return `${n} bytes`;
+}
+
+function createBatchLogger(store) {
+  if (!store) return null;
+  return (event) => {
+    if (!event) return;
+    store.push(event);
+    console.log(JSON.stringify(event));
+  };
+}
+
+function buildSummaryEvent({ processed, successes, failures, validationErrors, readErrors, unexpectedErrors, events }) {
+  const totalBytes = events.reduce((sum, event) => sum + (Number.isFinite(event.bytesWritten) ? event.bytesWritten : 0), 0);
+  const dryRuns = events.filter((event) => event.dryRun).length;
+  const passed = events.filter((event) => event.validationStatus === "passed").length;
+  const failed = events.filter((event) => event.validationStatus === "failed").length;
+  return {
+    event: "ingest.summary",
+    timestamp: new Date().toISOString(),
+    processed,
+    successes,
+    failures,
+    validationErrors,
+    readErrors,
+    unexpectedErrors,
+    ingested: events.length,
+    passed,
+    failed,
+    dryRuns,
+    bytesWritten: totalBytes,
+  };
 }
