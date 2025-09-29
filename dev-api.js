@@ -332,99 +332,318 @@ async function savePostFromWrite(payload) {
 }
 
 // ---------- INGEST (PostSpec v2) ----------
-function writeMarkdownFromSpec(spec) {
-  if (spec.specVersion !== 2) throw new Error('specVersion must be 2');
-  const title = String(spec.title || '').trim();
-  if (!title) throw new Error('title is required');
-  const initialSlug = slugify(spec.slug || title);
-  if (!initialSlug) throw new Error('slug could not be derived');
-
-  const sections = Array.isArray(spec.sections) ? spec.sections : [];
-  const body = sections.map(sec => {
-    const h = sec && sec.heading ? `## ${sec.heading}\n\n` : '';
-    const md = String(sec && sec.markdown || '').trim();
-    return h + md.trim();
-  }).filter(Boolean).join('\n\n');
-
-  const outline = Array.isArray(spec.outline) && spec.outline.length
-    ? spec.outline.map(o => String(o.heading || '').trim()).filter(Boolean)
-    : sections.map(s => String(s.heading || '').trim()).filter(Boolean);
-
-  const tags = Array.isArray(spec.tags) ? spec.tags : [];
-  const excerpt = String(spec.excerpt || '').trim();
-  const metaDescription = String(spec.metaDescription || spec.excerpt || '').trim();
-
-  const includeAds = Array.isArray(spec.adPlacements) && spec.adPlacements.length > 0;
-  const includeKofi = !!(spec.cta && spec.cta.type === 'kofi');
-
-  const words = (body.match(/\b\w+\b/g) || []).length;
-  const readingMinutes = Math.max(1, Math.round(words / 200));
-
-  const affiliateAnchors = Array.isArray(spec.affiliateHints)
-    ? spec.affiliateHints.map(a => ({ key: a.key, text: a.anchor, insertedCount: 0 }))
-    : [];
-
-  const internalLinks = [];
-
-  const ents = Array.isArray(spec.entities) ? spec.entities : [];
-  for (const e of ents) {
-    const type = String(e.type || '').trim();
-    const slug = slugify(e.slug || '');
-    if (!type || !slug) continue;
-    const file = path.join(CWD, 'content', 'entities', type, `${slug}.json`);
-    if (!fs.existsSync(file)) {
-      ensureDir(path.dirname(file));
-      const stub = {
-        type,
-        name: slug.replace(/-/g, ' ').replace(/\b\w/g, m => m.toUpperCase()),
-        slug,
-        summary: '',
-        properties: {},
-        related: []
-      };
-      fs.writeFileSync(file, JSON.stringify(stub, null, 2));
+function pickFirstString(...candidates) {
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string') {
+      const trimmed = candidate.trim();
+      if (trimmed) return trimmed;
     }
   }
+  return '';
+}
+
+function normalizeCta(rawCta, report) {
+  const CTA_TYPES = new Set(['kofi', 'download', 'none']);
+  if (typeof rawCta === 'string') {
+    const lower = rawCta.trim().toLowerCase();
+    if (!CTA_TYPES.has(lower)) {
+      report.push('CTA type defaulted to none.');
+      return { type: 'none' };
+    }
+    if (lower === 'download') {
+      return { type: 'download' };
+    }
+    return { type: lower };
+  }
+
+  if (rawCta && typeof rawCta === 'object') {
+    const type = pickFirstString(rawCta.type).toLowerCase();
+    const id = pickFirstString(rawCta.id);
+    if (!CTA_TYPES.has(type)) {
+      report.push('CTA type defaulted to none.');
+      return { type: 'none' };
+    }
+    if (type === 'download') {
+      return id ? { type, id } : { type, id: '' };
+    }
+    return { type };
+  }
+
+  return { type: 'none' };
+}
+
+function normalizeAdPlacements(raw, report) {
+  const VALID = new Set(['lead', 'mid', 'end']);
+  const items = Array.isArray(raw)
+    ? raw
+    : typeof raw === 'string'
+      ? raw.split(',')
+      : [];
+  const seen = new Set();
+  const out = [];
+  for (const item of items) {
+    const slot = pickFirstString(item).toLowerCase();
+    if (!slot) continue;
+    if (!VALID.has(slot)) {
+      report.push(`Dropped invalid ad placement "${slot}".`);
+      continue;
+    }
+    if (seen.has(slot)) continue;
+    seen.add(slot);
+    out.push(slot);
+  }
+  return out;
+}
+
+function normalizeLooseSpec(rawSpec) {
+  const report = [];
+  const input = rawSpec && typeof rawSpec === 'object' ? rawSpec : {};
+  const spec = {
+    specVersion: 2,
+    title: '',
+    slug: '',
+    metaDescription: '',
+    tags: [],
+    excerpt: '',
+    outline: [],
+    sections: [],
+    entities: [],
+    heroImagePrompt: null,
+    altTexts: [],
+    internalLinkHints: [],
+    affiliateHints: [],
+    cta: { type: 'none' },
+    adPlacements: []
+  };
+
+  const title = pickFirstString(input.title, input.name, input.headline);
+  if (!title) throw new Error('Title required');
+  spec.title = title;
+
+  if (input.specVersion && Number(input.specVersion) !== 2) {
+    report.push('specVersion forced to 2.');
+  }
+
+  const initialSlug = pickFirstString(input.slug, input.title, input.name, input.headline);
+  spec.slug = slugify(initialSlug || spec.title);
+
+  const excerpt = pickFirstString(input.excerpt, input.summary, input.description);
+  spec.excerpt = excerpt;
+
+  const metaDescription = pickFirstString(input.metaDescription, input.meta, input.description, input.summary, spec.excerpt);
+  spec.metaDescription = metaDescription || spec.excerpt;
+
+  const tags = Array.isArray(input.tags)
+    ? input.tags
+    : typeof input.tags === 'string'
+      ? input.tags.split(',')
+      : [];
+  spec.tags = tags.map(t => pickFirstString(t)).filter(Boolean);
+
+  const sections = Array.isArray(input.sections) ? input.sections : [];
+  const normalizedSections = [];
+  for (const section of sections) {
+    if (!section || typeof section !== 'object') continue;
+    const heading = pickFirstString(section.heading, section.title, section.name);
+    const rawMarkdown = section.markdown ?? section.content ?? section.body ?? '';
+    const markdown = typeof rawMarkdown === 'string' ? rawMarkdown.trim() : '';
+    if (!heading && !markdown) continue;
+    normalizedSections.push({
+      heading,
+      markdown
+    });
+  }
+  spec.sections = normalizedSections;
+
+  let outline = Array.isArray(input.outline) ? input.outline : [];
+  const normalizedOutline = outline
+    .map(item => {
+      if (!item || typeof item !== 'object') return null;
+      const heading = pickFirstString(item.heading, item.title, item.name);
+      if (!heading) return null;
+      let id = pickFirstString(item.id, item.slug);
+      if (!id) id = slugify(heading);
+      return { heading, id };
+    })
+    .filter(Boolean);
+  if (!normalizedOutline.length && normalizedSections.length) {
+    const derived = normalizedSections
+      .map(sec => {
+        const heading = pickFirstString(sec.heading);
+        if (!heading) return null;
+        return { heading, id: slugify(heading) };
+      })
+      .filter(Boolean);
+    if (derived.length) {
+      report.push('Derived outline from sections.');
+      spec.outline = derived;
+    } else {
+      spec.outline = [];
+    }
+  } else {
+    spec.outline = normalizedOutline;
+  }
+
+  const entities = Array.isArray(input.entities) ? input.entities : [];
+  const normalizedEntities = [];
+  for (const entity of entities) {
+    if (!entity || typeof entity !== 'object') continue;
+    const type = pickFirstString(entity.type);
+    const slug = slugify(pickFirstString(entity.slug, entity.name));
+    if (!type || !slug) {
+      report.push('Dropped invalid entity entry.');
+      continue;
+    }
+    normalizedEntities.push({ type, slug });
+  }
+  spec.entities = normalizedEntities;
+
+  const heroCandidate = input.heroImagePrompt ?? input.heroPrompt ?? input.heroImage;
+  const hero = pickFirstString(heroCandidate);
+  spec.heroImagePrompt = hero || null;
+
+  const altTexts = Array.isArray(input.altTexts) ? input.altTexts : [];
+  spec.altTexts = altTexts.map(t => pickFirstString(t)).filter(Boolean);
+
+  const internalLinkHints = Array.isArray(input.internalLinkHints) ? input.internalLinkHints : [];
+  spec.internalLinkHints = internalLinkHints
+    .map(link => {
+      if (!link || typeof link !== 'object') return null;
+      const anchor = pickFirstString(link.anchor, link.text);
+      if (!anchor) return null;
+      const rationale = pickFirstString(link.rationale, link.reason, link.notes);
+      return { anchor, rationale };
+    })
+    .filter(Boolean);
+
+  const affiliateHints = Array.isArray(input.affiliateHints) ? input.affiliateHints : [];
+  spec.affiliateHints = affiliateHints
+    .map(hint => {
+      if (!hint || typeof hint !== 'object') return null;
+      const key = pickFirstString(hint.key);
+      const anchor = pickFirstString(hint.anchor, hint.text);
+      if (!key || !anchor) return null;
+      const rationale = pickFirstString(hint.rationale, hint.reason);
+      return { key, anchor, rationale };
+    })
+    .filter(Boolean);
+
+  spec.cta = normalizeCta(input.cta, report);
+  spec.adPlacements = normalizeAdPlacements(input.adPlacements, report);
+
+  return { spec, report };
+}
+
+function prepareNormalizedSpec(rawSpec) {
+  const { spec, report } = normalizeLooseSpec(rawSpec);
+
+  const desiredSlug = spec.slug || slugify(spec.title);
+  const normalizedSlug = slugify(desiredSlug || spec.title);
+  if (normalizedSlug && normalizedSlug !== spec.slug) {
+    report.push(`Slug normalized to ${normalizedSlug}.`);
+  }
+  let slug = normalizedSlug || slugify(spec.title);
+  if (!slug) throw new Error('Title required');
 
   const postsDir = path.join(CWD, 'content', 'posts');
-  ensureDir(postsDir);
-  let slug = initialSlug;
+  let uniqueSlug = slug;
   let idx = 2;
-  while (fs.existsSync(path.join(postsDir, `${slug}.md`))) {
-    slug = `${initialSlug}-${idx++}`;
+  while (fs.existsSync(path.join(postsDir, `${uniqueSlug}.md`))) {
+    uniqueSlug = `${slug}-${idx++}`;
   }
+  if (uniqueSlug !== slug) {
+    report.push(`Slug collision resolved as ${uniqueSlug}.`);
+  }
+  spec.slug = uniqueSlug;
+
+  const outlineHeadings = spec.outline.map(o => o.heading);
+  if (!outlineHeadings.length) {
+    const fallbackOutline = spec.sections
+      .map(sec => pickFirstString(sec.heading))
+      .filter(Boolean);
+    spec.outline = fallbackOutline.map(h => ({ heading: h, id: slugify(h) }));
+  }
+
+  const body = spec.sections
+    .map(section => {
+      const heading = pickFirstString(section.heading);
+      const markdown = pickFirstString(section.markdown);
+      const headingBlock = heading ? `## ${heading}\n\n` : '';
+      const trimmed = markdown ? markdown.trim() : '';
+      const chunk = `${headingBlock}${trimmed}`.trim();
+      return chunk ? chunk : '';
+    })
+    .filter(Boolean)
+    .join('\n\n');
+
+  const words = wordCount(body);
+  const readingMinutes = Math.max(1, Math.round(words / 200));
+  const includeAds = spec.adPlacements.length > 0;
+  const includeKofi = spec.cta && spec.cta.type === 'kofi';
+  const excerpt = pickFirstString(spec.excerpt);
+  const metaDescription = pickFirstString(spec.metaDescription, excerpt);
 
   const settings = readJSON(path.join(CWD, 'content', 'settings.json')) || { siteUrl: 'https://example.com' };
   const site = String(settings.siteUrl || 'https://example.com').replace(/\/$/, '');
-  const canonical = `${site}/post/${slug}`;
+  const canonical = `${site}/post/${uniqueSlug}`;
 
   const fm = [
     '---',
-    `title: ${yq(title)}`,
-    `slug: ${slug}`,
+    `title: ${yq(spec.title)}`,
+    `slug: ${uniqueSlug}`,
     `excerpt: ${yq(excerpt)}`,
-    `metaTitle: ${yq(title)}`,
+    `metaTitle: ${yq(spec.title)}`,
     `metaDescription: ${yq(metaDescription)}`,
-    `tags: ${ya(tags)}`,
-    `outline: ${ya(outline)}`,
+    `tags: ${ya(spec.tags)}`,
+    `outline: ${ya(spec.outline.map(o => o.heading))}`,
     `wordCount: ${words}`,
     `readingMinutes: ${readingMinutes}`,
     `includeAds: ${includeAds ? 'true' : 'false'}`,
     `includeKofi: ${includeKofi ? 'true' : 'false'}`,
-    `affiliateAnchors: ${JSON.stringify(affiliateAnchors)}`,
-    `internalLinks: ${JSON.stringify(internalLinks)}`,
+    `affiliateAnchors: ${JSON.stringify(spec.affiliateHints.map(a => ({ key: a.key, text: a.anchor, insertedCount: 0 })))}`,
+    `internalLinks: ${JSON.stringify([])}`,
     `publishedAt: ${yq(new Date().toISOString())}`,
     `canonicalUrl: ${yq(canonical)}`,
     'specVersion: 2',
     '---'
   ].join('\n');
 
-  const full = fm + '\n' + body.trim() + '\n';
+  const postFilePath = path.join(CWD, 'content', 'posts', `${uniqueSlug}.md`);
+  const postContents = fm + '\n' + (body ? body : '') + '\n';
 
-  const filePath = path.join(postsDir, `${slug}.md`);
-  fs.writeFileSync(filePath, full, 'utf8');
+  const entityStubs = spec.entities.map(entity => {
+    const entityFile = path.join(CWD, 'content', 'entities', entity.type, `${entity.slug}.json`);
+    const payload = {
+      type: entity.type,
+      name: entity.slug.replace(/-/g, ' ').replace(/\b\w/g, m => m.toUpperCase()),
+      slug: entity.slug,
+      summary: '',
+      properties: {},
+      related: []
+    };
+    return { file: entityFile, payload };
+  });
 
-  return { slug, path: `content/posts/${slug}.md` };
+  return {
+    spec,
+    normalizationReport: report,
+    post: {
+      filePath: postFilePath,
+      contents: postContents
+    },
+    entityStubs
+  };
+}
+
+async function persistNormalizedSpec(prepared) {
+  for (const stub of prepared.entityStubs) {
+    if (fs.existsSync(stub.file)) continue;
+    ensureDir(path.dirname(stub.file));
+    await fsp.writeFile(stub.file, JSON.stringify(stub.payload, null, 2), 'utf8');
+  }
+
+  ensureDir(path.dirname(prepared.post.filePath));
+  await fsp.writeFile(prepared.post.filePath, prepared.post.contents, 'utf8');
 }
 
 function run(cmd, args, cwd = CWD) {
@@ -526,14 +745,56 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, { ok: true, prompt, options: { topic, mode: rawMode || null, strict } });
     }
 
-    if (req.method === 'POST' && req.url === '/ingest') {
-      const spec = await parseBody(req);
-      if (!spec) return send(res, 400, { ok: false, error: 'No JSON body provided. Paste a PostSpec v2 object.' });
-      try {
-        const result = writeMarkdownFromSpec(spec);
-        return send(res, 200, { ok: true, ...result });
-      } catch (e) {
-        return send(res, 400, { ok: false, error: e.message || String(e) });
+    if (req.method === 'POST') {
+      const parsedUrl = new URL(req.url, `http://localhost:${PORT}`);
+      if (parsedUrl.pathname === '/ingest') {
+        const payload = await parseBody(req);
+        if (!payload) {
+          return send(res, 400, { error: 'No JSON body provided. Paste a PostSpec v2 object.' });
+        }
+
+        const queryDryRun = (() => {
+          const flag = parsedUrl.searchParams.get('dryRun');
+          return flag === 'true' || flag === '1';
+        })();
+        const bodyDryRun = typeof payload === 'object' && payload
+          ? payload.dryRun === true || payload.dryRun === 'true'
+          : false;
+        const dryRun = queryDryRun || bodyDryRun;
+
+        let rawSpec;
+        if (payload && typeof payload === 'object' && payload.spec && typeof payload.spec === 'object') {
+          rawSpec = payload.spec;
+        } else if (payload && typeof payload === 'object') {
+          const clone = { ...payload };
+          delete clone.dryRun;
+          rawSpec = clone;
+        } else {
+          rawSpec = payload;
+        }
+
+        if (rawSpec && typeof rawSpec === 'object' && !Array.isArray(rawSpec) && 'dryRun' in rawSpec) {
+          rawSpec = { ...rawSpec };
+          delete rawSpec.dryRun;
+        }
+
+        try {
+          const prepared = prepareNormalizedSpec(rawSpec || {});
+          if (!dryRun) {
+            await persistNormalizedSpec(prepared);
+          }
+          return send(res, 200, {
+            spec: prepared.spec,
+            normalizationReport: prepared.normalizationReport,
+            saved: !dryRun
+          });
+        } catch (e) {
+          const message = e && e.message ? e.message : String(e);
+          if (message === 'Title required') {
+            return send(res, 400, { error: 'Title required' });
+          }
+          return send(res, 400, { error: message });
+        }
       }
     }
 
