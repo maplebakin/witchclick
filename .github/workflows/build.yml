@@ -1,0 +1,77 @@
+name: Build
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Detect Node version
+        id: detect-node
+        run: |
+          set -euo pipefail
+          if [ -f ".nvmrc" ]; then
+            version=$(tr -d ' \t\r\n' < .nvmrc)
+          elif [ -f ".node-version" ]; then
+            version=$(tr -d ' \t\r\n' < .node-version)
+          elif [ -f ".tool-versions" ]; then
+            version=$(grep -E '^node(js)? ' .tool-versions | head -n 1 | awk '{print $2}')
+          else
+            version=$(python3 - <<'PY'
+import json
+try:
+    with open("package.json", "r", encoding="utf-8") as f:
+        data = json.load(f)
+    print(data.get("engines", {}).get("node", ""))
+except FileNotFoundError:
+    print("")
+PY
+)
+          fi
+          version=$(echo "$version" | tr -d ' \t\r\n')
+          if [ -z "$version" ]; then
+            echo "Unable to determine Node version. Provide .nvmrc, .node-version, .tool-versions, or package.json#engines.node." >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Detected Node version $version"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.detect-node.outputs.version }}
+
+      - name: Detect package manager
+        id: detect-pm
+        run: |
+          set -euo pipefail
+          if [ -f "pnpm-lock.yaml" ]; then
+            pm="pnpm"
+            install="pnpm install --frozen-lockfile"
+            build="pnpm build"
+          elif [ -f "yarn.lock" ]; then
+            pm="yarn"
+            install="yarn install --frozen-lockfile"
+            build="yarn build"
+          elif [ -f "package-lock.json" ]; then
+            pm="npm"
+            install="npm ci"
+            build="npm run build"
+          else
+            echo "Unable to determine package manager. Add pnpm-lock.yaml, yarn.lock, or package-lock.json." >&2
+            exit 1
+          fi
+          echo "manager=$pm" >> "$GITHUB_OUTPUT"
+          echo "install=$install" >> "$GITHUB_OUTPUT"
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+          echo "Detected $pm with install command '$install'"
+
+      - name: Install dependencies
+        run: ${{ steps.detect-pm.outputs.install }}
+
+      - name: Run build
+        run: ${{ steps.detect-pm.outputs.build }}
