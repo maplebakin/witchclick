@@ -7,6 +7,7 @@ import fssync from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
+import prompts from "./lib/prompts.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -150,6 +151,7 @@ export async function ingestFromSpec(input, options = {}) {
 /*
 Usage:
   node scripts/ingest.mjs path/to/spec.json [--dry] [--dir src/content/posts]
+  node scripts/ingest.mjs --interactive [--dry] [--dir src/content/posts]
 Spec JSON shape (flexible):
 {
   "title": "Tea Ritual for Focus",
@@ -170,8 +172,29 @@ Spec JSON shape (flexible):
 */
 
 async function main() {
+  if (opts.interactive) {
+    if (opts.input) {
+      die("Interactive mode cannot be combined with a spec file input.");
+    }
+    try {
+      await runInteractiveIngest(opts);
+      return;
+    } catch (err) {
+      if (err instanceof IngestValidationError) {
+        console.error("Spec validation failed:");
+        for (const e of err.errors) {
+          console.error(` • ${e}`);
+        }
+        process.exit(1);
+      }
+      throw err;
+    }
+  }
+
   if (!opts.input) {
-    die("Usage: node scripts/ingest.mjs <spec.json> [--dry] [--dir <outDir>]");
+    die(
+      "Usage: node scripts/ingest.mjs <spec.json> [--dry] [--dir <outDir>] | node scripts/ingest.mjs --interactive [--dir <outDir>] [--dry]"
+    );
   }
   try {
     const result = await ingestFromFile(opts.input, { dir: opts.dir, dry: opts.dry });
@@ -237,6 +260,162 @@ function resolveLogEmitter(loggerOption) {
   return (payload) => method(payload);
 }
 
+async function runInteractiveIngest(options) {
+  const spec = await promptSpec();
+  const preview = await ingestFromSpec(spec, { dir: options.dir, dry: true });
+
+  console.log("----- DRY RUN PREVIEW -----");
+  console.log(rel(preview.path));
+  console.log(preview.content);
+
+  if (options.dry) {
+    console.log("Dry run flag detected. Skipping write.");
+    return;
+  }
+
+  const { proceed } = await prompts(
+    {
+      type: "confirm",
+      name: "proceed",
+      message: `Write file to ${rel(preview.path)}?`,
+      initial: true,
+    },
+    { onCancel: handlePromptCancel }
+  );
+
+  if (!proceed) {
+    console.log("Interactive ingest cancelled by user.");
+    return;
+  }
+
+  const result = await ingestFromSpec(spec, { dir: options.dir, dry: false });
+  console.log(`Wrote ${rel(result.path)} (${bytes(result.bytes)})`);
+  console.log("Tip: commit and deploy when ready.");
+}
+
+async function promptSpec() {
+  const { title } = await prompts(
+    {
+      type: "text",
+      name: "title",
+      message: "Post title",
+      validate: (val) => (val && val.trim() ? true : "Title is required"),
+    },
+    { onCancel: handlePromptCancel }
+  );
+
+  const initialSlug = title ? slugify(title).toLowerCase() : "";
+
+  const slugAnswer = await prompts(
+    {
+      type: "text",
+      name: "slug",
+      message: "Slug (leave blank to derive from title)",
+      initial: initialSlug,
+      validate: (val) => {
+        if (!val) return true;
+        return slugPattern.test(val) ? true : "Slug must contain only lowercase letters, numbers, or hyphen separators";
+      },
+    },
+    { onCancel: handlePromptCancel }
+  );
+
+  const { description } = await prompts(
+    {
+      type: "text",
+      name: "description",
+      message: "Description",
+    },
+    { onCancel: handlePromptCancel }
+  );
+
+  const tagAnswer = await prompts(
+    {
+      type: "list",
+      name: "tags",
+      message: "Tags (comma separated)",
+      separator: ",",
+    },
+    { onCancel: handlePromptCancel }
+  );
+
+  const affiliateAnchors = await promptAffiliateAnchors();
+
+  const { body } = await prompts(
+    {
+      type: "text",
+      name: "body",
+      message: "Body (Markdown)",
+      validate: (val) => (val && val.trim() ? true : "Body text is required"),
+    },
+    { onCancel: handlePromptCancel }
+  );
+
+  const tags = Array.isArray(tagAnswer.tags)
+    ? tagAnswer.tags.map((tag) => tag.trim()).filter(Boolean)
+    : [];
+
+  const slug = slugAnswer.slug ? slugify(slugAnswer.slug).toLowerCase() : undefined;
+
+  const normalizedTitle = title.trim();
+  const normalizedBody = body.trim();
+
+  return {
+    title: normalizedTitle,
+    slug,
+    description: description?.trim() ? description.trim() : undefined,
+    tags,
+    affiliateAnchors,
+    body: normalizedBody,
+  };
+}
+
+async function promptAffiliateAnchors() {
+  const anchors = [];
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const { add } = await prompts(
+      {
+        type: "confirm",
+        name: "add",
+        message: anchors.length
+          ? "Add another affiliate anchor?"
+          : "Would you like to add an affiliate anchor?",
+        initial: false,
+      },
+      { onCancel: handlePromptCancel }
+    );
+
+    if (!add) break;
+
+    const anchor = await prompts(
+      [
+        {
+          type: "text",
+          name: "key",
+          message: "Affiliate anchor key",
+          validate: (val) => (val && val.trim() ? true : "Key is required"),
+        },
+        {
+          type: "text",
+          name: "text",
+          message: "Affiliate anchor text",
+          validate: (val) => (val && val.trim() ? true : "Text is required"),
+        },
+      ],
+      { onCancel: handlePromptCancel }
+    );
+
+    anchors.push({ key: anchor.key.trim(), text: anchor.text.trim() });
+  }
+  return anchors;
+}
+
+function handlePromptCancel() {
+  console.log("Interactive ingest cancelled.");
+  process.exit(0);
+}
+
 function deriveLoggingSlug(spec, rawInput) {
   const candidates = [
     spec?.slug,
@@ -259,11 +438,12 @@ function normalizeSlugCandidate(candidate) {
 }
 
 function parseArgs(a) {
-  const out = { input: null, dry: false, dir: null };
+  const out = { input: null, dry: false, dir: null, interactive: false };
   for (let i = 0; i < a.length; i++) {
     const t = a[i];
     if (t === "--dry") out.dry = true;
     else if (t === "--dir") out.dir = a[++i];
+    else if (t === "--interactive") out.interactive = true;
     else if (!out.input) out.input = t;
   }
   return out;
