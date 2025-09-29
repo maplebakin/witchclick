@@ -64,6 +64,7 @@ async function main() {
 
   const affiliateAnchors = Array.isArray(spec.affiliateAnchors) ? spec.affiliateAnchors : [];
   const internalLinks = Array.isArray(spec.internalLinks) ? spec.internalLinks : [];
+  const entities = Array.isArray(spec.entities) ? spec.entities : [];
 
   const body = str(spec.body) ?? "";
 
@@ -87,6 +88,7 @@ async function main() {
     readingMinutes,
     affiliateAnchors,
     internalLinks,
+    entities,
     includeAds,
     includeKofi,
     downloadId,
@@ -125,15 +127,14 @@ function parseArgs(a) {
 
 async function pickOutDir(preferred) {
   if (preferred) return path.resolve(ROOT, preferred);
-  const paths = [
-    path.join(ROOT, "src", "content", "posts"), // Content Collections
-    path.join(ROOT, "content", "posts"),        // legacy
-  ];
-  for (const p of paths) {
-    if (fssync.existsSync(path.dirname(p))) return p;
-  }
+  const legacy = path.join(ROOT, "content", "posts");
+  if (fssync.existsSync(legacy)) return legacy;
+
+  const modern = path.join(ROOT, "src", "content", "posts");
+  if (fssync.existsSync(path.dirname(modern))) return modern;
+
   // last resort: create under src/content/posts
-  return paths[0];
+  return modern;
 }
 
 function frontmatter(obj) {
