@@ -69,6 +69,18 @@ const htmlRaw = marked.parse(content || "");
 const htmlSafe = stripInlineHandlers(stripScripts(String(htmlRaw)));
 let html = String(htmlSafe);
 
+let ctaType: "kofi" | "download" | "none" = "none";
+let ctaId: string | undefined;
+
+if (data && typeof data === "object") {
+  if (data.downloadId) {
+    ctaType = "download";
+    ctaId = String(data.downloadId);
+  } else if (data.includeKofi) {
+    ctaType = "kofi";
+  }
+}
+
 const productsFilePath = "./content/products.json";
 const productsDoc = fs.existsSync(productsFilePath)
   ? JSON.parse(fs.readFileSync(productsFilePath, "utf8"))
@@ -185,7 +197,7 @@ function stripInlineHandlers(html: string) {
     <aside class="lg:col-span-4 lg:pl-6">
       <div class="sticky top-24 space-y-6">
         <AdSlot slot="side" />
-        <CtaFooter />
+        <CtaFooter type={ctaType} id={ctaId} />
         {resolvedEntities.length > 0 && (
           <section class="rounded-3xl border border-purple-100 bg-white/70 p-5 shadow-sm">
             <h2 class="text-sm font-semibold uppercase tracking-wide text-purple-600">Referenced entities</h2>
