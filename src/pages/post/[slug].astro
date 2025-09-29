@@ -176,7 +176,7 @@ function stripInlineHandlers(html: string) {
       {hasAffiliates && <Disclosure />}
 
       {Array.isArray(data.downloadId) ? null : data.downloadId ? (
-        <DownloadCard slug={String(data.downloadId)} />
+        <DownloadCard id={String(data.downloadId)} />
       ) : null}
 
       <AdSlot slot="end" class="mt-10" />
