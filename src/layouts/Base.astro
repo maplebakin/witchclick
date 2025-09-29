@@ -2,7 +2,8 @@
 /* src/layouts/Base.astro */
 import "../styles/tailwind.css";
 import SearchBox from "../components/SearchBox.astro";
-import { readSettings, getSiteOrigin, toAbsoluteUrl, getTheme } from "../utils/settings";
+import { readSettings, getSiteOrigin, toAbsoluteUrl } from "../utils/settings";
+import { getTheme } from "../utils/theme";
 
 const props = Astro.props || {};
 const {
@@ -29,7 +30,7 @@ const canonicalUrl = canon
 
 const pageTitle = title && title !== brandName ? `${title} — ${brandName}` : brandName;
 const ogImg = ogImage ? toAbsoluteUrl(ogImage, settings) : (siteOrigin ? `${siteOrigin}/og-default.png` : "");
-const theme = getTheme(settings);
+const theme = getTheme();
 
 const headerWidthClass = wide ? "max-w-6xl" : "max-w-4xl";
 const mainWidthClass = wide ? "max-w-6xl" : "max-w-3xl";

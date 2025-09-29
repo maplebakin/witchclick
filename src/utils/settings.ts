@@ -1,14 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 
-export interface ThemeSettings {
-  primary: string;
-  accent: string;
-  background: string;
-  fontSerif: string;
-  fontScript: string;
-}
-
 export interface AnalyticsSettings {
   enabled: boolean;
   endpoint?: string;
@@ -29,16 +21,7 @@ export interface SiteSettings {
   kofiUsername?: string;
   analytics?: AnalyticsSettings;
   ads?: AdsSettings;
-  theme?: ThemeSettings;
 }
-
-const DEFAULT_THEME: ThemeSettings = {
-  primary: "#6b21a8",
-  accent: "#d9b2c4",
-  background: "#faf7f5",
-  fontSerif: "Literata",
-  fontScript: "Parisienne",
-};
 
 const DEFAULT_SETTINGS: SiteSettings = {
   siteUrl: "https://example.com",
@@ -46,19 +29,12 @@ const DEFAULT_SETTINGS: SiteSettings = {
   disclosure:
     "As an affiliate, we may earn a small commission if you purchase through our links.",
   analytics: { enabled: false },
-  theme: DEFAULT_THEME,
 };
 
 let cached: SiteSettings | null = null;
 let warned = false;
 
 function deepMergeSettings(base: SiteSettings, next: Partial<SiteSettings>): SiteSettings {
-  const theme: ThemeSettings = {
-    ...DEFAULT_THEME,
-    ...(base.theme ?? {}),
-    ...(next.theme ?? {}),
-  };
-
   const analytics: AnalyticsSettings | undefined = next.analytics
     ? { ...(base.analytics ?? { enabled: false }), ...next.analytics }
     : base.analytics;
@@ -72,7 +48,6 @@ function deepMergeSettings(base: SiteSettings, next: Partial<SiteSettings>): Sit
     ...next,
     analytics,
     ads,
-    theme,
   };
 }
 
@@ -99,7 +74,7 @@ export function readSettings(): SiteSettings {
     }
   }
 
-  cached = { ...loaded, theme: loaded.theme ?? DEFAULT_THEME };
+  cached = { ...loaded };
   return cached;
 }
 
@@ -120,10 +95,6 @@ export function toAbsoluteUrl(url: string, settings: SiteSettings = readSettings
   } catch {
     return url;
   }
-}
-
-export function getTheme(settings: SiteSettings = readSettings()): ThemeSettings {
-  return settings.theme ?? DEFAULT_THEME;
 }
 
 function sanitizeSettings(input: unknown): Partial<SiteSettings> {
@@ -169,11 +140,6 @@ function sanitizeSettings(input: unknown): Partial<SiteSettings> {
   if ("ads" in data) {
     const value = sanitizeAds(data.ads, errors);
     if (value) out.ads = value;
-  }
-
-  if ("theme" in data) {
-    const value = sanitizeTheme(data.theme, errors);
-    if (value) out.theme = value;
   }
 
   if (errors.length) {
@@ -245,31 +211,6 @@ function sanitizeAds(value: unknown, errors: string[]): AdsSettings | undefined 
   }
 
   return ads;
-}
-
-function sanitizeTheme(value: unknown, errors: string[]): ThemeSettings | undefined {
-  if (value === undefined) return undefined;
-  if (!value || typeof value !== "object") {
-    errors.push("theme must be an object");
-    return undefined;
-  }
-  const data = value as Record<string, unknown>;
-  const primary = expectString(data.primary, "theme.primary", errors);
-  const accent = expectString(data.accent, "theme.accent", errors);
-  const background = expectString(data.background, "theme.background", errors);
-  const fontSerif = expectString(data.fontSerif, "theme.fontSerif", errors);
-  const fontScript = expectString(data.fontScript, "theme.fontScript", errors);
-
-  const requiredValues = [primary, accent, background, fontSerif, fontScript];
-  if (requiredValues.some((v) => !v)) return undefined;
-
-  return {
-    primary: primary!,
-    accent: accent!,
-    background: background!,
-    fontSerif: fontSerif!,
-    fontScript: fontScript!,
-  };
 }
 
 function expectString(
