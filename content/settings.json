@@ -3,13 +3,6 @@
   "brandName": "WitchClick",
   "kofiUsername": "",
   "analytics": { "enabled": false },
-  "theme": {
-    "primary": "#8b7e8f",
-    "background": "#faf7f5",
-    "accent": "#d9b2c4",
-    "fontSerif": "Literata",
-    "fontScript": "Parisienne"
-  },
   "ads": {
     "provider": "adsense",
     "adsenseClientId": "ca-pub-5789790751393621",
