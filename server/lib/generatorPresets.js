@@ -40,26 +40,72 @@ const STRICT_OUTPUT_CONTRACT = [
   'Do NOT include markdown fences or any commentary outside the JSON.'
 ];
 
-const makePreset = (system, goal) => ({
+const makePreset = ({ label, system, goal }) => ({
+  label,
   system,
   goal,
   looseOutputContract: LOOSE_OUTPUT_CONTRACT,
   strictOutputContract: STRICT_OUTPUT_CONTRACT
 });
 
-const presets = {
-  reflection: makePreset(
-    'You are a gentle, practical guide. Be kind, concrete, and non-dogmatic.',
-    'A reflective, secular piece aimed at journaling and gentle self-inquiry.'
-  ),
-  ritual: makePreset(
-    'You are a precise ritual describer. Emphasize safety, consent, and optionality.',
-    'A step-by-step ritual with materials, timing, and safety notes.'
-  ),
-  spread: makePreset(
-    'You are a tarot spread designer. Be secular-friendly and practical.',
-    'A tarot spread with positions, layout notes, and usage guidance.'
-  )
-};
+const DEFINITIONS = [
+  {
+    key: 'reflection',
+    label: 'Reflection Essay',
+    system: 'You are a gentle, practical guide. Be kind, concrete, and non-dogmatic.',
+    goal: 'A reflective, secular piece aimed at journaling and gentle self-inquiry.'
+  },
+  {
+    key: 'ritual',
+    label: 'Ritual Guide',
+    system: 'You are a precise ritual describer. Emphasize safety, consent, and optionality.',
+    goal: 'A step-by-step ritual with materials, timing, and safety notes.'
+  },
+  {
+    key: 'story',
+    label: 'Story / Vignette',
+    system: 'You are a cozy storyteller sharing first-person snapshots of everyday magic.',
+    goal: 'A narrative vignette that blends sensory detail, emotion, and gentle takeaways.'
+  },
+  {
+    key: 'tarotSpread',
+    label: 'Tarot Spread',
+    system: 'You are a tarot spread designer. Be secular-friendly and practical.',
+    goal: 'A tarot spread with positions, layout notes, and usage guidance.'
+  },
+  {
+    key: 'spellwork',
+    label: 'Spellwork Recipe',
+    system: 'You are a careful spellcraft mentor. Highlight consent, substitutions, and mundane options.',
+    goal: 'A spell or working with correspondences, timing, variations, and safety notes.'
+  },
+  {
+    key: 'crystals',
+    label: 'Crystal Profile',
+    system: 'You are a crystal caretaker who balances geology with mindful, secular use.',
+    goal: 'A crystal spotlight covering properties, care, and practical, grounded applications.'
+  }
+];
+
+const presets = {};
+for (const def of DEFINITIONS) {
+  const preset = makePreset(def);
+  presets[def.key] = preset;
+  if (Array.isArray(def.aliases)) {
+    for (const alias of def.aliases) {
+      presets[alias] = preset;
+    }
+  }
+}
+
+// Back-compat aliases
+presets.spread = presets.tarotSpread;
+presets.tarot = presets.tarotSpread;
+
+export const generatorPresetOptions = DEFINITIONS.map(({ key, label, goal }) => ({
+  key,
+  label,
+  description: goal
+}));
 
 export default presets;

@@ -2,11 +2,41 @@
 /* Admin: Prompt → JSON → Preview → Ingest */
 import Base from "../../layouts/Base.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
+import generatorStyles from "../../../server/lib/generatorStyles.js";
+import { generatorPresetOptions } from "../../../server/lib/generatorPresets.js";
 
 export const prerender = false; // never emit in static builds
 
 const settings = readSettings();
 const site = getSiteOrigin(settings) || "https://example.com";
+
+const toLabel = (key: string) =>
+  key
+    .replace(/([A-Z])/g, " $1")
+    .replace(/[-_]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+
+const presetOptions = generatorPresetOptions;
+
+const styleOptions = Object.entries(generatorStyles)
+  .map(([key, description]) => ({
+    key,
+    label: key === "cozy" ? "Cozy (default)" : toLabel(key),
+    description,
+  }))
+  .sort((a, b) => {
+    if (a.key === "cozy") return -1;
+    if (b.key === "cozy") return 1;
+    return a.label.localeCompare(b.label);
+  });
+
+const defaultModeDescription =
+  "Use the master prompt for the full ritual + reflection flow, or choose a template for a specialty outline.";
+const defaultStyleDescription =
+  styleOptions.find((option) => option.key === "cozy")?.description ??
+  "Write like a gentle, imperfect friend: warm, soft, everyday metaphors.";
 
 // Gate: dev OR query ?key=PUBLIC_ADMIN_KEY (useful if you later switch to a server adapter)
 const isDev = import.meta.env.DEV;
@@ -30,7 +60,14 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
   </Fragment>
 
   {canUse ? (
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-12" data-dev-api={DEV_API}>
+    <div
+      class="grid grid-cols-1 gap-6 lg:grid-cols-12"
+      data-dev-api={DEV_API}
+      data-preset-options={JSON.stringify(presetOptions)}
+      data-style-options={JSON.stringify(styleOptions)}
+      data-default-mode={defaultModeDescription}
+      data-default-style={defaultStyleDescription}
+    >
       {/* LEFT: Prompt builder */}
       <section class="lg:col-span-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
         <h1 class="mb-3 text-xl font-semibold">1) Build Post Generator Prompt</h1>
@@ -42,6 +79,27 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           <label class="block">
             <span class="text-xs font-medium">Word count</span>
             <input id="words" type="number" class="mt-1 w-full rounded-lg border px-3 py-2" value="1200" />
+          </label>
+          <label class="block">
+            <span class="text-xs font-medium">Template</span>
+            <select id="mode" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+              <option value="" selected>Standard ritual workflow</option>
+              {presetOptions.map((option) => (
+                <option value={option.key}>{option.label}</option>
+              ))}
+            </select>
+            <p id="modeHelp" class="mt-1 text-[11px] text-gray-600">{defaultModeDescription}</p>
+          </label>
+          <label class="block">
+            <span class="text-xs font-medium">Writing style</span>
+            <select id="style" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+              {styleOptions.map((option) => (
+                <option value={option.key} selected={option.key === "cozy"}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <p id="styleHelp" class="mt-1 text-[11px] text-gray-600">{defaultStyleDescription}</p>
           </label>
           <div class="flex gap-4 text-sm">
             <label class="inline-flex items-center gap-2">
@@ -96,6 +154,14 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         var root = document.querySelector('[data-dev-api]');
         var DEV_API = root?.getAttribute('data-dev-api') || 'http://localhost:8787';
         var $ = function(id){ return document.getElementById(id); };
+        var rawPresets = root?.getAttribute('data-preset-options') || '[]';
+        var rawStyles = root?.getAttribute('data-style-options') || '[]';
+        var DEFAULT_MODE_DESC = root?.getAttribute('data-default-mode') || '';
+        var DEFAULT_STYLE_DESC = root?.getAttribute('data-default-style') || '';
+        var PRESET_OPTIONS = [];
+        var STYLE_OPTIONS = [];
+        try { PRESET_OPTIONS = JSON.parse(rawPresets); } catch {}
+        try { STYLE_OPTIONS = JSON.parse(rawStyles); } catch {}
         function setStatus(msg, ok){
           var el=$('status');
           el.textContent=msg;
@@ -106,6 +172,22 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             .forEach(function(id){ var b=$(id); if(b){ b.disabled=!!on; b.style.opacity = on ? .6 : 1; }});
         }
 
+        function updateHelp(selectId, helpId, options, fallback){
+          var select = $(selectId);
+          var help = $(helpId);
+          if (!select || !help) return;
+          function render(){
+            var value = select.value;
+            var match = options.find(function(opt){ return opt.key === value; });
+            help.textContent = match ? match.description : fallback;
+          }
+          select.addEventListener('change', render);
+          render();
+        }
+
+        updateHelp('mode', 'modeHelp', PRESET_OPTIONS, DEFAULT_MODE_DESC);
+        updateHelp('style', 'styleHelp', STYLE_OPTIONS, DEFAULT_STYLE_DESC);
+
         $('genPrompt').addEventListener('click', async function(){
           try{
             busy(true); setStatus('Generating prompt...');
@@ -115,6 +197,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               ads: $('ads').checked ? 'on' : 'off',
               kofi: $('kofi').checked ? 'on' : 'off'
             };
+            var mode = $('mode').value;
+            if (mode) body.mode = mode;
+            var style = $('style').value || 'cozy';
+            body.style = style;
             var res = await fetch(DEV_API + '/genprompt', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
             if(!res.ok) throw new Error('gen failed ('+res.status+')');
             var data = await res.json();
