@@ -6,6 +6,7 @@ import fs from "node:fs/promises";
 import fssync from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { z } from "zod";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -265,218 +266,182 @@ function bytes(n) { return `${n} bytes`; }
 function die(msg) { console.error(msg); process.exit(1); }
 
 function validateSpec(input) {
-  const errors = [];
-  const value = {};
+  const result = specSchema.safeParse(input);
+  if (result.success) {
+    return { value: result.data, errors: [] };
+  }
 
-  const title = optionalNonEmptyString(input.title, "title", errors, { allowEmpty: false, optional: true });
-  if (title) value.title = title;
+  return { value: {}, errors: formatZodErrors(result.error) };
+}
+const slugPattern = /^[a-z0-9]+(?:[a-z0-9-]*[a-z0-9])?$/i;
 
-  const slugRaw = optionalNonEmptyString(input.slug, "slug", errors, { allowEmpty: false, optional: true });
-  if (slugRaw) {
-    if (!isValidSlug(slugRaw)) {
-      errors.push("slug must contain only lowercase letters, numbers, or hyphen separators");
+const affiliateAnchorSchema = z
+  .object(
+    {
+      key: z
+        .string({ required_error: "affiliateAnchors[].key is required", invalid_type_error: "affiliateAnchors[].key must be a string" })
+        .trim()
+        .min(1, "affiliateAnchors[].key cannot be empty"),
+      text: z
+        .string({ required_error: "affiliateAnchors[].text is required", invalid_type_error: "affiliateAnchors[].text must be a string" })
+        .trim()
+        .min(1, "affiliateAnchors[].text cannot be empty"),
+    },
+    { invalid_type_error: "affiliateAnchors[] must be an object with key and text" }
+  )
+  .strict();
+
+const internalLinkSchema = z
+  .object(
+    {
+      slug: z
+        .string({ required_error: "internalLinks[].slug is required", invalid_type_error: "internalLinks[].slug must be a string" })
+        .trim()
+        .min(1, "internalLinks[].slug cannot be empty")
+        .transform((val) => val.toLowerCase()),
+      anchor: z
+        .string({ required_error: "internalLinks[].anchor is required", invalid_type_error: "internalLinks[].anchor must be a string" })
+        .trim()
+        .min(1, "internalLinks[].anchor cannot be empty"),
+    },
+    { invalid_type_error: "internalLinks[] must be an object" }
+  )
+  .strict();
+
+const entitySchema = z
+  .object(
+    {
+      type: z
+        .string({ required_error: "entities[].type is required", invalid_type_error: "entities[].type must be a string" })
+        .trim()
+        .min(1, "entities[].type cannot be empty"),
+      slug: z
+        .string({ required_error: "entities[].slug is required", invalid_type_error: "entities[].slug must be a string" })
+        .trim()
+        .min(1, "entities[].slug cannot be empty")
+        .transform((val) => val.toLowerCase()),
+    },
+    { invalid_type_error: "entities[] must be an object" }
+  )
+  .strict();
+
+const isoDate = (field) =>
+  z
+    .preprocess(
+      (val) => {
+        if (val === undefined || val === null) return undefined;
+        if (typeof val === "string" && val.trim() === "") return undefined;
+        if (val instanceof Date) return val.toISOString();
+        if (typeof val === "number") return new Date(val).toISOString();
+        return val;
+      },
+      z
+        .string({ invalid_type_error: `${field} must be a string` })
+        .refine((val) => !Number.isNaN(Date.parse(val)), { message: `${field} must be a valid date` })
+        .transform((val) => new Date(val).toISOString())
+    )
+    .optional();
+
+const specSchema = z
+  .object(
+    {
+      title: z
+        .string({ invalid_type_error: "title must be a string" })
+        .trim()
+        .min(1, "title cannot be empty")
+        .optional(),
+      slug: z
+        .string({ invalid_type_error: "slug must be a string" })
+        .trim()
+        .min(1, "slug cannot be empty")
+        .regex(slugPattern, "slug must contain only lowercase letters, numbers, or hyphen separators")
+        .transform((val) => val.toLowerCase())
+        .optional(),
+      description: z.string({ invalid_type_error: "description must be a string" }).optional(),
+      canonical: z
+        .string({ invalid_type_error: "canonical must be a string" })
+        .trim()
+        .min(1, "canonical cannot be empty")
+        .refine((val) => looksLikeUrl(val), { message: "canonical must be an absolute URL or start with '/'" })
+        .optional(),
+      ogImage: z
+        .string({ invalid_type_error: "ogImage must be a string" })
+        .trim()
+        .min(1, "ogImage cannot be empty")
+        .optional(),
+      downloadId: z
+        .string({ invalid_type_error: "downloadId must be a string" })
+        .trim()
+        .min(1, "downloadId cannot be empty")
+        .optional(),
+      tags: z
+        .array(
+          z
+            .string({ invalid_type_error: "tags[] must be a string" })
+            .trim()
+            .min(1, "tags[] cannot be empty"),
+          { invalid_type_error: "tags must be an array of strings" }
+        )
+        .optional()
+        .default([]),
+      draft: z.boolean({ invalid_type_error: "draft must be a boolean" }).optional(),
+      includeAds: z.boolean({ invalid_type_error: "includeAds must be a boolean" }).optional(),
+      includeKofi: z.boolean({ invalid_type_error: "includeKofi must be a boolean" }).optional(),
+      pubDate: isoDate("pubDate"),
+      updatedAt: isoDate("updatedAt"),
+      readingMinutes: z
+        .number({ invalid_type_error: "readingMinutes must be a positive number" })
+        .finite("readingMinutes must be a positive number")
+        .positive("readingMinutes must be a positive number")
+        .transform((val) => Math.round(val))
+        .optional(),
+      affiliateAnchors: z
+        .array(affiliateAnchorSchema, { invalid_type_error: "affiliateAnchors must be an array" })
+        .optional()
+        .default([]),
+      internalLinks: z
+        .array(internalLinkSchema, { invalid_type_error: "internalLinks must be an array" })
+        .optional()
+        .default([]),
+      entities: z
+        .array(entitySchema, { invalid_type_error: "entities must be an array" })
+        .optional()
+        .default([]),
+      body: z
+        .string({ required_error: "body is required", invalid_type_error: "body must be a string" })
+        .trim()
+        .min(1, "body cannot be empty"),
+    },
+    { invalid_type_error: "Spec must be an object" }
+  )
+  .strict()
+  .superRefine((val, ctx) => {
+    if (!val.title && !val.slug) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Provide at least a title or slug" });
+    }
+  });
+
+function formatZodErrors(error) {
+  return error.issues.map((issue) => {
+    const path = formatZodPath(issue.path);
+    const message = issue.message;
+    return path ? `${path}: ${message}` : message;
+  });
+}
+
+function formatZodPath(path) {
+  if (!path || path.length === 0) return "";
+  let out = "";
+  for (const segment of path) {
+    if (typeof segment === "number") {
+      out += `[${segment}]`;
+    } else if (!out) {
+      out = segment;
     } else {
-      value.slug = slugRaw.toLowerCase();
+      out += `.${segment}`;
     }
   }
-
-  const description = optionalNonEmptyString(input.description, "description", errors, { optional: true, allowEmpty: true });
-  if (description !== undefined) value.description = description;
-
-  const canonical = optionalNonEmptyString(input.canonical, "canonical", errors, { optional: true });
-  if (canonical) {
-    if (!looksLikeUrl(canonical)) {
-      errors.push("canonical must be an absolute URL or start with '/'");
-    } else {
-      value.canonical = canonical;
-    }
-  }
-
-  const ogImage = optionalNonEmptyString(input.ogImage, "ogImage", errors, { optional: true });
-  if (ogImage) value.ogImage = ogImage;
-
-  const downloadId = optionalNonEmptyString(input.downloadId, "downloadId", errors, { optional: true });
-  if (downloadId) value.downloadId = downloadId;
-
-  value.tags = normalizeStringArray(input.tags, "tags", errors);
-
-  const draft = optionalBoolean(input.draft, "draft", errors);
-  if (draft !== undefined) value.draft = draft;
-
-  const includeAds = optionalBoolean(input.includeAds, "includeAds", errors);
-  if (includeAds !== undefined) value.includeAds = includeAds;
-
-  const includeKofi = optionalBoolean(input.includeKofi, "includeKofi", errors);
-  if (includeKofi !== undefined) value.includeKofi = includeKofi;
-
-  const pubDate = optionalIsoDate(input.pubDate, "pubDate", errors);
-  if (pubDate) value.pubDate = pubDate;
-
-  const updatedAt = optionalIsoDate(input.updatedAt, "updatedAt", errors);
-  if (updatedAt) value.updatedAt = updatedAt;
-
-  const readingMinutes = optionalPositiveInteger(input.readingMinutes, "readingMinutes", errors);
-  if (readingMinutes !== undefined) value.readingMinutes = readingMinutes;
-
-  value.affiliateAnchors = normalizeAnchorArray(input.affiliateAnchors, "affiliateAnchors", errors);
-  value.internalLinks = normalizeInternalLinks(input.internalLinks, errors);
-  value.entities = normalizeEntities(input.entities, errors);
-
-  const body = readBody(input.body, errors);
-  if (body) value.body = body;
-
-  if (!value.title && !value.slug) {
-    errors.push("Provide at least a title or slug");
-  }
-
-  return { value, errors };
-}
-
-function optionalNonEmptyString(value, field, errors, { optional = false, allowEmpty = false } = {}) {
-  if (value === undefined || value === null) {
-    if (optional) return undefined;
-    errors.push(`${field} is required`);
-    return undefined;
-  }
-  if (typeof value !== "string") {
-    errors.push(`${field} must be a string`);
-    return undefined;
-  }
-  const trimmed = value.trim();
-  if (!allowEmpty && trimmed.length === 0) {
-    errors.push(`${field} cannot be empty`);
-    return undefined;
-  }
-  return allowEmpty ? value : trimmed;
-}
-
-function optionalBoolean(value, field, errors) {
-  if (value === undefined || value === null) return undefined;
-  if (typeof value !== "boolean") {
-    errors.push(`${field} must be a boolean`);
-    return undefined;
-  }
-  return value;
-}
-
-function optionalIsoDate(value, field, errors) {
-  if (value === undefined || value === null || value === "") return undefined;
-  const date = new Date(value);
-  if (Number.isNaN(+date)) {
-    errors.push(`${field} must be a valid date`);
-    return undefined;
-  }
-  return date.toISOString();
-}
-
-function optionalPositiveInteger(value, field, errors) {
-  if (value === undefined || value === null) return undefined;
-  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
-    errors.push(`${field} must be a positive number`);
-    return undefined;
-  }
-  return Math.round(value);
-}
-
-function normalizeStringArray(value, field, errors) {
-  if (value === undefined || value === null) return [];
-  if (!Array.isArray(value)) {
-    errors.push(`${field} must be an array of strings`);
-    return [];
-  }
-  const out = [];
-  value.forEach((item, index) => {
-    if (typeof item !== "string") {
-      errors.push(`${field}[${index}] must be a string`);
-      return;
-    }
-    const trimmed = item.trim();
-    if (!trimmed) {
-      errors.push(`${field}[${index}] cannot be empty`);
-      return;
-    }
-    out.push(trimmed);
-  });
   return out;
-}
-
-function normalizeAnchorArray(value, field, errors) {
-  if (value === undefined || value === null) return [];
-  if (!Array.isArray(value)) {
-    errors.push(`${field} must be an array`);
-    return [];
-  }
-  const out = [];
-  value.forEach((item, index) => {
-    if (!item || typeof item !== "object") {
-      errors.push(`${field}[${index}] must be an object with key and text`);
-      return;
-    }
-    const key = optionalNonEmptyString(item.key, `${field}[${index}].key`, errors);
-    const text = optionalNonEmptyString(item.text, `${field}[${index}].text`, errors);
-    if (key && text) {
-      out.push({ key, text });
-    }
-  });
-  return out;
-}
-
-function normalizeInternalLinks(value, errors) {
-  if (value === undefined || value === null) return [];
-  if (!Array.isArray(value)) {
-    errors.push("internalLinks must be an array");
-    return [];
-  }
-  const out = [];
-  value.forEach((item, index) => {
-    if (!item || typeof item !== "object") {
-      errors.push(`internalLinks[${index}] must be an object`);
-      return;
-    }
-    const slug = optionalNonEmptyString(item.slug, `internalLinks[${index}].slug`, errors);
-    const anchor = optionalNonEmptyString(item.anchor, `internalLinks[${index}].anchor`, errors);
-    if (slug && anchor) {
-      out.push({ slug: slug.toLowerCase(), anchor });
-    }
-  });
-  return out;
-}
-
-function normalizeEntities(value, errors) {
-  if (value === undefined || value === null) return [];
-  if (!Array.isArray(value)) {
-    errors.push("entities must be an array");
-    return [];
-  }
-  const out = [];
-  value.forEach((item, index) => {
-    if (!item || typeof item !== "object") {
-      errors.push(`entities[${index}] must be an object`);
-      return;
-    }
-    const type = optionalNonEmptyString(item.type, `entities[${index}].type`, errors);
-    const slug = optionalNonEmptyString(item.slug, `entities[${index}].slug`, errors);
-    if (type && slug) {
-      out.push({ type, slug: slug.toLowerCase() });
-    }
-  });
-  return out;
-}
-
-function readBody(value, errors) {
-  if (value === undefined || value === null) {
-    errors.push("body is required");
-    return "";
-  }
-  if (typeof value !== "string") {
-    errors.push("body must be a string");
-    return "";
-  }
-  if (!value.trim()) {
-    errors.push("body cannot be empty");
-    return "";
-  }
-  return value;
 }
 
 function looksLikeUrl(value) {
@@ -488,6 +453,3 @@ function looksLikeUrl(value) {
   }
 }
 
-function isValidSlug(value) {
-  return /^[a-z0-9]+(?:[a-z0-9-]*[a-z0-9])?$/i.test(value);
-}
