@@ -12,6 +12,29 @@ export interface LoadedPost {
 
 let cachedPosts: LoadedPost[] | null = null;
 
+const runtimeEnv =
+  typeof import.meta !== "undefined"
+    ? (import.meta as ImportMeta & { env?: Record<string, any> }).env ?? null
+    : null;
+
+const shouldCache = runtimeEnv ? Boolean(runtimeEnv.PROD) : process.env.NODE_ENV === "production";
+
+function resolvePostDirectory(): string | null {
+  const cwd = process.cwd();
+  const candidates = [
+    path.join(cwd, "src", "content", "posts"),
+    path.join(cwd, "content", "posts"),
+  ];
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
 function deriveSlug(file: string, data: Record<string, any>): string {
   const fmSlug = data?.slug ? String(data.slug) : "";
   return (fmSlug || file.replace(/\.md$/, "")).toLowerCase();
@@ -38,17 +61,18 @@ function deriveDate(
 }
 
 export function loadAllPosts(): LoadedPost[] {
-  if (cachedPosts) return cachedPosts;
+  if (shouldCache && cachedPosts) return cachedPosts;
 
-  const dir = path.join(process.cwd(), "content", "posts");
-  if (!fs.existsSync(dir)) {
-    cachedPosts = [];
-    return cachedPosts;
+  const dir = resolvePostDirectory();
+  if (!dir) {
+    if (shouldCache) cachedPosts = [];
+    return [];
   }
 
-  const files = fs
-    .readdirSync(dir)
-    .filter((file) => file.endsWith(".md"));
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  const files = entries
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
+    .map((entry) => entry.name);
 
   const posts = files.map((file) => {
     const fullPath = path.join(dir, file);
@@ -67,8 +91,16 @@ export function loadAllPosts(): LoadedPost[] {
   });
 
   posts.sort((a, b) => +b.date - +a.date);
-  cachedPosts = posts;
-  return cachedPosts;
+  if (shouldCache) {
+    cachedPosts = posts;
+    return cachedPosts;
+  }
+
+  return posts;
+}
+
+export function resetPostCache() {
+  cachedPosts = null;
 }
 
 export function getPostBySlug(slug: string): LoadedPost | null {
