@@ -235,6 +235,9 @@ export async function POST({ request }: { request: Request }) {
       includeKofi: normalizeCta(spec.cta).type === 'kofi',
       downloadId,
       affiliateAnchors: (spec.affiliateHints||[]).map(h=>({ key:h.key, text:h.anchor, insertedCount:0 })),
+      internalLinkHints: (spec.internalLinkHints||[])
+        .map(h => String(h?.anchor || '').trim())
+        .filter(anchor => anchor.length > 0),
       internalLinks: [],
       publishedAt: new Date().toISOString(),
       canonicalUrl: `${String(settings.siteUrl||'').replace(/\/$/,'')}/post/${slug}`,

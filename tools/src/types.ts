@@ -35,6 +35,7 @@ export interface Frontmatter {
   includeKofi: boolean;
   downloadId?: string;
   affiliateAnchors: { key: string; text: string; insertedCount: number }[];
+  internalLinkHints: string[];
   /** renderer+export only need slug+anchor; title is optional for back-compat */
   internalLinks: { slug: string; anchor: string; title?: string }[];
   publishedAt: string;

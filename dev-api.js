@@ -696,6 +696,7 @@ function prepareNormalizedSpec(rawSpec) {
     `includeAds: ${includeAds ? 'true' : 'false'}`,
     `includeKofi: ${includeKofi ? 'true' : 'false'}`,
     `affiliateAnchors: ${JSON.stringify(spec.affiliateHints.map(a => ({ key: a.key, text: a.anchor, insertedCount: 0 })))}`,
+    `internalLinkHints: ${JSON.stringify(spec.internalLinkHints.map(h => h.anchor).filter(Boolean))}`,
     `internalLinks: ${JSON.stringify([])}`,
     `entities: ${entitiesJson}`,
     `downloadId: ${yq(downloadId)}`,

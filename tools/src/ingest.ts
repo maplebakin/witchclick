@@ -85,6 +85,9 @@ const slug =
       text: h.anchor,
       insertedCount: 0,
     })),
+    internalLinkHints: (json.internalLinkHints || [])
+      .map((hint) => String(hint?.anchor || '').trim())
+      .filter((anchor) => anchor.length > 0),
     internalLinks: [],
     publishedAt: new Date().toISOString(),
     canonicalUrl: `${String(settings.siteUrl).replace(/\/$/, '')}/post/${slug}`,
