@@ -14,6 +14,103 @@ const ROOT = path.resolve(__dirname, "..");
 // ---------- CLI args ----------
 const args = process.argv.slice(2);
 const opts = parseArgs(args);
+
+export class IngestValidationError extends Error {
+  constructor(errors) {
+    super("Spec validation failed");
+    this.name = "IngestValidationError";
+    this.errors = errors;
+  }
+}
+
+export async function ingestFromFile(filePath, options = {}) {
+  const raw = await fs.readFile(filePath, "utf8");
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (e) {
+    throw new Error(`Could not parse JSON: ${e?.message || e}`);
+  }
+  return ingestFromSpec(parsed, { ...options, inputPath: filePath });
+}
+
+export async function ingestFromSpec(input, options = {}) {
+  const { dir, dry = false, inputPath } = options;
+  const { value: spec, errors } = validateSpec(input);
+  if (errors.length > 0) {
+    throw new IngestValidationError(errors);
+  }
+
+  const title = spec.title || "Untitled";
+  const slug = (spec.slug || slugify(title)).toLowerCase();
+  const description = spec.description || "";
+  const tags = spec.tags ?? [];
+  const draft = spec.draft ?? false;
+  const pubDate = spec.pubDate || new Date().toISOString();
+  const updatedAt = spec.updatedAt;
+  const canonical = spec.canonical;
+  const ogImage = spec.ogImage;
+  const includeAds = spec.includeAds ?? false;
+  const includeKofi = spec.includeKofi ?? false;
+  const downloadId = spec.downloadId;
+
+  const affiliateAnchors = spec.affiliateAnchors ?? [];
+  const internalLinks = spec.internalLinks ?? [];
+  const entities = spec.entities ?? [];
+
+  const body = (spec.body ?? "").trim();
+
+  const readingMinutes = spec.readingMinutes ?? Math.max(1, Math.ceil(wordCount(body) / 200));
+
+  const defaultDir = await pickOutDir(dir);
+  await fs.mkdir(defaultDir, { recursive: true });
+
+  const outPath = path.join(defaultDir, `${slug}.md`);
+  const fmData = {
+    title,
+    description,
+    pubDate,
+    updatedAt,
+    tags,
+    draft,
+    canonical,
+    ogImage,
+    readingMinutes,
+    affiliateAnchors,
+    internalLinks,
+    entities,
+    includeAds,
+    includeKofi,
+    downloadId,
+  };
+
+  const fm = frontmatter(fmData);
+  const fileContent = `${fm}\n${body}\n`;
+  const size = Buffer.byteLength(fileContent, "utf8");
+
+  if (dry) {
+    return {
+      dryRun: true,
+      path: outPath,
+      slug,
+      bytes: size,
+      frontmatter: fmData,
+      content: fileContent,
+      source: inputPath || null,
+    };
+  }
+
+  await fs.writeFile(outPath, fileContent, "utf8");
+  return {
+    dryRun: false,
+    path: outPath,
+    slug,
+    bytes: size,
+    frontmatter: fmData,
+    source: inputPath || null,
+  };
+}
+
 /*
 Usage:
   node scripts/ingest.mjs path/to/spec.json [--dry] [--dir src/content/posts]
@@ -40,87 +137,35 @@ async function main() {
   if (!opts.input) {
     die("Usage: node scripts/ingest.mjs <spec.json> [--dry] [--dir <outDir>]");
   }
-  const raw = await fs.readFile(opts.input, "utf8");
-  let parsed;
   try {
-    parsed = JSON.parse(raw);
-  } catch (e) {
-    die(`Could not parse JSON: ${e?.message || e}`);
-  }
-
-  const { value: spec, errors } = validateSpec(parsed);
-  if (errors.length > 0) {
-    console.error("Spec validation failed:");
-    for (const err of errors) {
-      console.error(` • ${err}`);
+    const result = await ingestFromFile(opts.input, { dir: opts.dir, dry: opts.dry });
+    if (result.dryRun) {
+      console.log("----- DRY RUN (no write) -----");
+      console.log(result.path);
+      console.log(result.content);
+      return;
     }
+    console.log(`Wrote ${rel(result.path)} (${bytes(result.bytes)})`);
+    console.log("Tip: commit and deploy when ready.");
+  } catch (err) {
+    if (err instanceof IngestValidationError) {
+      console.error("Spec validation failed:");
+      for (const e of err.errors) {
+        console.error(` • ${e}`);
+      }
+      process.exit(1);
+    }
+    console.error(err?.stack || err);
     process.exit(1);
   }
-
-  // Normalize / defaults using validated data
-  const title = spec.title || "Untitled";
-  const slug = (spec.slug || slugify(title)).toLowerCase();
-  const description = spec.description || "";
-  const tags = spec.tags ?? [];
-  const draft = spec.draft ?? false;
-  const pubDate = spec.pubDate || new Date().toISOString();
-  const updatedAt = spec.updatedAt;
-  const canonical = spec.canonical;
-  const ogImage = spec.ogImage;
-  const includeAds = spec.includeAds ?? false;
-  const includeKofi = spec.includeKofi ?? false;
-  const downloadId = spec.downloadId;
-
-  const affiliateAnchors = spec.affiliateAnchors ?? [];
-  const internalLinks = spec.internalLinks ?? [];
-  const entities = spec.entities ?? [];
-
-  const body = spec.body ?? "";
-
-  // Compute reading minutes if not provided
-  const readingMinutes = spec.readingMinutes ?? Math.max(1, Math.ceil(wordCount(body) / 200));
-
-  // Where to write?
-  const defaultDir = await pickOutDir(opts.dir);
-  await fs.mkdir(defaultDir, { recursive: true });
-
-  const outPath = path.join(defaultDir, `${slug}.md`);
-  const fm = frontmatter({
-    title,
-    description,
-    pubDate,
-    updatedAt,
-    tags,
-    draft,
-    canonical,
-    ogImage,
-    readingMinutes,
-    affiliateAnchors,
-    internalLinks,
-    entities,
-    includeAds,
-    includeKofi,
-    downloadId,
-  });
-
-  const fileContent = `${fm}\n${body.trim()}\n`;
-
-  if (opts.dry) {
-    console.log("----- DRY RUN (no write) -----");
-    console.log(outPath);
-    console.log(fileContent);
-    return;
-  }
-
-  await fs.writeFile(outPath, fileContent, "utf8");
-  console.log(`Wrote ${rel(outPath)} (${bytes(fileContent.length)})`);
-  console.log("Tip: commit and deploy when ready.");
 }
 
-main().catch((e) => {
-  console.error(e?.stack || e);
-  process.exit(1);
-});
+if (process.argv[1] === __filename) {
+  main().catch((e) => {
+    console.error(e?.stack || e);
+    process.exit(1);
+  });
+}
 
 // ---------- helpers ----------
 function parseArgs(a) {

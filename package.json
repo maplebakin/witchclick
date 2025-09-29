@@ -12,6 +12,7 @@
     "postinstall": "node scripts/build-tools.js",
     "genprompt": "node tools/wc.js genprompt",
     "ingest": "node scripts/ingest.mjs",
+    "ingest:queue": "node scripts/ingest-queue.mjs",
     "check": "node scripts/run-check.mjs",
     "zip": "zip -r witchclick_snapshot_$(date +%F).zip astro.config.mjs package.json src content public tools scripts -x \"**/node_modules/**\" -x \"**/.git/**\"",
     "test": "vitest run",
