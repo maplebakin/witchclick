@@ -218,6 +218,8 @@ export async function POST({ request }: { request: Request }) {
     const slug = ensureUniqueSlug(baseSlug, POSTS_DIR);
 
     // Frontmatter
+    const downloadId = spec.cta?.type === 'download' ? spec.cta.id ?? '' : undefined;
+
     const fm = {
       title: spec.title,
       slug,
@@ -231,6 +233,7 @@ export async function POST({ request }: { request: Request }) {
       entities: spec.entities || [],
       includeAds: !!(spec.adPlacements && spec.adPlacements.length),
       includeKofi: normalizeCta(spec.cta).type === 'kofi',
+      downloadId,
       affiliateAnchors: (spec.affiliateHints||[]).map(h=>({ key:h.key, text:h.anchor, insertedCount:0 })),
       internalLinks: [],
       publishedAt: new Date().toISOString(),
