@@ -631,6 +631,8 @@ function prepareNormalizedSpec(rawSpec) {
   const includeKofi = spec.cta && spec.cta.type === 'kofi';
   const excerpt = pickFirstString(spec.excerpt);
   const metaDescription = pickFirstString(spec.metaDescription, excerpt);
+  const downloadId = spec.cta && spec.cta.type === 'download' ? String(spec.cta.id || '') : '';
+  const entitiesJson = JSON.stringify(spec.entities || []);
 
   const settings = readJSON(path.join(CWD, 'content', 'settings.json')) || { siteUrl: 'https://example.com' };
   const site = String(settings.siteUrl || 'https://example.com').replace(/\/$/, '');
@@ -651,6 +653,8 @@ function prepareNormalizedSpec(rawSpec) {
     `includeKofi: ${includeKofi ? 'true' : 'false'}`,
     `affiliateAnchors: ${JSON.stringify(spec.affiliateHints.map(a => ({ key: a.key, text: a.anchor, insertedCount: 0 })))}`,
     `internalLinks: ${JSON.stringify([])}`,
+    `entities: ${entitiesJson}`,
+    `downloadId: ${yq(downloadId)}`,
     `publishedAt: ${yq(new Date().toISOString())}`,
     `canonicalUrl: ${yq(canonical)}`,
     'specVersion: 2',
