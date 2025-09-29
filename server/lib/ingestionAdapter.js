@@ -1,3 +1,5 @@
+// server/lib/ingestionAdapter.js — conflict-free, deterministic normalizer
+
 const OPENING_HEADING = 'Opening Reflection';
 const OPENING_ID = 'opening-reflection';
 const VALID_AD_PLACEMENTS = new Set(['lead', 'mid', 'end']);
@@ -25,9 +27,7 @@ function slugify(value) {
 
 function sanitizeStringArray(value) {
   if (Array.isArray(value)) {
-    return value
-      .map((item) => toTrimmedString(item))
-      .filter(Boolean);
+    return value.map((item) => toTrimmedString(item)).filter(Boolean);
   }
   if (typeof value === 'string') {
     return value
@@ -111,7 +111,7 @@ function ensureOpening(outline, sections, report) {
       if (idx > 0) {
         normalizedOutline = [
           { heading: OPENING_HEADING, id: entry.id ? slugify(entry.id) || OPENING_ID : OPENING_ID },
-          ...rest
+          ...rest,
         ];
         if (!movedReported) {
           report.push('moved Opening Reflection to first position');
@@ -120,7 +120,7 @@ function ensureOpening(outline, sections, report) {
       } else {
         normalizedOutline = [
           { heading: OPENING_HEADING, id: entry.id ? slugify(entry.id) || OPENING_ID : OPENING_ID },
-          ...rest
+          ...rest,
         ];
       }
     }
@@ -143,11 +143,8 @@ function ensureOpening(outline, sections, report) {
       const rest = normalizedSections.filter((_, i) => i !== idx);
       if (idx > 0) {
         normalizedSections = [
-          {
-            heading: OPENING_HEADING,
-            markdown: typeof entry.markdown === 'string' ? entry.markdown : ''
-          },
-          ...rest
+          { heading: OPENING_HEADING, markdown: typeof entry.markdown === 'string' ? entry.markdown : '' },
+          ...rest,
         ];
         if (!movedReported) {
           report.push('moved Opening Reflection to first position');
@@ -155,19 +152,14 @@ function ensureOpening(outline, sections, report) {
         }
       } else {
         normalizedSections = [
-          {
-            heading: OPENING_HEADING,
-            markdown: typeof entry.markdown === 'string' ? entry.markdown : ''
-          },
-          ...rest
+          { heading: OPENING_HEADING, markdown: typeof entry.markdown === 'string' ? entry.markdown : '' },
+          ...rest,
         ];
       }
     }
   }
   if (normalizedSections.length) {
-    const firstMarkdown = typeof normalizedSections[0].markdown === 'string'
-      ? normalizedSections[0].markdown
-      : '';
+    const firstMarkdown = typeof normalizedSections[0].markdown === 'string' ? normalizedSections[0].markdown : '';
     normalizedSections[0] = { heading: OPENING_HEADING, markdown: firstMarkdown };
   }
 
@@ -178,6 +170,7 @@ export function normalizePostSpec(raw) {
   const input = isPlainObject(raw) ? raw : {};
   const report = [];
 
+  // title & aliases
   let title = toTrimmedString(input.title);
   if (!title) {
     const fromName = toTrimmedString(input.name);
@@ -195,12 +188,14 @@ export function normalizePostSpec(raw) {
   }
   if (!title) throw new Error('Title required');
 
+  // slug
   let slug = slugify(input.slug);
   if (!slug) {
     slug = slugify(title);
     report.push('generated slug from title');
   }
 
+  // metaDescription & aliases
   let metaDescription = toTrimmedString(input.metaDescription);
   if (!metaDescription) {
     const fromDescription = toTrimmedString(input.description);
@@ -223,7 +218,9 @@ export function normalizePostSpec(raw) {
       report.push('summary→metaDescription');
     }
   }
+  metaDescription = metaDescription || '';
 
+  // tags & aliases
   const tagsFromCanonical = sanitizeStringArray(input.tags);
   let tags = Array.isArray(tagsFromCanonical) ? tagsFromCanonical : [];
   let tagsProvided = tagsFromCanonical !== null;
@@ -248,8 +245,10 @@ export function normalizePostSpec(raw) {
     report.push('defaulted tags=[]');
   }
 
+  // excerpt
   const excerpt = toTrimmedString(input.excerpt);
 
+  // outline & alias mapping
   const outlineSource = Array.isArray(input.outline) ? input.outline : [];
   let outline = [];
   let outlineAliasReported = false;
@@ -271,6 +270,7 @@ export function normalizePostSpec(raw) {
     outline.push({ heading, id: id || OPENING_ID });
   }
 
+  // sections & alias mapping
   const sectionsSource = Array.isArray(input.sections) ? input.sections : [];
   let sections = [];
   let sectionContentAliased = false;
@@ -303,38 +303,31 @@ export function normalizePostSpec(raw) {
     sections.push({ heading, markdown });
   }
 
+  // hero
   const heroImagePrompt = toTrimmedString(input.heroImagePrompt) || null;
 
+  // arrays with defaults & reports
   const altTextsFromCanonical = sanitizeStringArray(input.altTexts);
   const altTexts = altTextsFromCanonical !== null ? altTextsFromCanonical : [];
-  if (altTextsFromCanonical === null) {
-    report.push('defaulted altTexts=[]');
-  }
+  if (altTextsFromCanonical === null) report.push('defaulted altTexts=[]');
 
   const internalLinkHintsFromCanonical = sanitizeInternalLinkHints(input.internalLinkHints);
   const internalLinkHints = internalLinkHintsFromCanonical !== null ? internalLinkHintsFromCanonical : [];
-  if (internalLinkHintsFromCanonical === null) {
-    report.push('defaulted internalLinkHints=[]');
-  }
+  if (internalLinkHintsFromCanonical === null) report.push('defaulted internalLinkHints=[]');
 
   const affiliateHintsFromCanonical = sanitizeAffiliateHints(input.affiliateHints);
   const affiliateHints = affiliateHintsFromCanonical !== null ? affiliateHintsFromCanonical : [];
-  if (affiliateHintsFromCanonical === null) {
-    report.push('defaulted affiliateHints=[]');
-  }
+  if (affiliateHintsFromCanonical === null) report.push('defaulted affiliateHints=[]');
 
   const adPlacementsFromCanonical = sanitizeAdPlacements(input.adPlacements);
   const adPlacements = adPlacementsFromCanonical !== null ? adPlacementsFromCanonical : [];
-  if (adPlacementsFromCanonical === null) {
-    report.push('defaulted adPlacements=[]');
-  }
+  if (adPlacementsFromCanonical === null) report.push('defaulted adPlacements=[]');
 
   const entitiesFromCanonical = sanitizeEntities(input.entities);
   const entities = entitiesFromCanonical !== null ? entitiesFromCanonical : [];
-  if (entitiesFromCanonical === null) {
-    report.push('defaulted entities=[]');
-  }
+  if (entitiesFromCanonical === null) report.push('defaulted entities=[]');
 
+  // CTA
   let cta = { type: 'none' };
   let ctaDefaulted = true;
   if (isPlainObject(input.cta)) {
@@ -350,15 +343,11 @@ export function normalizePostSpec(raw) {
     } else if (type === 'none') {
       cta = { type: 'none' };
       ctaDefaulted = false;
-    } else {
-      cta = { type: 'none' };
-      ctaDefaulted = true;
     }
   }
-  if (ctaDefaulted) {
-    report.push('cta defaulted to none');
-  }
+  if (ctaDefaulted) report.push('cta defaulted to none');
 
+  // Opening Reflection enforcement
   const ensured = ensureOpening(outline, sections, report);
 
   const spec = {
@@ -376,7 +365,7 @@ export function normalizePostSpec(raw) {
     internalLinkHints,
     affiliateHints,
     cta,
-    adPlacements
+    adPlacements,
   };
 
   return { spec, report };
