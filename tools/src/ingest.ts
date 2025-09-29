@@ -64,6 +64,8 @@ const slug =
 
   const totalWords = json.sections.reduce((n, s) => n + wordCountFromMarkdown(s.markdown), 0);
 
+  const downloadId = json.cta?.type === "download" ? json.cta.id ?? "" : undefined;
+
   const fm: Frontmatter = {
     title: json.title,
     slug,
@@ -77,6 +79,7 @@ const slug =
     entities: json.entities || [],
     includeAds: !!(json.adPlacements && json.adPlacements.length > 0),
     includeKofi: json.cta?.type === 'kofi',
+    downloadId,
     affiliateAnchors: (json.affiliateHints || []).map((h) => ({
       key: h.key,
       text: h.anchor,

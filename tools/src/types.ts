@@ -33,6 +33,7 @@ export interface Frontmatter {
   entities: { type: EntityType; slug: string }[];
   includeAds: boolean;
   includeKofi: boolean;
+  downloadId?: string;
   affiliateAnchors: { key: string; text: string; insertedCount: number }[];
   /** renderer+export only need slug+anchor; title is optional for back-compat */
   internalLinks: { slug: string; anchor: string; title?: string }[];
