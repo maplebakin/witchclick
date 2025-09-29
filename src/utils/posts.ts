@@ -19,18 +19,35 @@ const runtimeEnv =
 
 const shouldCache = runtimeEnv ? Boolean(runtimeEnv.PROD) : process.env.NODE_ENV === "production";
 
+function isDirectory(candidate: string): boolean {
+  try {
+    return fs.statSync(candidate).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+function directoryHasMarkdown(candidate: string): boolean {
+  if (!isDirectory(candidate)) return false;
+
+  try {
+    return fs
+      .readdirSync(candidate, { withFileTypes: true })
+      .some((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".md"));
+  } catch {
+    return false;
+  }
+}
+
 function resolvePostDirectory(): string | null {
   const cwd = process.cwd();
-  const candidates = [
-    path.join(cwd, "src", "content", "posts"),
-    path.join(cwd, "content", "posts"),
-  ];
+  const modern = path.join(cwd, "src", "content", "posts");
+  const legacy = path.join(cwd, "content", "posts");
 
-  for (const candidate of candidates) {
-    if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
-      return candidate;
-    }
-  }
+  if (directoryHasMarkdown(modern)) return modern;
+  if (directoryHasMarkdown(legacy)) return legacy;
+  if (isDirectory(modern)) return modern;
+  if (isDirectory(legacy)) return legacy;
 
   return null;
 }

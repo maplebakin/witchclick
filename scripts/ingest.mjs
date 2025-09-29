@@ -9,7 +9,9 @@ import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const ROOT = path.resolve(__dirname, "..");
+const PROJECT_ROOT = process.env.WC_PROJECT_ROOT
+  ? path.resolve(process.env.WC_PROJECT_ROOT)
+  : path.resolve(__dirname, "..");
 
 // ---------- CLI args ----------
 const args = process.argv.slice(2);
@@ -180,15 +182,37 @@ function parseArgs(a) {
 }
 
 async function pickOutDir(preferred) {
-  if (preferred) return path.resolve(ROOT, preferred);
-  const legacy = path.join(ROOT, "content", "posts");
-  if (fssync.existsSync(legacy)) return legacy;
+  if (preferred) return path.resolve(PROJECT_ROOT, preferred);
 
-  const modern = path.join(ROOT, "src", "content", "posts");
-  if (fssync.existsSync(path.dirname(modern))) return modern;
+  const modern = path.join(PROJECT_ROOT, "src", "content", "posts");
+  const legacy = path.join(PROJECT_ROOT, "content", "posts");
+
+  if (directoryHasMarkdown(modern)) return modern;
+  if (directoryHasMarkdown(legacy)) return legacy;
+  if (isDirectory(modern)) return modern;
+  if (isDirectory(legacy)) return legacy;
 
   // last resort: create under src/content/posts
   return modern;
+}
+
+function isDirectory(candidate) {
+  try {
+    return fssync.statSync(candidate).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+function directoryHasMarkdown(candidate) {
+  if (!isDirectory(candidate)) return false;
+
+  try {
+    const entries = fssync.readdirSync(candidate, { withFileTypes: true });
+    return entries.some((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".md"));
+  } catch {
+    return false;
+  }
 }
 
 function frontmatter(obj) {
@@ -236,7 +260,7 @@ function wordCount(md) {
     .split(/\s+/)
     .filter(Boolean).length;
 }
-function rel(p) { return path.relative(ROOT, p); }
+function rel(p) { return path.relative(PROJECT_ROOT, p); }
 function bytes(n) { return `${n} bytes`; }
 function die(msg) { console.error(msg); process.exit(1); }
 

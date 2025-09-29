@@ -26,6 +26,7 @@ describe("posts utilities", () => {
   });
 
   afterEach(async () => {
+    delete process.env.WC_PROJECT_ROOT;
     await cleanupTempDir();
     vi.resetModules();
   });
@@ -105,5 +106,40 @@ describe("posts utilities", () => {
     expect(totalPages).toBe(3);
     expect(items).toHaveLength(2);
     expect(items[0].date.getTime()).toBeGreaterThanOrEqual(items[1].date.getTime());
+  });
+
+  it("ingests posts into the directory used by loadAllPosts", async () => {
+    const srcDir = path.join(tempDir, "src", "content", "posts");
+    const legacyDir = path.join(tempDir, "content", "posts");
+    await fs.mkdir(srcDir, { recursive: true });
+    await fs.mkdir(legacyDir, { recursive: true });
+
+    await fs.writeFile(
+      path.join(srcDir, "seed.md"),
+      `---\ntitle: Seed\npubDate: 2024-01-01T00:00:00Z\n---\nSeed content`,
+      "utf8",
+    );
+
+    process.env.WC_PROJECT_ROOT = tempDir;
+    vi.resetModules();
+
+    const { loadAllPosts, resetPostCache } = await import("../src/utils/posts");
+    resetPostCache();
+
+    let posts = loadAllPosts();
+    expect(posts.map((p) => p.slug)).toContain("seed");
+
+    const { ingestFromSpec } = await import("../scripts/ingest.mjs");
+    await ingestFromSpec({
+      title: "Ingested Post",
+      body: "# Heading\n\nBody content.",
+    });
+
+    resetPostCache();
+    posts = loadAllPosts();
+    expect(posts.map((p) => p.slug)).toContain("ingested-post");
+
+    const writtenFiles = await fs.readdir(srcDir);
+    expect(writtenFiles).toContain("ingested-post.md");
   });
 });
