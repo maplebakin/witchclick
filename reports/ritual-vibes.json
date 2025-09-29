@@ -1,0 +1,41 @@
+{
+  "Calm": [
+    "breath-and-card-check-in",
+    "calm-space-setup",
+    "tea-and-timer",
+    "tea-ritual"
+  ],
+  "Clarity": [
+    "decision-release-ritual",
+    "inner-dialogue-spread",
+    "name-the-need",
+    "secular-journaling-ritual",
+    "secular-sign-check-in"
+  ],
+  "Energy": [
+    "bravery-ladder",
+    "creative-spark-ritual",
+    "worldbuilding-spread"
+  ],
+  "Gaming": [
+    "controller-spread",
+    "game-day-spread",
+    "game-night-ritual"
+  ],
+  "Grounding": [
+    "desk-altar",
+    "first-day-new-job-spread",
+    "pre-interview-grounding-ritual"
+  ],
+  "Other": [
+    "_vibes-map"
+  ],
+  "Protection": [
+    "doorway-ritual"
+  ],
+  "Reset": [
+    "90-second-reset",
+    "deep-closure-ritual",
+    "walkaway-cooldown"
+  ]
+}

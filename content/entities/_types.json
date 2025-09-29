@@ -1,0 +1,9 @@
+{
+  "crystal": { "label": "Crystals", "icon": "💎" },
+  "herb":    { "label": "Herbs",    "icon": "🌿" },
+  "planet":  { "label": "Planets",  "icon": "🪐" },
+  "day":     { "label": "Days",     "icon": "📅" },
+  "moon-phase": { "label": "Moon Phases", "icon": "🌙" },
+  "ritual":  { "label": "Rituals",  "icon": "🕯️" },
+  "tarot":   { "label": "Tarot",    "icon": "🃏" }
+}

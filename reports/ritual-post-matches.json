@@ -1,0 +1,158 @@
+{
+  "generatedAt": "2025-09-22T17:18:26.206Z",
+  "exactCount": 1,
+  "fuzzyCount": 2,
+  "missCount": 20,
+  "results": [
+    {
+      "ritual": "90-second-reset",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "bravery-ladder",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "breath-and-card-check-in",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "calm-space-setup",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "controller-spread",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "creative-spark-ritual",
+      "match": {
+        "routerSlug": "creative-spark-ritual",
+        "file": "/home/maddie/Documents/code/witchclick/content/posts/creativity-tarot-ritual.md",
+        "rel": "creativity-tarot-ritual.md"
+      },
+      "score": 56,
+      "reason": "fuzzy(creativity-tarot-ritual)"
+    },
+    {
+      "ritual": "decision-release-ritual",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "deep-closure-ritual",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "desk-altar",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "doorway-ritual",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "first-day-new-job-spread",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "game-day-spread",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "game-night-ritual",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "inner-dialogue-spread",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "name-the-need",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "pre-interview-grounding-ritual",
+      "match": {
+        "routerSlug": "pre-interview-grounding-ritual",
+        "file": "/home/maddie/Documents/code/witchclick/content/posts/pre-interview-grounding-ritual.md",
+        "rel": "pre-interview-grounding-ritual.md"
+      },
+      "score": 100,
+      "reason": "exact"
+    },
+    {
+      "ritual": "secular-journaling-ritual",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "secular-sign-check-in",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "tea-and-timer",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "tea-ritual",
+      "match": {
+        "routerSlug": "tea-ritual",
+        "file": "/home/maddie/Documents/code/witchclick/content/posts/tea-ritual-for-focus.md",
+        "rel": "tea-ritual-for-focus.md"
+      },
+      "score": 85,
+      "reason": "substring"
+    },
+    {
+      "ritual": "vibes-map",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "walkaway-cooldown",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    },
+    {
+      "ritual": "worldbuilding-spread",
+      "match": null,
+      "score": 0,
+      "reason": "no-confident-match"
+    }
+  ]
+}

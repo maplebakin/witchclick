@@ -1,0 +1,15 @@
+---
+const env = {
+  dev: Boolean(import.meta?.env?.DEV),
+  mode: import.meta?.env?.MODE,
+};
+const url = Astro.url?.pathname || '/';
+---
+<html>
+  <body>
+    <h1>_debug</h1>
+    <p>url: {url}</p>
+    <pre>{JSON.stringify(env, null, 2)}</pre>
+    <p><a href="/">Home</a></p>
+  </body>
+</html>

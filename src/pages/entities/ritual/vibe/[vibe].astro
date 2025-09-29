@@ -1,0 +1,180 @@
+---
+import Base from "../../../../layouts/Base.astro";
+import fs from "node:fs";
+import path from "node:path";
+
+type Entity = {
+  type: string;
+  slug: string;
+  name?: string;
+  summary?: string;
+  properties?: Record<string, any>;
+  url?: string | null; // real post URL or null if not found
+};
+
+export async function getStaticPaths() {
+  const VIBE_CANON: Record<string, string> = {
+    reset: "Reset", refresh: "Reset", cleanse: "Reset", cleansing: "Reset", clear: "Reset", resetting: "Reset",
+    ground: "Grounding", grounding: "Grounding", center: "Grounding", centering: "Grounding", root: "Grounding",
+    gaming: "Gaming", game: "Gaming", focus: "Gaming", concentration: "Gaming", study: "Gaming", productivity: "Gaming",
+    calm: "Calm", soothe: "Calm", soothing: "Calm", anxiety: "Calm", relax: "Calm", relaxation: "Calm",
+    protection: "Protection", protect: "Protection", ward: "Protection",
+    clarity: "Clarity", insight: "Clarity", vision: "Clarity",
+    energy: "Energy", energize: "Energy", boost: "Energy",
+  };
+
+  const titleCase = (s: string) => (s || "").toLowerCase().replace(/\b([a-z])/g, (_m, c) => c.toUpperCase());
+  const slugify = (s: string) =>
+    String(s).toLowerCase().trim()
+      .replace(/[_\s]+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+
+  const canonVibe = (e: Entity): string => {
+    let raw = String(e.properties?.vibe || "").toLowerCase().trim();
+    if (!raw && Array.isArray(e.properties?.keywords)) {
+      for (const kw of e.properties!.keywords) {
+        const k = String(kw || "").toLowerCase().trim();
+        if (VIBE_CANON[k]) { raw = k; break; }
+      }
+    }
+    const mapped = VIBE_CANON[raw];
+    return mapped ? mapped : (raw ? titleCase(raw) : "Other");
+  };
+
+  const findDir = () => {
+    const roots = ["./content/entities/ritual", "./src/content/entities/ritual"];
+    for (const r of roots) if (fs.existsSync(r)) return r;
+    return "";
+  };
+
+  // Optional manual overrides: content/posts/_slug-map.json
+  let SLUG_MAP: Record<string, string> = {};
+  try {
+    const mapPath = "./content/posts/_slug-map.json";
+    if (fs.existsSync(mapPath)) SLUG_MAP = JSON.parse(fs.readFileSync(mapPath, "utf8"));
+  } catch {}
+
+  const POSTS_ROOTS = ["./content/posts", "./content/posts/rituals"];
+  const fileExists = (p: string) => { try { return fs.existsSync(p); } catch { return false; } };
+
+  // Return a real post URL if found; otherwise return null (so we can hide it)
+  function ritualPostUrl(slugRaw: string): string | null {
+    const want = slugify(slugRaw);
+    const mapped = SLUG_MAP[want] ? slugify(SLUG_MAP[want]) : want;
+    const exts = [".md", ".mdx"];
+
+    // direct files or folder index
+    for (const root of POSTS_ROOTS) {
+      for (const ext of exts) {
+        if (fileExists(path.join(root, `${mapped}${ext}`))) return `/post/${mapped}`;
+        if (fileExists(path.join(root, mapped, `index${ext}`))) return `/post/${mapped}`;
+      }
+    }
+
+    // date-prefixed & one-level nested scans
+    const endsWithSlugFileRE = new RegExp(`^(\\d{4}-\\d{2}-\\d{2}-)?${mapped}\\.(md|mdx)$`, "i");
+    const endsWithSlugDirRE  = new RegExp(`^(\\d{4}-\\d{2}-\\d{2}-)?${mapped}$`, "i");
+
+    for (const root of POSTS_ROOTS) {
+      if (!fileExists(root)) continue;
+      for (const entry of fs.readdirSync(root)) {
+        const full = path.join(root, entry);
+        const stat = fs.statSync(full);
+        if (stat.isFile() && endsWithSlugFileRE.test(entry)) return `/post/${mapped}`;
+        if (stat.isDirectory()) {
+          if (endsWithSlugDirRE.test(entry)) {
+            for (const ext of exts) {
+              if (fileExists(path.join(full, `index${ext}`))) return `/post/${mapped}`;
+            }
+          }
+          for (const sub of fs.readdirSync(full)) {
+            const subFull = path.join(full, sub);
+            const sstat = fs.statSync(subFull);
+            if (sstat.isFile() && endsWithSlugFileRE.test(sub)) return `/post/${mapped}`;
+            if (sstat.isDirectory() && endsWithSlugDirRE.test(sub)) {
+              for (const ext of exts) {
+                if (fileExists(path.join(subFull, `index${ext}`))) return `/post/${mapped}`;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return null; // ← hide if no post yet
+  }
+
+  const dir = findDir();
+  if (!dir) return [];
+
+  /** Load rituals (from entities) */
+  const rituals: Entity[] = [];
+  for (const f of fs.readdirSync(dir).filter(f => f.endsWith(".json"))) {
+    try {
+      const raw = fs.readFileSync(path.join(dir, f), "utf8");
+      const data = JSON.parse(raw);
+      const slug = slugify(data?.slug ? String(data.slug) : f.replace(/\.json$/, ""));
+      rituals.push({
+        type: "ritual",
+        slug,
+        name: data?.name || "",
+        summary: data?.summary || "",
+        properties: (data?.properties && typeof data.properties === "object") ? data.properties : {},
+        url: ritualPostUrl(slug),
+      });
+    } catch {}
+  }
+
+  // Derive canonical vibes present
+  const vibes = new Set<string>();
+  rituals.forEach(r => vibes.add(canonVibe(r)));
+
+  return Array.from(vibes).map((v) => {
+    // Only include rituals that have a real post URL
+    const itemsWithPosts = rituals
+      .filter(r => canonVibe(r) === v && r.url)
+      .sort((a,b)=> (a.name||"").localeCompare(b.name||""));
+    return {
+      params: { vibe: slugify(v) },
+      props: { vibe: v, items: itemsWithPosts }
+    };
+  });
+}
+
+// Render
+const { vibe, items } = Astro.props as { vibe: string; items: Entity[] };
+const pageTitle = `Rituals — ${vibe}`;
+const pageDescription = `Rituals in the “${vibe}” vibe category.`;
+---
+<Base title={pageTitle} description={pageDescription}>
+  <header class="mb-6">
+    <p class="text-xs uppercase tracking-wide text-slate-500">Rituals</p>
+    <h1 class="font-serif text-3xl">Rituals — {vibe}</h1>
+    <nav class="mt-2 text-sm">
+      <a class="hover:underline" href="/entities">← Entities</a>
+      <span class="mx-2 text-slate-400">•</span>
+      <a class="hover:underline" href="/entities#ritual">Vibe Categories</a>
+    </nav>
+  </header>
+
+  {items.length === 0 ? (
+    <p class="text-slate-600">
+      No published rituals in this vibe yet.
+      <br />
+      <a class="hover:underline" href="/entities#ritual">Browse other vibes</a>
+    </p>
+  ) : (
+    <ul class="not-prose grid gap-4 sm:grid-cols-2">
+      {items.map((e) => (
+        <li class="rounded-lg border bg-white p-4 shadow-sm">
+          <a href={e.url!} class="text-lg font-semibold hover:underline">
+            {e.name || e.slug}
+          </a>
+          {e.summary && <p class="mt-1 text-sm text-slate-600">{e.summary}</p>}
+        </li>
+      ))}
+    </ul>
+  )}
+</Base>

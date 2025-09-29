@@ -1,0 +1,70 @@
+---
+import Base from "../../../layouts/Base.astro";
+import fs from "node:fs";
+import path from "node:path";
+
+type Card = {
+  type: string;
+  slug: string;
+  name?: string;
+  summary?: string;
+  properties?: Record<string, any>;
+};
+
+function findDir() {
+  const roots = ["./content/entities/tarot", "./src/content/entities/tarot"];
+  for (const r of roots) if (fs.existsSync(r)) return r;
+  return "";
+}
+
+const dir = findDir();
+let items: Card[] = [];
+if (dir) {
+  const files = fs.readdirSync(dir).filter((x) => x.endsWith(".json"));
+  for (const f of files) {
+    try {
+      const raw = fs.readFileSync(path.join(dir, f), "utf8");
+      const data = JSON.parse(raw);
+      const slug = (data?.slug ? String(data.slug) : f.replace(/\.json$/, "")).toLowerCase();
+      items.push({
+        type: "tarot",
+        slug,
+        name: data?.name || slug,
+        summary: data?.summary || "",
+        properties: (data?.properties && typeof data.properties === "object") ? data.properties : {}
+      });
+    } catch {}
+  }
+}
+items.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+
+const pageTitle = "Tarot — All Cards";
+const count = items.length;
+---
+<Base title={pageTitle} description={`Browse all ${count} tarot cards.`}>
+  <header class="mb-6">
+    <p class="text-xs uppercase tracking-wide text-slate-500">Tarot</p>
+    <h1 class="font-serif text-3xl">All Cards</h1>
+    <p class="mt-1 text-slate-600">{count} card{count === 1 ? "" : "s"}</p>
+    <nav class="mt-3 text-sm">
+      <a class="hover:underline" href="/entities">← Entities</a>
+      <span class="mx-2 text-slate-400">•</span>
+      <a class="hover:underline" href="/entities/tarot/major">Major Arcana</a>
+      <span class="mx-2 text-slate-400">•</span>
+      <a class="hover:underline" href="/entities/tarot/minor">Minor Arcana</a>
+    </nav>
+  </header>
+
+  {items.length === 0 ? (
+    <p class="text-slate-600">No cards yet.</p>
+  ) : (
+    <ul class="not-prose grid gap-4 sm:grid-cols-2">
+      {items.map((e) => (
+        <li class="rounded-lg border bg-white p-4 shadow-sm">
+          <a href={`/entities/tarot/${e.slug}`} class="text-lg font-semibold hover:underline">{e.name}</a>
+          {e.summary && <p class="mt-1 text-sm text-slate-600">{e.summary}</p>}
+        </li>
+      ))}
+    </ul>
+  )}
+</Base>
