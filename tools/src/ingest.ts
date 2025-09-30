@@ -11,7 +11,7 @@ import {
   toYAML,
   wordCountFromMarkdown,
   writeFileEnsure,
-} from './utils';
+} from './utils.js';
 import type { PostSpecV2, Frontmatter } from './types';
 
 // --- path helpers ---
