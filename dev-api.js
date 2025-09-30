@@ -154,6 +154,91 @@ const slugify = (s) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
 
+function markdownToPlainText(md) {
+  return String(md || '')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`[^`]*`/g, ' ')
+    .replace(/!\[[^\]]*]\([^)]+\)/g, ' ')
+    .replace(/\[([^\]]+)]\([^)]+\)/g, '$1')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/[\\*_#>~`]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function splitSentences(text) {
+  const sentences = [];
+  const re = /[^.!?]+[.!?]*/g;
+  let match;
+  while ((match = re.exec(text))) {
+    const sentence = match[0].trim();
+    if (sentence) sentences.push(sentence);
+  }
+  return sentences;
+}
+
+function buildSummary(text, maxLength) {
+  const plain = text.trim();
+  if (!plain) return '';
+  const sentences = splitSentences(plain);
+  let summary = '';
+  for (const sentence of sentences) {
+    const candidate = summary ? `${summary} ${sentence}`.trim() : sentence;
+    if (candidate.length > maxLength) break;
+    summary = candidate;
+  }
+  if (!summary) summary = plain.slice(0, maxLength).trim();
+  summary = summary.replace(/\s+/g, ' ').trim();
+  if (summary.length > maxLength) {
+    const truncated = summary.slice(0, maxLength);
+    const lastSpace = truncated.lastIndexOf(' ');
+    summary = (lastSpace > 40 ? truncated.slice(0, lastSpace) : truncated).trim();
+  }
+  if (summary.length < plain.length && summary.length + 1 <= maxLength) {
+    summary = summary.replace(/[.!?…]+$/g, '').trim();
+    if (summary.length + 1 <= maxLength) summary += '…';
+  }
+  return summary;
+}
+
+function generateExcerpt(markdown, providedExcerpt) {
+  const manual = String(providedExcerpt || '').trim();
+  if (manual) return { value: manual, auto: false };
+  const plain = markdownToPlainText(markdown);
+  if (!plain) return { value: '', auto: false };
+  return { value: buildSummary(plain, 220), auto: true };
+}
+
+function generateMetaDescription(markdown, providedMeta, excerptFallback) {
+  const manual = String(providedMeta || '').trim();
+  if (manual) return { value: manual, auto: false };
+  const plain = markdownToPlainText(markdown);
+  if (!plain) {
+    const fallbackPlain = markdownToPlainText(excerptFallback || '');
+    if (!fallbackPlain) return { value: '', auto: true };
+    return { value: buildSummary(fallbackPlain, 155), auto: true };
+  }
+  return { value: buildSummary(plain, 155), auto: true };
+}
+
+function normalizeTags(input) {
+  const items = Array.isArray(input)
+    ? input
+    : String(input || '')
+        .split(/[\n,]/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+  const seen = new Set();
+  const tags = [];
+  for (const tag of items) {
+    const normalized = tag.toLowerCase();
+    if (seen.has(normalized)) continue;
+    seen.add(normalized);
+    tags.push(tag);
+  }
+  return tags;
+}
+
 // ---------- GENPROMPT (updated to enforce Opening Reflection) ----------
 function buildGenprompt({ topic, words, ads, kofi }) {
   const settings = readJSON(path.join(CWD, 'content', 'settings.json')) || { brandName: 'WitchClick', siteUrl: 'https://example.com' };
@@ -353,12 +438,7 @@ async function savePostFromWrite(payload) {
   const site = String(settings.siteUrl || 'https://example.com').replace(/\/$/, '');
   const canonical = `${site}/post/${slug}`;
 
-  const tags = Array.isArray(payload.tags)
-    ? payload.tags.map(String)
-    : String(payload.tags||'')
-        .split(',')
-        .map(s=>s.trim())
-        .filter(Boolean);
+  const tags = normalizeTags(payload.tags);
 
   const entitiesInput = payload.entities;
   const entities = [];
@@ -398,9 +478,19 @@ async function savePostFromWrite(payload) {
 
   const includeAds = !!payload.includeAds;
   const includeKofi = !!payload.includeKofi;
-  const excerpt = String(payload.excerpt||'').trim();
-  const metaDescription = String(payload.metaDescription || excerpt).trim();
   const markdown = String(payload.markdown||'').trim();
+  if (!markdown) throw new Error('markdown is required');
+
+  const warnings = [];
+  const { value: excerpt, auto: excerptAuto } = generateExcerpt(markdown, payload.excerpt);
+  const { value: metaDescription, auto: metaAuto } = generateMetaDescription(
+    markdown,
+    payload.metaDescription,
+    excerpt || markdown,
+  );
+  if (excerptAuto && excerpt) warnings.push('Excerpt auto-generated from Markdown.');
+  if (metaAuto && metaDescription) warnings.push('Meta description auto-generated from Markdown.');
+  if (tags.length < 4 || tags.length > 7) warnings.push(`Tags ideal range is 4–7 (currently ${tags.length}).`);
 
   const readingMinutes = Math.max(1, Math.round(wordCount(markdown)/200));
 
@@ -432,7 +522,10 @@ async function savePostFromWrite(payload) {
     result.entities = entities;
   }
   if (invalidEntities) {
-    result.warnings = [`Dropped ${invalidEntities} invalid entity entr${invalidEntities === 1 ? 'y' : 'ies'}.`];
+    warnings.push(`Dropped ${invalidEntities} invalid entity entr${invalidEntities === 1 ? 'y' : 'ies'}.`);
+  }
+  if (warnings.length) {
+    result.warnings = warnings;
   }
   return result;
 }
@@ -1112,6 +1205,17 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, () => {
-  console.log(`[dev-api] listening on http://localhost:${PORT}`);
-});
+if (process.env.VITEST !== 'true') {
+  server.listen(PORT, () => {
+    console.log(`[dev-api] listening on http://localhost:${PORT}`);
+  });
+}
+
+export {
+  savePostFromWrite,
+  slugify,
+  markdownToPlainText,
+  generateExcerpt,
+  generateMetaDescription,
+  normalizeTags,
+};
