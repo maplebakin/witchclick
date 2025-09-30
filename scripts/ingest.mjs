@@ -99,6 +99,7 @@ export async function ingestFromSpec(input, options = {}) {
     includeAds,
     includeKofi,
     downloadId,
+    contentType: spec.contentType,
   };
 
   const fm = frontmatter(fmData);
@@ -609,6 +610,8 @@ const isoDate = (field) =>
     )
     .optional();
 
+const ALLOWED_CONTENT_TYPES = ["ritual", "guide"];
+
 const specSchema = z
   .object(
     {
@@ -654,6 +657,11 @@ const specSchema = z
       draft: z.boolean({ invalid_type_error: "draft must be a boolean" }).optional(),
       includeAds: z.boolean({ invalid_type_error: "includeAds must be a boolean" }).optional(),
       includeKofi: z.boolean({ invalid_type_error: "includeKofi must be a boolean" }).optional(),
+      contentType: z
+        .enum(ALLOWED_CONTENT_TYPES, {
+          invalid_type_error: "contentType must be one of the allowed values",
+        })
+        .optional(),
       pubDate: isoDate("pubDate"),
       updatedAt: isoDate("updatedAt"),
       readingMinutes: z

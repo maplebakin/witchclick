@@ -142,4 +142,24 @@ describe("posts utilities", () => {
     const writtenFiles = await fs.readdir(srcDir);
     expect(writtenFiles).toContain("ingested-post.md");
   });
+
+  it("accepts guide content type in ingest schema", async () => {
+    const srcDir = path.join(tempDir, "src", "content", "posts");
+    await fs.mkdir(srcDir, { recursive: true });
+
+    process.env.WC_PROJECT_ROOT = tempDir;
+    vi.resetModules();
+
+    const { ingestFromSpec } = await import("../scripts/ingest.mjs");
+    const result = await ingestFromSpec(
+      {
+        title: "Guide Content",
+        body: "# Heading\n\nBody.",
+        contentType: "guide",
+      },
+      { dry: true },
+    );
+
+    expect(result.frontmatter.contentType).toBe("guide");
+  });
 });
