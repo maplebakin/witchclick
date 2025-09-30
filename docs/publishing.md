@@ -22,6 +22,8 @@ The WitchClick pipeline turns generated outlines into live posts. Follow this ch
 ## 4. Review and test
 - Open the post in `npm run dev` and confirm rich content, downloads, and affiliate anchors render as expected.
 - Execute `npm run test` and `npm run check` before committing. Tests cover post loading, pagination, and ingestion edge cases.
+- Generate or refresh hero art with `node tools/hero-image.mjs --slug <slug>` after exporting content. Set the `FAL_KEY` environment
+  variable so the script can call the Fal API; on failure it falls back to the local SVG template and logs a warning.
 - Update related entities, downloads, or settings in `content/` as needed.
 
 ## 5. Commit and deploy
