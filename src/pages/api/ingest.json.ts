@@ -1,31 +1,14 @@
 // src/pages/api/ingest.json.ts
 export const prerender = false;
 
+export type { PostSpecV2 } from '../../lib/postSpecSchema';
 import fs from 'node:fs';
 import path from 'node:path';
 
-type EntityType = 'crystal'|'herb'|'moonPhase'|'tarot'|'planetaryDay'|'ritual';
-const CONTENT_TYPES = ['ritual','guide','spread'] as const;
-export type PostContentType = typeof CONTENT_TYPES[number];
-
-export interface PostSpecV2 {
-  specVersion: 2;
-  title: string;
-  slug: string;
-  contentType?: PostContentType;
-  metaDescription: string;
-  tags: string[];
-  excerpt: string;
-  outline: { heading: string; id: string }[];
-  sections: { heading: string; markdown: string }[];
-  entities: { type: EntityType; slug: string }[];
-  heroImagePrompt: string | null;
-  altTexts: string[];
-  internalLinkHints: { anchor: string; rationale: string }[];
-  affiliateHints: { key: string; anchor: string; rationale: string }[];
-  cta: { type: 'kofi'|'download'|'none'; id?: string };
-  adPlacements: ('lead'|'mid'|'end')[];
-}
+import { normalizePostSpec } from '../../../server/lib/ingestionAdapter.js';
+import { validateStructure } from '../../../server/lib/structureValidation.js';
+import { PostSpecV2Schema, type PostSpecV2 } from '../../lib/postSpecSchema';
+import { validatePostSpec } from '../../lib/postSpecValidator';
 
 /* ---------- helpers ---------- */
 
@@ -93,145 +76,93 @@ function normalizeCta(cta:any): { type:'kofi'|'download'|'none'; id?:string }{
   return { type:'none' };
 }
 
-function needsSafetyNote(sections: {heading:string; markdown:string}[]){
-  const text = sections.map(s => `${s.heading}\n${s.markdown}`).join('\n').toLowerCase();
-  return /candle|open flame|fire|smoke|incense|knife|scissors|burn|trauma|panic|anxiety|depression/.test(text);
-}
-
-function hasSafetySection(sections: {heading:string; markdown:string}[]){
-  return sections.some(sec => /safety|note|disclaimer/i.test(sec.heading));
-}
-
-function isPostContentType(value: unknown): value is PostContentType {
-  return typeof value === 'string' && CONTENT_TYPES.includes(value as PostContentType);
-}
-
-function resolveContentType(spec: PostSpecV2, warnings: string[]): PostContentType {
-  const raw = spec.contentType as unknown;
-  if (isPostContentType(raw)) {
-    spec.contentType = raw;
-    return raw;
-  }
-  if (raw !== undefined && raw !== null) {
-    warnings.push(`Unknown contentType "${raw}", defaulting to "ritual".`);
-  }
-  spec.contentType = 'ritual';
-  return 'ritual';
-}
-
-export function validateStructure(spec: PostSpecV2, contentWords:number){
-  const errors:string[] = [];
-  const warnings:string[] = [];
-
-  const contentType = resolveContentType(spec, warnings);
-
-  const missing = ['specVersion','title','slug','contentType','metaDescription','tags','excerpt','outline','sections','affiliateHints','internalLinkHints','cta','adPlacements']
-    .filter(k => (spec as any)[k] === undefined);
-  if (missing.length) errors.push(`Missing fields: ${missing.join(', ')}`);
-
-  if (spec.specVersion !== 2) errors.push('specVersion must be 2');
-  if (!Array.isArray(spec.tags) || spec.tags.length < 4 || spec.tags.length > 7) errors.push('tags must be 4–7');
-
-  const mdLen = (spec.metaDescription||'').length;
-  if (mdLen < 150 || mdLen > 160) warnings.push(`metaDescription length ≈${mdLen} (target 150–160)`);
-
-  // Required sections
-  const heads = (spec.sections||[]).map(s => String(s.heading||'').toLowerCase());
-  const body = (spec.sections||[]).map(s => s.markdown||'').join('\n').toLowerCase();
-
-  const hasOpening =
-    heads.includes('opening reflection') ||
-    heads.some(h => /^opening/.test(h) && /reflection|scene|note/.test(h));
-  if (!hasOpening) errors.push('Missing section: Opening Reflection');
-
-  const hasQuick = heads.some(h => /quick|low[- ]?energy|5[- ]?minute/.test(h)) || /quick|low[- ]?energy/.test(body);
-  const hasDeep  = heads.some(h => /deep( dive)?|long(er)?/.test(h)) || /deep( dive)?/.test(body);
-  const variantsRequired = contentType === 'ritual';
-  if (variantsRequired && !(hasQuick && hasDeep)) {
-    errors.push('Ritual posts require both Quick/Low-Energy and Deep variants.');
-  }
-
-  const hasChecklist = heads.some(h => /checklist|summary|at a glance/.test(h));
-  if (!hasChecklist) errors.push('Missing section: Checklist/Summary');
-
-  const hasReflect = heads.some(h => /reflection prompt|journal|reflection/.test(h)) || /prompt|question/.test(body);
-  if (!hasReflect) errors.push('Missing section: Reflection Prompt');
-
-  // heroImagePrompt type
-  if (!(typeof spec.heroImagePrompt === 'string' || spec.heroImagePrompt === null)) {
-    errors.push('heroImagePrompt must be string or null');
-  }
-
-  // internal link hints count (soft)
-  if (!Array.isArray(spec.internalLinkHints) || spec.internalLinkHints.length < 3) {
-    warnings.push('internalLinkHints are sparse (aim 5–8).');
-  }
-
-  // anchors-in-prose check (soft)
-  const prose = body.toLowerCase();
-  const missingAnchors = (spec.internalLinkHints||[])
-    .map(h => String(h.anchor||'').toLowerCase())
-    .filter(a => a && !prose.includes(a));
-  if (missingAnchors.length) {
-    warnings.push(`Some internalLinkHints anchors not found verbatim in prose: ${missingAnchors.slice(0,5).join(', ')}${missingAnchors.length>5?'…':''}`);
-  }
-
-  // affiliate density (soft)
-  const maxAnchors = Math.floor(contentWords/250) + 1;
-  const affCount = Array.isArray(spec.affiliateHints) ? spec.affiliateHints.length : 0;
-  if (affCount > maxAnchors) warnings.push(`Affiliate density high (${affCount} > ${maxAnchors}); aim ≤ ~1 per 250 words.`);
-
-  // safety note heuristic (soft)
-  if (needsSafetyNote(spec.sections) && !hasSafetySection(spec.sections)) {
-    warnings.push('Content looks like it needs a safety note, but none was found.');
-  }
-
-  // image alt texts (soft)
-  const imagesMentioned = (spec.sections||[]).some(s => /!\[[^\]]*\]\([^)]+\)/.test(s.markdown));
-  if (imagesMentioned && (!Array.isArray(spec.altTexts) || spec.altTexts.length === 0)) {
-    warnings.push('Images appear in markdown but altTexts is empty.');
-  }
-
-  return { errors, warnings };
-}
-
 /* ---------- handler ---------- */
 
 export async function POST({ request }: { request: Request }) {
   try {
-    let spec: PostSpecV2 | null = null;
+    let input: unknown = null;
 
     // 1) Try JSON first
-    try { spec = await request.json(); } catch {}
+    try { input = await request.json(); } catch {}
 
     // 2) Fallback to text() → JSON.parse
-    if (!spec) {
+    if (!input) {
       try {
         const txt = await request.text();
-        if (txt && txt.trim()) spec = JSON.parse(txt);
+        if (txt && txt.trim()) input = JSON.parse(txt);
       } catch {}
     }
 
     // 3) Fallback to multipart/form-data
-    if (!spec) {
+    if (!input) {
       try {
         const form = await request.formData();
         const raw = (form.get('json') || form.get('body') || '') as string;
-        if (typeof raw === 'string' && raw.trim()) spec = JSON.parse(raw);
+        if (typeof raw === 'string' && raw.trim()) input = JSON.parse(raw);
       } catch {}
     }
 
-    if (!spec) return json({ ok:false, error:'No JSON body provided. Paste a PostSpec v2 object.' }, 400);
+    if (!input) {
+      return json({ ok:false, error:'No JSON body provided. Paste a PostSpec v2 object.' }, 400);
+    }
 
-    // Compute word count upfront for density checks
-    const contentWords = (spec.sections||[]).reduce((n,s)=> n + wordCount(s.markdown||''), 0);
+    let normalizationReport: string[] = [];
+    let normalizedSpec: PostSpecV2;
+    try {
+      const { spec, report } = normalizePostSpec(input);
+      normalizedSpec = spec;
+      normalizationReport = report;
+    } catch (error: any) {
+      return json({ ok:false, error: error?.message || String(error) }, 400);
+    }
+
+    const parsed = PostSpecV2Schema.safeParse(normalizedSpec);
+    if (!parsed.success) {
+      const schemaErrors = parsed.error.issues.map((issue) => {
+        const path = issue.path.join('.') || 'root';
+        return `${path}: ${issue.message}`;
+      });
+      return json({ ok:false, error: schemaErrors[0], errors: schemaErrors, normalizations: normalizationReport }, 400);
+    }
+
+    const spec = parsed.data;
+
+    const CWD = process.cwd();
+    const PRODUCTS_PATH = path.join(CWD, 'content', 'products.json');
+    const products = safeReadJSON<{ products: { key: string }[] }>(PRODUCTS_PATH, { products: [] });
+    const allowedAffiliateKeys = Array.isArray(products.products)
+      ? products.products.map((product) => String(product?.key || '').trim()).filter(Boolean)
+      : [];
+
+    const enforcement = validatePostSpec(spec, {
+      targetWordCount: 1200,
+      allowedAffiliateKeys,
+    });
+    if (!enforcement.valid) {
+      return json({
+        ok: false,
+        error: enforcement.errors[0],
+        errors: enforcement.errors,
+        warnings: enforcement.warnings,
+        normalizations: normalizationReport,
+      }, 400);
+    }
+
+    const contentWords = enforcement.wordCount;
 
     // Structural + soft validation
     const { errors, warnings } = validateStructure(spec, contentWords);
-    if (errors.length) return json({ ok:false, error: errors[0], errors, warnings }, 400);
+    if (errors.length) {
+      return json({
+        ok:false,
+        error: errors[0],
+        errors,
+        warnings: [...enforcement.warnings, ...warnings],
+        normalizations: normalizationReport,
+      }, 400);
+    }
 
     // Paths & settings
-    const CWD = process.cwd();
     const POSTS_DIR = path.join(CWD, 'content', 'posts');
     const SETTINGS_PATH = path.join(CWD, 'content', 'settings.json');
     ensureDirSync(POSTS_DIR);
@@ -280,7 +211,16 @@ export async function POST({ request }: { request: Request }) {
     const outPath = path.join(POSTS_DIR, `${slug}.md`);
     fs.writeFileSync(outPath, file, 'utf8');
 
-    return json({ ok:true, slug, path:`content/posts/${slug}.md`, words: contentWords, warnings });
+    const combinedWarnings = [...new Set([...enforcement.warnings, ...warnings])];
+
+    return json({
+      ok:true,
+      slug,
+      path:`content/posts/${slug}.md`,
+      words: contentWords,
+      warnings: combinedWarnings,
+      normalizations: normalizationReport,
+    });
   } catch (e: any) {
     return json({ ok:false, error: e?.message || String(e) }, 500);
   }

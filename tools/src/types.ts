@@ -1,24 +1,10 @@
 // tools/src/types.ts
-export type EntityType = 'crystal'|'herb'|'moonPhase'|'tarot'|'planetaryDay'|'ritual';
-export type AdSlot = 'lead'|'mid'|'end';
+export type {
+  EntityType,
+  PostSpecV2,
+} from '../../src/lib/postSpecSchema';
 
-export interface PostSpecV2 {
-  specVersion: 2;
-  title: string;
-  slug: string;
-  metaDescription: string;
-  tags: string[];
-  excerpt: string;
-  outline: { heading: string; id: string }[];
-  sections: { heading: string; markdown: string }[];
-  entities: { type: EntityType; slug: string }[];
-  heroImagePrompt: string | null;
-  altTexts: string[];
-  internalLinkHints: { anchor: string; rationale: string }[];
-  affiliateHints: { key: string; anchor: string; rationale: string }[];
-  cta: { type: 'kofi'|'download'|'none'; id?: string };
-  adPlacements: AdSlot[];
-}
+export type AdSlot = 'lead'|'mid'|'end';
 
 export interface Frontmatter {
   title: string;
