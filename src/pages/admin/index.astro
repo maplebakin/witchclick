@@ -130,7 +130,16 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           <button id="ingestBtn" class="rounded-lg bg-green-600 px-3 py-2 text-sm text-white hover:bg-green-700">Ingest</button>
           <button id="ingestPublishBtn" class="rounded-lg bg-indigo-600 px-3 py-2 text-sm text-white hover:bg-indigo-700">Ingest + Publish</button>
           <button id="clearBtn" class="rounded-lg border px-3 py-2 text-sm">Clear</button>
-          <span id="status" class="self-center text-sm"></span>
+        </div>
+        <div class="mt-3 flex flex-col gap-3">
+          <div
+            id="status"
+            class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700"
+          ></div>
+          <div
+            id="specSummary"
+            class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-[11px] text-gray-700"
+          ></div>
         </div>
 
         <div id="preview" class="prose prose-neutral mt-4 max-w-none border-t pt-4"></div>
@@ -162,14 +171,135 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         var STYLE_OPTIONS = [];
         try { PRESET_OPTIONS = JSON.parse(rawPresets); } catch {}
         try { STYLE_OPTIONS = JSON.parse(rawStyles); } catch {}
-        function setStatus(msg, ok){
+        function setStatus(msg, ok, warnings, notes){
           var el=$('status');
-          el.textContent=msg;
-          el.style.color = ok===false ? '#7f1d1d' : '#065f46';
+          if (!el) return;
+          var base='rounded-lg border px-3 py-2 text-sm';
+          if (ok === false) {
+            el.className = base + ' border-red-200 bg-red-50 text-red-700';
+          } else if (ok === true) {
+            el.className = base + ' border-emerald-200 bg-emerald-50 text-emerald-700';
+          } else {
+            el.className = base + ' border-slate-200 bg-slate-50 text-slate-700';
+          }
+          el.innerHTML='';
+
+          if (msg) {
+            var p=document.createElement('p');
+            p.className='font-medium';
+            p.textContent=msg;
+            el.appendChild(p);
+          }
+
+          function appendList(label, items, className){
+            if (!Array.isArray(items) || !items.length) return;
+            var heading=document.createElement('p');
+            heading.className='mt-2 text-[11px] font-semibold ' + className;
+            heading.textContent=label + ':';
+            el.appendChild(heading);
+            var list=document.createElement('ul');
+            list.className='mt-1 list-disc pl-5 text-[11px] ' + className;
+            items.forEach(function(item){
+              var li=document.createElement('li');
+              li.textContent=String(item);
+              list.appendChild(li);
+            });
+            el.appendChild(list);
+          }
+
+          appendList('Warnings', warnings, 'text-amber-700');
+          appendList('Notes', notes, 'text-slate-600');
+
+          if (!msg && !(Array.isArray(warnings) && warnings.length) && !(Array.isArray(notes) && notes.length)) {
+            el.textContent='Ready for PostSpec JSON.';
+          }
         }
         function busy(on){
           ['genPrompt','validateBtn','previewBtn','ingestBtn','ingestPublishBtn','copyPrompt']
             .forEach(function(id){ var b=$(id); if(b){ b.disabled=!!on; b.style.opacity = on ? .6 : 1; }});
+        }
+
+        function summarizeEntities(list){
+          if (!Array.isArray(list) || !list.length) return 'None';
+          var sample = list.map(function(item){
+            var type = item && item.type ? item.type : '?';
+            var slug = item && item.slug ? item.slug : '?';
+            return type + ':' + slug;
+          });
+          return sample.join(', ');
+        }
+
+        function summarizePlacements(list){
+          if (!Array.isArray(list) || !list.length) return 'None';
+          return list.join(', ');
+        }
+
+        function renderSpecSummary(spec){
+          var panel = $('specSummary');
+          if (!panel) return;
+          panel.innerHTML='';
+          var baseClass='rounded-lg border border-gray-200 bg-gray-50 p-3 text-[11px]';
+          if (!spec) {
+            panel.className = baseClass + ' text-gray-600';
+            var empty=document.createElement('p');
+            empty.textContent='No PostSpec parsed yet. Paste JSON to inspect the structure.';
+            panel.appendChild(empty);
+            return;
+          }
+
+          panel.className = baseClass + ' text-gray-700';
+          var title=document.createElement('p');
+          title.className='text-xs font-semibold uppercase tracking-wide text-gray-500';
+          title.textContent='Spec Summary';
+          panel.appendChild(title);
+
+          var tags=Array.isArray(spec.tags) ? spec.tags : [];
+          var sections=Array.isArray(spec.sections) ? spec.sections : [];
+          var outline=Array.isArray(spec.outline) ? spec.outline : [];
+          var entities=Array.isArray(spec.entities) ? spec.entities : [];
+          var internal=Array.isArray(spec.internalLinkHints) ? spec.internalLinkHints : [];
+          var affiliates=Array.isArray(spec.affiliateHints) ? spec.affiliateHints : [];
+          var placements=Array.isArray(spec.adPlacements) ? spec.adPlacements : [];
+          var altTexts=Array.isArray(spec.altTexts) ? spec.altTexts : [];
+          var totalWords=sections.reduce(function(sum, section){ return sum + wordCount(section && section.markdown || ''); }, 0);
+          var reading=Math.max(1, Math.round(totalWords / 200));
+          var ctaType=spec.cta && spec.cta.type ? spec.cta.type : 'none';
+          var ctaDetail = ctaType === 'download'
+            ? (spec.cta && spec.cta.id ? 'download (' + spec.cta.id + ')' : 'download (missing id)')
+            : ctaType;
+
+          function addRow(label, value){
+            var row=document.createElement('div');
+            row.className='grid grid-cols-[120px_1fr] gap-2';
+            var dt=document.createElement('dt');
+            dt.className='text-[11px] font-medium text-gray-500';
+            dt.textContent=label;
+            var dd=document.createElement('dd');
+            dd.className='text-[11px] text-gray-800';
+            dd.textContent=value;
+            row.appendChild(dt);
+            row.appendChild(dd);
+            body.appendChild(row);
+          }
+
+          var body=document.createElement('dl');
+          body.className='mt-2 space-y-1';
+
+          addRow('Title', spec.title || '(missing)');
+          addRow('Slug', spec.slug || '(missing)');
+          addRow('Tags', (tags.length ? tags.length + ' — ' + tags.join(', ') : 'None'));
+          addRow('Sections', sections.length ? sections.length + ' sections' : 'None');
+          addRow('Outline', outline.length ? outline.length + ' items' : 'None');
+          addRow('Word count', totalWords + ' (~' + reading + ' min read)');
+          addRow('Hero prompt', spec.heroImagePrompt ? 'Provided' : 'None');
+          addRow('Alt texts', altTexts.length ? altTexts.length + ' provided' : 'None');
+          addRow('Entities', entities.length ? entities.length + ' — ' + summarizeEntities(entities) : 'None');
+          addRow('Internal links', internal.length ? internal.length + ' hints' : 'None');
+          addRow('Affiliate hints', affiliates.length ? affiliates.length + ' entries' : 'None');
+          addRow('Ads', placements.length ? placements.length + ' — ' + summarizePlacements(placements) : 'None');
+          addRow('CTA', ctaDetail);
+
+          panel.appendChild(body);
         }
 
         function updateHelp(selectId, helpId, options, fallback){
@@ -188,9 +318,12 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         updateHelp('mode', 'modeHelp', PRESET_OPTIONS, DEFAULT_MODE_DESC);
         updateHelp('style', 'styleHelp', STYLE_OPTIONS, DEFAULT_STYLE_DESC);
 
+        setStatus('Ready for PostSpec JSON.');
+        renderSpecSummary(null);
+
         $('genPrompt').addEventListener('click', async function(){
           try{
-            busy(true); setStatus('Generating prompt...');
+            busy(true); setStatus('Generating prompt...', null);
             var body = {
               topic: $('topic').value || 'tea ritual for focus',
               words: Number($('words').value || 1200),
@@ -206,17 +339,17 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             var data = await res.json();
             if (!data.ok) throw new Error(data.error || 'gen failed');
             $('promptOut').value = data.prompt || '';
-            setStatus('Prompt ready ✓');
+            setStatus('Prompt ready ✓', true);
           }catch(e){ setStatus('Prompt error: ' + (e.message||String(e)), false); }
           finally{ busy(false); }
         });
 
         $('copyPrompt').addEventListener('click', async function(){
-          try{ await navigator.clipboard.writeText($('promptOut').value || ''); setStatus('Copied ✓'); }
-          catch { $('promptOut').select(); document.execCommand('copy'); setStatus('Copied ✓'); }
+          try{ await navigator.clipboard.writeText($('promptOut').value || ''); setStatus('Copied ✓', true); }
+          catch { $('promptOut').select(); document.execCommand('copy'); setStatus('Copied ✓', true); }
         });
 
-        // --- JSON paste sanitizer: remove illegal backslashes before []{} when OUTSIDE strings
+        // --- JSON paste sanitizer helpers ---
         function deBackslashOutsideStrings(s){
           var out='', inStr=false, esc=false;
           for (var i=0;i<s.length;i++){
@@ -230,7 +363,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               if (ch === '"'){ inStr=true; out+=ch; }
               else if (ch === '\\'){
                 var next=s[i+1];
-                if (next==='[' || next===']' || next==='{' || next==='}'){ continue; } // drop stray backslash
+                if (next==='[' || next===']' || next==='{' || next==='}'){ continue; }
                 out+=ch;
               } else { out+=ch; }
             }
@@ -238,73 +371,130 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           return out;
         }
 
+        function stripCodeFences(s){
+          return s
+            .replace(/^\s*```(?:json)?\s*/i, '')
+            .replace(/\s*```\s*$/, '');
+        }
+
+        function normalizeQuotes(s){
+          return s
+            .replace(/[\u201C\u201D]/g, '"')
+            .replace(/[\u2018\u2019]/g, "'");
+        }
+
+        function stripInvisible(s){
+          return s.replace(/[\uFEFF\u200B-\u200F\u202A-\u202E\u00A0\r]/g, '');
+        }
+
+        function normalizeSpec(spec){
+          if (!spec || typeof spec !== 'object') return spec;
+
+          if (typeof spec.specVersion === 'string') {
+            var parsedVersion = Number(spec.specVersion);
+            if (!Number.isNaN(parsedVersion)) spec.specVersion = parsedVersion;
+          }
+
+          if (typeof spec.title === 'string') spec.title = spec.title.trim();
+          if (typeof spec.slug === 'string') spec.slug = spec.slug.trim();
+          if (typeof spec.metaDescription === 'string') spec.metaDescription = spec.metaDescription.trim();
+          if (typeof spec.excerpt === 'string') spec.excerpt = spec.excerpt.trim();
+
+          if (!Array.isArray(spec.tags)) {
+            if (typeof spec.tags === 'string') {
+              spec.tags = spec.tags.split(/[\n,]/).map(function(tag){ return tag.trim(); }).filter(Boolean);
+            } else {
+              spec.tags = [];
+            }
+          } else {
+            spec.tags = spec.tags.map(function(tag){ return String(tag || '').trim(); }).filter(Boolean);
+          }
+          var seenTags = new Set();
+          spec.tags = spec.tags.filter(function(tag){
+            var lower = tag.toLowerCase();
+            if (seenTags.has(lower)) return false;
+            seenTags.add(lower);
+            return true;
+          });
+
+          if (!Array.isArray(spec.sections)) {
+            spec.sections = [];
+          } else {
+            spec.sections = spec.sections.map(function(section){
+              var heading = section && typeof section.heading === 'string'
+                ? section.heading
+                : (section && typeof section.title === 'string' ? section.title : '');
+              var markdown = section && typeof section.markdown === 'string'
+                ? section.markdown
+                : (section && typeof section.content === 'string' ? section.content : '');
+              var cleaned = {
+                heading: heading.trim(),
+                markdown: String(markdown || '').trim(),
+              };
+              if (section && typeof section === 'object') {
+                for (var key in section) {
+                  if (key === 'heading' || key === 'markdown') continue;
+                  cleaned[key] = section[key];
+                }
+              }
+              return cleaned;
+            });
+          }
+
+          if (!Array.isArray(spec.internalLinkHints)) spec.internalLinkHints = [];
+          if (!Array.isArray(spec.affiliateHints)) spec.affiliateHints = [];
+          if (spec.heroImagePrompt === false) spec.heroImagePrompt = null;
+          if (spec.heroImagePrompt != null && typeof spec.heroImagePrompt !== 'string') {
+            spec.heroImagePrompt = String(spec.heroImagePrompt);
+          }
+
+          return spec;
+        }
+
         function parseSpec(){
-  function stripCodeFences(s){
-    // remove leading/trailing ``` or ```json fences
-    return s
-      .replace(/^\s*```(?:json)?\s*/i, '')
-      .replace(/\s*```\s*$/, '');
-  }
-  function normalizeQuotes(s){
-    return s
-      .replace(/[\u201C\u201D]/g, '"') // smart double
-      .replace(/[\u2018\u2019]/g, "'"); // smart single
-  }
-  function stripInvisible(s){
-    // BOM + zero-width + NBSP + CR
-    return s.replace(/[\uFEFF\u200B-\u200F\u202A-\u202E\u00A0\r]/g, '');
-  }
-  // remove stray backslashes before []{} only when OUTSIDE strings
-  function deBackslashOutsideStrings(s){
-    var out='', inStr=false, esc=false;
-    for (var i=0;i<s.length;i++){
-      var ch=s[i];
-      if (inStr){
-        out+=ch;
-        if (esc){ esc=false; }
-        else if (ch==='\\'){ esc=true; }
-        else if (ch==='"'){ inStr=false; }
-      } else {
-        if (ch === '"'){ inStr=true; out+=ch; }
-        else if (ch === '\\'){
-          var next=s[i+1];
-          if (next==='[' || next===']' || next==='{' || next==='}'){ continue; } // drop
-          out+=ch;
-        } else { out+=ch; }
-      }
-    }
-    return out;
-  }
+          var raw = document.getElementById('spec').value;
+          if (!raw.trim()) throw new Error('No JSON provided.');
 
-  var raw = document.getElementById('spec').value;
-  if (!raw.trim()) throw new Error('No JSON provided.');
+          var base = stripInvisible(normalizeQuotes(stripCodeFences(raw)));
+          var attempts = [base];
+          var cleanedBackslashes = deBackslashOutsideStrings(base);
+          if (cleanedBackslashes !== base) attempts.push(cleanedBackslashes);
 
-  // Stage 0: trim code fences & normalize quotes & strip invisibles
-  var base = stripInvisible(normalizeQuotes(stripCodeFences(raw)));
+          function tryParse(value){
+            try {
+              return JSON.parse(value);
+            } catch(_e) {
+              try {
+                var maybe = JSON.parse(value);
+                if (typeof maybe === 'string') {
+                  return JSON.parse(maybe);
+                }
+              } catch(_err){}
+            }
+            return null;
+          }
 
-  // Try as-is
-  try { return JSON.parse(base); } catch(_e){}
+          var parsed = null;
+          for (var i=0;i<attempts.length && !parsed;i++){
+            parsed = tryParse(attempts[i]);
+          }
 
-  // Try with stray top-level backslashes removed
-  var fixed = deBackslashOutsideStrings(base);
-  try { return JSON.parse(fixed); } catch(_e){}
+          if (!parsed) {
+            throw new Error('Invalid JSON — cleaned for fences/quotes, but structure still fails. Save to a file and validate with jq.');
+          }
 
-  // If body is a quoted JSON string → parse twice
-  try {
-    var maybe = JSON.parse(base);
-    if (typeof maybe === 'string') return JSON.parse(maybe);
-  } catch(_e){}
-
-  throw new Error('Invalid JSON — cleaned for fences/quotes, but structure still fails. Save to a file and validate with jq.');
-}
+          return normalizeSpec(parsed);
+        }
 
 
         function checkSpec(s){
           var errors = [], warnings = [];
-          if (s.specVersion !== 2) errors.push('specVersion must be 2');
+          var version = Number(s.specVersion);
+          if (version !== 2) errors.push('specVersion must be 2');
           if (!s.title || !s.slug) errors.push('title and slug are required');
           if (!Array.isArray(s.sections) || s.sections.length === 0) errors.push('sections[] required');
-          if (!Array.isArray(s.tags) || s.tags.length < 4 || s.tags.length > 7) errors.push('tags must be 4–7');
+          var tags = Array.isArray(s.tags) ? s.tags : [];
+          if (tags.length < 4 || tags.length > 7) errors.push('tags must be 4–7');
           var mdLen = (s.metaDescription || '').length;
           if (mdLen < 150 || mdLen > 160) warnings.push('metaDescription length ~'+mdLen+' (target 150–160)');
           var heads = (s.sections||[]).map(function(x){ return String(x.heading||'').toLowerCase(); });
@@ -327,8 +517,9 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           try{
             var s=parseSpec();
             var res = checkSpec(s);
+            renderSpecSummary(s);
             if (!res.ok) throw new Error(res.errors[0]);
-            setStatus(res.warnings.length ? ('Valid ✓ — ' + res.warnings.join(' · ')) : 'Valid ✓');
+            setStatus('Valid ✓', true, res.warnings);
           }catch(e){ setStatus(e.message, false); }
         });
 
@@ -364,45 +555,68 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         $('previewBtn').addEventListener('click', function(){
           try{
             var s=parseSpec(); var res=checkSpec(s);
+            renderSpecSummary(s);
             if(!res.ok) throw new Error(res.errors[0]);
             renderPreview(s);
-            setStatus(res.warnings.length ? ('Preview ✓ — ' + res.warnings.join(' · ')) : 'Preview ✓');
+            setStatus('Preview ✓', true, res.warnings);
           }catch(e){ setStatus(e.message, false); }
         });
 
         async function ingest(spec){
           var res = await fetch(DEV_API + '/ingest', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(spec) });
-          var data = await res.json();
-          if (!data.ok) throw new Error(data.error || 'ingest failed');
+          var data;
+          try { data = await res.json(); }
+          catch { data = {}; }
+          if (!res.ok) {
+            throw new Error((data && data.error) || ('ingest failed (' + res.status + ')'));
+          }
+          if (!data || data.ok === false) {
+            throw new Error((data && data.error) || 'ingest failed');
+          }
           return data;
         }
 
         $('ingestBtn').addEventListener('click', async function(){
           try{
-            busy(true); setStatus('Ingesting…');
-            var spec = parseSpec(); var res=checkSpec(spec); if(!res.ok) throw new Error(res.errors[0]);
+            busy(true); setStatus('Ingesting…', null);
+            var spec = parseSpec();
+            var res=checkSpec(spec);
+            renderSpecSummary(spec);
+            if(!res.ok) throw new Error(res.errors[0]);
             var data = await ingest(spec);
-            setStatus('Ingested → ' + data.path + '  Open: /post/' + data.slug);
+            var finalSpec = data.spec || spec;
+            renderSpecSummary(finalSpec);
+            var location = data.path || ('content/posts/' + (data.slug || finalSpec.slug || 'post') + '.md');
+            var slug = data.slug || (finalSpec && finalSpec.slug) || '';
+            var msg = (data.saved === false ? 'Ingested (dry run)' : 'Ingested ✓') + ' → ' + location + (slug ? ' • Preview: /post/' + slug : '');
+            setStatus(msg, true, res.warnings, data.normalizationReport);
           }catch(e){ setStatus(e.message, false); }
           finally{ busy(false); }
         });
 
         $('ingestPublishBtn').addEventListener('click', async function(){
           try{
-            busy(true); setStatus('Ingesting…');
-            var spec = parseSpec(); var res=checkSpec(spec); if(!res.ok) throw new Error(res.errors[0]);
+            busy(true); setStatus('Ingesting…', null);
+            var spec = parseSpec();
+            var res=checkSpec(spec);
+            renderSpecSummary(spec);
+            if(!res.ok) throw new Error(res.errors[0]);
             var data = await ingest(spec);
-            setStatus('Ingested. Publishing…');
+            var finalSpec = data.spec || spec;
+            renderSpecSummary(finalSpec);
+            setStatus('Ingested. Publishing…', true, res.warnings, data.normalizationReport);
             var r = await fetch(DEV_API + '/bundle', { method:'POST' });
             var b = await r.json();
             if (!b.ok) throw new Error((b.steps && b.steps.map(function(s){return s.err;}).filter(Boolean).join('\n')) || b.error || 'bundle failed');
-            setStatus('Published ✓  Open post: /post/' + data.slug);
+            var slug = data.slug || (finalSpec && finalSpec.slug) || '';
+            var publishMsg = 'Published ✓' + (slug ? ' • Open post: /post/' + slug : '');
+            setStatus(publishMsg, true, res.warnings, data.normalizationReport);
           }catch(e){ setStatus(e.message, false); }
           finally{ busy(false); }
         });
 
         $('clearBtn').addEventListener('click', function(){
-          $('spec').value=''; $('preview').innerHTML=''; setStatus('Cleared');
+          $('spec').value=''; $('preview').innerHTML=''; renderSpecSummary(null); setStatus('Cleared. Ready for new JSON.', null);
         });
       })();
     </script>
