@@ -1219,6 +1219,17 @@ if (process.env.VITEST !== 'true') {
   });
 }
 
+const adminPipelineHelpers = {
+  savePostFromWrite,
+  slugify,
+  markdownToPlainText,
+  generateExcerpt,
+  generateMetaDescription,
+  normalizeTags,
+  prepareNormalizedSpec,
+  persistNormalizedSpec,
+};
+
 export {
   savePostFromWrite,
   slugify,
@@ -1228,4 +1239,5 @@ export {
   normalizeTags,
   prepareNormalizedSpec,
   persistNormalizedSpec,
+  adminPipelineHelpers,
 };
