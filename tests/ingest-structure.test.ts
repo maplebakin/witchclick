@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { validateStructure } from '../src/pages/api/ingest.json';
-import type { PostSpecV2 } from '../src/pages/api/ingest.json';
+import { validateStructure } from '../server/lib/structureValidation.js';
+import type { PostSpecV2 } from '../src/lib/postSpecSchema';
 
 function createBaseSpec(): PostSpecV2 {
   return {
