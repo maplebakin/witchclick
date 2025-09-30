@@ -6,8 +6,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 let tempDir: string;
 let cwdSpy: ReturnType<typeof vi.spyOn> | undefined;
-let prepareNormalizedSpec: (payload: any) => any;
-let persistNormalizedSpec: (prepared: any) => Promise<void>;
+let prepareSpecForPersistence: (payload: any) => any;
+let persistPreparedSpec: (prepared: any) => Promise<{ postPath: string; createdEntities: string[] }>;
 
 async function prepareTempDir() {
   tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "wc-admin-generator-"));
@@ -27,7 +27,7 @@ describe("admin post generator pipeline", () => {
   beforeEach(async () => {
     await prepareTempDir();
     vi.resetModules();
-    ({ prepareNormalizedSpec, persistNormalizedSpec } = await import("../dev-api.js"));
+    ({ prepareSpecForPersistence, persistPreparedSpec } = await import("../dev-api.js"));
   });
 
   afterEach(async () => {
@@ -44,68 +44,94 @@ describe("admin post generator pipeline", () => {
       title: " Cozy Focus Tea ",
       slug: "Cozy Focus Tea",
       excerpt: "  Quick focus tea summary. ",
-      tags: ["Focus ", " cozy", "ritual"],
+      summary: " Quick focus tea summary. ",
+      tags: ["Focus ", " cozy", "ritual", "tea"],
       sections: [
         { heading: "Opening Reflection", markdown: "A gentle opening." },
-        { title: "Quick Ritual", content: "Step one." },
-        { heading: "Deep Dive", markdown: "A longer companion ritual." },
+        { heading: "Quick Ritual", title: "Quick Ritual", content: "Quick ritual steps include a Focus tea ritual mention." },
+        { heading: "Deep Dive", markdown: "A longer companion ritual that feels like a deep dive ritual." },
+        { heading: "Ritual Checklist", markdown: "- Checklist items anchor for quick packing with Enamel mug on hand." },
+        { heading: "Reflection Prompt", markdown: "Reflection prompt question anchor for journaling." },
+      ],
+      outline: [
+        { heading: "Opening Reflection", id: "opening-reflection" },
+        { heading: "Quick Ritual", id: "quick-ritual" },
+        { heading: "Deep Dive", id: "deep-dive" },
+        { heading: "Ritual Checklist", id: "ritual-checklist" },
+        { heading: "Reflection Prompt", id: "reflection-prompt" },
       ],
       entities: [
         { type: "herb", slug: "Peppermint" },
         { type: "crystal", name: "Fluorite" },
         { type: "herb", slug: "" },
       ],
-      heroPrompt: "A cozy desk with tea.",
+      heroImagePrompt: "A cozy desk with tea.",
       altTexts: ["A warm mug"],
       internalLinkHints: [
         { anchor: "Focus tea ritual", rationale: "Link to breathing guide." },
-        { text: "" },
+        { anchor: "Checklist items anchor", rationale: "Link to supply checklist." },
+        { anchor: "Reflection prompt question", rationale: "Link to journaling prompts." },
+        { anchor: "Deep dive ritual", rationale: "Link to deep ritual guide." },
+        { anchor: "Quick ritual steps", rationale: "Link to quick ritual." },
       ],
       affiliateHints: [
-        { key: "mug", anchor: "Enamel mug" },
+        { key: "mug", anchor: "Enamel mug", rationale: "Suggest favorite mug." },
         { key: "invalid", anchor: "" },
       ],
       cta: { type: "kofi" },
       adPlacements: ["Lead", "footer", "mid"],
     };
 
-    const prepared = prepareNormalizedSpec(rawSpec);
+    const prepared = prepareSpecForPersistence(rawSpec, {
+      cwd: tempDir,
+      postsDirectories: [
+        path.join(tempDir, "src", "content", "posts"),
+        path.join(tempDir, "content", "posts"),
+      ],
+    });
 
     expect(prepared.spec.slug).toBe("cozy-focus-tea-2");
     expect(prepared.spec.title).toBe("Cozy Focus Tea");
     expect(prepared.spec.excerpt).toBe("Quick focus tea summary.");
     expect(prepared.spec.metaDescription).toBe("Quick focus tea summary.");
-    expect(prepared.spec.tags).toEqual(["Focus", "cozy", "ritual"]);
+    expect(prepared.spec.tags).toEqual(["Focus", "cozy", "ritual", "tea"]);
     expect(prepared.spec.entities).toEqual([
       { type: "herb", slug: "peppermint" },
       { type: "crystal", slug: "fluorite" },
     ]);
-    expect(prepared.spec.internalLinkHints).toHaveLength(1);
+    expect(prepared.spec.internalLinkHints).toHaveLength(5);
+    expect(prepared.spec.internalLinkHints.map((hint: any) => hint.anchor)).toEqual(
+      expect.arrayContaining([
+        "Focus tea ritual",
+        "Checklist items anchor",
+        "Reflection prompt question",
+        "Deep dive ritual",
+        "Quick ritual steps",
+      ]),
+    );
     expect(prepared.spec.affiliateHints).toHaveLength(1);
     expect(prepared.spec.adPlacements).toEqual(["lead", "mid"]);
     expect(prepared.spec.cta.type).toBe("kofi");
-    expect(prepared.spec.outline).toHaveLength(3);
+    expect(prepared.spec.outline).toHaveLength(5);
     expect(prepared.spec.heroImagePrompt).toBe("A cozy desk with tea.");
 
     expect(prepared.normalizationReport).toEqual(
       expect.arrayContaining([
-        "specVersion forced to 2.",
-        "Dropped invalid entity entry.",
-        "Dropped invalid ad placement \"footer\".",
-        "Derived outline from sections.",
-        "Slug collision resolved as cozy-focus-tea-2.",
+        expect.stringContaining("summary→metaDescription"),
+        expect.stringContaining("sections.content"),
+        expect.stringContaining("slug→cozy-focus-tea-2"),
       ]),
     );
 
     expect(prepared.post.filePath.endsWith("cozy-focus-tea-2.md")).toBe(true);
     expect(prepared.post.contents).toContain('title: "Cozy Focus Tea"');
-    expect(prepared.post.contents).toContain("slug: cozy-focus-tea-2");
+    expect(prepared.post.contents).toContain('slug: "cozy-focus-tea-2"');
     expect(prepared.post.contents).toContain('metaDescription: "Quick focus tea summary."');
     expect(prepared.post.contents).toContain("includeAds: true");
     expect(prepared.post.contents).toContain("includeKofi: true");
-    expect(prepared.post.contents).toContain('outline: ["Opening Reflection", "Quick Ritual", "Deep Dive"]');
+    expect(prepared.post.contents).toContain('outline: ["Opening Reflection","Quick Ritual","Deep Dive","Ritual Checklist","Reflection Prompt"]');
 
-    await persistNormalizedSpec(prepared);
+    await persistPreparedSpec(prepared);
 
     const saved = await fs.readFile(path.join(postsDir, "cozy-focus-tea-2.md"), "utf8");
     expect(saved).toBe(prepared.post.contents);

@@ -1,4 +1,15 @@
 // server/lib/ingestionAdapter.js — conflict-free, deterministic normalizer
+// @ts-check
+
+import { CONTENT_TYPES } from './postSpecSchema.js';
+
+/**
+ * @typedef {import('./postSpecSchema.js').PostSpecV2} PostSpecV2
+ */
+
+/**
+ * @typedef {{ spec: PostSpecV2; report: string[] }} NormalizePostSpecResult
+ */
 
 const OPENING_HEADING = 'Opening Reflection';
 const OPENING_ID = 'opening-reflection';
@@ -166,6 +177,10 @@ function ensureOpening(outline, sections, report) {
   return { outline: normalizedOutline, sections: normalizedSections };
 }
 
+/**
+ * @param {unknown} raw
+ * @returns {NormalizePostSpecResult}
+ */
 export function normalizePostSpec(raw) {
   const input = isPlainObject(raw) ? raw : {};
   const report = [];
@@ -219,6 +234,13 @@ export function normalizePostSpec(raw) {
     }
   }
   metaDescription = metaDescription || '';
+
+  // content type
+  const rawContentType = toTrimmedString(input.contentType).toLowerCase();
+  const contentType = CONTENT_TYPES.includes(rawContentType) ? rawContentType : undefined;
+  if (contentType && rawContentType !== input.contentType) {
+    report.push('normalized contentType');
+  }
 
   // tags & aliases
   const tagsFromCanonical = sanitizeStringArray(input.tags);
@@ -350,10 +372,12 @@ export function normalizePostSpec(raw) {
   // Opening Reflection enforcement
   const ensured = ensureOpening(outline, sections, report);
 
+  /** @type {PostSpecV2} */
   const spec = {
     specVersion: 2,
     title,
     slug,
+    ...(contentType ? { contentType } : {}),
     metaDescription,
     tags,
     excerpt,
