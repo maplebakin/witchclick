@@ -22,6 +22,11 @@ import generatorStyles from './server/lib/generatorStyles.js';
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8787;
 const CWD = process.cwd();
 
+const POST_DIR_CANDIDATES = [
+  path.join(CWD, 'src', 'content', 'posts'),
+  path.join(CWD, 'content', 'posts')
+];
+
 function send(res, code, data) {
   const body = JSON.stringify(data);
   res.writeHead(code, {
@@ -37,6 +42,45 @@ function readJSON(p) {
   try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return null; }
 }
 function ensureDir(p) { fs.mkdirSync(p, { recursive: true }); }
+
+function isDirectory(candidate) {
+  try {
+    return fs.statSync(candidate).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+function directoryHasMarkdown(candidate) {
+  if (!isDirectory(candidate)) return false;
+  try {
+    return fs
+      .readdirSync(candidate, { withFileTypes: true })
+      .some((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.md'));
+  } catch {
+    return false;
+  }
+}
+
+function resolvePrimaryPostsDir() {
+  for (const candidate of POST_DIR_CANDIDATES) {
+    if (directoryHasMarkdown(candidate)) return candidate;
+  }
+  for (const candidate of POST_DIR_CANDIDATES) {
+    if (isDirectory(candidate)) return candidate;
+  }
+  return POST_DIR_CANDIDATES[0];
+}
+
+function listPostDirsForCollisions() {
+  const dirs = [];
+  for (const candidate of POST_DIR_CANDIDATES) {
+    if (isDirectory(candidate)) dirs.push(candidate);
+  }
+  const primary = resolvePrimaryPostsDir();
+  if (!dirs.includes(primary)) dirs.unshift(primary);
+  return dirs;
+}
 
 function parseBody(req) {
   return new Promise((resolve, reject) => {
@@ -115,13 +159,26 @@ function buildGenprompt({ topic, words, ads, kofi }) {
   const settings = readJSON(path.join(CWD, 'content', 'settings.json')) || { brandName: 'WitchClick', siteUrl: 'https://example.com' };
   const products = readJSON(path.join(CWD, 'content', 'products.json')) || { products: [] };
   const allowed = Array.isArray(products.products) ? products.products.map((p) => p.key) : [];
-  const postsDir = path.join(CWD, 'content', 'posts');
-  const existingTitles = fs.existsSync(postsDir)
-    ? fs.readdirSync(postsDir).filter(f=>f.endsWith('.md')).map(f=>{
-        const m = fs.readFileSync(path.join(postsDir,f),'utf8').match(/^title:\s*(.+)$/m);
-        return m ? m[1].trim().replace(/^"(.*)"$/,'$1') : '';
-      }).filter(Boolean)
-    : [];
+  const existingTitles = [];
+  const seenTitles = new Set();
+  for (const dir of listPostDirsForCollisions()) {
+    if (!fs.existsSync(dir)) continue;
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
+      const file = path.join(dir, entry.name);
+      try {
+        const match = fs.readFileSync(file, 'utf8').match(/^title:\s*(.+)$/m);
+        if (!match) continue;
+        const title = match[1].trim().replace(/^"(.*)"$/, '$1');
+        if (!title || seenTitles.has(title)) continue;
+        seenTitles.add(title);
+        existingTitles.push(title);
+      } catch {
+        /* ignore unreadable file */
+      }
+    }
+  }
 
   const lines = [
     'WITCHCLICK PASSIVE-INCOME POST GENERATOR — MASTER PROMPT',
@@ -281,12 +338,16 @@ async function savePostFromWrite(payload) {
   const desiredSlug = payload.slug ? slugify(payload.slug) : slugify(title);
   if (!desiredSlug) throw new Error('slug could not be derived');
 
-  const postsDir = path.join(CWD, 'content', 'posts');
+  const postsDir = resolvePrimaryPostsDir();
   ensureDir(postsDir);
+  const collisionDirs = listPostDirsForCollisions();
+
+  const slugTaken = (candidate) =>
+    collisionDirs.some((dir) => fs.existsSync(path.join(dir, `${candidate}.md`)));
 
   let slug = desiredSlug;
   let i = 2;
-  while (fs.existsSync(path.join(postsDir, `${slug}.md`))) slug = `${desiredSlug}-${i++}`;
+  while (slugTaken(slug)) slug = `${desiredSlug}-${i++}`;
 
   const settings = readJSON(path.join(CWD, 'content', 'settings.json')) || { siteUrl: 'https://example.com' };
   const site = String(settings.siteUrl || 'https://example.com').replace(/\/$/, '');
@@ -366,7 +427,7 @@ async function savePostFromWrite(payload) {
   const filePath = path.join(postsDir, `${slug}.md`);
   await fsp.writeFile(filePath, fm + '\n' + markdown + '\n', 'utf8');
 
-  const result = { slug, path: `content/posts/${slug}.md` };
+  const result = { slug, path: path.relative(CWD, filePath) };
   if (entities.length) {
     result.entities = entities;
   }
@@ -649,10 +710,13 @@ function prepareNormalizedSpec(rawSpec) {
   let slug = normalizedSlug || slugify(spec.title);
   if (!slug) throw new Error('Title required');
 
-  const postsDir = path.join(CWD, 'content', 'posts');
+  const postsDir = resolvePrimaryPostsDir();
+  const collisionDirs = listPostDirsForCollisions();
+  const slugExists = (candidate) =>
+    collisionDirs.some(dir => fs.existsSync(path.join(dir, `${candidate}.md`)));
   let uniqueSlug = slug;
   let idx = 2;
-  while (fs.existsSync(path.join(postsDir, `${uniqueSlug}.md`))) {
+  while (slugExists(uniqueSlug)) {
     uniqueSlug = `${slug}-${idx++}`;
   }
   if (uniqueSlug !== slug) {
@@ -706,7 +770,7 @@ function prepareNormalizedSpec(rawSpec) {
     '---'
   ].join('\n');
 
-  const postFilePath = path.join(CWD, 'content', 'posts', `${uniqueSlug}.md`);
+  const postFilePath = path.join(postsDir, `${uniqueSlug}.md`);
   const postContents = fm + '\n' + (markdownBody || '');
 
   const entityStubs = spec.entities.map(entity => {
