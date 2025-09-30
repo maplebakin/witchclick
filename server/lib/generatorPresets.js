@@ -1,3 +1,5 @@
+import { STRICT_JSON_RULES } from './strictJsonRules.js';
+
 const LOOSE_OUTPUT_CONTRACT = [
   'Return a JSON object using relaxed keys. Allowed keys and aliases:',
   '- title (aliases: name, headline)',
@@ -37,7 +39,9 @@ const STRICT_OUTPUT_CONTRACT = [
   '  "adPlacements": []',
   '}',
   "The first outline item and first section MUST be 'Opening Reflection' with id 'opening-reflection'.",
-  'Do NOT include markdown fences or any commentary outside the JSON.'
+  'Do NOT include markdown fences or any commentary outside the JSON.',
+  '',
+  ...STRICT_JSON_RULES
 ];
 
 const makePreset = ({ label, system, goal }) => ({

@@ -18,6 +18,7 @@ import { spawn } from 'node:child_process';
 
 import generatorPresets from './server/lib/generatorPresets.js';
 import generatorStyles from './server/lib/generatorStyles.js';
+import { STRICT_JSON_RULES } from './server/lib/strictJsonRules.js';
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8787;
 const CWD = process.cwd();
@@ -515,19 +516,9 @@ function buildGenprompt({ topic, words, ads, kofi }) {
     'RETURN INSTRUCTIONS',
     '• Return a single, valid JSON object matching PostSpec v2 exactly, with all fields populated per the schema.',
     '• Do not include any explanations, headings, or code fences—JSON only.',
-    '',
-    'STRICT JSON OUTPUT RULES (do all of these):',
-    '• Output a single JSON object. No markdown fences. No preface/suffix text.',
-    '• Use straight quotes ("). Never use “smart quotes”.',
-    '•Inside all markdown strings, avoid unescaped double quotes; prefer single quotes or escape like \\" within JSON strings.',
-    '• Do not escape brackets/braces unless inside strings: never emit \\[ or \\{ in the top-level structure.',
-    '• No trailing commas. No comments. No undefined. Use [] for empty arrays and "" for empty strings. heroImagePrompt may be null.',
-    '• Start your response with "{" and end with "}".',
-    '• Self-check before sending: imagine running JSON.parse on your answer. If it would fail, correct and re-emit the entire object.',
-    '',
-    'GOLDEN JSON EXAMPLE (minimally valid shape — copy the structure, not the content):',
-    '{"specVersion":2,"title":"t","slug":"t","metaDescription":"t","tags":["a","b","c","d"],"excerpt":"t","outline":[{"heading":"Opening Reflection","id":"opening-reflection"}],"sections":[{"heading":"Opening Reflection","markdown":"M"}],"entities":[],"heroImagePrompt":null,"altTexts":[],"internalLinkHints":[{"anchor":"a","rationale":"r"}],"affiliateHints":[{"key":"journal","anchor":"a","rationale":"r"}],"cta":{"type":"none"},"adPlacements":[]}'
   ];
+  lines.push('');
+  lines.push(...STRICT_JSON_RULES);
   lines.push('');
   lines.push('Note: If the model returns relaxed keys (e.g., description, sections[].content), the server will normalize them to PostSpec v2 by default (strict=false). Set strict=true to require exact PostSpec v2.');
   return lines.join('\n');
@@ -542,12 +533,16 @@ function buildPresetPrompt({ preset, topic, strict, styleDirective }) {
 
   lines.push(`Goal: ${preset.goal}`, '', `Topic: ${topic}`, '');
 
-  if (strict) {
-    lines.push('STRICT JSON CONTRACT:');
-    lines.push(preset.strictOutputContract.join('\n'));
-  } else {
-    lines.push('LOOSE JSON CONTRACT:');
-    lines.push(preset.looseOutputContract.join('\n'));
+  const contractLines = strict
+    ? preset.strictOutputContract
+    : preset.looseOutputContract;
+
+  lines.push(strict ? 'STRICT JSON CONTRACT:' : 'LOOSE JSON CONTRACT:');
+  lines.push(contractLines.join('\n'));
+
+  if (!contractLines.includes('STRICT JSON OUTPUT RULES (do all of these):')) {
+    lines.push('');
+    lines.push(...STRICT_JSON_RULES);
   }
 
   return lines.join('\n');
