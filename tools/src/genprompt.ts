@@ -144,7 +144,7 @@ export function genprompt({
     '8) Affiliate strategy (hints only; do not insert links)',
     '   • ≤ 1 per ~250 words; "key" MUST be one of allowedAffiliateKeys.',
     '9) CTA & ads',
-    '   • If includeKofi="on", set cta.type="kofi". If download, set cta with id. If includeAds="on", choose from ["lead","mid","end"]; else [].',
+    '   • If includeKofi="on", set cta.type="kofi". If includeKofi="off" and no download CTA, output {"type":"none"} with no id. Only include cta.id when cta.type is "download". If includeAds="on", choose from ["lead","mid","end"]; else [].',
     '10) Quality gate',
     '   • Title 50–60; Meta 150–160; 4–7 tags; Grade 6–8 readability; no raw HTML;',
     '   • Anchors appear verbatim in markdown; altTexts if images appear;',
