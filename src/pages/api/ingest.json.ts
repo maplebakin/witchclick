@@ -5,11 +5,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 type EntityType = 'crystal'|'herb'|'moonPhase'|'tarot'|'planetaryDay'|'ritual';
+const CONTENT_TYPES = ['ritual','guide','spread'] as const;
+export type PostContentType = typeof CONTENT_TYPES[number];
 
-interface PostSpecV2 {
+export interface PostSpecV2 {
   specVersion: 2;
   title: string;
   slug: string;
+  contentType?: PostContentType;
   metaDescription: string;
   tags: string[];
   excerpt: string;
@@ -99,11 +102,30 @@ function hasSafetySection(sections: {heading:string; markdown:string}[]){
   return sections.some(sec => /safety|note|disclaimer/i.test(sec.heading));
 }
 
-function validateStructure(spec: PostSpecV2, contentWords:number){
+function isPostContentType(value: unknown): value is PostContentType {
+  return typeof value === 'string' && CONTENT_TYPES.includes(value as PostContentType);
+}
+
+function resolveContentType(spec: PostSpecV2, warnings: string[]): PostContentType {
+  const raw = spec.contentType as unknown;
+  if (isPostContentType(raw)) {
+    spec.contentType = raw;
+    return raw;
+  }
+  if (raw !== undefined && raw !== null) {
+    warnings.push(`Unknown contentType "${raw}", defaulting to "ritual".`);
+  }
+  spec.contentType = 'ritual';
+  return 'ritual';
+}
+
+export function validateStructure(spec: PostSpecV2, contentWords:number){
   const errors:string[] = [];
   const warnings:string[] = [];
 
-  const missing = ['specVersion','title','slug','metaDescription','tags','excerpt','outline','sections','affiliateHints','internalLinkHints','cta','adPlacements']
+  const contentType = resolveContentType(spec, warnings);
+
+  const missing = ['specVersion','title','slug','contentType','metaDescription','tags','excerpt','outline','sections','affiliateHints','internalLinkHints','cta','adPlacements']
     .filter(k => (spec as any)[k] === undefined);
   if (missing.length) errors.push(`Missing fields: ${missing.join(', ')}`);
 
@@ -124,7 +146,10 @@ function validateStructure(spec: PostSpecV2, contentWords:number){
 
   const hasQuick = heads.some(h => /quick|low[- ]?energy|5[- ]?minute/.test(h)) || /quick|low[- ]?energy/.test(body);
   const hasDeep  = heads.some(h => /deep( dive)?|long(er)?/.test(h)) || /deep( dive)?/.test(body);
-  if (!(hasQuick && hasDeep)) errors.push('Ritual variants required: Quick/Low-Energy and Deep');
+  const variantsRequired = contentType === 'ritual';
+  if (variantsRequired && !(hasQuick && hasDeep)) {
+    errors.push('Ritual posts require both Quick/Low-Energy and Deep variants.');
+  }
 
   const hasChecklist = heads.some(h => /checklist|summary|at a glance/.test(h));
   if (!hasChecklist) errors.push('Missing section: Checklist/Summary');
