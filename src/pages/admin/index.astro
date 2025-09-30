@@ -500,6 +500,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
         function checkSpec(s){
           var errors = [], warnings = [];
+          var rawType = (s && typeof s.contentType === 'string') ? s.contentType.trim().toLowerCase() : '';
+          var contentType = rawType || 'ritual';
+          var variantsRequiredFor = new Set(['ritual']);
+          var requiresVariants = variantsRequiredFor.has(contentType);
           var version = Number(s.specVersion);
           if (version !== 2) errors.push('specVersion must be 2');
           if (!s.title || !s.slug) errors.push('title and slug are required');
@@ -514,7 +518,16 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           if (!hasOpening) errors.push('Missing section: Opening Reflection');
           var hasQuick = heads.some(function(h){ return /quick|low[- ]?energy|5[- ]?minute/.test(h); }) || /quick|low[- ]?energy/.test(body);
           var hasDeep  = heads.some(function(h){ return /deep( dive)?|long(er)?/.test(h); }) || /deep( dive)?/.test(body);
-          if (!(hasQuick && hasDeep)) errors.push('Ritual variants required: Quick/Low-Energy and Deep');
+          if (requiresVariants) {
+            if (!(hasQuick && hasDeep)) errors.push('Ritual variants required: Quick/Low-Energy and Deep');
+          } else {
+            var hasEither = hasQuick || hasDeep;
+            if (hasEither && !(hasQuick && hasDeep)) {
+              warnings.push('Ritual variants detected but incomplete — Quick + Deep should appear together when included.');
+            } else if (hasQuick && hasDeep) {
+              warnings.push('Ritual variants present, but contentType "' + contentType + '" does not require them.');
+            }
+          }
           var hasChecklist = heads.some(function(h){ return /checklist|summary|at a glance/.test(h); });
           if (!hasChecklist) errors.push('Missing section: Checklist/Summary');
           var hasReflect = heads.some(function(h){ return /reflection prompt|journal|reflection/.test(h); }) || /prompt|question/.test(body);
