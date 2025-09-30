@@ -19,6 +19,11 @@ import { spawn } from 'node:child_process';
 import generatorPresets from './server/lib/generatorPresets.js';
 import generatorStyles from './server/lib/generatorStyles.js';
 import { STRICT_JSON_RULES } from './server/lib/strictJsonRules.js';
+import { buildMasterPrompt } from './server/lib/promptBuilder.js';
+import {
+  prepareSpecForPersistence,
+  persistPreparedSpec,
+} from './server/lib/specPreparation.js';
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8787;
 const CWD = process.cwd();
@@ -387,11 +392,18 @@ function normalizeTags(input) {
   return tags;
 }
 
-// ---------- GENPROMPT (updated to enforce Opening Reflection) ----------
+// ---------- GENPROMPT (shared with CLI) ----------
 function buildGenprompt({ topic, words, ads, kofi }) {
-  const settings = readJSON(path.join(CWD, 'content', 'settings.json')) || { brandName: 'WitchClick', siteUrl: 'https://example.com' };
+  const settings =
+    readJSON(path.join(CWD, 'content', 'settings.json')) ||
+    { brandName: 'WitchClick', siteUrl: 'https://example.com' };
   const products = readJSON(path.join(CWD, 'content', 'products.json')) || { products: [] };
-  const allowed = Array.isArray(products.products) ? products.products.map((p) => p.key) : [];
+  const allowed = Array.isArray(products.products)
+    ? products.products
+        .map((p) => String(p?.key || '').trim())
+        .filter(Boolean)
+    : [];
+
   const existingTitles = [];
   const seenTitles = new Set();
   for (const dir of listPostDirsForCollisions()) {
@@ -413,115 +425,16 @@ function buildGenprompt({ topic, words, ads, kofi }) {
     }
   }
 
-  const lines = [
-    'WITCHCLICK PASSIVE-INCOME POST GENERATOR — MASTER PROMPT',
-    '(Role, rules, inputs, and exact JSON contract. Paste this whole thing into a fresh chat, then edit the INPUTS block.)',
-    '',
-    `—you are my Head of Content Ops, SEO, and Affiliate Strategy for a metaphysical blog called “${settings.brandName}.” Your job is to produce a single, production-ready article spec that maximizes search intent coverage, internal linking potential, and affiliate conversion while staying gentle, ethical, and cozy.`,
-    '',
-    'AUDIENCE & VOICE',
-    '• Audience: spiritual, planner-loving, neurodivergent, cottagecore; cozy gamers and creatives welcome.',
-    '• Voice: write like a gentle, imperfect guide — a friend sharing what helped them, not a guru giving decrees.',
-    '• Tone rules:',
-    '  - Practical, kind, and honest; admit uncertainty; invite adaptation.',
-    '  - Use playful metaphors from games, cozy rituals, and everyday life.',
-    '  - Avoid absolutes or predictions; empower reader choice.',
-    '• Reading level: Grade 6–8 (simple sentences; concrete verbs; short paragraphs).',
-    '',
-    'SECULAR TAROT CLAUSE',
-    '• When writing about tarot: treat it as a tool for reflection and creativity, not prediction.',
-    '• Present cards as prompts/archetypes/characters. If traditional meanings appear, pair with open-ended interpretations.',
-    '• Avoid implying divine insight or supernatural accuracy; focus on noticing feelings, options, and narratives.',
-    '',
-    'NON-NEGOTIABLES',
-    '• Markdown-only (no raw HTML).',
-    '• Accessibility-first: short paragraphs, scannable lists; include a checklist box.',
-    '• Avoid medical/health claims; add a gentle safety note if content could be misconstrued as medical/therapeutic or if fire/sharp objects are involved.',
-    '• Use inclusive language; no gendered assumptions; no gatekeeping.',
-    '• REQUIRED: The first outline item AND the first section MUST be **Opening Reflection** with id **opening-reflection** (1–2 short paragraphs).',
-    '',
-    'STRUCTURE (must-follow)',
-    '1) Opening Reflection (first section): 1–2 short paragraphs setting a relatable, human scene.',
-    '2) Main Ritual/Spread: provide TWO variants:',
-    '   - Headings MUST explicitly include "Quick" (or "Low-Energy") for the short variant.',
-    '   - Headings MUST explicitly include "Deep" for the extended variant.',
-    '   Write steps like a recipe or quest log (numbered).',
-    '3) Reflection Prompt: end with a single open-ended journaling question, using a heading that contains "Reflection Prompt".',
-    '4) Checklist / Summary Box: explicit bullet list for skimmers, using a heading that contains "Checklist" (or "Summary").',
-    '5) Safety Note (if relevant): brief, gentle, non-alarmist.',
-    '',
-    'RETURN FORMAT',
-    '• Return JSON ONLY. No backticks, no commentary. Valid JSON, double-quoted keys/strings.',
-    '• Must match PostSpec v2 exactly.',
-    '',
-    'SCHEMA (PostSpec v2)',
-    '{',
-    '  "specVersion": 2,',
-    '  "title": string,',
-    '  "slug": string,',
-    '  "metaDescription": string,',
-    '  "tags": string[],',
-    '  "excerpt": string,',
-    '  "outline": { "heading": string, "id": string }[],',
-    '  "sections": { "heading": string, "markdown": string }[],',
-    '  "entities": { "type": "crystal"|"herb"|"moonPhase"|"tarot"|"planetaryDay"|"ritual", "slug": string }[],',
-    '  "heroImagePrompt": string | null,',
-    '  "altTexts": string[],',
-    '  "internalLinkHints": { "anchor": string, "rationale": string }[],',
-    '  "affiliateHints": { "key": string, "anchor": string, "rationale": string }[],',
-    '  "cta": { "type": "kofi"|"download"|"none", "id"?: string },',
-    '  "adPlacements": ["lead"|"mid"|"end"]',
-    '}',
-    '',
-    'INPUTS',
-    `brandName: "${settings.brandName}"`,
-    `siteUrl: "${settings.siteUrl}"`,
-    `topic: "${topic}"`,
-    `wordCount: ${words}`,
-    `includeAds: "${ads}"`,
-    `includeKofi: "${kofi}"`,
-    `existingPostTitles: ${JSON.stringify(existingTitles)}`,
-    `allowedAffiliateKeys: ${JSON.stringify(allowed)}`,
-    '',
-    'PROCESS & CONSTRAINTS (follow step-by-step)',
-    '1) Search intent & slug',
-    '   • Infer primary intent + 2 secondary intents from the topic.',
-    '   • Draft a slug in kebab-case reflecting the primary intent; avoid collisions with existingPostTitles.',
-    '2) Title & meta',
-    '   • Title 50–60 chars with primary keyword. Meta 150–160 chars; cozy, non-clickbait.',
-    '3) Tags & excerpt',
-    '   • 4–7 tags. Excerpt 1–2 sentences that entice the click without hype.',
-    '4) Outline',
-    '   • H2/H3 flow MUST include, in this order:',
-    '     - Opening Reflection (id: opening-reflection) → Steps (headings include "Quick"/"Low-Energy" and "Deep") → Variations/Accessibility → Safety/Ethics → Wrap-up with Reflection Prompt (heading contains "Reflection Prompt").',
-    '   • The FIRST outline item must be exactly {"heading":"Opening Reflection","id":"opening-reflection"}.',
-    '   • Include exactly one short checklist section with a heading containing "Checklist" or "Summary".',
-    '5) Sections',
-    `   • Write ~${words} words total. Short paragraphs, sparse bulleted lists. One gentle disclaimer if advice could be misconstrued as medical/therapeutic.`,
-    '   • Steps must be numbered and include two variants with headings containing "Quick" (or "Low-Energy") and "Deep".',
-    '   • The FIRST section object must have "heading":"Opening Reflection".',
-    '6) Alt texts & optional image',
-    '   • If images are referenced in markdown, provide equal-or-greater altTexts; else []. Set heroImagePrompt to a descriptive scene OR null.',
-    '7) Internal links (hints)',
-    '   • Provide 5–8 internalLinkHints as anchor phrases used verbatim in the prose; include a brief rationale.',
-    '8) Affiliate strategy (hints only; do not insert links)',
-    '   • ≤ 1 per ~250 words; "key" MUST be one of allowedAffiliateKeys. If allowedAffiliateKeys is [], return affiliateHints: [].',
-    '9) CTA & ads',
-    '   • If includeKofi="on", set cta.type="kofi". If includeKofi="off" and no download CTA, output {"type":"none"} with no id. Only include cta.id when cta.type is "download". If includeAds="on", choose from ["lead","mid","end"]; else [].',
-    '10) Quality gate',
-    '   • Title 50–60; Meta 150–160; 4–7 tags; Grade 6–8 readability; no raw HTML;',
-    '   • Anchors appear verbatim in markdown; altTexts if images appear;',
-    '   • Opening Reflection is first in outline (id opening-reflection) AND first in sections; Quick/Low-Energy & Deep headings present; Reflection Prompt heading; Checklist/Summary heading present.',
-    '',
-    'RETURN INSTRUCTIONS',
-    '• Return a single, valid JSON object matching PostSpec v2 exactly, with all fields populated per the schema.',
-    '• Do not include any explanations, headings, or code fences—JSON only.',
-  ];
-  lines.push('');
-  lines.push(...STRICT_JSON_RULES);
-  lines.push('');
-  lines.push('Note: If the model returns relaxed keys (e.g., description, sections[].content), the server will normalize them to PostSpec v2 by default (strict=false). Set strict=true to require exact PostSpec v2.');
-  return lines.join('\n');
+  return buildMasterPrompt({
+    topic,
+    words,
+    ads,
+    kofi,
+    brandName: settings.brandName ?? 'WitchClick',
+    siteUrl: settings.siteUrl ?? 'https://example.com',
+    existingPostTitles: existingTitles,
+    allowedAffiliateKeys: allowed,
+  });
 }
 
 function buildPresetPrompt({ preset, topic, strict, styleDirective }) {
@@ -672,376 +585,6 @@ async function savePostFromWrite(payload) {
   return result;
 }
 
-// ---------- INGEST (PostSpec v2) ----------
-function pickFirstString(...candidates) {
-  for (const candidate of candidates) {
-    if (typeof candidate === 'string') {
-      const trimmed = candidate.trim();
-      if (trimmed) return trimmed;
-    }
-  }
-  return '';
-}
-
-function normalizeEOL(s) {
-  if (s == null) return '';
-  return String(s).replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
-}
-
-function startsWithHeading(markdown, heading) {
-  if (!heading) return false;
-  const normalizedHeading = String(heading).trim();
-  if (!normalizedHeading) return false;
-  const lines = normalizeEOL(markdown).split('\n');
-  for (const rawLine of lines) {
-    if (!rawLine.trim()) continue;
-    const line = rawLine.trim();
-    const match = line.match(/^#{1,6}\s*(.*?)\s*$/);
-    if (!match) return false;
-    let text = match[1];
-    text = text.replace(/\s+#+\s*$/, '').trim();
-    return text.toLowerCase() === normalizedHeading.toLowerCase();
-  }
-  return false;
-}
-
-function normalizeCta(rawCta, report) {
-  const CTA_TYPES = new Set(['kofi', 'download', 'none']);
-  if (typeof rawCta === 'string') {
-    const lower = rawCta.trim().toLowerCase();
-    if (!CTA_TYPES.has(lower)) {
-      report.push('CTA type defaulted to none.');
-      return { type: 'none' };
-    }
-    if (lower === 'download') {
-      return { type: 'download' };
-    }
-    return { type: lower };
-  }
-
-  if (rawCta && typeof rawCta === 'object') {
-    const type = pickFirstString(rawCta.type).toLowerCase();
-    const id = pickFirstString(rawCta.id);
-    if (!CTA_TYPES.has(type)) {
-      report.push('CTA type defaulted to none.');
-      return { type: 'none' };
-    }
-    if (type === 'download') {
-      return id ? { type, id } : { type, id: '' };
-    }
-    return { type };
-  }
-
-  return { type: 'none' };
-}
-
-function normalizeAdPlacements(raw, report) {
-  const VALID = new Set(['lead', 'mid', 'end']);
-  const items = Array.isArray(raw)
-    ? raw
-    : typeof raw === 'string'
-      ? raw.split(',')
-      : [];
-  const seen = new Set();
-  const out = [];
-  for (const item of items) {
-    const slot = pickFirstString(item).toLowerCase();
-    if (!slot) continue;
-    if (!VALID.has(slot)) {
-      report.push(`Dropped invalid ad placement "${slot}".`);
-      continue;
-    }
-    if (seen.has(slot)) continue;
-    seen.add(slot);
-    out.push(slot);
-  }
-  return out;
-}
-
-function normalizeLooseSpec(rawSpec) {
-  const report = [];
-  const input = rawSpec && typeof rawSpec === 'object' ? rawSpec : {};
-  const spec = {
-    specVersion: 2,
-    title: '',
-    slug: '',
-    metaDescription: '',
-    tags: [],
-    excerpt: '',
-    outline: [],
-    sections: [],
-    entities: [],
-    heroImagePrompt: null,
-    altTexts: [],
-    internalLinkHints: [],
-    affiliateHints: [],
-    cta: { type: 'none' },
-    adPlacements: []
-  };
-
-  const title = pickFirstString(input.title, input.name, input.headline);
-  if (!title) throw new Error('Title required');
-  spec.title = title;
-
-  if (input.specVersion && Number(input.specVersion) !== 2) {
-    report.push('specVersion forced to 2.');
-  }
-
-  const initialSlug = pickFirstString(input.slug, input.title, input.name, input.headline);
-  spec.slug = slugify(initialSlug || spec.title);
-
-  const excerpt = pickFirstString(input.excerpt, input.summary, input.description);
-  spec.excerpt = excerpt;
-
-  const metaDescription = pickFirstString(input.metaDescription, input.meta, input.description, input.summary, spec.excerpt);
-  spec.metaDescription = metaDescription || spec.excerpt;
-
-  const tags = Array.isArray(input.tags)
-    ? input.tags
-    : typeof input.tags === 'string'
-      ? input.tags.split(',')
-      : [];
-  spec.tags = tags.map(t => pickFirstString(t)).filter(Boolean);
-
-  const sections = Array.isArray(input.sections) ? input.sections : [];
-  const normalizedSections = [];
-  for (const section of sections) {
-    if (!section || typeof section !== 'object') continue;
-    const heading = pickFirstString(section.heading, section.title, section.name);
-    const rawMarkdown = section.markdown ?? section.content ?? section.body ?? '';
-    const markdown = typeof rawMarkdown === 'string' ? String(rawMarkdown) : '';
-    if (!heading && !markdown.trim()) continue;
-    normalizedSections.push({
-      heading,
-      markdown
-    });
-  }
-  spec.sections = normalizedSections;
-
-  let outline = Array.isArray(input.outline) ? input.outline : [];
-  const normalizedOutline = outline
-    .map(item => {
-      if (!item || typeof item !== 'object') return null;
-      const heading = pickFirstString(item.heading, item.title, item.name);
-      if (!heading) return null;
-      let id = pickFirstString(item.id, item.slug);
-      if (!id) id = slugify(heading);
-      return { heading, id };
-    })
-    .filter(Boolean);
-  if (!normalizedOutline.length && normalizedSections.length) {
-    const derived = normalizedSections
-      .map(sec => {
-        const heading = pickFirstString(sec.heading);
-        if (!heading) return null;
-        return { heading, id: slugify(heading) };
-      })
-      .filter(Boolean);
-    if (derived.length) {
-      report.push('Derived outline from sections.');
-      spec.outline = derived;
-    } else {
-      spec.outline = [];
-    }
-  } else {
-    spec.outline = normalizedOutline;
-  }
-
-  const entities = Array.isArray(input.entities) ? input.entities : [];
-  const normalizedEntities = [];
-  for (const entity of entities) {
-    if (!entity || typeof entity !== 'object') continue;
-    const type = pickFirstString(entity.type);
-    const slug = slugify(pickFirstString(entity.slug, entity.name));
-    if (!type || !slug) {
-      report.push('Dropped invalid entity entry.');
-      continue;
-    }
-    normalizedEntities.push({ type, slug });
-  }
-  spec.entities = normalizedEntities;
-
-  const heroCandidate = input.heroImagePrompt ?? input.heroPrompt ?? input.heroImage;
-  const hero = pickFirstString(heroCandidate);
-  spec.heroImagePrompt = hero || null;
-
-  const altTexts = Array.isArray(input.altTexts) ? input.altTexts : [];
-  spec.altTexts = altTexts.map(t => pickFirstString(t)).filter(Boolean);
-
-  const internalLinkHints = Array.isArray(input.internalLinkHints) ? input.internalLinkHints : [];
-  spec.internalLinkHints = internalLinkHints
-    .map(link => {
-      if (!link || typeof link !== 'object') return null;
-      const anchor = pickFirstString(link.anchor, link.text);
-      if (!anchor) return null;
-      const rationale = pickFirstString(link.rationale, link.reason, link.notes);
-      return { anchor, rationale };
-    })
-    .filter(Boolean);
-
-  const affiliateHints = Array.isArray(input.affiliateHints) ? input.affiliateHints : [];
-  spec.affiliateHints = affiliateHints
-    .map(hint => {
-      if (!hint || typeof hint !== 'object') return null;
-      const key = pickFirstString(hint.key);
-      const anchor = pickFirstString(hint.anchor, hint.text);
-      if (!key || !anchor) return null;
-      const rationale = pickFirstString(hint.rationale, hint.reason);
-      return { key, anchor, rationale };
-    })
-    .filter(Boolean);
-
-  spec.cta = normalizeCta(input.cta, report);
-  spec.adPlacements = normalizeAdPlacements(input.adPlacements, report);
-
-  return { spec, report };
-}
-
-function buildMarkdownFromSpec(spec) {
-  const sections = Array.isArray(spec && spec.sections) ? spec.sections : [];
-  const chunks = [];
-
-  for (const section of sections) {
-    if (!section || typeof section !== 'object') continue;
-    const heading = section.heading ? String(section.heading).trim() : '';
-    const normalizedMarkdown = normalizeEOL(section.markdown);
-    const cleanedMarkdown = normalizedMarkdown
-      ? normalizedMarkdown.replace(/[ \t]+$/gm, '')
-      : '';
-    const body = cleanedMarkdown
-      ? cleanedMarkdown.replace(/^\n+/, '').replace(/\n+$/, '')
-      : '';
-    const hasBody = !!body;
-
-    if (!heading && !hasBody) continue;
-
-    const parts = [];
-    if (heading) {
-      if (!startsWithHeading(cleanedMarkdown, heading)) {
-        parts.push(`## ${heading}`);
-        if (hasBody) parts.push('');
-      }
-    }
-
-    if (hasBody) parts.push(body);
-
-    const chunk = parts.join('\n');
-    if (chunk) chunks.push(chunk);
-  }
-
-  const doc = chunks.join('\n\n');
-  if (!doc) return '';
-  return doc.endsWith('\n') ? doc : `${doc}\n`;
-}
-
-function prepareNormalizedSpec(rawSpec) {
-  const { spec, report } = normalizeLooseSpec(rawSpec);
-
-  const desiredSlug = spec.slug || slugify(spec.title);
-  const normalizedSlug = slugify(desiredSlug || spec.title);
-  if (normalizedSlug && normalizedSlug !== spec.slug) {
-    report.push(`Slug normalized to ${normalizedSlug}.`);
-  }
-  let slug = normalizedSlug || slugify(spec.title);
-  if (!slug) throw new Error('Title required');
-
-  const postsDir = resolvePrimaryPostsDir();
-  const collisionDirs = listPostDirsForCollisions();
-  const slugExists = (candidate) =>
-    collisionDirs.some(dir => fs.existsSync(path.join(dir, `${candidate}.md`)));
-  let uniqueSlug = slug;
-  let idx = 2;
-  while (slugExists(uniqueSlug)) {
-    uniqueSlug = `${slug}-${idx++}`;
-  }
-  if (uniqueSlug !== slug) {
-    report.push(`Slug collision resolved as ${uniqueSlug}.`);
-  }
-  spec.slug = uniqueSlug;
-
-  const outlineHeadings = spec.outline.map(o => o.heading);
-  if (!outlineHeadings.length) {
-    const fallbackOutline = spec.sections
-      .map(sec => pickFirstString(sec.heading))
-      .filter(Boolean);
-    spec.outline = fallbackOutline.map(h => ({ heading: h, id: slugify(h) }));
-  }
-
-  const markdownBody = buildMarkdownFromSpec(spec);
-  const words = wordCount(markdownBody);
-  const readingMinutes = Math.max(1, Math.round(words / 200));
-  const includeAds = spec.adPlacements.length > 0;
-  const includeKofi = spec.cta && spec.cta.type === 'kofi';
-  const excerpt = pickFirstString(spec.excerpt);
-  const metaDescription = pickFirstString(spec.metaDescription, excerpt);
-  const downloadId = spec.cta && spec.cta.type === 'download' ? String(spec.cta.id || '') : '';
-  const entitiesJson = JSON.stringify(spec.entities || []);
-
-  const settings = readJSON(path.join(CWD, 'content', 'settings.json')) || { siteUrl: 'https://example.com' };
-  const site = String(settings.siteUrl || 'https://example.com').replace(/\/$/, '');
-  const canonical = `${site}/post/${uniqueSlug}`;
-
-  const fm = [
-    '---',
-    `title: ${yq(spec.title)}`,
-    `slug: ${uniqueSlug}`,
-    `excerpt: ${yq(excerpt)}`,
-    `metaTitle: ${yq(spec.title)}`,
-    `metaDescription: ${yq(metaDescription)}`,
-    `tags: ${ya(spec.tags)}`,
-    `outline: ${ya(spec.outline.map(o => o.heading))}`,
-    `wordCount: ${words}`,
-    `readingMinutes: ${readingMinutes}`,
-    `includeAds: ${includeAds ? 'true' : 'false'}`,
-    `includeKofi: ${includeKofi ? 'true' : 'false'}`,
-    `affiliateAnchors: ${JSON.stringify(spec.affiliateHints.map(a => ({ key: a.key, text: a.anchor, insertedCount: 0 })))}`,
-    `internalLinkHints: ${JSON.stringify(spec.internalLinkHints.map(h => h.anchor).filter(Boolean))}`,
-    `internalLinks: ${JSON.stringify([])}`,
-    `entities: ${entitiesJson}`,
-    `downloadId: ${yq(downloadId)}`,
-    `publishedAt: ${yq(new Date().toISOString())}`,
-    `canonicalUrl: ${yq(canonical)}`,
-    'specVersion: 2',
-    '---'
-  ].join('\n');
-
-  const postFilePath = path.join(postsDir, `${uniqueSlug}.md`);
-  const postContents = fm + '\n' + (markdownBody || '');
-
-  const entityStubs = spec.entities.map(entity => {
-    const entityFile = path.join(CWD, 'content', 'entities', entity.type, `${entity.slug}.json`);
-    const payload = {
-      type: entity.type,
-      name: entity.slug.replace(/-/g, ' ').replace(/\b\w/g, m => m.toUpperCase()),
-      slug: entity.slug,
-      summary: '',
-      properties: {},
-      related: []
-    };
-    return { file: entityFile, payload };
-  });
-
-  return {
-    spec,
-    normalizationReport: report,
-    post: {
-      filePath: postFilePath,
-      contents: postContents
-    },
-    entityStubs
-  };
-}
-
-async function persistNormalizedSpec(prepared) {
-  for (const stub of prepared.entityStubs) {
-    if (fs.existsSync(stub.file)) continue;
-    ensureDir(path.dirname(stub.file));
-    await fsp.writeFile(stub.file, JSON.stringify(stub.payload, null, 2), 'utf8');
-  }
-
-  ensureDir(path.dirname(prepared.post.filePath));
-  await fsp.writeFile(prepared.post.filePath, prepared.post.contents, 'utf8');
-}
 
 function run(cmd, args, cwd = CWD) {
   return new Promise((resolve) => {
@@ -1243,26 +786,35 @@ const server = http.createServer(async (req, res) => {
         }
 
         try {
-          const prepared = prepareNormalizedSpec(rawSpec || {});
+          const prepared = prepareSpecForPersistence(rawSpec || {}, {
+            cwd: CWD,
+            postsDirectories: listPostDirsForCollisions(),
+          });
           if (!dryRun) {
-            await persistNormalizedSpec(prepared);
+            await persistPreparedSpec(prepared);
           }
+          const relativePath = path.relative(CWD, prepared.post.filePath).replace(/\\/g, '/');
           return send(res, 200, {
             ok: true,
             spec: prepared.spec,
             normalizationReport: prepared.normalizationReport,
+            normalizations: prepared.normalizationReport,
+            warnings: prepared.warnings,
+            validationWarnings: prepared.warnings,
+            wordCount: prepared.wordCount,
             saved: !dryRun,
             slug: prepared.spec.slug,
-            path: path
-              .relative(CWD, prepared.post.filePath)
-              .replace(/\\/g, '/')
+            path: relativePath,
           });
         } catch (e) {
-          const message = e && e.message ? e.message : String(e);
-          if (message === 'Title required') {
-            return send(res, 400, { ok: false, error: 'Title required' });
-          }
-          return send(res, 400, { ok: false, error: message });
+          const status = Array.isArray(e?.errors) ? 400 : 500;
+          return send(res, status, {
+            ok: false,
+            error: e?.message || String(e),
+            errors: e?.errors,
+            warnings: e?.warnings || [],
+            normalizations: e?.normalizations || [],
+          });
         }
       }
     }
@@ -1464,8 +1016,9 @@ const adminPipelineHelpers = {
   generateExcerpt,
   generateMetaDescription,
   normalizeTags,
-  prepareNormalizedSpec,
-  persistNormalizedSpec,
+  buildGenprompt,
+  prepareSpecForPersistence,
+  persistPreparedSpec,
 };
 
 export {
@@ -1475,7 +1028,8 @@ export {
   generateExcerpt,
   generateMetaDescription,
   normalizeTags,
-  prepareNormalizedSpec,
-  persistNormalizedSpec,
+  buildGenprompt,
+  prepareSpecForPersistence,
+  persistPreparedSpec,
   adminPipelineHelpers,
 };
