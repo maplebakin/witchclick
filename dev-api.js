@@ -519,7 +519,7 @@ function buildGenprompt({ topic, words, ads, kofi }) {
     'STRICT JSON OUTPUT RULES (do all of these):',
     '• Output a single JSON object. No markdown fences. No preface/suffix text.',
     '• Use straight quotes ("). Never use “smart quotes”.',
-    '•Inside all markdown strings, avoid unescaped double quotes; prefer single quotes or escape like \" within JSON strings.',
+    '•Inside all markdown strings, avoid unescaped double quotes; prefer single quotes or escape like \\" within JSON strings.',
     '• Do not escape brackets/braces unless inside strings: never emit \\[ or \\{ in the top-level structure.',
     '• No trailing commas. No comments. No undefined. Use [] for empty arrays and "" for empty strings. heroImagePrompt may be null.',
     '• Start your response with "{" and end with "}".',
@@ -1216,7 +1216,10 @@ const server = http.createServer(async (req, res) => {
       if (parsedUrl.pathname === '/ingest') {
         const payload = await parseBody(req);
         if (!payload) {
-          return send(res, 400, { error: 'No JSON body provided. Paste a PostSpec v2 object.' });
+          return send(res, 400, {
+            ok: false,
+            error: 'No JSON body provided. Paste a PostSpec v2 object.'
+          });
         }
 
         const queryDryRun = (() => {
@@ -1250,16 +1253,21 @@ const server = http.createServer(async (req, res) => {
             await persistNormalizedSpec(prepared);
           }
           return send(res, 200, {
+            ok: true,
             spec: prepared.spec,
             normalizationReport: prepared.normalizationReport,
-            saved: !dryRun
+            saved: !dryRun,
+            slug: prepared.spec.slug,
+            path: path
+              .relative(CWD, prepared.post.filePath)
+              .replace(/\\/g, '/')
           });
         } catch (e) {
           const message = e && e.message ? e.message : String(e);
           if (message === 'Title required') {
-            return send(res, 400, { error: 'Title required' });
+            return send(res, 400, { ok: false, error: 'Title required' });
           }
-          return send(res, 400, { error: message });
+          return send(res, 400, { ok: false, error: message });
         }
       }
     }
@@ -1453,6 +1461,18 @@ if (process.env.VITEST !== 'true') {
   });
 }
 
+// ---- Admin helpers (for admin UI / tests)
+const adminPipelineHelpers = {
+  savePostFromWrite,
+  slugify,
+  markdownToPlainText,
+  generateExcerpt,
+  generateMetaDescription,
+  normalizeTags,
+  prepareNormalizedSpec,
+  persistNormalizedSpec,
+};
+
 export {
   savePostFromWrite,
   slugify,
@@ -1460,4 +1480,7 @@ export {
   generateExcerpt,
   generateMetaDescription,
   normalizeTags,
+  prepareNormalizedSpec,
+  persistNormalizedSpec,
+  adminPipelineHelpers,
 };
