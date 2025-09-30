@@ -142,7 +142,7 @@ export function genprompt({
     '7) Internal links (hints)',
     '   • Provide 5–8 internalLinkHints as anchor phrases used verbatim in the prose; include a brief rationale.',
     '8) Affiliate strategy (hints only; do not insert links)',
-    '   • ≤ 1 per ~250 words; "key" MUST be one of allowedAffiliateKeys.',
+    '   • ≤ 1 per ~250 words; "key" MUST be one of allowedAffiliateKeys. If allowedAffiliateKeys is [], return affiliateHints: [].',
     '9) CTA & ads',
     '   • If includeKofi="on", set cta.type="kofi". If download, set cta with id. If includeAds="on", choose from ["lead","mid","end"]; else [].',
     '10) Quality gate',
