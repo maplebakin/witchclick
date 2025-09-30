@@ -73,6 +73,12 @@ const readingMinutes = data.readingMinutes ?? estimateReadingMinutes(content);
 const htmlRaw = marked.parse(content || "");
 let html = DOMPurify.sanitize(String(htmlRaw), { USE_PROFILES: { html: true } });
 
+const heroImage = typeof data.heroImage === "string" ? data.heroImage.trim() : "";
+const heroAlt =
+  typeof data.heroAlt === "string" && data.heroAlt.trim().length
+    ? data.heroAlt.trim()
+    : title;
+
 let ctaType: "kofi" | "download" | "none" = "none";
 let ctaId: string | undefined;
 
@@ -165,6 +171,16 @@ const jsonLd = {
 
   <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
     <article class="prose prose-neutral max-w-none lg:col-span-8">
+      {heroImage && (
+        <figure class="mb-6 overflow-hidden rounded-3xl border border-purple-100 bg-purple-50 shadow-sm">
+          <img
+            src={heroImage}
+            alt={heroAlt}
+            loading="eager"
+            class="h-auto w-full object-cover"
+          />
+        </figure>
+      )}
       <h1 class="mb-2">{title}</h1>
       <p class="mt-0 mb-4 text-sm text-gray-600">
         {publishedAt && (

@@ -1,112 +1,23 @@
 ---
-import fs from "node:fs";
-import path from "node:path";
 import Base from "../../layouts/Base.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
-import { loadAllPosts, type LoadedPost } from "../../utils/posts";
 
 export const prerender = false;
 
 const settings = readSettings();
 const site = getSiteOrigin(settings) || "https://example.com";
 
-const posts: LoadedPost[] = loadAllPosts();
-
-const heroDir = path.join(process.cwd(), "public", "hero-images");
-let heroFiles: string[] = [];
-try {
-  heroFiles = fs
-    .readdirSync(heroDir, { withFileTypes: true })
-    .filter((entry) => entry.isFile())
-    .map((entry) => entry.name)
-    .filter((file) => /\.(png|jpe?g|webp|gif|avif)$/i.test(file));
-} catch {
-  heroFiles = [];
-}
-
-const heroFileSet = new Set(heroFiles.map((file) => `hero-images/${file}`));
-
-interface HeroAdminPost {
-  slug: string;
-  title: string;
-  heroPrompt: string | null;
-  heroAlt: string;
-  heroSrc: string | null;
-  heroFile: string | null;
-  publishedAt: string | null;
-  status: {
-    hasPrompt: boolean;
-    hasImage: boolean;
-    hasAlt: boolean;
-  };
-}
-
-const heroPosts: HeroAdminPost[] = posts.map((post) => {
-  const rawPrompt =
-    typeof post.data?.heroImagePrompt === "string"
-      ? post.data.heroImagePrompt.trim()
-      : "";
-  const heroPrompt = rawPrompt.length ? rawPrompt : null;
-
-  const rawSrc =
-    typeof post.data?.heroImageSrc === "string" ? post.data.heroImageSrc.trim() : "";
-  const heroSrc = rawSrc.length ? rawSrc : null;
-  const normalizedSrc = heroSrc ? heroSrc.replace(/^\/+/, "") : null;
-
-  const inferredFile = heroFileSet.has(`hero-images/${post.slug}.png`)
-    ? `hero-images/${post.slug}.png`
-    : null;
-
-  const heroFile = normalizedSrc && heroFileSet.has(normalizedSrc)
-    ? normalizedSrc
-    : inferredFile;
-
-  const rawAlt =
-    typeof post.data?.heroImageAlt === "string" ? post.data.heroImageAlt.trim() : "";
-  const heroAlt = rawAlt;
-
-  const publishedCandidate =
-    (post.data?.publishedAt ?? post.data?.pubDate ?? post.data?.date ?? null) as
-      | string
-      | number
-      | Date
-      | null;
-
-  let publishedAt: string | null = null;
-  if (publishedCandidate) {
-    const asDate = new Date(publishedCandidate);
-    if (!Number.isNaN(+asDate)) {
-      publishedAt = asDate.toISOString();
-    }
-  }
-
-  return {
-    slug: post.slug,
-    title: post.title,
-    heroPrompt,
-    heroAlt,
-    heroSrc,
-    heroFile,
-    publishedAt,
-    status: {
-      hasPrompt: Boolean(heroPrompt),
-      hasImage: Boolean(heroFile),
-      hasAlt: Boolean(heroAlt),
-    },
-  } satisfies HeroAdminPost;
-});
-
-const clientJson = JSON.stringify(heroPosts).replace(/</g, "\\u003c");
-
 const isDev = import.meta.env.DEV;
 const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
 const url = new URL(Astro.request.url);
 const keyOk = ADMIN_KEY && url.searchParams.get("key") === ADMIN_KEY;
 const canUse = isDev || !!keyOk;
+
+const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
 ---
 <Base
-  title="WitchClick — Hero Images"
-  description="Capture hero prompts, upload art, and wire metadata."
+  title="WitchClick — Hero Image Uploader"
+  description="Upload, attach, and publish hero images for posts."
   canon={`${site}/admin/hero`}
   wide={true}
   noindex={true}
@@ -116,528 +27,375 @@ const canUse = isDev || !!keyOk;
   </Fragment>
 
   {canUse ? (
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
-      <section class="lg:col-span-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-        <div class="flex items-center justify-between">
-          <h1 class="text-xl font-semibold">Hero image workflow</h1>
-          <span class="rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700">
-            {heroPosts.length} post{heroPosts.length === 1 ? "" : "s"}
-          </span>
-        </div>
-        <p class="mt-2 text-sm text-gray-700">
-          Pick a post, copy its hero prompt, then follow the upload and frontmatter steps.
+    <section
+      id="heroUploader"
+      class="mx-auto max-w-4xl space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+      data-dev-api={DEV_API}
+      data-site-origin={site}
+    >
+      <header class="space-y-2">
+        <h1 class="text-2xl font-semibold text-gray-900">Admin → Hero Image Uploader</h1>
+        <p class="text-sm text-gray-700">
+          Choose a post, drop in artwork (PNG, JPG, or WEBP up to 5&nbsp;MB), add alt text, and the uploader will
+          store the file under <code class="rounded bg-gray-100 px-1 py-0.5 text-[11px]">/public/images/hero/&lt;slug&gt;</code>
+          before wiring the frontmatter.
         </p>
-        <label class="mt-4 block text-xs font-medium text-gray-600">
-          Search posts
+      </header>
+
+      <div class="grid gap-5">
+        <label class="block">
+          <span class="text-xs font-medium uppercase tracking-wide text-gray-600">Post</span>
+          <select
+            class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-purple-500 focus:outline-none"
+            data-post-select
+            disabled
+          >
+            <option>Loading posts…</option>
+          </select>
+        </label>
+
+        <div
+          class="rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-6 py-10 text-center transition"
+          data-drop-zone
+        >
           <input
-            id="search"
-            class="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-            placeholder="tea ritual, grounding, cozy games"
-            disabled={heroPosts.length === 0}
+            type="file"
+            accept="image/png,image/jpeg,image/jpg,image/webp"
+            class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+            data-file-input
+            aria-label="Upload hero image"
+          />
+          <p class="text-sm font-medium text-gray-800">Drag &amp; drop hero artwork, or click to browse</p>
+          <p class="mt-2 text-xs text-gray-600">
+            Accepted: PNG, JPG, WEBP. Maximum size: 5&nbsp;MB. A preview appears below once selected.
+          </p>
+          <p class="mt-4 text-xs text-gray-700" data-file-info></p>
+        </div>
+
+        <img
+          data-preview
+          alt="Selected hero preview"
+          class="hidden w-full rounded-xl border border-gray-200 object-cover shadow-sm"
+        />
+
+        <label class="block">
+          <span class="text-xs font-medium uppercase tracking-wide text-gray-600">Alt text</span>
+          <input
+            type="text"
+            placeholder="Cozy cauldron simmering beside tarot cards on a window seat"
+            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:outline-none"
+            data-alt-input
           />
         </label>
-        <div
-          id="postList"
-          class="mt-4 max-h-[70vh] overflow-auto rounded-xl border border-gray-200 bg-gray-50"
-        >
-          {heroPosts.length === 0 ? (
-            <p class="px-4 py-6 text-sm text-gray-600">
-              No posts yet. Ingest a PostSpec to populate this list.
-            </p>
-          ) : (
-            <p class="px-4 py-6 text-sm text-gray-600">
-              Loading posts…
-            </p>
-          )}
-        </div>
-      </section>
 
-      <section class="lg:col-span-8 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-        <h2 class="text-lg font-semibold">Prompt → image → frontmatter</h2>
-        <p class="mt-1 text-sm text-gray-700">
-          This guide mirrors the recommended loop: reuse the ingested prompt, drop the image in
-          <code class="rounded bg-gray-100 px-1 py-0.5 text-[11px]">public/hero-images</code>, then wire
-          <code class="rounded bg-gray-100 px-1 py-0.5 text-[11px]">heroImageSrc</code> and
-          <code class="rounded bg-gray-100 px-1 py-0.5 text-[11px]">heroImageAlt</code> in frontmatter.
-        </p>
+        <div class="flex flex-wrap items-center gap-3">
+          <button
+            class="rounded-lg bg-purple-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-purple-800 disabled:cursor-not-allowed disabled:opacity-60"
+            data-submit
+            disabled
+          >
+            Upload &amp; Attach
+          </button>
+          <span class="text-sm text-gray-600" data-status></span>
+        </div>
 
         <div
-          id="emptyState"
-          class="mt-6 rounded-xl border border-dashed border-purple-200 bg-purple-50/40 p-6 text-center text-sm text-purple-700"
-        >
-          Select a post from the list to get started.
-        </div>
-
-        <div id="workflow" class="mt-6 hidden space-y-5">
-          <div class="rounded-xl border border-gray-200 bg-white/80 p-4">
-            <div class="flex flex-wrap items-baseline justify-between gap-3">
-              <div>
-                <h3 id="postTitle" class="text-lg font-semibold text-gray-900"></h3>
-                <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-600">
-                  <span>
-                    Slug:
-                    <code
-                      id="postSlug"
-                      class="rounded bg-gray-100 px-1 py-0.5 text-[11px]"
-                    ></code>
-                  </span>
-                  <span id="postPublishedWrap" class="hidden">
-                    Published
-                    <span id="postPublished"></span>
-                  </span>
-                </div>
-              </div>
-              <div class="flex flex-wrap gap-1 text-xs" id="statusBadges"></div>
-            </div>
-          </div>
-
-          <div class="rounded-xl border border-gray-200 bg-white/80 p-4">
-            <h4 class="text-sm font-semibold text-gray-900">Step 1 — Copy the hero prompt</h4>
-            <p id="promptNotice" class="mt-1 text-xs text-gray-600"></p>
-            <textarea
-              id="promptText"
-              class="mt-3 h-40 w-full rounded-lg border px-3 py-2 font-mono text-xs"
-              placeholder="No heroImagePrompt captured for this post yet."
-            ></textarea>
-            <div class="mt-2 flex gap-2">
-              <button
-                id="copyPrompt"
-                type="button"
-                class="rounded-lg border px-3 py-2 text-sm"
-              >
-                Copy prompt
-              </button>
-            </div>
-          </div>
-
-          <div class="rounded-xl border border-gray-200 bg-white/80 p-4">
-            <h4 class="text-sm font-semibold text-gray-900">
-              Step 2 — Generate & upload the hero image
-            </h4>
-            <p class="mt-1 text-xs text-gray-600">
-              Run the prompt in your image tool, then save the output into the repo so builds can pick it
-              up automatically.
-            </p>
-            <ul class="mt-2 list-disc pl-5 text-sm text-gray-700">
-              <li>
-                Filename:
-                <code id="fileName" class="rounded bg-gray-100 px-1 py-0.5 text-[11px]"></code>
-              </li>
-              <li>
-                Path:
-                <code class="rounded bg-gray-100 px-1 py-0.5 text-[11px]">
-                  public/<span id="filePath"></span>
-                </code>
-              </li>
-            </ul>
-            <div id="imageStatus" class="mt-3 text-sm"></div>
-            <img
-              id="heroPreview"
-              class="mt-3 hidden max-h-64 w-full rounded-lg border object-cover"
-              loading="lazy"
-              alt=""
-            />
-            <p class="mt-3 text-xs text-gray-600">
-              Tip: once the file exists, run
-              <code class="rounded bg-gray-100 px-1 py-0.5 text-[11px]">node tools/hero-image.mjs &lt;slug&gt;</code>
-              to fill in frontmatter automatically.
-            </p>
-          </div>
-
-          <div class="rounded-xl border border-gray-200 bg-white/80 p-4">
-            <h4 class="text-sm font-semibold text-gray-900">Step 3 — Wire frontmatter metadata</h4>
-            <p class="mt-1 text-xs text-gray-600">
-              Keep the alt text human-friendly and focused on what appears in the image.
-            </p>
-            <label class="mt-3 block text-xs font-medium text-gray-600">
-              Hero alt text
-              <input
-                id="altInput"
-                class="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-                placeholder="Describe the scene for screen readers"
-              />
-            </label>
-            <p id="altNotice" class="mt-1 text-xs text-gray-600"></p>
-            <label class="mt-3 block text-xs font-medium text-gray-600">
-              Frontmatter snippet
-              <textarea
-                id="snippet"
-                class="mt-1 h-24 w-full rounded-lg border px-3 py-2 font-mono text-xs"
-                readonly
-              ></textarea>
-            </label>
-            <div class="mt-2 flex gap-2">
-              <button
-                id="copySnippet"
-                type="button"
-                class="rounded-lg border px-3 py-2 text-sm"
-              >
-                Copy snippet
-              </button>
-            </div>
-          </div>
-
-          <p id="actionStatus" class="text-sm text-gray-700"></p>
-        </div>
-      </section>
-    </div>
+          class="hidden rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800"
+          data-success
+        ></div>
+      </div>
+    </section>
   ) : (
     <section class="mx-auto max-w-3xl rounded-2xl border border-purple-100 bg-white p-6 text-center shadow-sm">
       <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
-      <p class="text-gray-700">
-        These tools only run in <strong>development</strong> (or with a temporary key when hosted on a server
-        adapter).
-      </p>
+      <p class="text-gray-700">These tools only run in <strong>development</strong> (or with a temporary key when hosted).</p>
       <ol class="mx-auto mt-4 list-decimal space-y-2 text-left text-sm text-gray-700">
-        <li>Run <code>npm run dev</code> locally.</li>
-        <li>Use the ingestion CLI: <code>npm run ingest ./path/to/post.json</code>.</li>
-        <li>If you later switch to serverless, set <code>PUBLIC_ADMIN_KEY</code> and visit <code>/admin?key=…</code>.</li>
+        <li>Run <code>npm run dev:all</code> locally to start Astro + the admin API.</li>
+        <li>Visit <code>/admin/hero</code> from the local site.</li>
+        <li>If you later host with an adapter, set <code>PUBLIC_ADMIN_KEY</code> and append <code>?key=…</code>.</li>
       </ol>
     </section>
   )}
 
   {canUse && (
-    <>
-      <script type="application/json" id="heroData">{clientJson}</script>
-      <script is:inline>
-        (function () {
-          var dataEl = document.getElementById('heroData');
-          if (!dataEl) return;
-          var raw = dataEl.textContent || '[]';
-          var posts;
-          try {
-            posts = JSON.parse(raw);
-          } catch (err) {
-            console.error('Failed to parse hero admin data', err);
-            posts = [];
+    <script is:inline>
+      (function () {
+        const root = document.getElementById('heroUploader');
+        if (!root) return;
+        const DEV_API = root.getAttribute('data-dev-api') || 'http://localhost:8787';
+        const SITE_ORIGIN = root.getAttribute('data-site-origin') || 'https://example.com';
+        const select = root.querySelector('[data-post-select]');
+        const dropZone = root.querySelector('[data-drop-zone]');
+        const fileInput = root.querySelector('[data-file-input]');
+        const fileInfo = root.querySelector('[data-file-info]');
+        const preview = root.querySelector('[data-preview]');
+        const altInput = root.querySelector('[data-alt-input]');
+        const submitButton = root.querySelector('[data-submit]');
+        const statusEl = root.querySelector('[data-status]');
+        const successEl = root.querySelector('[data-success]');
+
+        let posts = [];
+        let selectedFile = null;
+        let previewUrl = null;
+
+        const MAX_SIZE = 5 * 1024 * 1024;
+        const ACCEPTED_EXT = /\.(png|jpe?g|webp)$/i;
+
+        function setStatus(message, tone) {
+          if (!statusEl) return;
+          statusEl.textContent = message || '';
+          statusEl.classList.remove('text-gray-600', 'text-red-700', 'text-green-700', 'text-indigo-700');
+          if (!message) {
+            statusEl.classList.add('text-gray-600');
+            return;
           }
-          dataEl.remove();
+          if (tone === 'error') statusEl.classList.add('text-red-700');
+          else if (tone === 'success') statusEl.classList.add('text-green-700');
+          else if (tone === 'progress') statusEl.classList.add('text-indigo-700');
+          else statusEl.classList.add('text-gray-600');
+        }
 
-          var listEl = document.getElementById('postList');
-          var searchEl = document.getElementById('search');
-          var emptyState = document.getElementById('emptyState');
-          var workflow = document.getElementById('workflow');
-          var titleEl = document.getElementById('postTitle');
-          var slugEl = document.getElementById('postSlug');
-          var publishedWrap = document.getElementById('postPublishedWrap');
-          var publishedEl = document.getElementById('postPublished');
-          var badgesEl = document.getElementById('statusBadges');
-          var promptNotice = document.getElementById('promptNotice');
-          var promptArea = document.getElementById('promptText');
-          var copyPromptBtn = document.getElementById('copyPrompt');
-          var fileNameEl = document.getElementById('fileName');
-          var filePathEl = document.getElementById('filePath');
-          var imageStatus = document.getElementById('imageStatus');
-          var heroPreview = document.getElementById('heroPreview');
-          var altInput = document.getElementById('altInput');
-          var altNotice = document.getElementById('altNotice');
-          var snippetArea = document.getElementById('snippet');
-          var copySnippetBtn = document.getElementById('copySnippet');
-          var statusBar = document.getElementById('actionStatus');
+        function clearSuccess() {
+          if (!successEl) return;
+          successEl.classList.add('hidden');
+          successEl.innerHTML = '';
+        }
 
-          var selected = null;
+        function showSuccess(path, slug) {
+          if (!successEl) return;
+          const safePath = String(path || '');
+          const safeSlug = encodeURIComponent(slug || '');
+          const href = `${SITE_ORIGIN.replace(/\/$/, '')}/post/${safeSlug}`;
+          successEl.innerHTML = `
+            <strong class="font-semibold">Success!</strong>
+            Hero saved to <code class="rounded bg-green-100 px-1 py-0.5 text-[11px] text-green-900">${safePath}</code>.
+            <a class="ml-1 text-green-900 underline" href="${href}" target="_blank" rel="noopener">View post →</a>
+          `;
+          successEl.classList.remove('hidden');
+        }
 
-          function escapeHtml(value) {
-            return String(value || '')
-              .replace(/&/g, '&amp;')
-              .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;')
-              .replace(/"/g, '&quot;')
-              .replace(/'/g, '&#39;');
+        function setBusy(on) {
+          if (submitButton) {
+            submitButton.disabled = !!on;
+            submitButton.textContent = on ? 'Uploading…' : 'Upload & Attach';
+            submitButton.classList.toggle('opacity-60', !!on);
           }
-
-          function ensureLeadingSlash(value) {
-            var v = String(value || '').trim();
-            if (!v) return '';
-            return v.charAt(0) === '/' ? v : '/' + v;
+          if (select) {
+            select.disabled = !!on || posts.length === 0;
           }
-
-          function formatDate(iso) {
-            if (!iso) return '';
-            var date = new Date(iso);
-            if (isNaN(+date)) return '';
-            return date.toLocaleDateString(undefined, {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric'
-            });
+          if (fileInput) {
+            fileInput.disabled = !!on;
           }
-
-          function badge(label, ok) {
-            var classes = ok
-              ? 'bg-emerald-100 text-emerald-700'
-              : 'bg-amber-100 text-amber-700';
-            var icon = ok ? '✓' : '!';
-            return '<span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ' + classes + '">' +
-              icon + ' ' + escapeHtml(label) + '</span>';
+          if (dropZone) {
+            dropZone.classList.toggle('opacity-70', !!on);
           }
+        }
 
-          function renderList() {
-            if (!listEl) return;
-            if (!posts.length) {
-              listEl.innerHTML = '<p class="px-4 py-6 text-sm text-gray-600">No posts yet. Ingest a PostSpec to populate this list.</p>';
-              return;
-            }
-            var query = (searchEl && searchEl.value ? searchEl.value : '').toLowerCase().trim();
-            var filtered = posts.filter(function (post) {
-              if (!query) return true;
-              return post.title.toLowerCase().includes(query) || post.slug.toLowerCase().includes(query);
-            });
-            if (!filtered.length) {
-              listEl.innerHTML = '<p class="px-4 py-6 text-sm text-gray-600">No matches for "' + escapeHtml(query) + '".</p>';
-              return;
-            }
-            var html = filtered
-              .map(function (post) {
-                var isActive = selected && selected.slug === post.slug;
-                var base = 'w-full text-left transition border rounded-xl px-3 py-3 mb-2 last:mb-0';
-                var classes = isActive
-                  ? base + ' border-purple-300 bg-purple-50'
-                  : base + ' border-transparent bg-white hover:border-purple-200 hover:bg-purple-50';
-                return (
-                  '<button type="button" data-slug="' + escapeHtml(post.slug) + '" class="' + classes + '">' +
-                  '<div class="flex items-start justify-between gap-3">' +
-                  '<div>' +
-                  '<div class="text-sm font-semibold text-gray-900">' + escapeHtml(post.title) + '</div>' +
-                  '<div class="text-xs text-gray-600">' + escapeHtml(post.slug) + '</div>' +
-                  '<div class="mt-1 flex flex-wrap gap-1">' +
-                  badge('Prompt', post.status && post.status.hasPrompt) +
-                  badge('Image', post.status && post.status.hasImage) +
-                  badge('Alt', post.status && post.status.hasAlt) +
-                  '</div>' +
-                  '</div>' +
-                  '<div class="text-[11px] text-gray-500">' + (post.publishedAt ? formatDate(post.publishedAt) : 'Draft') + '</div>' +
-                  '</div>' +
-                  '</button>'
-                );
-              })
-              .join('');
-            listEl.innerHTML = html;
-            var buttons = listEl.querySelectorAll('button[data-slug]');
-            buttons.forEach(function (btn) {
-              btn.addEventListener('click', function () {
-                var slug = this.getAttribute('data-slug');
-                select(slug);
-              });
-            });
+        function renderOptions() {
+          if (!select) return;
+          const current = select.value;
+          select.innerHTML = '';
+          if (!posts.length) {
+            const option = document.createElement('option');
+            option.textContent = 'No posts available';
+            option.disabled = true;
+            option.selected = true;
+            select.appendChild(option);
+            select.disabled = true;
+            if (submitButton) submitButton.disabled = true;
+            return;
           }
+          const placeholder = document.createElement('option');
+          placeholder.value = '';
+          placeholder.textContent = 'Select a post…';
+          placeholder.disabled = true;
+          placeholder.selected = !posts.some((p) => p.slug === current);
+          select.appendChild(placeholder);
+          posts.forEach((post) => {
+            const option = document.createElement('option');
+            option.value = post.slug;
+            option.textContent = post.title ? `${post.title} (${post.slug})` : post.slug;
+            if (post.slug === current) option.selected = true;
+            select.appendChild(option);
+          });
+          select.disabled = false;
+          if (submitButton) submitButton.disabled = false;
+        }
 
-          function showStatus(message, isError) {
-            if (!statusBar) return;
-            statusBar.textContent = message;
-            statusBar.style.color = isError ? '#7f1d1d' : '#065f46';
+        function revokePreview() {
+          if (previewUrl) {
+            try { URL.revokeObjectURL(previewUrl); } catch (err) { console.warn(err); }
+            previewUrl = null;
           }
+        }
 
-          function updateBadges(post) {
-            if (!badgesEl) return;
-            badgesEl.innerHTML =
-              badge('Prompt', post.status && post.status.hasPrompt) +
-              badge('Image', post.status && post.status.hasImage) +
-              badge('Alt', post.status && post.status.hasAlt);
+        function useFile(file) {
+          clearSuccess();
+          if (!file || !fileInfo || !preview) return;
+          if (file.size > MAX_SIZE) {
+            setStatus('Image must be 5 MB or smaller.', 'error');
+            selectedFile = null;
+            fileInfo.textContent = '';
+            preview.classList.add('hidden');
+            revokePreview();
+            return;
           }
-
-          function updateSnippet() {
-            if (!selected || !snippetArea) return;
-            var alt = (altInput && altInput.value ? altInput.value : '').trim();
-            if (!alt) {
-              alt = selected.heroPrompt || (selected.title + ' — hero image');
-            }
-            var safeAlt = alt.replace(/'/g, "''");
-            var expectedPath = selected.heroFile || ('hero-images/' + selected.slug + '.png');
-            var srcCandidate = selected.heroSrc && selected.heroSrc.trim()
-              ? selected.heroSrc.trim()
-              : '/' + expectedPath;
-            var src = ensureLeadingSlash(srcCandidate);
-            snippetArea.value = "heroImageSrc: " + src + "\nheroImageAlt: '" + safeAlt + "'";
-            if (altInput) {
-              selected.heroAlt = alt;
-              selected.status.hasAlt = alt.trim().length > 0;
-              updateBadges(selected);
-              renderList();
-            }
+          const typeOk = file.type ? file.type.startsWith('image/') : ACCEPTED_EXT.test(file.name);
+          const extOk = ACCEPTED_EXT.test(file.name || '');
+          if (!typeOk || !extOk) {
+            setStatus('Please choose a PNG, JPG, or WEBP image.', 'error');
+            selectedFile = null;
+            fileInfo.textContent = '';
+            preview.classList.add('hidden');
+            revokePreview();
+            return;
           }
+          selectedFile = file;
+          revokePreview();
+          previewUrl = URL.createObjectURL(file);
+          preview.src = previewUrl;
+          preview.classList.remove('hidden');
+          const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+          fileInfo.textContent = `${file.name} • ${sizeMb} MB`;
+          setStatus('Preview ready. Add alt text and click Upload & Attach.', 'progress');
+        }
 
-          function select(slug) {
-            if (!slug) return;
-            var post = posts.find(function (item) { return item.slug === slug; });
-            if (!post) return;
-            selected = post;
-            if (emptyState) emptyState.classList.add('hidden');
-            if (workflow) workflow.classList.remove('hidden');
-            if (titleEl) titleEl.textContent = post.title;
-            if (slugEl) slugEl.textContent = post.slug;
-            if (publishedWrap && publishedEl) {
-              if (post.publishedAt) {
-                publishedWrap.classList.remove('hidden');
-                publishedEl.textContent = formatDate(post.publishedAt);
-              } else {
-                publishedWrap.classList.add('hidden');
-                publishedEl.textContent = '';
-              }
-            }
-            updateBadges(post);
-
-            if (promptArea) {
-              promptArea.value = post.heroPrompt || '';
-              promptArea.placeholder = post.heroPrompt ? '' : 'No heroImagePrompt captured for this post yet.';
-            }
-            if (promptNotice) {
-              promptNotice.textContent = post.heroPrompt
-                ? 'Copy this prompt into your image model and tweak as needed.'
-                : 'No heroImagePrompt was captured for this post. Paste a prompt here or regenerate one before creating art.';
-            }
-            if (copyPromptBtn) {
-              copyPromptBtn.disabled = !(post.heroPrompt && post.heroPrompt.length);
-            }
-
-            var expectedPath = post.heroFile || ('hero-images/' + post.slug + '.png');
-            if (fileNameEl) {
-              var parts = expectedPath.split('/');
-              fileNameEl.textContent = parts[parts.length - 1] || expectedPath;
-            }
-            if (filePathEl) {
-              filePathEl.textContent = expectedPath;
-            }
-            if (imageStatus) {
-              if (post.status && post.status.hasImage) {
-                imageStatus.innerHTML = '<span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700">✓ Hero image found</span>';
-              } else {
-                imageStatus.innerHTML = '<span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">Upload pending — save the generated image to public/' + escapeHtml(expectedPath) + '</span>';
-              }
-            }
-            if (heroPreview) {
-              if (post.status && post.status.hasImage) {
-                var src = ensureLeadingSlash(post.heroSrc || '/' + expectedPath);
-                heroPreview.src = src;
-                heroPreview.alt = post.heroAlt || post.title + ' — hero image';
-                heroPreview.classList.remove('hidden');
-              } else {
-                heroPreview.classList.add('hidden');
-                heroPreview.removeAttribute('src');
-              }
-            }
-            if (altInput) {
-              var initialAlt = post.heroAlt && post.heroAlt.trim()
-                ? post.heroAlt.trim()
-                : (post.heroPrompt ? post.heroPrompt : post.title + ' — hero image');
-              altInput.value = initialAlt;
-              altInput.disabled = false;
-            }
-            if (altNotice) {
-              altNotice.textContent = 'We pre-fill from existing alt text or the prompt. Adjust it so it clearly describes the uploaded art.';
-            }
-            if (statusBar) {
-              statusBar.textContent = '';
-              statusBar.style.color = '#374151';
-            }
-
-            updateSnippet();
-            renderList();
-          }
-
-          function handlePromptInput() {
-            if (!selected || !promptArea) return;
-            var value = promptArea.value.trim();
-            selected.heroPrompt = value.length ? value : null;
-            selected.status.hasPrompt = value.length > 0;
-            if (copyPromptBtn) {
-              copyPromptBtn.disabled = value.length === 0;
-            }
-            if (promptNotice) {
-              promptNotice.textContent = value.length
-                ? 'Copy this prompt into your image model and tweak as needed.'
-                : 'No heroImagePrompt was captured for this post. Paste a prompt here or regenerate one before creating art.';
-            }
-            renderList();
-          }
-
-          function copyToClipboard(text, onSuccess, onError) {
-            if (!text) {
-              if (onError) onError(new Error('Nothing to copy'));
-              return;
-            }
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-              navigator.clipboard.writeText(text).then(onSuccess, onError);
-              return;
-            }
+        function syncFileInput(file) {
+          if (!fileInput || !file) return;
+          if (typeof DataTransfer !== 'undefined') {
             try {
-              var temp = document.createElement('textarea');
-              temp.value = text;
-              temp.style.position = 'fixed';
-              temp.style.top = '-1000px';
-              document.body.appendChild(temp);
-              temp.focus();
-              temp.select();
-              var ok = document.execCommand('copy');
-              document.body.removeChild(temp);
-              if (ok) {
-                if (onSuccess) onSuccess();
-              } else if (onError) {
-                onError(new Error('Copy command failed'));
-              }
+              const dt = new DataTransfer();
+              dt.items.add(file);
+              fileInput.files = dt.files;
             } catch (err) {
-              if (onError) onError(err);
+              console.warn(err);
             }
           }
+        }
 
-          if (promptArea) {
-            promptArea.addEventListener('input', function () {
-              handlePromptInput();
-            });
+        async function readAsDataURL(file) {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(new Error('Could not read image.'));
+            reader.readAsDataURL(file);
+          });
+        }
+
+        async function postJson(endpoint, payload) {
+          const response = await fetch(`${DEV_API}${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload || {}),
+          });
+          let data = null;
+          try { data = await response.json(); } catch (err) { /* ignore */ }
+          const ok = data && data.ok !== false && response.ok;
+          if (!ok) {
+            const message = (data && data.error) || `Request failed (${response.status})`;
+            throw new Error(message);
           }
+          return data;
+        }
 
-          if (altInput) {
-            altInput.addEventListener('input', function () {
-              updateSnippet();
-            });
+        async function loadPosts() {
+          setStatus('Loading posts…', 'progress');
+          try {
+            const data = await postJson('/posts/list', {});
+            posts = Array.isArray(data.items) ? data.items : [];
+            renderOptions();
+            if (!posts.length) {
+              setStatus('No posts found. Ingest a post before uploading heroes.', 'error');
+            } else {
+              setStatus('Select a post, then choose an image to begin.', '');
+            }
+          } catch (err) {
+            setStatus(err && err.message ? err.message : 'Could not load posts.', 'error');
           }
+        }
 
-          if (copyPromptBtn) {
-            copyPromptBtn.addEventListener('click', function () {
-              if (!selected) return;
-              var value = promptArea ? promptArea.value.trim() : '';
-              if (!value) {
-                showStatus('Nothing to copy — add a prompt first.', true);
-                return;
+        if (select) {
+          select.addEventListener('change', () => {
+            clearSuccess();
+            setStatus('', '');
+          });
+        }
+
+        if (fileInput) {
+          fileInput.addEventListener('change', (event) => {
+            const target = event.currentTarget;
+            const file = target && target.files ? target.files[0] : null;
+            useFile(file || null);
+          });
+        }
+
+        if (dropZone) {
+          ['dragenter', 'dragover'].forEach((evt) => {
+            dropZone.addEventListener(evt, (event) => {
+              event.preventDefault();
+              dropZone.classList.add('border-purple-400', 'bg-purple-50');
+            });
+          });
+          ['dragleave', 'dragend', 'drop'].forEach((evt) => {
+            dropZone.addEventListener(evt, (event) => {
+              event.preventDefault();
+              dropZone.classList.remove('border-purple-400', 'bg-purple-50');
+            });
+          });
+          dropZone.addEventListener('drop', (event) => {
+            event.preventDefault();
+            const dt = event.dataTransfer;
+            if (dt && dt.files && dt.files.length) {
+              const file = dt.files[0];
+              syncFileInput(file);
+              useFile(file);
+            }
+          });
+        }
+
+        if (submitButton) {
+          submitButton.addEventListener('click', async (event) => {
+            event.preventDefault();
+            clearSuccess();
+            if (!select || !select.value) {
+              setStatus('Pick a post first.', 'error');
+              return;
+            }
+            if (!selectedFile) {
+              setStatus('Choose an image before uploading.', 'error');
+              return;
+            }
+            const alt = altInput ? altInput.value.trim() : '';
+            try {
+              setBusy(true);
+              setStatus('Uploading image…', 'progress');
+              const dataUrl = await readAsDataURL(selectedFile);
+              if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) {
+                throw new Error('Selected file is not a valid image.');
               }
-              copyToClipboard(value, function () {
-                showStatus('Hero prompt copied to clipboard ✓');
-              }, function (err) {
-                console.error(err);
-                showStatus('Copy failed. Select the text and copy manually.', true);
+              const upload = await postJson('/upload/hero', {
+                slug: select.value,
+                filename: selectedFile.name,
+                contentBase64: dataUrl,
               });
-            });
-          }
-
-          if (copySnippetBtn) {
-            copySnippetBtn.addEventListener('click', function () {
-              if (!selected) return;
-              var value = snippetArea ? snippetArea.value : '';
-              if (!value.trim()) {
-                showStatus('Snippet is empty.', true);
-                return;
-              }
-              copyToClipboard(value, function () {
-                showStatus('Frontmatter snippet copied ✓');
-              }, function (err) {
-                console.error(err);
-                showStatus('Copy failed. Select the text and copy manually.', true);
+              setStatus('Attaching hero metadata…', 'progress');
+              const attach = await postJson('/posts/attach-hero', {
+                slug: select.value,
+                heroImage: upload.path,
+                heroAlt: alt,
               });
-            });
-          }
+              showSuccess(upload.path, select.value);
+              setStatus(`Hero attached. Updated ${attach.path}.`, 'success');
+            } catch (err) {
+              setStatus(err && err.message ? err.message : 'Upload failed.', 'error');
+            } finally {
+              setBusy(false);
+            }
+          });
+        }
 
-          if (searchEl) {
-            searchEl.addEventListener('input', function () {
-              renderList();
-            });
-          }
-
-          renderList();
-          if (posts.length) {
-            select(posts[0].slug);
-          }
-        })();
-      </script>
-    </>
+        loadPosts();
+      })();
+    </script>
   )}
 </Base>

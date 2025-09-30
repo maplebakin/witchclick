@@ -43,6 +43,153 @@ function readJSON(p) {
 }
 function ensureDir(p) { fs.mkdirSync(p, { recursive: true }); }
 
+const HERO_IMAGE_ROOT = path.join(CWD, 'public', 'images', 'hero');
+const VALID_POST_SLUG = /^[a-z0-9-]+$/;
+
+const FRONTMATTER_REGEX = /^---\n([\s\S]*?)\n---\n?/;
+
+function parseFrontmatter(content) {
+  const match = FRONTMATTER_REGEX.exec(content);
+  if (!match) return null;
+  const lines = match[1].replace(/\r\n?/g, '\n').split('\n');
+  const rest = content.slice(match[0].length);
+  return { lines, rest };
+}
+
+function extractFrontmatterValue(lines, key) {
+  const prefix = `${key}:`;
+  for (const line of lines) {
+    if (!line || typeof line !== 'string') continue;
+    if (!line.trim().startsWith(prefix)) continue;
+    const raw = line.trim().slice(prefix.length).trim();
+    if (!raw) return '';
+    const first = raw[0];
+    const last = raw[raw.length - 1];
+    if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
+      return raw.slice(1, -1);
+    }
+    return raw;
+  }
+  return '';
+}
+
+const MIME_EXTENSION_MAP = {
+  'image/jpeg': '.jpg',
+  'image/jpg': '.jpg',
+  'image/png': '.png',
+  'image/webp': '.webp',
+};
+
+function normalizeExtension(ext, fallback) {
+  if (!ext) return fallback;
+  const lower = ext.toLowerCase();
+  if (lower === '.jpeg') return '.jpg';
+  if (lower === '.jpg' || lower === '.png' || lower === '.webp') return lower;
+  return fallback;
+}
+
+function sanitizeHeroFilename(rawName, fallbackExt) {
+  const safeFallback = fallbackExt && fallbackExt.startsWith('.') ? fallbackExt : '.jpg';
+  let value = String(rawName || '').toLowerCase().trim();
+  value = value.replace(/[^a-z0-9-_.]+/g, '-');
+  value = value.replace(/-+/g, '-');
+  value = value.replace(/^[.-]+/, '').replace(/[.-]+$/, '');
+  let ext = path.extname(value);
+  let base = ext ? value.slice(0, -ext.length) : value;
+  ext = normalizeExtension(ext, safeFallback);
+  base = base.replace(/\.+/g, '-').replace(/-+/g, '-');
+  if (!base) base = 'hero-image';
+  return { base, ext: ext || safeFallback };
+}
+
+function ensureUniqueFilename(dir, base, ext) {
+  let attempt = `${base}${ext}`;
+  let counter = 2;
+  while (fs.existsSync(path.join(dir, attempt))) {
+    attempt = `${base}-${counter++}${ext}`;
+  }
+  return attempt;
+}
+
+function parseImageDataUrl(value) {
+  const str = String(value || '');
+  if (!str.startsWith('data:image/')) return null;
+  const match = /^data:(image\/[a-z0-9.+-]+);base64,(.*)$/i.exec(str);
+  if (!match) return null;
+  const mime = match[1].toLowerCase();
+  const base64 = match[2] ? match[2].trim() : '';
+  if (!base64) return null;
+  return { mime, base64: base64.replace(/\s+/g, '') };
+}
+
+async function listPostsForHero() {
+  const postsDir = resolvePrimaryPostsDir();
+  let entries = [];
+  try {
+    entries = await fsp.readdir(postsDir, { withFileTypes: true });
+  } catch {
+    entries = [];
+  }
+  const items = [];
+  for (const entry of entries) {
+    if (!entry.isFile()) continue;
+    if (!entry.name.toLowerCase().endsWith('.md')) continue;
+    const file = path.join(postsDir, entry.name);
+    const fileSlug = path.basename(entry.name, path.extname(entry.name));
+    let slug = fileSlug;
+    let title = fileSlug;
+    try {
+      const raw = await fsp.readFile(file, 'utf8');
+      const parsed = parseFrontmatter(raw);
+      if (parsed) {
+        const fmSlug = extractFrontmatterValue(parsed.lines, 'slug');
+        if (fmSlug && VALID_POST_SLUG.test(fmSlug)) slug = fmSlug;
+        const fmTitle = extractFrontmatterValue(parsed.lines, 'title');
+        if (fmTitle) title = fmTitle;
+      }
+    } catch {
+      /* ignore unreadable file */
+    }
+    if (!VALID_POST_SLUG.test(slug)) continue;
+    items.push({ slug, title });
+  }
+  items.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }));
+  return items;
+}
+
+function findPostFileBySlug(slug) {
+  const dirs = listPostDirsForCollisions();
+  for (const dir of dirs) {
+    const direct = path.join(dir, `${slug}.md`);
+    if (fs.existsSync(direct)) {
+      const raw = fs.readFileSync(direct, 'utf8');
+      const parsed = parseFrontmatter(raw);
+      if (!parsed) throw new Error('Frontmatter missing');
+      return { file: direct, lines: parsed.lines, rest: parsed.rest, raw };
+    }
+  }
+  for (const dir of dirs) {
+    if (!fs.existsSync(dir)) continue;
+    const candidates = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of candidates) {
+      if (!entry.isFile() || !entry.name.toLowerCase().endsWith('.md')) continue;
+      const file = path.join(dir, entry.name);
+      try {
+        const raw = fs.readFileSync(file, 'utf8');
+        const parsed = parseFrontmatter(raw);
+        if (!parsed) continue;
+        const fmSlug = extractFrontmatterValue(parsed.lines, 'slug');
+        if (fmSlug && fmSlug === slug) {
+          return { file, lines: parsed.lines, rest: parsed.rest, raw };
+        }
+      } catch {
+        /* ignore read errors */
+      }
+    }
+  }
+  return null;
+}
+
 function isDirectory(candidate) {
   try {
     return fs.statSync(candidate).isDirectory();
@@ -372,7 +519,7 @@ function buildGenprompt({ topic, words, ads, kofi }) {
     'STRICT JSON OUTPUT RULES (do all of these):',
     '• Output a single JSON object. No markdown fences. No preface/suffix text.',
     '• Use straight quotes ("). Never use “smart quotes”.',
-    '•Inside all markdown strings, avoid unescaped double quotes; prefer single quotes or escape like \" within JSON strings.',
+    '•Inside all markdown strings, avoid unescaped double quotes; prefer single quotes or escape like \\" within JSON strings.',
     '• Do not escape brackets/braces unless inside strings: never emit \\[ or \\{ in the top-level structure.',
     '• No trailing commas. No comments. No undefined. Use [] for empty arrays and "" for empty strings. heroImagePrompt may be null.',
     '• Start your response with "{" and end with "}".',
@@ -1136,6 +1283,101 @@ const server = http.createServer(async (req, res) => {
       });
     }
 
+    if (req.method === 'POST' && req.url === '/posts/list') {
+      try {
+        const items = await listPostsForHero();
+        return send(res, 200, { ok: true, items });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/upload/hero') {
+      try {
+        const body = await parseBody(req);
+        if (!body || typeof body !== 'object') {
+          return send(res, 400, { ok: false, error: 'Invalid JSON body' });
+        }
+        const slug = String(body.slug || '').trim();
+        if (!VALID_POST_SLUG.test(slug)) {
+          return send(res, 400, { ok: false, error: 'Invalid slug' });
+        }
+        const parsed = parseImageDataUrl(body.contentBase64);
+        if (!parsed) {
+          return send(res, 400, { ok: false, error: 'contentBase64 must be a data:image/… URL' });
+        }
+        const fallbackExt = MIME_EXTENSION_MAP[parsed.mime];
+        if (!fallbackExt) {
+          return send(res, 400, { ok: false, error: 'Unsupported image mime type' });
+        }
+        const sanitized = sanitizeHeroFilename(body.filename, fallbackExt);
+        const base = sanitized.base;
+        const ext = fallbackExt;
+        const buffer = Buffer.from(parsed.base64, 'base64');
+        if (!buffer.length) {
+          return send(res, 400, { ok: false, error: 'Image data was empty' });
+        }
+        const targetDir = path.join(HERO_IMAGE_ROOT, slug);
+        ensureDir(targetDir);
+        const finalName = ensureUniqueFilename(targetDir, base, ext);
+        const filePath = path.join(targetDir, finalName);
+        const relativePath = `/images/hero/${slug}/${finalName}`.replace(/\\+/g, '/');
+        await fsp.writeFile(filePath, buffer);
+        return send(res, 200, { ok: true, path: relativePath });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/posts/attach-hero') {
+      try {
+        const body = await parseBody(req);
+        if (!body || typeof body !== 'object') {
+          return send(res, 400, { ok: false, error: 'Invalid JSON body' });
+        }
+        const slug = String(body.slug || '').trim();
+        if (!VALID_POST_SLUG.test(slug)) {
+          return send(res, 400, { ok: false, error: 'Invalid slug' });
+        }
+        const heroImage = String(body.heroImage || '').trim();
+        if (!heroImage || !heroImage.startsWith(`/images/hero/${slug}/`)) {
+          return send(res, 400, { ok: false, error: 'heroImage must point to the hero directory for this slug' });
+        }
+        const heroAlt = body.heroAlt == null ? '' : String(body.heroAlt).trim();
+        const found = findPostFileBySlug(slug);
+        if (!found) {
+          return send(res, 404, { ok: false, error: 'Post not found' });
+        }
+        const lines = Array.isArray(found.lines) ? [...found.lines] : [];
+        const specIndex = lines.findIndex((line) => typeof line === 'string' && line.trim().startsWith('specVersion:'));
+        const heroImageLine = `heroImage: ${yq(heroImage)}`;
+        const heroAltLine = `heroAlt: ${yq(heroAlt)}`;
+        let heroImageIndex = lines.findIndex((line) => typeof line === 'string' && line.trim().startsWith('heroImage:'));
+        if (heroImageIndex !== -1) {
+          lines[heroImageIndex] = heroImageLine;
+        } else {
+          const insertIndex = specIndex === -1 ? lines.length : specIndex;
+          lines.splice(insertIndex, 0, heroImageLine);
+          heroImageIndex = insertIndex;
+        }
+        let heroAltIndex = lines.findIndex((line) => typeof line === 'string' && line.trim().startsWith('heroAlt:'));
+        if (heroAltIndex !== -1) {
+          lines[heroAltIndex] = heroAltLine;
+        } else {
+          const insertIndex = heroImageIndex >= 0 ? heroImageIndex + 1 : (specIndex === -1 ? lines.length : specIndex);
+          lines.splice(insertIndex, 0, heroAltLine);
+          heroAltIndex = insertIndex;
+        }
+        const frontMatter = ['---', ...lines, '---'].join('\n');
+        let next = `${frontMatter}\n${found.rest}`;
+        if (!next.endsWith('\n')) next += '\n';
+        await fsp.writeFile(found.file, next, 'utf8');
+        return send(res, 200, { ok: true, path: path.relative(CWD, found.file) });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
     // ---- Downloads
     if (req.method === 'POST' && req.url === '/downloads/list') {
       try {
@@ -1219,6 +1461,7 @@ if (process.env.VITEST !== 'true') {
   });
 }
 
+// ---- Admin helpers (for admin UI / tests)
 const adminPipelineHelpers = {
   savePostFromWrite,
   slugify,
