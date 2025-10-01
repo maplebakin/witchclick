@@ -34,17 +34,17 @@ readingMinutes: 3
 includeAds: true
 includeKofi: false
 affiliateAnchors:
-  - key: journal
+  - key: ritual-journal
     text: undated daily journal with checkbox layout
     insertedCount: 0
-  - key: notebooks
-    text: pocket notebook
+  - key: micro-notebook
+    text: pocket breadcrumb notebook
     insertedCount: 0
-  - key: crystals
+  - key: grounding-stone
     text: smooth grounding stone
     insertedCount: 0
-  - key: cozy-games
-    text: cozy game
+  - key: cozy-game
+    text: cozy reset game
     insertedCount: 0
 internalLinks:
   - text: 'Knowing When to Give Up: A Gentle Quitter''s Guide'

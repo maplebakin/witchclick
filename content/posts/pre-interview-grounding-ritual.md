@@ -30,17 +30,17 @@ readingMinutes: 6
 includeAds: true
 includeKofi: false
 affiliateAnchors:
-  - key: journal
+  - key: ritual-journal
     text: pocket interview journal
     insertedCount: 0
-  - key: notebooks
-    text: interview prep notebook
+  - key: planner-pad
+    text: interview prep planner pad
     insertedCount: 0
-  - key: crystals
-    text: small black tourmaline palm stone
+  - key: grounding-stone
+    text: black tourmaline palm stone
     insertedCount: 0
-  - key: cozy-games
-    text: gentle cozy games for nerves
+  - key: focus-tea
+    text: nerves-settling tea
     insertedCount: 0
 internalLinks:
   - text: 'Create a Calm Space During Political Unrest: A Gentle Guide'

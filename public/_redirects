@@ -1,6 +1,12 @@
 /admin      /404  404
 /admin/*    /404  404
-/go/journal    https://example.com/journal?utm_source=witchclick&utm_medium=affiliate   302
-/go/crystals    https://example.com/crystals?utm_source=witchclick&utm_medium=affiliate   302
-/go/cozy-games    https://example.com/game?utm_source=witchclick&utm_medium=affiliate   302
-/go/notebooks    https://example.com/notebook?utm_source=witchclick&utm_medium=affiliate   302
+/go/ritual-journal    https://example.com/products/ritual-journal?utm_source=witchclick&utm_medium=affiliate&utm_campaign=ritual_journal   302
+/go/micro-notebook    https://example.com/products/micro-notebook?utm_source=witchclick&utm_medium=affiliate&utm_campaign=micro_notebook   302
+/go/grounding-stone    https://example.com/products/grounding-stone?utm_source=witchclick&utm_medium=affiliate&utm_campaign=grounding_stone   302
+/go/cozy-game    https://example.com/products/cozy-game?utm_source=witchclick&utm_medium=affiliate&utm_campaign=cozy_game   302
+/go/tarot-deck    https://example.com/products/tarot-deck?utm_source=witchclick&utm_medium=affiliate&utm_campaign=tarot_deck   302
+/go/tarot-cloth    https://example.com/products/tarot-cloth?utm_source=witchclick&utm_medium=affiliate&utm_campaign=tarot_cloth   302
+/go/focus-tea    https://example.com/products/focus-tea?utm_source=witchclick&utm_medium=affiliate&utm_campaign=focus_tea   302
+/go/herbal-kit    https://example.com/products/herbal-kit?utm_source=witchclick&utm_medium=affiliate&utm_campaign=herbal_kit   302
+/go/planner-pad    https://example.com/products/planner-pad?utm_source=witchclick&utm_medium=affiliate&utm_campaign=planner_pad   302
+/go/led-candle    https://example.com/products/led-candle?utm_source=witchclick&utm_medium=affiliate&utm_campaign=led_candle   302

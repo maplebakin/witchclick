@@ -11,7 +11,7 @@ readingMinutes: 15
 entities: [{"type":"ritual","slug":"candle-grounding"},{"type":"moonPhase","slug":"waxing-gibbous"}]
 includeAds: true
 includeKofi: true
-affiliateAnchors: [{"key":"journal","text":"linen reflection journal","insertedCount":0}]
+affiliateAnchors: [{"key":"ritual-journal","text":"linen reflection journal","insertedCount":0}]
 internalLinkHints: ["spiritual resilience practice","holistic therapy frameworks","trauma informed mindfulness","integrative psychology rituals","community care journaling"]
 internalLinks: []
 publishedAt: "2025-09-30T16:12:37.793Z"

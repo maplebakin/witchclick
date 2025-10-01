@@ -11,7 +11,7 @@ readingMinutes: 5
 entities: [{"type":"herb","slug":"peppermint"},{"type":"herb","slug":"rosemary"}]
 includeAds: false
 includeKofi: true
-affiliateAnchors: [{"key":"notebooks","text":"dotted ritual notebook","insertedCount":0},{"key":"journal","text":"tea reflection journal","insertedCount":0},{"key":"cozy-games","text":"cozy focus game break","insertedCount":0}]
+affiliateAnchors: [{"key":"focus-tea","text":"peppermint rosemary focus tea","insertedCount":0},{"key":"ritual-journal","text":"tea reflection journal","insertedCount":0},{"key":"planner-pad","text":"dotted ritual planner pad","insertedCount":0},{"key":"herbal-kit","text":"countertop herb drying kit","insertedCount":0}]
 internalLinkHints: ["gentle morning planning spread","cozy focus playlist","slow productivity rituals","planner-friendly tarot tracking","anxiety-soothing tea blends"]
 internalLinks: []
 publishedAt: "2025-09-29T23:57:11.746Z"

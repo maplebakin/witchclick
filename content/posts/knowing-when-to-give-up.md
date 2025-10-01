@@ -30,35 +30,20 @@ readingMinutes: 7
 includeAds: true
 includeKofi: false
 affiliateAnchors:
-  - key: notebooks
-    text: pocket notebook
+  - key: planner-pad
+    text: undated momentum planner pad
     insertedCount: 0
-  - key: notebooks
-    text: tear-out notepad
+  - key: ritual-journal
+    text: guided release journal
     insertedCount: 0
-  - key: journal
-    text: undated guided journal
+  - key: micro-notebook
+    text: pocket win notebook
     insertedCount: 0
-  - key: journal
-    text: refillable leather journal
-    insertedCount: 0
-  - key: crystals
+  - key: grounding-stone
     text: smoky quartz palm stone
     insertedCount: 0
-  - key: crystals
-    text: labradorite worry stone
-    insertedCount: 0
-  - key: notebooks
-    text: grid notebook
-    insertedCount: 0
-  - key: journal
-    text: hardcover reflection journal
-    insertedCount: 0
-  - key: cozy-games
+  - key: cozy-game
     text: gentle cozy game break
-    insertedCount: 0
-  - key: cozy-games
-    text: low-stakes farming sim
     insertedCount: 0
 internalLinks:
   - text: 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'

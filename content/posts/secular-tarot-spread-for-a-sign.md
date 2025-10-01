@@ -28,17 +28,17 @@ readingMinutes: 5
 includeAds: false
 includeKofi: true
 affiliateAnchors:
-  - key: notebooks
-    text: softcover dot-grid notebook
+  - key: tarot-deck
+    text: beginner-friendly tarot deck
     insertedCount: 0
-  - key: journal
-    text: pocket journal
+  - key: ritual-journal
+    text: pocket tarot journal
     insertedCount: 0
-  - key: crystals
-    text: beginner crystal set
+  - key: tarot-cloth
+    text: compact tarot spread cloth
     insertedCount: 0
-  - key: cozy-games
-    text: cozy games for gentle nights
+  - key: grounding-stone
+    text: beginner grounding stone
     insertedCount: 0
 internalLinks:
   - text: 'Secular Tarot in Psychological Practice: A Gentle Guide'

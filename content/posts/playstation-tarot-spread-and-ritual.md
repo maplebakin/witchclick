@@ -60,17 +60,17 @@ entities:
 includeAds: true
 includeKofi: true
 affiliateAnchors:
-  - key: journal
-    text: journal
+  - key: tarot-deck
+    text: modern tarot deck
     insertedCount: 0
-  - key: notebooks
-    text: notebooks
+  - key: grounding-stone
+    text: hematite grounding stone
     insertedCount: 0
-  - key: crystals
-    text: crystals
+  - key: micro-notebook
+    text: pocket session notebook
     insertedCount: 0
-  - key: cozy-games
-    text: cozy games
+  - key: cozy-game
+    text: cozy cooldown game
     insertedCount: 0
 internalLinks:
   - text: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'

@@ -28,29 +28,17 @@ readingMinutes: 6
 includeAds: true
 includeKofi: false
 affiliateAnchors:
-  - key: journal
-    text: softcover reflection journal
+  - key: tarot-deck
+    text: professional-friendly tarot deck
     insertedCount: 0
-  - key: notebooks
-    text: pocket dot-grid notebook
+  - key: ritual-journal
+    text: therapy reflection journal
     insertedCount: 0
-  - key: notebooks
-    text: simple bullet journal notebook
+  - key: tarot-cloth
+    text: neutral tarot cloth for offices
     insertedCount: 0
-  - key: journal
-    text: hardcover guided journal
-    insertedCount: 0
-  - key: crystals
-    text: calm-toned crystal set for décor
-    insertedCount: 0
-  - key: crystals
-    text: tiny palm stone for fidgeting
-    insertedCount: 0
-  - key: cozy-games
-    text: cozy narrative game night
-    insertedCount: 0
-  - key: cozy-games
-    text: low-stakes cozy game for cooldowns
+  - key: grounding-stone
+    text: smooth palm stone for clients
     insertedCount: 0
 internalLinks:
   - text: Secular Tarot Spread When You're Seeking a Clear Sign

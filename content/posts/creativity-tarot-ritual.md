@@ -28,14 +28,17 @@ readingMinutes: 3
 includeAds: true
 includeKofi: false
 affiliateAnchors:
-  - key: crystals
-    text: carnelian
+  - key: tarot-deck
+    text: creativity tarot deck
     insertedCount: 0
-  - key: notebooks
-    text: journal
+  - key: ritual-journal
+    text: spark-tracking journal
     insertedCount: 0
-  - key: cozy-games
-    text: game controller
+  - key: tarot-cloth
+    text: ember-themed tarot cloth
+    insertedCount: 0
+  - key: focus-tea
+    text: creativity focus tea blend
     insertedCount: 0
 internalLinks:
   - text: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
