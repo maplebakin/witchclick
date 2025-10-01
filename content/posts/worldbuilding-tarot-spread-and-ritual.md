@@ -62,17 +62,17 @@ entities:
 includeAds: true
 includeKofi: false
 affiliateAnchors:
-  - key: journal
-    text: journal
+  - key: tarot-deck
+    text: storybuilding tarot deck
     insertedCount: 0
-  - key: notebooks
-    text: notebooks
+  - key: tarot-cloth
+    text: grid-lined tarot cloth
     insertedCount: 0
-  - key: crystals
-    text: crystals
+  - key: ritual-journal
+    text: lore-building journal
     insertedCount: 0
-  - key: cozy-games
-    text: cozy games
+  - key: grounding-stone
+    text: iridescent grounding stone
     insertedCount: 0
 internalLinks:
   - text: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'

@@ -50,17 +50,17 @@ entities:
 includeAds: false
 includeKofi: true
 affiliateAnchors:
-  - key: journal
-    text: journal
+  - key: focus-tea
+    text: focus tea blend
     insertedCount: 0
-  - key: notebooks
-    text: notebooks
+  - key: ritual-journal
+    text: tea reflection journal
     insertedCount: 0
-  - key: crystals
-    text: crystals
+  - key: planner-pad
+    text: micro-step planner pad
     insertedCount: 0
-  - key: cozy-games
-    text: cozy games
+  - key: grounding-stone
+    text: smoky quartz worry stone
     insertedCount: 0
 internalLinks:
   - text: 'Create a Calm Space During Political Unrest: A Gentle Guide'

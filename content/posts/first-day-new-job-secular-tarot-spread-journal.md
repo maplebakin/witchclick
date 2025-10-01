@@ -29,29 +29,20 @@ readingMinutes: 6
 includeAds: true
 includeKofi: true
 affiliateAnchors:
-  - key: notebooks
-    text: pocket notebook
+  - key: ritual-journal
+    text: first-week reflection journal
     insertedCount: 0
-  - key: journal
-    text: soft-cover bullet journal
+  - key: planner-pad
+    text: first-day planning pad
     insertedCount: 0
-  - key: notebooks
-    text: undated planner
+  - key: micro-notebook
+    text: pocket note capture notebook
     insertedCount: 0
-  - key: journal
-    text: desk-friendly journal
+  - key: grounding-stone
+    text: calming desk stone
     insertedCount: 0
-  - key: crystals
-    text: grounding crystals
-    insertedCount: 0
-  - key: crystals
-    text: calming stone
-    insertedCount: 0
-  - key: cozy-games
+  - key: cozy-game
     text: stress-free cozy game break
-    insertedCount: 0
-  - key: notebooks
-    text: notebook set with tabs
     insertedCount: 0
 internalLinks:
   - text: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'

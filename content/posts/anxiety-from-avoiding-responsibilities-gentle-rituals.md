@@ -35,17 +35,17 @@ readingMinutes: 4
 includeAds: true
 includeKofi: false
 affiliateAnchors:
-  - key: journal
-    text: undated daily planner (two-page spread)
+  - key: planner-pad
+    text: undated daily planner pad
     insertedCount: 0
-  - key: notebooks
-    text: A5 dot-grid notebook
+  - key: micro-notebook
+    text: tiny momentum notebook
     insertedCount: 0
-  - key: crystals
-    text: 'grounding palm stones (black tourmaline, amethyst)'
+  - key: grounding-stone
+    text: grounding palm stone trio
     insertedCount: 0
-  - key: cozy-games
-    text: low-stakes cozy farming or adventure games
+  - key: focus-tea
+    text: calming restart tea
     insertedCount: 0
 internalLinks:
   - text: >-

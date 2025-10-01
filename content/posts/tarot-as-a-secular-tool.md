@@ -33,17 +33,17 @@ readingMinutes: 3
 includeAds: false
 includeKofi: true
 affiliateAnchors:
-  - key: journal
-    text: journal
+  - key: tarot-deck
+    text: modern tarot deck
     insertedCount: 0
-  - key: notebooks
-    text: pocket notebook
+  - key: ritual-journal
+    text: linen tarot reflection journal
     insertedCount: 0
-  - key: crystals
-    text: smooth stone
+  - key: tarot-cloth
+    text: portable tarot cloth
     insertedCount: 0
-  - key: cozy-games
-    text: cozy game
+  - key: grounding-stone
+    text: grounding palm stone
     insertedCount: 0
 internalLinks:
   - text: 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore'

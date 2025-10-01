@@ -53,9 +53,10 @@
     { "anchor": "anxiety-soothing tea blends", "rationale": "Direct to a guide about calming herbal combinations." }
   ],
   "affiliateHints": [
-    { "key": "notebooks", "anchor": "dotted ritual notebook", "rationale": "Suggest a durable dotted notebook for quick micro-step lists." },
-    { "key": "journal", "anchor": "tea reflection journal", "rationale": "Offer a guided journal designed for tea-based rituals." },
-    { "key": "cozy-games", "anchor": "cozy focus game break", "rationale": "Highlight a short cozy game that pairs with the ritual's timed pauses." }
+    { "key": "focus-tea", "anchor": "peppermint rosemary focus tea", "rationale": "Recommend a caffeine-optional blend tailored for mindful focus." },
+    { "key": "ritual-journal", "anchor": "tea reflection journal", "rationale": "Offer a guided journal designed for tea-based rituals." },
+    { "key": "planner-pad", "anchor": "dotted ritual planner pad", "rationale": "Suggest a durable pad for capturing micro-steps during the ritual." },
+    { "key": "grounding-stone", "anchor": "smoky quartz grounding stone", "rationale": "Invite a tactile stone to anchor the sipping pauses." }
   ],
   "cta": { "type": "kofi" },
   "adPlacements": []

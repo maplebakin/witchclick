@@ -32,17 +32,17 @@ readingMinutes: 6
 includeAds: true
 includeKofi: false
 affiliateAnchors:
-  - key: journal
-    text: journal
+  - key: ritual-journal
+    text: calm space reflection journal
     insertedCount: 0
-  - key: notebooks
-    text: notebooks
+  - key: led-candle
+    text: flameless ritual candle
     insertedCount: 0
-  - key: crystals
-    text: crystals
+  - key: grounding-stone
+    text: grounding crystal trio
     insertedCount: 0
-  - key: cozy-games
-    text: cozy games
+  - key: cozy-game
+    text: calming cozy game break
     insertedCount: 0
 internalLinks:
   - text: 'Pre-Interview Grounding Ritual: Quick and Deep Guide'

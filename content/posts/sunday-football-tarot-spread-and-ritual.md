@@ -52,17 +52,17 @@ entities:
 includeAds: true
 includeKofi: true
 affiliateAnchors:
-  - key: journal
-    text: journal
+  - key: tarot-deck
+    text: game-day tarot deck
     insertedCount: 0
-  - key: notebooks
-    text: notebooks
+  - key: tarot-cloth
+    text: sports-stripe tarot cloth
     insertedCount: 0
-  - key: crystals
-    text: crystals
+  - key: grounding-stone
+    text: team-color grounding stone
     insertedCount: 0
-  - key: cozy-games
-    text: cozy games
+  - key: cozy-game
+    text: halftime cozy game
     insertedCount: 0
 internalLinks:
   - text: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'

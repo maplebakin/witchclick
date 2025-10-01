@@ -8,6 +8,7 @@ import path from 'node:path';
 import { normalizePostSpec } from '../../../server/lib/ingestionAdapter.js';
 import { validateStructure } from '../../../server/lib/structureValidation.js';
 import { PostSpecV2Schema, type PostSpecV2 } from '../../lib/postSpecSchema';
+import type { EntityType } from '../../lib/postSpecSchema';
 import { validatePostSpec } from '../../lib/postSpecValidator';
 
 /* ---------- helpers ---------- */

@@ -1,9 +1,95 @@
 
 {
   "products": [
-    { "key": "journal", "name": "Linen Journal", "url": "https://example.com/journal", "utm": "utm_source=witchclick&utm_medium=affiliate", "rel": "sponsored nofollow" },
-    { "key": "crystals", "name": "Starter Crystal Set", "url": "https://example.com/crystals", "utm": "utm_source=witchclick&utm_medium=affiliate", "rel": "sponsored nofollow" },
-    { "key": "cozy-games", "name": "Cozy Game", "url": "https://example.com/game", "utm": "utm_source=witchclick&utm_medium=affiliate", "rel": "sponsored nofollow" },
-    { "key": "notebooks", "name": "Dotted Notebook", "url": "https://example.com/notebook", "utm": "utm_source=witchclick&utm_medium=affiliate", "rel": "sponsored nofollow" }
+    {
+      "key": "ritual-journal",
+      "name": "Ember & Ash Ritual Journal",
+      "brand": "Ember & Ash",
+      "url": "https://example.com/products/ritual-journal",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=ritual_journal",
+      "rel": "sponsored nofollow",
+      "tags": ["journaling", "ritual"]
+    },
+    {
+      "key": "micro-notebook",
+      "name": "Pocket Sparks Dot Grid Notebook",
+      "brand": "Pocket Sparks",
+      "url": "https://example.com/products/micro-notebook",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=micro_notebook",
+      "rel": "sponsored nofollow",
+      "tags": ["notetaking", "portable"]
+    },
+    {
+      "key": "grounding-stone",
+      "name": "Smoky Quartz Grounding Stone",
+      "brand": "Stonewell",
+      "url": "https://example.com/products/grounding-stone",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=grounding_stone",
+      "rel": "sponsored nofollow",
+      "tags": ["crystal", "anxiety"]
+    },
+    {
+      "key": "cozy-game",
+      "name": "LoFi Cozy Game Library",
+      "brand": "LoFi Library",
+      "url": "https://example.com/products/cozy-game",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=cozy_game",
+      "rel": "sponsored nofollow",
+      "tags": ["digital", "break"]
+    },
+    {
+      "key": "tarot-deck",
+      "name": "Everyday Pattern Tarot Deck",
+      "brand": "Everyday Pattern",
+      "url": "https://example.com/products/tarot-deck",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=tarot_deck",
+      "rel": "sponsored nofollow",
+      "tags": ["tarot", "cards"]
+    },
+    {
+      "key": "tarot-cloth",
+      "name": "Reversible Tarot Spread Cloth",
+      "brand": "Moonloom",
+      "url": "https://example.com/products/tarot-cloth",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=tarot_cloth",
+      "rel": "sponsored nofollow",
+      "tags": ["tarot", "altar"]
+    },
+    {
+      "key": "focus-tea",
+      "name": "Peppermint Rosemary Focus Tea",
+      "brand": "Kettlebright",
+      "url": "https://example.com/products/focus-tea",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=focus_tea",
+      "rel": "sponsored nofollow",
+      "tags": ["tea", "focus"]
+    },
+    {
+      "key": "herbal-kit",
+      "name": "Countertop Herb Drying Kit",
+      "brand": "HerbNest",
+      "url": "https://example.com/products/herbal-kit",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=herbal_kit",
+      "rel": "sponsored nofollow",
+      "tags": ["herbs", "kitchen"]
+    },
+    {
+      "key": "planner-pad",
+      "name": "Undated Focus Planner Pad",
+      "brand": "Gentle Plans",
+      "url": "https://example.com/products/planner-pad",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=planner_pad",
+      "rel": "sponsored nofollow",
+      "tags": ["planning", "focus"]
+    },
+    {
+      "key": "led-candle",
+      "name": "Rechargeable LED Ritual Candle",
+      "brand": "Glowstead",
+      "url": "https://example.com/products/led-candle",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=led_candle",
+      "rel": "sponsored nofollow",
+      "tags": ["ambient", "safety"]
+    }
   ]
 }

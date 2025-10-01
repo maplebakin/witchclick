@@ -41,17 +41,17 @@ readingMinutes: 5
 includeAds: true
 includeKofi: false
 affiliateAnchors:
-  - key: journal
+  - key: ritual-journal
     text: conflict repair journal (simple prompts)
     insertedCount: 0
-  - key: notebooks
-    text: A5 dot-grid notebook
+  - key: focus-tea
+    text: calming focus tea blend
     insertedCount: 0
-  - key: crystals
-    text: 'soothing palm stones (rose quartz, blue lace agate)'
+  - key: grounding-stone
+    text: soothing palm stone set
     insertedCount: 0
-  - key: cozy-games
-    text: low-stress cozy co-op or solo games
+  - key: led-candle
+    text: rechargeable ritual candle
     insertedCount: 0
 internalLinks:
   - text: 'When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day'
