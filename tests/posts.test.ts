@@ -3,6 +3,8 @@ import path from "node:path";
 import os from "node:os";
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 
+import { createPostSpec } from "./postSpecTestUtils";
+
 let tempDir: string;
 let cwdSpy: ReturnType<typeof vi.spyOn>;
 
@@ -130,10 +132,8 @@ describe("posts utilities", () => {
     expect(posts.map((p) => p.slug)).toContain("seed");
 
     const { ingestFromSpec } = await import("../scripts/ingest.mjs");
-    await ingestFromSpec({
-      title: "Ingested Post",
-      body: "# Heading\n\nBody content.",
-    });
+    const spec = createPostSpec({ title: "Ingested Post", slug: "ingested-post" });
+    await ingestFromSpec(spec);
 
     resetPostCache();
     posts = loadAllPosts();
@@ -151,15 +151,13 @@ describe("posts utilities", () => {
     vi.resetModules();
 
     const { ingestFromSpec } = await import("../scripts/ingest.mjs");
-    const result = await ingestFromSpec(
-      {
-        title: "Guide Content",
-        body: "# Heading\n\nBody.",
-        contentType: "guide",
-      },
-      { dry: true },
-    );
+    const spec = createPostSpec({
+      title: "Guide Content",
+      slug: "guide-content",
+      contentType: "guide",
+    });
+    const result = await ingestFromSpec(spec, { dry: true });
 
-    expect(result.frontmatter.contentType).toBe("guide");
+    expect(result.spec.contentType).toBe("guide");
   });
 });
