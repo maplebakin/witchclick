@@ -7,12 +7,12 @@ The WitchClick pipeline turns generated outlines into live posts. Follow this ch
 - Review the generated copy for tone and structure before saving it to disk.
 
 ## 2. Prepare the ingest spec
-- Save the approved prompt as a JSON spec that includes frontmatter fields (title, slug, tags, dates) and a Markdown `body`.
-- Confirm required fields such as `title`, `slug`, `tags`, and `body` are present and valid. The ingest script now validates dates, links, and anchors before writing content.
+- Save the approved prompt as a PostSpec v2 JSON payload (see `npm run ingest -- --help`) containing `specVersion: 2`, title, slug, meta description, excerpt, 4-7 tags, outline items, sections with Markdown, entities, internal link hints, affiliate hints, CTA, and ad placements.
+- Validate that the outline IDs match the section headings and that every array meets the schema requirements. The ingest script shares the same normalization and warning messages as the local admin API.
 
 ## 3. Ingest content (manually or from the queue)
 - For one-off conversions, run `npm run ingest -- path/to/spec.json` to convert the spec into Markdown.
-- Add `--dry` to preview the generated frontmatter without writing files.
+- Add `--dry` to preview the generated Markdown, normalization report, and warnings without writing files.
 - The script automatically targets `src/content/posts` when it exists and reports validation errors with actionable messages.
 - To automate publishing, drop approved specs into `content/prompt-queue/approved/` and schedule `npm run ingest:queue`.
   - The queue runner validates every file, writes posts, and moves successes to `content/prompt-queue/shipped/`.

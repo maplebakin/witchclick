@@ -3,6 +3,8 @@ import { mkdtemp, rm, mkdir } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
+import { createPostSpec } from "./postSpecTestUtils";
+
 const TMP_PREFIX = path.join(os.tmpdir(), "wc-ingest-logs-");
 
 describe("ingest logging", () => {
@@ -27,13 +29,8 @@ describe("ingest logging", () => {
     const events: Array<Record<string, unknown>> = [];
     const { ingestFromSpec } = await import("../scripts/ingest.mjs");
 
-    await ingestFromSpec(
-      {
-        title: "Loggable Post",
-        body: "# Hello\n\nWorld.",
-      },
-      { logger: (event) => events.push(event) },
-    );
+    const spec = createPostSpec({ title: "Loggable Post", slug: "loggable-post" });
+    await ingestFromSpec(spec, { logger: (event) => events.push(event) });
 
     expect(events).toHaveLength(1);
     expect(events[0]).toMatchObject({
@@ -50,14 +47,10 @@ describe("ingest logging", () => {
     const events: Array<Record<string, unknown>> = [];
     const { ingestFromSpec, IngestValidationError } = await import("../scripts/ingest.mjs");
 
-    await expect(
-      ingestFromSpec(
-        {
-          title: "Missing body",
-        },
-        { logger: (event) => events.push(event) },
-      ),
-    ).rejects.toBeInstanceOf(IngestValidationError);
+    const invalidSpec = createPostSpec({ sections: [] });
+    await expect(ingestFromSpec(invalidSpec, { logger: (event) => events.push(event) })).rejects.toBeInstanceOf(
+      IngestValidationError,
+    );
 
     expect(events).toHaveLength(1);
     expect(events[0]).toMatchObject({
