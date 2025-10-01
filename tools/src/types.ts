@@ -1,8 +1,10 @@
 // tools/src/types.ts
+import type { EntityType } from '../../server/lib/postSpecSchema.js';
+
 export type {
   EntityType,
   PostSpecV2,
-} from '../../src/lib/postSpecSchema';
+} from '../../server/lib/postSpecSchema.js';
 
 export type AdSlot = 'lead'|'mid'|'end';
 
