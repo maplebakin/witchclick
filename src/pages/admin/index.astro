@@ -182,7 +182,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         var STYLE_OPTIONS = [];
         try { PRESET_OPTIONS = JSON.parse(rawPresets); } catch {}
         try { STYLE_OPTIONS = JSON.parse(rawStyles); } catch {}
-        function setStatus(msg, ok, warnings, notes){
+        function setStatus(msg, ok, warnings, notes, errors){
           var el=$('status');
           if (!el) return;
           var base='rounded-lg border px-3 py-2 text-sm';
@@ -218,6 +218,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             el.appendChild(list);
           }
 
+          appendList('Errors', errors, 'text-red-700');
           appendList('Warnings', warnings, 'text-amber-700');
           appendList('Notes', notes, 'text-slate-600');
 
@@ -498,53 +499,99 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         }
 
 
-        function checkSpec(s){
-          var errors = [], warnings = [];
-          var rawType = (s && typeof s.contentType === 'string') ? s.contentType.trim().toLowerCase() : '';
-          var contentType = rawType || 'ritual';
-          var variantsRequiredFor = new Set(['ritual']);
-          var requiresVariants = variantsRequiredFor.has(contentType);
-          var version = Number(s.specVersion);
-          if (version !== 2) errors.push('specVersion must be 2');
-          if (!s.title || !s.slug) errors.push('title and slug are required');
-          if (!Array.isArray(s.sections) || s.sections.length === 0) errors.push('sections[] required');
-          var tags = Array.isArray(s.tags) ? s.tags : [];
-          if (tags.length < 4 || tags.length > 7) errors.push('tags must be 4–7');
-          var mdLen = (s.metaDescription || '').length;
-          if (mdLen < 150 || mdLen > 160) warnings.push('metaDescription length ~'+mdLen+' (target 150–160)');
-          var heads = (s.sections||[]).map(function(x){ return String(x.heading||'').toLowerCase(); });
-          var body = (s.sections||[]).map(function(x){ return x.markdown||''; }).join('\n').toLowerCase();
-          var hasOpening = heads.some(function(h){ return h === 'opening reflection' || (h.startsWith('opening') && /reflection|scene|note/.test(h)); });
-          if (!hasOpening) errors.push('Missing section: Opening Reflection');
-          var hasQuick = heads.some(function(h){ return /quick|low[- ]?energy|5[- ]?minute/.test(h); }) || /quick|low[- ]?energy/.test(body);
-          var hasDeep  = heads.some(function(h){ return /deep( dive)?|long(er)?/.test(h); }) || /deep( dive)?/.test(body);
-          if (requiresVariants) {
-            if (!(hasQuick && hasDeep)) errors.push('Ritual variants required: Quick/Low-Energy and Deep');
-          } else {
-            var hasEither = hasQuick || hasDeep;
-            if (hasEither && !(hasQuick && hasDeep)) {
-              warnings.push('Ritual variants detected but incomplete — Quick + Deep should appear together when included.');
-            } else if (hasQuick && hasDeep) {
-              warnings.push('Ritual variants present, but contentType "' + contentType + '" does not require them.');
-            }
-          }
-          var hasChecklist = heads.some(function(h){ return /checklist|summary|at a glance/.test(h); });
-          if (!hasChecklist) errors.push('Missing section: Checklist/Summary');
-          var hasReflect = heads.some(function(h){ return /reflection prompt|journal|reflection/.test(h); }) || /prompt|question/.test(body);
-          if (!hasReflect) errors.push('Missing section: Reflection Prompt');
-          if (!(typeof s.heroImagePrompt === 'string' || s.heroImagePrompt === null)) errors.push('heroImagePrompt must be string or null');
-          if (!Array.isArray(s.internalLinkHints) || s.internalLinkHints.length < 3) warnings.push('internalLinkHints are sparse (aim 5–8).');
-          return { ok: errors.length===0, errors: errors, warnings: warnings };
+        function normalizeResponseSpec(spec, fallback){
+          if (spec && typeof spec === 'object') return spec;
+          return fallback;
         }
 
-        $('validateBtn').addEventListener('click', function(){
+        function extractArray(value){
+          return Array.isArray(value) ? value : [];
+        }
+
+        function buildError(message, type, info){
+          var err = new Error(message);
+          err.type = type;
+          if (info && typeof info === 'object') {
+            Object.keys(info).forEach(function(key){ err[key] = info[key]; });
+          }
+          return err;
+        }
+
+        async function postSpec(spec, options){
+          var dryRun = options && options.dryRun ? 'true' : 'false';
+          var url = DEV_API + '/ingest' + (dryRun === 'true' ? '?dryRun=true' : '');
+          var res;
+          try {
+            res = await fetch(url, {
+              method:'POST',
+              headers:{'Content-Type':'application/json'},
+              body: JSON.stringify(spec)
+            });
+          } catch (networkError) {
+            throw buildError('Network error contacting ingest endpoint: ' + (networkError && networkError.message ? networkError.message : 'unknown network error'), 'network', {
+              original: networkError
+            });
+          }
+
+          var text;
+          try {
+            text = await res.text();
+          } catch (readError) {
+            text = '';
+          }
+
+          var data = {};
+          if (text) {
+            try { data = JSON.parse(text); }
+            catch { data = { raw: text }; }
+          }
+
+          if (!res.ok) {
+            throw buildError(
+              'Server error (' + res.status + '): ' + (data && data.error ? data.error : res.statusText || 'Unknown error'),
+              'http',
+              { status: res.status, data: data }
+            );
+          }
+
+          return data;
+        }
+
+        function handleSpecError(err){
+          if (err && err.data && err.data.spec) {
+            renderSpecSummary(err.data.spec);
+          }
+          var warnings = err && err.data ? extractArray(err.data.warnings) : [];
+          var notes = err && err.data ? extractArray(err.data.normalizationReport) : [];
+          var errors = err && err.data ? extractArray(err.data.errors) : [];
+          if (err && err.type === 'network') {
+            setStatus(err.message, false, warnings, notes, errors);
+            return;
+          }
+          if (err && err.type === 'http') {
+            setStatus(err.message, false, warnings, notes, errors);
+            return;
+          }
+          setStatus((err && err.message) || 'Unexpected error', false, warnings, notes, errors);
+        }
+
+        $('validateBtn').addEventListener('click', async function(){
           try{
-            var s=parseSpec();
-            var res = checkSpec(s);
-            renderSpecSummary(s);
-            if (!res.ok) throw new Error(res.errors[0]);
-            setStatus('Valid ✓', true, res.warnings);
-          }catch(e){ setStatus(e.message, false); }
+            busy(true); setStatus('Validating…', null);
+            var spec = parseSpec();
+            var data = await postSpec(spec, { dryRun: true });
+            var finalSpec = normalizeResponseSpec(data.spec, spec);
+            renderSpecSummary(finalSpec);
+            var warnings = extractArray(data.warnings);
+            var notes = extractArray(data.normalizationReport);
+            var errors = extractArray(data.errors);
+            if (data.ok === false) {
+              setStatus(data.error || 'Validation errors found.', false, warnings, notes, errors);
+              return;
+            }
+            setStatus('Valid ✓', true, warnings, notes, errors);
+          }catch(e){ handleSpecError(e); }
+          finally{ busy(false); }
         });
 
         function wordCount(md){
@@ -576,66 +623,89 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           el.appendChild(meta);
         }
 
-        $('previewBtn').addEventListener('click', function(){
+        $('previewBtn').addEventListener('click', async function(){
           try{
-            var s=parseSpec(); var res=checkSpec(s);
-            renderSpecSummary(s);
-            if(!res.ok) throw new Error(res.errors[0]);
-            renderPreview(s);
-            setStatus('Preview ✓', true, res.warnings);
-          }catch(e){ setStatus(e.message, false); }
+            busy(true); setStatus('Validating for preview…', null);
+            var spec = parseSpec();
+            var data = await postSpec(spec, { dryRun: true });
+            var finalSpec = normalizeResponseSpec(data.spec, spec);
+            renderSpecSummary(finalSpec);
+            var warnings = extractArray(data.warnings);
+            var notes = extractArray(data.normalizationReport);
+            var errors = extractArray(data.errors);
+            if (data.ok === false) {
+              setStatus(data.error || 'Validation errors found.', false, warnings, notes, errors);
+              return;
+            }
+            renderPreview(finalSpec);
+            setStatus('Preview ✓', true, warnings, notes, errors);
+          }catch(e){ handleSpecError(e); }
+          finally{ busy(false); }
         });
-
-        async function ingest(spec){
-          var res = await fetch(DEV_API + '/ingest', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(spec) });
-          var data;
-          try { data = await res.json(); }
-          catch { data = {}; }
-          if (!res.ok) {
-            throw new Error((data && data.error) || ('ingest failed (' + res.status + ')'));
-          }
-          if (!data || data.ok === false) {
-            throw new Error((data && data.error) || 'ingest failed');
-          }
-          return data;
-        }
 
         $('ingestBtn').addEventListener('click', async function(){
           try{
-            busy(true); setStatus('Ingesting…', null);
+            busy(true); setStatus('Validating…', null);
             var spec = parseSpec();
-            var res=checkSpec(spec);
-            renderSpecSummary(spec);
-            if(!res.ok) throw new Error(res.errors[0]);
-            var data = await ingest(spec);
-            var finalSpec = data.spec || spec;
+            var dryRun = await postSpec(spec, { dryRun: true });
+            var finalSpec = normalizeResponseSpec(dryRun.spec, spec);
             renderSpecSummary(finalSpec);
+            var warnings = extractArray(dryRun.warnings);
+            var notes = extractArray(dryRun.normalizationReport);
+            var errors = extractArray(dryRun.errors);
+            if (dryRun.ok === false) {
+              setStatus(dryRun.error || 'Validation errors found.', false, warnings, notes, errors);
+              return;
+            }
+            setStatus('Validation passed. Ingesting…', null, warnings, notes, errors);
+            var data = await postSpec(finalSpec, { dryRun: false });
+            if (data.ok === false) {
+              setStatus(data.error || 'Ingest failed.', false, extractArray(data.warnings), extractArray(data.normalizationReport), extractArray(data.errors));
+              return;
+            }
+            var ingestWarnings = extractArray(data.warnings);
+            var ingestNotes = extractArray(data.normalizationReport);
+            var mergedWarnings = ingestWarnings.length ? ingestWarnings : warnings;
+            var mergedNotes = ingestNotes.length ? ingestNotes : notes;
             var location = data.path || ('content/posts/' + (data.slug || finalSpec.slug || 'post') + '.md');
             var slug = data.slug || (finalSpec && finalSpec.slug) || '';
             var msg = (data.saved === false ? 'Ingested (dry run)' : 'Ingested ✓') + ' → ' + location + (slug ? ' • Preview: /post/' + slug : '');
-            setStatus(msg, true, res.warnings, data.normalizationReport);
-          }catch(e){ setStatus(e.message, false); }
+            setStatus(msg, true, mergedWarnings, mergedNotes, extractArray(data.errors));
+          }catch(e){ handleSpecError(e); }
           finally{ busy(false); }
         });
 
         $('ingestPublishBtn').addEventListener('click', async function(){
           try{
-            busy(true); setStatus('Ingesting…', null);
+            busy(true); setStatus('Validating…', null);
             var spec = parseSpec();
-            var res=checkSpec(spec);
-            renderSpecSummary(spec);
-            if(!res.ok) throw new Error(res.errors[0]);
-            var data = await ingest(spec);
-            var finalSpec = data.spec || spec;
+            var dryRun = await postSpec(spec, { dryRun: true });
+            var finalSpec = normalizeResponseSpec(dryRun.spec, spec);
             renderSpecSummary(finalSpec);
-            setStatus('Ingested. Publishing…', true, res.warnings, data.normalizationReport);
+            var warnings = extractArray(dryRun.warnings);
+            var notes = extractArray(dryRun.normalizationReport);
+            var errors = extractArray(dryRun.errors);
+            if (dryRun.ok === false) {
+              setStatus(dryRun.error || 'Validation errors found.', false, warnings, notes, errors);
+              return;
+            }
+            setStatus('Validation passed. Ingesting…', null, warnings, notes, errors);
+            var data = await postSpec(finalSpec, { dryRun: false });
+            if (data.ok === false) {
+              setStatus(data.error || 'Ingest failed.', false, extractArray(data.warnings), extractArray(data.normalizationReport), extractArray(data.errors));
+              return;
+            }
+            var ingestWarnings = extractArray(data.warnings);
+            var ingestNotes = extractArray(data.normalizationReport);
+            var slug = data.slug || (finalSpec && finalSpec.slug) || '';
+            setStatus('Ingested. Publishing…', true, ingestWarnings.length ? ingestWarnings : warnings, ingestNotes.length ? ingestNotes : notes, extractArray(data.errors));
             var r = await fetch(DEV_API + '/bundle', { method:'POST' });
             var b = await r.json();
             if (!b.ok) throw new Error((b.steps && b.steps.map(function(s){return s.err;}).filter(Boolean).join('\n')) || b.error || 'bundle failed');
             var slug = data.slug || (finalSpec && finalSpec.slug) || '';
             var publishMsg = 'Published ✓' + (slug ? ' • Open post: /post/' + slug : '');
-            setStatus(publishMsg, true, res.warnings, data.normalizationReport);
-          }catch(e){ setStatus(e.message, false); }
+            setStatus(publishMsg, true, ingestWarnings.length ? ingestWarnings : warnings, ingestNotes.length ? ingestNotes : notes, extractArray(data.errors));
+          }catch(e){ handleSpecError(e); }
           finally{ busy(false); }
         });
 
