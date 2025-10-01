@@ -74,6 +74,11 @@ async function cmdIngest(flags: Flags) {
   const mod = await import('./ingest.js');
   const args: string[] = [];
   if (fromFile) args.push('--from-file', fromFile);
+  const dryRunValue = flags['dry-run'] ?? flags['dryRun'];
+  const dryRun = typeof dryRunValue === 'string'
+    ? dryRunValue === 'true' || dryRunValue === '1'
+    : Boolean(dryRunValue);
+  if (dryRun) args.push('--dry-run');
   await (mod as any).ingest(args);
 }
 
