@@ -6,6 +6,10 @@ export interface NormalizePostSpecResult {
   warnings: string[];
 }
 
-export function normalizePostSpec(raw: unknown): NormalizePostSpecResult;
+export interface NormalizePostSpecOptions {
+  allowedAffiliateKeys?: string[];
+}
+
+export function normalizePostSpec(raw: unknown, options?: NormalizePostSpecOptions): NormalizePostSpecResult;
 
 export default normalizePostSpec;

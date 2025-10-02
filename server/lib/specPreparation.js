@@ -148,7 +148,9 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
     ? options.allowedAffiliateKeys
     : listAllowedAffiliateKeys(cwd);
 
-  const { spec: normalizedSpec, report, warnings: normalizationWarnings } = normalizePostSpec(rawSpec);
+  const { spec: normalizedSpec, report, warnings: normalizationWarnings } = normalizePostSpec(rawSpec, {
+    allowedAffiliateKeys,
+  });
   const normalizationReport = Array.isArray(report) ? [...report] : [];
   const normalizationWarningsList = Array.isArray(normalizationWarnings) ? [...normalizationWarnings] : [];
 

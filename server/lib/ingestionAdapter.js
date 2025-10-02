@@ -8,7 +8,11 @@ import { CONTENT_TYPES } from './postSpecSchema.js';
  */
 
 /**
- * @typedef {{ spec: PostSpecV2; report: string[] }} NormalizePostSpecResult
+ * @typedef {{ spec: PostSpecV2; report: string[]; warnings: string[] }} NormalizePostSpecResult
+ */
+
+/**
+ * @typedef {{ allowedAffiliateKeys?: string[] }} NormalizePostSpecOptions
  */
 
 const OPENING_HEADING = 'Opening Reflection';
@@ -78,9 +82,12 @@ function sanitizeInternalLinkHints(value) {
   return hints;
 }
 
-function sanitizeAffiliateHints(value, warnings) {
+function sanitizeAffiliateHints(value, warnings, report, allowedAffiliateKeys) {
   if (!Array.isArray(value)) return null;
   const hints = [];
+  const allowedSet = Array.isArray(allowedAffiliateKeys) && allowedAffiliateKeys.length
+    ? new Set(allowedAffiliateKeys)
+    : null;
   for (const item of value) {
     if (!isPlainObject(item)) continue;
     const originalKey = toTrimmedString(item.key);
@@ -95,6 +102,11 @@ function sanitizeAffiliateHints(value, warnings) {
       warnings.push(`Affiliate key "${originalKey}" normalized to "${key}".`);
     }
     const rationale = toTrimmedString(item.rationale);
+    if (allowedSet && !allowedSet.has(key)) {
+      if (warnings) warnings.push(`Affiliate hint dropped: key "${key}" not in allowed list.`);
+      if (report) report.push(`affiliateHints dropped key="${key}" (not allowed)`);
+      continue;
+    }
     hints.push({ key, anchor, rationale });
   }
   return hints;
@@ -203,12 +215,17 @@ function ensureOpening(outline, sections, report) {
 
 /**
  * @param {unknown} raw
+ * @param {NormalizePostSpecOptions} [options]
  * @returns {NormalizePostSpecResult}
  */
-export function normalizePostSpec(raw) {
+export function normalizePostSpec(raw, options = {}) {
   const input = isPlainObject(raw) ? raw : {};
   const report = [];
   const warnings = [];
+
+  const allowedAffiliateKeys = Array.isArray(options.allowedAffiliateKeys)
+    ? options.allowedAffiliateKeys.map((key) => toTrimmedString(key)).filter(Boolean)
+    : [];
 
   // title & aliases
   let title = toTrimmedString(input.title);
@@ -362,7 +379,12 @@ export function normalizePostSpec(raw) {
   let internalLinkHints = internalLinkHintsFromCanonical !== null ? internalLinkHintsFromCanonical : [];
   if (internalLinkHintsFromCanonical === null) report.push('defaulted internalLinkHints=[]');
 
-  const affiliateHintsFromCanonical = sanitizeAffiliateHints(input.affiliateHints, warnings);
+  const affiliateHintsFromCanonical = sanitizeAffiliateHints(
+    input.affiliateHints,
+    warnings,
+    report,
+    allowedAffiliateKeys,
+  );
   const affiliateHints = affiliateHintsFromCanonical !== null ? affiliateHintsFromCanonical : [];
   if (affiliateHintsFromCanonical === null) report.push('defaulted affiliateHints=[]');
 

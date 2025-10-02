@@ -107,11 +107,18 @@ export async function POST({ request }: { request: Request }) {
       return json({ ok:false, error:'No JSON body provided. Paste a PostSpec v2 object.' }, 400);
     }
 
+    const CWD = process.cwd();
+    const PRODUCTS_PATH = path.join(CWD, 'content', 'products.json');
+    const products = safeReadJSON<{ products: { key: string }[] }>(PRODUCTS_PATH, { products: [] });
+    const allowedAffiliateKeys = Array.isArray(products.products)
+      ? products.products.map((product) => String(product?.key || '').trim()).filter(Boolean)
+      : [];
+
     let normalizationReport: string[] = [];
     let normalizationWarnings: string[] = [];
     let normalizedSpec: PostSpecV2;
     try {
-      const { spec, report, warnings } = normalizePostSpec(input);
+      const { spec, report, warnings } = normalizePostSpec(input, { allowedAffiliateKeys });
       normalizedSpec = spec;
       normalizationReport = report;
       normalizationWarnings = Array.isArray(warnings) ? [...warnings] : [];
@@ -129,13 +136,6 @@ export async function POST({ request }: { request: Request }) {
     }
 
     const spec = parsed.data;
-
-    const CWD = process.cwd();
-    const PRODUCTS_PATH = path.join(CWD, 'content', 'products.json');
-    const products = safeReadJSON<{ products: { key: string }[] }>(PRODUCTS_PATH, { products: [] });
-    const allowedAffiliateKeys = Array.isArray(products.products)
-      ? products.products.map((product) => String(product?.key || '').trim()).filter(Boolean)
-      : [];
 
     const enforcement = validatePostSpec(spec, {
       targetWordCount: 1200,
