@@ -92,16 +92,17 @@ describe('prepareSpecForPersistence affiliate hints', () => {
     expect(dropped.spec.affiliateHints).toHaveLength(0);
     expect(dropped.warnings).toContain('Affiliate hint dropped: empty key after normalization.');
 
-    expect(() =>
-      prepareSpecForPersistence(
-        createPostSpec({
-          slug: 'affiliate-invalid',
-          affiliateHints: [
-            { key: 'cozy-games', anchor: 'Cozy game set', rationale: 'Highlight cozy game bundle.' },
-          ],
-        }),
-        AFFILIATE_OPTIONS,
-      ),
-    ).toThrow(/Affiliate key "cozy-games" is not in allowed list/);
+    const invalid = prepareSpecForPersistence(
+      createPostSpec({
+        slug: 'affiliate-invalid',
+        affiliateHints: [
+          { key: 'cozy-games', anchor: 'Cozy game set', rationale: 'Highlight cozy game bundle.' },
+        ],
+      }),
+      AFFILIATE_OPTIONS,
+    );
+    expect(invalid.spec.affiliateHints).toHaveLength(0);
+    expect(invalid.warnings).toContain('Affiliate hint dropped: key "cozy-games" not in allowed list.');
+    expect(invalid.normalizationReport).toContain('affiliateHints dropped key="cozy-games" (not allowed)');
   });
 });
