@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { normalizePostSpec } from '../server/lib/ingestionAdapter.js';
+import { validatePostSpec } from '../server/lib/postSpecValidator.js';
 
 import { prepareSpecForPersistence } from '../server/lib/specPreparation.js';
 import { createPostSpec } from './postSpecTestUtils';
@@ -56,6 +57,37 @@ describe('normalizePostSpec loose mode aliases', () => {
     expect(result.spec.metaDescription).toBe('Custom meta description.');
     expect(result.spec.sections[1]?.markdown).toBe('Deep steps go here.');
     expect(result.report).toContain('sections.content→sections.markdown');
+  });
+});
+
+describe('normalizePostSpec internal link hints', () => {
+  it('drops missing anchors and reports the change', () => {
+    const input = createBase();
+    input.sections[0] = {
+      heading: 'Opening Reflection',
+      markdown: 'Opening paragraph describing mindful breathing exercises and calming tea.',
+    };
+    input.sections[1] = {
+      heading: 'Quick Variant',
+      markdown: 'Quick steps revisit the mindful breathing exercises for busy mornings.',
+    };
+    input.internalLinkHints = [
+      { anchor: 'Mindful breathing exercises', rationale: 'Link to breathing ritual.' },
+      { anchor: 'Missing anchor phrase', rationale: 'Should be removed.' },
+    ];
+
+    const result = normalizePostSpec(input);
+
+    expect(result.spec.internalLinkHints).toEqual([
+      { anchor: 'Mindful breathing exercises', rationale: 'Link to breathing ritual.' },
+    ]);
+    const message = 'internalLinkHint dropped: anchor "Missing anchor phrase" not found in content.';
+    expect(result.report).toContain(message);
+    expect(result.warnings).toContain(message);
+
+    const validation = validatePostSpec(result.spec, { allowedAffiliateKeys: [] });
+    expect(validation.valid).toBe(true);
+    expect(validation.errors).toHaveLength(0);
   });
 });
 

@@ -359,7 +359,7 @@ export function normalizePostSpec(raw) {
   if (altTextsFromCanonical === null) report.push('defaulted altTexts=[]');
 
   const internalLinkHintsFromCanonical = sanitizeInternalLinkHints(input.internalLinkHints);
-  const internalLinkHints = internalLinkHintsFromCanonical !== null ? internalLinkHintsFromCanonical : [];
+  let internalLinkHints = internalLinkHintsFromCanonical !== null ? internalLinkHintsFromCanonical : [];
   if (internalLinkHintsFromCanonical === null) report.push('defaulted internalLinkHints=[]');
 
   const affiliateHintsFromCanonical = sanitizeAffiliateHints(input.affiliateHints, warnings);
@@ -396,6 +396,31 @@ export function normalizePostSpec(raw) {
 
   // Opening Reflection enforcement
   const ensured = ensureOpening(outline, sections, report);
+
+  const combinedMarkdown = ensured.sections
+    .map((section) => {
+      const heading = typeof section.heading === 'string' ? section.heading : '';
+      const markdown = typeof section.markdown === 'string' ? section.markdown : '';
+      return `${heading}\n${markdown}`.trim();
+    })
+    .filter(Boolean)
+    .join('\n');
+
+  if (internalLinkHints.length > 0) {
+    const lowerCombined = combinedMarkdown.toLowerCase();
+    const filteredHints = [];
+    for (const hint of internalLinkHints) {
+      const anchor = hint.anchor || '';
+      if (anchor && lowerCombined.includes(anchor.toLowerCase())) {
+        filteredHints.push(hint);
+      } else {
+        const message = `internalLinkHint dropped: anchor "${anchor}" not found in content.`;
+        report.push(message);
+        warnings.push(message);
+      }
+    }
+    internalLinkHints = filteredHints;
+  }
 
   /** @type {PostSpecV2} */
   const spec = {
