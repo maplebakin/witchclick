@@ -9,7 +9,24 @@ export const STRICT_JSON_RULES = [
   '• Self-check before sending: imagine running JSON.parse on your answer. If it would fail, correct and re-emit the entire object.',
   '',
   'GOLDEN JSON EXAMPLE (minimally valid shape — copy the structure, not the content):',
-  '{"specVersion":2,"title":"t","slug":"t","metaDescription":"t","tags":["a","b","c","d"],"excerpt":"t","outline":[{"heading":"Opening Reflection","id":"opening-reflection"}],"sections":[{"heading":"Opening Reflection","markdown":"M"}],"entities":[],"heroImagePrompt":null,"altTexts":[],"internalLinkHints":[{"anchor":"a","rationale":"r"}],"affiliateHints":[{"key":"ritual-journal","anchor":"a","rationale":"r"}],"cta":{"type":"none"},"adPlacements":[]}'
+  '{"specVersion":2,"title":"t","slug":"t","metaDescription":"t","tags":["a","b","c","d"],"excerpt":"t","outline":[{"heading":"Opening Reflection","id":"opening-reflection"}],"sections":[{"heading":"Opening Reflection","markdown":"M"}],"entities":[],"heroImagePrompt":null,"altTexts":[],"internalLinkHints":[{"anchor":"a","rationale":"r"}],"affiliateHints":[{"key":"ritual-journal","anchor":"a","rationale":"r"}],"cta":{"type":"none"},"adPlacements":[]}',
+  '',
+  'GOLDEN JSON EXAMPLE (no relevant affiliates despite allowed keys):',
+  '{',
+  '  "specVersion":2,',
+  '  "title":"Grounding Breath Break Ritual",',
+  '  "slug":"grounding-breath-break-ritual",',
+  '  "metaDescription":"Reset with a mindful breathwork pause that calms your nervous system gently.",',
+  '  "tags":["breathwork","mindfulness","self-care","grounding"],',
+  '  "excerpt":"Pause for a grounding breath ritual with quick and deep pathways.",',
+  '  "outline":[{"heading":"Opening Reflection","id":"opening-reflection"},{"heading":"Quick Breath Break Variant","id":"quick-breath-break-variant"},{"heading":"Deep Breath Break Variant","id":"deep-breath-break-variant"},{"heading":"Reflection Prompt","id":"reflection-prompt"},{"heading":"Breath Break Checklist","id":"breath-break-checklist"}],',
+  '  "sections":[{"heading":"Opening Reflection","markdown":"Two short grounding paragraphs..."},{"heading":"Quick Breath Break Variant","markdown":"1. Step one..."},{"heading":"Deep Breath Break Variant","markdown":"1. Step one..."},{"heading":"Reflection Prompt","markdown":"### Reflection Prompt\\nWhat sensation shifted as you breathed?"},{"heading":"Breath Break Checklist","markdown":"- Item one"}],',
+  '  "entities":[], "heroImagePrompt":null, "altTexts":[],',
+  '  "internalLinkHints":[{"anchor":"mindful breathing","rationale":"Link to existing breathwork explainer."}],',
+  '  "affiliateHints":[],',
+  '  "cta":{"type":"none"},',
+  '  "adPlacements":["mid"]',
+  '}'
 ];
 
 export default STRICT_JSON_RULES;

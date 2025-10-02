@@ -114,7 +114,7 @@ export function buildMasterPrompt(options) {
     '7) Internal links (hints)',
     '   • Provide 5–8 internalLinkHints whose anchors are 2–6 words that appear verbatim in the sections. Each rationale explains where/why to link.',
     '8) Affiliate strategy (hints only; do not insert links)',
-    '   • ≤ 1 recommendation per ~250 words; "key" MUST be in allowedAffiliateKeys. If allowedAffiliateKeys is empty, set affiliateHints: [].',
+    '   • ≤ 1 recommendation per ~250 words. Zero is acceptable. Do not invent or paraphrase keys. Requires: "key" ∈ allowedAffiliateKeys verbatim (case-sensitive match), else omit the hint. If no relevant keys, set affiliateHints: []. Never use plurals/synonyms like notebooks, journal, crystals, cozy-games unless they are exact matches in allowedAffiliateKeys.',
     '9) CTA & ads',
     '   • CTA: If includeKofi="on" return {"type":"kofi"}; if a download is relevant, include id and {"type":"download"}; otherwise {"type":"none"}. Never supply an id for kofi/none.',
     '   • Ads: If includeAds="off", return []. If "on", choose placements based on wordCount buckets — <900 words: ["mid"], 900–1399: ["lead","mid"], ≥1400: ["lead","mid","end"].',
