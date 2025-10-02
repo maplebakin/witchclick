@@ -15,6 +15,12 @@ const OPENING_HEADING = 'Opening Reflection';
 const OPENING_ID = 'opening-reflection';
 const VALID_AD_PLACEMENTS = new Set(['lead', 'mid', 'end']);
 
+const AFFILIATE_SYNONYMS = {
+  notebooks: 'micro-notebook',
+  journal: 'ritual-journal',
+  crystals: 'grounding-stone',
+};
+
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
@@ -23,6 +29,16 @@ function toTrimmedString(value) {
   if (typeof value === 'string') return value.trim();
   if (typeof value === 'number' && Number.isFinite(value)) return String(value).trim();
   return '';
+}
+
+function normalizeAffiliateKey(key) {
+  const trimmed = typeof key === 'string' ? key.trim() : toTrimmedString(key);
+  if (!trimmed) return null;
+  const lowered = trimmed.toLowerCase();
+  if (Object.prototype.hasOwnProperty.call(AFFILIATE_SYNONYMS, lowered)) {
+    return AFFILIATE_SYNONYMS[lowered];
+  }
+  return trimmed;
 }
 
 function slugify(value) {
@@ -62,14 +78,22 @@ function sanitizeInternalLinkHints(value) {
   return hints;
 }
 
-function sanitizeAffiliateHints(value) {
+function sanitizeAffiliateHints(value, warnings) {
   if (!Array.isArray(value)) return null;
   const hints = [];
   for (const item of value) {
     if (!isPlainObject(item)) continue;
-    const key = toTrimmedString(item.key);
+    const originalKey = toTrimmedString(item.key);
+    const key = normalizeAffiliateKey(originalKey);
     const anchor = toTrimmedString(item.anchor);
-    if (!key || !anchor) continue;
+    if (!key) {
+      if (warnings) warnings.push('Affiliate hint dropped: empty key after normalization.');
+      continue;
+    }
+    if (!anchor) continue;
+    if (warnings && originalKey && key !== originalKey) {
+      warnings.push(`Affiliate key "${originalKey}" normalized to "${key}".`);
+    }
     const rationale = toTrimmedString(item.rationale);
     hints.push({ key, anchor, rationale });
   }
@@ -184,6 +208,7 @@ function ensureOpening(outline, sections, report) {
 export function normalizePostSpec(raw) {
   const input = isPlainObject(raw) ? raw : {};
   const report = [];
+  const warnings = [];
 
   // title & aliases
   let title = toTrimmedString(input.title);
@@ -337,7 +362,7 @@ export function normalizePostSpec(raw) {
   const internalLinkHints = internalLinkHintsFromCanonical !== null ? internalLinkHintsFromCanonical : [];
   if (internalLinkHintsFromCanonical === null) report.push('defaulted internalLinkHints=[]');
 
-  const affiliateHintsFromCanonical = sanitizeAffiliateHints(input.affiliateHints);
+  const affiliateHintsFromCanonical = sanitizeAffiliateHints(input.affiliateHints, warnings);
   const affiliateHints = affiliateHintsFromCanonical !== null ? affiliateHintsFromCanonical : [];
   if (affiliateHintsFromCanonical === null) report.push('defaulted affiliateHints=[]');
 
@@ -392,7 +417,7 @@ export function normalizePostSpec(raw) {
     adPlacements,
   };
 
-  return { spec, report };
+  return { spec, report, warnings };
 }
 
 export default normalizePostSpec;

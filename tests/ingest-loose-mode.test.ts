@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import { normalizePostSpec } from '../server/lib/ingestionAdapter.js';
 
+import { prepareSpecForPersistence } from '../server/lib/specPreparation.js';
+import { createPostSpec } from './postSpecTestUtils';
+
 function createBase() {
   return {
     name: 'Cozy Focus Ritual',
@@ -53,5 +56,52 @@ describe('normalizePostSpec loose mode aliases', () => {
     expect(result.spec.metaDescription).toBe('Custom meta description.');
     expect(result.spec.sections[1]?.markdown).toBe('Deep steps go here.');
     expect(result.report).toContain('sections.content→sections.markdown');
+  });
+});
+
+const AFFILIATE_OPTIONS = { allowedAffiliateKeys: ['micro-notebook', 'ritual-journal', 'grounding-stone'], postsDirectories: ['virtual-posts'] };
+
+describe('prepareSpecForPersistence affiliate hints', () => {
+  it('normalizes synonyms, drops empties, and enforces the allow list', () => {
+    const synonyms = prepareSpecForPersistence(
+      createPostSpec({
+        slug: 'affiliate-synonyms',
+        affiliateHints: [
+          { key: 'notebooks', anchor: 'Travel notebook', rationale: 'Recommend compact notebook.' },
+          { key: 'journal', anchor: 'Daily journal', rationale: 'Suggest ritual journal.' },
+          { key: 'crystals', anchor: 'Grounding stone', rationale: 'Offer grounding stone.' },
+        ],
+      }),
+      AFFILIATE_OPTIONS,
+    );
+
+    expect(synonyms.spec.affiliateHints.map((hint: any) => hint.key)).toEqual(['micro-notebook', 'ritual-journal', 'grounding-stone']);
+    expect(synonyms.warnings).toEqual(expect.arrayContaining([
+      'Affiliate key "notebooks" normalized to "micro-notebook".',
+      'Affiliate key "journal" normalized to "ritual-journal".',
+      'Affiliate key "crystals" normalized to "grounding-stone".',
+    ]));
+
+    const dropped = prepareSpecForPersistence(
+      createPostSpec({
+        slug: 'affiliate-empty',
+        affiliateHints: [{ key: '   ', anchor: 'Notebook', rationale: 'Notebook mention.' }],
+      }),
+      AFFILIATE_OPTIONS,
+    );
+    expect(dropped.spec.affiliateHints).toHaveLength(0);
+    expect(dropped.warnings).toContain('Affiliate hint dropped: empty key after normalization.');
+
+    expect(() =>
+      prepareSpecForPersistence(
+        createPostSpec({
+          slug: 'affiliate-invalid',
+          affiliateHints: [
+            { key: 'cozy-games', anchor: 'Cozy game set', rationale: 'Highlight cozy game bundle.' },
+          ],
+        }),
+        AFFILIATE_OPTIONS,
+      ),
+    ).toThrow(/Affiliate key "cozy-games" is not in allowed list/);
   });
 });

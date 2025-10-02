@@ -108,11 +108,13 @@ export async function POST({ request }: { request: Request }) {
     }
 
     let normalizationReport: string[] = [];
+    let normalizationWarnings: string[] = [];
     let normalizedSpec: PostSpecV2;
     try {
-      const { spec, report } = normalizePostSpec(input);
+      const { spec, report, warnings } = normalizePostSpec(input);
       normalizedSpec = spec;
       normalizationReport = report;
+      normalizationWarnings = Array.isArray(warnings) ? [...warnings] : [];
     } catch (error: any) {
       return json({ ok:false, error: error?.message || String(error) }, 400);
     }
@@ -123,7 +125,7 @@ export async function POST({ request }: { request: Request }) {
         const path = issue.path.join('.') || 'root';
         return `${path}: ${issue.message}`;
       });
-      return json({ ok:false, error: schemaErrors[0], errors: schemaErrors, normalizations: normalizationReport }, 400);
+      return json({ ok:false, error: schemaErrors[0], errors: schemaErrors, warnings: normalizationWarnings, normalizations: normalizationReport }, 400);
     }
 
     const spec = parsed.data;
@@ -140,27 +142,17 @@ export async function POST({ request }: { request: Request }) {
       allowedAffiliateKeys,
     });
     if (!enforcement.valid) {
-      return json({
-        ok: false,
-        error: enforcement.errors[0],
-        errors: enforcement.errors,
-        warnings: enforcement.warnings,
-        normalizations: normalizationReport,
-      }, 400);
+      const warnings = [...new Set([...normalizationWarnings, ...enforcement.warnings])];
+      return json({ ok: false, error: enforcement.errors[0], errors: enforcement.errors, warnings, normalizations: normalizationReport }, 400);
     }
 
     const contentWords = enforcement.wordCount;
 
     // Structural + soft validation
-    const { errors, warnings } = validateStructure(spec, contentWords);
-    if (errors.length) {
-      return json({
-        ok:false,
-        error: errors[0],
-        errors,
-        warnings: [...enforcement.warnings, ...warnings],
-        normalizations: normalizationReport,
-      }, 400);
+    const structureResult = validateStructure(spec, contentWords);
+    if (structureResult.errors.length) {
+      const warnings = [...new Set([...normalizationWarnings, ...enforcement.warnings, ...structureResult.warnings])];
+      return json({ ok:false, error: structureResult.errors[0], errors: structureResult.errors, warnings, normalizations: normalizationReport }, 400);
     }
 
     // Paths & settings
@@ -212,7 +204,7 @@ export async function POST({ request }: { request: Request }) {
     const outPath = path.join(POSTS_DIR, `${slug}.md`);
     fs.writeFileSync(outPath, file, 'utf8');
 
-    const combinedWarnings = [...new Set([...enforcement.warnings, ...warnings])];
+    const combinedWarnings = [...new Set([...normalizationWarnings, ...enforcement.warnings, ...structureResult.warnings])];
 
     return json({
       ok:true,

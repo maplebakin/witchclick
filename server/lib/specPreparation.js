@@ -148,8 +148,9 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
     ? options.allowedAffiliateKeys
     : listAllowedAffiliateKeys(cwd);
 
-  const { spec: normalizedSpec, report } = normalizePostSpec(rawSpec);
+  const { spec: normalizedSpec, report, warnings: normalizationWarnings } = normalizePostSpec(rawSpec);
   const normalizationReport = Array.isArray(report) ? [...report] : [];
+  const normalizationWarningsList = Array.isArray(normalizationWarnings) ? [...normalizationWarnings] : [];
 
   const parsed = PostSpecV2Schema.safeParse(normalizedSpec);
   if (!parsed.success) {
@@ -160,6 +161,7 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
     });
     const error = new Error(schemaErrors[0] || 'Invalid PostSpec payload.');
     error.errors = schemaErrors;
+    error.warnings = normalizationWarningsList;
     error.normalizations = normalizationReport;
     throw error;
   }
@@ -173,7 +175,7 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
   if (!enforcement.valid) {
     const error = new Error(enforcement.errors[0] || 'PostSpec validation failed.');
     error.errors = enforcement.errors;
-    error.warnings = enforcement.warnings;
+    error.warnings = dedupe([...normalizationWarningsList, ...enforcement.warnings]);
     error.normalizations = normalizationReport;
     throw error;
   }
@@ -182,12 +184,12 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
   if (structure.errors.length) {
     const error = new Error(structure.errors[0] || 'Structural validation failed.');
     error.errors = structure.errors;
-    error.warnings = dedupe([...enforcement.warnings, ...structure.warnings]);
+    error.warnings = dedupe([...normalizationWarningsList, ...enforcement.warnings, ...structure.warnings]);
     error.normalizations = normalizationReport;
     throw error;
   }
 
-  const combinedWarnings = dedupe([...enforcement.warnings, ...structure.warnings]);
+  const combinedWarnings = dedupe([...normalizationWarningsList, ...enforcement.warnings, ...structure.warnings]);
 
   const baseSlug = slugify(spec.slug || spec.title);
   const uniqueSlug = ensureUniqueSlug(baseSlug, postsDirectories);
