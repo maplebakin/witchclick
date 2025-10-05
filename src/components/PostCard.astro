@@ -38,14 +38,23 @@ function formatDate(value?: string){
   return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 }
 ---
-<a href={link} class="block rounded-2xl border border-purple-100/60 bg-white/70 p-5 shadow-sm transition hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-300">
-  {_dateLabel && <p class="text-xs uppercase tracking-wide text-purple-500">{_dateLabel}</p>}
-  <h3 class="mt-2 text-lg font-semibold text-purple-900">{_title}</h3>
-  {_excerpt && <p class="mt-2 text-sm text-purple-700 line-clamp-3">{_excerpt}</p>}
+<a
+  href={link}
+  class="block rounded-2xl border border-[var(--wc-borders)] bg-[var(--wc-panel)] p-5 shadow-sm transition hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
+>
+  {_dateLabel && <p class="text-xs uppercase tracking-wide text-[var(--wc-type-accent-soft)]">{_dateLabel}</p>}
+  <h3 class="mt-2 text-lg font-semibold text-[var(--wc-type-accent)]">{_title}</h3>
+  {_excerpt && (
+    <p class="mt-2 text-sm text-[color:color-mix(in_srgb,var(--wc-type-accent)_85%,white_15%)] line-clamp-3">{_excerpt}</p>
+  )}
   <div class="mt-4 flex flex-wrap gap-2 text-xs">
-    {_mins && <span class="rounded-full border border-purple-200 bg-purple-50 px-2 py-0.5">⏱️ {_mins} min</span>}
+    {_mins && (
+      <span class="rounded-full border border-[var(--wc-borders)] bg-[var(--wc-veil)] px-2 py-0.5 text-[var(--wc-type-accent)]">⏱️ {_mins} min</span>
+    )}
     {_tags.slice(0, 6).map((t) => (
-      <span class="rounded-full border border-purple-200 bg-purple-50 px-2 py-0.5">#{String(t).toLowerCase()}</span>
+      <span class="rounded-full border border-[var(--wc-borders)] bg-[var(--wc-veil)] px-2 py-0.5 text-[var(--wc-type-accent)]">
+        #{String(t).toLowerCase()}
+      </span>
     ))}
   </div>
 </a>

@@ -1,0 +1,13 @@
+:root {
+  --wc-page: #faf7f5;
+  --wc-panel: rgba(255, 255, 255, 0.82);
+  --wc-veil: rgba(124, 58, 237, 0.12);
+  --wc-borders: rgba(124, 58, 237, 0.2);
+  --wc-type-accent: #4a3a52;
+  --wc-type-accent-soft: color-mix(in srgb, var(--wc-type-accent) 65%, white 35%);
+}
+
+body {
+  background-color: var(--wc-page);
+  color: var(--wc-type-accent);
+}

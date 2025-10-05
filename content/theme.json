@@ -2,6 +2,15 @@
   "primary": "#8b7e8f",
   "accent": "#d9b2c4",
   "background": "#faf7f5",
+  "neutrals": {
+    "page": "#faf7f5",
+    "panel": "rgba(255, 255, 255, 0.82)",
+    "veil": "rgba(139, 126, 143, 0.12)",
+    "borders": "rgba(139, 126, 143, 0.2)"
+  },
+  "type": {
+    "accent": "#4a3a52"
+  },
   "fontSerif": "Literata",
   "fontScript": "Parisienne"
 }
