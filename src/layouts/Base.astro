@@ -321,10 +321,10 @@ const bodyStyle = `
       .grimoire-menu-panel {
         position: absolute;
         top: calc(100% + 0.5rem);
-        left: 50%;
-        transform: translateX(-50%);
+        right: 0;
+        transform: translateY(-0.35rem);
         min-width: 18rem;
-        padding: 0.85rem;
+        padding: 0.95rem;
         border-radius: calc(var(--glass-panel-radius) / 1.8);
         border: 1px solid var(--glass-panel-border);
         background: linear-gradient(150deg, var(--glass-panel-surface), var(--glass-panel-overlay));
@@ -334,13 +334,24 @@ const bodyStyle = `
         opacity: 0;
         visibility: hidden;
         transition: opacity 180ms ease, transform 200ms ease;
-        transform-origin: top;
+        transform-origin: top right;
       }
 
-      .grimoire-nav-item.is-open > .grimoire-menu-panel {
+      .grimoire-menu-panel.is-open {
         opacity: 1;
         visibility: visible;
-        transform: translate(-50%, 0);
+        transform: translateY(0);
+      }
+
+      .grimoire-menu-panel[data-floating="true"] {
+        position: fixed;
+        inset: auto;
+        min-width: 220px;
+        max-width: 92vw;
+        max-height: min(60vh, calc(100vh - 24px));
+        overflow: auto;
+        margin: 0;
+        z-index: 70;
       }
 
       .grimoire-menu-list {
@@ -422,9 +433,12 @@ const bodyStyle = `
           margin-top: 0.25rem;
           min-width: 0;
           width: 100%;
+          max-width: none;
+          max-height: none;
+          overflow: visible;
         }
 
-        .grimoire-nav-item:not(.is-open) > .grimoire-menu-panel {
+        .grimoire-menu-panel:not(.is-open) {
           display: none;
         }
 
@@ -642,10 +656,22 @@ const bodyStyle = `
         const panel = menu.querySelector("[data-grimoire-panel]");
         const panelList = panel ? panel.querySelector(".grimoire-menu-list") : null;
         const pointerQuery = window.matchMedia("(pointer: fine)");
+        const mobileQuery = window.matchMedia("(max-width: 639px)");
         let open = false;
         let closeTimeout = null;
 
-        const getItems = () => Array.from(menu.querySelectorAll("[data-grimoire-item]"));
+        const placeholder = panel && panel.parentNode ? document.createElement("div") : null;
+        if (panel && placeholder && panel.parentNode) {
+          placeholder.style.display = "none";
+          panel.parentNode.insertBefore(placeholder, panel);
+        }
+
+        const viewportMargin = 12;
+
+        const getItems = () => {
+          if (!panel) return [];
+          return Array.from(panel.querySelectorAll("[data-grimoire-item]"));
+        };
         const getFocusables = () => {
           const items = getItems();
           const focusables = [];
@@ -679,17 +705,106 @@ const bodyStyle = `
           }
         };
 
+        const isWithinMenu = (node) => {
+          if (!(node instanceof Node)) return false;
+          if (menu.contains(node)) return true;
+          if (panel && panel.contains(node)) return true;
+          return false;
+        };
+
+        const updateFloatingState = () => {
+          if (!panel) return;
+          const shouldFloat = !mobileQuery.matches;
+          if (shouldFloat) {
+            if (panel.dataset.floating !== "true") {
+              panel.setAttribute("data-floating", "true");
+              document.body.appendChild(panel);
+            }
+          } else if (panel.dataset.floating === "true") {
+            panel.removeAttribute("data-floating");
+            if (placeholder && placeholder.parentNode) {
+              const parent = placeholder.parentNode;
+              if (placeholder.nextSibling) {
+                parent.insertBefore(panel, placeholder.nextSibling);
+              } else {
+                parent.appendChild(panel);
+              }
+            }
+            panel.style.removeProperty("top");
+            panel.style.removeProperty("left");
+            panel.style.removeProperty("right");
+            panel.style.removeProperty("bottom");
+          }
+        };
+
+        const positionPanel = () => {
+          if (!panel || panel.dataset.floating !== "true" || !button || panel.hasAttribute("hidden")) {
+            return;
+          }
+
+          const previousVisibility = panel.style.visibility;
+          const previousDisplay = panel.style.display;
+
+          panel.style.visibility = "hidden";
+          panel.style.display = "block";
+          panel.style.left = "auto";
+          panel.style.right = "auto";
+          panel.style.top = "auto";
+          panel.style.bottom = "auto";
+
+          const triggerRect = button.getBoundingClientRect();
+          const panelWidth = panel.offsetWidth;
+          const panelHeight = panel.offsetHeight;
+          const viewportWidth = window.innerWidth;
+          const viewportHeight = window.innerHeight;
+
+          let left = triggerRect.right - panelWidth;
+          if (left + panelWidth > viewportWidth - viewportMargin) {
+            left = Math.min(triggerRect.left, viewportWidth - viewportMargin - panelWidth);
+          }
+          if (left < viewportMargin) {
+            left = viewportMargin;
+          }
+
+          let top = triggerRect.bottom + 8;
+          if (top + panelHeight > viewportHeight - viewportMargin) {
+            top = Math.max(viewportMargin, viewportHeight - viewportMargin - panelHeight);
+          }
+          top = Math.max(viewportMargin, top);
+
+          panel.style.top = `${top}px`;
+          panel.style.left = `${left}px`;
+          panel.style.right = "auto";
+          panel.style.bottom = "auto";
+          panel.style.visibility = previousVisibility;
+          panel.style.display = previousDisplay;
+        };
+
+        updateFloatingState();
+
         const openMenu = () => {
           if (open) return;
           open = true;
           menu.classList.add("is-open");
+          if (panel) {
+            panel.classList.add("is-open");
+          }
+          updateFloatingState();
           setAria(true);
+          positionPanel();
         };
 
         const closeMenu = (focusButton = false) => {
           if (!open) return;
           open = false;
           menu.classList.remove("is-open");
+          if (panel) {
+            panel.classList.remove("is-open");
+            panel.style.removeProperty("top");
+            panel.style.removeProperty("left");
+            panel.style.removeProperty("right");
+            panel.style.removeProperty("bottom");
+          }
           setAria(false);
           if (focusButton) {
             focusElement(button);
@@ -721,32 +836,46 @@ const bodyStyle = `
           });
         }
 
-        menu.addEventListener("pointerenter", () => {
+        const handlePointerEnter = () => {
           if (!pointerQuery.matches) return;
           clearCloseTimeout();
           openMenu();
-        });
+        };
 
-        menu.addEventListener("pointerleave", () => {
+        const handlePointerLeave = () => {
           if (!pointerQuery.matches) return;
           scheduleClose();
-        });
+        };
 
-        menu.addEventListener("focusin", () => {
+        menu.addEventListener("pointerenter", handlePointerEnter);
+        menu.addEventListener("pointerleave", handlePointerLeave);
+        if (panel) {
+          panel.addEventListener("pointerenter", handlePointerEnter);
+          panel.addEventListener("pointerleave", handlePointerLeave);
+        }
+
+        const handleFocusIn = () => {
           clearCloseTimeout();
           openMenu();
-        });
+        };
 
-        menu.addEventListener("focusout", (event) => {
+        const handleFocusOut = (event) => {
           const nextTarget = event.relatedTarget;
-          if (!menu.contains(nextTarget)) {
+          if (!isWithinMenu(nextTarget)) {
             scheduleClose();
           }
-        });
+        };
+
+        menu.addEventListener("focusin", handleFocusIn);
+        menu.addEventListener("focusout", handleFocusOut);
+        if (panel) {
+          panel.addEventListener("focusin", handleFocusIn);
+          panel.addEventListener("focusout", handleFocusOut);
+        }
 
         document.addEventListener("pointerdown", (event) => {
           if (!open) return;
-          if (!(event.target instanceof Node) || !menu.contains(event.target)) {
+          if (!(event.target instanceof Node) || !isWithinMenu(event.target)) {
             closeMenu();
           }
         });
@@ -815,12 +944,36 @@ const bodyStyle = `
         };
 
         menu.addEventListener("keydown", handleKeyDown);
+        if (panel) {
+          panel.addEventListener("keydown", (event) => {
+            if (panel.dataset.floating !== "true") {
+              return;
+            }
+            handleKeyDown(event);
+          });
+        }
 
         pointerQuery.addEventListener("change", () => {
           if (!pointerQuery.matches) {
             clearCloseTimeout();
           }
         });
+
+        mobileQuery.addEventListener("change", () => {
+          updateFloatingState();
+          if (open) {
+            positionPanel();
+          }
+        });
+
+        const handleViewportChange = () => {
+          if (open) {
+            positionPanel();
+          }
+        };
+
+        window.addEventListener("resize", handleViewportChange);
+        window.addEventListener("scroll", handleViewportChange, true);
       })();
     </script>
   </body>
