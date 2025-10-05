@@ -31,22 +31,23 @@ items.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
 >
   <div class="grimoire-bg min-h-screen">
     <section class="downloads-canvas mx-auto max-w-5xl px-4 py-12 sm:py-16">
-      <div class="grimoire-card downloads-panel">
+      <section class="downloads-panel panel shadow-2" aria-labelledby="downloads-heading">
         <header class="downloads-header">
-          <h1 class="font-serif">Downloads</h1>
+          <h1 id="downloads-heading" class="font-serif">Downloads</h1>
           <p>Printable planners and cozy tools.</p>
         </header>
 
         {items.length === 0 ? (
-          <div class="grimoire-card downloads-empty" role="status">
-            <p>No downloads yet.</p>
+          <div class="downloads-empty soft-card shadow-1" role="status">
+            <span class="downloads-empty-icon" aria-hidden="true">✨</span>
+            <p class="downloads-empty-copy">Fresh printable spells are on their way. Check back after the next moon.</p>
           </div>
         ) : (
           <div class="downloads-grid">
             {items.map((item) => (
               <a
                 href={`/downloads/${item.slug}`}
-                class="card-panel card-tier-1 card-panel-strong focus-visible:outline-none"
+                class="card-panel card-tier-1 card-panel-strong focus-visible:outline-none shadow-1"
               >
                 <span aria-hidden class="card-radial card-radial-top" />
                 <span aria-hidden class="card-radial card-radial-bottom" />
@@ -76,7 +77,7 @@ items.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
             ))}
           </div>
         )}
-      </div>
+      </section>
     </section>
   </div>
 </Base>
@@ -87,9 +88,9 @@ items.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   }
 
   .downloads-panel {
-    padding: clamp(1.75rem, 4vw, 2.9rem);
+    padding: clamp(1.75rem, 4vw, 2.75rem);
     display: grid;
-    gap: clamp(1.5rem, 4vw, 2.5rem);
+    gap: clamp(1.35rem, 4vw, 2.35rem);
   }
 
   .downloads-header {
@@ -122,9 +123,25 @@ items.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   }
 
   .downloads-empty {
-    padding: clamp(1.35rem, 3vw, 1.85rem);
+    display: grid;
+    place-items: center;
+    gap: 0.75rem;
+    padding: clamp(1.5rem, 3.5vw, 2.1rem);
     text-align: center;
-    color: color-mix(in srgb, var(--ink-muted, currentColor) 82%, white 18%);
+    color: color-mix(in srgb, var(--ink-body, currentColor) 88%, white 12%);
+  }
+
+  .downloads-empty-icon {
+    font-size: clamp(1.75rem, 4vw, 2.4rem);
+    filter: drop-shadow(0 6px 15px color-mix(in srgb, var(--glow-iris, transparent) 85%, transparent));
+  }
+
+  .downloads-empty-copy {
+    margin: 0;
+    max-width: 36ch;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 75%, white 25%);
   }
 
   .downloads-empty p {

@@ -15,6 +15,7 @@ interface Props {
   backgroundImage?: string;
   imageAlt?: string;
   ctaButtons?: CTAButton[];
+  class?: string;
 }
 
 const {
@@ -24,36 +25,36 @@ const {
   backgroundImage,
   imageAlt = title,
   ctaButtons = [],
+  class: className = "",
 } = Astro.props as Props;
 
 const hasImage = Boolean(backgroundImage);
 ---
 <section
-  class={`flex flex-col gap-8 overflow-hidden rounded-3xl border border-purple-200/70 bg-gradient-to-br from-purple-50 via-white to-amber-50 p-6 shadow-sm sm:p-8 ${
-    hasImage ? "lg:flex-row lg:items-center" : ""
-  }`}
+  class:list={[
+    "hero-panel panel shadow-2",
+    hasImage ? "hero-panel--with-media" : "hero-panel--simple",
+    className,
+  ]}
 >
-  <div class="flex-1">
-    {eyebrow && <p class="text-xs uppercase tracking-[0.3em] text-purple-500">{eyebrow}</p>}
-    <h1 class="mt-3 text-3xl font-semibold text-purple-900 sm:text-4xl">{title}</h1>
-    <p class="mt-4 max-w-2xl text-lg text-purple-800/80">{description}</p>
+  <div class="hero-content">
+    {eyebrow && <p class="hero-eyebrow">{eyebrow}</p>}
+    <h1 class="hero-title font-serif">{title}</h1>
+    <p class="hero-summary">{description}</p>
     {ctaButtons.length > 0 && (
-      <div class="mt-6 flex flex-wrap gap-3">
+      <div class="hero-actions">
         {ctaButtons.map((button) => {
           const variant = button.variant ?? "primary";
-          const baseClasses =
-            "inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition";
-          const variantClasses =
-            variant === "secondary"
-              ? "border border-purple-300 text-purple-800 hover:border-purple-400 hover:bg-purple-50"
-              : "bg-purple-700 text-white hover:bg-purple-800";
           return (
             <a
               href={button.href}
               aria-label={button.ariaLabel ?? undefined}
               target={button.target ?? undefined}
               rel={button.rel ?? undefined}
-              class={`${baseClasses} ${variantClasses}`}
+              class:list={[
+                "hero-cta",
+                variant === "secondary" ? "hero-cta--secondary" : "hero-cta--primary",
+              ]}
             >
               {button.label}
               {variant !== "secondary" && <span aria-hidden="true">→</span>}
@@ -64,7 +65,7 @@ const hasImage = Boolean(backgroundImage);
     )}
   </div>
   {hasImage && backgroundImage && (
-    <div class="flex-1 overflow-hidden rounded-2xl border border-purple-100 bg-white/60 p-2 sm:p-3 lg:max-w-sm">
+    <div class="hero-media">
       <picture>
         <source media="(min-width: 1024px)" srcset={backgroundImage} />
         <source media="(min-width: 640px)" srcset={backgroundImage} />
@@ -73,9 +74,139 @@ const hasImage = Boolean(backgroundImage);
           alt={imageAlt}
           loading="lazy"
           decoding="async"
-          class="h-48 w-full rounded-xl object-cover shadow-inner sm:h-64 lg:h-80"
         />
       </picture>
     </div>
   )}
 </section>
+
+<style>
+  .hero-panel {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.75rem);
+    padding: clamp(1.85rem, 4.5vw, 3rem);
+    color: var(--ink-body, currentColor);
+  }
+
+  .hero-panel--with-media {
+    align-items: center;
+    gap: clamp(1.75rem, 5vw, 3rem);
+  }
+
+  @media (min-width: 1024px) {
+    .hero-panel--with-media {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    }
+  }
+
+  .hero-content {
+    display: grid;
+    gap: clamp(1rem, 2.5vw, 1.6rem);
+  }
+
+  .hero-eyebrow {
+    margin: 0;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.32em;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
+  }
+
+  .hero-title {
+    margin: 0;
+    font-size: clamp(2.35rem, 5vw, 3.2rem);
+    font-weight: 600;
+    line-height: 1.08;
+    color: var(--ink-strong, currentColor);
+  }
+
+  .hero-summary {
+    margin: 0;
+    max-width: 48ch;
+    font-size: clamp(1.05rem, 3vw, 1.25rem);
+    line-height: 1.65;
+    color: color-mix(in srgb, var(--ink-body, currentColor) 92%, white 8%);
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .hero-cta {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.65rem 1.4rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 180ms ease, box-shadow 220ms ease, background 220ms ease, color 220ms ease;
+  }
+
+  .hero-cta--primary {
+    background: var(--action-primary);
+    color: var(--action-primary-text);
+    box-shadow: var(--elevation-tier-1);
+  }
+
+  .hero-cta--primary:hover,
+  .hero-cta--primary:focus-visible {
+    background: var(--action-primary-hover);
+    transform: translateY(-1px);
+  }
+
+  .hero-cta--secondary {
+    border: 1px solid var(--action-secondary-border);
+    background: var(--action-secondary-surface);
+    color: var(--action-secondary-text);
+  }
+
+  .hero-cta--secondary:hover,
+  .hero-cta--secondary:focus-visible {
+    background: var(--action-secondary-hover);
+  }
+
+  .hero-cta:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--action-primary) 25%, transparent),
+      0 0 0 5px color-mix(in srgb, white 65%, transparent 35%);
+    transform: translateY(-1px);
+  }
+
+  .hero-media {
+    position: relative;
+    border-radius: clamp(1.4rem, 3vw, 1.75rem);
+    padding: clamp(0.75rem, 2vw, 1.25rem);
+    border: 1px solid color-mix(in srgb, var(--panel-border-soft) 80%, transparent);
+    background: color-mix(in srgb, var(--panel-surface-soft) 92%, transparent 8%);
+    box-shadow: var(--elevation-tier-1);
+    overflow: hidden;
+  }
+
+  .hero-media picture,
+  .hero-media img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .hero-media img {
+    border-radius: clamp(1rem, 2.5vw, 1.4rem);
+    object-fit: cover;
+    max-height: clamp(14rem, 32vw, 20rem);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, white 75%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-cta,
+    .hero-media,
+    .hero-panel {
+      transition-duration: 0ms !important;
+      transition: none;
+    }
+  }
+</style>
