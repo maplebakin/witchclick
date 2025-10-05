@@ -24,10 +24,10 @@ const rel = hasExternal ? 'noopener' : undefined;
   <div class="flex gap-4">
     {data.cover && <img src={data.cover} alt={`${data.name} cover`} class="h-24 w-24 rounded-lg object-cover" loading="lazy" />}
     <div class="min-w-0">
-      <h3 class="m-0 text-lg font-semibold">{data.name}</h3>
-      {data.summary && <p class="mt-1 mb-2 text-sm text-purple-900">{data.summary}</p>}
+      <h3 class="wc-serif-heading m-0 text-lg">{data.name}</h3>
+      {data.summary && <p class="wc-sans-body mt-1 mb-2 text-sm text-purple-900">{data.summary}</p>}
       {Array.isArray(data.features) && data.features.length > 0 && (
-        <ul class="mb-3 list-disc pl-5 text-sm">
+        <ul class="wc-sans-body mb-3 list-disc pl-5 text-sm">
           {data.features.slice(0,3).map((f:string)=><li>{f}</li>)}
         </ul>
       )}

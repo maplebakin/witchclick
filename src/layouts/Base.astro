@@ -54,6 +54,7 @@ const bodyStyle = `
   --color-primary: ${theme.primary};
   --color-accent: ${theme.accent};
   --color-background: ${theme.background};
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-serif: '${theme.fontSerif}', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
   --font-script: '${theme.fontScript}', cursive;
   background: ${theme.background};
@@ -95,11 +96,11 @@ const bodyStyle = `
 
     <style is:inline>
       :root {
-        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-family: var(--font-sans, "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
       }
 
-      h1, h2, h3, .font-serif {
-        font-family: var(--font-serif);
+      h1, h2, h3, h4, .font-serif {
+        font-family: var(--font-serif, Literata, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif);
       }
 
       .font-script {
@@ -111,7 +112,7 @@ const bodyStyle = `
     <slot name="head" />
   </head>
 
-  <body class="min-h-screen text-gray-900" style={bodyStyle}>
+  <body class="min-h-screen text-gray-900 wc-sans-body" style={bodyStyle}>
     {/* Skip link for a11y */}
     <a
       href="#main"
@@ -122,8 +123,8 @@ const bodyStyle = `
 
     <header class={`mx-auto ${headerWidthClass} px-4 pb-4 pt-6`}> 
       <div class="flex flex-wrap items-center justify-between gap-4">
-        <a href="/" class="text-3xl font-script text-[var(--color-primary)]">{brandName}</a>
-        <nav class="text-sm" aria-label="Primary">
+        <a href="/" class="text-3xl wc-serif-heading text-[var(--color-primary)]">{brandName}</a>
+        <nav class="text-sm wc-smallcaps" aria-label="Primary">
           <ul class="flex flex-wrap items-center gap-4">
             {links.map((l) => {
               const active = here === l.href || (l.href !== "/" && here.startsWith(l.href + "/"));

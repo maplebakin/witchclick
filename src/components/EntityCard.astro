@@ -107,20 +107,20 @@ const typeLabel =
 
     <div class="relative z-10 flex h-full flex-col gap-4">
       <div class="flex items-start justify-between gap-3">
-        <span class="entity-card-label text-xs uppercase tracking-[0.35em]">{typeLabel}</span>
+        <span class="entity-card-label wc-smallcaps text-xs tracking-[0.35em]">{typeLabel}</span>
         {showStubBadge && (
-          <span class="entity-card-badge rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wide shadow-sm">
+          <span class="entity-card-badge wc-smallcaps rounded-full border px-3 py-1 text-[11px] font-semibold tracking-wide shadow-sm">
             Lore in progress
           </span>
         )}
       </div>
 
       <div class="space-y-3">
-        <h3 class="entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]">
+        <h3 class="entity-card-title wc-serif-heading text-2xl tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]">
           {name}
         </h3>
         {summaryContent && (
-          <p class:list={["entity-card-summary text-sm italic", showStubBadge && !displaySummary ? "entity-card-placeholder" : ""]}>
+          <p class:list={["entity-card-summary wc-sans-body text-sm italic", showStubBadge && !displaySummary ? "entity-card-placeholder" : ""]}>
             {summaryContent}
           </p>
         )}
@@ -129,21 +129,21 @@ const typeLabel =
       {keywords.length > 0 ? (
         <div class="mt-auto flex flex-wrap gap-2">
           {keywords.map((tag) => (
-            <span class="entity-card-tag rounded-full border px-3 py-1 text-xs uppercase tracking-wide shadow-[0_2px_6px_rgba(15,23,42,0.12)]">
+            <span class="entity-card-tag wc-smallcaps rounded-full border px-3 py-1 text-xs tracking-wide shadow-[0_2px_6px_rgba(15,23,42,0.12)]">
               {tag}
             </span>
           ))}
         </div>
       ) : (
-        showStubBadge && <p class="entity-card-empty-keywords mt-auto text-xs uppercase tracking-[0.25em]">Keywords forthcoming</p>
+        showStubBadge && <p class="entity-card-empty-keywords wc-smallcaps mt-auto text-xs tracking-[0.25em]">Keywords forthcoming</p>
       )}
     </div>
   </a>
 ) : (
   <a href={`/entities/${type}/${slug}`} class="card block p-5 group">
-    <div class="text-xs uppercase tracking-wider text-neutral-400 mb-2">{type}</div>
-    <h3 class="text-lg font-semibold group-hover:text-plum-300">{name}</h3>
-    {displaySummary && <p class="mt-2 text-neutral-300 text-sm">{displaySummary}</p>}
+    <div class="wc-smallcaps text-xs tracking-wider text-neutral-400 mb-2">{type}</div>
+    <h3 class="wc-serif-heading text-lg group-hover:text-plum-300">{name}</h3>
+    {displaySummary && <p class="wc-sans-body mt-2 text-neutral-300 text-sm">{displaySummary}</p>}
   </a>
 )}
 

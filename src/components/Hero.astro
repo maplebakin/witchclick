@@ -34,9 +34,9 @@ const hasImage = Boolean(backgroundImage);
   }`}
 >
   <div class="flex-1">
-    {eyebrow && <p class="text-xs uppercase tracking-[0.3em] text-purple-500">{eyebrow}</p>}
-    <h1 class="mt-3 text-3xl font-semibold text-purple-900 sm:text-4xl">{title}</h1>
-    <p class="mt-4 max-w-2xl text-lg text-purple-800/80">{description}</p>
+    {eyebrow && <p class="wc-smallcaps text-xs text-purple-500">{eyebrow}</p>}
+    <h1 class="wc-serif-heading mt-3 text-3xl text-purple-900 sm:text-4xl">{title}</h1>
+    <p class="wc-sans-body mt-4 max-w-2xl text-lg text-purple-800/80">{description}</p>
     {ctaButtons.length > 0 && (
       <div class="mt-6 flex flex-wrap gap-3">
         {ctaButtons.map((button) => {
