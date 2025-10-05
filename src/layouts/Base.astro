@@ -96,6 +96,19 @@ const bodyStyle = `
     <style is:inline>
       :root {
         font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --glass-panel-radius: 1.75rem;
+        --glass-panel-border: rgba(124, 58, 237, 0.28);
+        --glass-panel-blur: 18px;
+        --glass-panel-surface: rgba(255, 255, 255, 0.82);
+        --glass-panel-overlay: rgba(124, 58, 237, 0.12);
+        --glass-panel-shadow: 0 20px 45px -25px rgba(15, 23, 42, 0.35);
+        --glass-panel-shadow-hover: 0 25px 60px -30px rgba(15, 23, 42, 0.45);
+        --glass-pill-gradient-start: rgba(246, 241, 255, 0.9);
+        --glass-pill-gradient-end: rgba(221, 214, 254, 0.55);
+        --glass-pill-border: rgba(124, 58, 237, 0.35);
+        --glass-pill-border-active: rgba(91, 33, 182, 0.48);
+        --glass-pill-text: rgba(76, 29, 149, 0.85);
+        --glass-pill-text-active: rgba(59, 7, 100, 0.95);
       }
 
       h1, h2, h3, .font-serif {
@@ -104,6 +117,120 @@ const bodyStyle = `
 
       .font-script {
         font-family: var(--font-script);
+      }
+
+      .grimoire-header-panel {
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--glass-panel-radius);
+        border: 1px solid var(--glass-panel-border);
+        background: linear-gradient(145deg, var(--glass-panel-surface), rgba(255, 255, 255, 0.65));
+        backdrop-filter: blur(var(--glass-panel-blur));
+        -webkit-backdrop-filter: blur(var(--glass-panel-blur));
+        box-shadow: var(--glass-panel-shadow);
+      }
+
+      .grimoire-header-panel::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(circle at top right, var(--glass-panel-overlay), transparent 65%);
+      }
+
+      .grimoire-header-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.25rem;
+        padding: clamp(1.25rem, 4vw, 2rem) clamp(1.5rem, 4vw, 2.75rem);
+      }
+
+      .grimoire-brand {
+        color: var(--glass-pill-text-active);
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+      }
+
+      .grimoire-nav {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .grimoire-nav-link {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        padding: 0.55rem 1.15rem;
+        border-radius: calc(var(--glass-panel-radius) / 2.2);
+        border: 1px solid var(--glass-pill-border);
+        background: linear-gradient(135deg, var(--glass-pill-gradient-start), var(--glass-pill-gradient-end));
+        color: var(--glass-pill-text);
+        text-transform: uppercase;
+        font-variant: small-caps;
+        font-variant-caps: all-small-caps;
+        letter-spacing: 0.22em;
+        font-size: 0.72rem;
+        line-height: 1;
+        transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease, color 220ms ease,
+          background 220ms ease;
+        box-shadow: var(--glass-panel-shadow);
+        text-decoration: none;
+      }
+
+      .grimoire-nav-link:hover,
+      .grimoire-nav-link:focus-visible,
+      .grimoire-nav-link.is-active {
+        transform: translateY(-4px);
+        border-color: var(--glass-pill-border-active);
+        box-shadow: var(--glass-panel-shadow-hover);
+        color: var(--glass-pill-text-active);
+        background: linear-gradient(140deg, rgba(255, 255, 255, 0.95), rgba(221, 214, 254, 0.7));
+      }
+
+      .grimoire-nav-link:focus-visible {
+        outline: none;
+        box-shadow: var(--glass-panel-shadow-hover), 0 0 0 3px rgba(221, 214, 254, 0.75);
+      }
+
+      .grimoire-nav-link::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        opacity: 0.9;
+        pointer-events: none;
+      }
+
+      @media (max-width: 639px) {
+        .grimoire-header-content {
+          padding-inline: 1.25rem;
+          padding-block: 1.15rem;
+        }
+
+        .grimoire-header-content nav {
+          flex-basis: 100%;
+        }
+
+        .grimoire-nav {
+          gap: 0.5rem;
+        }
+
+        .grimoire-nav-link {
+          padding-inline: 1rem;
+          padding-block: 0.5rem;
+          letter-spacing: 0.18em;
+        }
       }
     </style>
 
@@ -120,31 +247,31 @@ const bodyStyle = `
       Skip to content
     </a>
 
-    <header class={`mx-auto ${headerWidthClass} px-4 pb-4 pt-6`}> 
-      <div class="flex flex-wrap items-center justify-between gap-4">
-        <a href="/" class="text-3xl font-script text-[var(--color-primary)]">{brandName}</a>
-        <nav class="text-sm" aria-label="Primary">
-          <ul class="flex flex-wrap items-center gap-4">
-            {links.map((l) => {
-              const active = here === l.href || (l.href !== "/" && here.startsWith(l.href + "/"));
-              return (
-                <li>
-                  <a
-                    href={l.href}
-                    rel={l.rel}
-                    aria-current={active ? "page" : undefined}
-                    class={`rounded-full px-3 py-1 text-sm transition-colors hover:bg-purple-50 ${
-                      active ? "bg-purple-100 text-purple-900" : "text-purple-700"
-                    }`}
-                  >
-                    {l.label}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-        <div class="hidden sm:block"><SearchBox /></div>
+    <header class={`mx-auto ${headerWidthClass} px-4 pb-6 pt-6`}>
+      <div class="grimoire-header-panel">
+        <div class="grimoire-header-content">
+          <a href="/" class="grimoire-brand text-3xl font-script text-[var(--color-primary)]">{brandName}</a>
+          <nav aria-label="Primary">
+            <ul class="grimoire-nav">
+              {links.map((l) => {
+                const active = here === l.href || (l.href !== "/" && here.startsWith(l.href + "/"));
+                return (
+                  <li>
+                    <a
+                      href={l.href}
+                      rel={l.rel}
+                      aria-current={active ? "page" : undefined}
+                      class:list={["grimoire-nav-link", active && "is-active"]}
+                    >
+                      {l.label}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+          <div class="hidden sm:block"><SearchBox /></div>
+        </div>
       </div>
     </header>
 
