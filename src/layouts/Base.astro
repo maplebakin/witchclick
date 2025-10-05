@@ -5,6 +5,7 @@ import "../styles/cards.css";
 import SearchBox from "../components/SearchBox.astro";
 import { readSettings, getSiteOrigin, toAbsoluteUrl } from "../utils/settings";
 import { getTheme } from "../utils/theme";
+import { mixColors, toRgba } from "../utils/color";
 
 const props = Astro.props || {};
 const {
@@ -14,6 +15,8 @@ const {
   wide = false,
   ogImage = "",
   noindex = false,
+  bodyDataType = undefined,
+  ambientColor,
 } = props;
 
 const settings = readSettings();
@@ -58,12 +61,47 @@ const backgroundLayers = [
   "var(--color-background)",
 ].join(", ");
 
+const ambientBase = ambientColor ?? theme.primary;
+const ambientLight = mixColors("#ffffff", ambientBase, 0.18);
+const ambientDeep = mixColors("#0f172a", ambientBase, 0.3);
+const ambientGlass = toRgba(ambientBase, 0.14);
+const ambientGlassBorder = toRgba(mixColors("#e2e8f0", ambientBase, 0.45), 0.55);
+const ambientPillBorder = toRgba(mixColors("#c7d2fe", ambientBase, 0.3), 0.4);
+const ambientPillText = toRgba(mixColors("#312e81", ambientBase, 0.45), 0.88);
+const ambientPillTextActive = toRgba(mixColors("#1e1b4b", ambientBase, 0.55), 0.95);
+const footerSurfaceTop = toRgba(mixColors("#ffffff", ambientBase, 0.22), 0.85);
+const footerSurfaceBottom = toRgba(mixColors("#fdf4ff", ambientBase, 0.32), 0.7);
+const footerBorder = toRgba(mixColors("#cbd5f5", ambientBase, 0.35), 0.5);
+const footerText = mixColors("#1f2937", ambientBase, 0.3);
+const footerMuted = toRgba(mixColors("#475569", ambientBase, 0.35), 0.82);
+const bodyOverlay = `linear-gradient(160deg, ${toRgba(ambientLight, 0.55)} 0%, ${toRgba(
+  ambientBase,
+  0.12
+)} 35%, ${toRgba(ambientDeep, 0.32)} 75%, transparent 100%)`;
+const contentTexture = `radial-gradient(circle at 12% 18%, ${toRgba(ambientBase, 0.08)}, transparent 55%), radial-gradient(circle at 80% 12%, ${toRgba(
+  ambientLight,
+  0.12
+)}, transparent 60%)`;
+
 const bodyStyle = `
   --color-primary: ${theme.primary};
   --color-accent: ${theme.accent};
   --color-background: ${theme.background};
   --font-serif: '${theme.fontSerif}', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
   --font-script: '${theme.fontScript}', cursive;
+  --ambient-color: ${ambientBase};
+  --glass-panel-overlay: ${ambientGlass};
+  --glass-panel-border: ${ambientGlassBorder};
+  --glass-pill-border: ${ambientPillBorder};
+  --glass-pill-border-active: ${toRgba(mixColors("#818cf8", ambientBase, 0.35), 0.55)};
+  --glass-pill-text: ${ambientPillText};
+  --glass-pill-text-active: ${ambientPillTextActive};
+  --panel-muted-surface: linear-gradient(165deg, ${footerSurfaceTop} 0%, ${footerSurfaceBottom} 100%);
+  --panel-muted-border: ${footerBorder};
+  --panel-muted-text: ${footerMuted};
+  --panel-muted-heading: ${footerText};
+  --body-overlay: ${bodyOverlay};
+  --content-texture: ${contentTexture};
   background: ${backgroundLayers};
 `;
 ---
@@ -117,6 +155,10 @@ const bodyStyle = `
         --glass-pill-border-active: rgba(91, 33, 182, 0.48);
         --glass-pill-text: rgba(76, 29, 149, 0.85);
         --glass-pill-text-active: rgba(59, 7, 100, 0.95);
+        --panel-muted-surface: rgba(255, 255, 255, 0.78);
+        --panel-muted-border: rgba(148, 163, 184, 0.35);
+        --panel-muted-text: rgba(71, 85, 105, 0.85);
+        --panel-muted-heading: #1f2937;
       }
 
       h1, h2, h3, .font-serif {
@@ -125,6 +167,20 @@ const bodyStyle = `
 
       .font-script {
         font-family: var(--font-script);
+      }
+
+      h1.font-serif {
+        line-height: 1.05;
+      }
+
+      body {
+        transition: background 420ms ease, color 220ms ease;
+      }
+
+      body[data-type] .grimoire-header-panel,
+      body[data-type] .layout-footer,
+      body[data-type] .layout-content::before {
+        transition: background 320ms ease, box-shadow 320ms ease, border-color 320ms ease, opacity 320ms ease;
       }
 
       .grimoire-header-panel {
@@ -138,12 +194,23 @@ const bodyStyle = `
         box-shadow: var(--glass-panel-shadow);
       }
 
+      .grimoire-header-panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(140deg, var(--glass-panel-overlay), transparent 65%);
+        mix-blend-mode: multiply;
+        pointer-events: none;
+        z-index: 0;
+      }
+
       .grimoire-header-panel::after {
         content: "";
         position: absolute;
         inset: 0;
         pointer-events: none;
-        background: radial-gradient(circle at top right, var(--glass-panel-overlay), transparent 65%);
+        background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.35), transparent 65%);
+        z-index: 0;
       }
 
       .grimoire-header-content {
@@ -240,13 +307,94 @@ const bodyStyle = `
           letter-spacing: 0.18em;
         }
       }
+
+      .layout-content {
+        position: relative;
+        z-index: 0;
+      }
+
+      .layout-content::before {
+        content: "";
+        position: absolute;
+        inset: -1.5rem 0 0;
+        border-radius: clamp(2rem, 4vw, 3rem);
+        background-image: var(--content-texture), var(--surface-parchment-overlay);
+        background-size: 120% 120%, cover;
+        background-repeat: no-repeat, no-repeat;
+        opacity: 0.35;
+        mix-blend-mode: multiply;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .layout-content > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .layout-footer {
+        margin-top: auto;
+        position: relative;
+        border-top: 1px solid transparent;
+        border-image: linear-gradient(90deg, transparent, var(--panel-muted-border), transparent) 1;
+        background: var(--panel-muted-surface);
+        color: var(--panel-muted-text);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        box-shadow: 0 -12px 30px -20px rgba(15, 23, 42, 0.3);
+      }
+
+      .layout-footer::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: clamp(2rem, 6vw, 3rem);
+        background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.45), transparent 60%);
+        pointer-events: none;
+      }
+
+      .layout-footer-panel {
+        position: relative;
+        z-index: 1;
+      }
+
+      .layout-footer h2 {
+        color: var(--panel-muted-heading);
+      }
+
+      .footer-link {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.1rem 0.35rem;
+        border-radius: 9999px;
+        color: inherit;
+        text-decoration: underline;
+        text-decoration-color: color-mix(in srgb, currentColor 65%, transparent);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 6px;
+        transition: color 220ms ease, text-decoration-color 220ms ease, box-shadow 220ms ease;
+      }
+
+      .footer-link:hover,
+      .footer-link:focus-visible {
+        color: color-mix(in srgb, var(--panel-muted-heading) 65%, #111827 35%);
+        text-decoration: none;
+      }
+
+      .footer-link:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 2px color-mix(in srgb, #ffffff 40%, var(--ambient-color) 60%),
+          0 0 0 5px color-mix(in srgb, var(--panel-muted-border) 70%, transparent);
+      }
     </style>
 
     {/* Page-level head slot */}
     <slot name="head" />
   </head>
 
-  <body class="min-h-screen text-gray-900" style={bodyStyle}>
+  <body class="min-h-screen text-gray-900" style={bodyStyle} data-type={bodyDataType}>
     {/* Skip link for a11y */}
     <a
       href="#main"
@@ -283,7 +431,7 @@ const bodyStyle = `
       </div>
     </header>
 
-    <main id="main" class={`mx-auto ${mainWidthClass} px-4 pb-16`}>
+    <main id="main" class={`mx-auto ${mainWidthClass} px-4 pb-16 layout-content`}>
       <div class="sm:hidden mb-6"><SearchBox /></div>
       <slot />
     </main>
@@ -291,24 +439,22 @@ const bodyStyle = `
     {/* CTA slot (filled only on posts) */}
     <slot name="cta" />
 
-    <footer
-      class="mt-auto border-t border-purple-100/60 backdrop-blur-sm"
-      style="background: var(--footer-surface, var(--surface-parchment-overlay));"
-    >
-      <div class={`mx-auto ${mainWidthClass} px-4 py-8 text-sm leading-relaxed text-gray-700`}>
-        {settings.disclosure && <p class="mb-2">{settings.disclosure}</p>}
-        <p class="flex flex-wrap items-center gap-3">
-          <a class="underline underline-offset-4 hover:no-underline" href="/rss.xml">RSS</a>
+    <footer class="layout-footer">
+      <div class={`layout-footer-panel mx-auto ${mainWidthClass} px-4 py-8 text-sm leading-relaxed`}>
+        <h2 class="font-serif text-base tracking-tight">WitchClick Grimoire</h2>
+        {settings.disclosure && <p class="mt-3 text-xs sm:text-sm">{settings.disclosure}</p>}
+        <p class="mt-4 flex flex-wrap items-center gap-3 text-sm">
+          <a class="footer-link" href="/rss.xml">RSS</a>
           <span aria-hidden="true">•</span>
-          <a class="underline underline-offset-4 hover:no-underline" href="/sitemap-index.xml">Sitemap</a>
+          <a class="footer-link" href="/sitemap-index.xml">Sitemap</a>
           {canonicalUrl && (
             <span class="inline-flex items-center gap-3">
               <span aria-hidden="true">•</span>
-              <a class="underline underline-offset-4 hover:no-underline" href={canonicalUrl}>Permalink</a>
+              <a class="footer-link" href={canonicalUrl}>Permalink</a>
             </span>
           )}
         </p>
-        <p class="mt-3 text-gray-500">© {new Date().getFullYear()} {brandName}.</p>
+        <p class="mt-4 text-xs uppercase tracking-[0.2em] text-slate-600/80">© {new Date().getFullYear()} {brandName}.</p>
       </div>
     </footer>
 

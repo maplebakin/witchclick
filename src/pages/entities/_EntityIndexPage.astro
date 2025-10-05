@@ -44,7 +44,7 @@ const sectionStyle = sectionVars ? `${sectionVars};` : undefined;
 const typeLabel = formatTypeLabel(type);
 const lowerTypeLabel = typeLabel.toLowerCase();
 ---
-<Base title={metadata.title} description={metadata.subtitle}>
+<Base title={metadata.title} description={metadata.subtitle} ambientColor={accentHex} bodyDataType={type}>
   <section class="entity-index py-12" style={sectionStyle}>
     <header class="entity-header space-y-4">
       <h1 class="entity-heading text-4xl font-serif leading-tight">
@@ -61,7 +61,7 @@ const lowerTypeLabel = typeLabel.toLowerCase();
         <code class="entity-empty-code">content/entities/{type}</code> to begin weaving this index.
       </p>
     ) : (
-      <div class="entity-grid mt-10 grid gap-6 sm:grid-cols-2">
+      <div class="entity-grid grid sm:grid-cols-2">
         {entities.map((entity) => (
           <EntityCard
             type={entity.type}
@@ -88,6 +88,7 @@ const lowerTypeLabel = typeLabel.toLowerCase();
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    line-height: 1.05;
   }
 
   .entity-heading-icon {
@@ -128,6 +129,8 @@ const lowerTypeLabel = typeLabel.toLowerCase();
 
   .entity-grid {
     position: relative;
+    gap: clamp(1.75rem, 3vw, 2.35rem);
+    margin-top: clamp(2rem, 4vw, 2.5rem);
   }
 
   @media (min-width: 640px) {
