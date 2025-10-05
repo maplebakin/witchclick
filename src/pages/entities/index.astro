@@ -1,26 +1,43 @@
 ---
 import Base from "../../layouts/Base.astro";
-import EntityCard from "../../components/EntityCard.astro";
-import { readAllEntities } from "../../utils/entities";
+import { sections } from "../../data/typeMetadata";
 
-
-const all = readAllEntities();
-const typeNames = Object.keys(all).sort();
+const labelFor = (type: string) =>
+  type
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (char) => char.toUpperCase());
 ---
-<Base title="Entities — WitchClick">
-<h1 class="mb-6">Entities</h1>
-{typeNames.length === 0 ? (
-<p class="text-neutral-400">No entities yet. They are created automatically when you ingest a post that references them, or via your admin endpoint.</p>
-) : (
-typeNames.map((type) => (
-<section class="mb-10">
-<h2 class="text-xl font-semibold mb-3">{type}</h2>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-{all[type].map((e) => (
-<EntityCard type={e.type} slug={e.slug} name={e.name} summary={e.summary} />
-))}
-</div>
-</section>
-))
-)}
+<Base title="The Grimoire — WitchClick">
+  <section class="mx-auto max-w-5xl px-4 py-12 sm:py-16">
+    <h1 class="font-serif text-4xl tracking-tight text-neutral-900 sm:text-5xl">The Grimoire</h1>
+    <p class="mt-4 max-w-2xl text-lg text-neutral-600">
+      Choose your path through this digital grimoire — each chapter holds whispered wisdom waiting to unfold.
+    </p>
+
+    <div class="mt-10 grid gap-6 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      {sections.map((section) => (
+        <a
+          href={section.href}
+          class="group flex h-full flex-col justify-between rounded-2xl border border-neutral-200/70 bg-white/60 p-6 shadow-sm transition-transform duration-300 ease-out hover:-translate-y-1 hover:border-indigo-300 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2"
+        >
+          <div>
+            <div class="flex items-center gap-3 text-3xl" aria-hidden="true">
+              <span>{section.icon}</span>
+              <span class="text-xs font-medium uppercase tracking-[0.2em] text-neutral-500">
+                {labelFor(section.type)}
+              </span>
+            </div>
+            <h2 class="mt-4 font-serif text-2xl text-neutral-900 transition-colors duration-300 group-hover:text-indigo-600">
+              {section.title}
+            </h2>
+            <p class="mt-2 text-base text-neutral-600">{section.subtitle}</p>
+          </div>
+          <span class="mt-6 inline-flex items-center gap-2 text-sm font-medium text-indigo-600 transition-colors duration-300 group-hover:text-indigo-500">
+            Enter this chapter
+            <span aria-hidden="true">→</span>
+          </span>
+        </a>
+      ))}
+    </div>
+  </section>
 </Base>
