@@ -19,6 +19,23 @@
     radial-gradient(circle at 82% 8%, rgba(255, 255, 255, 0.16), transparent 50%),
     radial-gradient(circle at 65% 72%, rgba(255, 255, 255, 0.14), transparent 58%),
     radial-gradient(circle at 28% 68%, rgba(255, 255, 255, 0.1), transparent 55%);
+  --glow-iris: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 24%, transparent);
+  --glow-horizon: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 16%, white 10%);
+  --glow-ember: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 12%, black 4%);
+  --ink-strong: color-mix(in srgb, black 38%, var(--ambient-color, var(--color-primary)) 24%);
+  --ink-body: color-mix(in srgb, black 28%, var(--ambient-color, var(--color-primary)) 18%);
+  --ink-muted: color-mix(in srgb, black 18%, var(--ambient-color, var(--color-primary)) 14%);
+  --panel-surface-strong: var(--glass-panel-surface);
+  --panel-surface-soft: color-mix(in srgb, var(--panel-surface-strong) 82%, transparent);
+  --panel-border-strong: var(--glass-panel-border);
+  --panel-border-soft: color-mix(in srgb, var(--panel-border-strong) 68%, transparent);
+  --action-primary: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 88%, black 12%);
+  --action-primary-hover: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 90%, black 18%);
+  --action-primary-text: color-mix(in srgb, white 92%, var(--ambient-color, var(--color-primary)) 8%);
+  --action-secondary-surface: color-mix(in srgb, white 94%, var(--ambient-color, var(--color-primary)) 6%);
+  --action-secondary-hover: color-mix(in srgb, white 90%, var(--ambient-color, var(--color-primary)) 10%);
+  --action-secondary-border: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 35%, transparent);
+  --action-secondary-text: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 62%, var(--ink-body) 38%);
 }
 
 body {
@@ -38,4 +55,59 @@ body {
 
 a {
   color: inherit;
+}
+
+@layer components {
+  .panel,
+  .soft-card {
+    position: relative;
+    border-radius: var(--glass-panel-radius, 1.75rem);
+    border: 1px solid var(--panel-border-strong);
+    background: linear-gradient(150deg, color-mix(in srgb, var(--panel-surface-strong) 92%, transparent) 0%,
+        color-mix(in srgb, var(--glass-panel-overlay, transparent) 48%, transparent) 70%),
+      var(--panel-surface-strong);
+    backdrop-filter: blur(var(--glass-panel-blur, 18px));
+    -webkit-backdrop-filter: blur(var(--glass-panel-blur, 18px));
+    box-shadow: var(--glass-panel-shadow, var(--elevation-tier-1));
+    overflow: hidden;
+  }
+
+  .soft-card {
+    border-color: var(--panel-border-soft);
+    background: linear-gradient(160deg, color-mix(in srgb, var(--panel-surface-soft) 88%, transparent) 0%,
+        color-mix(in srgb, var(--glass-panel-overlay, transparent) 32%, transparent) 75%),
+      var(--panel-surface-soft);
+    box-shadow: var(--elevation-tier-1);
+  }
+
+  .panel::before,
+  .soft-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 12% 10%, color-mix(in srgb, var(--glass-panel-overlay, transparent) 65%, transparent) 0%,
+        transparent 60%),
+      radial-gradient(circle at 85% 85%, color-mix(in srgb, var(--glow-iris, transparent) 85%, transparent) 0%, transparent 70%);
+    opacity: 0.6;
+    pointer-events: none;
+    mix-blend-mode: soft-light;
+  }
+
+  .panel::after,
+  .soft-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(120% 120% at 110% 110%, color-mix(in srgb, var(--glow-horizon, transparent) 90%, transparent) 0%,
+        transparent 65%),
+      radial-gradient(110% 110% at -10% 110%, color-mix(in srgb, var(--glow-ember, transparent) 70%, transparent) 0%, transparent 68%);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .panel > *,
+  .soft-card > * {
+    position: relative;
+    z-index: 1;
+  }
 }

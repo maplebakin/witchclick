@@ -29,41 +29,103 @@ items.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   description="Printable planners and cozy tools."
   canon={site ? `${site}/downloads` : ""}
 >
-  <section class="prose prose-neutral max-w-none">
-    <h1>Downloads</h1>
-    {items.length === 0 && <p>No downloads yet.</p>}
-    <div class="mt-6 grid gap-6 md:grid-cols-2">
-      {items.map((item) => (
-        <a
-          href={`/downloads/${item.slug}`}
-          class="card-panel card-tier-1 card-panel-strong focus-visible:outline-none"
-        >
-          <span aria-hidden class="card-radial card-radial-top" />
-          <span aria-hidden class="card-radial card-radial-bottom" />
-          <div class="relative z-10 flex gap-4">
-            {item.cover && (
-              <img
-                src={item.cover}
-                alt={`${item.name} cover`}
-                class="h-20 w-20 flex-none rounded-xl border border-white/60 object-cover shadow-sm"
-                loading="lazy"
-              />
-            )}
-            <div class="space-y-2">
-              <h2 class="card-heading m-0 text-lg font-semibold">{item.name}</h2>
-              <p class="m-0 text-sm text-purple-900/80 line-clamp-3">{item.summary}</p>
-              <span class="card-pill card-badge">
-                {item.price && item.currency
-                  ? new Intl.NumberFormat(undefined, {
-                      style: "currency",
-                      currency: item.currency,
-                    }).format(parseFloat(item.price))
-                  : "Free"}
-              </span>
-            </div>
-          </div>
-        </a>
-      ))}
+  <section class="downloads-canvas mx-auto max-w-5xl px-4 py-12 sm:py-16">
+    <div class="panel downloads-panel">
+      <header class="downloads-header">
+        <h1 class="font-serif">Downloads</h1>
+        <p>Printable planners and cozy tools.</p>
+      </header>
+
+      {items.length === 0 ? (
+        <div class="soft-card downloads-empty" role="status">
+          <p>No downloads yet.</p>
+        </div>
+      ) : (
+        <div class="downloads-grid">
+          {items.map((item) => (
+            <a
+              href={`/downloads/${item.slug}`}
+              class="card-panel card-tier-1 card-panel-strong focus-visible:outline-none"
+            >
+              <span aria-hidden class="card-radial card-radial-top" />
+              <span aria-hidden class="card-radial card-radial-bottom" />
+              <div class="relative z-10 flex gap-4">
+                {item.cover && (
+                  <img
+                    src={item.cover}
+                    alt={`${item.name} cover`}
+                    class="h-20 w-20 flex-none rounded-xl border border-white/60 object-cover shadow-sm"
+                    loading="lazy"
+                  />
+                )}
+                <div class="space-y-2">
+                  <h2 class="card-heading m-0 text-lg font-semibold">{item.name}</h2>
+                  <p class="m-0 text-sm text-purple-900/80 line-clamp-3">{item.summary}</p>
+                  <span class="card-pill card-badge">
+                    {item.price && item.currency
+                      ? new Intl.NumberFormat(undefined, {
+                          style: "currency",
+                          currency: item.currency,
+                        }).format(parseFloat(item.price))
+                      : "Free"}
+                  </span>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   </section>
 </Base>
+
+<style>
+  .downloads-canvas {
+    color: var(--ink-body, currentColor);
+  }
+
+  .downloads-panel {
+    padding: clamp(1.75rem, 4vw, 2.9rem);
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .downloads-header {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .downloads-header h1 {
+    margin: 0;
+    font-size: clamp(2.25rem, 4vw, 2.85rem);
+    color: var(--ink-strong, currentColor);
+  }
+
+  .downloads-header p {
+    margin: 0;
+    max-width: 40ch;
+    font-size: 1rem;
+    color: color-mix(in srgb, var(--ink-body, currentColor) 90%, white 10%);
+  }
+
+  .downloads-grid {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  @media (min-width: 768px) {
+    .downloads-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .downloads-empty {
+    padding: clamp(1.35rem, 3vw, 1.85rem);
+    text-align: center;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 82%, white 18%);
+  }
+
+  .downloads-empty p {
+    margin: 0;
+  }
+</style>
