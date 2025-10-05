@@ -159,7 +159,7 @@ const bodyStyle = `
         --glass-panel-radius: 1.75rem;
         --glass-panel-border: rgba(124, 58, 237, 0.28);
         --glass-panel-blur: 18px;
-        --glass-panel-surface: rgba(255, 255, 255, 0.82);
+        --glass-panel-surface: rgba(255, 255, 255, 0.88);
         --glass-panel-overlay: rgba(124, 58, 237, 0.12);
         --glass-panel-shadow: 0 20px 45px -25px rgba(15, 23, 42, 0.35);
         --glass-panel-shadow-hover: 0 25px 60px -30px rgba(15, 23, 42, 0.45);
@@ -169,7 +169,7 @@ const bodyStyle = `
         --glass-pill-border-active: rgba(91, 33, 182, 0.48);
         --glass-pill-text: rgba(76, 29, 149, 0.85);
         --glass-pill-text-active: rgba(59, 7, 100, 0.95);
-        --panel-muted-surface: rgba(255, 255, 255, 0.78);
+        --panel-muted-surface: rgba(255, 255, 255, 0.84);
         --panel-muted-border: rgba(148, 163, 184, 0.35);
         --panel-muted-text: rgba(71, 85, 105, 0.85);
         --panel-muted-heading: #1f2937;
@@ -481,27 +481,25 @@ const bodyStyle = `
       .layout-footer {
         margin-top: auto;
         position: relative;
-        border-top: 1px solid transparent;
-        border-image: linear-gradient(90deg, transparent, var(--panel-muted-border), transparent) 1;
-        background: var(--panel-muted-surface);
-        color: var(--panel-muted-text);
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
-        box-shadow: 0 -12px 30px -20px rgba(15, 23, 42, 0.3);
+        padding: clamp(2rem, 5vw, 3rem) 0;
+        background: transparent;
       }
 
       .layout-footer::before {
         content: "";
         position: absolute;
         inset: 0;
-        border-radius: clamp(2rem, 6vw, 3rem);
-        background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.45), transparent 60%);
+        background:
+          radial-gradient(140% 120% at 10% 0%, color-mix(in srgb, white 55%, transparent) 0%, transparent 72%),
+          radial-gradient(135% 125% at 95% 120%, color-mix(in srgb, var(--glow-horizon, transparent) 65%, transparent) 0%, transparent 78%);
+        opacity: 0.45;
         pointer-events: none;
       }
 
       .layout-footer-panel {
         position: relative;
         z-index: 1;
+        color: var(--panel-muted-text);
       }
 
       .layout-footer h2 {
@@ -626,7 +624,7 @@ const bodyStyle = `
     <slot name="cta" />
 
     <footer class="layout-footer">
-      <div class={`layout-footer-panel mx-auto ${mainWidthClass} px-4 py-8 text-sm leading-relaxed`}>
+      <div class={`layout-footer-panel panel-muted shadow-1 mx-auto ${mainWidthClass} px-4 py-8 text-sm leading-relaxed`}>
         <h2 class="font-serif text-base tracking-tight">WitchClick Grimoire</h2>
         {settings.disclosure && <p class="mt-3 text-xs sm:text-sm">{settings.disclosure}</p>}
         <p class="mt-4 flex flex-wrap items-center gap-3 text-sm">

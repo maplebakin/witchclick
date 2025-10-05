@@ -80,20 +80,19 @@ function resolveDate(data) {
 >
   <div class="grimoire-bg min-h-screen">
     <section class="home-canvas mx-auto max-w-5xl px-4 py-12 sm:py-16">
-      <div class="grimoire-card home-hero">
-        <Hero
-          eyebrow="Fresh from the coven"
-          title={heroTitle}
-          description={heroDescription}
-          backgroundImage={heroBackgroundImage}
-          imageAlt={heroImageAlt}
-          ctaButtons={heroCtaButtons}
-        />
-      </div>
+      <Hero
+        class="home-hero"
+        eyebrow="Fresh from the coven"
+        title={heroTitle}
+        description={heroDescription}
+        backgroundImage={heroBackgroundImage}
+        imageAlt={heroImageAlt}
+        ctaButtons={heroCtaButtons}
+      />
 
-      <div class="grimoire-card home-feed">
+      <section class="home-feed panel shadow-2" aria-labelledby="latest-heading">
         <div class="home-feed-header">
-          <h2 class="home-feed-title font-serif">Latest rituals &amp; planners</h2>
+          <h2 id="latest-heading" class="home-feed-title font-serif">Latest rituals &amp; planners</h2>
           {totalPages > 1 && (
             <a class="home-feed-link" href="/page/2">
               Browse the archive →
@@ -103,7 +102,7 @@ function resolveDate(data) {
 
         {hero && (
           <div class="home-feature">
-            <article class="grimoire-card home-feature-card">
+            <article class="soft-card shadow-1 home-feature-card">
               <p class="home-feature-eyebrow">Featured guide</p>
               <h3 class="home-feature-title font-serif">{hero.title}</h3>
               <p class="home-feature-summary">{hero.excerpt}</p>
@@ -119,7 +118,7 @@ function resolveDate(data) {
               </a>
             </article>
 
-            <aside class="grimoire-card home-callout" aria-labelledby="home-callout-heading">
+            <aside class="soft-card shadow-1 home-callout" aria-labelledby="home-callout-heading">
               <h3 id="home-callout-heading" class="font-serif">Need a cozy starting place?</h3>
               <p>
                 Browse guided spreads, gentle accountability planners, and grounding prompts to keep your routines soft and sustainable.
@@ -140,6 +139,7 @@ function resolveDate(data) {
                 const card = toViewModel(post);
                 return (
                   <PostCard
+                    class="shadow-1"
                     post={{
                       slug: card.slug,
                       title: card.title,
@@ -163,7 +163,7 @@ function resolveDate(data) {
             No posts found yet. Add a Markdown file to <code>content/posts</code> to get started.
           </p>
         )}
-      </div>
+      </section>
     </section>
 
     {totalPages > 1 ? (
@@ -181,59 +181,10 @@ function resolveDate(data) {
     color: var(--ink-body, currentColor);
   }
 
-  .home-hero {
-    padding: clamp(1.75rem, 4vw, 2.75rem);
-  }
-
-  .home-hero > section {
-    background: transparent;
-    border: 0;
-    border-radius: clamp(1.5rem, 4vw, 2.25rem);
-    box-shadow: none;
-    padding: 0;
-    gap: clamp(1.5rem, 4vw, 2.5rem);
-  }
-
-  .home-hero > section .text-xs {
-    letter-spacing: 0.32em;
-    color: color-mix(in srgb, var(--ink-muted, currentColor) 82%, white 18%);
-  }
-
-  .home-hero > section h1 {
-    color: var(--ink-strong, currentColor);
-    font-family: var(--font-serif, inherit);
-  }
-
-  .home-hero > section p {
-    color: color-mix(in srgb, var(--ink-body, currentColor) 92%, white 8%);
-  }
-
-  .home-hero :is(a.bg-purple-700) {
-    background: var(--action-primary);
-    color: var(--action-primary-text);
-    border-color: transparent;
-  }
-
-  .home-hero :is(a.bg-purple-700):hover,
-  .home-hero :is(a.bg-purple-700):focus-visible {
-    background: var(--action-primary-hover);
-  }
-
-  .home-hero :is(a.border) {
-    background: var(--action-secondary-surface);
-    border-color: var(--action-secondary-border);
-    color: var(--action-secondary-text);
-  }
-
-  .home-hero :is(a.border):hover,
-  .home-hero :is(a.border):focus-visible {
-    background: var(--action-secondary-hover);
-  }
-
   .home-feed {
-    padding: clamp(1.75rem, 4vw, 2.85rem);
+    padding: clamp(1.6rem, 4vw, 2.4rem);
     display: grid;
-    gap: clamp(1.75rem, 4vw, 2.6rem);
+    gap: clamp(1.2rem, 3.5vw, 2.1rem);
   }
 
   .home-feed-header {
@@ -280,7 +231,7 @@ function resolveDate(data) {
     display: flex;
     flex-direction: column;
     gap: 1.1rem;
-    padding: clamp(1.5rem, 3.5vw, 2.2rem);
+    padding: clamp(1.5rem, 3.5vw, 2.1rem);
   }
 
   .home-feature-eyebrow {
@@ -316,7 +267,7 @@ function resolveDate(data) {
     border-radius: 999px;
     border: 1px solid var(--panel-border-soft);
     padding: 0.35rem 0.85rem;
-    background: color-mix(in srgb, var(--panel-surface-soft) 88%, transparent);
+    background: color-mix(in srgb, var(--panel-surface-soft) 92%, transparent);
   }
 
   .home-feature-link {
@@ -336,7 +287,7 @@ function resolveDate(data) {
   }
 
   .home-callout {
-    padding: clamp(1.5rem, 3vw, 2rem);
+    padding: clamp(1.4rem, 3vw, 1.9rem);
     display: grid;
     gap: 1rem;
     color: var(--ink-body, currentColor);

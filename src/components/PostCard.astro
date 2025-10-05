@@ -19,9 +19,10 @@ export interface Props {
   tags?: string[]
   readingMinutes?: number
   publishedAt?: string
+  class?: string
 }
 
-const { post, href, title, excerpt, tags, readingMinutes, publishedAt } = Astro.props as Props
+const { post, href, title, excerpt, tags, readingMinutes, publishedAt, class: className } = Astro.props as Props
 
 const link = href || (post?.slug ? `/post/${post.slug}` : '#')
 const _title = (title ?? post?.title ?? 'Untitled')
@@ -41,8 +42,8 @@ function formatDate(value?: string){
 <a
   href={link}
   class:list={[
-    "card-panel card-tier-1 card-panel-soft focus-visible:outline-none",
-    "text-purple-900"
+    "card-panel card-tier-1 card-panel-soft focus-visible:outline-none text-purple-900",
+    className,
   ]}
 >
   <span aria-hidden class="card-radial card-radial-top" />
