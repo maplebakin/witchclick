@@ -28,55 +28,58 @@ items.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   title="Downloads"
   description="Printable planners and cozy tools."
   canon={site ? `${site}/downloads` : ""}
+  wide
 >
-  <section class="downloads-canvas mx-auto max-w-5xl px-4 py-12 sm:py-16">
-    <div class="panel downloads-panel">
-      <header class="downloads-header">
-        <h1 class="font-serif">Downloads</h1>
-        <p>Printable planners and cozy tools.</p>
-      </header>
+  <div class="grimoire-bg min-h-screen">
+    <section class="downloads-canvas mx-auto max-w-5xl px-4 py-12 sm:py-16">
+      <div class="grimoire-card downloads-panel">
+        <header class="downloads-header">
+          <h1 class="font-serif">Downloads</h1>
+          <p>Printable planners and cozy tools.</p>
+        </header>
 
-      {items.length === 0 ? (
-        <div class="soft-card downloads-empty" role="status">
-          <p>No downloads yet.</p>
-        </div>
-      ) : (
-        <div class="downloads-grid">
-          {items.map((item) => (
-            <a
-              href={`/downloads/${item.slug}`}
-              class="card-panel card-tier-1 card-panel-strong focus-visible:outline-none"
-            >
-              <span aria-hidden class="card-radial card-radial-top" />
-              <span aria-hidden class="card-radial card-radial-bottom" />
-              <div class="relative z-10 flex gap-4">
-                {item.cover && (
-                  <img
-                    src={item.cover}
-                    alt={`${item.name} cover`}
-                    class="h-20 w-20 flex-none rounded-xl border border-white/60 object-cover shadow-sm"
-                    loading="lazy"
-                  />
-                )}
-                <div class="space-y-2">
-                  <h2 class="card-heading m-0 text-lg font-semibold">{item.name}</h2>
-                  <p class="m-0 text-sm text-purple-900/80 line-clamp-3">{item.summary}</p>
-                  <span class="card-pill card-badge">
-                    {item.price && item.currency
-                      ? new Intl.NumberFormat(undefined, {
-                          style: "currency",
-                          currency: item.currency,
-                        }).format(parseFloat(item.price))
-                      : "Free"}
-                  </span>
+        {items.length === 0 ? (
+          <div class="grimoire-card downloads-empty" role="status">
+            <p>No downloads yet.</p>
+          </div>
+        ) : (
+          <div class="downloads-grid">
+            {items.map((item) => (
+              <a
+                href={`/downloads/${item.slug}`}
+                class="card-panel card-tier-1 card-panel-strong focus-visible:outline-none"
+              >
+                <span aria-hidden class="card-radial card-radial-top" />
+                <span aria-hidden class="card-radial card-radial-bottom" />
+                <div class="relative z-10 flex gap-4">
+                  {item.cover && (
+                    <img
+                      src={item.cover}
+                      alt={`${item.name} cover`}
+                      class="h-20 w-20 flex-none rounded-xl border border-white/60 object-cover shadow-sm"
+                      loading="lazy"
+                    />
+                  )}
+                  <div class="space-y-2">
+                    <h2 class="card-heading m-0 text-lg font-semibold">{item.name}</h2>
+                    <p class="m-0 text-sm text-purple-900/80 line-clamp-3">{item.summary}</p>
+                    <span class="card-pill card-badge">
+                      {item.price && item.currency
+                        ? new Intl.NumberFormat(undefined, {
+                            style: "currency",
+                            currency: item.currency,
+                          }).format(parseFloat(item.price))
+                        : "Free"}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </a>
-          ))}
-        </div>
-      )}
-    </div>
-  </section>
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  </div>
 </Base>
 
 <style>

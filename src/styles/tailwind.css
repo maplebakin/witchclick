@@ -49,6 +49,74 @@ body {
   background-attachment: fixed, fixed, fixed;
 }
 
+.grimoire-bg {
+  position: relative;
+  isolation: isolate;
+  min-height: 100%;
+  background-color: color-mix(in srgb, rgba(246, 241, 255, 0.9) 68%, rgba(255, 255, 255, 0.96) 32%);
+  background-image: radial-gradient(
+      145% 130% at 18% -12%,
+      color-mix(in srgb, var(--ambient-color, var(--color-primary)) 22%, transparent) 0%,
+      transparent 68%
+    ),
+    radial-gradient(
+      140% 125% at 82% -8%,
+      color-mix(
+        in srgb,
+        color-mix(in srgb, var(--ambient-color, var(--color-primary)) 55%, white 45%) 18%,
+        transparent
+      ) 0%,
+      transparent 72%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, rgba(255, 255, 255, 0.98) 88%, transparent) 0%,
+      color-mix(in srgb, rgba(249, 245, 255, 0.95) 82%, transparent) 48%,
+      color-mix(in srgb, rgba(244, 240, 236, 0.9) 82%, transparent) 100%
+    );
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.grimoire-bg::before {
+  content: "";
+  position: absolute;
+  inset: -12% -10% -16%;
+  background:
+    radial-gradient(
+      120% 120% at 52% 112%,
+      color-mix(in srgb, var(--glow-ember, rgba(124, 58, 237, 0.18)) 55%, transparent) 0%,
+      transparent 72%
+    ),
+    radial-gradient(
+      125% 120% at 50% -10%,
+      color-mix(in srgb, rgba(255, 255, 255, 0.72) 75%, transparent) 0%,
+      transparent 74%
+    );
+  opacity: 0.68;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  z-index: 0;
+}
+
+.grimoire-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(92% 78% at 52% 14%, rgba(255, 255, 255, 0.45), transparent 70%),
+    radial-gradient(110% 90% at 50% 118%, rgba(15, 23, 42, 0.06), transparent 75%);
+  pointer-events: none;
+  opacity: 0.55;
+  mix-blend-mode: screen;
+  z-index: 0;
+}
+
+.grimoire-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
 .prose {
   font-family: var(--font-serif, Literata, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif);
 }
@@ -107,6 +175,77 @@ a {
 
   .panel > *,
   .soft-card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .grimoire-card {
+    position: relative;
+    border-radius: var(--glass-panel-radius, 1.75rem);
+    border: 1px solid color-mix(in srgb, var(--glass-panel-border) 78%, transparent);
+    background:
+      radial-gradient(
+        125% 120% at 18% -8%,
+        color-mix(in srgb, var(--glass-panel-overlay, transparent) 62%, transparent) 0%,
+        transparent 70%
+      ),
+      radial-gradient(
+        115% 115% at 82% -6%,
+        color-mix(in srgb, var(--glass-panel-overlay, transparent) 46%, transparent) 0%,
+        transparent 74%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, rgba(255, 255, 255, 0.98) 88%, transparent) 0%,
+        color-mix(in srgb, rgba(249, 245, 255, 0.94) 72%, transparent) 55%,
+        color-mix(in srgb, rgba(244, 240, 236, 0.9) 78%, transparent) 100%
+      );
+    backdrop-filter: blur(calc(var(--glass-panel-blur, 18px) * 1.08));
+    -webkit-backdrop-filter: blur(calc(var(--glass-panel-blur, 18px) * 1.08));
+    box-shadow: var(--glass-panel-shadow, var(--elevation-tier-1));
+    overflow: hidden;
+  }
+
+  .grimoire-card::before {
+    content: "";
+    position: absolute;
+    inset: -18% -16% -28%;
+    background:
+      radial-gradient(
+        120% 120% at 12% -15%,
+        color-mix(in srgb, var(--glow-iris, rgba(167, 139, 250, 0.35)) 65%, transparent) 0%,
+        transparent 75%
+      ),
+      radial-gradient(
+        145% 135% at 88% -12%,
+        color-mix(in srgb, var(--glow-horizon, rgba(244, 219, 255, 0.32)) 62%, transparent) 0%,
+        transparent 72%
+      ),
+      radial-gradient(
+        160% 120% at 50% 112%,
+        color-mix(in srgb, var(--glow-ember, rgba(91, 33, 182, 0.22)) 58%, transparent) 0%,
+        transparent 74%
+      );
+    opacity: 0.58;
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .grimoire-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(80% 75% at 50% 15%, rgba(255, 255, 255, 0.5), transparent 70%),
+      radial-gradient(100% 100% at 50% 120%, rgba(15, 23, 42, 0.07), transparent 72%);
+    opacity: 0.68;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .grimoire-card > * {
     position: relative;
     z-index: 1;
   }
