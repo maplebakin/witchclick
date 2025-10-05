@@ -3,6 +3,10 @@
 import Base from "../../../layouts/Base.astro";
 import fs from "node:fs";
 import path from "node:path";
+import { getTypeMetadata } from "../../../data/typeMetadata";
+import { resolveTailwindColor, mixColors, toRgba } from "../../../utils/color";
+import { toCssVariables } from "../../../utils/style";
+import { getPostsForEntity } from "../../../utils/entityPosts";
 
 export const prerender = true;
 
@@ -40,24 +44,369 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const { ent } = Astro.props as { ent: {
-  type: string; slug: string; name: string; summary?: string;
-  properties?: Record<string, unknown>; related?: string[];
-}};
+const { ent } = Astro.props as {
+  ent: {
+    type: string;
+    slug: string;
+    name: string;
+    summary?: string;
+    properties?: Record<string, unknown>;
+    related?: string[];
+  };
+};
+
+const metadata = getTypeMetadata(ent.type);
+const accentHex = resolveTailwindColor(metadata.themeColor);
+const accentSoft = toRgba(accentHex, 0.18);
+const accentSurface = toRgba(accentHex, 0.08);
+const accentBorder = toRgba(accentHex, 0.25);
+const accentHeading = mixColors(accentHex, "#1f2937", 0.42);
+const accentSummary = mixColors(accentHex, "#1f2937", 0.55);
+const accentLabel = toRgba(accentHex, 0.6);
+const accentShadow = toRgba(accentHex, 0.2);
+
+const themeVarString = toCssVariables({
+  "entity-accent": accentHex,
+  "entity-accent-soft": accentSoft,
+  "entity-accent-surface": accentSurface,
+  "entity-accent-border": accentBorder,
+  "entity-accent-heading": accentHeading,
+  "entity-accent-summary": accentSummary,
+  "entity-accent-label": accentLabel,
+  "entity-accent-shadow": accentShadow,
+});
+
+const summaryText = typeof ent.summary === "string" ? ent.summary.trim() : "";
+const isStub = summaryText ? /stub/i.test(summaryText) : false;
+
+const typeLabel = ent.type
+  .split(/[-_\s]+/)
+  .map((part) => (part ? part[0].toUpperCase() + part.slice(1) : ""))
+  .join(" ");
+
+const propertyEntries = ent.properties && typeof ent.properties === "object"
+  ? Object.entries(ent.properties)
+  : [];
+
+let relatedPosts: Array<{ title: string; href: string; excerpt?: string }> = [];
+try {
+  // This helper will be wired to real content soon; we fall back quietly for now.
+  const maybePosts = await getPostsForEntity?.(ent.type, ent.slug);
+  if (Array.isArray(maybePosts)) {
+    relatedPosts = maybePosts;
+  }
+} catch {
+  relatedPosts = [];
+}
 
 function pretty(v: unknown) {
-  try { return JSON.stringify(v, null, 2); } catch { return String(v); }
+  try {
+    return JSON.stringify(v, null, 2);
+  } catch {
+    return String(v);
+  }
 }
 ---
-<Base title={`${ent.name} — ${ent.type} — WitchClick`}>
-  <p class="text-xs uppercase tracking-wider text-neutral-400">{ent.type}</p>
-  <h1 class="mb-3">{ent.name}</h1>
-  {ent.summary && <p class="text-neutral-300">{ent.summary}</p>}
+<Base title={`${ent.name} — ${typeLabel} — WitchClick`} wide>
+  <article class="entity-page" style={themeVarString ? `${themeVarString};` : undefined}>
+    <header class="entity-hero">
+      <div class="entity-hero-sheen" aria-hidden="true" />
+      <div class="entity-hero-inner">
+        <span class="entity-hero-icon" aria-hidden="true">{metadata.icon}</span>
+        <div class="entity-hero-heading">
+          <p class="entity-hero-type" data-label={typeLabel}>{typeLabel}</p>
+          <h1 class="entity-hero-title">{ent.name}</h1>
+        </div>
+        {summaryText && !isStub && (
+          <p class="entity-hero-summary">{summaryText}</p>
+        )}
+      </div>
+    </header>
 
-  {ent.properties && Object.keys(ent.properties).length > 0 ? (
-    <section class="mt-8">
-      <h2 class="text-xl font-semibold mb-2">Properties</h2>
-      <pre class="bg-neutral-900 rounded-xl p-4 border border-neutral-800 overflow-x-auto"><code>{pretty(ent.properties)}</code></pre>
+    {isStub ? (
+      <section class="entity-stub-card" aria-live="polite">
+        <h2 class="entity-stub-heading">Lore in Progress</h2>
+        <p class="entity-stub-copy">{metadata.stubLine}</p>
+        {/* Future: add subscription/notification CTA when lore completes. */}
+      </section>
+    ) : (
+      <section class="entity-detail">
+        {summaryText && (
+          <div class="entity-detail-summary">
+            <h2 class="entity-section-title">Overview</h2>
+            <p>{summaryText}</p>
+          </div>
+        )}
+
+        {propertyEntries.length > 0 && (
+          <div class="entity-properties">
+            <h2 class="entity-section-title">Properties</h2>
+            <dl>
+              {propertyEntries.map(([key, value]) => (
+                <div class="entity-property" key={key}>
+                  <dt>{key}</dt>
+                  <dd>{typeof value === "string" || typeof value === "number" ? String(value) : <pre><code>{pretty(value)}</code></pre>}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        )}
+
+        {/* Future enhancement: render related entities using ent.related for richer cross-links. */}
+      </section>
+    )}
+
+    <section class="entity-related">
+      <div class="entity-related-header">
+        <h2 class="entity-section-title">Related Posts</h2>
+        <p class="entity-related-sub">Stories that will eventually echo this lore.</p>
+      </div>
+      {relatedPosts.length > 0 ? (
+        <ul class="entity-related-list">
+          {relatedPosts.map((post) => (
+            <li key={post.href ?? post.title}>
+              <a href={post.href} class="entity-related-card">
+                <h3>{post.title}</h3>
+                {post.excerpt && <p>{post.excerpt}</p>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div class="entity-related-placeholder">
+          <p>Our scribes are gathering tales to weave here soon.</p>
+          {/* TODO: Once getPostsForEntity resolves real data, replace this placeholder copy. */}
+        </div>
+      )}
     </section>
-  ) : null}
+  </article>
 </Base>
+
+<style>
+  .entity-page {
+    display: grid;
+    gap: 3rem;
+    margin-top: 2rem;
+    margin-bottom: 4rem;
+    color: #111827;
+  }
+
+  .entity-hero {
+    position: relative;
+    border-radius: 2rem;
+    padding: clamp(2rem, 6vw, 4rem);
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--entity-accent-surface, rgba(124, 58, 237, 0.08)), rgba(255, 255, 255, 0.92));
+    box-shadow: 0 28px 60px -35px var(--entity-accent-shadow, rgba(124, 58, 237, 0.2));
+  }
+
+  .entity-hero::before {
+    content: "";
+    position: absolute;
+    inset: -30% -35% auto;
+    height: 60%;
+    border-radius: 50%;
+    background: radial-gradient(circle at top, var(--entity-accent, rgba(124, 58, 237, 0.45)), transparent 70%);
+    opacity: 0.25;
+  }
+
+  .entity-hero-sheen {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.3), transparent 60%);
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+
+  .entity-hero-inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .entity-hero-icon {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  .entity-hero-heading {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .entity-hero-type {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.35em;
+    color: var(--entity-accent-label, rgba(124, 58, 237, 0.6));
+  }
+
+  .entity-hero-title {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    line-height: 1.1;
+    font-family: var(--font-serif, "Literata", serif);
+    color: var(--entity-accent-heading, #4c1d95);
+  }
+
+  .entity-hero-summary {
+    max-width: 60ch;
+    font-size: 1.1rem;
+    color: var(--entity-accent-summary, #4338ca);
+  }
+
+  .entity-detail {
+    display: grid;
+    gap: 2.5rem;
+    padding: clamp(2rem, 5vw, 3rem);
+    border-radius: 1.75rem;
+    border: 1px solid var(--entity-accent-border, rgba(124, 58, 237, 0.25));
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.85));
+    box-shadow: 0 18px 45px -28px var(--entity-accent-shadow, rgba(124, 58, 237, 0.18));
+  }
+
+  .entity-detail-summary p {
+    margin-top: 0.75rem;
+    color: #374151;
+    line-height: 1.7;
+  }
+
+  .entity-section-title {
+    font-size: 1.35rem;
+    font-weight: 600;
+    font-family: var(--font-serif, "Literata", serif);
+    color: var(--entity-accent-heading, #4c1d95);
+  }
+
+  .entity-properties dl {
+    margin-top: 1rem;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .entity-property dt {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--entity-accent-label, rgba(124, 58, 237, 0.6));
+    margin-bottom: 0.35rem;
+  }
+
+  .entity-property dd {
+    margin: 0;
+    font-size: 1rem;
+    color: #1f2937;
+  }
+
+  .entity-property pre {
+    margin: 0;
+    padding: 1rem;
+    background: rgba(15, 23, 42, 0.85);
+    color: rgba(226, 232, 240, 0.95);
+    border-radius: 1rem;
+    overflow-x: auto;
+    font-size: 0.85rem;
+  }
+
+  .entity-stub-card {
+    padding: clamp(2rem, 5vw, 3rem);
+    border-radius: 1.75rem;
+    border: 1px dashed var(--entity-accent-border, rgba(124, 58, 237, 0.28));
+    background: rgba(255, 255, 255, 0.82);
+    text-align: center;
+    display: grid;
+    gap: 1rem;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), 0 25px 55px -38px var(--entity-accent-shadow, rgba(124, 58, 237, 0.22));
+  }
+
+  .entity-stub-heading {
+    font-size: 1.8rem;
+    font-family: var(--font-serif, "Literata", serif);
+    color: var(--entity-accent-heading, #4c1d95);
+  }
+
+  .entity-stub-copy {
+    font-size: 1rem;
+    color: #374151;
+  }
+
+  .entity-related {
+    display: grid;
+    gap: 1.5rem;
+    padding: clamp(2rem, 5vw, 3rem);
+    border-radius: 1.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.95), var(--entity-accent-surface, rgba(124, 58, 237, 0.08)));
+  }
+
+  .entity-related-sub {
+    margin-top: 0.25rem;
+    font-size: 0.95rem;
+    color: #4b5563;
+  }
+
+  .entity-related-list {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .entity-related-card {
+    display: block;
+    padding: 1.25rem 1.5rem;
+    border-radius: 1.25rem;
+    border: 1px solid var(--entity-accent-border, rgba(124, 58, 237, 0.22));
+    background: rgba(255, 255, 255, 0.88);
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  }
+
+  .entity-related-card h3 {
+    font-family: var(--font-serif, "Literata", serif);
+    font-size: 1.2rem;
+    color: var(--entity-accent-heading, #4c1d95);
+    margin-bottom: 0.5rem;
+  }
+
+  .entity-related-card p {
+    color: #374151;
+    font-size: 0.95rem;
+  }
+
+  .entity-related-card:hover,
+  .entity-related-card:focus-visible {
+    transform: translateY(-4px);
+    border-color: var(--entity-accent, rgba(124, 58, 237, 0.45));
+    box-shadow: 0 18px 45px -30px var(--entity-accent-shadow, rgba(124, 58, 237, 0.3));
+  }
+
+  .entity-related-placeholder {
+    padding: 1.75rem;
+    border-radius: 1.25rem;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px dashed var(--entity-accent-border, rgba(124, 58, 237, 0.25));
+    text-align: center;
+    color: #4b5563;
+  }
+
+  @media (max-width: 768px) {
+    .entity-page {
+      gap: 2.5rem;
+      margin-top: 1rem;
+    }
+
+    .entity-hero,
+    .entity-detail,
+    .entity-stub-card,
+    .entity-related {
+      border-radius: 1.5rem;
+    }
+
+    .entity-hero-title {
+      font-size: clamp(2.25rem, 8vw, 3rem);
+    }
+
+    .entity-detail,
+    .entity-stub-card,
+    .entity-related {
+      padding: clamp(1.5rem, 6vw, 2.5rem);
+    }
+  }
+</style>
