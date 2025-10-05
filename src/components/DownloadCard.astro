@@ -20,31 +20,59 @@ const href = hasExternal ? data.url : (data.file || '#');
 const target = hasExternal ? '_blank' : undefined;
 const rel = hasExternal ? 'noopener' : undefined;
 ---
-<aside class="my-8 rounded-2xl border border-purple-200 bg-purple-50 p-4">
-  <div class="flex gap-4">
-    {data.cover && <img src={data.cover} alt={`${data.name} cover`} class="h-24 w-24 rounded-lg object-cover" loading="lazy" />}
-    <div class="min-w-0">
-      <h3 class="m-0 text-lg font-semibold">{data.name}</h3>
-      {data.summary && <p class="mt-1 mb-2 text-sm text-purple-900">{data.summary}</p>}
-      {Array.isArray(data.features) && data.features.length > 0 && (
-        <ul class="mb-3 list-disc pl-5 text-sm">
-          {data.features.slice(0,3).map((f:string)=><li>{f}</li>)}
-        </ul>
+<aside class="my-8">
+  <div class="card-panel card-tier-2 card-panel-strong card-panel-static">
+    <span aria-hidden class="card-radial card-radial-soft" />
+    <div class="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-start">
+      {data.cover && (
+        <img
+          src={data.cover}
+          alt={`${data.name} cover`}
+          class="h-24 w-24 flex-none rounded-xl border border-white/60 object-cover shadow-sm"
+          loading="lazy"
+        />
       )}
-      <div class="flex items-center gap-3">
-        {(data.price && data.currency) ? (
-          <span class="rounded bg-white px-2 py-1 text-sm font-medium text-purple-900">
-            {new Intl.NumberFormat(undefined, { style:'currency', currency:data.currency }).format(parseFloat(data.price))}
-          </span>
-        ) : (
-          <span class="rounded bg-white px-2 py-1 text-sm font-medium text-purple-900">Free</span>
+      <div class="min-w-0 space-y-4">
+        <header class="space-y-2">
+          <p class="card-eyebrow">Download</p>
+          <h3 class="card-heading text-xl font-semibold">{data.name}</h3>
+        </header>
+        {data.summary && <p class="card-subtle text-sm leading-relaxed">{data.summary}</p>}
+        {Array.isArray(data.features) && data.features.length > 0 && (
+          <ul class="grid gap-2 text-sm text-purple-900/90 sm:list-none sm:gap-1">
+            {data.features.slice(0, 3).map((f: string) => (
+              <li class="flex items-start gap-2">
+                <span aria-hidden class="mt-1 text-xs text-purple-500">✶</span>
+                <span>{f}</span>
+              </li>
+            ))}
+          </ul>
         )}
-        <a href={href} target={target} rel={rel}
-           class="rounded-lg bg-purple-700 px-3 py-2 text-sm font-medium text-white hover:bg-purple-800"
-           data-analytics="download_click" data-analytics-meta={data.id}>
-          {hasExternal ? 'Buy now' : 'Download'}
-        </a>
-        <a href={`/downloads/${data.slug}`} class="text-sm underline text-purple-700">Details</a>
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="card-pill card-badge">
+            {(data.price && data.currency)
+              ? new Intl.NumberFormat(undefined, { style: "currency", currency: data.currency }).format(
+                  parseFloat(data.price)
+                )
+              : "Free"}
+          </span>
+          <a
+            href={href}
+            target={target}
+            rel={rel}
+            class="inline-flex items-center justify-center rounded-full bg-purple-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300 focus-visible:ring-offset-2"
+            data-analytics="download_click"
+            data-analytics-meta={data.id}
+          >
+            {hasExternal ? "Buy now" : "Download"}
+          </a>
+          <a
+            href={`/downloads/${data.slug}`}
+            class="text-sm font-semibold text-purple-700 underline-offset-4 transition hover:text-purple-900 hover:underline"
+          >
+            Details
+          </a>
+        </div>
       </div>
     </div>
   </div>

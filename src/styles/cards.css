@@ -1,0 +1,183 @@
+:root {
+  --card-radius: 1.5rem;
+  --card-panel-surface: rgba(255, 255, 255, 0.78);
+  --card-panel-surface-strong: rgba(255, 255, 255, 0.86);
+  --card-panel-border: rgba(124, 58, 237, 0.2);
+  --card-panel-border-strong: rgba(124, 58, 237, 0.32);
+  --card-panel-border-soft: rgba(124, 58, 237, 0.16);
+  --card-hover-translate: -0.35rem;
+  --card-transition: 220ms ease;
+  --card-focus-ring: 0 0 0 3px rgba(167, 139, 250, 0.35);
+  --card-focus-ring-strong: 0 0 0 3px rgba(124, 58, 237, 0.4);
+  --card-highlight: radial-gradient(circle at 15% -25%, rgba(167, 139, 250, 0.32), transparent 60%);
+  --card-highlight-alt: radial-gradient(circle at 85% -10%, rgba(253, 186, 116, 0.28), transparent 70%);
+  --card-highlight-soft: radial-gradient(circle at 50% 0%, rgba(167, 139, 250, 0.2), transparent 70%);
+  --elevation-tier-1: 0 20px 45px -25px rgba(15, 23, 42, 0.35);
+  --elevation-tier-2: 0 25px 60px -30px rgba(15, 23, 42, 0.45);
+  --elevation-tier-3: 0 35px 75px -32px rgba(15, 23, 42, 0.52);
+  --elevation-tier-ambient: 0 10px 25px -18px rgba(15, 23, 42, 0.3);
+  --card-badge-bg: rgba(124, 58, 237, 0.18);
+  --card-badge-border: rgba(124, 58, 237, 0.36);
+  --card-badge-text: rgba(76, 29, 149, 0.88);
+  --card-tag-bg: rgba(124, 58, 237, 0.12);
+  --card-tag-border: rgba(124, 58, 237, 0.28);
+  --card-tag-text: rgba(76, 29, 149, 0.85);
+}
+
+.card-panel {
+  position: relative;
+  display: block;
+  border-radius: var(--card-radius);
+  padding: var(--card-panel-padding, 1.5rem);
+  border: 1px solid var(--card-panel-border);
+  background: var(--card-panel-surface);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--card-elevation-base, var(--elevation-tier-1));
+  color: inherit;
+  overflow: hidden;
+  transition: transform var(--card-transition), box-shadow var(--card-transition), border-color var(--card-transition);
+}
+
+.card-panel:hover,
+.card-panel:focus-visible {
+  transform: translateY(var(--card-hover-translate));
+  box-shadow: var(--card-elevation-hover, var(--elevation-tier-2));
+  border-color: var(--card-panel-border-hover, var(--card-panel-border-strong));
+}
+
+.card-panel:active {
+  transform: translateY(calc(var(--card-hover-translate) * 0.5));
+  box-shadow: var(--card-elevation-active, var(--elevation-tier-ambient));
+}
+
+.card-panel:focus-visible {
+  outline: none;
+  box-shadow: var(--card-focus-ring), var(--card-elevation-hover, var(--elevation-tier-2));
+}
+
+.card-panel.card-panel-strong {
+  background: var(--card-panel-surface-strong);
+  border-color: var(--card-panel-border-strong);
+}
+
+.card-panel.card-panel-soft {
+  border-color: var(--card-panel-border-soft);
+}
+
+.card-panel.card-panel-static {
+  --card-hover-translate: 0rem;
+  --card-elevation-hover: var(--card-elevation-base, var(--elevation-tier-1));
+}
+
+.card-panel.card-panel-static:hover,
+.card-panel.card-panel-static:focus-visible,
+.card-panel.card-panel-static:active {
+  transform: translateY(0);
+}
+
+.card-tier-1 {
+  --card-elevation-base: var(--elevation-tier-1);
+  --card-elevation-hover: var(--elevation-tier-2);
+  --card-elevation-active: var(--elevation-tier-ambient);
+}
+
+.card-tier-2 {
+  --card-elevation-base: var(--elevation-tier-2);
+  --card-elevation-hover: var(--elevation-tier-3);
+  --card-focus-ring: var(--card-focus-ring-strong);
+}
+
+.card-tier-3 {
+  --card-elevation-base: var(--elevation-tier-3);
+  --card-elevation-hover: var(--elevation-tier-3);
+}
+
+.card-radial {
+  position: absolute;
+  pointer-events: none;
+  width: 140%;
+  height: 65%;
+  filter: blur(0px);
+  opacity: 0.55;
+  transition: transform var(--card-transition), opacity var(--card-transition);
+  z-index: 0;
+}
+
+.card-radial.card-radial-top {
+  top: -40%;
+  left: -20%;
+  background: var(--card-highlight);
+  transform: rotate(-6deg);
+}
+
+.card-radial.card-radial-bottom {
+  bottom: -45%;
+  right: -10%;
+  background: var(--card-highlight-alt);
+  transform: rotate(12deg);
+}
+
+.card-radial.card-radial-soft {
+  top: -30%;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 180%;
+  background: var(--card-highlight-soft);
+}
+
+.card-panel:hover .card-radial,
+.card-panel:focus-visible .card-radial {
+  opacity: 0.75;
+  transform: translateY(-0.25rem) scale(1.05);
+}
+
+.card-panel:active .card-radial {
+  opacity: 0.65;
+  transform: translateY(-0.15rem) scale(1.02);
+}
+
+.card-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 9999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.625rem;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: var(--card-pill-bg, var(--card-tag-bg));
+  border: 1px solid var(--card-pill-border, var(--card-tag-border));
+  color: var(--card-pill-text, var(--card-tag-text));
+  box-shadow: var(--card-pill-shadow, 0 2px 6px rgba(15, 23, 42, 0.12));
+}
+
+.card-badge {
+  --card-pill-bg: var(--card-badge-bg);
+  --card-pill-border: var(--card-badge-border);
+  --card-pill-text: var(--card-badge-text);
+}
+
+.card-tag {
+  --card-pill-bg: var(--card-tag-bg);
+  --card-pill-border: var(--card-tag-border);
+  --card-pill-text: var(--card-tag-text);
+}
+
+.card-eyebrow {
+  font-size: 0.625rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(88, 28, 135, 0.7);
+}
+
+.card-heading {
+  color: rgba(76, 29, 149, 0.92);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.card-subtle {
+  color: rgba(76, 29, 149, 0.75);
+}
