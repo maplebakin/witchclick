@@ -4,16 +4,20 @@
 @tailwind utilities;
 
 :root {
+  --wc-canvas-from: hsl(270 60% 98%);
+  --wc-canvas-to: hsl(270 40% 92%);
+  --wc-canvas-vignette: 0 0 0 / 0.08;
+  --surface-tint: hsl(270 55% 62%);
   --surface-parchment: radial-gradient(
       125% 125% at 50% 0%,
-      rgba(255, 255, 255, 0.96) 0%,
-      rgba(250, 247, 245, 0.9) 55%,
-      rgba(245, 240, 236, 0.82) 100%
+      color-mix(in oklab, white 96%, var(--surface-tint) 4%) 0%,
+      color-mix(in oklab, white 92%, var(--surface-tint) 8%) 55%,
+      color-mix(in oklab, white 88%, var(--surface-tint) 12%) 100%
     );
   --surface-parchment-overlay: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.92) 0%,
-    rgba(255, 255, 255, 0.86) 100%
+    color-mix(in oklab, white 92%, var(--surface-tint) 8%) 0%,
+    color-mix(in oklab, white 88%, var(--surface-tint) 12%) 100%
   );
   --surface-starfield: radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.18), transparent 42%),
     radial-gradient(circle at 82% 8%, rgba(255, 255, 255, 0.16), transparent 50%),
@@ -25,10 +29,12 @@
   --ink-strong: color-mix(in srgb, black 38%, var(--ambient-color, var(--color-primary)) 24%);
   --ink-body: color-mix(in srgb, black 28%, var(--ambient-color, var(--color-primary)) 18%);
   --ink-muted: color-mix(in srgb, black 18%, var(--ambient-color, var(--color-primary)) 14%);
-  --panel-surface-strong: var(--glass-panel-surface);
-  --panel-surface-soft: color-mix(in srgb, var(--panel-surface-strong) 90%, transparent);
-  --panel-border-strong: var(--glass-panel-border);
-  --panel-border-soft: color-mix(in srgb, var(--panel-border-strong) 68%, transparent);
+  --panel-surface-strong: color-mix(in oklab, white 65%, var(--surface-tint) 35%);
+  --panel-surface-soft: color-mix(in oklab, white 72%, var(--surface-tint) 28%);
+  --panel-border-strong: hsl(270 30% 75% / 0.35);
+  --panel-border-soft: hsl(270 30% 82% / 0.3);
+  --shadow-1: var(--elevation-tier-1);
+  --shadow-2: var(--elevation-tier-2);
   --action-primary: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 88%, black 12%);
   --action-primary-hover: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 90%, black 18%);
   --action-primary-text: color-mix(in srgb, white 92%, var(--ambient-color, var(--color-primary)) 8%);
@@ -53,51 +59,22 @@ body {
   position: relative;
   isolation: isolate;
   min-height: 100%;
-  background-image:
-    radial-gradient(
-      185% 145% at 50% -25%,
-      color-mix(in srgb, var(--glow-iris, transparent) 92%, white 12%) 0%,
-      transparent 72%
-    ),
-    radial-gradient(
-      160% 135% at 12% 92%,
-      color-mix(in srgb, var(--glow-ember, transparent) 78%, transparent) 0%,
-      transparent 78%
-    ),
-    radial-gradient(
-      150% 135% at 88% 112%,
-      color-mix(in srgb, var(--glow-horizon, transparent) 82%, transparent) 0%,
-      transparent 76%
-    ),
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--panel-surface-strong) 92%, transparent) 0%,
-      color-mix(in srgb, var(--panel-surface-soft) 94%, transparent) 50%,
-      color-mix(in srgb, var(--glow-ember, transparent) 24%, white 82%) 100%
-    ),
-    var(--surface-starfield);
-  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat;
-  background-size: cover, cover, cover, cover, 720px 720px;
+  background:
+    radial-gradient(1200px 700px at 50% -10%, var(--wc-canvas-from), transparent 70%),
+    linear-gradient(to bottom, var(--wc-canvas-from), var(--wc-canvas-to));
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .grimoire-bg::before {
   content: "";
   position: absolute;
-  inset: -14% -12% -18%;
-  background:
-    radial-gradient(
-      130% 130% at 48% 108%,
-      color-mix(in srgb, var(--glow-ember, transparent) 72%, transparent) 0%,
-      transparent 70%
-    ),
-    radial-gradient(
-      140% 140% at 52% -8%,
-      color-mix(in srgb, white 62%, transparent) 0%,
-      transparent 74%
-    );
-  opacity: 0.78;
+  inset: -8% -10% -14%;
+  background: var(--surface-starfield);
+  box-shadow: inset 0 0 140px 70px rgb(var(--wc-canvas-vignette));
+  opacity: 0.08;
+  mix-blend-mode: multiply;
   pointer-events: none;
-  mix-blend-mode: soft-light;
   z-index: 0;
 }
 
@@ -105,12 +82,14 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(120% 110% at 50% 14%, color-mix(in srgb, white 55%, transparent) 0%, transparent 78%),
-    radial-gradient(125% 120% at 105% 108%, color-mix(in srgb, var(--glow-horizon, transparent) 75%, transparent) 0%, transparent 80%);
-  pointer-events: none;
-  opacity: 0.6;
+  background: radial-gradient(
+      135% 120% at 50% 10%,
+      color-mix(in oklab, white 22%, var(--surface-tint) 18%) 0%,
+      transparent 72%
+    );
+  opacity: 0.35;
   mix-blend-mode: screen;
+  pointer-events: none;
   z-index: 0;
 }
 
@@ -133,58 +112,17 @@ a {
     position: relative;
     border-radius: var(--glass-panel-radius, 1.75rem);
     border: 1px solid var(--panel-border-strong);
-    background:
-      radial-gradient(160% 140% at 18% -20%, color-mix(in srgb, var(--glow-iris, transparent) 65%, transparent) 0%, transparent 70%),
-      radial-gradient(150% 135% at 112% 108%, color-mix(in srgb, var(--glow-horizon, transparent) 78%, transparent) 0%, transparent 78%),
-      linear-gradient(165deg, color-mix(in srgb, var(--panel-surface-strong) 96%, transparent) 0%,
-        color-mix(in srgb, var(--panel-surface-strong) 86%, transparent) 65%);
-    backdrop-filter: blur(var(--glass-panel-blur, 18px));
-    -webkit-backdrop-filter: blur(var(--glass-panel-blur, 18px));
-    box-shadow: var(--elevation-tier-1);
+    background: color-mix(in oklab, white 65%, var(--surface-tint, hsl(270 50% 60%)) 35%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-2);
     overflow: hidden;
   }
 
   .soft-card {
     border-color: var(--panel-border-soft);
-    background:
-      radial-gradient(150% 135% at 14% -18%, color-mix(in srgb, var(--glass-panel-overlay, transparent) 55%, transparent) 0%, transparent 68%),
-      linear-gradient(165deg, color-mix(in srgb, var(--panel-surface-soft) 94%, transparent) 0%,
-        color-mix(in srgb, var(--panel-surface-soft) 82%, transparent) 70%);
-  }
-
-  .panel::before,
-  .soft-card::before {
-    content: "";
-    position: absolute;
-    inset: -4% -6%;
-    background:
-      radial-gradient(120% 120% at 8% 10%, color-mix(in srgb, var(--glass-panel-overlay, transparent) 65%, transparent) 0%, transparent 60%),
-      radial-gradient(140% 140% at 85% 12%, color-mix(in srgb, var(--glow-iris, transparent) 82%, transparent) 0%, transparent 75%);
-    opacity: 0.55;
-    pointer-events: none;
-    mix-blend-mode: soft-light;
-  }
-
-  .panel::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(125% 115% at 108% 108%, color-mix(in srgb, var(--glow-horizon, transparent) 85%, transparent) 0%, transparent 78%),
-      radial-gradient(135% 135% at -6% 112%, color-mix(in srgb, var(--glow-ember, transparent) 70%, transparent) 0%, transparent 72%);
-    opacity: 0.68;
-    pointer-events: none;
-  }
-
-  .soft-card::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(120% 110% at 105% 105%, color-mix(in srgb, var(--glow-horizon, transparent) 65%, transparent) 0%, transparent 78%),
-      radial-gradient(125% 120% at -10% 105%, color-mix(in srgb, var(--glow-ember, transparent) 55%, transparent) 0%, transparent 75%);
-    opacity: 0.55;
-    pointer-events: none;
+    background: color-mix(in oklab, white 72%, var(--surface-tint, hsl(270 50% 60%)) 28%);
+    box-shadow: var(--shadow-1);
   }
 
   .panel-muted {

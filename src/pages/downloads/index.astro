@@ -31,14 +31,14 @@ items.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
 >
   <div class="grimoire-bg min-h-screen">
     <section class="downloads-canvas mx-auto max-w-5xl px-4 py-12 sm:py-16">
-      <section class="downloads-panel panel shadow-2" aria-labelledby="downloads-heading">
+      <section class="downloads-panel panel" aria-labelledby="downloads-heading">
         <header class="downloads-header">
           <h1 id="downloads-heading" class="font-serif">Downloads</h1>
           <p>Printable planners and cozy tools.</p>
         </header>
 
         {items.length === 0 ? (
-          <div class="downloads-empty soft-card shadow-1" role="status">
+          <div class="downloads-empty soft-card" role="status">
             <span class="downloads-empty-icon" aria-hidden="true">✨</span>
             <p class="downloads-empty-copy">Fresh printable spells are on their way. Check back after the next moon.</p>
           </div>

@@ -169,73 +169,153 @@ const jsonLd = {
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </Fragment>
 
-  <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
-    <article class="prose prose-neutral max-w-none lg:col-span-8">
-      {heroImage && (
-        <figure class="mb-6 overflow-hidden rounded-3xl border border-purple-100 bg-purple-50 shadow-sm">
-          <img
-            src={heroImage}
-            alt={heroAlt}
-            loading="eager"
-            class="h-auto w-full object-cover"
-          />
-        </figure>
-      )}
-      <h1 class="mb-2">{title}</h1>
-      <p class="mt-0 mb-4 text-sm text-gray-600">
-        {publishedAt && (
-          <time datetime={new Date(publishedAt).toISOString()}>
-            {new Date(publishedAt).toLocaleDateString(undefined, {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })}
-          </time>
-        )}
-        {(publishedAt || readingMinutes) && <span> · </span>}
-        {readingMinutes && <span>{readingMinutes} minute read</span>}
-      </p>
+  <div class="grimoire-bg min-h-screen">
+    <section class="post-canvas mx-auto max-w-6xl px-4 py-12 lg:py-16">
+      <div class="post-panel panel">
+        <div class="post-layout grid grid-cols-1 lg:grid-cols-12">
+          <article class="post-article prose prose-neutral max-w-none lg:col-span-8">
+            {heroImage && (
+              <figure class="mb-6 overflow-hidden rounded-3xl border border-purple-100 bg-purple-50 shadow-sm">
+                <img
+                  src={heroImage}
+                  alt={heroAlt}
+                  loading="eager"
+                  class="h-auto w-full object-cover"
+                />
+              </figure>
+            )}
+            <h1 class="mb-2">{title}</h1>
+            <p class="post-meta mt-0 mb-4 text-sm">
+              {publishedAt && (
+                <time datetime={new Date(publishedAt).toISOString()}>
+                  {new Date(publishedAt).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </time>
+              )}
+              {(publishedAt || readingMinutes) && <span> · </span>}
+              {readingMinutes && <span>{readingMinutes} minute read</span>}
+            </p>
 
-      <div class="mb-6 flex flex-wrap gap-2 text-xs uppercase tracking-wide text-purple-600">
-        {Array.isArray(data.tags) &&
-          data.tags.map((tag: any) => (
-            <span class="rounded-full border border-purple-200 bg-purple-50 px-3 py-0.5">#{String(tag).toLowerCase()}</span>
-          ))}
+            <div class="mb-6 flex flex-wrap gap-2 text-xs uppercase tracking-wide text-purple-600">
+              {Array.isArray(data.tags) &&
+                data.tags.map((tag: any) => (
+                  <span class="rounded-full border border-purple-200 bg-purple-50 px-3 py-0.5">#{String(tag).toLowerCase()}</span>
+                ))}
+            </div>
+
+            <div class="prose prose-neutral max-w-none" set:html={html} />
+
+            <Disclosure show={hasAffiliates} />
+
+            {Array.isArray(data.downloadId) ? null : data.downloadId ? (
+              <DownloadCard id={String(data.downloadId)} />
+            ) : null}
+
+            <AdSlot slot="end" class="mt-10" />
+          </article>
+
+          <aside class="post-sidebar lg:col-span-4 lg:pl-6">
+            <div class="sticky top-24 space-y-6">
+              <AdSlot slot="side" />
+              <CtaFooter type={ctaType} id={ctaId} />
+              {resolvedEntities.length > 0 && (
+                <section class="post-entities soft-card">
+                  <h2 class="post-entities-title">Referenced entities</h2>
+                  <ul class="post-entities-list">
+                    {resolvedEntities.map((entity: any) => (
+                      <li>
+                        <a class="post-entities-link" href={entity.href}>
+                          {entity.name}
+                        </a>
+                        {entity.description && <p class="post-entities-summary">{entity.description}</p>}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+            </div>
+          </aside>
+        </div>
       </div>
 
-      <div class="prose prose-neutral max-w-none" set:html={html} />
-
-      <Disclosure show={hasAffiliates} />
-
-      {Array.isArray(data.downloadId) ? null : data.downloadId ? (
-        <DownloadCard id={String(data.downloadId)} />
-      ) : null}
-
-      <AdSlot slot="end" class="mt-10" />
-    </article>
-
-    <aside class="lg:col-span-4 lg:pl-6">
-      <div class="sticky top-24 space-y-6">
-        <AdSlot slot="side" />
-        <CtaFooter type={ctaType} id={ctaId} />
-        {resolvedEntities.length > 0 && (
-          <section class="rounded-3xl border border-purple-100 bg-white/70 p-5 shadow-sm">
-            <h2 class="text-sm font-semibold uppercase tracking-wide text-purple-600">Referenced entities</h2>
-            <ul class="mt-3 space-y-3 text-sm text-purple-800">
-              {resolvedEntities.map((entity: any) => (
-                <li>
-                  <a class="font-medium text-purple-700 underline-offset-4 hover:underline" href={entity.href}>
-                    {entity.name}
-                  </a>
-                  {entity.description && <p class="mt-1 text-xs text-purple-600">{entity.description}</p>}
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-      </div>
-    </aside>
+      <RelatedPosts currentSlug={effectiveSlug} tags={data.tags || []} prev={prev} next={next} />
+    </section>
   </div>
-
-  <RelatedPosts currentSlug={effectiveSlug} tags={data.tags || []} prev={prev} next={next} />
 </Base>
+
+<style>
+  .post-canvas {
+    display: grid;
+    gap: clamp(2rem, 5vw, 3rem);
+  }
+
+  .post-panel {
+    padding: clamp(1.85rem, 4.5vw, 2.85rem);
+    color: var(--ink-body, currentColor);
+  }
+
+  .post-layout {
+    align-items: start;
+    gap: clamp(1.75rem, 4vw, 2.75rem);
+  }
+
+  .post-article h1 {
+    color: var(--ink-strong, currentColor);
+  }
+
+  .post-meta {
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 82%, white 18%);
+  }
+
+  .post-sidebar .soft-card {
+    padding: clamp(1.4rem, 3.5vw, 1.95rem);
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .post-entities-title {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.32em;
+    color: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 68%, var(--ink-body, currentColor) 32%);
+  }
+
+  .post-entities-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.85rem;
+    font-size: 0.9rem;
+    color: color-mix(in srgb, var(--ink-body, currentColor) 88%, white 12%);
+  }
+
+  .post-entities-link {
+    font-weight: 600;
+    color: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 70%, var(--ink-strong, currentColor) 30%);
+    text-decoration: none;
+  }
+
+  .post-entities-link:hover,
+  .post-entities-link:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .post-entities-summary {
+    margin: 0.35rem 0 0;
+    font-size: 0.8rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 80%, white 20%);
+  }
+
+  @media (min-width: 1024px) {
+    .post-sidebar .soft-card {
+      position: relative;
+    }
+  }
+</style>
