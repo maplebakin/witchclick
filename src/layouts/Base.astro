@@ -61,10 +61,11 @@ const links = [
 ];
 
 const backgroundLayers = [
-  "var(--body-overlay, var(--surface-parchment-overlay))",
+  "var(--wc-bg-layer-1, var(--body-overlay, var(--surface-parchment-overlay)))",
+  "var(--wc-bg-layer-2, transparent)",
   "var(--body-texture, var(--surface-starfield))",
   "var(--body-surface, var(--surface-parchment))",
-  "var(--color-background)",
+  "var(--color-background, transparent)",
 ].join(", ");
 
 const ambientBase = ambientColor ?? theme.primary;
@@ -117,6 +118,7 @@ const bodyStyle = `
   --content-texture: ${contentTexture};
   --grimoire-ring-color: ${grimoireRingColor ?? "var(--glass-pill-border-active)"};
   background: ${backgroundLayers};
+  color: var(--ink-body, #111827);
 `;
 ---
 <html lang="en" class="scroll-smooth">
@@ -267,7 +269,7 @@ const bodyStyle = `
         border-radius: calc(var(--glass-panel-radius) / 2.2);
         border: 1px solid var(--glass-pill-border);
         background: linear-gradient(135deg, var(--glass-pill-gradient-start), var(--glass-pill-gradient-end));
-        color: var(--glass-pill-text);
+        color: var(--wc-ink-label, var(--glass-pill-text));
         text-transform: uppercase;
         font-variant: small-caps;
         font-variant-caps: all-small-caps;
@@ -291,7 +293,7 @@ const bodyStyle = `
         transform: translateY(-4px);
         border-color: var(--glass-pill-border-active);
         box-shadow: var(--glass-panel-shadow-hover);
-        color: var(--glass-pill-text-active);
+        color: var(--ink-strong, var(--glass-pill-text-active));
         background: linear-gradient(140deg, rgba(255, 255, 255, 0.95), rgba(221, 214, 254, 0.7));
       }
 
@@ -538,7 +540,21 @@ const bodyStyle = `
     <slot name="head" />
   </head>
 
-  <body class="min-h-screen text-gray-900" style={bodyStyle} data-type={bodyDataType}>
+  <body class="min-h-screen" style={bodyStyle} data-type={bodyDataType}>
+    <style is:inline>
+      :global(html),
+      :global(body) {
+        background:
+          var(--wc-bg-layer-1, var(--body-overlay, var(--surface-parchment-overlay))),
+          var(--wc-bg-layer-2, transparent),
+          var(--body-texture, var(--surface-starfield)),
+          var(--body-surface, var(--surface-parchment)),
+          var(--color-background, transparent);
+        background-attachment: fixed, fixed, fixed, fixed, fixed;
+        background-repeat: no-repeat, no-repeat, repeat, no-repeat, no-repeat;
+        background-size: cover, cover, auto, auto, auto;
+      }
+    </style>
     {/* Skip link for a11y */}
     <a
       href="#main"

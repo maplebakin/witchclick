@@ -8,36 +8,57 @@ const labelFor = (type: string) =>
     .replace(/^./, (char) => char.toUpperCase());
 ---
 <Base title="The Grimoire — WitchClick">
-  <section class="mx-auto max-w-5xl px-4 py-12 sm:py-16">
-    <h1 class="font-serif text-4xl tracking-tight text-neutral-900 sm:text-5xl">The Grimoire</h1>
-    <p class="mt-4 max-w-2xl text-lg text-neutral-600">
-      Choose your path through this digital grimoire — each chapter holds whispered wisdom waiting to unfold.
-    </p>
+  <div class="grimoire-bg min-h-screen">
+    <section class="mx-auto max-w-5xl px-4 py-12 sm:py-16">
+      <h1 class="font-serif text-4xl tracking-tight text-[color:var(--ink-strong)] sm:text-5xl">The Grimoire</h1>
+      <p class="mt-4 max-w-2xl text-lg text-[color:var(--ink-body)]">
+        Choose your path through this digital grimoire — each chapter holds whispered wisdom waiting to unfold.
+      </p>
 
-    <div class="mt-10 grid gap-6 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3">
-      {sections.map((section) => (
-        <a
-          href={section.href}
-          class="group flex h-full flex-col justify-between rounded-2xl border border-neutral-200/70 bg-white/60 p-6 shadow-sm transition-transform duration-300 ease-out hover:-translate-y-1 hover:border-indigo-300 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2"
-        >
-          <div>
-            <div class="flex items-center gap-3 text-3xl" aria-hidden="true">
-              <span>{section.icon}</span>
-              <span class="text-xs font-medium uppercase tracking-[0.2em] text-neutral-500">
-                {labelFor(section.type)}
-              </span>
+      <div class="mt-10 grid gap-6 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {sections.map((section) => (
+          <a
+            href={section.href}
+            class="entity-hub-card group flex h-full flex-col justify-between rounded-2xl border p-6 shadow-sm transition-transform duration-300 ease-out hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--glass-pill-border-active)] focus-visible:ring-offset-2"
+          >
+            <div>
+              <div class="flex items-center gap-3 text-3xl" aria-hidden="true">
+                <span>{section.icon}</span>
+                <span class="text-xs font-medium uppercase tracking-[0.2em] text-[color:var(--wc-ink-label)]">
+                  {labelFor(section.type)}
+                </span>
+              </div>
+              <h2 class="mt-4 font-serif text-2xl text-[color:var(--ink-strong)] transition-colors duration-300 group-hover:text-[color:var(--ink-strong)]">
+                {section.title}
+              </h2>
+              <p class="mt-2 text-base text-[color:var(--ink-body)]">{section.subtitle}</p>
             </div>
-            <h2 class="mt-4 font-serif text-2xl text-neutral-900 transition-colors duration-300 group-hover:text-indigo-600">
-              {section.title}
-            </h2>
-            <p class="mt-2 text-base text-neutral-600">{section.subtitle}</p>
-          </div>
-          <span class="mt-6 inline-flex items-center gap-2 text-sm font-medium text-indigo-600 transition-colors duration-300 group-hover:text-indigo-500">
-            Enter this chapter
-            <span aria-hidden="true">→</span>
-          </span>
-        </a>
-      ))}
-    </div>
-  </section>
+            <span class="mt-6 inline-flex items-center gap-2 text-sm font-medium text-[color:var(--wc-ink-label)] transition-colors duration-300 group-hover:text-[color:var(--ink-strong)]">
+              Enter this chapter
+              <span aria-hidden="true">→</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
+  </div>
 </Base>
+
+<style>
+  .entity-hub-card {
+    border-color: var(--panel-border-soft, rgba(124, 58, 237, 0.16));
+    background: color-mix(in oklab, white 78%, var(--surface-tint, hsl(270 55% 62%)) 22%);
+    color: var(--ink-body, currentColor);
+    box-shadow: var(--wc-shadow-soft, 0 20px 45px -25px rgba(15, 23, 42, 0.35));
+  }
+
+  .entity-hub-card:hover,
+  .entity-hub-card:focus-visible {
+    border-color: var(--panel-border-strong, rgba(124, 58, 237, 0.24));
+    box-shadow: var(--wc-shadow-strong, 0 25px 60px -30px rgba(15, 23, 42, 0.45));
+  }
+
+  .entity-hub-card:focus-visible {
+    box-shadow: var(--wc-shadow-strong, 0 25px 60px -30px rgba(15, 23, 42, 0.45)), 0 0 0 3px var(--glass-pill-border-active);
+  }
+</style>

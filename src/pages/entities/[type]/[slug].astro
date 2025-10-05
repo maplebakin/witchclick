@@ -107,7 +107,7 @@ function pretty(v: unknown) {
   }
 }
 ---
-<Base title={`${ent.name} — ${typeLabel} — WitchClick`} wide>
+<Base title={`${ent.name} — ${typeLabel} — WitchClick`} wide ambientColor={accentHex}>
   <article class="entity-page" style={themeVarString ? `${themeVarString};` : undefined}>
     <header class="entity-hero">
       <div class="entity-hero-sheen" aria-hidden="true" />
@@ -188,7 +188,7 @@ function pretty(v: unknown) {
     gap: 3rem;
     margin-top: 2rem;
     margin-bottom: 4rem;
-    color: #111827;
+    color: var(--ink-body, #111827);
   }
 
   .entity-hero {
@@ -266,7 +266,7 @@ function pretty(v: unknown) {
 
   .entity-detail-summary p {
     margin-top: 0.75rem;
-    color: #374151;
+    color: var(--ink-body, #111827);
     line-height: 1.7;
   }
 
@@ -294,7 +294,7 @@ function pretty(v: unknown) {
   .entity-property dd {
     margin: 0;
     font-size: 1rem;
-    color: #1f2937;
+    color: var(--ink-strong, #1f2937);
   }
 
   .entity-property pre {
@@ -326,7 +326,7 @@ function pretty(v: unknown) {
 
   .entity-stub-copy {
     font-size: 1rem;
-    color: #374151;
+    color: var(--ink-body, #111827);
   }
 
   .entity-related {
@@ -341,7 +341,7 @@ function pretty(v: unknown) {
   .entity-related-sub {
     margin-top: 0.25rem;
     font-size: 0.95rem;
-    color: #4b5563;
+    color: var(--ink-muted, #4b5563);
   }
 
   .entity-related-list {
@@ -366,7 +366,7 @@ function pretty(v: unknown) {
   }
 
   .entity-related-card p {
-    color: #374151;
+    color: var(--ink-body, #111827);
     font-size: 0.95rem;
   }
 
@@ -383,7 +383,7 @@ function pretty(v: unknown) {
     background: rgba(255, 255, 255, 0.7);
     border: 1px dashed var(--entity-accent-border, rgba(124, 58, 237, 0.25));
     text-align: center;
-    color: #4b5563;
+    color: var(--ink-muted, #4b5563);
   }
 
   @media (max-width: 768px) {

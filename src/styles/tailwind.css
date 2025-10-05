@@ -42,17 +42,36 @@
   --action-secondary-hover: color-mix(in srgb, white 90%, var(--ambient-color, var(--color-primary)) 10%);
   --action-secondary-border: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 35%, transparent);
   --action-secondary-text: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 62%, var(--ink-body) 38%);
+
+  /* Radii */
+  --wc-radius-lg: 1.5rem;
+  --wc-radius-xl: 1.75rem;
+  --wc-radius-xxl: 2rem;
+
+  /* Shadows */
+  --wc-shadow-soft: 0 12px 30px -18px rgb(17 24 39 / 0.18);
+  --wc-shadow-strong: 0 22px 60px -28px rgb(17 24 39 / 0.30);
+  --wc-shadow-lifted: 0 28px 60px -35px rgb(17 24 39 / 0.35);
+
+  /* Ink */
+  --wc-ink-label: color-mix(in oklab, var(--ink-strong) 72%, var(--ink-muted) 28%);
+
+  /* Parchment background (Option A: lilac parchment) */
+  --wc-bg-layer-1: radial-gradient(140% 80% at 50% -20%, oklch(0.94 0.08 300) 0%, transparent 65%);
+  --wc-bg-layer-2: linear-gradient(180deg, oklch(0.97 0.04 305) 0%, oklch(0.90 0.06 295) 100%);
 }
 
 body {
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background-color: var(--color-background, #faf7f5);
-  background-image: var(--body-overlay, var(--surface-parchment-overlay)),
+  background:
+    var(--wc-bg-layer-1, var(--body-overlay, var(--surface-parchment-overlay))),
+    var(--wc-bg-layer-2, transparent),
     var(--body-texture, var(--surface-starfield)),
-    var(--body-surface, var(--surface-parchment));
-  background-repeat: no-repeat, repeat, no-repeat;
-  background-size: cover, 720px 720px, cover;
-  background-attachment: fixed, fixed, fixed;
+    var(--body-surface, var(--surface-parchment)),
+    var(--color-background, transparent);
+  background-repeat: no-repeat, no-repeat, repeat, no-repeat, no-repeat;
+  background-size: cover, cover, auto, auto, auto;
+  background-attachment: fixed, fixed, fixed, fixed, fixed;
 }
 
 .grimoire-bg {
@@ -110,19 +129,19 @@ a {
   .panel,
   .soft-card {
     position: relative;
-    border-radius: var(--glass-panel-radius, 1.75rem);
+    border-radius: var(--wc-radius-xl, var(--glass-panel-radius, 1.75rem));
     border: 1px solid var(--panel-border-strong);
     background: color-mix(in oklab, white 65%, var(--surface-tint, hsl(270 50% 60%)) 35%);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    box-shadow: var(--shadow-2);
+    box-shadow: var(--wc-shadow-soft, var(--shadow-2));
     overflow: hidden;
   }
 
   .soft-card {
     border-color: var(--panel-border-soft);
     background: color-mix(in oklab, white 72%, var(--surface-tint, hsl(270 50% 60%)) 28%);
-    box-shadow: var(--shadow-1);
+    box-shadow: var(--wc-shadow-soft, var(--shadow-1));
   }
 
   .panel-muted {
