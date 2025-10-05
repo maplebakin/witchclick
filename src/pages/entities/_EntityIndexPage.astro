@@ -1,0 +1,147 @@
+---
+import Base from "../../layouts/Base.astro";
+import EntityCard from "../../components/EntityCard.astro";
+import { getTypeMetadata } from "../../data/typeMetadata";
+import { getEntitiesForType } from "../../utils/entityIndex";
+import { resolveTailwindColor, mixColors, toRgba } from "../../utils/color";
+import { toCssVariables } from "../../utils/style";
+
+interface Props {
+  type: string;
+}
+
+const { type } = Astro.props as Props;
+
+const metadata = getTypeMetadata(type);
+const entities = getEntitiesForType(type, metadata);
+
+function formatTypeLabel(value: string): string {
+  const spaced = value.replace(/[-_]/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2");
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+}
+
+const accentHex = resolveTailwindColor(metadata.themeColor);
+const accentStrong = mixColors(accentHex, "#1f2937", 0.45);
+const accentMuted = toRgba(accentHex, 0.75);
+const accentBody = mixColors(accentHex, "#334155", 0.65);
+const accentBorder = toRgba(accentHex, 0.35);
+const accentPanelBg = toRgba(accentHex, 0.12);
+const accentPanelBorder = toRgba(accentHex, 0.25);
+const accentIcon = toRgba(accentHex, 0.25);
+
+const sectionVars = toCssVariables({
+  "index-accent": accentHex,
+  "index-accent-strong": accentStrong,
+  "index-accent-muted": accentMuted,
+  "index-accent-body": accentBody,
+  "index-accent-border": accentBorder,
+  "index-accent-panel-bg": accentPanelBg,
+  "index-accent-panel-border": accentPanelBorder,
+  "index-accent-icon": accentIcon,
+});
+
+const sectionStyle = sectionVars ? `${sectionVars};` : undefined;
+const typeLabel = formatTypeLabel(type);
+const lowerTypeLabel = typeLabel.toLowerCase();
+---
+<Base title={metadata.title} description={metadata.subtitle}>
+  <section class="entity-index py-12" style={sectionStyle}>
+    <header class="entity-header space-y-4">
+      <h1 class="entity-heading text-4xl font-serif leading-tight">
+        <span class="entity-heading-icon" aria-hidden="true">{metadata.icon}</span>
+        <span class="entity-heading-text">{metadata.title}</span>
+        <span class="entity-heading-subtitle">{metadata.subtitle}</span>
+      </h1>
+      <p class="entity-intro max-w-3xl text-base leading-relaxed">{metadata.introText}</p>
+    </header>
+
+    {entities.length === 0 ? (
+      <p class="entity-empty mt-10 rounded-2xl border border-dashed p-6 text-sm">
+        No {lowerTypeLabel} entries have been catalogued yet. Add JSON files under
+        <code class="entity-empty-code">content/entities/{type}</code> to begin weaving this index.
+      </p>
+    ) : (
+      <div class="entity-grid mt-10 grid gap-6 sm:grid-cols-2">
+        {entities.map((entity) => (
+          <EntityCard
+            type={entity.type}
+            slug={entity.slug}
+            name={entity.name}
+            summary={entity.summary}
+            tags={entity.tags}
+            isStub={entity.isStub}
+            variant="grimoire"
+            theme={metadata}
+          />
+        ))}
+      </div>
+    )}
+  </section>
+</Base>
+
+<style>
+  .entity-index {
+    color: #1f2933;
+  }
+
+  .entity-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .entity-heading-icon {
+    font-size: 2.75rem;
+    line-height: 1;
+    color: var(--index-accent-icon, rgba(124, 58, 237, 0.25));
+  }
+
+  .entity-heading-text {
+    color: var(--index-accent-strong, #4c1d95);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .entity-heading-subtitle {
+    font-size: 1.05rem;
+    font-weight: 400;
+    color: var(--index-accent-muted, rgba(124, 58, 237, 0.75));
+  }
+
+  .entity-intro {
+    color: var(--index-accent-body, #4b5563);
+  }
+
+  .entity-empty {
+    border-color: var(--index-accent-border, rgba(124, 58, 237, 0.35));
+    background-color: var(--index-accent-panel-bg, rgba(124, 58, 237, 0.12));
+    color: var(--index-accent-body, #4b5563);
+  }
+
+  .entity-empty code {
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.5rem;
+    color: inherit;
+  }
+
+  .entity-grid {
+    position: relative;
+  }
+
+  @media (min-width: 640px) {
+    .entity-heading {
+      flex-direction: row;
+      align-items: baseline;
+    }
+
+    .entity-heading-icon {
+      font-size: 2.5rem;
+    }
+
+    .entity-heading-subtitle {
+      margin-left: 1rem;
+    }
+  }
+</style>
