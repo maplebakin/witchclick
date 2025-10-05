@@ -78,94 +78,327 @@ function resolveDate(data) {
   description={tagline}
   ogImage={heroOgImage ?? ""}
 >
-  <Hero
-    eyebrow="Fresh from the coven"
-    title={heroTitle}
-    description={heroDescription}
-    backgroundImage={heroBackgroundImage}
-    imageAlt={heroImageAlt}
-    ctaButtons={heroCtaButtons}
-  />
-
-  <section class="mt-12">
-    <div class="flex flex-wrap items-baseline justify-between gap-4">
-      <h2 class="text-2xl font-semibold text-purple-900">Latest rituals &amp; planners</h2>
-      {totalPages > 1 && (
-        <a class="text-sm font-medium text-purple-700 underline-offset-4 hover:underline" href="/page/2">
-          Browse the archive →
-        </a>
-      )}
+  <section class="home-canvas mx-auto max-w-5xl px-4 py-12 sm:py-16">
+    <div class="panel home-hero">
+      <Hero
+        eyebrow="Fresh from the coven"
+        title={heroTitle}
+        description={heroDescription}
+        backgroundImage={heroBackgroundImage}
+        imageAlt={heroImageAlt}
+        ctaButtons={heroCtaButtons}
+      />
     </div>
 
-    {hero && (
-      <div class="mt-6 grid gap-6 md:grid-cols-3">
-        <article class="md:col-span-2 rounded-3xl border border-purple-100 bg-white/80 p-6 shadow-sm">
-          <p class="text-xs uppercase tracking-wide text-purple-500">Featured guide</p>
-          <h3 class="mt-2 text-2xl font-semibold text-purple-900">{hero.title}</h3>
-          <p class="mt-3 text-sm text-purple-700">{hero.excerpt}</p>
-          <div class="mt-4 flex flex-wrap gap-2 text-xs">
-            {hero.readingMinutes && (
-              <span class="rounded-full border border-purple-200 bg-purple-50 px-3 py-0.5">⏱️ {hero.readingMinutes} min read</span>
-            )}
-            {hero.tags.slice(0, 4).map((tag) => (
-              <span class="rounded-full border border-purple-200 bg-purple-50 px-3 py-0.5">#{String(tag).toLowerCase()}</span>
-            ))}
-          </div>
-          <a
-            class="mt-6 inline-flex items-center gap-2 text-sm font-medium text-purple-700 underline-offset-4 hover:underline"
-            href={hero.href}
-          >
-            Dive into the ritual
-            <span aria-hidden="true">→</span>
+    <div class="panel home-feed">
+      <div class="home-feed-header">
+        <h2 class="home-feed-title font-serif">Latest rituals &amp; planners</h2>
+        {totalPages > 1 && (
+          <a class="home-feed-link" href="/page/2">
+            Browse the archive →
           </a>
-        </article>
-        <div class="rounded-3xl border border-purple-100 bg-white/70 p-6 shadow-sm">
-          <h3 class="text-lg font-semibold text-purple-900">Need a cozy starting place?</h3>
-          <p class="mt-3 text-sm text-purple-700">
-            Browse guided spreads, gentle accountability planners, and grounding prompts to keep your routines soft and sustainable.
-          </p>
-          <ul class="mt-4 space-y-2 text-sm text-purple-700">
-            <li>• <a class="underline-offset-4 hover:underline" href="/downloads">Printable downloads</a></li>
-            <li>• <a class="underline-offset-4 hover:underline" href="/entities">Entity library &amp; correspondences</a></li>
-            <li>• <a class="underline-offset-4 hover:underline" href="/post/pre-interview-grounding-ritual">Pre-interview grounding ritual</a></li>
-          </ul>
-        </div>
+        )}
       </div>
-    )}
 
-    {hasPosts ? (
-      gridPosts.length > 0 ? (
-        <div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {gridPosts.map((post) => {
-            const card = toViewModel(post);
-            return (
-              <PostCard
-                post={{
-                  slug: card.slug,
-                  title: card.title,
-                  excerpt: card.excerpt,
-                  tags: card.tags,
-                  readingMinutes: card.readingMinutes,
-                  publishedAt: card.publishedAt,
-                }}
-                href={card.href}
-              />
-            );
-          })}
+      {hero && (
+        <div class="home-feature">
+          <article class="soft-card home-feature-card">
+            <p class="home-feature-eyebrow">Featured guide</p>
+            <h3 class="home-feature-title font-serif">{hero.title}</h3>
+            <p class="home-feature-summary">{hero.excerpt}</p>
+            <div class="home-feature-meta">
+              {hero.readingMinutes && <span>⏱️ {hero.readingMinutes} min read</span>}
+              {hero.tags.slice(0, 4).map((tag) => (
+                <span>#{String(tag).toLowerCase()}</span>
+              ))}
+            </div>
+            <a class="home-feature-link" href={hero.href}>
+              Dive into the ritual
+              <span aria-hidden="true">→</span>
+            </a>
+          </article>
+
+          <aside class="soft-card home-callout" aria-labelledby="home-callout-heading">
+            <h3 id="home-callout-heading" class="font-serif">Need a cozy starting place?</h3>
+            <p>
+              Browse guided spreads, gentle accountability planners, and grounding prompts to keep your routines soft and sustainable.
+            </p>
+            <ul class="home-callout-list">
+              <li><a href="/downloads">Printable downloads</a></li>
+              <li><a href="/entities">Entity library &amp; correspondences</a></li>
+              <li><a href="/post/pre-interview-grounding-ritual">Pre-interview grounding ritual</a></li>
+            </ul>
+          </aside>
         </div>
+      )}
+
+      {hasPosts ? (
+        gridPosts.length > 0 ? (
+          <div class="home-grid grid grid-cols-1 sm:grid-cols-2">
+            {gridPosts.map((post) => {
+              const card = toViewModel(post);
+              return (
+                <PostCard
+                  post={{
+                    slug: card.slug,
+                    title: card.title,
+                    excerpt: card.excerpt,
+                    tags: card.tags,
+                    readingMinutes: card.readingMinutes,
+                    publishedAt: card.publishedAt,
+                  }}
+                  href={card.href}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <p class="home-empty">
+            More guides are brewing. Check back soon or explore the archive below.
+          </p>
+        )
       ) : (
-        <p class="mt-8 text-sm text-purple-700/70">
-          More guides are brewing. Check back soon or explore the archive below.
+        <p class="home-empty">
+          No posts found yet. Add a Markdown file to <code>content/posts</code> to get started.
         </p>
-      )
-    ) : (
-      <p class="mt-8 text-sm text-purple-700/70">
-        No posts found yet. Add a Markdown file to <code>content/posts</code> to get started.
-      </p>
-    )}
+      )}
+    </div>
   </section>
 
   {totalPages > 1 ? (
-    <Pagination page={1} totalPages={totalPages} baseHref="/page" />
+    <div class="mx-auto max-w-5xl px-4">
+      <Pagination page={1} totalPages={totalPages} baseHref="/page" />
+    </div>
   ) : null}
 </Base>
+
+<style>
+  .home-canvas {
+    display: grid;
+    gap: clamp(2rem, 5vw, 3.5rem);
+    color: var(--ink-body, currentColor);
+  }
+
+  .home-hero {
+    padding: clamp(1.75rem, 4vw, 2.75rem);
+  }
+
+  .home-hero > section {
+    background: transparent;
+    border: 0;
+    border-radius: clamp(1.5rem, 4vw, 2.25rem);
+    box-shadow: none;
+    padding: 0;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .home-hero > section .text-xs {
+    letter-spacing: 0.32em;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 82%, white 18%);
+  }
+
+  .home-hero > section h1 {
+    color: var(--ink-strong, currentColor);
+    font-family: var(--font-serif, inherit);
+  }
+
+  .home-hero > section p {
+    color: color-mix(in srgb, var(--ink-body, currentColor) 92%, white 8%);
+  }
+
+  .home-hero :is(a.bg-purple-700) {
+    background: var(--action-primary);
+    color: var(--action-primary-text);
+    border-color: transparent;
+  }
+
+  .home-hero :is(a.bg-purple-700):hover,
+  .home-hero :is(a.bg-purple-700):focus-visible {
+    background: var(--action-primary-hover);
+  }
+
+  .home-hero :is(a.border) {
+    background: var(--action-secondary-surface);
+    border-color: var(--action-secondary-border);
+    color: var(--action-secondary-text);
+  }
+
+  .home-hero :is(a.border):hover,
+  .home-hero :is(a.border):focus-visible {
+    background: var(--action-secondary-hover);
+  }
+
+  .home-feed {
+    padding: clamp(1.75rem, 4vw, 2.85rem);
+    display: grid;
+    gap: clamp(1.75rem, 4vw, 2.6rem);
+  }
+
+  .home-feed-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .home-feed-title {
+    margin: 0;
+    font-size: clamp(1.75rem, 3vw, 2rem);
+    font-weight: 600;
+    color: var(--ink-strong, currentColor);
+  }
+
+  .home-feed-link {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 68%, var(--ink-body, currentColor) 32%);
+    text-decoration: none;
+  }
+
+  .home-feed-link:hover,
+  .home-feed-link:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+  }
+
+  .home-feature {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.1rem);
+  }
+
+  @media (min-width: 768px) {
+    .home-feature {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      align-items: stretch;
+    }
+  }
+
+  .home-feature-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    padding: clamp(1.5rem, 3.5vw, 2.2rem);
+  }
+
+  .home-feature-eyebrow {
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 82%, white 18%);
+    margin: 0;
+  }
+
+  .home-feature-title {
+    margin: 0;
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    color: var(--ink-strong, currentColor);
+  }
+
+  .home-feature-summary {
+    margin: 0;
+    color: var(--ink-body, currentColor);
+  }
+
+  .home-feature-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--ink-muted, currentColor);
+  }
+
+  .home-feature-meta span {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid var(--panel-border-soft);
+    padding: 0.35rem 0.85rem;
+    background: color-mix(in srgb, var(--panel-surface-soft) 88%, transparent);
+  }
+
+  .home-feature-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 66%, var(--ink-body, currentColor) 34%);
+    text-decoration: none;
+  }
+
+  .home-feature-link:hover,
+  .home-feature-link:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+  }
+
+  .home-callout {
+    padding: clamp(1.5rem, 3vw, 2rem);
+    display: grid;
+    gap: 1rem;
+    color: var(--ink-body, currentColor);
+  }
+
+  .home-callout p {
+    margin: 0;
+  }
+
+  .home-callout h3 {
+    margin: 0;
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    color: var(--ink-strong, currentColor);
+  }
+
+  .home-callout-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.65rem;
+    font-size: 0.95rem;
+  }
+
+  .home-callout-list li {
+    position: relative;
+    padding-left: 1.2rem;
+  }
+
+  .home-callout-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 65%, var(--ink-body, currentColor) 35%);
+  }
+
+  .home-callout a {
+    color: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 65%, var(--ink-body, currentColor) 35%);
+    text-decoration: none;
+  }
+
+  .home-callout a:hover,
+  .home-callout a:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 5px;
+  }
+
+  .home-grid {
+    gap: clamp(1.5rem, 3vw, 2.35rem);
+  }
+
+  .home-grid .card-panel {
+    color: var(--ink-strong, currentColor);
+  }
+
+  .home-empty {
+    margin: 0;
+    font-size: 0.95rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 85%, white 15%);
+  }
+
+  .home-empty code {
+    padding: 0.2rem 0.45rem;
+    border-radius: 0.6rem;
+    background: color-mix(in srgb, var(--panel-surface-soft) 88%, transparent);
+  }
+</style>
