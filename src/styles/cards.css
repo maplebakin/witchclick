@@ -27,12 +27,12 @@
 .card-panel {
   position: relative;
   display: block;
-  border-radius: var(--card-radius);
+  border-radius: var(--wc-radius-lg, var(--card-radius, 1.5rem));
   padding: var(--card-panel-padding, 1.5rem);
   border: 1px solid var(--card-panel-border);
   background: var(--card-panel-surface);
   backdrop-filter: blur(18px);
-  box-shadow: var(--card-elevation-base, var(--elevation-tier-1));
+  box-shadow: var(--card-elevation-base, var(--wc-shadow-soft, var(--elevation-tier-1)));
   color: inherit;
   overflow: hidden;
   transition: transform var(--card-transition), box-shadow var(--card-transition), border-color var(--card-transition);
