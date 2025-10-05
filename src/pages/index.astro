@@ -90,7 +90,7 @@ function resolveDate(data) {
         ctaButtons={heroCtaButtons}
       />
 
-      <section class="home-feed panel shadow-2" aria-labelledby="latest-heading">
+      <section class="home-feed panel" aria-labelledby="latest-heading">
         <div class="home-feed-header">
           <h2 id="latest-heading" class="home-feed-title font-serif">Latest rituals &amp; planners</h2>
           {totalPages > 1 && (
@@ -102,7 +102,7 @@ function resolveDate(data) {
 
         {hero && (
           <div class="home-feature">
-            <article class="soft-card shadow-1 home-feature-card">
+            <article class="soft-card home-feature-card">
               <p class="home-feature-eyebrow">Featured guide</p>
               <h3 class="home-feature-title font-serif">{hero.title}</h3>
               <p class="home-feature-summary">{hero.excerpt}</p>
@@ -118,7 +118,7 @@ function resolveDate(data) {
               </a>
             </article>
 
-            <aside class="soft-card shadow-1 home-callout" aria-labelledby="home-callout-heading">
+            <aside class="soft-card home-callout" aria-labelledby="home-callout-heading">
               <h3 id="home-callout-heading" class="font-serif">Need a cozy starting place?</h3>
               <p>
                 Browse guided spreads, gentle accountability planners, and grounding prompts to keep your routines soft and sustainable.
