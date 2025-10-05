@@ -1,14 +1,111 @@
 ---
 export interface Props {
-type: string;
-slug: string;
-name: string;
-summary?: string;
+  type: string;
+  slug: string;
+  name: string;
+  summary?: string;
+  tags?: string[];
+  variant?: "default" | "grimoire";
+  isStub?: boolean;
 }
-const { type, slug, name, summary = '' } = Astro.props as Props;
+
+const {
+  type,
+  slug,
+  name,
+  summary = "",
+  tags = [],
+  variant = "default",
+  isStub = false,
+} = Astro.props as Props;
+
+const summaryText = typeof summary === "string" ? summary.trim() : "";
+const stubFromSummary = summaryText ? /stub entity/i.test(summaryText) : false;
+const showStubBadge = variant === "grimoire" && (isStub || stubFromSummary);
+
+const keywords = Array.isArray(tags)
+  ? Array.from(
+      new Map(
+        tags
+          .map((tag) => (typeof tag === "string" ? tag.trim() : ""))
+          .filter(Boolean)
+          .map((tag) => [tag.toLowerCase(), tag])
+      ).values()
+    )
+  : [];
+
+const displaySummary = variant === "grimoire" ? (stubFromSummary ? "" : summaryText) : summaryText;
+
+const placeholderSummary =
+  variant === "grimoire" && showStubBadge
+    ? "Lore pending — the scribes are still etching this crystal’s mysteries."
+    : "";
+
+const summaryContent = displaySummary || placeholderSummary;
+
+const typeLabel =
+  variant === "grimoire"
+    ? type
+        .split(/[-_\s]+/)
+        .map((part) => (part ? part[0].toUpperCase() + part.slice(1) : ""))
+        .join(" ")
+    : type;
 ---
-<a href={`/entities/${type}/${slug}`} class="card block p-5 group">
-<div class="text-xs uppercase tracking-wider text-neutral-400 mb-2">{type}</div>
-<h3 class="text-lg font-semibold group-hover:text-plum-300">{name}</h3>
-{summary && <p class="mt-2 text-neutral-300 text-sm">{summary}</p>}
-</a>
+{variant === "grimoire" ? (
+  <a
+    href={`/entities/${type}/${slug}`}
+    class="relative block overflow-hidden rounded-3xl border border-purple-200/40 bg-gradient-to-br from-purple-50/80 via-white/80 to-indigo-100/60 p-6 shadow-[0_20px_45px_-25px_rgba(88,28,135,0.55)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_25px_60px_-30px_rgba(88,28,135,0.7)]"
+  >
+    <span
+      aria-hidden
+      class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(216,180,254,0.25),_transparent_65%)]"
+    />
+    <span
+      aria-hidden
+      class="pointer-events-none absolute -top-8 right-8 h-28 w-28 rounded-full border border-purple-200/40 bg-gradient-to-br from-purple-100/60 via-transparent to-transparent blur-xl"
+    />
+    <span
+      aria-hidden
+      class="pointer-events-none absolute bottom-0 left-0 h-24 w-24 -translate-x-10 translate-y-12 rotate-12 bg-gradient-to-tr from-rose-100/50 via-purple-100/30 to-transparent blur-3xl"
+    />
+    <span aria-hidden class="pointer-events-none absolute top-5 right-6 text-4xl text-purple-200">✶</span>
+
+    <div class="relative z-10 flex h-full flex-col gap-4">
+      <div class="flex items-start justify-between gap-3">
+        <span class="text-xs uppercase tracking-[0.35em] text-purple-500/80">{typeLabel}</span>
+        {showStubBadge && (
+          <span class="rounded-full border border-purple-200/60 bg-purple-50/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-purple-600 shadow-sm">
+            Lore in progress
+          </span>
+        )}
+      </div>
+
+      <div class="space-y-3">
+        <h3 class="text-2xl font-serif tracking-wide text-purple-900 drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]">
+          {name}
+        </h3>
+        {summaryContent && <p class="text-sm italic text-purple-700/90">{summaryContent}</p>}
+      </div>
+
+      {keywords.length > 0 ? (
+        <div class="mt-auto flex flex-wrap gap-2">
+          {keywords.map((tag) => (
+            <span class="rounded-full border border-purple-200/50 bg-white/60 px-3 py-1 text-xs uppercase tracking-wide text-purple-600 shadow-[0_2px_6px_rgba(88,28,135,0.12)]">
+              {tag}
+            </span>
+          ))}
+        </div>
+      ) : (
+        showStubBadge && (
+          <p class="mt-auto text-xs uppercase tracking-[0.25em] text-purple-300">Keywords forthcoming</p>
+        )
+      )}
+    </div>
+  </a>
+) : (
+  <a href={`/entities/${type}/${slug}`} class="card block p-5 group">
+    <div class="text-xs uppercase tracking-wider text-neutral-400 mb-2">{type}</div>
+    <h3 class="text-lg font-semibold group-hover:text-plum-300">{name}</h3>
+    {displaySummary && <p class="mt-2 text-neutral-300 text-sm">{displaySummary}</p>}
+  </a>
+)}
