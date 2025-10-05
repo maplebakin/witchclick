@@ -49,6 +49,67 @@ body {
   background-attachment: fixed, fixed, fixed;
 }
 
+.grimoire-bg {
+  position: relative;
+  isolation: isolate;
+  min-height: 100%;
+  background-image: radial-gradient(
+      140% 120% at 18% -10%,
+      color-mix(in srgb, rgba(167, 139, 250, 0.32) 85%, transparent) 0%,
+      transparent 65%
+    ),
+    radial-gradient(
+      140% 120% at 82% -5%,
+      color-mix(in srgb, rgba(244, 219, 255, 0.3) 75%, transparent) 0%,
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, rgba(255, 255, 255, 0.95) 88%, transparent) 0%,
+      color-mix(in srgb, rgba(250, 247, 245, 0.92) 90%, transparent) 45%,
+      color-mix(in srgb, rgba(244, 240, 236, 0.88) 95%, transparent) 100%
+    );
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.grimoire-bg::before {
+  content: "";
+  position: absolute;
+  inset: -12% -10% -18%;
+  background:
+    radial-gradient(
+      120% 120% at 50% 108%,
+      color-mix(in srgb, var(--glow-ember, rgba(124, 58, 237, 0.18)) 75%, transparent) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      120% 120% at 50% -6%,
+      color-mix(in srgb, rgba(255, 255, 255, 0.65) 85%, transparent) 0%,
+      transparent 72%
+    );
+  opacity: 0.85;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  z-index: 0;
+}
+
+.grimoire-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(95% 85% at 50% 12%, rgba(255, 255, 255, 0.4), transparent 72%);
+  pointer-events: none;
+  opacity: 0.55;
+  mix-blend-mode: screen;
+  z-index: 0;
+}
+
+.grimoire-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
 .prose {
   font-family: var(--font-serif, Literata, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif);
 }
@@ -107,6 +168,77 @@ a {
 
   .panel > *,
   .soft-card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .grimoire-card {
+    position: relative;
+    border-radius: var(--glass-panel-radius, 1.75rem);
+    border: 1px solid color-mix(in srgb, var(--glass-panel-border) 78%, transparent);
+    background:
+      radial-gradient(
+        125% 120% at 18% -8%,
+        color-mix(in srgb, var(--glass-panel-overlay, transparent) 75%, transparent) 0%,
+        transparent 68%
+      ),
+      radial-gradient(
+        115% 115% at 82% -6%,
+        color-mix(in srgb, var(--glass-panel-overlay, transparent) 55%, transparent) 0%,
+        transparent 72%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, rgba(255, 255, 255, 0.96) 88%, transparent) 0%,
+        color-mix(in srgb, rgba(248, 244, 255, 0.92) 68%, transparent) 55%,
+        color-mix(in srgb, rgba(243, 236, 231, 0.88) 82%, transparent) 100%
+      );
+    backdrop-filter: blur(calc(var(--glass-panel-blur, 18px) * 1.08));
+    -webkit-backdrop-filter: blur(calc(var(--glass-panel-blur, 18px) * 1.08));
+    box-shadow: var(--glass-panel-shadow, var(--elevation-tier-1));
+    overflow: hidden;
+  }
+
+  .grimoire-card::before {
+    content: "";
+    position: absolute;
+    inset: -18% -16% -28%;
+    background:
+      radial-gradient(
+        120% 120% at 12% -15%,
+        color-mix(in srgb, var(--glow-iris, rgba(167, 139, 250, 0.35)) 82%, transparent) 0%,
+        transparent 72%
+      ),
+      radial-gradient(
+        145% 135% at 88% -12%,
+        color-mix(in srgb, var(--glow-horizon, rgba(244, 219, 255, 0.32)) 78%, transparent) 0%,
+        transparent 70%
+      ),
+      radial-gradient(
+        160% 120% at 50% 112%,
+        color-mix(in srgb, var(--glow-ember, rgba(91, 33, 182, 0.22)) 75%, transparent) 0%,
+        transparent 72%
+      );
+    opacity: 0.65;
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .grimoire-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(80% 75% at 50% 15%, rgba(255, 255, 255, 0.55), transparent 68%),
+      radial-gradient(100% 100% at 50% 120%, rgba(15, 23, 42, 0.08), transparent 70%);
+    opacity: 0.75;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .grimoire-card > * {
     position: relative;
     z-index: 1;
   }
