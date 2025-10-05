@@ -77,3 +77,12 @@ export type TypeMetadata = typeof typeMetadata;
 export const getTypeMetadata = (type: string): TypeMetadataEntry => {
   return typeMetadata[type as keyof TypeMetadata] ?? defaultMetadata;
 };
+
+export const sections = Object.entries(typeMetadata).map(([type, metadata]) => ({
+  type,
+  title: metadata.title,
+  subtitle: metadata.subtitle,
+  icon: metadata.icon,
+  href: `/entities/${type}/`,
+  themeColor: metadata.themeColor,
+}));
