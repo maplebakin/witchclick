@@ -78,98 +78,100 @@ function resolveDate(data) {
   description={tagline}
   ogImage={heroOgImage ?? ""}
 >
-  <section class="home-canvas mx-auto max-w-5xl px-4 py-12 sm:py-16">
-    <div class="panel home-hero">
-      <Hero
-        eyebrow="Fresh from the coven"
-        title={heroTitle}
-        description={heroDescription}
-        backgroundImage={heroBackgroundImage}
-        imageAlt={heroImageAlt}
-        ctaButtons={heroCtaButtons}
-      />
-    </div>
-
-    <div class="panel home-feed">
-      <div class="home-feed-header">
-        <h2 class="home-feed-title font-serif">Latest rituals &amp; planners</h2>
-        {totalPages > 1 && (
-          <a class="home-feed-link" href="/page/2">
-            Browse the archive →
-          </a>
-        )}
+  <div class="grimoire-bg min-h-screen">
+    <section class="home-canvas mx-auto max-w-5xl px-4 py-12 sm:py-16">
+      <div class="grimoire-card home-hero">
+        <Hero
+          eyebrow="Fresh from the coven"
+          title={heroTitle}
+          description={heroDescription}
+          backgroundImage={heroBackgroundImage}
+          imageAlt={heroImageAlt}
+          ctaButtons={heroCtaButtons}
+        />
       </div>
 
-      {hero && (
-        <div class="home-feature">
-          <article class="soft-card home-feature-card">
-            <p class="home-feature-eyebrow">Featured guide</p>
-            <h3 class="home-feature-title font-serif">{hero.title}</h3>
-            <p class="home-feature-summary">{hero.excerpt}</p>
-            <div class="home-feature-meta">
-              {hero.readingMinutes && <span>⏱️ {hero.readingMinutes} min read</span>}
-              {hero.tags.slice(0, 4).map((tag) => (
-                <span>#{String(tag).toLowerCase()}</span>
-              ))}
-            </div>
-            <a class="home-feature-link" href={hero.href}>
-              Dive into the ritual
-              <span aria-hidden="true">→</span>
+      <div class="grimoire-card home-feed">
+        <div class="home-feed-header">
+          <h2 class="home-feed-title font-serif">Latest rituals &amp; planners</h2>
+          {totalPages > 1 && (
+            <a class="home-feed-link" href="/page/2">
+              Browse the archive →
             </a>
-          </article>
-
-          <aside class="soft-card home-callout" aria-labelledby="home-callout-heading">
-            <h3 id="home-callout-heading" class="font-serif">Need a cozy starting place?</h3>
-            <p>
-              Browse guided spreads, gentle accountability planners, and grounding prompts to keep your routines soft and sustainable.
-            </p>
-            <ul class="home-callout-list">
-              <li><a href="/downloads">Printable downloads</a></li>
-              <li><a href="/entities">Entity library &amp; correspondences</a></li>
-              <li><a href="/post/pre-interview-grounding-ritual">Pre-interview grounding ritual</a></li>
-            </ul>
-          </aside>
+          )}
         </div>
-      )}
 
-      {hasPosts ? (
-        gridPosts.length > 0 ? (
-          <div class="home-grid grid grid-cols-1 sm:grid-cols-2">
-            {gridPosts.map((post) => {
-              const card = toViewModel(post);
-              return (
-                <PostCard
-                  post={{
-                    slug: card.slug,
-                    title: card.title,
-                    excerpt: card.excerpt,
-                    tags: card.tags,
-                    readingMinutes: card.readingMinutes,
-                    publishedAt: card.publishedAt,
-                  }}
-                  href={card.href}
-                />
-              );
-            })}
+        {hero && (
+          <div class="home-feature">
+            <article class="grimoire-card home-feature-card">
+              <p class="home-feature-eyebrow">Featured guide</p>
+              <h3 class="home-feature-title font-serif">{hero.title}</h3>
+              <p class="home-feature-summary">{hero.excerpt}</p>
+              <div class="home-feature-meta">
+                {hero.readingMinutes && <span>⏱️ {hero.readingMinutes} min read</span>}
+                {hero.tags.slice(0, 4).map((tag) => (
+                  <span>#{String(tag).toLowerCase()}</span>
+                ))}
+              </div>
+              <a class="home-feature-link" href={hero.href}>
+                Dive into the ritual
+                <span aria-hidden="true">→</span>
+              </a>
+            </article>
+
+            <aside class="grimoire-card home-callout" aria-labelledby="home-callout-heading">
+              <h3 id="home-callout-heading" class="font-serif">Need a cozy starting place?</h3>
+              <p>
+                Browse guided spreads, gentle accountability planners, and grounding prompts to keep your routines soft and sustainable.
+              </p>
+              <ul class="home-callout-list">
+                <li><a href="/downloads">Printable downloads</a></li>
+                <li><a href="/entities">Entity library &amp; correspondences</a></li>
+                <li><a href="/post/pre-interview-grounding-ritual">Pre-interview grounding ritual</a></li>
+              </ul>
+            </aside>
           </div>
+        )}
+
+        {hasPosts ? (
+          gridPosts.length > 0 ? (
+            <div class="home-grid grid grid-cols-1 sm:grid-cols-2">
+              {gridPosts.map((post) => {
+                const card = toViewModel(post);
+                return (
+                  <PostCard
+                    post={{
+                      slug: card.slug,
+                      title: card.title,
+                      excerpt: card.excerpt,
+                      tags: card.tags,
+                      readingMinutes: card.readingMinutes,
+                      publishedAt: card.publishedAt,
+                    }}
+                    href={card.href}
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            <p class="home-empty">
+              More guides are brewing. Check back soon or explore the archive below.
+            </p>
+          )
         ) : (
           <p class="home-empty">
-            More guides are brewing. Check back soon or explore the archive below.
+            No posts found yet. Add a Markdown file to <code>content/posts</code> to get started.
           </p>
-        )
-      ) : (
-        <p class="home-empty">
-          No posts found yet. Add a Markdown file to <code>content/posts</code> to get started.
-        </p>
-      )}
-    </div>
-  </section>
+        )}
+      </div>
+    </section>
 
-  {totalPages > 1 ? (
-    <div class="mx-auto max-w-5xl px-4">
-      <Pagination page={1} totalPages={totalPages} baseHref="/page" />
-    </div>
-  ) : null}
+    {totalPages > 1 ? (
+      <div class="mx-auto max-w-5xl px-4 pb-12">
+        <Pagination page={1} totalPages={totalPages} baseHref="/page" />
+      </div>
+    ) : null}
+  </div>
 </Base>
 
 <style>
