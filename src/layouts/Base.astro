@@ -3,9 +3,10 @@
 import "../styles/tailwind.css";
 import "../styles/cards.css";
 import SearchBox from "../components/SearchBox.astro";
+import { typeMetadata } from "../data/typeMetadata";
 import { readSettings, getSiteOrigin, toAbsoluteUrl } from "../utils/settings";
 import { getTheme } from "../utils/theme";
-import { mixColors, toRgba } from "../utils/color";
+import { mixColors, resolveTailwindColor, toRgba } from "../utils/color";
 
 const props = Astro.props || {};
 const {
@@ -39,9 +40,14 @@ const theme = getTheme();
 const headerWidthClass = wide ? "max-w-6xl" : "max-w-4xl";
 const mainWidthClass = wide ? "max-w-6xl" : "max-w-3xl";
 
+const grimoireChapters = Object.entries(typeMetadata).map(([type, metadata]) => ({
+  title: metadata.title,
+  icon: metadata.icon,
+  href: `/entities/${type}`,
+}));
+
 const links = [
   { href: "/", label: "Home" },
-  { href: "/entities", label: "Entities" },
   { href: "/downloads", label: "Downloads" },
   ...(import.meta.env.DEV
     ? [
@@ -83,6 +89,13 @@ const contentTexture = `radial-gradient(circle at 12% 18%, ${toRgba(ambientBase,
   0.12
 )}, transparent 60%)`;
 
+const activeTypeMetadata = bodyDataType
+  ? typeMetadata[bodyDataType as keyof typeof typeMetadata]
+  : undefined;
+const grimoireRingColor = activeTypeMetadata
+  ? resolveTailwindColor(activeTypeMetadata.themeColor)
+  : undefined;
+
 const bodyStyle = `
   --color-primary: ${theme.primary};
   --color-accent: ${theme.accent};
@@ -102,6 +115,7 @@ const bodyStyle = `
   --panel-muted-heading: ${footerText};
   --body-overlay: ${bodyOverlay};
   --content-texture: ${contentTexture};
+  --grimoire-ring-color: ${grimoireRingColor ?? "var(--glass-pill-border-active)"};
   background: ${backgroundLayers};
 `;
 ---
@@ -239,6 +253,10 @@ const bodyStyle = `
         padding: 0;
       }
 
+      .grimoire-nav-item {
+        position: relative;
+      }
+
       .grimoire-nav-link {
         position: relative;
         display: inline-flex;
@@ -262,6 +280,11 @@ const bodyStyle = `
         text-decoration: none;
       }
 
+      .grimoire-nav-toggle-icon {
+        font-size: 0.8em;
+        transition: transform 220ms ease;
+      }
+
       .grimoire-nav-link:hover,
       .grimoire-nav-link:focus-visible,
       .grimoire-nav-link.is-active {
@@ -270,6 +293,14 @@ const bodyStyle = `
         box-shadow: var(--glass-panel-shadow-hover);
         color: var(--glass-pill-text-active);
         background: linear-gradient(140deg, rgba(255, 255, 255, 0.95), rgba(221, 214, 254, 0.7));
+      }
+
+      .grimoire-nav-item.is-open > .grimoire-nav-link {
+        transform: translateY(-4px);
+      }
+
+      .grimoire-nav-item.is-open > .grimoire-nav-link .grimoire-nav-toggle-icon {
+        transform: rotateX(180deg);
       }
 
       .grimoire-nav-link:focus-visible {
@@ -285,6 +316,78 @@ const bodyStyle = `
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
         opacity: 0.9;
         pointer-events: none;
+      }
+
+      .grimoire-menu-panel {
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        left: 50%;
+        transform: translateX(-50%);
+        min-width: 18rem;
+        padding: 0.85rem;
+        border-radius: calc(var(--glass-panel-radius) / 1.8);
+        border: 1px solid var(--glass-panel-border);
+        background: linear-gradient(150deg, var(--glass-panel-surface), var(--glass-panel-overlay));
+        box-shadow: var(--glass-panel-shadow-hover);
+        backdrop-filter: blur(var(--glass-panel-blur));
+        -webkit-backdrop-filter: blur(var(--glass-panel-blur));
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 180ms ease, transform 200ms ease;
+        transform-origin: top;
+      }
+
+      .grimoire-nav-item.is-open > .grimoire-menu-panel {
+        opacity: 1;
+        visibility: visible;
+        transform: translate(-50%, 0);
+      }
+
+      .grimoire-menu-list {
+        display: grid;
+        gap: 0.35rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .grimoire-menu-link {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.55rem 0.75rem;
+        border-radius: 0.85rem;
+        border: 1px solid transparent;
+        text-decoration: none;
+        color: var(--panel-muted-heading);
+        font-size: 0.9rem;
+        line-height: 1.35;
+        transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease, color 160ms ease;
+      }
+
+      .grimoire-menu-link:hover,
+      .grimoire-menu-link:focus-visible {
+        outline: none;
+        background: rgba(255, 255, 255, 0.65);
+        border-color: var(--glass-pill-border-active);
+        box-shadow: 0 0 0 2px var(--grimoire-ring-color);
+        color: var(--glass-pill-text-active);
+      }
+
+      .grimoire-menu-link:focus-visible {
+        box-shadow: 0 0 0 3px rgba(221, 214, 254, 0.75), 0 0 0 6px var(--grimoire-ring-color);
+      }
+
+      .grimoire-menu-icon {
+        font-size: 1.05rem;
+      }
+
+      .grimoire-menu-subtitle {
+        display: block;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--panel-muted-text);
       }
 
       @media (max-width: 639px) {
@@ -305,6 +408,35 @@ const bodyStyle = `
           padding-inline: 1rem;
           padding-block: 0.5rem;
           letter-spacing: 0.18em;
+        }
+
+        .grimoire-nav-item {
+          flex-basis: 100%;
+        }
+
+        .grimoire-menu-panel {
+          position: static;
+          transform: none;
+          opacity: 1;
+          visibility: visible;
+          margin-top: 0.25rem;
+          min-width: 0;
+          width: 100%;
+        }
+
+        .grimoire-nav-item:not(.is-open) > .grimoire-menu-panel {
+          display: none;
+        }
+
+        .grimoire-menu-list {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .grimoire-menu-link {
+          padding: 0.85rem 1rem;
+          font-size: 1rem;
         }
       }
 
@@ -409,10 +541,50 @@ const bodyStyle = `
           <a href="/" class="grimoire-brand text-3xl font-script text-[var(--color-primary)]">{brandName}</a>
           <nav aria-label="Primary">
             <ul class="grimoire-nav">
+              <li class="grimoire-nav-item" data-grimoire-menu>
+                <button
+                  type="button"
+                  class="grimoire-nav-link"
+                  data-grimoire-toggle
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  aria-controls="grimoire-menu"
+                >
+                  Grimoire
+                  <span class="grimoire-nav-toggle-icon" aria-hidden="true">⌄</span>
+                </button>
+                <div
+                  id="grimoire-menu"
+                  role="menu"
+                  aria-label="Grimoire chapters"
+                  class="grimoire-menu-panel"
+                  data-grimoire-panel
+                  hidden
+                >
+                  <ul class="grimoire-menu-list">
+                    {grimoireChapters.map((chapter) => (
+                      <li>
+                        <a
+                          href={chapter.href}
+                          role="menuitem"
+                          class="grimoire-menu-link"
+                          data-grimoire-item
+                        >
+                          <span class="grimoire-menu-icon" aria-hidden="true">{chapter.icon}</span>
+                          <span>
+                            {chapter.title}
+                            <span class="grimoire-menu-subtitle">Chapter</span>
+                          </span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
               {links.map((l) => {
                 const active = here === l.href || (l.href !== "/" && here.startsWith(l.href + "/"));
                 return (
-                  <li>
+                  <li class="grimoire-nav-item">
                     <a
                       href={l.href}
                       rel={l.rel}
@@ -460,5 +632,196 @@ const bodyStyle = `
 
     {/* Optional page-tail slot for per-page scripts */}
     <slot name="foot" />
+
+    <script is:inline>
+      (() => {
+        const menu = document.querySelector("[data-grimoire-menu]");
+        if (!menu) return;
+
+        const button = menu.querySelector("[data-grimoire-toggle]");
+        const panel = menu.querySelector("[data-grimoire-panel]");
+        const panelList = panel ? panel.querySelector(".grimoire-menu-list") : null;
+        const pointerQuery = window.matchMedia("(pointer: fine)");
+        let open = false;
+        let closeTimeout = null;
+
+        const getItems = () => Array.from(menu.querySelectorAll("[data-grimoire-item]"));
+        const getFocusables = () => {
+          const items = getItems();
+          const focusables = [];
+          if (button instanceof HTMLElement) {
+            focusables.push(button);
+          }
+          items.forEach((item) => {
+            if (item instanceof HTMLElement) {
+              focusables.push(item);
+            }
+          });
+          return focusables;
+        };
+
+        const focusElement = (element) => {
+          if (element instanceof HTMLElement) {
+            element.focus();
+          }
+        };
+
+        const setAria = (expanded) => {
+          if (button) {
+            button.setAttribute("aria-expanded", expanded ? "true" : "false");
+          }
+          if (panel) {
+            if (expanded) {
+              panel.removeAttribute("hidden");
+            } else {
+              panel.setAttribute("hidden", "");
+            }
+          }
+        };
+
+        const openMenu = () => {
+          if (open) return;
+          open = true;
+          menu.classList.add("is-open");
+          setAria(true);
+        };
+
+        const closeMenu = (focusButton = false) => {
+          if (!open) return;
+          open = false;
+          menu.classList.remove("is-open");
+          setAria(false);
+          if (focusButton) {
+            focusElement(button);
+          }
+        };
+
+        const clearCloseTimeout = () => {
+          if (closeTimeout !== null) {
+            window.clearTimeout(closeTimeout);
+            closeTimeout = null;
+          }
+        };
+
+        const scheduleClose = () => {
+          clearCloseTimeout();
+          closeTimeout = window.setTimeout(() => {
+            closeMenu();
+          }, 120);
+        };
+
+        if (button) {
+          button.addEventListener("click", () => {
+            if (open) {
+              closeMenu();
+            } else {
+              openMenu();
+              focusElement(getItems()[0]);
+            }
+          });
+        }
+
+        menu.addEventListener("pointerenter", () => {
+          if (!pointerQuery.matches) return;
+          clearCloseTimeout();
+          openMenu();
+        });
+
+        menu.addEventListener("pointerleave", () => {
+          if (!pointerQuery.matches) return;
+          scheduleClose();
+        });
+
+        menu.addEventListener("focusin", () => {
+          clearCloseTimeout();
+          openMenu();
+        });
+
+        menu.addEventListener("focusout", (event) => {
+          const nextTarget = event.relatedTarget;
+          if (!menu.contains(nextTarget)) {
+            scheduleClose();
+          }
+        });
+
+        document.addEventListener("pointerdown", (event) => {
+          if (!open) return;
+          if (!(event.target instanceof Node) || !menu.contains(event.target)) {
+            closeMenu();
+          }
+        });
+
+        if (panelList) {
+          panelList.addEventListener("click", (event) => {
+            const target = event.target;
+            if (target instanceof Element) {
+              const item = target.closest("[data-grimoire-item]");
+              if (item) {
+                closeMenu();
+              }
+            }
+          });
+        }
+
+        const handleKeyDown = (event) => {
+          if (!button) return;
+
+          if (event.target === button && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
+            event.preventDefault();
+            openMenu();
+            const items = getItems();
+            if (!items.length) return;
+            const targetItem = event.key === "ArrowDown" ? items[0] : items[items.length - 1];
+            focusElement(targetItem);
+            return;
+          }
+
+          if (!open) return;
+
+          if (event.key === "Escape") {
+            event.preventDefault();
+            closeMenu(true);
+            return;
+          }
+
+          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            const items = getItems();
+            if (!items.length) return;
+            event.preventDefault();
+            const current = document.activeElement;
+            let index = current instanceof Element ? items.indexOf(current) : -1;
+            if (index === -1) {
+              index = event.key === "ArrowDown" ? -1 : 0;
+            }
+            const nextIndex =
+              event.key === "ArrowDown"
+                ? (index + 1) % items.length
+                : (index - 1 + items.length) % items.length;
+            focusElement(items[nextIndex]);
+            return;
+          }
+
+          if (event.key === "Tab") {
+            const focusables = getFocusables();
+            const active = document.activeElement;
+            const index = active instanceof HTMLElement ? focusables.indexOf(active) : -1;
+            if (index === -1) return;
+            event.preventDefault();
+            const nextIndex = event.shiftKey
+              ? (index - 1 + focusables.length) % focusables.length
+              : (index + 1) % focusables.length;
+            focusElement(focusables[nextIndex]);
+          }
+        };
+
+        menu.addEventListener("keydown", handleKeyDown);
+
+        pointerQuery.addEventListener("change", () => {
+          if (!pointerQuery.matches) {
+            clearCloseTimeout();
+          }
+        });
+      })();
+    </script>
   </body>
 </html>
