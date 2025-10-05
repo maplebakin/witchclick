@@ -36,28 +36,30 @@ items.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
       {items.map((item) => (
         <a
           href={`/downloads/${item.slug}`}
-          class="block rounded-2xl border border-purple-200 bg-purple-50 p-4 transition hover:bg-purple-100"
+          class="card-panel card-tier-1 card-panel-strong focus-visible:outline-none"
         >
-          <div class="flex gap-4">
+          <span aria-hidden class="card-radial card-radial-top" />
+          <span aria-hidden class="card-radial card-radial-bottom" />
+          <div class="relative z-10 flex gap-4">
             {item.cover && (
               <img
                 src={item.cover}
                 alt={`${item.name} cover`}
-                class="h-20 w-20 rounded-lg object-cover"
+                class="h-20 w-20 flex-none rounded-xl border border-white/60 object-cover shadow-sm"
                 loading="lazy"
               />
             )}
-            <div>
-              <h2 class="m-0 text-lg font-semibold text-purple-900">{item.name}</h2>
-              <p class="m-0 text-sm text-purple-800/90">{item.summary}</p>
-              <p class="m-0 mt-1 text-sm text-purple-700">
+            <div class="space-y-2">
+              <h2 class="card-heading m-0 text-lg font-semibold">{item.name}</h2>
+              <p class="m-0 text-sm text-purple-900/80 line-clamp-3">{item.summary}</p>
+              <span class="card-pill card-badge">
                 {item.price && item.currency
                   ? new Intl.NumberFormat(undefined, {
                       style: "currency",
                       currency: item.currency,
                     }).format(parseFloat(item.price))
                   : "Free"}
-              </p>
+              </span>
             </div>
           </div>
         </a>

@@ -53,31 +53,37 @@ const rel = hasExternal ? "noopener" : undefined;
         )}
       </div>
       <aside class="md:col-span-1">
-        <div class="sticky top-24 rounded-2xl border border-purple-200 bg-purple-50 p-4">
-          {data.price && data.currency ? (
-            <p class="m-0 text-lg font-semibold">
-              {new Intl.NumberFormat(undefined, {
-                style: "currency",
-                currency: data.currency,
-              }).format(parseFloat(data.price))}
-            </p>
-          ) : (
-            <p class="m-0 text-lg font-semibold">Free</p>
-          )}
-          <p class="mt-1 text-sm text-purple-900">Instant digital download.</p>
-          <a
-            href={href}
-            target={target}
-            rel={rel}
-            class="mt-3 inline-block rounded-lg bg-purple-700 px-4 py-2 font-medium text-white transition hover:bg-purple-800"
-            data-analytics="download_click"
-            data-analytics-meta={data.id}
-          >
-            {hasExternal ? "Buy now" : "Download PDF"}
-          </a>
-          {data.file && !hasExternal && (
-            <p class="mt-2 text-xs text-purple-900">Opens a PDF. Save to keep.</p>
-          )}
+        <div class="sticky top-24">
+          <div class="card-panel card-tier-2 card-panel-strong card-panel-static">
+            <span aria-hidden class="card-radial card-radial-soft" />
+            <div class="relative z-10 space-y-4">
+              <div class="space-y-2">
+                <p class="card-eyebrow">Download</p>
+                <span class="card-pill card-badge">
+                  {data.price && data.currency
+                    ? new Intl.NumberFormat(undefined, {
+                        style: "currency",
+                        currency: data.currency,
+                      }).format(parseFloat(data.price))
+                    : "Free"}
+                </span>
+                <p class="card-subtle text-sm leading-relaxed">Instant digital download.</p>
+              </div>
+              <a
+                href={href}
+                target={target}
+                rel={rel}
+                class="inline-flex w-full items-center justify-center rounded-full bg-purple-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300 focus-visible:ring-offset-2"
+                data-analytics="download_click"
+                data-analytics-meta={data.id}
+              >
+                {hasExternal ? "Buy now" : "Download PDF"}
+              </a>
+              {data.file && !hasExternal && (
+                <p class="text-xs text-purple-900/80">Opens a PDF. Save to keep.</p>
+              )}
+            </div>
+          </div>
         </div>
       </aside>
     </div>
