@@ -50,13 +50,20 @@ const links = [
     : []),
 ];
 
+const backgroundLayers = [
+  "var(--body-overlay, var(--surface-parchment-overlay))",
+  "var(--body-texture, var(--surface-starfield))",
+  "var(--body-surface, var(--surface-parchment))",
+  "var(--color-background)",
+].join(", ");
+
 const bodyStyle = `
   --color-primary: ${theme.primary};
   --color-accent: ${theme.accent};
   --color-background: ${theme.background};
   --font-serif: '${theme.fontSerif}', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
   --font-script: '${theme.fontScript}', cursive;
-  background: ${theme.background};
+  background: ${backgroundLayers};
 `;
 ---
 <html lang="en" class="scroll-smooth">
@@ -156,7 +163,10 @@ const bodyStyle = `
     {/* CTA slot (filled only on posts) */}
     <slot name="cta" />
 
-    <footer class="mt-auto border-t border-purple-100/60 bg-white/70">
+    <footer
+      class="mt-auto border-t border-purple-100/60 backdrop-blur-sm"
+      style="background: var(--footer-surface, var(--surface-parchment-overlay));"
+    >
       <div class={`mx-auto ${mainWidthClass} px-4 py-8 text-sm leading-relaxed text-gray-700`}>
         {settings.disclosure && <p class="mb-2">{settings.disclosure}</p>}
         <p class="flex flex-wrap items-center gap-3">
