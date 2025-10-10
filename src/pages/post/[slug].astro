@@ -79,6 +79,8 @@ const heroAlt =
     ? data.heroAlt.trim()
     : title;
 
+const includeAds = Boolean(data.includeAds);
+
 let ctaType: "kofi" | "download" | "none" = "none";
 let ctaId: string | undefined;
 
@@ -214,12 +216,12 @@ const jsonLd = {
               <DownloadCard id={String(data.downloadId)} />
             ) : null}
 
-            <AdSlot slot="end" class="mt-10" />
+            {includeAds && <AdSlot slot="end" class="mt-10" />}
           </article>
 
           <aside class="post-sidebar lg:col-span-4 lg:pl-6">
             <div class="sticky top-24 space-y-6">
-              <AdSlot slot="side" />
+              {includeAds && <AdSlot slot="side" />}
               <CtaFooter type={ctaType} id={ctaId} />
               {resolvedEntities.length > 0 && (
                 <section class="post-entities soft-card">
