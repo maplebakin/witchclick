@@ -1,26 +1,17 @@
 import '../styles/global.css';
 
-import Sidebar from '../components/Sidebar.astro';
-import DraftEditor from '../components/DraftEditor.astro';
-import DraftPreview from '../components/DraftPreview.astro';
-import ControlBar from '../components/ControlBar.astro';
+import PromptEngine from '../components/PromptEngine.astro';
+import { loadDraftLibrary } from '../data/draftLibrary';
+
+const drafts = await loadDraftLibrary();
 ---
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cauldron · Draft Lab (Placeholder)</title>
+    <title>Cauldron · Prompt Engine</title>
   </head>
   <body>
-    <main class="flex min-h-screen bg-slate-950/40">
-      <Sidebar />
-      <section class="flex min-h-screen flex-1 flex-col">
-        <ControlBar />
-        <div class="flex flex-1 bg-slate-950/20">
-          <DraftEditor />
-          <DraftPreview />
-        </div>
-      </section>
-    </main>
+    <PromptEngine drafts={drafts} />
   </body>
 </html>

@@ -3,10 +3,23 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": [
+        "src/*"
+      ]
     },
-    "types": ["node", "astro/client"]
+    "types": [
+      "node",
+      "astro/client"
+    ],
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact"
   },
-  "include": ["src", "scripts"],
-  "exclude": ["dist", "node_modules"]
+  "include": [
+    "src",
+    "scripts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
 }
