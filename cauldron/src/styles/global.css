@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+a {
+  @apply text-indigo-300 underline-offset-4 transition-colors duration-150 ease-out;
+}
+
+a:hover,
+a:focus-visible {
+  @apply text-indigo-200;
+}
+
+a:focus-visible {
+  @apply outline-none shadow-focus;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  @apply outline-none shadow-focus;
+}
