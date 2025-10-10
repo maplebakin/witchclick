@@ -29,7 +29,13 @@ The WitchClick pipeline turns generated outlines into live posts. Follow this ch
 - Push your branch and open a pull request. Ensure CI checks pass, then merge via the `main` branch deployment process.
 - If you automate releases, `npm run ship` runs checks and pushes with a guided message.
 
-## 6. Monitor after launch
+## 6. White Magic Curses
+- Generate prompts in the admin console under the **Curses** panel or via `npm run curses -- --type mirror --target person --tone poetic`.
+- Validate JSON with `npm run ingest:curses -- --from-file ./curse.json` (add `--dry-run` to preview).
+- Render printable cards for ritual kits using `npm run export:curses`.
+- Curses are published to `content/white-magic-curses/` and appear automatically at `/curses`.
+
+## 7. Monitor after launch
 - Spot check the live page once the deploy finishes.
 - Review analytics and affiliate dashboards (if configured) to measure early performance.
 

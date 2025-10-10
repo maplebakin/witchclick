@@ -20,10 +20,16 @@ import generatorPresets from './server/lib/generatorPresets.js';
 import generatorStyles from './server/lib/generatorStyles.js';
 import { STRICT_JSON_RULES } from './server/lib/strictJsonRules.js';
 import { buildMasterPrompt } from './server/lib/promptBuilder.js';
+import { buildCursePrompt } from './server/lib/cursePromptBuilder.js';
+import { CURSE_TARGETS, CURSE_TONES, CURSE_TYPES } from './server/lib/curseSpecSchema.js';
 import {
   prepareSpecForPersistence,
   persistPreparedSpec,
 } from './server/lib/specPreparation.js';
+import {
+  prepareCurseForPersistence,
+  persistPreparedCurse,
+} from './server/lib/cursePreparation.js';
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8787;
 const CWD = process.cwd();
@@ -749,6 +755,45 @@ const server = http.createServer(async (req, res) => {
       });
     }
 
+    if (req.method === 'POST' && req.url === '/curses/prompt') {
+      const body = (await parseBody(req)) || {};
+      const select = (value, allowed, fallback) => {
+        const text = typeof value === 'string' ? value.trim() : '';
+        return allowed.includes(text) ? text : fallback;
+      };
+
+      const type = select(body.type, CURSE_TYPES, 'mirror');
+      const target = select(body.target, CURSE_TARGETS, 'person');
+      const tone = select(body.tone, CURSE_TONES, 'poetic');
+      const sigilName = typeof body.sigilName === 'string' && body.sigilName.trim() ? body.sigilName.trim() : undefined;
+      const altarItem = typeof body.altarItem === 'string' && body.altarItem.trim() ? body.altarItem.trim() : undefined;
+      const journalingFollowUp = typeof body.journalingFollowUp === 'string' && body.journalingFollowUp.trim()
+        ? body.journalingFollowUp.trim()
+        : undefined;
+
+      const prompt = buildCursePrompt({
+        type,
+        target,
+        tone,
+        sigilName,
+        altarItem,
+        journalingFollowUp,
+      });
+
+      if (!prompt.includes('WHITE MAGIC CURSE GENERATOR') || !prompt.includes('CurseSpec v1')) {
+        return send(res, 500, {
+          ok: false,
+          error: 'Stale curse prompt detected (missing guard phrases).',
+        });
+      }
+
+      return send(res, 200, {
+        ok: true,
+        prompt,
+        options: { type, target, tone, sigilName: sigilName ?? null, altarItem: altarItem ?? null, journalingFollowUp: journalingFollowUp ?? null },
+      });
+    }
+
     if (req.method === 'POST') {
       const parsedUrl = new URL(req.url, `http://localhost:${PORT}`);
       if (parsedUrl.pathname === '/ingest') {
@@ -814,6 +859,53 @@ const server = http.createServer(async (req, res) => {
             errors: e?.errors,
             warnings: e?.warnings || [],
             normalizations: e?.normalizations || [],
+          });
+        }
+      } else if (parsedUrl.pathname === '/curses/ingest') {
+        const payload = await parseBody(req);
+        if (!payload) {
+          return send(res, 400, {
+            ok: false,
+            error: 'No JSON body provided. Paste a CurseSpec object.'
+          });
+        }
+
+        const queryDryRun = (() => {
+          const flag = parsedUrl.searchParams.get('dryRun');
+          return flag === 'true' || flag === '1';
+        })();
+        const bodyDryRun = typeof payload === 'object' && payload
+          ? payload.dryRun === true || payload.dryRun === 'true'
+          : false;
+        const dryRun = queryDryRun || bodyDryRun;
+
+        let rawSpec = payload && typeof payload === 'object' && payload.spec ? payload.spec : payload;
+
+        if (rawSpec && typeof rawSpec === 'object' && 'dryRun' in rawSpec) {
+          rawSpec = { ...rawSpec };
+          delete rawSpec.dryRun;
+        }
+
+        try {
+          const prepared = prepareCurseForPersistence(rawSpec || {}, { cwd: CWD });
+          if (!dryRun) {
+            await persistPreparedCurse(prepared);
+          }
+          const relativePath = path.relative(CWD, prepared.markdown.filePath).replace(/\\/g, '/');
+          return send(res, 200, {
+            ok: true,
+            spec: prepared.spec,
+            warnings: prepared.warnings,
+            saved: !dryRun,
+            slug: prepared.spec.slug,
+            path: relativePath,
+          });
+        } catch (e) {
+          const status = Array.isArray(e?.errors) ? 400 : 500;
+          return send(res, status, {
+            ok: false,
+            error: e?.message || String(e),
+            errors: e?.errors,
           });
         }
       }

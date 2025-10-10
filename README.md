@@ -21,3 +21,23 @@ Editors can reference the following affiliate keys in post specs and frontmatter
 
 ## Publishing workflow
 
+### Posts
+
+1. Generate a PostSpec prompt via the admin console (`/admin`) or CLI (`npm run genprompt`).
+2. Feed the prompt to your model, paste the JSON back into the admin panel, and validate.
+3. Ingest with `npm run ingest -- --from-file my-spec.json` or via the admin UI.
+
+### White Magic Curses
+
+1. Visit `/admin` and switch the panel to **Curses** to build a generation prompt.
+2. Paste the generated CurseSpec JSON to validate, preview, and persist a markdown file under `content/white-magic-curses/`.
+3. The CLI mirrors the same flow:
+   - `npm run curses -- --type mirror --target person --tone poetic` writes `tmp/curse_prompt.txt`.
+   - `npm run ingest:curses -- --from-file path/to/curse.json` validates and saves the curse markdown.
+   - `npm run export:curses` renders printable HTML cards in `dist/exports/curses/`.
+
+### Rendering
+
+- Posts render at `/post/<slug>`.
+- Curses automatically surface at `/curses` with detail pages at `/curses/<slug>`.
+
