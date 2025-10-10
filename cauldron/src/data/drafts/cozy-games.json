@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "title": "Cozy Games for Rainy Nights",
+  "slug": "cozy-games-rainy-nights",
+  "status": "idea",
+  "excerpt": "A soft-focus guide to unwinding with wholesome adventures and candlelit vibes.",
+  "metaDescription": "A tea-warm list of cozy games to unwind with when the rain taps gently on your window.",
+  "tags": ["cozy", "games", "slow living"],
+  "sections": [
+    {
+      "type": "markdown",
+      "content": "### Why cozy games matter\nThey offer gentle goals, soft colors, and enough kindness to match the weather."
+    },
+    {
+      "type": "markdown",
+      "content": "### Starter bundle\n- Stardew Valley\n- Alba: A Wildlife Adventure\n- Unpacking"
+    }
+  ]
+}
