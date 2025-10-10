@@ -1,0 +1,79 @@
+{
+  "specVersion": 2,
+  "title": "Clean Cursing: Return Energy to Its Origin",
+  "slug": "clean-cursing",
+  "metaDescription": "A precise counter-ritual for sending unwanted energy back to where it came from, without scorched-earth backlash.",
+  "tags": [
+    "banishing",
+    "energy hygiene",
+    "ritual",
+    "protection"
+  ],
+  "excerpt": "Prep your altar, ground yourself, and use a three-phase ritual to send disruptive energy back to its source with clarity and care.",
+  "outline": [
+    { "heading": "Why Gentle Cursing Matters", "id": "why-gentle-cursing-matters" },
+    { "heading": "Stage One: Ground + Shield", "id": "stage-one-ground-shield" },
+    { "heading": "Stage Two: Name the Return", "id": "stage-two-name-the-return" },
+    { "heading": "Stage Three: Release + Seal", "id": "stage-three-release-seal" },
+    { "heading": "Aftercare + Integration", "id": "aftercare-integration" }
+  ],
+  "sections": [
+    {
+      "heading": "Why Gentle Cursing Matters",
+      "markdown": "Some hexes muddy the water when you only need clarity. Clean cursing focuses on precision: acknowledge the harm, name your boundaries, and redirect the static without shredding your own energy field."
+    },
+    {
+      "heading": "Stage One: Ground + Shield",
+      "markdown": "- Sweep your space clockwise with smoke or bells.\\n- Place a bowl of salt water at the north edge of your altar.\\n- Visualize a mirrored sphere forming around you, cool and reflective.\\n- Repeat: *What is not mine returns to where it can be held.*"
+    },
+    {
+      "heading": "Stage Two: Name the Return",
+      "markdown": "Write the source of the disruption on a bay leaf or slip of paper. Hold it over the salt water and speak plainly about what you are returning. Focus on neutral language: *I return this energy to its origin for resolution.* Burn or tear the petition and let the ashes fall into the bowl."
+    },
+    {
+      "heading": "Stage Three: Release + Seal",
+      "markdown": "Pour the salt water outside or down a drain with intention. Trace a clockwise circle in the air and seal it with three snaps or claps. Imagine the mirrored sphere dissolving as you say: *The boundary is tended. The path is clear.*"
+    },
+    {
+      "heading": "Aftercare + Integration",
+      "markdown": "Sip a grounding tea or eat something warm. Journal for five minutes: *What did I learn about my boundaries?* Close the entry with one practical step you will take to stay resourced."
+    }
+  ],
+  "entities": [
+    {
+      "type": "herb",
+      "slug": "bay-leaf"
+    },
+    {
+      "type": "ritual",
+      "slug": "salt-water-purification"
+    }
+  ],
+  "heroImagePrompt": "A moonlit altar with mirrored shields, silver bowl of salt water, bay leaves, and soft indigo lighting, digital illustration",
+  "altTexts": [
+    "Mirrored altar tools and a silver bowl of salt water under moonlight."
+  ],
+  "internalLinkHints": [
+    {
+      "anchor": "banishing rituals",
+      "rationale": "Link to the banishing ritual roundup for readers who want more techniques."
+    },
+    {
+      "anchor": "energy hygiene",
+      "rationale": "Point toward the energy hygiene checklist post for ongoing maintenance."
+    }
+  ],
+  "affiliateHints": [
+    {
+      "key": "altar-kit",
+      "anchor": "mirrored protection altar kit",
+      "rationale": "Curated tools that match the ritual instructions."
+    }
+  ],
+  "cta": {
+    "type": "kofi",
+    "id": "clean-cursing-bundle"
+  },
+  "adPlacements": ["lead", "mid"],
+  "status": "draft"
+}

@@ -1,0 +1,26 @@
+{
+  "name": "cauldron",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "validate": "tsx scripts/validate-drafts.ts",
+    "list-drafts": "tsx scripts/validate-drafts.ts --list",
+    "promote": "node scripts/promote-to-witchclick.js"
+  },
+  "dependencies": {
+    "@astrojs/tailwind": "^5.1.0",
+    "astro": "^4.15.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "tsx": "^4.20.5",
+    "typescript": "^5.6.2"
+  }
+}
