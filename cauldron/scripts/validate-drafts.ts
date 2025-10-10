@@ -2,7 +2,7 @@
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PostSpecV2Schema } from '../../server/lib/postSpecSchema.js';
+import { PostSpecV2Schema } from '../witchclick-shared/lib/postSpecSchema.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

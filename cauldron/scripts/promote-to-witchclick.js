@@ -1,15 +1,34 @@
 #!/usr/bin/env node
+import { existsSync } from 'node:fs';
 import { readFile, copyFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PostSpecV2Schema } from '../../server/lib/postSpecSchema.js';
+import { PostSpecV2Schema } from '../witchclick-shared/lib/postSpecSchema.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
-const witchclickRoot = path.resolve(projectRoot, '..');
 const draftsDir = path.join(projectRoot, 'drafts');
-const ingestDir = path.join(witchclickRoot, 'content', 'prompt-queue', 'approved');
+
+const candidateRoots = [
+  process.env.WITCHCLICK_ROOT && path.resolve(projectRoot, process.env.WITCHCLICK_ROOT),
+  path.resolve(projectRoot, '..', 'witchclick'),
+  path.resolve(projectRoot, '..'),
+].filter(Boolean);
+
+function resolveIngestDir() {
+  for (const root of candidateRoots) {
+    const ingestPath = path.join(root, 'content', 'prompt-queue', 'approved');
+    if (existsSync(path.join(root, 'content'))) {
+      return ingestPath;
+    }
+  }
+
+  const fallbackRoot = candidateRoots[0] ?? projectRoot;
+  return path.join(fallbackRoot, 'content', 'prompt-queue', 'approved');
+}
+
+const ingestDir = resolveIngestDir();
 
 async function main() {
   const [, , rawSlug] = process.argv;
