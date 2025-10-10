@@ -191,8 +191,7 @@ a {
     position: relative;
     border-radius: clamp(1.6rem, 4vw, 2.5rem);
     border: 1px solid var(--panel-muted-border);
-    background: linear-gradient(165deg, color-mix(in srgb, var(--panel-muted-surface) 95%, transparent) 0%,
-        color-mix(in srgb, var(--panel-muted-surface) 82%, transparent) 75%);
+    background: var(--panel-muted-surface);
     color: var(--panel-muted-text);
     backdrop-filter: blur(var(--glass-panel-blur, 18px));
     -webkit-backdrop-filter: blur(var(--glass-panel-blur, 18px));
