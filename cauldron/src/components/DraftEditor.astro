@@ -1,0 +1,38 @@
+---
+const fields = [
+  { label: 'Title', name: 'title', placeholder: 'Cozy Games for Rainy Nights' },
+  { label: 'Slug', name: 'slug', placeholder: 'cozy-games-rainy-nights' },
+  { label: 'Excerpt', name: 'excerpt', placeholder: 'A gentle guide to unwind with whimsical games.' },
+  { label: 'Meta Description', name: 'metaDescription', placeholder: 'Preview copy for the meta description.' },
+  { label: 'Tags', name: 'tags', placeholder: 'cozy, games, slow living' },
+];
+---
+<section class="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-950/30">
+  <header>
+    <h2 class="text-lg font-semibold text-slate-100">Draft Editor (Placeholder)</h2>
+    <p class="mt-1 text-sm text-slate-400">Structured fields will live here. This pass only sketches the layout.</p>
+  </header>
+  <form class="space-y-5">
+    {fields.map((field) => (
+      <label class="block">
+        <span class="text-xs font-medium uppercase tracking-[0.2em] text-slate-500">{field.label}</span>
+        <input
+          type="text"
+          name={field.name}
+          placeholder={field.placeholder}
+          class="mt-1 w-full rounded border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 focus:border-lime-300 focus:outline-none"
+          disabled
+        />
+      </label>
+    ))}
+    <label class="block">
+      <span class="text-xs font-medium uppercase tracking-[0.2em] text-slate-500">Sections</span>
+      <textarea
+        rows={6}
+        placeholder="Markdown sections will be editable in the next iteration."
+        class="mt-1 w-full rounded border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-100"
+        disabled
+      />
+    </label>
+  </form>
+</section>

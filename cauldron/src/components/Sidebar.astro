@@ -1,0 +1,30 @@
+---
+const sections = [
+  { label: 'Ideas', drafts: ['cozy-games.json'] },
+  { label: 'In Progress', drafts: ['burnout-kit.json'] },
+  { label: 'Ready to Publish', drafts: [] },
+];
+---
+<aside class="w-64 min-h-full bg-slate-950/60 border-r border-slate-800/70 p-4 text-slate-200">
+  <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Drafts</h2>
+  <nav class="mt-4 space-y-6 text-sm">
+    {sections.map((section) => (
+      <section>
+        <header class="mb-2 text-xs font-medium uppercase tracking-[0.15em] text-slate-500">
+          {section.label}
+        </header>
+        <ul class="space-y-1">
+          {section.drafts.length === 0 ? (
+            <li class="text-slate-600 italic">No drafts yet</li>
+          ) : (
+            section.drafts.map((draft) => (
+              <li class="rounded px-2 py-1 hover:bg-slate-800/70 focus-within:bg-slate-800/70">
+                <a href="#" class="block truncate text-slate-200 hover:text-lime-200">{draft}</a>
+              </li>
+            ))
+          )}
+        </ul>
+      </section>
+    ))}
+  </nav>
+</aside>
