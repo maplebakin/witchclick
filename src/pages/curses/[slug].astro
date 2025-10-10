@@ -1,0 +1,100 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readSettings, getSiteOrigin } from "../../utils/settings";
+import { loadAllCurses, getCurseBySlug, resetCurseCache } from "../../utils/curses";
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  const curses = loadAllCurses();
+  return curses.map((curse) => ({ params: { slug: curse.slug } }));
+}
+
+const slug = (Astro.params.slug as string) ?? "";
+let curse = getCurseBySlug(slug);
+
+if (!curse) {
+  resetCurseCache();
+  curse = getCurseBySlug(slug);
+}
+
+if (!curse) {
+  throw new Response('Not found', { status: 404 });
+}
+
+const settings = readSettings();
+const site = getSiteOrigin(settings) || "https://example.com";
+const title = curse.title;
+const description = curse.invocation || "White magic curse to return energy with clarity.";
+const canonical = `${site}/curses/${curse.slug}`;
+const generator = curse.frontmatter?.generator ?? {};
+const journaling = typeof generator?.journalingFollowUp === "string" ? generator.journalingFollowUp : "";
+const altarItem = typeof generator?.altarItem === "string" ? generator.altarItem : "";
+const sigilName = typeof generator?.sigilName === "string" ? generator.sigilName : "";
+---
+
+<Base title={title} description={description} canon={canonical} wide={true}>
+  <article class="mx-auto max-w-3xl space-y-6 py-10">
+    <header class="space-y-3 text-center">
+      <p class="text-xs uppercase tracking-[0.2em] text-purple-500">White Magic Curse</p>
+      <h1 class="text-3xl font-semibold text-purple-900">{title}</h1>
+      {curse.invocation && (
+        <p class="text-sm italic text-purple-700">{curse.invocation}</p>
+      )}
+      <div class="flex flex-wrap justify-center gap-2 text-[11px] uppercase tracking-wide text-purple-600">
+        {curse.tags.map((tag) => (
+          <span class="rounded-full border border-purple-200 px-2 py-0.5">{tag}</span>
+        ))}
+      </div>
+      <dl class="mx-auto grid max-w-xl grid-cols-1 gap-2 text-[11px] text-slate-600 sm:grid-cols-2">
+        <div>
+          <dt class="font-semibold uppercase tracking-wide text-purple-600">Type</dt>
+          <dd class="capitalize">{generator?.type ?? '—'}</dd>
+        </div>
+        <div>
+          <dt class="font-semibold uppercase tracking-wide text-purple-600">Target</dt>
+          <dd class="capitalize">{generator?.target ?? '—'}</dd>
+        </div>
+        <div>
+          <dt class="font-semibold uppercase tracking-wide text-purple-600">Tone</dt>
+          <dd class="capitalize">{generator?.tone ?? '—'}</dd>
+        </div>
+        {sigilName && (
+          <div>
+            <dt class="font-semibold uppercase tracking-wide text-purple-600">Sigil</dt>
+            <dd>{sigilName}</dd>
+          </div>
+        )}
+        {altarItem && (
+          <div>
+            <dt class="font-semibold uppercase tracking-wide text-purple-600">Altar Item</dt>
+            <dd>{altarItem}</dd>
+          </div>
+        )}
+      </dl>
+    </header>
+
+    <div class="prose prose-purple mx-auto max-w-none">
+      {curse.sections.map((section) => {
+        const safeContent = section.content
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/\n/g, '<br/>');
+        return (
+          <section>
+            <h2>{section.label}</h2>
+            <p set:html={safeContent}></p>
+          </section>
+        );
+      })}
+    </div>
+
+    {journaling && (
+      <section class="rounded-2xl border border-purple-100 bg-purple-50 p-5">
+        <h2 class="text-lg font-semibold text-purple-900">Journaling Follow-up</h2>
+        <p class="mt-2 text-sm text-purple-800">{journaling}</p>
+      </section>
+    )}
+  </article>
+</Base>

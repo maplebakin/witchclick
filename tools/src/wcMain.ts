@@ -69,6 +69,18 @@ async function cmdGenprompt(flags: Flags) {
   console.log(prompt);
 }
 
+async function cmdCurses(flags: Flags) {
+  const type = String(flags.type ?? flags.t ?? 'mirror');
+  const target = String(flags.target ?? flags.g ?? 'person');
+  const tone = String(flags.tone ?? flags.o ?? 'poetic');
+  const sigilName = typeof flags.sigil === 'string' ? flags.sigil : undefined;
+  const altarItem = typeof flags.altar === 'string' ? flags.altar : undefined;
+  const journalingFollowUp = typeof flags.journal === 'string' ? flags.journal : undefined;
+
+  const mod = await import('./gencurse.js');
+  (mod as any).gencurse({ type, target, tone, sigilName, altarItem, journalingFollowUp });
+}
+
 async function cmdIngest(flags: Flags) {
   const fromFile = String((flags['from-file'] as string) ?? '');
   const mod = await import('./ingest.js');
@@ -80,6 +92,19 @@ async function cmdIngest(flags: Flags) {
     : Boolean(dryRunValue);
   if (dryRun) args.push('--dry-run');
   await (mod as any).ingest(args);
+}
+
+async function cmdCursesIngest(flags: Flags) {
+  const fromFile = String((flags['from-file'] as string) ?? '');
+  const mod = await import('./ingestCurse.js');
+  const args: string[] = [];
+  if (fromFile) args.push('--from-file', fromFile);
+  const dryRunValue = flags['dry-run'] ?? flags['dryRun'];
+  const dryRun = typeof dryRunValue === 'string'
+    ? dryRunValue === 'true' || dryRunValue === '1'
+    : Boolean(dryRunValue);
+  if (dryRun) args.push('--dry-run');
+  await (mod as any).ingestCurse(args);
 }
 
 async function cmdLinker() {
@@ -119,6 +144,14 @@ async function cmdExport(flags: Flags) {
   }
   const mod = await import('./export.js');
   await (mod as any).exportCmd(['--slug', slug, '--format', format]);
+}
+
+async function cmdCursesExport(flags: Flags) {
+  const slug = String(flags.slug ?? '');
+  const mod = await import('./exportCurses.js');
+  const args: string[] = [];
+  if (slug) args.push('--slug', slug);
+  await (mod as any).exportCurses(args);
 }
 
 async function cmdGoBuild() {
@@ -169,14 +202,20 @@ export async function main(argv: string[] = process.argv.slice(2)) {
   switch (cmd) {
     case 'genprompt':
       return cmdGenprompt(flags);
+    case 'curses':
+      return cmdCurses(flags);
     case 'ingest':
       return cmdIngest(flags);
+    case 'curses:ingest':
+      return cmdCursesIngest(flags);
     case 'linker':
       return cmdLinker();
     case 'seo':
       return cmdSEO(flags);
     case 'export':
       return cmdExport(flags);
+    case 'curses:export':
+      return cmdCursesExport(flags);
     case 'go:build':
       return cmdGoBuild();
     case 'health':
@@ -189,6 +228,9 @@ export async function main(argv: string[] = process.argv.slice(2)) {
           '',
           'Usage:',
           '  node tools/wc.js genprompt --topic "..." --words 1200 --ads on|off --kofi on|off',
+          '  node tools/wc.js curses --type mirror --target person --tone poetic [--sigil "Sigil"] [--altar "Item"] [--journal "Question"]',
+          '  node tools/wc.js curses:ingest --from-file curse.json [--dry-run]',
+          '  node tools/wc.js curses:export [--slug curse-slug]',
           '  node tools/wc.js ingest --from-file drafts/latest.json',
           '  node tools/wc.js linker',
           '  node tools/wc.js seo --slug my-post [--apply]',

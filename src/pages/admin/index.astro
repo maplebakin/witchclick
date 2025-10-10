@@ -4,6 +4,12 @@ import Base from "../../layouts/Base.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
 import generatorStyles from "../../../server/lib/generatorStyles.js";
 import { generatorPresetOptions } from "../../../server/lib/generatorPresets.js";
+import {
+  CURSE_TARGETS,
+  CURSE_TONES,
+  CURSE_TYPES,
+  CURSE_TAGS,
+} from "../../../server/lib/curseSpecSchema.js";
 
 export const prerender = false; // never emit in static builds
 
@@ -38,6 +44,11 @@ const defaultStyleDescription =
   styleOptions.find((option) => option.key === "cozy")?.description ??
   "Write like a gentle, imperfect friend: warm, soft, everyday metaphors.";
 
+const curseTypeOptions = CURSE_TYPES;
+const curseTargetOptions = CURSE_TARGETS;
+const curseToneOptions = CURSE_TONES;
+const curseTags = CURSE_TAGS;
+
 // Gate: dev OR query ?key=PUBLIC_ADMIN_KEY (useful if you later switch to a server adapter)
 const isDev = import.meta.env.DEV;
 const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
@@ -70,90 +81,187 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         <a class="underline underline-offset-4 hover:no-underline" href="/admin/hero">Hero Image Uploader</a>
       </nav>
 
+      <div class="rounded-2xl border border-purple-100 bg-white/40 p-1 text-sm text-purple-900">
+        <span class="mr-3 font-medium">Panel:</span>
+        <button
+          type="button"
+          data-panel-toggle="posts"
+          class="rounded-lg px-3 py-1 text-sm font-medium text-purple-900 hover:bg-purple-100"
+        >
+          Posts
+        </button>
+        <button
+          type="button"
+          data-panel-toggle="curses"
+          class="rounded-lg px-3 py-1 text-sm font-medium text-purple-900 hover:bg-purple-100"
+        >
+          Curses
+        </button>
+      </div>
+
       <div
-        class="grid grid-cols-1 gap-6 lg:grid-cols-12"
+        data-panel-root
         data-dev-api={DEV_API}
         data-preset-options={JSON.stringify(presetOptions)}
         data-style-options={JSON.stringify(styleOptions)}
         data-default-mode={defaultModeDescription}
         data-default-style={defaultStyleDescription}
+        data-curse-types={JSON.stringify(curseTypeOptions)}
+        data-curse-targets={JSON.stringify(curseTargetOptions)}
+        data-curse-tones={JSON.stringify(curseToneOptions)}
+        data-curse-tags={JSON.stringify(curseTags)}
       >
-      {/* LEFT: Prompt builder */}
-      <section class="lg:col-span-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-        <h1 class="mb-3 text-xl font-semibold">1) Build Post Generator Prompt</h1>
-        <div class="grid gap-3">
-          <label class="block">
-            <span class="text-xs font-medium">Topic</span>
-            <input id="topic" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="tea ritual for focus" />
-          </label>
-          <label class="block">
-            <span class="text-xs font-medium">Word count</span>
-            <input id="words" type="number" class="mt-1 w-full rounded-lg border px-3 py-2" value="1200" />
-          </label>
-          <label class="block">
-            <span class="text-xs font-medium">Template</span>
-            <select id="mode" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
-              <option value="" selected>Standard ritual workflow</option>
-              {presetOptions.map((option) => (
-                <option value={option.key}>{option.label}</option>
-              ))}
-            </select>
-            <p id="modeHelp" class="mt-1 text-[11px] text-gray-600">{defaultModeDescription}</p>
-          </label>
-          <label class="block">
-            <span class="text-xs font-medium">Writing style</span>
-            <select id="style" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
-              {styleOptions.map((option) => (
-                <option value={option.key} selected={option.key === "cozy"}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <p id="styleHelp" class="mt-1 text-[11px] text-gray-600">{defaultStyleDescription}</p>
-          </label>
-          <div class="flex gap-4 text-sm">
-            <label class="inline-flex items-center gap-2">
-              <input type="checkbox" id="ads" /> <span>Include ads</span>
-            </label>
-            <label class="inline-flex items-center gap-2">
-              <input type="checkbox" id="kofi" checked /> <span>Include Ko-fi</span>
-            </label>
-          </div>
-          <div class="flex gap-2">
-            <button id="genPrompt" class="rounded-lg bg-purple-700 px-3 py-2 text-white hover:bg-purple-800">Generate Prompt</button>
-            <button id="copyPrompt" class="rounded-lg border px-3 py-2">Copy</button>
-          </div>
-          <textarea id="promptOut" class="mt-2 h-64 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder="Prompt will appear here…"></textarea>
-          <p class="text-xs text-gray-600">Paste this into your LLM → get JSON → paste into the box on the right.</p>
+        <div id="postsPanel" data-panel="posts" class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <section class="lg:col-span-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+            <h1 class="mb-3 text-xl font-semibold">1) Build Post Generator Prompt</h1>
+            <div class="grid gap-3">
+              <label class="block">
+                <span class="text-xs font-medium">Topic</span>
+                <input id="topic" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="tea ritual for focus" />
+              </label>
+              <label class="block">
+                <span class="text-xs font-medium">Word count</span>
+                <input id="words" type="number" class="mt-1 w-full rounded-lg border px-3 py-2" value="1200" />
+              </label>
+              <label class="block">
+                <span class="text-xs font-medium">Template</span>
+                <select id="mode" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+                  <option value="" selected>Standard ritual workflow</option>
+                  {presetOptions.map((option) => (
+                    <option value={option.key}>{option.label}</option>
+                  ))}
+                </select>
+                <p id="modeHelp" class="mt-1 text-[11px] text-gray-600">{defaultModeDescription}</p>
+              </label>
+              <label class="block">
+                <span class="text-xs font-medium">Writing style</span>
+                <select id="style" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+                  {styleOptions.map((option) => (
+                    <option value={option.key} selected={option.key === "cozy"}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <p id="styleHelp" class="mt-1 text-[11px] text-gray-600">{defaultStyleDescription}</p>
+              </label>
+              <div class="flex gap-4 text-sm">
+                <label class="inline-flex items-center gap-2">
+                  <input type="checkbox" id="ads" /> <span>Include ads</span>
+                </label>
+                <label class="inline-flex items-center gap-2">
+                  <input type="checkbox" id="kofi" checked /> <span>Include Ko-fi</span>
+                </label>
+              </div>
+              <div class="flex gap-2">
+                <button id="genPrompt" class="rounded-lg bg-purple-700 px-3 py-2 text-white hover:bg-purple-800">Generate Prompt</button>
+                <button id="copyPrompt" class="rounded-lg border px-3 py-2">Copy</button>
+              </div>
+              <textarea id="promptOut" class="mt-2 h-64 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder="Prompt will appear here…"></textarea>
+              <p class="text-xs text-gray-600">Paste this into your LLM → get JSON → paste into the box on the right.</p>
+            </div>
+          </section>
+
+          <section class="lg:col-span-7 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+            <h2 class="mb-3 text-xl font-semibold">2) Paste PostSpec JSON → Preview → Ingest → Publish</h2>
+
+            <textarea id="spec" class="h-56 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder='Paste the PostSpec v2 JSON here'></textarea>
+
+            <div class="mt-3 flex flex-wrap gap-2">
+              <button id="validateBtn" class="rounded-lg border px-3 py-2 text-sm">Validate</button>
+              <button id="previewBtn" class="rounded-lg border px-3 py-2 text-sm">Preview</button>
+              <button id="ingestBtn" class="rounded-lg bg-green-600 px-3 py-2 text-sm text-white hover:bg-green-700">Ingest</button>
+              <button id="ingestPublishBtn" class="rounded-lg bg-indigo-600 px-3 py-2 text-sm text-white hover:bg-indigo-700">Ingest + Publish</button>
+              <button id="clearBtn" class="rounded-lg border px-3 py-2 text-sm">Clear</button>
+            </div>
+            <div class="mt-3 flex flex-col gap-3">
+              <div
+                id="status"
+                class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700"
+              ></div>
+              <div
+                id="specSummary"
+                class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-[11px] text-gray-700"
+              ></div>
+            </div>
+
+            <div id="preview" class="prose prose-neutral mt-4 max-w-none border-t pt-4"></div>
+          </section>
         </div>
-      </section>
 
-      {/* RIGHT: JSON preview / ingest / publish */}
-      <section class="lg:col-span-7 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-        <h2 class="mb-3 text-xl font-semibold">2) Paste PostSpec JSON → Preview → Ingest → Publish</h2>
+        <div id="cursesPanel" data-panel="curses" class="hidden grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <section class="lg:col-span-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+            <h2 class="mb-3 text-xl font-semibold">1) Build Curse Prompt</h2>
+            <div class="grid gap-3">
+              <label class="block">
+                <span class="text-xs font-medium">Type</span>
+                <select id="curseType" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+                  {curseTypeOptions.map((value) => (
+                    <option value={value}>{toLabel(value)}</option>
+                  ))}
+                </select>
+              </label>
+              <label class="block">
+                <span class="text-xs font-medium">Target</span>
+                <select id="curseTarget" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+                  {curseTargetOptions.map((value) => (
+                    <option value={value}>{toLabel(value)}</option>
+                  ))}
+                </select>
+              </label>
+              <label class="block">
+                <span class="text-xs font-medium">Tone</span>
+                <select id="curseTone" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+                  {curseToneOptions.map((value) => (
+                    <option value={value}>{toLabel(value)}</option>
+                  ))}
+                </select>
+              </label>
+              <label class="block">
+                <span class="text-xs font-medium">Sigil name (optional)</span>
+                <input id="curseSigil" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Echo Lantern" />
+              </label>
+              <label class="block">
+                <span class="text-xs font-medium">Altar item (optional)</span>
+                <input id="curseAltar" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Clear quartz" />
+              </label>
+              <label class="block">
+                <span class="text-xs font-medium">Journaling follow-up (optional)</span>
+                <input id="curseJournal" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="What truth rose when the echo returned?" />
+              </label>
+              <div class="flex gap-2">
+                <button id="curseGenPrompt" class="rounded-lg bg-purple-700 px-3 py-2 text-white hover:bg-purple-800">Generate Prompt</button>
+                <button id="curseCopyPrompt" class="rounded-lg border px-3 py-2">Copy</button>
+              </div>
+              <textarea id="cursePromptOut" class="mt-2 h-64 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder="Prompt will appear here…"></textarea>
+              <p class="text-xs text-gray-600">Canonical tags: {curseTags.join(", ")}</p>
+            </div>
+          </section>
 
-        <textarea id="spec" class="h-56 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder='Paste the PostSpec v2 JSON here'></textarea>
+          <section class="lg:col-span-7 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+            <h2 class="mb-3 text-xl font-semibold">2) Paste CurseSpec JSON → Validate → Ingest</h2>
 
-        <div class="mt-3 flex flex-wrap gap-2">
-          <button id="validateBtn" class="rounded-lg border px-3 py-2 text-sm">Validate</button>
-          <button id="previewBtn" class="rounded-lg border px-3 py-2 text-sm">Preview</button>
-          <button id="ingestBtn" class="rounded-lg bg-green-600 px-3 py-2 text-sm text-white hover:bg-green-700">Ingest</button>
-          <button id="ingestPublishBtn" class="rounded-lg bg-indigo-600 px-3 py-2 text-sm text-white hover:bg-indigo-700">Ingest + Publish</button>
-          <button id="clearBtn" class="rounded-lg border px-3 py-2 text-sm">Clear</button>
+            <textarea id="curseSpec" class="h-56 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder='Paste the CurseSpec JSON here'></textarea>
+
+            <div class="mt-3 flex flex-wrap gap-2">
+              <button id="curseValidateBtn" class="rounded-lg border px-3 py-2 text-sm">Validate</button>
+              <button id="curseIngestBtn" class="rounded-lg bg-green-600 px-3 py-2 text-sm text-white hover:bg-green-700">Ingest</button>
+              <button id="curseClearBtn" class="rounded-lg border px-3 py-2 text-sm">Clear</button>
+            </div>
+
+            <div class="mt-3 flex flex-col gap-3">
+              <div
+                id="curseStatus"
+                class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700"
+              ></div>
+              <div
+                id="curseSummary"
+                class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-[11px] text-gray-700"
+              ></div>
+            </div>
+
+            <div id="cursePreview" class="prose prose-neutral mt-4 max-w-none border-t pt-4"></div>
+          </section>
         </div>
-        <div class="mt-3 flex flex-col gap-3">
-          <div
-            id="status"
-            class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700"
-          ></div>
-          <div
-            id="specSummary"
-            class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-[11px] text-gray-700"
-          ></div>
-        </div>
-
-        <div id="preview" class="prose prose-neutral mt-4 max-w-none border-t pt-4"></div>
-      </section>
       </div>
       </div>
     ) : (
@@ -171,17 +279,61 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
   {canUse && (
     <script is:inline>
       (function(){
-        var root = document.querySelector('[data-dev-api]');
+        var root = document.querySelector('[data-panel-root]');
         var DEV_API = root?.getAttribute('data-dev-api') || 'http://localhost:8787';
         var $ = function(id){ return document.getElementById(id); };
         var rawPresets = root?.getAttribute('data-preset-options') || '[]';
         var rawStyles = root?.getAttribute('data-style-options') || '[]';
         var DEFAULT_MODE_DESC = root?.getAttribute('data-default-mode') || '';
         var DEFAULT_STYLE_DESC = root?.getAttribute('data-default-style') || '';
+        var rawCurseTypes = root?.getAttribute('data-curse-types') || '[]';
+        var rawCurseTargets = root?.getAttribute('data-curse-targets') || '[]';
+        var rawCurseTones = root?.getAttribute('data-curse-tones') || '[]';
+        var rawCurseTags = root?.getAttribute('data-curse-tags') || '[]';
         var PRESET_OPTIONS = [];
         var STYLE_OPTIONS = [];
+        var CURSE_TYPES = [];
+        var CURSE_TARGETS = [];
+        var CURSE_TONES = [];
+        var CURSE_TAGS = [];
         try { PRESET_OPTIONS = JSON.parse(rawPresets); } catch {}
         try { STYLE_OPTIONS = JSON.parse(rawStyles); } catch {}
+        try { CURSE_TYPES = JSON.parse(rawCurseTypes); } catch {}
+        try { CURSE_TARGETS = JSON.parse(rawCurseTargets); } catch {}
+        try { CURSE_TONES = JSON.parse(rawCurseTones); } catch {}
+        try { CURSE_TAGS = JSON.parse(rawCurseTags); } catch {}
+
+        var panelButtons = Array.from(document.querySelectorAll('[data-panel-toggle]'));
+        var panels = Array.from(document.querySelectorAll('[data-panel]'));
+
+        function showPanel(name){
+          panels.forEach(function(panel){
+            if (panel.getAttribute('data-panel') === name) {
+              panel.classList.remove('hidden');
+            } else {
+              panel.classList.add('hidden');
+            }
+          });
+          panelButtons.forEach(function(button){
+            var active = button.getAttribute('data-panel-toggle') === name;
+            if (active) {
+              button.classList.add('bg-white', 'shadow');
+              button.setAttribute('aria-pressed', 'true');
+            } else {
+              button.classList.remove('bg-white', 'shadow');
+              button.setAttribute('aria-pressed', 'false');
+            }
+          });
+        }
+
+        panelButtons.forEach(function(button){
+          button.addEventListener('click', function(){
+            var target = button.getAttribute('data-panel-toggle') || 'posts';
+            showPanel(target);
+          });
+        });
+
+        showPanel('posts');
         function setStatus(msg, ok, warnings, notes, errors){
           var el=$('status');
           if (!el) return;
@@ -226,8 +378,49 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             el.textContent='Ready for PostSpec JSON.';
           }
         }
+
+        function setCurseStatus(msg, ok, errors){
+          var el = $('curseStatus');
+          if (!el) return;
+          var base='rounded-lg border px-3 py-2 text-sm';
+          if (ok === false) {
+            el.className = base + ' border-red-200 bg-red-50 text-red-700';
+          } else if (ok === true) {
+            el.className = base + ' border-emerald-200 bg-emerald-50 text-emerald-700';
+          } else {
+            el.className = base + ' border-slate-200 bg-slate-50 text-slate-700';
+          }
+          el.innerHTML='';
+
+          if (msg) {
+            var p=document.createElement('p');
+            p.className='font-medium';
+            p.textContent=msg;
+            el.appendChild(p);
+          }
+
+          if (Array.isArray(errors) && errors.length) {
+            var list=document.createElement('ul');
+            list.className='mt-2 list-disc pl-5 text-[11px] text-red-700';
+            errors.forEach(function(item){
+              var li=document.createElement('li');
+              li.textContent=String(item);
+              list.appendChild(li);
+            });
+            el.appendChild(list);
+          }
+
+          if (!msg && !(Array.isArray(errors) && errors.length)) {
+            el.textContent='Ready for CurseSpec JSON.';
+          }
+        }
         function busy(on){
           ['genPrompt','validateBtn','previewBtn','ingestBtn','ingestPublishBtn','copyPrompt']
+            .forEach(function(id){ var b=$(id); if(b){ b.disabled=!!on; b.style.opacity = on ? .6 : 1; }});
+        }
+
+        function curseBusy(on){
+          ['curseGenPrompt','curseValidateBtn','curseIngestBtn','curseCopyPrompt']
             .forEach(function(id){ var b=$(id); if(b){ b.disabled=!!on; b.style.opacity = on ? .6 : 1; }});
         }
 
@@ -314,6 +507,57 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           panel.appendChild(body);
         }
 
+        function renderCurseSummary(spec){
+          var panel = $('curseSummary');
+          if (!panel) return;
+          panel.innerHTML='';
+          var baseClass='rounded-lg border border-gray-200 bg-gray-50 p-3 text-[11px]';
+          if (!spec) {
+            panel.className = baseClass + ' text-gray-600';
+            var empty=document.createElement('p');
+            empty.textContent='No CurseSpec parsed yet. Paste JSON to inspect the structure.';
+            panel.appendChild(empty);
+            return;
+          }
+
+          panel.className = baseClass + ' text-gray-700';
+          var title=document.createElement('p');
+          title.className='text-xs font-semibold uppercase tracking-wide text-gray-500';
+          title.textContent='Curse Summary';
+          panel.appendChild(title);
+
+          function addRow(label, value){
+            var row=document.createElement('div');
+            row.className='grid grid-cols-[120px_1fr] gap-2';
+            var dt=document.createElement('dt');
+            dt.className='text-[11px] font-medium text-gray-500';
+            dt.textContent=label;
+            var dd=document.createElement('dd');
+            dd.className='text-[11px] text-gray-800';
+            dd.textContent=value;
+            row.appendChild(dt);
+            row.appendChild(dd);
+            body.appendChild(row);
+          }
+
+          var body=document.createElement('dl');
+          body.className='mt-2 space-y-1';
+          var generator = spec.generator || {};
+
+          addRow('Title', spec.title || '(missing)');
+          addRow('Slug', spec.slug || '(missing)');
+          addRow('Invocation', spec.invocation || '(missing)');
+          addRow('Type / Target', (generator.type || '?') + ' → ' + (generator.target || '?'));
+          addRow('Tone', generator.tone || '(unspecified)');
+          if (generator.sigilName) addRow('Sigil', generator.sigilName);
+          if (generator.altarItem) addRow('Altar item', generator.altarItem);
+          if (generator.journalingFollowUp) addRow('Journal', generator.journalingFollowUp);
+          addRow('Tags', Array.isArray(spec.tags) && spec.tags.length ? spec.tags.join(', ') : '(none)');
+          if (spec.safetyNotes) addRow('Safety', spec.safetyNotes);
+
+          panel.appendChild(body);
+        }
+
         function updateHelp(selectId, helpId, options, fallback){
           var select = $(selectId);
           var help = $(helpId);
@@ -332,6 +576,9 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
         setStatus('Ready for PostSpec JSON.');
         renderSpecSummary(null);
+        setCurseStatus('Ready for CurseSpec JSON.');
+        renderCurseSummary(null);
+        renderCursePreview(null);
 
         $('genPrompt').addEventListener('click', async function(){
           try{
@@ -463,6 +710,43 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           return spec;
         }
 
+        function normalizeCurseSpec(spec){
+          if (!spec || typeof spec !== 'object') return spec;
+          if (typeof spec.specVersion === 'string') {
+            var parsed = Number(spec.specVersion);
+            if (!Number.isNaN(parsed)) spec.specVersion = parsed;
+          }
+          ['title','slug','openingReflection','invocation','method','closure','safetyNotes'].forEach(function(key){
+            if (typeof spec[key] === 'string') spec[key] = spec[key].trim();
+          });
+          if (!Array.isArray(spec.tags)) {
+            if (typeof spec.tags === 'string') {
+              spec.tags = spec.tags.split(/[\n,]/).map(function(tag){ return tag.trim(); }).filter(Boolean);
+            } else {
+              spec.tags = [];
+            }
+          } else {
+            spec.tags = spec.tags.map(function(tag){ return String(tag || '').trim(); }).filter(Boolean);
+          }
+          var seen = new Set();
+          spec.tags = spec.tags.filter(function(tag){
+            var lower = tag.toLowerCase();
+            if (seen.has(lower)) return false;
+            seen.add(lower);
+            return true;
+          });
+          if (!spec.generator || typeof spec.generator !== 'object') {
+            spec.generator = {};
+          } else {
+            ['type','target','tone','sigilName','altarItem','journalingFollowUp'].forEach(function(key){
+              if (typeof spec.generator[key] === 'string') {
+                spec.generator[key] = spec.generator[key].trim();
+              }
+            });
+          }
+          return spec;
+        }
+
         function parseSpec(){
           var raw = document.getElementById('spec').value;
           if (!raw.trim()) throw new Error('No JSON provided.');
@@ -496,6 +780,33 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           }
 
           return normalizeSpec(parsed);
+        }
+
+        function parseCurseSpec(){
+          var field = $('curseSpec');
+          if (!field) throw new Error('No textarea found.');
+          var raw = field.value;
+          if (!raw.trim()) throw new Error('No JSON provided.');
+
+          var base = stripInvisible(normalizeQuotes(stripCodeFences(raw)));
+          var attempts = [base];
+          var cleanedBackslashes = deBackslashOutsideStrings(base);
+          if (cleanedBackslashes !== base) attempts.push(cleanedBackslashes);
+
+          var parsed = null;
+          for (var i=0;i<attempts.length && !parsed;i++){
+            try {
+              parsed = JSON.parse(attempts[i]);
+            } catch (_err) {
+              parsed = null;
+            }
+          }
+
+          if (!parsed) {
+            throw new Error('Invalid JSON — cleaned for fences/quotes, but structure still fails.');
+          }
+
+          return normalizeCurseSpec(parsed);
         }
 
 
@@ -557,6 +868,40 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           return data;
         }
 
+        async function postCurse(spec, options){
+          var dryRun = options && options.dryRun ? 'true' : 'false';
+          var url = DEV_API + '/curses/ingest' + (dryRun === 'true' ? '?dryRun=true' : '');
+          var res;
+          try {
+            res = await fetch(url, {
+              method:'POST',
+              headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({ spec, dryRun })
+            });
+          } catch (networkError) {
+            throw buildError('Network error contacting curse ingest endpoint: ' + (networkError && networkError.message ? networkError.message : 'unknown network error'), 'network', {
+              original: networkError
+            });
+          }
+
+          var data;
+          try {
+            data = await res.json();
+          } catch (parseError) {
+            throw buildError('Curse ingest returned non-JSON response.', 'http', { status: res.status, original: parseError });
+          }
+
+          if (!res.ok || data.ok === false) {
+            throw buildError(
+              data && data.error ? data.error : 'Curse ingest error (' + res.status + ')',
+              'http',
+              { status: res.status, data: data }
+            );
+          }
+
+          return data;
+        }
+
         function handleSpecError(err){
           if (err && err.data && err.data.spec) {
             renderSpecSummary(err.data.spec);
@@ -573,6 +918,23 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             return;
           }
           setStatus((err && err.message) || 'Unexpected error', false, warnings, notes, errors);
+        }
+
+        function handleCurseError(err){
+          if (err && err.data && err.data.spec) {
+            renderCurseSummary(err.data.spec);
+            renderCursePreview(err.data.spec);
+          }
+          var errors = err && err.data ? extractArray(err.data.errors) : [];
+          if (err && err.type === 'network') {
+            setCurseStatus(err.message, false, errors);
+            return;
+          }
+          if (err && err.type === 'http') {
+            setCurseStatus(err.message, false, errors);
+            return;
+          }
+          setCurseStatus((err && err.message) || 'Unexpected error', false, errors);
         }
 
         $('validateBtn').addEventListener('click', async function(){
@@ -621,6 +983,41 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           meta.className='mt-4 text-xs text-gray-500';
           meta.textContent = '~' + totalWords + ' words • ~' + Math.max(1, Math.round(totalWords/200)) + ' min read';
           el.appendChild(meta);
+        }
+
+        function renderCursePreview(spec){
+          var el = $('cursePreview');
+          if (!el) return;
+          el.innerHTML='';
+          if (!spec) return;
+
+          var h1=document.createElement('h1');
+          h1.textContent = spec.title || '(untitled curse)';
+          el.appendChild(h1);
+
+          var tags = Array.isArray(spec.tags) ? spec.tags : [];
+          if (tags.length) {
+            var tagLine=document.createElement('p');
+            tagLine.className='text-sm text-gray-600';
+            tagLine.textContent='Tags: ' + tags.join(', ');
+            el.appendChild(tagLine);
+          }
+
+          function appendSection(label, value){
+            var heading=document.createElement('h2');
+            heading.textContent=label;
+            el.appendChild(heading);
+            var div=document.createElement('div');
+            var safe=String(value || '').trim().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+            div.innerHTML=safe;
+            el.appendChild(div);
+          }
+
+          appendSection('Opening Reflection', spec.openingReflection || '');
+          appendSection('Invocation', spec.invocation || '');
+          appendSection('Method', spec.method || '');
+          appendSection('Closure & Aftercare', spec.closure || '');
+          if (spec.safetyNotes) appendSection('Safety Notes', spec.safetyNotes);
         }
 
         $('previewBtn').addEventListener('click', async function(){
@@ -712,6 +1109,94 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         $('clearBtn').addEventListener('click', function(){
           $('spec').value=''; $('preview').innerHTML=''; renderSpecSummary(null); setStatus('Cleared. Ready for new JSON.', null);
         });
+
+        var curseTypeEl = $('curseType');
+        if (curseTypeEl) {
+          $('curseGenPrompt').addEventListener('click', async function(){
+            try {
+              curseBusy(true); setCurseStatus('Generating prompt...', null);
+              var type = ($('curseType')?.value || CURSE_TYPES[0] || 'mirror');
+              var target = ($('curseTarget')?.value || CURSE_TARGETS[0] || 'person');
+              var tone = ($('curseTone')?.value || CURSE_TONES[0] || 'poetic');
+              var sigil = ($('curseSigil')?.value || '').trim();
+              var altar = ($('curseAltar')?.value || '').trim();
+              var journal = ($('curseJournal')?.value || '').trim();
+              var body = { type, target, tone };
+              if (sigil) body.sigilName = sigil;
+              if (altar) body.altarItem = altar;
+              if (journal) body.journalingFollowUp = journal;
+              var res = await fetch(DEV_API + '/curses/prompt', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+              if (!res.ok) throw new Error('Prompt request failed (' + res.status + ')');
+              var data = await res.json();
+              if (!data.ok) throw new Error(data.error || 'Prompt request failed');
+              $('cursePromptOut').value = data.prompt || '';
+              setCurseStatus('Prompt ready ✓', true);
+            } catch (e) {
+              setCurseStatus('Prompt error: ' + (e && e.message ? e.message : String(e)), false);
+            } finally {
+              curseBusy(false);
+            }
+          });
+
+          $('curseCopyPrompt').addEventListener('click', async function(){
+            try {
+              await navigator.clipboard.writeText($('cursePromptOut').value || '');
+              setCurseStatus('Copied ✓', true);
+            } catch {
+              var field = $('cursePromptOut');
+              if (field) { field.select(); document.execCommand('copy'); }
+              setCurseStatus('Copied ✓', true);
+            }
+          });
+
+          $('curseValidateBtn').addEventListener('click', async function(){
+            try {
+              curseBusy(true); setCurseStatus('Validating…', null);
+              var spec = parseCurseSpec();
+              var data = await postCurse(spec, { dryRun: true });
+              var finalSpec = data && data.spec ? normalizeCurseSpec(data.spec) : spec;
+              renderCurseSummary(finalSpec);
+              renderCursePreview(finalSpec);
+              setCurseStatus('Valid ✓', true, extractArray(data.errors));
+            } catch (e) {
+              handleCurseError(e);
+            } finally {
+              curseBusy(false);
+            }
+          });
+
+          $('curseIngestBtn').addEventListener('click', async function(){
+            try {
+              curseBusy(true); setCurseStatus('Validating…', null);
+              var spec = parseCurseSpec();
+              var dryRun = await postCurse(spec, { dryRun: true });
+              var finalSpec = dryRun && dryRun.spec ? normalizeCurseSpec(dryRun.spec) : spec;
+              renderCurseSummary(finalSpec);
+              renderCursePreview(finalSpec);
+              var dryErrors = extractArray(dryRun.errors);
+              if (dryRun.ok === false) {
+                setCurseStatus(dryRun.error || 'Validation errors found.', false, dryErrors);
+                return;
+              }
+              setCurseStatus('Validation passed. Ingesting…', null, dryErrors);
+              var data = await postCurse(finalSpec, { dryRun: false });
+              var path = data.path || ('content/white-magic-curses/' + (data.slug || finalSpec.slug || 'curse') + '.md');
+              var message = (data.saved === false ? 'Saved (dry run only).' : 'Ingested ✓') + ' → ' + path;
+              setCurseStatus(message, true, extractArray(data.errors));
+            } catch (e) {
+              handleCurseError(e);
+            } finally {
+              curseBusy(false);
+            }
+          });
+
+          $('curseClearBtn').addEventListener('click', function(){
+            $('curseSpec').value='';
+            $('cursePreview').innerHTML='';
+            renderCurseSummary(null);
+            setCurseStatus('Cleared. Ready for new JSON.', null);
+          });
+        }
       })();
     </script>
   )}

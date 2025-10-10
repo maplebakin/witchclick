@@ -1,0 +1,53 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readSettings, getSiteOrigin } from "../../utils/settings";
+import { loadAllCurses } from "../../utils/curses";
+
+const settings = readSettings();
+const site = getSiteOrigin(settings) || "https://example.com";
+const curses = loadAllCurses();
+---
+
+<Base
+  title="White Magic Curses — WitchClick"
+  description="Ethical energy returns and poetic accountability rituals for boundary keepers."
+  canon={`${site}/curses`}
+  wide={true}
+>
+  <section class="mx-auto max-w-4xl space-y-6 py-8">
+    <header class="space-y-2 text-center">
+      <h1 class="text-3xl font-semibold tracking-tight text-purple-900">White Magic Curses</h1>
+      <p class="text-sm text-slate-600">
+        Honest energy work for people who refuse to stay silent or sink into bitterness.
+      </p>
+    </header>
+
+    <div class="grid gap-6">
+      {curses.length ? (
+        curses.map((curse) => (
+          <article class="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm transition hover:shadow-md">
+            <h2 class="text-xl font-semibold text-purple-900">
+              <a href={`/curses/${curse.slug}`}>{curse.title}</a>
+            </h2>
+            {curse.invocation && (
+              <p class="mt-2 text-sm italic text-purple-700">{curse.invocation}</p>
+            )}
+            <p class="mt-3 text-sm text-slate-700">
+              {curse.sections.find((section) => section.label.toLowerCase().includes("opening"))?.content
+                ?.split("\n")
+                .slice(0, 2)
+                .join(" ") ?? ""}
+            </p>
+            <div class="mt-3 flex flex-wrap gap-2 text-[11px] uppercase tracking-wide text-purple-600">
+              {curse.tags.map((tag) => (
+                <span class="rounded-full border border-purple-200 px-2 py-0.5">{tag}</span>
+              ))}
+            </div>
+          </article>
+        ))
+      ) : (
+        <p class="text-center text-sm text-slate-600">No curses published yet. Check back soon.</p>
+      )}
+    </div>
+  </section>
+</Base>
