@@ -1,0 +1,11 @@
+---
+import type { LoadedDraft } from '../types/draft';
+import PromptEngineIsland from './PromptEngine.tsx';
+
+interface Props {
+  drafts: LoadedDraft[];
+}
+
+const { drafts } = Astro.props as Props;
+---
+<PromptEngineIsland client:load drafts={drafts} />
