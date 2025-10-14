@@ -70,6 +70,31 @@ function isActive(href: string): boolean {
         ))}
       </ul>
       <div class="site-nav__actions">
+        {visibleAdmin.length > 0 && (
+          <details class="site-nav__dev" data-dev-menu>
+            <summary class="site-nav__button site-nav__button--dev">
+              Dev shortcuts
+              <svg class="site-nav__dev-caret" viewBox="0 0 12 8" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M10.59.59a2 2 0 0 1 0 2.82l-3.3 3.29a2 2 0 0 1-2.82 0L1.17 3.41A2 2 0 0 1 4 1.59l2 2 2-2a2 2 0 0 1 2.59 0Z"
+                />
+              </svg>
+            </summary>
+            <div class="site-nav__dev-dropdown" aria-label="Developer links">
+              <ul class="site-nav__dev-list">
+                {visibleAdmin.map((item) => (
+                  <li>
+                    <a class="site-nav__dev-link" href={item.href} rel={item.rel}>
+                      {item.label}
+                      <span aria-hidden="true">↗</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </details>
+        )}
         <button
           type="button"
           class="site-nav__button"
@@ -237,6 +262,91 @@ function isActive(href: string): boolean {
       align-items: center;
       gap: var(--space-2, 0.5rem);
     }
+  }
+
+  .site-nav__button--dev {
+    border-style: dashed;
+    color: rgba(244, 241, 255, 0.8);
+  }
+
+  .site-nav__dev {
+    position: relative;
+  }
+
+  .site-nav__dev > summary {
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .site-nav__dev > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .site-nav__dev-caret {
+    width: 0.75rem;
+    height: 0.75rem;
+    transition: transform 160ms ease;
+  }
+
+  .site-nav__dev[open] .site-nav__dev-caret {
+    transform: rotate(180deg);
+  }
+
+  .site-nav__dev-dropdown {
+    position: absolute;
+    right: 0;
+    margin-top: var(--space-2, 0.5rem);
+    padding: var(--space-4, 1rem);
+    border-radius: 1rem;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    background: rgba(18, 7, 37, 0.95);
+    box-shadow: var(--shadow-2, 0 28px 75px -24px rgba(3, 2, 12, 0.72));
+    display: grid;
+    gap: var(--space-2, 0.5rem);
+    min-width: 16rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-0.35rem);
+    transition: opacity 160ms ease, transform 160ms ease;
+    z-index: 40;
+  }
+
+  .site-nav__dev[open] .site-nav__dev-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .site-nav__dev-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-2, 0.5rem);
+  }
+
+  .site-nav__dev-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2, 0.5rem);
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    border-radius: 0.75rem;
+    border: 1px solid transparent;
+    background: rgba(124, 78, 176, 0.12);
+    color: rgba(244, 241, 255, 0.85);
+    font-family: var(--font-accent);
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .site-nav__dev-link:hover,
+  .site-nav__dev-link:focus-visible {
+    border-color: rgba(212, 175, 55, 0.45);
+    background: rgba(124, 78, 176, 0.25);
+    color: var(--color-gold, #d4af37);
   }
 
   .site-nav__mobile-admin {
