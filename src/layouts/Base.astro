@@ -5,6 +5,7 @@ import "@/styles/cards.css";
 import "@/styles/tailwind.css";
 
 import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
 import { readSettings, getSiteOrigin, toAbsoluteUrl } from "@/utils/settings";
 import { buildAnalyticsInjection } from "@/utils/analytics";
 import { Fragment } from "astro/jsx-runtime";
@@ -69,6 +70,9 @@ const adminLinks = isDev
   : [];
 
 const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined;
+const comfortId = Math.random().toString(36).slice(2, 10);
+const comfortThemeToggleId = `comfort-theme-${comfortId}`;
+const comfortFontToggleId = `comfort-font-${comfortId}`;
 ---
 <html lang="en" class="h-full">
   <head>
@@ -92,15 +96,60 @@ const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined
     <script is:inline>
       try {
         const stored = localStorage.getItem('witchclick-comfort');
-        if (stored) {
+        if (!stored) {
+          document.documentElement?.removeAttribute('data-comfort-theme');
+          document.documentElement?.removeAttribute('data-comfort-font');
+          if (document.readyState === 'complete') {
+            document.body?.removeAttribute('data-comfort-theme');
+            document.body?.removeAttribute('data-comfort-font');
+          } else {
+            document.addEventListener(
+              'DOMContentLoaded',
+              () => {
+                document.body?.removeAttribute('data-comfort-theme');
+                document.body?.removeAttribute('data-comfort-font');
+              },
+              { once: true }
+            );
+          }
+        } else {
           const prefs = JSON.parse(stored);
           const root = document.documentElement;
-          if (prefs && typeof prefs === 'object') {
-            if (prefs.theme === 'dawn') {
-              root.setAttribute('data-comfort-theme', 'dawn');
+          if (prefs && typeof prefs === 'object' && root) {
+            const theme = prefs.theme === 'dawn' ? 'dawn' : null;
+            const font = prefs.font === 'sans' ? 'sans' : null;
+
+            if (theme) {
+              root.setAttribute('data-comfort-theme', theme);
+            } else {
+              root.removeAttribute('data-comfort-theme');
             }
-            if (prefs.font === 'sans') {
-              root.setAttribute('data-comfort-font', 'sans');
+
+            if (font) {
+              root.setAttribute('data-comfort-font', font);
+            } else {
+              root.removeAttribute('data-comfort-font');
+            }
+
+            const applyToBody = () => {
+              const body = document.body;
+              if (!body) return;
+              if (theme) {
+                body.setAttribute('data-comfort-theme', theme);
+              } else {
+                body.removeAttribute('data-comfort-theme');
+              }
+              if (font) {
+                body.setAttribute('data-comfort-font', font);
+              } else {
+                body.removeAttribute('data-comfort-font');
+              }
+            };
+
+            if (document.readyState === 'loading') {
+              document.addEventListener('DOMContentLoaded', applyToBody, { once: true });
+            } else {
+              applyToBody();
             }
           }
         }
@@ -123,6 +172,34 @@ const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined
       adminLinks={adminLinks}
       currentPath={currentPath}
     />
+    <div class="comfort-toolbar" role="region" aria-label="Display comfort preferences">
+      <div class="wc-container comfort-toolbar__inner">
+        <div class="comfort-toolbar__group" role="group" aria-label="Theme and contrast">
+          <input
+            id={comfortThemeToggleId}
+            class="comfort-toolbar__control"
+            type="checkbox"
+            data-comfort-theme-toggle
+          />
+          <label class="comfort-toolbar__label" for={comfortThemeToggleId}>
+            <span class="comfort-toolbar__title">Gentle dawn theme</span>
+            <span class="comfort-toolbar__hint">Softer contrast, parchment glow</span>
+          </label>
+        </div>
+        <div class="comfort-toolbar__group" role="group" aria-label="Body font preference">
+          <input
+            id={comfortFontToggleId}
+            class="comfort-toolbar__control"
+            type="checkbox"
+            data-comfort-font-toggle
+          />
+          <label class="comfort-toolbar__label" for={comfortFontToggleId}>
+            <span class="comfort-toolbar__title">Sans-serif body text</span>
+            <span class="comfort-toolbar__hint">Switch to Inter for easy scanning</span>
+          </label>
+        </div>
+      </div>
+    </div>
     <main id="main" class="site-main">
       <div
         class:list={[
@@ -135,53 +212,13 @@ const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined
         <slot />
       </div>
     </main>
-    <footer class="site-footer" aria-label="Site footer">
-      <div class="wc-container site-footer__inner">
-        <div class="site-footer__grid">
-          <div>
-            <span class="site-logo" aria-label="{brandName} logo">{brandName}</span>
-            <p class="site-footer__blurb">
-              Cozy secular rituals, printable tools, and mindful planning spells for modern mystics.
-            </p>
-            {disclosure && <p class="site-footer__disclosure">{disclosure}</p>}
-          </div>
-          <div>
-            <p class="site-footer__title">Explore</p>
-            <ul class="site-footer__nav">
-              {navLinks.map((link) => (
-                <li>
-                  <a href={link.href}>{link.label}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <p class="site-footer__title">Stay connected</p>
-            <p class="site-footer__blurb">
-              Subscribe for gentle updates or drop by the contact page if you’d like to collaborate.
-            </p>
-            <div class="site-footer__meta">
-              <a class="hero-cta hero-cta--secondary" href="/contact/">Reach out</a>
-            </div>
-          </div>
-        </div>
-        <div class="site-footer__meta">
-          <ul class="site-footer__nav site-footer__nav--inline">
-            {utilityLinks.map((link) => (
-              <li>
-                <a href={link.href}>{link.label}</a>
-              </li>
-            ))}
-            {adminLinks.map((link) => (
-              <li class="site-footer__link--dev">
-                <a href={link.href}>{link.label}</a>
-              </li>
-            ))}
-          </ul>
-          <p class="site-footer__copyright">© {new Date().getFullYear()} {brandName}. All rights reserved.</p>
-        </div>
-      </div>
-    </footer>
+    <Footer
+      brandName={brandName}
+      navLinks={navLinks}
+      utilityLinks={utilityLinks}
+      adminLinks={adminLinks}
+      disclosure={disclosure}
+    />
     {analytics?.runtime && <Fragment set:html={analytics.runtime} />}
   </body>
 </html>
@@ -206,6 +243,105 @@ const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined
     top: 1rem;
     width: auto;
     height: auto;
+  }
+
+  .comfort-toolbar {
+    background: rgba(10, 4, 20, 0.6);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.22);
+    box-shadow: inset 0 -1px 0 rgba(12, 5, 23, 0.35);
+  }
+
+  .comfort-toolbar__inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: stretch;
+    justify-content: flex-end;
+    padding: 0.75rem 1.5rem;
+  }
+
+  .comfort-toolbar__group {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid rgba(212, 175, 55, 0.32);
+    background: rgba(18, 7, 37, 0.72);
+    backdrop-filter: blur(12px);
+  }
+
+  .comfort-toolbar__control {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 0.35rem;
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    background: rgba(6, 3, 12, 0.8);
+    appearance: none;
+    display: grid;
+    place-content: center;
+    cursor: pointer;
+  }
+
+  .comfort-toolbar__control::after {
+    content: "";
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 0.2rem;
+    background: rgba(212, 175, 55, 0.7);
+    transform: scale(0);
+    transition: transform 160ms ease;
+  }
+
+  .comfort-toolbar__control:checked::after {
+    transform: scale(1);
+  }
+
+  .comfort-toolbar__control:focus-visible {
+    outline: 2px solid rgba(212, 175, 55, 0.65);
+    outline-offset: 3px;
+  }
+
+  .comfort-toolbar__label {
+    display: grid;
+    gap: 0.25rem;
+    font-family: var(--font-body-ui, var(--font-body));
+    cursor: pointer;
+  }
+
+  .comfort-toolbar__title {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .comfort-toolbar__hint {
+    font-size: 0.65rem;
+    opacity: 0.75;
+  }
+
+  :root[data-comfort-theme="dawn"] .comfort-toolbar {
+    background: rgba(250, 245, 236, 0.82);
+    border-bottom-color: rgba(122, 94, 154, 0.28);
+    box-shadow: inset 0 -1px 0 rgba(214, 200, 236, 0.35);
+  }
+
+  :root[data-comfort-theme="dawn"] .comfort-toolbar__group {
+    border-color: rgba(122, 94, 154, 0.38);
+    background: rgba(255, 252, 247, 0.82);
+  }
+
+  :root[data-comfort-theme="dawn"] .comfort-toolbar__control {
+    border-color: rgba(122, 94, 154, 0.5);
+    background: rgba(247, 240, 232, 0.85);
+  }
+
+  :root[data-comfort-theme="dawn"] .comfort-toolbar__control::after {
+    background: rgba(122, 94, 154, 0.6);
+  }
+
+  :root[data-comfort-theme="dawn"] .comfort-toolbar__hint {
+    opacity: 0.85;
   }
 
   .site-shell {

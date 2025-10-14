@@ -1,22 +1,54 @@
 ---
-title: "Using Different Perspectives: A Gentle, Practical Guide"
-slug: "using-different-perspectives-a-gentle-practical-guide"
-excerpt: "Different perspectives are like windows in the same room: each one changes the light. This piece offers cozy, low-spoons options and deeper practices to help you see more clearly, get unstuck, and choose values-aligned decisions without forcing certainty."
-metaTitle: "Using Different Perspectives: A Gentle, Practical Guide"
-metaDescription: "A gentle, practical guide to perspective-taking: widen your view, ease stuckness, and choose values-aligned next steps with low-energy tips, rituals, and clear prompts."
-tags: ["perspective-taking","cognitive flexibility","self-inquiry","journaling","decision-making"]
-outline: ["Opening Reflection","Why Perspectives Matter (Without Overthinking)","Quick, Low-Energy Ways to Widen the View","Deep Dive: Seeing With More Than One Lens","Ritual: The Four Lenses Practice","Reflection Prompts For Your Journal","Common Pitfalls and Gentle Correctives","Checklist & Gentle Summary"]
+title: 'Using Different Perspectives: A Gentle, Practical Guide'
+slug: using-different-perspectives-a-gentle-practical-guide
+excerpt: 'Different perspectives are like windows in the same room: each one changes the light. This piece offers cozy, low-spoons options and deeper practices to help you see more clearly, get unstuck, and choose values-aligned decisions without forcing certainty.'
+metaTitle: 'Using Different Perspectives: A Gentle, Practical Guide'
+metaDescription: 'A gentle, practical guide to perspective-taking: widen your view, ease stuckness, and choose values-aligned next steps with low-energy tips, rituals, and clear prompts.'
+tags:
+  - planning
+  - perspective-taking
+  - cognitive flexibility
+  - self-inquiry
+  - journaling
+  - decision-making
+outline:
+  - Opening Reflection
+  - Why Perspectives Matter (Without Overthinking)
+  - 'Quick, Low-Energy Ways to Widen the View'
+  - 'Deep Dive: Seeing With More Than One Lens'
+  - 'Ritual: The Four Lenses Practice'
+  - Reflection Prompts For Your Journal
+  - Common Pitfalls and Gentle Correctives
+  - Checklist & Gentle Summary
 wordCount: 1164
 readingMinutes: 6
 entities: []
 includeAds: true
 includeKofi: true
-affiliateAnchors: [{"key":"notebooks","text":"dotted-grid journal","insertedCount":0},{"key":"journal","text":"small spiral notebook","insertedCount":0},{"key":"crystals","text":"grounding palm stone","insertedCount":0}]
-internalLinkHints: ["what is perspective-taking","cognitive flexibility","steelman the other side","map versus territory","beginner's mind","low-spoons options","values-aligned decision","journal prompts"]
+affiliateAnchors:
+  - key: notebooks
+    text: dotted-grid journal
+    insertedCount: 0
+  - key: journal
+    text: small spiral notebook
+    insertedCount: 0
+  - key: crystals
+    text: grounding palm stone
+    insertedCount: 0
+internalLinkHints:
+  - what is perspective-taking
+  - cognitive flexibility
+  - steelman the other side
+  - map versus territory
+  - beginner's mind
+  - low-spoons options
+  - values-aligned decision
+  - journal prompts
 internalLinks: []
-publishedAt: "2025-10-01T14:04:14.799Z"
-canonicalUrl: "https://witchclick.space/post/using-different-perspectives-a-gentle-practical-guide"
+publishedAt: '2025-10-01T14:04:14.799Z'
+canonicalUrl: 'https://witchclick.space/post/using-different-perspectives-a-gentle-practical-guide'
 specVersion: 2
+spoonLevel: medium
 ---
 
 ## Opening Reflection

@@ -1,22 +1,47 @@
 ---
-title: "Spiritual Integration for Reflective Psychology Sessions"
-slug: "spirituality-in-psychology-reflection"
-excerpt: "A reflective guide for weaving spirituality into psychology with quick grounding rituals, deep integration retreats, accessibility tweaks, and community care checklists."
-metaTitle: "Spiritual Integration for Reflective Psychology Sessions"
-metaDescription: "Design a 2500-word reflection on spirituality in psychology with quick resets, deep retreats, accessibility tweaks, and communal checklists for therapists."
-tags: ["psychology","spirituality","ritual","reflection","therapy"]
-outline: ["Opening Reflection","Quick Spiritual Grounding Practice (10-Minute Reset)","Deep Therapeutic Integration Retreat","Accessibility Tweaks & Gentle Variations","Safety, Community Care, and Boundaries","Reflection Prompt & Checklist"]
+title: Spiritual Integration for Reflective Psychology Sessions
+slug: spirituality-in-psychology-reflection
+excerpt: 'A reflective guide for weaving spirituality into psychology with quick grounding rituals, deep integration retreats, accessibility tweaks, and community care checklists.'
+metaTitle: Spiritual Integration for Reflective Psychology Sessions
+metaDescription: 'Design a 2500-word reflection on spirituality in psychology with quick resets, deep retreats, accessibility tweaks, and communal checklists for therapists.'
+tags:
+  - calm
+  - psychology
+  - spirituality
+  - ritual
+  - reflection
+  - therapy
+outline:
+  - Opening Reflection
+  - Quick Spiritual Grounding Practice (10-Minute Reset)
+  - Deep Therapeutic Integration Retreat
+  - Accessibility Tweaks & Gentle Variations
+  - 'Safety, Community Care, and Boundaries'
+  - Reflection Prompt & Checklist
 wordCount: 2992
 readingMinutes: 15
-entities: [{"type":"ritual","slug":"candle-grounding"},{"type":"moonPhase","slug":"waxing-gibbous"}]
+entities:
+  - type: ritual
+    slug: candle-grounding
+  - type: moonPhase
+    slug: waxing-gibbous
 includeAds: true
 includeKofi: true
-affiliateAnchors: [{"key":"ritual-journal","text":"linen reflection journal","insertedCount":0}]
-internalLinkHints: ["spiritual resilience practice","holistic therapy frameworks","trauma informed mindfulness","integrative psychology rituals","community care journaling"]
+affiliateAnchors:
+  - key: ritual-journal
+    text: linen reflection journal
+    insertedCount: 0
+internalLinkHints:
+  - spiritual resilience practice
+  - holistic therapy frameworks
+  - trauma informed mindfulness
+  - integrative psychology rituals
+  - community care journaling
 internalLinks: []
-publishedAt: "2025-09-30T16:12:37.793Z"
-canonicalUrl: "https://witchclick.space/post/spirituality-in-psychology-reflection"
+publishedAt: '2025-09-30T16:12:37.793Z'
+canonicalUrl: 'https://witchclick.space/post/spirituality-in-psychology-reflection'
 specVersion: 2
+spoonLevel: low
 ---
 
 ## Opening Reflection

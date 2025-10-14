@@ -1,22 +1,55 @@
 ---
-title: "What's the Deal with the Rapture? A Cozy Secular Tour"
-slug: "whats-the-deal-with-the-rapture-a-cozy-secular-tour"
-excerpt: "Rapture talk pops up like dramatic weather alerts: loud, sticky, and strangely compelling. This lighthearted, secular guide offers a gentle historical timeline, low-spoons perspective tools, and kind prompts so you can sort feelings from facts and choose values-aligned next steps."
-metaTitle: "What's the Deal with the Rapture? A Cozy Secular Tour"
-metaDescription: "A whimsical, secular primer on rapture ideas: where they came from, why they go viral, and how to stay grounded. Includes low-energy practices, a gentle historical timeline, and reflective prompts you can journal through."
-tags: ["rapture","secular","journaling","apocalypse","history","self-inquiry"]
-outline: ["Opening Reflection","Quick, Low-Energy Ways To Un-spook Yourself","Deep Dive: Context, History, And Interpretations","Ritual: The Five-Lantern Walk","Reflection Prompts For Your Journal","Common Pitfalls And Gentle Correctives","Checklist & Gentle Summary"]
+title: What's the Deal with the Rapture? A Cozy Secular Tour
+slug: whats-the-deal-with-the-rapture-a-cozy-secular-tour
+excerpt: 'Rapture talk pops up like dramatic weather alerts: loud, sticky, and strangely compelling. This lighthearted, secular guide offers a gentle historical timeline, low-spoons perspective tools, and kind prompts so you can sort feelings from facts and choose values-aligned next steps.'
+metaTitle: What's the Deal with the Rapture? A Cozy Secular Tour
+metaDescription: 'A whimsical, secular primer on rapture ideas: where they came from, why they go viral, and how to stay grounded. Includes low-energy practices, a gentle historical timeline, and reflective prompts you can journal through.'
+tags:
+  - calm
+  - rapture
+  - secular
+  - journaling
+  - apocalypse
+  - history
+  - self-inquiry
+outline:
+  - Opening Reflection
+  - 'Quick, Low-Energy Ways To Un-spook Yourself'
+  - 'Deep Dive: Context, History, And Interpretations'
+  - 'Ritual: The Five-Lantern Walk'
+  - Reflection Prompts For Your Journal
+  - Common Pitfalls And Gentle Correctives
+  - Checklist & Gentle Summary
 wordCount: 1080
 readingMinutes: 5
 entities: []
 includeAds: true
 includeKofi: true
-affiliateAnchors: [{"key":"ritual-journal","text":"soft ritual journal","insertedCount":0},{"key":"micro-notebook","text":"pocket micro notebook","insertedCount":0},{"key":"grounding-stone","text":"grounding palm stone","insertedCount":0},{"key":"cozy-game","text":"cozy narrative game","insertedCount":0}]
-internalLinkHints: ["secular overview of rapture","pre-trib versus post-trib","apocalyptic media literacy","gentle historical timeline","low-spoons perspective tools","values-aligned decision making"]
+affiliateAnchors:
+  - key: ritual-journal
+    text: soft ritual journal
+    insertedCount: 0
+  - key: micro-notebook
+    text: pocket micro notebook
+    insertedCount: 0
+  - key: grounding-stone
+    text: grounding palm stone
+    insertedCount: 0
+  - key: cozy-game
+    text: cozy narrative game
+    insertedCount: 0
+internalLinkHints:
+  - secular overview of rapture
+  - pre-trib versus post-trib
+  - apocalyptic media literacy
+  - gentle historical timeline
+  - low-spoons perspective tools
+  - values-aligned decision making
 internalLinks: []
-publishedAt: "2025-10-01T15:01:27.338Z"
-canonicalUrl: "https://witchclick.space/post/whats-the-deal-with-the-rapture-a-cozy-secular-tour"
+publishedAt: '2025-10-01T15:01:27.338Z'
+canonicalUrl: 'https://witchclick.space/post/whats-the-deal-with-the-rapture-a-cozy-secular-tour'
 specVersion: 2
+spoonLevel: low
 ---
 
 ## Opening Reflection

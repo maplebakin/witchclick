@@ -1,22 +1,50 @@
 ---
-title: "Colours as Doorways: Emotional and Spiritual Inquiry"
-slug: "colours-emotional-spiritual-inquiry"
-excerpt: "Colour speaks in whispers—each hue a doorway to feeling, memory, and meaning. This reflective practice invites you to meet colour as a companion in self-inquiry, exploring what surfaces when you pause to listen."
-metaTitle: "Colours as Doorways: Emotional and Spiritual Inquiry"
-metaDescription: "Explore colour as a mirror for feeling and meaning through gentle, secular journaling practices that invite self-discovery."
-tags: ["colour therapy","journaling","self-inquiry","emotional awareness","mindfulness","spiritual practice","introspection"]
-outline: ["Opening Reflection","Quick Colour Check-In","Deep Colour Meditation Journey","Reflection Prompt","Colour Inquiry Checklist"]
+title: 'Colours as Doorways: Emotional and Spiritual Inquiry'
+slug: colours-emotional-spiritual-inquiry
+excerpt: 'Colour speaks in whispers—each hue a doorway to feeling, memory, and meaning. This reflective practice invites you to meet colour as a companion in self-inquiry, exploring what surfaces when you pause to listen.'
+metaTitle: 'Colours as Doorways: Emotional and Spiritual Inquiry'
+metaDescription: 'Explore colour as a mirror for feeling and meaning through gentle, secular journaling practices that invite self-discovery.'
+tags:
+  - calm
+  - colour therapy
+  - journaling
+  - self-inquiry
+  - emotional awareness
+  - mindfulness
+  - spiritual practice
+  - introspection
+outline:
+  - Opening Reflection
+  - Quick Colour Check-In
+  - Deep Colour Meditation Journey
+  - Reflection Prompt
+  - Colour Inquiry Checklist
 wordCount: 1044
 readingMinutes: 5
 entities: []
 includeAds: true
 includeKofi: false
-affiliateAnchors: [{"key":"ritual-journal","text":"ritual journal","insertedCount":0},{"key":"grounding-stone","text":"grounding-stone","insertedCount":0},{"key":"led-candle","text":"led-candle","insertedCount":0}]
-internalLinkHints: ["journaling practices","grounding awareness","nervous system","spiritual practice","inner landscape"]
+affiliateAnchors:
+  - key: ritual-journal
+    text: ritual journal
+    insertedCount: 0
+  - key: grounding-stone
+    text: grounding-stone
+    insertedCount: 0
+  - key: led-candle
+    text: led-candle
+    insertedCount: 0
+internalLinkHints:
+  - journaling practices
+  - grounding awareness
+  - nervous system
+  - spiritual practice
+  - inner landscape
 internalLinks: []
-publishedAt: "2025-10-02T12:12:49.439Z"
-canonicalUrl: "https://witchclick.space/post/colours-emotional-spiritual-inquiry"
+publishedAt: '2025-10-02T12:12:49.439Z'
+canonicalUrl: 'https://witchclick.space/post/colours-emotional-spiritual-inquiry'
 specVersion: 2
+spoonLevel: low
 ---
 
 ## Opening Reflection

@@ -1,16 +1,11 @@
 ---
 title: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
 slug: sunday-football-tarot-spread-and-ritual
-excerpt: >-
-  A cozy, sports-night twist on tarot: use this 7-card spread and tiny ritual to
-  track momentum, read defenses, and spot turning points—without pressure or
-  predictions.
+excerpt: 'A cozy, sports-night twist on tarot: use this 7-card spread and tiny ritual to track momentum, read defenses, and spot turning points—without pressure or predictions.'
 metaTitle: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
-metaDescription: >-
-  Blend game-day vibes with a playful tarot spread and simple ritual for Sunday
-  football. Map momentum, defense, and turning points with clear steps, timing
-  tips, and a short checklist.
+metaDescription: 'Blend game-day vibes with a playful tarot spread and simple ritual for Sunday football. Map momentum, defense, and turning points with clear steps, timing tips, and a short checklist.'
 tags:
+  - calm
   - tarot
   - football
   - ritual
@@ -86,6 +81,7 @@ internalLinkHints:
   - 'Create a Calm Space During Political Unrest: A Gentle Guide'
 heroImageSrc: /hero-images/sunday-football-tarot-spread-and-ritual.png
 heroImageAlt: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide — hero image'
+spoonLevel: low
 ---
 
 ## Why tarot + football works

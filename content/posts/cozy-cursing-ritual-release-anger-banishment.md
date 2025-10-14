@@ -1,22 +1,42 @@
 ---
-title: "Cozy Cursing Ritual: Release Anger Through Banishment"
-slug: "cozy-cursing-ritual-release-anger-banishment"
-excerpt: "Sometimes anger is the only honest response to betrayal or systemic harm. This cozy cursing ritual offers a structured way to name what hurt you, release it through symbolic banishment, and reclaim your peace without causing direct harm."
-metaTitle: "Cozy Cursing Ritual: Release Anger Through Banishment"
-metaDescription: "A consent-based banishment ritual to release righteous anger and reclaim your peace when betrayal or harm demands a response."
-tags: ["banishment","anger release","shadow work","boundary ritual","emotional processing","cursing ritual","justice magic"]
-outline: ["Opening Reflection","Materials You'll Need","Quick Banishment Variant (15 Minutes)","Deep Banishment Variant (45–60 Minutes)","Safety and Consent Notes","Reflection Prompt","Banishment Ritual Checklist"]
+title: 'Cozy Cursing Ritual: Release Anger Through Banishment'
+slug: cozy-cursing-ritual-release-anger-banishment
+excerpt: 'Sometimes anger is the only honest response to betrayal or systemic harm. This cozy cursing ritual offers a structured way to name what hurt you, release it through symbolic banishment, and reclaim your peace without causing direct harm.'
+metaTitle: 'Cozy Cursing Ritual: Release Anger Through Banishment'
+metaDescription: A consent-based banishment ritual to release righteous anger and reclaim your peace when betrayal or harm demands a response.
+tags:
+  - release
+  - banishment
+  - anger release
+  - shadow work
+  - boundary ritual
+  - emotional processing
+  - cursing ritual
+  - justice magic
+outline:
+  - Opening Reflection
+  - Materials You'll Need
+  - Quick Banishment Variant (15 Minutes)
+  - Deep Banishment Variant (45–60 Minutes)
+  - Safety and Consent Notes
+  - Reflection Prompt
+  - Banishment Ritual Checklist
 wordCount: 1065
 readingMinutes: 5
 entities: []
 includeAds: true
 includeKofi: true
 affiliateAnchors: []
-internalLinkHints: ["anger as boundary","righteous anger","ritual journal","somatic or trauma-informed care"]
+internalLinkHints:
+  - anger as boundary
+  - righteous anger
+  - ritual journal
+  - somatic or trauma-informed care
 internalLinks: []
-publishedAt: "2025-10-14T12:16:04.884Z"
-canonicalUrl: "https://witchclick.space/post/cozy-cursing-ritual-release-anger-banishment"
+publishedAt: '2025-10-14T12:16:04.884Z'
+canonicalUrl: 'https://witchclick.space/post/cozy-cursing-ritual-release-anger-banishment'
 specVersion: 2
+spoonLevel: high
 ---
 
 ## Opening Reflection

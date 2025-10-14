@@ -1,22 +1,43 @@
 ---
-title: "Day After Acupuncture Recovery: Gentle Body Awareness"
-slug: "day-after-acupuncture-recovery-gentle-body-awareness"
-excerpt: "The day after acupuncture, your body is processing shifts—energy moving, tissues releasing, old patterns softening. This ritual offers two pathways to support your recovery with kindness and attention."
-metaTitle: "Day After Acupuncture Recovery: Gentle Body Awareness"
-metaDescription: "Navigate the day after acupuncture with a tender ritual that honors your body's healing process and supports gentle recovery."
-tags: ["acupuncture","body awareness","recovery","self-care","healing","rest"]
-outline: ["Opening Reflection","Quick Body Check Variant","Deep Recovery Ritual Variant","Reflection Prompt","Post-Acupuncture Recovery Checklist"]
+title: 'Day After Acupuncture Recovery: Gentle Body Awareness'
+slug: day-after-acupuncture-recovery-gentle-body-awareness
+excerpt: 'The day after acupuncture, your body is processing shifts—energy moving, tissues releasing, old patterns softening. This ritual offers two pathways to support your recovery with kindness and attention.'
+metaTitle: 'Day After Acupuncture Recovery: Gentle Body Awareness'
+metaDescription: Navigate the day after acupuncture with a tender ritual that honors your body's healing process and supports gentle recovery.
+tags:
+  - calm
+  - acupuncture
+  - body awareness
+  - recovery
+  - self-care
+  - healing
+  - rest
+outline:
+  - Opening Reflection
+  - Quick Body Check Variant
+  - Deep Recovery Ritual Variant
+  - Reflection Prompt
+  - Post-Acupuncture Recovery Checklist
 wordCount: 972
 readingMinutes: 5
 entities: []
 includeAds: true
 includeKofi: false
-affiliateAnchors: [{"key":"ritual-journal","text":"journal","insertedCount":0}]
-internalLinkHints: ["nervous system","gentle movement","self-massage","integration","emotional release"]
+affiliateAnchors:
+  - key: ritual-journal
+    text: journal
+    insertedCount: 0
+internalLinkHints:
+  - nervous system
+  - gentle movement
+  - self-massage
+  - integration
+  - emotional release
 internalLinks: []
-publishedAt: "2025-10-07T12:51:08.917Z"
-canonicalUrl: "https://witchclick.space/post/day-after-acupuncture-recovery-gentle-body-awareness"
+publishedAt: '2025-10-07T12:51:08.917Z'
+canonicalUrl: 'https://witchclick.space/post/day-after-acupuncture-recovery-gentle-body-awareness'
 specVersion: 2
+spoonLevel: low
 ---
 
 ## Opening Reflection

@@ -1,22 +1,58 @@
 ---
-title: "Clean Cursing Ritual: Return Released Energy to Origin"
-slug: "clean-cursing-return-energy-to-origin"
-excerpt: "This consent-first ritual helps you release what is not yours and return it to its rightful origin, cleanly and without escalation. A quick path supports low-spoons days; a deeper path offers structure. Safety notes keep it ethical, calm, and grounded."
-metaTitle: "Clean Cursing Ritual: Return Released Energy to Origin"
-metaDescription: "A careful, consent-first ritual for returning released energy to its rightful origin without harm or delay. Includes a low-energy option, a deep option, safety notes, and a practical checklist for ethical, grounded practice."
-tags: ["clean cursing","protection","ethics","energy work","grounding","consent"]
-outline: ["Opening Reflection","Quick/Low-Energy Clean Cursing","Deep Clean Cursing","Safety and Consent Notes","Reflection Prompt","Clean Cursing Checklist"]
+title: 'Clean Cursing Ritual: Return Released Energy to Origin'
+slug: clean-cursing-return-energy-to-origin
+excerpt: 'This consent-first ritual helps you release what is not yours and return it to its rightful origin, cleanly and without escalation. A quick path supports low-spoons days; a deeper path offers structure. Safety notes keep it ethical, calm, and grounded.'
+metaTitle: 'Clean Cursing Ritual: Return Released Energy to Origin'
+metaDescription: 'A careful, consent-first ritual for returning released energy to its rightful origin without harm or delay. Includes a low-energy option, a deep option, safety notes, and a practical checklist for ethical, grounded practice.'
+tags:
+  - release
+  - clean cursing
+  - protection
+  - ethics
+  - energy work
+  - grounding
+  - consent
+outline:
+  - Opening Reflection
+  - Quick/Low-Energy Clean Cursing
+  - Deep Clean Cursing
+  - Safety and Consent Notes
+  - Reflection Prompt
+  - Clean Cursing Checklist
 wordCount: 961
 readingMinutes: 5
 entities: []
 includeAds: true
 includeKofi: true
-affiliateAnchors: [{"key":"ritual-journal","text":"ritual journal","insertedCount":0},{"key":"grounding-stone","text":"grounding stone","insertedCount":0},{"key":"led-candle","text":"LED candle","insertedCount":0},{"key":"planner-pad","text":"planner pad","insertedCount":0},{"key":"focus-tea","text":"focus tea","insertedCount":0}]
-internalLinkHints: ["energetic consent","circle of return","banishing vs returning","calm nervous system","ritual journal","grounding stone","cup of water"]
+affiliateAnchors:
+  - key: ritual-journal
+    text: ritual journal
+    insertedCount: 0
+  - key: grounding-stone
+    text: grounding stone
+    insertedCount: 0
+  - key: led-candle
+    text: LED candle
+    insertedCount: 0
+  - key: planner-pad
+    text: planner pad
+    insertedCount: 0
+  - key: focus-tea
+    text: focus tea
+    insertedCount: 0
+internalLinkHints:
+  - energetic consent
+  - circle of return
+  - banishing vs returning
+  - calm nervous system
+  - ritual journal
+  - grounding stone
+  - cup of water
 internalLinks: []
-publishedAt: "2025-10-10T19:27:20.674Z"
-canonicalUrl: "https://witchclick.space/post/clean-cursing-return-energy-to-origin"
+publishedAt: '2025-10-10T19:27:20.674Z'
+canonicalUrl: 'https://witchclick.space/post/clean-cursing-return-energy-to-origin'
 specVersion: 2
+spoonLevel: high
 ---
 
 ## Opening Reflection

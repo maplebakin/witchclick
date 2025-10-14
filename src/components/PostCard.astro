@@ -11,6 +11,7 @@ export interface Props {
     readingMinutes?: number
     publishedAt?: string
     date?: string
+    spoonLevel?: string
   }
   // ...or pass these individually:
   href?: string
@@ -19,10 +20,11 @@ export interface Props {
   tags?: string[]
   readingMinutes?: number
   publishedAt?: string
+  spoonLevel?: string
   class?: string
 }
 
-const { post, href, title, excerpt, tags, readingMinutes, publishedAt, class: className } = Astro.props as Props
+const { post, href, title, excerpt, tags, readingMinutes, publishedAt, spoonLevel, class: className } = Astro.props as Props
 
 const link = href || (post?.slug ? `/post/${post.slug}` : '#')
 const _title = (title ?? post?.title ?? 'Untitled')
@@ -31,6 +33,9 @@ const _tags: string[] = Array.isArray(tags ?? post?.tags) ? (tags ?? post?.tags)
 const _mins = (readingMinutes ?? post?.readingMinutes) as number | undefined
 const _publishedAt = (publishedAt ?? post?.publishedAt ?? post?.date) as string | undefined
 const _dateLabel = formatDate(_publishedAt)
+const _spoonRaw = (spoonLevel ?? post?.spoonLevel) as string | undefined
+const _spoon = typeof _spoonRaw === 'string' ? _spoonRaw.trim().toLowerCase() : ''
+const _spoonLabel = _spoon ? `${_spoon.charAt(0).toUpperCase()}${_spoon.slice(1)}` : ''
 
 function formatDate(value?: string){
   if (!value) return '';
@@ -44,12 +49,20 @@ function formatDate(value?: string){
   class:list={[
     "card-panel card-tier-1 card-panel-soft focus-visible:outline-none ritual-card",
     className,
+    _spoon && `ritual-card--${_spoon}`,
   ]}
+  data-spoon-level={_spoon || undefined}
 >
   <span aria-hidden class="card-radial card-radial-top" />
   <span aria-hidden class="card-radial card-radial-bottom" />
   <div class="card-figure" aria-hidden="true"></div>
   <div class="card-body">
+    {_spoon && (
+      <div class="card-spoon">
+        <span class="card-spoon__icon" aria-hidden="true">🥄</span>
+        <span class="card-spoon__label">Spoon level: {_spoonLabel} day</span>
+      </div>
+    )}
     {_dateLabel && (
       <div class="card-metadata">
         <span>{_dateLabel}</span>

@@ -1,0 +1,111 @@
+---
+interface Props {
+  title: string;
+  open?: boolean;
+}
+
+const { title, open = false } = Astro.props as Props;
+---
+<details class="wc-accordion" open={open ? true : undefined}>
+  <summary class="wc-accordion__summary">{title}</summary>
+  <div class="wc-accordion__panel">
+    <slot />
+  </div>
+</details>
+
+<style>
+  .wc-accordion {
+    border-radius: 1rem;
+    border: 1px solid rgba(212, 175, 55, 0.28);
+    background: rgba(12, 5, 23, 0.72);
+    box-shadow: 0 20px 45px -28px rgba(8, 4, 18, 0.45);
+    overflow: hidden;
+  }
+
+  .wc-accordion[open] {
+    border-color: rgba(212, 175, 55, 0.42);
+    background: rgba(12, 5, 23, 0.82);
+  }
+
+  .wc-accordion__summary {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1.1rem;
+    font-family: var(--font-accent);
+    font-size: 0.85rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .wc-accordion__summary::before {
+    content: '✶';
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
+  .wc-accordion__summary::after {
+    content: '⌄';
+    margin-left: auto;
+    transition: transform 200ms ease;
+  }
+
+  .wc-accordion[open] .wc-accordion__summary::after {
+    transform: rotate(180deg);
+  }
+
+  .wc-accordion__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .wc-accordion__summary:focus-visible {
+    outline: 2px solid rgba(212, 175, 55, 0.6);
+    outline-offset: 3px;
+  }
+
+  .wc-accordion__panel {
+    padding: 1rem 1.1rem 1.25rem;
+    display: grid;
+    gap: 0.75rem;
+    font-family: var(--font-body-ui, var(--font-body));
+    font-size: 0.95rem;
+    color: color-mix(in srgb, var(--color-ink) 88%, white 12%);
+  }
+
+  .wc-accordion__lead {
+    margin: 0;
+  }
+
+  .wc-accordion__list {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .wc-accordion__list li::marker {
+    color: var(--color-gold);
+  }
+
+  :root[data-comfort-theme="dawn"] .wc-accordion {
+    background: rgba(255, 252, 247, 0.85);
+    border-color: rgba(122, 94, 154, 0.28);
+    box-shadow: 0 20px 45px -28px rgba(100, 78, 138, 0.22);
+  }
+
+  :root[data-comfort-theme="dawn"] .wc-accordion[open] {
+    border-color: rgba(122, 94, 154, 0.4);
+    background: rgba(255, 252, 247, 0.95);
+  }
+
+  :root[data-comfort-theme="dawn"] .wc-accordion__panel {
+    color: color-mix(in srgb, var(--color-ink) 92%, white 8%);
+  }
+
+  :root[data-comfort-theme="dawn"] .wc-accordion__list li::marker {
+    color: rgba(122, 94, 154, 0.65);
+  }
+</style>

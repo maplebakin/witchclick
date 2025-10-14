@@ -1,6 +1,9 @@
 ---
 import Base from "../../layouts/Base.astro";
 import fs from "node:fs";
+import { Fragment } from "astro/jsx-runtime";
+import { readSettings } from "../../utils/settings";
+import { createItemListSchema } from "../../utils/structuredData";
 
 const title = "Tools & Prints";
 const description = "Curated ritual tools, cozy prints, and affiliate picks.";
@@ -9,8 +12,49 @@ const productsDoc = fs.existsSync(productsPath)
   ? JSON.parse(fs.readFileSync(productsPath, "utf8"))
   : { products: [] };
 const allProducts = Array.isArray(productsDoc) ? productsDoc : productsDoc.products || [];
+const settings = readSettings();
+const productItems: { name: string; url: string; description?: string; image?: string }[] = allProducts
+  .map((product: any) => {
+    const name = typeof product?.name === "string" ? product.name : "";
+    const url = typeof product?.url === "string" ? product.url : "";
+    if (!name || !url) return null;
+
+    const descriptionCandidate =
+      typeof product?.description === "string"
+        ? product.description
+        : typeof product?.summary === "string"
+          ? product.summary
+          : undefined;
+
+    return {
+      name,
+      url,
+      description: descriptionCandidate,
+      image: typeof product?.image === "string" ? product.image : undefined,
+    };
+  })
+  .filter(Boolean);
+
+const productListSchema =
+  productItems.length > 0
+    ? createItemListSchema(
+        settings,
+        {
+          name: `${title} — WitchClick`,
+          url: "/tools/",
+          description,
+          itemType: "Product",
+        },
+        productItems,
+      )
+    : null;
 ---
 <Base {title} {description}>
+  {productListSchema && (
+    <Fragment slot="head">
+      <script type="application/ld+json" set:html={JSON.stringify(productListSchema)} />
+    </Fragment>
+  )}
   <section class="mx-auto max-w-5xl space-y-6">
     <header class="space-y-2 text-center">
       <h1 class="text-4xl font-serif">{title}</h1>

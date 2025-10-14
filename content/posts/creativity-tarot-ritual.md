@@ -1,14 +1,11 @@
 ---
 title: Tarot Ritual for When Creativity Feels Pointless
 slug: creativity-tarot-ritual
-excerpt: >-
-  When your creativity feels pointless, this gentle tarot and journaling ritual
-  helps you reconnect with your spark—no pressure, just presence.
+excerpt: 'When your creativity feels pointless, this gentle tarot and journaling ritual helps you reconnect with your spark—no pressure, just presence.'
 metaTitle: Tarot Ritual for When Creativity Feels Pointless
-metaDescription: >-
-  Feeling uninspired or like your creativity doesn’t matter? Try this cozy tarot
-  ritual and reflection practice to gently reconnect with your spark.
+metaDescription: Feeling uninspired or like your creativity doesn’t matter? Try this cozy tarot ritual and reflection practice to gently reconnect with your spark.
 tags:
+  - planning
   - creativity
   - tarot
   - ritual
@@ -62,6 +59,7 @@ internalLinkHints:
   - 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
 heroImageSrc: /hero-images/creativity-tarot-ritual.png
 heroImageAlt: Tarot Ritual for When Creativity Feels Pointless — hero image
+spoonLevel: medium
 ---
 ## Opening Reflection
 

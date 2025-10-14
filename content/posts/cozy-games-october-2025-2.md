@@ -1,22 +1,43 @@
 ---
-title: "Cozy Games to Curl Up With in October 2025 Evenings"
-slug: "cozy-games-october-2025-2"
-excerpt: "Explore October 2025’s coziest new releases alongside low-spoon nightly rituals, deeper weekend retreats, and gentle check-ins that keep playtime restful."
-metaTitle: "Cozy Games to Curl Up With in October 2025 Evenings"
-metaDescription: "Settle into October 2025 with cozy game-night rituals, new releases, and gentle pacing tips so your backlog feels restful instead of rushed all month long."
-tags: ["cozy gaming","game night","self-care","autumn rituals","mindful pacing"]
-outline: ["Opening Reflection","Quick Cozy Game Evenings (Low-Spoon Variant)","Deep Cozy Game Retreat (Layered Variant)","Reflection Prompt for October","Cozy Game Night Checklist","Gentle Safety Note for Cozy Marathons"]
+title: Cozy Games to Curl Up With in October 2025 Evenings
+slug: cozy-games-october-2025-2
+excerpt: 'Explore October 2025’s coziest new releases alongside low-spoon nightly rituals, deeper weekend retreats, and gentle check-ins that keep playtime restful.'
+metaTitle: Cozy Games to Curl Up With in October 2025 Evenings
+metaDescription: 'Settle into October 2025 with cozy game-night rituals, new releases, and gentle pacing tips so your backlog feels restful instead of rushed all month long.'
+tags:
+  - calm
+  - cozy gaming
+  - game night
+  - self-care
+  - autumn rituals
+  - mindful pacing
+outline:
+  - Opening Reflection
+  - Quick Cozy Game Evenings (Low-Spoon Variant)
+  - Deep Cozy Game Retreat (Layered Variant)
+  - Reflection Prompt for October
+  - Cozy Game Night Checklist
+  - Gentle Safety Note for Cozy Marathons
 wordCount: 1145
 readingMinutes: 6
 entities: []
 includeAds: true
 includeKofi: true
-affiliateAnchors: [{"key":"cozy-game","text":"cozy game starter pack","insertedCount":0}]
-internalLinkHints: ["focus tea rituals","gentle rituals to re-enter","cozy game-night spread","gentle quitter's guide","calm space during unrest"]
+affiliateAnchors:
+  - key: cozy-game
+    text: cozy game starter pack
+    insertedCount: 0
+internalLinkHints:
+  - focus tea rituals
+  - gentle rituals to re-enter
+  - cozy game-night spread
+  - gentle quitter's guide
+  - calm space during unrest
 internalLinks: []
-publishedAt: "2025-10-02T02:59:44.100Z"
-canonicalUrl: "https://witchclick.space/post/cozy-games-october-2025-2"
+publishedAt: '2025-10-02T02:59:44.100Z'
+canonicalUrl: 'https://witchclick.space/post/cozy-games-october-2025-2'
 specVersion: 2
+spoonLevel: low
 ---
 
 ## Opening Reflection

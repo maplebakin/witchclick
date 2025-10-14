@@ -1,15 +1,11 @@
 ---
 title: 'Create a Calm Space During Political Unrest: A Gentle Guide'
 slug: calm-space-during-political-unrest-2
-excerpt: >-
-  When news is heavy, a small ritualized corner can help you pause without
-  shutting down. Here’s a simple, cozy framework you can adapt to your home and
-  needs.
+excerpt: 'When news is heavy, a small ritualized corner can help you pause without shutting down. Here’s a simple, cozy framework you can adapt to your home and needs.'
 metaTitle: 'Create a Calm Space During Political Unrest: A Gentle Guide'
-metaDescription: >-
-  Create a refuge at home when the world feels loud. Step-by-step setup, sensory
-  anchors, and a checklist to make a calm corner you can return to anytime.
+metaDescription: 'Create a refuge at home when the world feels loud. Step-by-step setup, sensory anchors, and a checklist to make a calm corner you can return to anytime.'
 tags:
+  - calm
   - calm space
   - ritual
   - grounding
@@ -66,6 +62,7 @@ internalLinkHints:
   - 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
 heroImageSrc: /hero-images/calm-space-during-political-unrest-2.png
 heroImageAlt: 'Create a Calm Space During Political Unrest: A Gentle Guide — hero image'
+spoonLevel: low
 ---
 ## Why a calm space helps when the world feels loud
 
