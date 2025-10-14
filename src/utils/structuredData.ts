@@ -66,3 +66,9 @@ export function createCollectionPageSchema(
     mainEntity: listWithoutContext,
   };
 }
+
+const SCRIPT_END_PATTERN = /<\/(script)/gi;
+
+export function serializeStructuredData(data: unknown) {
+  return JSON.stringify(data).replace(SCRIPT_END_PATTERN, "<\\/$1");
+}

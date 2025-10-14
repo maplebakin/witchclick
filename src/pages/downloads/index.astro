@@ -3,7 +3,7 @@ import Base from "../../layouts/Base.astro";
 import fs from "node:fs";
 import path from "node:path";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
-import { createCollectionPageSchema } from "../../utils/structuredData";
+import { createCollectionPageSchema, serializeStructuredData } from "../../utils/structuredData";
 import { Fragment } from "astro/jsx-runtime";
 
 const settings = readSettings();
@@ -48,7 +48,10 @@ const downloadsSchema = createCollectionPageSchema(
   canon={site ? `${site}/downloads` : ""}
 >
   <Fragment slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(downloadsSchema)} />
+    <script
+      type="application/ld+json"
+      set:html={serializeStructuredData(downloadsSchema)}
+    />
   </Fragment>
 
   <div class="grimoire-bg min-h-screen">

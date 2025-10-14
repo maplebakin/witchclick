@@ -8,7 +8,7 @@ import Pagination from "../components/Pagination.astro";
 import { loadAllPosts, estimateReadingMinutes, firstParagraph } from "../utils/posts";
 import { readSettings } from "../utils/settings";
 import { readEvergreenBlocks } from "../utils/blocks";
-import { createItemListSchema } from "../utils/structuredData";
+import { createItemListSchema, serializeStructuredData } from "../utils/structuredData";
 import { Fragment } from "astro/jsx-runtime";
 
 export const prerender = true;
@@ -105,7 +105,10 @@ function resolveDate(data) {
   ogImage={heroOgImage ?? ""}
 >
   <Fragment slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(homeItemList)} />
+    <script
+      type="application/ld+json"
+      set:html={serializeStructuredData(homeItemList)}
+    />
   </Fragment>
 
   <div class="grimoire-bg min-h-screen">
