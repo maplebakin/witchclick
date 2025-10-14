@@ -1,8 +1,16 @@
 {
   "type": "herb",
-  "name": "rosemary",
+  "name": "Rosemary",
   "slug": "rosemary",
-  "summary": "rosemary — stub entity",
-  "properties": {},
-  "related": []
+  "summary": "Sharp-scented guardian herb for memory spells, workspace smoke cleansing, and energetic reset.",
+  "properties": {
+    "element": "Fire",
+    "correspondences": {
+      "planets": ["Sun"],
+      "uses": ["clarity", "protection", "focus"]
+    }
+  },
+  "related": [
+    "ritual:desk-altar"
+  ]
 }

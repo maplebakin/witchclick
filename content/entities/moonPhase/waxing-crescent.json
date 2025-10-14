@@ -1,8 +1,13 @@
 {
   "type": "moonPhase",
-  "name": "waxing crescent",
+  "name": "Waxing Crescent",
   "slug": "waxing-crescent",
-  "summary": "waxing crescent — stub entity",
-  "properties": {},
-  "related": []
+  "summary": "A tender growth window—ideal for planting creative intentions and celebrating small sparks.",
+  "properties": {
+    "keywords": ["momentum", "hope", "experimentation"],
+    "ritualIdeas": ["creative spark candle", "vision journaling"]
+  },
+  "related": [
+    "ritual:creative-spark-ritual"
+  ]
 }

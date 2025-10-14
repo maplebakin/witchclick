@@ -2,7 +2,16 @@
   "type": "ritual",
   "name": "Creative Spark Ritual",
   "slug": "creative-spark-ritual",
-  "summary": "",
-  "properties": {},
-  "related": []
+  "summary": "A three-step ignition pairing breath, candlelight, and tarot prompts to prime your next idea sprint.",
+  "properties": {
+    "duration": "15 minutes",
+    "idealTimes": ["Waxing crescent", "Monday mornings"],
+    "prompts": ["What wants to be expressed?", "What support do I need?"],
+    "playlist": "Slow lofi fire spells"
+  },
+  "related": [
+    "crystal:carnelian",
+    "herb:peppermint",
+    "moonPhase:waxing-crescent"
+  ]
 }

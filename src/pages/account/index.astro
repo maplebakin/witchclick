@@ -1,0 +1,927 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getTypeMetadata } from "../../data/typeMetadata";
+import { getEntitiesForType } from "../../utils/entityIndex";
+
+const ritualMeta = getTypeMetadata("ritual");
+const ritualEntries = getEntitiesForType("ritual", ritualMeta).map((entry) => ({
+  slug: entry.slug,
+  name: entry.name,
+  summary: entry.summary,
+  tags: Array.isArray(entry.tags) ? entry.tags.slice(0, 5) : [],
+}));
+
+const progressStatuses = [
+  { id: "completed", label: "Completed today", hint: "Mark when you complete the ritual.", accent: "✨" },
+  { id: "repeat-next-week", label: "Repeat next week", hint: "Schedule a gentle revisit.", accent: "🔁" },
+  { id: "resting", label: "Resting / paused", hint: "Pause the ritual to make space for integration.", accent: "🌙" },
+  { id: "insight", label: "Captured an insight", hint: "Log a realization, tweak, or note.", accent: "📝" },
+];
+
+const shareGift = {
+  title: "Three-Day Ritual Sampler Planner",
+  url: "/lab/three-day-sampler",
+  description:
+    "Unlock a printable sampler you can gift to a friend whenever you share a ritual invitation.",
+};
+---
+<Base
+  title="Member Ritual Shelf — WitchClick"
+  description="Save rituals you love, log your progress, and unlock a printable gift to share with friends."
+  wide={true}
+  ambientColor="#7c3aed"
+>
+  <section class="account-hero">
+    <div class="account-hero__content">
+      <p class="account-hero__eyebrow">Member Circle</p>
+      <h1 class="account-hero__title">Build your ritual shelf</h1>
+      <p class="account-hero__lead">
+        Bookmark rituals for quick reference, track how each practice unfolds, and celebrate the shifts you notice along the
+        way. Everything here lives in your browser so you can explore freely.
+      </p>
+      <p class="account-hero__note">Pro tip: share a ritual with a friend to unlock a printable planner gift.</p>
+    </div>
+  </section>
+
+  <section class="account-grid">
+    <div class="account-saved" data-saved-shell>
+      <header class="account-section-header">
+        <h2>Saved rituals &amp; progress log</h2>
+        <p>Track how each ritual is landing. Entries stay on this device unless you clear them.</p>
+      </header>
+      <div class="account-saved__empty" data-saved-empty>
+        <p>You haven&apos;t saved any rituals yet.</p>
+        <p>Select a ritual from the library to add it to your shelf.</p>
+      </div>
+      <div class="account-saved__list" data-saved-list aria-live="polite"></div>
+    </div>
+
+    <aside class="account-catalog">
+      <header class="account-section-header">
+        <h2>Ritual library</h2>
+        <p>Add rituals to your shelf to keep them close and start logging progress.</p>
+      </header>
+      <div class="account-catalog__list" data-catalog-list>
+        {ritualEntries.map((ritual) => (
+          <article class="catalog-card" data-slug={ritual.slug}>
+            <header class="catalog-card__header">
+              <h3>{ritual.name}</h3>
+              <button type="button" class="catalog-card__save" data-action="save">Add to shelf</button>
+            </header>
+            <p class="catalog-card__summary">{ritual.summary}</p>
+            {ritual.tags.length > 0 && (
+              <ul class="catalog-card__tags">
+                {ritual.tags.map((tag) => (
+                  <li>{tag}</li>
+                ))}
+              </ul>
+            )}
+            <p class="catalog-card__state" data-state-label hidden>On your shelf</p>
+          </article>
+        ))}
+      </div>
+      <p class="account-catalog__empty" data-catalog-empty hidden>
+        You&apos;ve added every ritual in this set—beautiful work!
+      </p>
+    </aside>
+  </section>
+
+  <section class="account-share" data-share-section>
+    <div class="account-share__content">
+      <h2>Share a ritual, gift a printable</h2>
+      <p>
+        Invite a friend into your practice circle. When you share an invitation, we unlock a printable planner you can gift
+        them right away.
+      </p>
+      <button type="button" class="account-share__button" data-share-button>Share a ritual invitation</button>
+      <p class="account-share__message" data-share-message></p>
+      <div class="account-share__count" data-share-count-wrapper hidden>
+        You&apos;ve gifted this printable <strong data-share-count>0</strong> time(s).
+      </div>
+      <div class="account-share__reward" data-share-reward hidden>
+        <p>
+          <span aria-hidden="true">🎁</span>
+          <strong>{shareGift.title}</strong>
+        </p>
+        <p>{shareGift.description}</p>
+        <a class="account-share__link" href={shareGift.url}>Download the printable gift</a>
+      </div>
+    </div>
+  </section>
+
+  <script type="application/json" id="account-rituals">
+    {JSON.stringify(ritualEntries)}
+  </script>
+  <script type="application/json" id="account-statuses">
+    {JSON.stringify(progressStatuses)}
+  </script>
+  <script type="application/json" id="account-share-gift">
+    {JSON.stringify(shareGift)}
+  </script>
+
+  <script type="module">
+    const ritualsSource = document.getElementById("account-rituals");
+    const statusesSource = document.getElementById("account-statuses");
+    const giftSource = document.getElementById("account-share-gift");
+
+    const rituals = ritualsSource ? JSON.parse(ritualsSource.textContent || "[]") : [];
+    const statuses = statusesSource ? JSON.parse(statusesSource.textContent || "[]") : [];
+    const shareGift = giftSource ? JSON.parse(giftSource.textContent || "{}") : {};
+
+    const ritualsMap = new Map(Array.isArray(rituals) ? rituals.map((ritual) => [ritual.slug, ritual]) : []);
+    const statusMap = new Map(Array.isArray(statuses) ? statuses.map((status) => [status.id, status]) : []);
+
+    const STORAGE_KEY = "witchclick-member-rituals";
+
+    const savedList = document.querySelector("[data-saved-list]");
+    const savedEmpty = document.querySelector("[data-saved-empty]");
+    const catalogList = document.querySelector("[data-catalog-list]");
+    const catalogEmpty = document.querySelector("[data-catalog-empty]");
+    const shareSection = document.querySelector("[data-share-section]");
+    const shareButton = shareSection?.querySelector("[data-share-button]");
+    const shareMessage = shareSection?.querySelector("[data-share-message]");
+    const shareReward = shareSection?.querySelector("[data-share-reward]");
+    const shareCountWrapper = shareSection?.querySelector("[data-share-count-wrapper]");
+    const shareCount = shareSection?.querySelector("[data-share-count]");
+
+    if (!(savedList instanceof HTMLElement) || !(catalogList instanceof HTMLElement)) {
+      console.warn("Ritual account shell missing containers");
+      return;
+    }
+
+    function createId() {
+      if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+        return crypto.randomUUID();
+      }
+      return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    function formatDate(value) {
+      if (!value) return "just now";
+      try {
+        return new Date(value).toLocaleString(undefined, {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      } catch (error) {
+        return "recently";
+      }
+    }
+
+    function loadState() {
+      const base = { rituals: {}, shareUnlocked: false, shareCount: 0 };
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return base;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== "object") return base;
+        if (parsed.rituals && typeof parsed.rituals === "object") {
+          for (const [slug, entry] of Object.entries(parsed.rituals)) {
+            const reference = ritualsMap.get(slug) || {};
+            base.rituals[slug] = {
+              slug,
+              name: entry?.name || reference.name || slug,
+              summary: entry?.summary || reference.summary || "",
+              addedAt: entry?.addedAt || new Date().toISOString(),
+              log: Array.isArray(entry?.log) ? entry.log.slice(0, 20) : [],
+            };
+          }
+        }
+        base.shareUnlocked = Boolean(parsed.shareUnlocked);
+        base.shareCount = typeof parsed.shareCount === "number" ? parsed.shareCount : 0;
+      } catch (error) {
+        console.warn("Unable to parse ritual shelf", error);
+      }
+      return base;
+    }
+
+    const state = loadState();
+
+    function persistState() {
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            rituals: state.rituals,
+            shareUnlocked: state.shareUnlocked,
+            shareCount: state.shareCount,
+          }),
+        );
+      } catch (error) {
+        console.warn("Unable to persist ritual shelf", error);
+      }
+    }
+
+    function renderSaved() {
+      const entries = Object.values(state.rituals || {});
+      entries.sort((a, b) => {
+        const left = Date.parse(b?.log?.[0]?.timestamp || b.addedAt || "");
+        const right = Date.parse(a?.log?.[0]?.timestamp || a.addedAt || "");
+        return left - right;
+      });
+
+      savedList.innerHTML = "";
+
+      if (entries.length === 0) {
+        if (savedEmpty instanceof HTMLElement) savedEmpty.hidden = false;
+        return;
+      }
+
+      if (savedEmpty instanceof HTMLElement) savedEmpty.hidden = true;
+
+      for (const ritual of entries) {
+        const card = document.createElement("article");
+        card.className = "account-card";
+        card.dataset.slug = ritual.slug;
+
+        const header = document.createElement("header");
+        header.className = "account-card__header";
+        const title = document.createElement("h3");
+        title.textContent = ritual.name;
+        header.appendChild(title);
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.dataset.action = "remove";
+        removeButton.className = "account-card__remove";
+        removeButton.textContent = "Remove";
+        header.appendChild(removeButton);
+
+        const summary = document.createElement("p");
+        summary.className = "account-card__summary";
+        summary.textContent = ritual.summary || "This ritual is waiting for your notes.";
+
+        card.appendChild(header);
+        card.appendChild(summary);
+
+        const lastEntry = Array.isArray(ritual.log) ? ritual.log[0] : null;
+        const statusBlock = document.createElement("div");
+        statusBlock.className = "account-card__status";
+        if (lastEntry) {
+          const statusDetails = statusMap.get(lastEntry.status) || { label: lastEntry.status };
+          const label = document.createElement("p");
+          label.innerHTML = `<strong>${statusDetails.accent || "✶"} ${statusDetails.label || lastEntry.status}</strong>`;
+          statusBlock.appendChild(label);
+          const time = document.createElement("p");
+          time.className = "account-card__status-time";
+          time.textContent = `Logged ${formatDate(lastEntry.timestamp)}`;
+          statusBlock.appendChild(time);
+          if (lastEntry.note) {
+            const note = document.createElement("p");
+            note.className = "account-card__status-note";
+            note.textContent = lastEntry.note;
+            statusBlock.appendChild(note);
+          }
+        } else {
+          const label = document.createElement("p");
+          label.innerHTML = `<strong>✨ First log awaits</strong>`;
+          const time = document.createElement("p");
+          time.textContent = "Capture the first moment this ritual resonates.";
+          statusBlock.appendChild(label);
+          statusBlock.appendChild(time);
+        }
+        card.appendChild(statusBlock);
+
+        const form = document.createElement("form");
+        form.dataset.action = "log";
+        form.className = "account-card__form";
+
+        const statusField = document.createElement("label");
+        statusField.className = "account-card__label";
+        statusField.textContent = "Log a new entry";
+        const statusSelect = document.createElement("select");
+        statusSelect.name = "status";
+        statusSelect.className = "account-card__select";
+        for (const status of statuses) {
+          const option = document.createElement("option");
+          option.value = status.id;
+          option.textContent = `${status.accent || "✶"} ${status.label}`;
+          statusSelect.appendChild(option);
+        }
+        statusField.appendChild(statusSelect);
+        form.appendChild(statusField);
+
+        const noteField = document.createElement("label");
+        noteField.className = "account-card__label";
+        noteField.textContent = "Notes";
+        const noteInput = document.createElement("textarea");
+        noteInput.name = "note";
+        noteInput.rows = 3;
+        noteInput.maxLength = 400;
+        noteInput.placeholder = "What shifted, what felt good, or what to adjust next time.";
+        noteInput.className = "account-card__textarea";
+        noteField.appendChild(noteInput);
+        form.appendChild(noteField);
+
+        const submit = document.createElement("button");
+        submit.type = "submit";
+        submit.className = "account-card__log-button";
+        submit.textContent = "Save log entry";
+        form.appendChild(submit);
+
+        card.appendChild(form);
+
+        const history = Array.isArray(ritual.log) ? ritual.log.slice(0, 5) : [];
+        if (history.length > 0) {
+          const historyList = document.createElement("ul");
+          historyList.className = "account-history";
+          for (const entry of history) {
+            const item = document.createElement("li");
+            const statusDetails = statusMap.get(entry.status) || { label: entry.status };
+            const headerRow = document.createElement("div");
+            headerRow.className = "account-history__header";
+            const statusLabel = document.createElement("span");
+            statusLabel.className = "account-history__status";
+            statusLabel.textContent = `${statusDetails.accent || "✶"} ${statusDetails.label || entry.status}`;
+            const time = document.createElement("time");
+            time.className = "account-history__time";
+            time.dateTime = entry.timestamp || "";
+            time.textContent = formatDate(entry.timestamp);
+            headerRow.appendChild(statusLabel);
+            headerRow.appendChild(time);
+            item.appendChild(headerRow);
+            if (entry.note) {
+              const note = document.createElement("p");
+              note.className = "account-history__note";
+              note.textContent = entry.note;
+              item.appendChild(note);
+            }
+            historyList.appendChild(item);
+          }
+          card.appendChild(historyList);
+        }
+
+        savedList.appendChild(card);
+      }
+    }
+
+    function updateCatalog() {
+      const savedSlugs = new Set(Object.keys(state.rituals || {}));
+      const cards = catalogList.querySelectorAll("[data-slug]");
+      let availableCount = 0;
+
+      cards.forEach((card) => {
+        if (!(card instanceof HTMLElement)) return;
+        const element = card;
+        const slug = element.dataset.slug;
+        const button = element.querySelector("[data-action='save']");
+        const stateLabel = element.querySelector("[data-state-label]");
+        if (slug && savedSlugs.has(slug)) {
+          element.classList.add("is-saved");
+          if (button instanceof HTMLButtonElement) {
+            button.disabled = true;
+            button.textContent = "On your shelf";
+          }
+          if (stateLabel instanceof HTMLElement) {
+            stateLabel.hidden = false;
+          }
+        } else {
+          availableCount += 1;
+          element.classList.remove("is-saved");
+          if (button instanceof HTMLButtonElement) {
+            button.disabled = false;
+            button.textContent = "Add to shelf";
+          }
+          if (stateLabel instanceof HTMLElement) {
+            stateLabel.hidden = true;
+          }
+        }
+      });
+
+      if (catalogEmpty instanceof HTMLElement) {
+        catalogEmpty.hidden = availableCount > 0;
+      }
+    }
+
+    function renderShareSection(message) {
+      if (!shareSection) return;
+      if (shareMessage instanceof HTMLElement) {
+        shareMessage.textContent = message || "";
+      }
+      if (shareReward instanceof HTMLElement) {
+        shareReward.hidden = !state.shareUnlocked;
+      }
+      if (shareButton instanceof HTMLButtonElement) {
+        shareButton.textContent = state.shareUnlocked ? "Gift it again" : "Share a ritual invitation";
+      }
+      if (shareCount instanceof HTMLElement && shareCountWrapper instanceof HTMLElement) {
+        shareCount.textContent = String(state.shareCount || 0);
+        shareCountWrapper.hidden = !state.shareCount;
+      }
+    }
+
+    function addRitual(slug) {
+      if (!slug || state.rituals[slug]) return;
+      const data = ritualsMap.get(slug);
+      if (!data) return;
+      state.rituals[slug] = {
+        slug,
+        name: data.name,
+        summary: data.summary,
+        addedAt: new Date().toISOString(),
+        log: [],
+      };
+      persistState();
+      renderSaved();
+      updateCatalog();
+      renderShareSection();
+    }
+
+    function removeRitual(slug) {
+      if (!slug || !state.rituals[slug]) return;
+      delete state.rituals[slug];
+      persistState();
+      renderSaved();
+      updateCatalog();
+      renderShareSection();
+    }
+
+    function logProgress(slug, statusId, note) {
+      if (!slug || !state.rituals[slug]) return;
+      const entry = {
+        id: createId(),
+        status: statusId,
+        note: note || "",
+        timestamp: new Date().toISOString(),
+      };
+      const existing = Array.isArray(state.rituals[slug].log) ? state.rituals[slug].log : [];
+      state.rituals[slug].log = [entry, ...existing].slice(0, 20);
+      persistState();
+      renderSaved();
+    }
+
+    savedList.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (target.dataset.action === "remove") {
+        const card = target.closest("[data-slug]");
+        const slug = card?.dataset.slug;
+        if (slug) {
+          removeRitual(slug);
+        }
+      }
+    });
+
+    savedList.addEventListener("submit", (event) => {
+      const form = event.target;
+      if (!(form instanceof HTMLFormElement)) return;
+      event.preventDefault();
+      const card = form.closest("[data-slug]");
+      const slug = card?.dataset.slug;
+      if (!slug) return;
+      const statusField = form.querySelector("select[name='status']");
+      const noteField = form.querySelector("textarea[name='note']");
+      const statusId = statusField instanceof HTMLSelectElement ? statusField.value : "completed";
+      const note = noteField instanceof HTMLTextAreaElement ? noteField.value.trim() : "";
+      logProgress(slug, statusId, note);
+      if (noteField instanceof HTMLTextAreaElement) {
+        noteField.value = "";
+      }
+    });
+
+    catalogList.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (target.dataset.action === "save") {
+        const card = target.closest("[data-slug]");
+        const slug = card?.dataset.slug;
+        if (slug) {
+          addRitual(slug);
+        }
+      }
+    });
+
+    async function handleShareClick() {
+      if (!shareButton || !shareMessage) return;
+      const savedSlugs = Object.keys(state.rituals || {});
+      const highlightSlug = savedSlugs[0];
+      const highlight = highlightSlug ? ritualsMap.get(highlightSlug) : null;
+      const shareText = highlight
+        ? `Join me for the "${highlight.name}" ritual on WitchClick.`
+        : "Join me for a WitchClick ritual I adore.";
+      const shareUrl = `${window.location.origin}/entities/ritual/`;
+      let shared = false;
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: "WitchClick Ritual", text: shareText, url: shareUrl });
+          shared = true;
+        } else if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+          shareMessage.textContent = "Invite copied—send it to your friend!";
+          shared = true;
+        } else {
+          shareMessage.textContent = `${shareText} ${shareUrl}`;
+          shared = true;
+        }
+      } catch (error) {
+        if (error?.name === "AbortError") {
+          shareMessage.textContent = "Share canceled—try again when you&apos;re ready.";
+        } else {
+          shareMessage.textContent = "We couldn&apos;t complete that share. Try again soon.";
+        }
+      }
+
+      if (shared) {
+        state.shareUnlocked = true;
+        state.shareCount = (state.shareCount || 0) + 1;
+        persistState();
+        renderShareSection("Gift unlocked! Enjoy the printable with your friend.");
+      }
+    }
+
+    if (shareButton instanceof HTMLButtonElement) {
+      shareButton.addEventListener("click", handleShareClick);
+    }
+
+    renderSaved();
+    updateCatalog();
+    renderShareSection();
+  </script>
+
+  <style>
+    .account-hero {
+      background: linear-gradient(140deg, rgba(124, 58, 237, 0.14), rgba(255, 255, 255, 0.95));
+      border-radius: 2rem;
+      padding: clamp(2rem, 6vw, 3.5rem);
+      margin-top: clamp(1.5rem, 4vw, 2.5rem);
+      box-shadow: 0 28px 60px -40px rgba(79, 70, 229, 0.45);
+    }
+
+    .account-hero__eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      font-size: 0.75rem;
+      color: rgba(79, 70, 229, 0.75);
+      margin-bottom: 0.75rem;
+    }
+
+    .account-hero__title {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-family: var(--font-heading, "Fraunces", serif);
+      color: color-mix(in srgb, var(--ambient-color, #7c3aed) 65%, #1f2937 35%);
+    }
+
+    .account-hero__lead {
+      max-width: 62ch;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: color-mix(in srgb, var(--ink-body, #1f2937) 78%, white 22%);
+    }
+
+    .account-hero__note {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      color: rgba(79, 70, 229, 0.85);
+    }
+
+    .account-grid {
+      margin-top: clamp(2.5rem, 6vw, 3.5rem);
+      display: grid;
+      gap: clamp(2rem, 5vw, 3rem);
+    }
+
+    @media (min-width: 1100px) {
+      .account-grid {
+        grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+        align-items: start;
+      }
+    }
+
+    .account-section-header h2 {
+      margin: 0;
+      font-size: 1.35rem;
+      color: color-mix(in srgb, var(--ambient-color, #7c3aed) 60%, #1f2937 40%);
+    }
+
+    .account-section-header p {
+      margin: 0.35rem 0 0;
+      font-size: 0.95rem;
+      color: rgba(71, 85, 105, 0.9);
+    }
+
+    .account-saved {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 2rem;
+      padding: clamp(1.75rem, 4vw, 2.5rem);
+      box-shadow: 0 30px 70px -45px rgba(15, 23, 42, 0.45);
+      display: grid;
+      gap: 1.75rem;
+    }
+
+    .account-saved__empty {
+      padding: 1.25rem;
+      border-radius: 1.25rem;
+      border: 1px dashed rgba(124, 58, 237, 0.35);
+      background: rgba(237, 233, 254, 0.55);
+      color: rgba(88, 28, 135, 0.9);
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .account-saved__list {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .account-card {
+      border-radius: 1.75rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(255, 255, 255, 0.94);
+      padding: clamp(1.25rem, 3vw, 1.75rem);
+      display: grid;
+      gap: 1.1rem;
+    }
+
+    .account-card__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+    }
+
+    .account-card__header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: color-mix(in srgb, var(--ambient-color, #7c3aed) 65%, #1f2937 35%);
+    }
+
+    .account-card__remove {
+      border: 0;
+      background: none;
+      color: rgba(220, 38, 38, 0.75);
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    .account-card__summary {
+      margin: 0;
+      color: color-mix(in srgb, var(--ink-body, #1f2937) 78%, white 22%);
+      line-height: 1.6;
+    }
+
+    .account-card__status {
+      border-radius: 1.25rem;
+      background: rgba(236, 233, 254, 0.7);
+      padding: 1rem 1.25rem;
+      display: grid;
+      gap: 0.4rem;
+      color: rgba(79, 70, 229, 0.95);
+    }
+
+    .account-card__status-time {
+      font-size: 0.9rem;
+      color: rgba(79, 70, 229, 0.8);
+    }
+
+    .account-card__status-note {
+      margin: 0;
+      font-size: 0.95rem;
+      color: rgba(55, 65, 81, 0.95);
+    }
+
+    .account-card__form {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .account-card__label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: rgba(71, 85, 105, 0.9);
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    .account-card__select,
+    .account-card__textarea {
+      width: 100%;
+      border-radius: 0.85rem;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      padding: 0.65rem 0.75rem;
+      font-size: 0.95rem;
+      color: #1f2937;
+      background: rgba(255, 255, 255, 0.96);
+    }
+
+    .account-card__textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .account-card__log-button {
+      justify-self: start;
+      border-radius: 999px;
+      border: 0;
+      background: linear-gradient(135deg, #7c3aed, #6366f1);
+      color: white;
+      font-weight: 600;
+      padding: 0.6rem 1.4rem;
+      cursor: pointer;
+    }
+
+    .account-card__log-button:hover,
+    .account-card__log-button:focus-visible {
+      box-shadow: 0 10px 24px -18px rgba(79, 70, 229, 0.85);
+    }
+
+    .account-history {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .account-history__header {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      align-items: baseline;
+    }
+
+    .account-history__status {
+      font-weight: 600;
+      color: rgba(79, 70, 229, 0.9);
+    }
+
+    .account-history__time {
+      font-size: 0.8rem;
+      color: rgba(107, 114, 128, 0.85);
+    }
+
+    .account-history__note {
+      margin: 0;
+      font-size: 0.9rem;
+      color: rgba(71, 85, 105, 0.95);
+    }
+
+    .account-catalog {
+      background: rgba(248, 250, 252, 0.9);
+      border-radius: 2rem;
+      padding: clamp(1.75rem, 4vw, 2.25rem);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .account-catalog__list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .catalog-card {
+      border-radius: 1.5rem;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 1.2rem 1.4rem;
+      display: grid;
+      gap: 0.75rem;
+      transition: transform 0.18s ease;
+    }
+
+    .catalog-card__header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .catalog-card__header h3 {
+      margin: 0;
+      font-size: 1.05rem;
+      color: rgba(79, 70, 229, 0.95);
+    }
+
+    .catalog-card__save {
+      border-radius: 999px;
+      border: 0;
+      background: rgba(99, 102, 241, 0.15);
+      color: rgba(79, 70, 229, 0.95);
+      font-weight: 600;
+      padding: 0.4rem 1rem;
+      cursor: pointer;
+    }
+
+    .catalog-card__save:disabled {
+      background: rgba(148, 163, 184, 0.25);
+      color: rgba(71, 85, 105, 0.8);
+      cursor: default;
+    }
+
+    .catalog-card__summary {
+      margin: 0;
+      font-size: 0.95rem;
+      color: rgba(71, 85, 105, 0.95);
+    }
+
+    .catalog-card__tags {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      font-size: 0.75rem;
+      color: rgba(94, 234, 212, 0.85);
+    }
+
+    .catalog-card__tags li {
+      border-radius: 999px;
+      border: 1px solid rgba(94, 234, 212, 0.35);
+      padding: 0.25rem 0.6rem;
+      background: rgba(16, 185, 129, 0.08);
+      color: rgba(15, 118, 110, 0.9);
+    }
+
+    .catalog-card__state {
+      margin: 0;
+      font-size: 0.8rem;
+      color: rgba(79, 70, 229, 0.75);
+    }
+
+    .catalog-card.is-saved {
+      opacity: 0.75;
+      transform: translateY(2px);
+    }
+
+    .account-catalog__empty {
+      margin: 0;
+      font-size: 0.9rem;
+      color: rgba(71, 85, 105, 0.8);
+      text-align: center;
+    }
+
+    .account-share {
+      margin-top: clamp(2.5rem, 6vw, 3.5rem);
+      border-radius: 2rem;
+      padding: clamp(1.75rem, 4vw, 2.5rem);
+      background: linear-gradient(120deg, rgba(59, 130, 246, 0.12), rgba(236, 233, 254, 0.95));
+      color: rgba(30, 64, 175, 0.95);
+    }
+
+    .account-share__content {
+      display: grid;
+      gap: 0.75rem;
+      max-width: 58ch;
+    }
+
+    .account-share__button {
+      justify-self: start;
+      border-radius: 999px;
+      border: 0;
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      color: white;
+      font-weight: 600;
+      padding: 0.6rem 1.4rem;
+      cursor: pointer;
+    }
+
+    .account-share__message {
+      margin: 0;
+      font-size: 0.9rem;
+      color: rgba(37, 99, 235, 0.9);
+      min-height: 1.2rem;
+    }
+
+    .account-share__reward {
+      margin-top: 0.75rem;
+      padding: 1rem 1.25rem;
+      border-radius: 1.25rem;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      display: grid;
+      gap: 0.4rem;
+      color: rgba(30, 64, 175, 0.95);
+    }
+
+    .account-share__link {
+      color: rgba(37, 99, 235, 0.95);
+      font-weight: 600;
+    }
+
+    .account-share__count {
+      margin: 0;
+      font-size: 0.85rem;
+      color: rgba(37, 99, 235, 0.75);
+    }
+
+    @media (max-width: 640px) {
+      .catalog-card__header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .account-card__header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</Base>

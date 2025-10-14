@@ -1,8 +1,16 @@
 {
   "type": "herb",
-  "name": "peppermint",
+  "name": "Peppermint",
   "slug": "peppermint",
-  "summary": "peppermint — stub entity",
-  "properties": {},
-  "related": []
+  "summary": "Cooling herb for alertness, idea incubation, and easing tension between creative sprints.",
+  "properties": {
+    "element": "Air",
+    "correspondences": {
+      "planets": ["Mercury"],
+      "uses": ["clarity", "uplift", "soothing"]
+    }
+  },
+  "related": [
+    "ritual:creative-spark-ritual"
+  ]
 }

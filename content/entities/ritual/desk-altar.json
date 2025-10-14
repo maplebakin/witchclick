@@ -1,8 +1,17 @@
 {
   "type": "ritual",
-  "name": "desk altar",
+  "name": "Desk Altar",
   "slug": "desk-altar",
-  "summary": "desk altar — stub entity",
-  "properties": {},
-  "related": []
+  "summary": "Curate a pocket altar beside your keyboard to anchor focus and energetic protection throughout the workday.",
+  "properties": {
+    "duration": "10 minutes",
+    "idealTimes": ["Monday sunrise", "New project kickoff"],
+    "tools": ["small dish", "protective stone", "herbal mist"],
+    "intention": "Invite clarity and boundaries into digital spaces."
+  },
+  "related": [
+    "crystal:amethyst",
+    "herb:rosemary",
+    "moonPhase:waning-moon"
+  ]
 }

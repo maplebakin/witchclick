@@ -1,0 +1,547 @@
+---
+interface Props {
+  slug: string;
+  title: string;
+}
+
+const { slug, title } = Astro.props as Props;
+const sectionId = `comments-${slug}`.replace(/[^a-z0-9-]/gi, "-");
+const configId = `${sectionId}-config`;
+---
+<section class="comments" aria-labelledby={`${sectionId}-heading`} id={sectionId}>
+  <div class="comments__intro">
+    <h2 class="comments__title" id={`${sectionId}-heading`}>Circle reflections</h2>
+    <p class="comments__summary">
+      Share how <strong>{title}</strong> is echoing in your practice. Every note is moderated with care before it appears here.
+    </p>
+  </div>
+
+  <div class="comments__body">
+    <form class="comments__form" data-comments-form>
+      <fieldset>
+        <legend class="sr-only">Share a comment on this ritual</legend>
+        <label class="comments__label" for={`${sectionId}-name`}>
+          Name or nickname
+          <span class="comments__hint">Shown next to your note</span>
+        </label>
+        <input
+          id={`${sectionId}-name`}
+          name="author"
+          type="text"
+          required
+          autocomplete="name"
+          maxlength="80"
+          class="comments__input"
+        />
+
+        <label class="comments__label" for={`${sectionId}-message`}>
+          Your reflection
+          <span class="comments__hint">Up to 1,000 characters</span>
+        </label>
+        <textarea
+          id={`${sectionId}-message`}
+          name="message"
+          rows={5}
+          required
+          maxlength={1000}
+          class="comments__textarea"
+        ></textarea>
+
+        <button type="submit" class="comments__submit">Send to the circle</button>
+      </fieldset>
+      <p class="comments__status" role="status" data-comments-status></p>
+    </form>
+
+    <div class="comments__thread" aria-live="polite">
+      <h3 class="comments__thread-title">Shared notes</h3>
+      <div class="comments__pending" data-comments-pending hidden></div>
+      <ol class="comments__list" data-comments-list aria-label="Published comments"></ol>
+      <p class="comments__empty" data-comments-empty>Be the first to share how this ritual met you.</p>
+    </div>
+  </div>
+</section>
+
+<script type="application/json" id={configId}>
+  {JSON.stringify({ slug, title })}
+</script>
+
+<script type="module">
+  const configEl = document.getElementById("{configId}");
+  if (!configEl) {
+    console.warn("Comments configuration missing");
+  }
+
+  const config = configEl ? JSON.parse(configEl.textContent || "{}") : {};
+  const slug = config.slug;
+  if (!slug) {
+    console.warn("Comments slug missing");
+  }
+
+  const section = document.getElementById("{sectionId}");
+  if (!section || !slug) {
+    return;
+  }
+
+  const STORAGE_PROFILE = "witchclick-comment-profile";
+  const STORAGE_PENDING = "witchclick-comment-pending";
+
+  const form = section.querySelector("[data-comments-form]");
+  const statusEl = section.querySelector("[data-comments-status]");
+  const listEl = section.querySelector("[data-comments-list]");
+  const emptyEl = section.querySelector("[data-comments-empty]");
+  const pendingEl = section.querySelector("[data-comments-pending]");
+
+  if (!(form instanceof HTMLFormElement) || !(listEl instanceof HTMLOListElement)) {
+    return;
+  }
+
+  const state = {
+    comments: [],
+    pendingLocal: [],
+  };
+
+  function readProfile() {
+    try {
+      const raw = localStorage.getItem(STORAGE_PROFILE);
+      return raw ? JSON.parse(raw) : {};
+    } catch (error) {
+      console.warn("Unable to read profile", error);
+      return {};
+    }
+  }
+
+  function saveProfile(profile) {
+    try {
+      localStorage.setItem(STORAGE_PROFILE, JSON.stringify(profile));
+    } catch (error) {
+      console.warn("Unable to persist profile", error);
+    }
+  }
+
+  function readPending() {
+    try {
+      const raw = localStorage.getItem(STORAGE_PENDING);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      console.warn("Unable to parse pending comments", error);
+      return [];
+    }
+  }
+
+  function savePending(pending) {
+    try {
+      localStorage.setItem(STORAGE_PENDING, JSON.stringify(pending));
+    } catch (error) {
+      console.warn("Unable to persist pending comments", error);
+    }
+  }
+
+  function formatDate(value) {
+    if (!value) return "just now";
+    try {
+      const date = new Date(value);
+      return date.toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch (error) {
+      return "just now";
+    }
+  }
+
+  function renderComments() {
+    if (!listEl) return;
+    listEl.innerHTML = "";
+
+    if (!Array.isArray(state.comments) || state.comments.length === 0) {
+      if (emptyEl) emptyEl.hidden = false;
+    } else {
+      if (emptyEl) emptyEl.hidden = true;
+      for (const comment of state.comments) {
+        const item = document.createElement("li");
+        item.className = "comments__item";
+
+        const header = document.createElement("div");
+        header.className = "comments__meta";
+
+        const author = document.createElement("span");
+        author.className = "comments__author";
+        author.textContent = comment.author || "Anonymous";
+        header.appendChild(author);
+
+        const time = document.createElement("time");
+        time.className = "comments__time";
+        time.dateTime = comment.createdAt || "";
+        time.textContent = formatDate(comment.createdAt);
+        header.appendChild(time);
+
+        const body = document.createElement("p");
+        body.className = "comments__text";
+        body.textContent = comment.message;
+
+        item.appendChild(header);
+        item.appendChild(body);
+        listEl.appendChild(item);
+      }
+    }
+  }
+
+  function renderPending() {
+    if (!pendingEl) return;
+    if (!state.pendingLocal || state.pendingLocal.length === 0) {
+      pendingEl.hidden = true;
+      pendingEl.textContent = "";
+      return;
+    }
+
+    pendingEl.hidden = false;
+    pendingEl.innerHTML = "";
+    const title = document.createElement("p");
+    title.className = "comments__pending-title";
+    title.textContent = "Your note is waiting for a gentle moderation pass:";
+    pendingEl.appendChild(title);
+
+    const list = document.createElement("ul");
+    list.className = "comments__pending-list";
+    for (const entry of state.pendingLocal) {
+      const li = document.createElement("li");
+      const heading = document.createElement("strong");
+      heading.textContent = entry.author || "You";
+      li.appendChild(heading);
+      const text = document.createElement("p");
+      text.textContent = entry.message;
+      li.appendChild(text);
+      const time = document.createElement("time");
+      time.dateTime = entry.createdAt || "";
+      time.textContent = formatDate(entry.createdAt);
+      li.appendChild(time);
+      list.appendChild(li);
+    }
+    pendingEl.appendChild(list);
+  }
+
+  function syncPendingFromStorage() {
+    const all = readPending();
+    state.pendingLocal = all.filter((item) => item.slug === slug);
+    renderPending();
+  }
+
+  function prunePendingUsingApproved() {
+    if (!Array.isArray(state.comments) || state.comments.length === 0) return;
+    const approvedIds = new Set(state.comments.map((comment) => comment.id));
+    if (approvedIds.size === 0) return;
+    const all = readPending();
+    const filtered = all.filter((item) => !approvedIds.has(item.id));
+    savePending(filtered);
+    state.pendingLocal = filtered.filter((item) => item.slug === slug);
+    renderPending();
+  }
+
+  async function loadComments() {
+    try {
+      const response = await fetch(`/api/comments/${encodeURIComponent(slug)}.json`);
+      if (!response.ok) throw new Error("Failed to load comments");
+      const payload = await response.json();
+      state.comments = Array.isArray(payload.comments) ? payload.comments : [];
+      renderComments();
+      prunePendingUsingApproved();
+    } catch (error) {
+      console.warn("Unable to load comments", error);
+      if (statusEl) {
+        statusEl.textContent = "We couldn't fetch comments right now. Please refresh soon.";
+      }
+    }
+  }
+
+  function preparePayload(formData) {
+    const author = String(formData.get("author") || "").trim();
+    const message = String(formData.get("message") || "").trim();
+    return { author, message };
+  }
+
+  async function submitComment(event) {
+    event.preventDefault();
+    if (!form || !statusEl) return;
+    const formData = new FormData(form);
+    const { author, message } = preparePayload(formData);
+
+    if (!author || !message) {
+      statusEl.textContent = "Please add both a name and a reflection.";
+      return;
+    }
+
+    statusEl.textContent = "Sending to the moderation queue…";
+    const submitButton = form.querySelector("button[type='submit']");
+    const previousDisabled = submitButton ? submitButton.disabled : false;
+    if (submitButton) submitButton.disabled = true;
+
+    try {
+      const response = await fetch(`/api/comments/${encodeURIComponent(slug)}.json`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ author, message }),
+      });
+      const payload = await response.json().catch(() => ({ ok: false }));
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload?.error || "Unable to save comment");
+      }
+
+      statusEl.textContent = "Thank you. We'll publish this after a quick moderation glance.";
+      form.reset();
+      const pendingEntry = {
+        id: payload.comment?.id || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        author,
+        message,
+        createdAt: payload.comment?.createdAt || new Date().toISOString(),
+        slug,
+      };
+      const all = readPending();
+      all.push(pendingEntry);
+      savePending(all);
+      syncPendingFromStorage();
+      const profile = readProfile();
+      profile.author = author;
+      saveProfile(profile);
+    } catch (error) {
+      console.warn("Comment submit failed", error);
+      statusEl.textContent = "We couldn't save that note just yet. Try again in a moment.";
+    } finally {
+      if (submitButton) submitButton.disabled = previousDisabled;
+    }
+  }
+
+  form.addEventListener("submit", submitComment);
+
+  const profile = readProfile();
+  if (profile && typeof profile === "object" && profile.author) {
+    const nameInput = form.querySelector("input[name='author']");
+    if (nameInput instanceof HTMLInputElement && !nameInput.value) {
+      nameInput.value = profile.author;
+    }
+  }
+
+  syncPendingFromStorage();
+  renderComments();
+  loadComments();
+</script>
+
+<style>
+  .comments {
+    margin-top: clamp(3rem, 6vw, 4rem);
+    padding: clamp(2rem, 5vw, 2.75rem);
+    border-radius: 2rem;
+    background: linear-gradient(150deg, rgba(139, 92, 246, 0.08), rgba(255, 255, 255, 0.95));
+    border: 1px solid rgba(139, 92, 246, 0.15);
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .comments__intro {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .comments__title {
+    font-size: clamp(1.4rem, 3vw, 1.85rem);
+    font-family: var(--font-heading, "Fraunces", serif);
+    color: color-mix(in srgb, var(--entity-accent-heading, #4338ca) 65%, #1f2937 35%);
+    margin: 0;
+  }
+
+  .comments__summary {
+    margin: 0;
+    max-width: 48ch;
+    color: color-mix(in srgb, var(--entity-accent-body, #4b5563) 75%, #1f2937 25%);
+  }
+
+  .comments__body {
+    display: grid;
+    gap: clamp(1.75rem, 4vw, 2.5rem);
+  }
+
+  @media (min-width: 960px) {
+    .comments__body {
+      grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+      gap: clamp(2rem, 3vw, 3rem);
+    }
+  }
+
+  .comments__form {
+    display: grid;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.88);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 12px 30px -18px rgba(79, 70, 229, 0.45);
+  }
+
+  .comments__form fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .comments__label {
+    display: grid;
+    gap: 0.3rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--entity-accent-heading, #4338ca) 70%, #1f2937 30%);
+  }
+
+  .comments__hint {
+    font-weight: 400;
+    font-size: 0.8rem;
+    color: color-mix(in srgb, var(--entity-accent-body, #4b5563) 65%, white 35%);
+  }
+
+  .comments__input,
+  .comments__textarea {
+    width: 100%;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(79, 70, 229, 0.35);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    color: #1f2937;
+  }
+
+  .comments__input:focus-visible,
+  .comments__textarea:focus-visible {
+    outline: 2px solid rgba(79, 70, 229, 0.6);
+    outline-offset: 2px;
+  }
+
+  .comments__textarea {
+    resize: vertical;
+    min-height: 140px;
+  }
+
+  .comments__submit {
+    align-self: start;
+    padding: 0.7rem 1.4rem;
+    border-radius: 999px;
+    border: 0;
+    cursor: pointer;
+    background: linear-gradient(135deg, #7c3aed, #6366f1);
+    color: white;
+    font-weight: 600;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .comments__submit:hover,
+  .comments__submit:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px -14px rgba(79, 70, 229, 0.65);
+  }
+
+  .comments__status {
+    margin: 0;
+    font-size: 0.9rem;
+    min-height: 1.2rem;
+    color: color-mix(in srgb, var(--entity-accent-body, #4b5563) 80%, #1f2937 20%);
+  }
+
+  .comments__thread {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .comments__thread-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--entity-accent-heading, #4338ca) 70%, #1f2937 30%);
+  }
+
+  .comments__pending {
+    border-radius: 1rem;
+    border: 1px dashed rgba(250, 204, 21, 0.6);
+    background: rgba(255, 251, 235, 0.85);
+    padding: 1rem;
+    display: grid;
+    gap: 0.5rem;
+    color: #92400e;
+  }
+
+  .comments__pending-title {
+    margin: 0;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .comments__pending-list {
+    margin: 0;
+    padding-left: 1rem;
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .comments__pending-list li {
+    list-style: disc;
+  }
+
+  .comments__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 1.2rem;
+  }
+
+  .comments__item {
+    border-radius: 1.1rem;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(255, 255, 255, 0.92);
+    padding: 1.1rem 1.25rem;
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .comments__meta {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    font-size: 0.9rem;
+  }
+
+  .comments__author {
+    font-weight: 600;
+    color: color-mix(in srgb, var(--entity-accent-heading, #4338ca) 70%, #1f2937 30%);
+  }
+
+  .comments__time {
+    font-size: 0.8rem;
+    color: rgba(100, 116, 139, 0.9);
+  }
+
+  .comments__text {
+    margin: 0;
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--entity-accent-body, #4b5563) 85%, #1f2937 15%);
+  }
+
+  .comments__empty {
+    margin: 0;
+    font-size: 0.9rem;
+    color: rgba(100, 116, 139, 0.9);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+</style>

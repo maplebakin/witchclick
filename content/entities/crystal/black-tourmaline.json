@@ -1,8 +1,13 @@
 {
   "type": "crystal",
-  "name": "black tourmaline",
+  "name": "Black Tourmaline",
   "slug": "black-tourmaline",
-  "summary": "black tourmaline — stub entity",
-  "properties": {},
-  "related": []
+  "summary": "A grounding shield that absorbs errant static, anchors anxious thoughts, and supports deep rooting.",
+  "properties": {
+    "keywords": ["protection", "grounding", "transmutation"],
+    "element": "Earth"
+  },
+  "related": [
+    "ritual:candle-grounding"
+  ]
 }

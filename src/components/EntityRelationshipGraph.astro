@@ -1,0 +1,243 @@
+---
+interface EntityNode {
+  type: string;
+  slug: string;
+  name: string;
+  summary: string;
+  direction?: "outbound" | "inbound" | "bidirectional";
+}
+
+interface Props {
+  center: EntityNode;
+  neighbors: EntityNode[];
+}
+
+const { center, neighbors } = Astro.props as Props;
+const graphId = `entity-graph-${Math.random().toString(36).slice(2, 10)}`;
+const centerId = `${center.type}:${center.slug}`;
+const nodes = [
+  {
+    id: centerId,
+    label: center.name,
+    type: center.type,
+    summary: center.summary,
+    direction: "center",
+  },
+  ...neighbors.map((entity) => ({
+    id: `${entity.type}:${entity.slug}`,
+    label: entity.name,
+    type: entity.type,
+    summary: entity.summary,
+    direction: entity.direction ?? "outbound",
+  })),
+];
+
+const links = neighbors.map((entity) => ({
+  source: centerId,
+  target: `${entity.type}:${entity.slug}`,
+  direction: entity.direction ?? "outbound",
+}));
+
+const palette: Record<string, string> = {
+  ritual: "#8b5cf6",
+  crystal: "#38bdf8",
+  herb: "#34d399",
+  moonPhase: "#facc15",
+  planetaryDay: "#fb7185",
+  tarot: "#f472b6",
+  default: "#c4b5fd",
+};
+---
+<section class="entity-graph" aria-label="Relationship graph">
+  <div class="entity-graph__canvas" id={graphId} data-graph={JSON.stringify({ nodes, links, centerId, palette })}></div>
+  <footer class="entity-graph__legend">
+    <div class="legend-dot legend-dot--outbound" aria-hidden="true"></div>
+    <span>Lavender ring → ritual cites this ally</span>
+    <div class="legend-dot legend-dot--inbound" aria-hidden="true"></div>
+    <span>Gold ring → other lore points back here</span>
+  </footer>
+</section>
+
+<script type="module">
+  const container = document.getElementById("{graphId}");
+  if (!container) {
+    console.warn("Entity graph container missing");
+    return;
+  }
+
+  let d3;
+  try {
+    d3 = await import("https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm");
+  } catch (error) {
+    console.warn("Unable to load D3 for entity graph", error);
+    return;
+  }
+
+  const dataset = JSON.parse(container.dataset.graph || "{}");
+  const { nodes, links, centerId, palette } = dataset;
+  const width = 640;
+  const height = 420;
+
+  const svg = d3
+    .select(container)
+    .append("svg")
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("role", "img")
+    .attr("aria-label", "Entity relationship graph")
+    .style("width", "100%")
+    .style("height", "100%");
+
+  const canvas = svg.append("g");
+
+  const link = canvas
+    .append("g")
+    .attr("stroke", "#d1d5db")
+    .attr("stroke-width", 1.2)
+    .selectAll("line")
+    .data(links)
+    .join("line")
+    .attr("stroke-opacity", 0.65);
+
+  const node = canvas
+    .append("g")
+    .selectAll("g")
+    .data(nodes)
+    .join("g")
+    .attr("tabindex", (d) => (d.id === centerId ? "-1" : "0"))
+    .attr("role", "listitem");
+
+  node
+    .append("circle")
+    .attr("r", (d) => (d.id === centerId ? 30 : 22))
+    .attr("fill", (d) => palette[d.type] || palette.default)
+    .attr("fill-opacity", (d) => (d.id === centerId ? 0.9 : 0.7))
+    .attr("stroke", (d) =>
+      d.direction === "inbound"
+        ? "#f59e0b"
+        : d.direction === "bidirectional"
+          ? "#8b5cf6"
+          : "#6366f1"
+    )
+    .attr("stroke-width", (d) => (d.id === centerId ? 3 : 2))
+    .attr("stroke-dasharray", (d) => (d.direction === "inbound" ? "4 2" : ""));
+
+  node
+    .append("text")
+    .text((d) => d.label)
+    .attr("text-anchor", "middle")
+    .attr("font-size", (d) => (d.id === centerId ? "15px" : "12px"))
+    .attr("dy", (d) => (d.id === centerId ? 5 : 4))
+    .attr("fill", "#111827")
+    .attr("pointer-events", "none");
+
+  node.append("title").text((d) => `${d.label}\n${d.summary}`);
+
+  const simulation = d3
+    .forceSimulation(nodes)
+    .force(
+      "link",
+      d3
+        .forceLink(links)
+        .id((d) => d.id)
+        .distance((d) => (d.target.id === centerId ? 140 : 160))
+        .strength(0.65)
+    )
+    .force("charge", d3.forceManyBody().strength(-260))
+    .force("center", d3.forceCenter(width / 2, height / 2))
+    .force("collision", d3.forceCollide().radius((d) => (d.id === centerId ? 48 : 36)).strength(0.9));
+
+  simulation.on("tick", () => {
+    link
+      .attr("x1", (d) => d.source.x)
+      .attr("y1", (d) => d.source.y)
+      .attr("x2", (d) => d.target.x)
+      .attr("y2", (d) => d.target.y);
+
+    node.attr("transform", (d) => `translate(${d.x}, ${d.y})`);
+  });
+
+  const drag = d3
+    .drag()
+    .on("start", (event, d) => {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    })
+    .on("drag", (event, d) => {
+      d.fx = event.x;
+      d.fy = event.y;
+    })
+    .on("end", (event, d) => {
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    });
+
+  node.call(drag);
+
+  const zoom = d3
+    .zoom()
+    .scaleExtent([0.7, 1.8])
+    .on("zoom", (event) => {
+      canvas.attr("transform", event.transform);
+    });
+
+  svg.call(zoom);
+
+  if ("ResizeObserver" in window) {
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const bounds = entry.contentRect;
+        const aspect = height / width;
+        const newHeight = Math.max(320, bounds.width * aspect);
+        const svgElement = container.firstElementChild;
+        if (svgElement instanceof SVGElement) {
+          svgElement.style.width = "100%";
+          svgElement.style.height = `${newHeight}px`;
+        }
+      }
+    });
+
+    ro.observe(container);
+  }
+</script>
+
+<style>
+  .entity-graph {
+    margin-top: 2.5rem;
+    border-radius: 1.5rem;
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.05), rgba(255, 255, 255, 0.9));
+    padding: clamp(1.5rem, 4vw, 2.25rem);
+    display: grid;
+    gap: 1rem;
+  }
+
+  .entity-graph__canvas {
+    position: relative;
+    width: 100%;
+    min-height: 320px;
+  }
+
+  .entity-graph__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--entity-accent-heading, #4338ca) 70%, #1f2937 30%);
+  }
+
+  .legend-dot {
+    width: 0.85rem;
+    height: 0.85rem;
+    border-radius: 50%;
+    border: 2px solid #6366f1;
+    background: rgba(124, 58, 237, 0.2);
+  }
+
+  .legend-dot--inbound {
+    border-color: #f59e0b;
+    border-style: dashed;
+  }
+</style>

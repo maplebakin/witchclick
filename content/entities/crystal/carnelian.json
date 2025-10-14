@@ -2,7 +2,13 @@
   "type": "crystal",
   "name": "Carnelian",
   "slug": "carnelian",
-  "summary": "",
-  "properties": {},
-  "related": []
+  "summary": "Sun-warmed chalcedony that sparks courage, creative drive, and steady forward motion.",
+  "properties": {
+    "keywords": ["motivation", "confidence", "activation"],
+    "chakra": "Sacral",
+    "element": "Fire"
+  },
+  "related": [
+    "ritual:creative-spark-ritual"
+  ]
 }
