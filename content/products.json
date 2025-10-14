@@ -1,95 +1,112 @@
-
 {
   "products": [
     {
-      "key": "ritual-journal",
-      "name": "Ember & Ash Ritual Journal",
-      "brand": "Ember & Ash",
-      "url": "https://example.com/products/ritual-journal",
-      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=ritual_journal",
+      "key": "sustainable-incense",
+      "name": "Sustainable Incense Stick Set",
+      "brand": "Various Makers",
+      "url": "https://www.amazon.com/s?k=sustainable+incense+sticks&tag=YOURTAG-20",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=sustainable_incense",
       "rel": "sponsored nofollow",
-      "tags": ["journaling", "ritual"]
+      "tags": ["incense", "cleansing", "aromatherapy"]
     },
     {
-      "key": "micro-notebook",
-      "name": "Pocket Sparks Dot Grid Notebook",
-      "brand": "Pocket Sparks",
-      "url": "https://example.com/products/micro-notebook",
-      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=micro_notebook",
+      "key": "altar-kit",
+      "name": "Altar Kit (Cloth, Chalice & Ritual Candles)",
+      "brand": "Curated Set",
+      "url": "https://www.amazon.com/s?k=altar+tools+chalice+altar+cloth+ritual+candles&tag=YOURTAG-20",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=altar_kit",
       "rel": "sponsored nofollow",
-      "tags": ["notetaking", "portable"]
+      "tags": ["altar", "ritual", "setup"]
     },
     {
-      "key": "grounding-stone",
-      "name": "Smoky Quartz Grounding Stone",
-      "brand": "Stonewell",
-      "url": "https://example.com/products/grounding-stone",
-      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=grounding_stone",
+      "key": "gemstone-candle",
+      "name": "Gemstone-Infused Aromatherapy Candle",
+      "brand": "Crystal Candle Co.",
+      "url": "https://www.amazon.com/s?k=gemstone+infused+candle&tag=YOURTAG-20",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=gemstone_candle",
       "rel": "sponsored nofollow",
-      "tags": ["crystal", "anxiety"]
+      "tags": ["candle", "aromatherapy", "crystal"]
     },
     {
-      "key": "cozy-game",
-      "name": "LoFi Cozy Game Library",
-      "brand": "LoFi Library",
-      "url": "https://example.com/products/cozy-game",
-      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=cozy_game",
+      "key": "aroma-diffuser",
+      "name": "Ceramic Essential Oil Diffuser",
+      "brand": "CalmMist",
+      "url": "https://www.amazon.com/s?k=ceramic+essential+oil+diffuser&tag=YOURTAG-20",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=aroma_diffuser",
       "rel": "sponsored nofollow",
-      "tags": ["digital", "break"]
+      "tags": ["aromatherapy", "diffuser", "wellness"]
     },
     {
-      "key": "tarot-deck",
-      "name": "Everyday Pattern Tarot Deck",
-      "brand": "Everyday Pattern",
-      "url": "https://example.com/products/tarot-deck",
-      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=tarot_deck",
+      "key": "tumbled-stones",
+      "name": "Tumbled Stone Crystal Set",
+      "brand": "Crystal Collective",
+      "url": "https://www.amazon.com/s?k=tumbled+stones+set&tag=YOURTAG-20",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=tumbled_stones",
       "rel": "sponsored nofollow",
-      "tags": ["tarot", "cards"]
+      "tags": ["crystal", "set", "grounding"]
     },
     {
-      "key": "tarot-cloth",
-      "name": "Reversible Tarot Spread Cloth",
-      "brand": "Moonloom",
-      "url": "https://example.com/products/tarot-cloth",
-      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=tarot_cloth",
+      "key": "himalayan-salt-lamp",
+      "name": "Himalayan Salt Lamp",
+      "brand": "Summit Glow",
+      "url": "https://www.amazon.com/s?k=himalayan+salt+lamp&tag=YOURTAG-20",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=himalayan_salt_lamp",
       "rel": "sponsored nofollow",
-      "tags": ["tarot", "altar"]
+      "tags": ["ambient", "lighting", "salt"]
     },
     {
-      "key": "focus-tea",
-      "name": "Peppermint Rosemary Focus Tea",
-      "brand": "Kettlebright",
-      "url": "https://example.com/products/focus-tea",
-      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=focus_tea",
+      "key": "singing-bowl",
+      "name": "Tibetan Singing Bowl Set",
+      "brand": "Resonant Tone",
+      "url": "https://www.amazon.com/s?k=singing+bowl+set&tag=YOURTAG-20",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=singing_bowl",
       "rel": "sponsored nofollow",
-      "tags": ["tea", "focus"]
+      "tags": ["sound", "meditation", "healing"]
     },
     {
-      "key": "herbal-kit",
-      "name": "Countertop Herb Drying Kit",
-      "brand": "HerbNest",
-      "url": "https://example.com/products/herbal-kit",
-      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=herbal_kit",
+      "key": "mindfulness-journal",
+      "name": "Guided Mindfulness Journal",
+      "brand": "Quiet Pages",
+      "url": "https://www.amazon.com/s?k=guided+mindfulness+journal&tag=YOURTAG-20",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=mindfulness_journal",
       "rel": "sponsored nofollow",
-      "tags": ["herbs", "kitchen"]
+      "tags": ["journal", "mindfulness", "reflection"]
     },
     {
-      "key": "planner-pad",
-      "name": "Undated Focus Planner Pad",
-      "brand": "Gentle Plans",
-      "url": "https://example.com/products/planner-pad",
-      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=planner_pad",
+      "key": "chakra-bracelet",
+      "name": "Chakra Bracelet / Mala Beads",
+      "brand": "Aura Threads",
+      "url": "https://www.amazon.com/s?k=chakra+bracelet+mala&tag=YOURTAG-20",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=chakra_bracelet",
       "rel": "sponsored nofollow",
-      "tags": ["planning", "focus"]
+      "tags": ["jewelry", "chakra", "meditation"]
     },
     {
-      "key": "led-candle",
-      "name": "Rechargeable LED Ritual Candle",
-      "brand": "Glowstead",
-      "url": "https://example.com/products/led-candle",
-      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=led_candle",
+      "key": "smudge-kit",
+      "name": "White Sage & Palo Santo Smudge Kit",
+      "brand": "Sacred Smoke",
+      "url": "https://www.amazon.com/s?k=white+sage+palo+santo+kit&tag=YOURTAG-20",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=smudge_kit",
       "rel": "sponsored nofollow",
-      "tags": ["ambient", "safety"]
+      "tags": ["cleansing", "smudging", "ritual"]
+    },
+    {
+      "key": "crystal-bible",
+      "name": "The Crystal Bible (Judy Hall)",
+      "brand": "Bookshop",
+      "url": "https://bookshop.org/a/YOUR_BOOKSHOP_ID/search?keywords=the+crystal+bible+judy+hall",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=crystal_bible",
+      "rel": "sponsored nofollow",
+      "tags": ["book", "crystal", "reference"]
+    },
+    {
+      "key": "moonology",
+      "name": "Moonology (Yasmin Boland)",
+      "brand": "Bookshop",
+      "url": "https://bookshop.org/a/YOUR_BOOKSHOP_ID/search?keywords=moonology+yasmin+boland",
+      "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=moonology",
+      "rel": "sponsored nofollow",
+      "tags": ["book", "lunar", "astrology"]
     }
   ]
 }
