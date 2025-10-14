@@ -55,6 +55,12 @@ const gridPosts = heroPost ? pagePosts.slice(1) : pagePosts;
 const hasPosts = pagePosts.length > 0;
 const evergreenCta = evergreenBlocks.cta;
 const evergreenTestimonials = evergreenBlocks.testimonials ?? [];
+const moodRibbonIndex = 3;
+const moodLinks = [
+  { href: "/downloads", label: "Printable planners" },
+  { href: "/entities", label: "Herbal allies" },
+  { href: "/post/pre-interview-grounding-ritual", label: "Grounding ritual" },
+];
 const homeStructuredItems = pagePosts.map((post) => {
   const card = toViewModel(post);
   return {
@@ -103,23 +109,38 @@ function resolveDate(data) {
   title={`${settings.brandName ?? "WitchClick"} — Cozy secular rituals & tools`}
   description={tagline}
   ogImage={heroOgImage ?? ""}
+  desktopWide={true}
 >
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(homeItemList)} />
   </Fragment>
 
   <div class="grimoire-bg min-h-screen">
-    <section class="home-canvas mx-auto max-w-5xl px-4 py-12 sm:py-16">
-      <Hero
-        class="home-hero"
-        eyebrow="Fresh from the coven"
-        title={heroTitle}
-        description={heroDescription}
-        backgroundImage={heroBackgroundImage}
-        imageAlt={heroImageAlt}
-        ctaButtons={heroCtaButtons}
-        ctaDescription="Pick the path that fits your spoons right now."
-      />
+    <section class="home-canvas mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 xl:max-w-7xl xl:px-12">
+      <div class="home-hero-grid">
+        <Hero
+          class="home-hero-panel"
+          eyebrow="Fresh from the coven"
+          title={heroTitle}
+          description={heroDescription}
+          backgroundImage={heroBackgroundImage}
+          imageAlt={heroImageAlt}
+          ctaButtons={heroCtaButtons}
+          ctaDescription="Pick the path that fits your spoons right now."
+        />
+
+        <aside class="soft-card home-callout home-hero-rail" aria-labelledby="home-callout-heading">
+          <h3 id="home-callout-heading" class="font-serif">Need a cozy starting place?</h3>
+          <p>
+            Browse guided spreads, gentle accountability planners, and grounding prompts to keep your routines soft and sustainable.
+          </p>
+          <ul class="home-callout-list">
+            <li><a href="/downloads">Printable downloads</a></li>
+            <li><a href="/entities">Entity library &amp; correspondences</a></li>
+            <li><a href="/post/pre-interview-grounding-ritual">Pre-interview grounding ritual</a></li>
+          </ul>
+        </aside>
+      </div>
 
       {(evergreenCta || evergreenTestimonials.length > 0) && (
         <section class="home-evergreen" aria-label="Evergreen invitations">
@@ -164,39 +185,39 @@ function resolveDate(data) {
                 <span aria-hidden="true">→</span>
               </a>
             </article>
-
-            <aside class="soft-card home-callout" aria-labelledby="home-callout-heading">
-              <h3 id="home-callout-heading" class="font-serif">Need a cozy starting place?</h3>
-              <p>
-                Browse guided spreads, gentle accountability planners, and grounding prompts to keep your routines soft and sustainable.
-              </p>
-              <ul class="home-callout-list">
-                <li><a href="/downloads">Printable downloads</a></li>
-                <li><a href="/entities">Entity library &amp; correspondences</a></li>
-                <li><a href="/post/pre-interview-grounding-ritual">Pre-interview grounding ritual</a></li>
-              </ul>
-            </aside>
           </div>
         )}
 
         {hasPosts ? (
           gridPosts.length > 0 ? (
-            <div class="home-grid grid grid-cols-1 sm:grid-cols-2">
-              {gridPosts.map((post) => {
+            <div class="home-grid grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
+              {gridPosts.map((post, index) => {
                 const card = toViewModel(post);
                 return (
-                  <PostCard
-                    class="shadow-1"
-                    post={{
-                      slug: card.slug,
-                      title: card.title,
-                      excerpt: card.excerpt,
-                      tags: card.tags,
-                      readingMinutes: card.readingMinutes,
-                      publishedAt: card.publishedAt,
-                    }}
-                    href={card.href}
-                  />
+                  <Fragment key={card.slug}>
+                    <PostCard
+                      class="shadow-1"
+                      post={{
+                        slug: card.slug,
+                        title: card.title,
+                        excerpt: card.excerpt,
+                        tags: card.tags,
+                        readingMinutes: card.readingMinutes,
+                        publishedAt: card.publishedAt,
+                      }}
+                      href={card.href}
+                    />
+                    {index === moodRibbonIndex - 1 && gridPosts.length > moodRibbonIndex && (
+                      <div class="home-grid-ribbon" aria-label="Browse by mood">
+                        <p class="home-grid-ribbon-eyebrow">Browse by mood</p>
+                        <div class="home-grid-ribbon-links">
+                          {moodLinks.map((link) => (
+                            <a href={link.href} key={link.href}>{link.label}</a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </Fragment>
                 );
               })}
             </div>
@@ -214,7 +235,7 @@ function resolveDate(data) {
     </section>
 
     {totalPages > 1 ? (
-      <div class="mx-auto max-w-5xl px-4 pb-12">
+      <div class="mx-auto w-full max-w-6xl px-4 pb-12 sm:px-6 lg:px-8 xl:max-w-7xl xl:px-12">
         <Pagination page={1} totalPages={totalPages} baseHref="/page" />
       </div>
     ) : null}
@@ -228,6 +249,50 @@ function resolveDate(data) {
     color: var(--ink-body, currentColor);
   }
 
+  .home-hero-grid {
+    display: grid;
+    gap: clamp(1.75rem, 4vw, 2.75rem);
+  }
+
+  .home-hero-panel {
+    min-width: 0;
+  }
+
+  .home-hero-rail {
+    padding: clamp(1.4rem, 3vw, 1.9rem);
+    display: grid;
+    gap: 1rem;
+    color: var(--ink-body, currentColor);
+  }
+
+  @media (min-width: 1024px) {
+    .home-hero-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      align-items: start;
+    }
+
+    .home-hero-panel {
+      grid-column: span 8;
+    }
+
+    .home-hero-rail {
+      grid-column: span 4;
+      position: sticky;
+      top: 6.5rem;
+      align-self: start;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .home-hero-panel {
+      grid-column: span 7;
+    }
+
+    .home-hero-rail {
+      grid-column: span 5;
+    }
+  }
+
   .home-evergreen {
     display: grid;
     gap: clamp(1.5rem, 3vw, 2.5rem);
@@ -235,6 +300,16 @@ function resolveDate(data) {
 
   .home-evergreen > * {
     min-width: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .home-evergreen {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .home-evergreen > * {
+      height: 100%;
+    }
   }
 
   .home-feed {
@@ -276,18 +351,27 @@ function resolveDate(data) {
     gap: clamp(1.5rem, 4vw, 2.1rem);
   }
 
-  @media (min-width: 768px) {
-    .home-feature {
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-      align-items: stretch;
-    }
-  }
-
   .home-feature-card {
     display: flex;
     flex-direction: column;
     gap: 1.1rem;
     padding: clamp(1.5rem, 3.5vw, 2.1rem);
+  }
+
+  @media (min-width: 1024px) {
+    .home-feature {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .home-feature-card {
+      grid-column: span 8;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .home-feature-card {
+      grid-column: span 7;
+    }
   }
 
   .home-feature-eyebrow {
@@ -342,13 +426,6 @@ function resolveDate(data) {
     text-underline-offset: 6px;
   }
 
-  .home-callout {
-    padding: clamp(1.4rem, 3vw, 1.9rem);
-    display: grid;
-    gap: 1rem;
-    color: var(--ink-body, currentColor);
-  }
-
   .home-callout p {
     margin: 0;
   }
@@ -395,8 +472,62 @@ function resolveDate(data) {
     gap: clamp(1.5rem, 3vw, 2.35rem);
   }
 
+  .home-grid > * {
+    min-width: 0;
+  }
+
   .home-grid .card-panel {
     color: var(--ink-strong, currentColor);
+  }
+
+  .home-grid-ribbon {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 0.75rem;
+    padding: clamp(1.25rem, 3vw, 1.75rem);
+    border-radius: 1.5rem;
+    background: color-mix(in srgb, var(--panel-muted-surface) 78%, transparent);
+    border: 1px solid color-mix(in srgb, var(--ambient-color, var(--color-primary)) 25%, transparent);
+  }
+
+  .home-grid-ribbon-eyebrow {
+    margin: 0;
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 72%, var(--ink-body, currentColor) 28%);
+  }
+
+  .home-grid-ribbon-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  .home-grid-ribbon-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.95rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 15%, white 85%);
+    color: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 65%, var(--ink-body, currentColor) 35%);
+    text-decoration: none;
+    box-shadow: 0 10px 22px -18px rgba(15, 23, 42, 0.35);
+  }
+
+  .home-grid-ribbon-links a:hover,
+  .home-grid-ribbon-links a:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+  }
+
+  @media (min-width: 1280px) {
+    .home-grid > :not(.home-grid-ribbon):nth-of-type(3n + 2) {
+      transform: translateY(1.25rem);
+    }
   }
 
   .home-empty {
