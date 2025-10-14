@@ -6,6 +6,7 @@ import Disclosure from "../../components/Disclosure.astro";
 import DownloadCard from "../../components/DownloadCard.astro";
 import RelatedPosts from "../../components/RelatedPosts.astro";
 import CtaFooter from "../../components/CtaFooter.astro";
+import ProductRecommendations from "../../components/ProductRecommendations.astro";
 import { readEntity } from "../../utils/entities";
 
 import fs from "node:fs";
@@ -96,6 +97,40 @@ const productsDoc = fs.existsSync(productsFilePath)
   ? JSON.parse(fs.readFileSync(productsFilePath, "utf8"))
   : { products: [] };
 const allProducts = Array.isArray(productsDoc) ? productsDoc : productsDoc.products || [];
+
+const postTagsRaw = Array.isArray(data.tags)
+  ? data.tags
+  : typeof data.tags === "string"
+    ? data.tags.split(",")
+    : [];
+
+const postTags = Array.from(
+  new Set(
+    postTagsRaw
+      .map((tag: any) => String(tag ?? "").split(","))
+      .flat()
+      .map((tag: string) => tag.trim().toLowerCase())
+      .filter(Boolean),
+  ),
+);
+
+const productRecommendations = (postTags.length
+  ? allProducts.filter((product: any) => {
+      if (!product || typeof product !== "object") return false;
+      const tags = Array.isArray(product.tags)
+        ? product.tags
+            .map((tag: any) => String(tag ?? "").trim().toLowerCase())
+            .filter(Boolean)
+        : [];
+      if (tags.length === 0) return false;
+      return tags.some((tag: string) => postTags.includes(tag));
+    })
+  : [])
+  .filter((product: any, index: number, list: any[]) => {
+    const key = product?.key ? String(product.key) : null;
+    if (!key) return true;
+    return index === list.findIndex((item: any) => item?.key && String(item.key) === key);
+  });
 
 const ogCandidate = path.join(process.cwd(), "public", "og", `${effectiveSlug}.jpg`);
 const ogImage = data.ogImage
@@ -205,6 +240,10 @@ const jsonLd = {
                   <span class="rounded-full border border-purple-200 bg-purple-50 px-3 py-0.5">#{String(tag).toLowerCase()}</span>
                 ))}
             </div>
+
+            {productRecommendations.length > 0 && (
+              <ProductRecommendations products={productRecommendations} class="mb-8" />
+            )}
 
             <div class="prose prose-neutral max-w-none" set:html={html} />
 

@@ -1,0 +1,191 @@
+---
+interface ProductInput {
+  key?: string;
+  name?: string;
+  brand?: string;
+  url?: string;
+  utm?: string;
+  rel?: string;
+  tags?: string[];
+  image?: string;
+}
+
+interface Props {
+  products?: ProductInput[];
+  title?: string;
+  class?: string;
+}
+
+const { products = [], title = "Cozy tools for this ritual", class: className = "" } = Astro.props as Props;
+
+const filtered = Array.isArray(products)
+  ? products
+      .map((product) => ({ ...product }))
+      .filter((product) => typeof product?.url === "string" && product.url.trim().length > 0)
+  : [];
+
+const display = filtered.slice(0, 3);
+
+const containerClass = ["product-recs", "soft-card", className].filter(Boolean).join(" ");
+
+function buildHref(product: ProductInput): string {
+  if (product?.key) {
+    return `/go/${product.key}`;
+  }
+  const base = typeof product?.url === "string" ? product.url : "";
+  if (!base) return "#";
+  if (product?.utm && !base.includes("?")) {
+    return `${base}?${product.utm}`;
+  }
+  return base;
+}
+
+function resolveImage(product: ProductInput): string {
+  if (typeof product?.image === "string" && product.image.trim().length > 0) {
+    return product.image;
+  }
+  const placeholderLabel = encodeURIComponent(product?.name ?? "Affiliate pick");
+  return `https://placehold.co/600x400?text=${placeholderLabel}`;
+}
+---
+{display.length > 0 && (
+  <section class={containerClass} aria-labelledby="product-recs-title">
+    <div class="product-recs-header">
+      <h2 id="product-recs-title">{title}</h2>
+      <p class="product-recs-subtitle">Hand-picked goodies that align with today&apos;s focus.</p>
+    </div>
+    <ul class="product-recs-list">
+      {display.map((product) => {
+        const href = buildHref(product);
+        const rel = product?.rel ?? "sponsored nofollow";
+        const image = resolveImage(product);
+        return (
+          <li class="product-card">
+            <a
+              href={href}
+              rel={rel}
+              target="_blank"
+              class="product-card-link"
+              data-affiliate="true"
+            >
+              <img src={image} alt={product?.name ?? "Affiliate product"} loading="lazy" class="product-card-image" />
+            </a>
+            <div class="product-card-body">
+              <h3 class="product-card-title">{product?.name ?? "Affiliate product"}</h3>
+              <a
+                href={href}
+                rel={rel}
+                target="_blank"
+                class="product-card-button"
+                data-affiliate="true"
+              >
+                Buy Now
+              </a>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
+)}
+
+<style>
+  .product-recs {
+    border-radius: 1.5rem;
+    background: color-mix(in srgb, var(--surface-panel, white) 88%, var(--color-primary) 12%);
+    box-shadow: 0 18px 38px color-mix(in srgb, var(--ambient-color, rgba(81, 45, 168, 0.16)) 28%, transparent 72%);
+    gap: 1.25rem;
+  }
+
+  .product-recs-header {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .product-recs h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 72%, var(--ink-body, currentColor) 28%);
+  }
+
+  .product-recs-subtitle {
+    margin: 0;
+    font-size: 0.9rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 82%, white 18%);
+  }
+
+  .product-recs-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .product-card {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .product-card-link {
+    display: block;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--color-primary) 12%, transparent 88%);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .product-card-link:focus-visible,
+  .product-card-link:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 24px color-mix(in srgb, var(--color-primary) 18%, transparent 82%);
+  }
+
+  .product-card-image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .product-card-body {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .product-card-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--ink-strong, currentColor) 90%, white 10%);
+  }
+
+  .product-card-button {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-primary) 92%, white 8%);
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: background 0.25s ease, transform 0.25s ease;
+  }
+
+  .product-card-button:hover,
+  .product-card-button:focus-visible {
+    background: color-mix(in srgb, var(--color-primary) 80%, black 20%);
+    transform: translateY(-1px);
+  }
+
+  @media (min-width: 640px) {
+    .product-recs-list {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+  }
+</style>
