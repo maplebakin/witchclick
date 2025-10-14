@@ -56,7 +56,12 @@
   • Add section dividers or ambient flourishes (constellation dividers) that only appear beyond `md` to signal that desktop has more room to explore.
 
 ## Implementation Sequencing
-1. Prototype a widened Base layout variant and apply it to the home, downloads, and entities pages to validate the new grid rhythm.  
-2. Refresh the home hero and feed to adopt multi-column treatments, then mirror that compositional language on downloads/entities for cohesion.  
-3. Iterate on article sidebar content and supporting visuals so long-form reading feels intentionally expansive instead of stretched mobile UI.  
+1. Prototype a widened Base layout variant and apply it to the home, downloads, and entities pages to validate the new grid rhythm.
+2. Refresh the home hero and feed to adopt multi-column treatments, then mirror that compositional language on downloads/entities for cohesion.
+3. Iterate on article sidebar content and supporting visuals so long-form reading feels intentionally expansive instead of stretched mobile UI.
 4. Audit remaining static pages and introduce the shared story layout to keep typography comfortable on large screens.
+
+## Stewardship Notes
+- Capture screenshots of widened experiments during implementation to keep visual regressions in check and document the evolving art direction alongside this brief.
+- When experimenting with broader breakpoints, watch for regressions in cozy microcopy placement—if phrases wrap awkwardly, introduce breakpoint-specific line breaks rather than shrinking font sizes.
+- Surface layout changes to the content team during weekly rituals so fresh printable drops can intentionally leverage any new horizontal storytelling room.
