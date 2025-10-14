@@ -704,6 +704,8 @@ const bodyStyle = `
 
     {analyticsInjection?.runtime && <Fragment set:html={analyticsInjection.runtime} />}
 
+    <script src="/clickthrough.js" defer></script>
+
     <script is:inline>
       (() => {
         const menu = document.querySelector("[data-grimoire-menu]");
