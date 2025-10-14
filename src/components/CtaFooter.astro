@@ -18,9 +18,9 @@ if (type === 'kofi') {
   const idx = Math.floor(Math.random() * KOFI_CTA_VARIANTS.length);
   text = KOFI_CTA_VARIANTS[idx];
   href = KO_FI_URL;
-} else if (type === 'download' && id) {
-  text = 'Grab the printable that goes with this post.';
-  href = `/downloads/${id}`;
+} else if (type === 'download') {
+  text = 'Explore cozy tools and printable rituals.';
+  href = '/tools/';
 }
 ---
 {type !== 'none' && text && href && (

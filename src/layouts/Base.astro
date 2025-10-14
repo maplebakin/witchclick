@@ -3,7 +3,7 @@
 import "../styles/base.css";
 import "../styles/tailwind.css";
 import "../styles/cards.css";
-import SearchBox from "../components/SearchBox.astro";
+import Header from "@/components/Header.astro";
 import { typeMetadata } from "../data/typeMetadata";
 import { readSettings, getSiteOrigin, toAbsoluteUrl } from "../utils/settings";
 import { buildAnalyticsInjection } from "../utils/analytics";
@@ -68,7 +68,7 @@ const bodyFont = "Lora";
 const primaryLinks = [
   { href: "/", label: "Rituals" },
   { href: "/entities", label: "Entity Library" },
-  { href: "/downloads", label: "Tools & Prints" },
+  { href: "/tools/", label: "Tools & Prints" },
 ];
 
 const secondaryLinks = [
@@ -85,8 +85,6 @@ const devLinks = import.meta.env.DEV
       { href: "/admin/hero", label: "Hero Uploader", rel: "nofollow" },
     ]
   : [];
-
-const navLinks = [...primaryLinks, ...secondaryLinks, ...devLinks];
 const footerUtilityLinks = [
   { href: "/rss.xml", label: "RSS" },
   { href: "/sitemap-index.xml", label: "Sitemap" },
@@ -307,157 +305,7 @@ const bodyStyle = `
       Skip to content
     </a>
 
-    <header class="site-header">
-      <div class:list={["wc-container site-header__inner", layoutPaddingClass]}>
-        <a href="/" class="site-logo">
-          <span aria-hidden="true">☾</span>
-          <span>{brandName}</span>
-        </a>
-        <nav class="site-nav" aria-label="Primary navigation">
-          <button
-            type="button"
-            class="site-nav__toggle"
-            data-nav-toggle
-            aria-expanded="false"
-            aria-controls="site-nav-mobile"
-          >
-            <span class="sr-only">Toggle navigation</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-              <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-          <ul
-            class:list={[
-              "site-nav__list",
-              "flex flex-wrap items-center gap-x-3 gap-y-2",
-            ]}
-          >
-            <li class="site-nav__item" data-nav-dropdown-container>
-              <button
-                type="button"
-                class="site-nav__button"
-                data-nav-dropdown
-                aria-expanded="false"
-                aria-controls="grimoire-menu"
-              >
-                Grimoire
-                <span aria-hidden="true">⌄</span>
-              </button>
-              <div
-                id="grimoire-menu"
-                class="site-nav__submenu"
-                data-nav-submenu
-                role="menu"
-                hidden
-              >
-                <ul class="site-nav__submenu-list">
-                  {grimoireChapters.map((chapter) => (
-                    <li>
-                      <a href={chapter.href} class="site-nav__submenu-link" data-nav-submenu-item>
-                        <span class="site-nav__submenu-icon" aria-hidden="true">{chapter.icon}</span>
-                        <span>
-                          <span class="site-nav__submenu-label">{chapter.title}</span>
-                          <span class="site-nav__submenu-meta">Chapter</span>
-                        </span>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </li>
-            {primaryLinks.map((link) => {
-              const active = here === link.href || (link.href !== "/" && here.startsWith(link.href + "/"));
-              return (
-                <li>
-                  <a
-                    href={link.href}
-                    aria-current={active ? "page" : undefined}
-                    class="site-nav__link"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              );
-            })}
-        {secondaryLinks.map((link) => {
-          const active = here === link.href || (link.href !== "/" && here.startsWith(link.href + "/"));
-          return (
-            <li>
-              <a
-                    href={link.href}
-                    aria-current={active ? "page" : undefined}
-                    class="site-nav__link site-nav__link--secondary"
-                  >
-                {link.label}
-              </a>
-            </li>
-          );
-        })}
-        {devLinks.map((link) => {
-          const active = here === link.href || (link.href !== "/" && here.startsWith(link.href + "/"));
-          return (
-            <li>
-              <a
-                href={link.href}
-                rel={link.rel}
-                aria-current={active ? "page" : undefined}
-                class="site-nav__link site-nav__link--secondary site-nav__link--dev"
-              >
-                {link.label}
-              </a>
-            </li>
-          );
-        })}
-          </ul>
-          <div class="site-nav__actions">
-            <SearchBox />
-          </div>
-        </nav>
-      </div>
-    </header>
-
-    <div id="site-nav-mobile" class="site-nav__mobile" data-nav-mobile aria-hidden="true">
-      <div class="site-nav__mobile-header">
-        <p class="section-title">WitchClick Paths</p>
-        <button type="button" class="wc-button wc-button--ghost" data-nav-close>
-          Close ✕
-        </button>
-      </div>
-      <div class="site-nav__mobile-search">
-        <SearchBox />
-      </div>
-      <nav aria-label="Mobile navigation">
-        <p class="site-footer__title">Grimoire chapters</p>
-        <ul class="site-nav__mobile-list">
-          {grimoireChapters.map((chapter) => (
-            <li>
-              <a href={chapter.href} class="site-nav__mobile-link">
-                {chapter.icon} {chapter.title}
-              </a>
-            </li>
-          ))}
-        </ul>
-        <div class="section-divider" aria-hidden="true"></div>
-        <p class="site-footer__title">Explore</p>
-        <ul class="site-nav__mobile-list">
-          {navLinks.map((link) => {
-            const active = here === link.href || (link.href !== "/" && here.startsWith(link.href + "/"));
-            return (
-              <li>
-                <a
-                  href={link.href}
-                  rel={link.rel}
-                  aria-current={active ? "page" : undefined}
-                  class="site-nav__mobile-link"
-                >
-                  {link.label}
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-    </div>
+    <Header />
 
     <main
       id="main"
@@ -537,156 +385,5 @@ const bodyStyle = `
     {analyticsInjection?.runtime && <Fragment set:html={analyticsInjection.runtime} />}
 
     <script src="/clickthrough.js" defer></script>
-
-    <script is:inline>
-      (() => {
-        const body = document.body;
-        const navToggle = document.querySelector("[data-nav-toggle]");
-        const mobilePanel = document.querySelector("[data-nav-mobile]");
-        const dropdownToggle = document.querySelector("[data-nav-dropdown]");
-        const dropdown = document.querySelector("[data-nav-submenu]");
-        const dropdownContainer = dropdownToggle?.closest("[data-nav-dropdown-container]");
-        const closeButtons = document.querySelectorAll("[data-nav-close]");
-        const mobileQuery = window.matchMedia("(min-width: 921px)");
-        let mobileOpen = false;
-        let dropdownOpen = false;
-
-        const setMobileState = (open) => {
-          mobileOpen = open;
-          if (!mobilePanel || !navToggle) return;
-          if (open) {
-            mobilePanel.classList.add("is-open");
-            mobilePanel.setAttribute("aria-hidden", "false");
-            navToggle.setAttribute("aria-expanded", "true");
-            body?.setAttribute("data-menu-open", "true");
-          } else {
-            mobilePanel.classList.remove("is-open");
-            mobilePanel.setAttribute("aria-hidden", "true");
-            navToggle.setAttribute("aria-expanded", "false");
-            body?.removeAttribute("data-menu-open");
-          }
-        };
-
-        const getDropdownItems = () => {
-          if (!dropdown) return [];
-          return Array.from(dropdown.querySelectorAll("[data-nav-submenu-item]"));
-        };
-
-        const openDropdown = () => {
-          if (!dropdown || !dropdownToggle) return;
-          dropdownOpen = true;
-          dropdown.classList.add("is-open");
-          dropdown.removeAttribute("hidden");
-          dropdownToggle.setAttribute("aria-expanded", "true");
-        };
-
-        const closeDropdown = () => {
-          if (!dropdown || !dropdownToggle) return;
-          dropdownOpen = false;
-          dropdown.classList.remove("is-open");
-          dropdown.setAttribute("hidden", "");
-          dropdownToggle.setAttribute("aria-expanded", "false");
-        };
-
-        const toggleDropdown = () => {
-          if (dropdownOpen) {
-            closeDropdown();
-          } else {
-            openDropdown();
-          }
-        };
-
-        navToggle?.addEventListener("click", () => {
-          setMobileState(!mobileOpen);
-        });
-
-        closeButtons.forEach((button) => {
-          button.addEventListener("click", () => setMobileState(false));
-        });
-
-        mobilePanel?.addEventListener("click", (event) => {
-          const target = event.target;
-          if (target instanceof HTMLElement && target.tagName === "A") {
-            setMobileState(false);
-          }
-        });
-
-        dropdownToggle?.addEventListener("click", (event) => {
-          event.preventDefault();
-          toggleDropdown();
-        });
-
-        dropdownToggle?.addEventListener("keydown", (event) => {
-          if (event.key === "ArrowDown") {
-            event.preventDefault();
-            if (!dropdownOpen) openDropdown();
-            const items = getDropdownItems();
-            if (items.length) {
-              (items[0]).focus();
-            }
-          }
-        });
-
-        dropdown?.addEventListener("keydown", (event) => {
-          const items = getDropdownItems();
-          if (!items.length) return;
-          const current = document.activeElement;
-          const index = current instanceof HTMLElement ? items.indexOf(current) : -1;
-          if (event.key === "ArrowDown") {
-            event.preventDefault();
-            const next = index === -1 ? 0 : (index + 1) % items.length;
-            items[next].focus();
-          } else if (event.key === "ArrowUp") {
-            event.preventDefault();
-            const prev = index === -1 ? items.length - 1 : (index - 1 + items.length) % items.length;
-            items[prev].focus();
-          } else if (event.key === "Escape") {
-            event.preventDefault();
-            closeDropdown();
-            dropdownToggle?.focus();
-          }
-        });
-
-        dropdownContainer?.addEventListener("focusout", (event) => {
-          const next = event.relatedTarget;
-          if (!dropdownOpen) return;
-          if (!(next instanceof HTMLElement)) {
-            closeDropdown();
-            return;
-          }
-          if (!dropdownContainer.contains(next)) {
-            closeDropdown();
-          }
-        });
-
-        document.addEventListener("click", (event) => {
-          const target = event.target;
-          if (dropdownOpen && dropdown && dropdownToggle) {
-            const within = target instanceof Node && (dropdown.contains(target) || dropdownToggle.contains(target));
-            if (!within) {
-              closeDropdown();
-            }
-          }
-        });
-
-        document.addEventListener("keydown", (event) => {
-          if (event.key === "Escape") {
-            if (mobileOpen) {
-              setMobileState(false);
-            }
-            if (dropdownOpen) {
-              closeDropdown();
-              dropdownToggle?.focus();
-            }
-          }
-        });
-
-        mobileQuery.addEventListener("change", () => {
-          if (mobileQuery.matches) {
-            setMobileState(false);
-          }
-        });
-      })();
-    </script>
   </body>
 </html>
