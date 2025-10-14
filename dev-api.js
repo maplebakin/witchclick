@@ -22,6 +22,10 @@ import { STRICT_JSON_RULES } from './server/lib/strictJsonRules.js';
 import { buildMasterPrompt } from './server/lib/promptBuilder.js';
 import { buildCursePrompt } from './server/lib/cursePromptBuilder.js';
 import { CURSE_TARGETS, CURSE_TONES, CURSE_TYPES } from './server/lib/curseSpecSchema.js';
+import { resolvePostsDirectories } from './scripts/lib/contentPaths.js';
+import { frontmatterString, parseFrontmatter, readFrontmatter } from './scripts/lib/frontmatter.js';
+import { collectPostMetadata } from './scripts/lib/postInventory.js';
+import { readSlugHistory, writeSlugHistory } from './scripts/lib/slugHistory.js';
 import {
   prepareSpecForPersistence,
   persistPreparedSpec,
@@ -34,10 +38,9 @@ import {
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8787;
 const CWD = process.cwd();
 
-const POST_DIR_CANDIDATES = [
-  path.join(CWD, 'src', 'content', 'posts'),
-  path.join(CWD, 'content', 'posts')
-];
+function listPostDirsForCollisions() {
+  return resolvePostsDirectories({ root: CWD });
+}
 
 function send(res, code, data) {
   const body = JSON.stringify(data);
@@ -58,64 +61,6 @@ function ensureDir(p) { fs.mkdirSync(p, { recursive: true }); }
 const HERO_IMAGE_ROOT = path.join(CWD, 'public', 'images', 'hero');
 const DOWNLOADS_ROOT = path.join(CWD, 'public', 'downloads');
 const VALID_POST_SLUG = /^[a-z0-9-]+$/;
-
-const FRONTMATTER_REGEX = /^---\n([\s\S]*?)\n---\n?/;
-
-function parseFrontmatter(content) {
-  const match = FRONTMATTER_REGEX.exec(content);
-  if (!match) return null;
-  const lines = match[1].replace(/\r\n?/g, '\n').split('\n');
-  const rest = content.slice(match[0].length);
-  return { lines, rest };
-}
-
-function extractFrontmatterValue(lines, key) {
-  const prefix = `${key}:`;
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    if (!line || typeof line !== 'string') continue;
-    const trimmed = line.trim();
-    if (!trimmed.startsWith(prefix)) continue;
-    const remainder = trimmed.slice(prefix.length).trim();
-    if (!remainder) return '';
-    if (remainder === '|' || remainder === '|-' || remainder === '>' || remainder === '>-') {
-      const baseIndent = line.length - line.trimStart().length;
-      let blockIndent = null;
-      const blockLines = [];
-      for (let j = i + 1; j < lines.length; j++) {
-        const candidate = lines[j];
-        if (typeof candidate !== 'string') continue;
-        if (!candidate.trim()) {
-          blockLines.push('');
-          continue;
-        }
-        const candidateIndent = candidate.length - candidate.trimStart().length;
-        if (candidateIndent <= baseIndent) break;
-        if (blockIndent == null) blockIndent = candidateIndent;
-        if (candidateIndent < blockIndent) break;
-        blockLines.push(candidate.slice(blockIndent));
-      }
-      let text = blockLines.join('\n');
-      if (remainder.startsWith('>')) {
-        text = text
-          .replace(/\s*\n\s*/g, ' ')
-          .replace(/\s+/g, ' ')
-          .trim();
-      } else {
-        text = text.replace(/\r?\n/g, '\n').trim();
-      }
-      return text;
-    }
-    if (/^(null|NULL|~)$/.test(remainder)) return '';
-    const first = remainder[0];
-    const last = remainder[remainder.length - 1];
-    if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
-      return remainder.slice(1, -1);
-    }
-    return remainder;
-  }
-  return '';
-}
 
 const MIME_EXTENSION_MAP = {
   'image/jpeg': '.jpg',
@@ -196,27 +141,25 @@ async function listPostsForHero() {
     try {
       const raw = await fsp.readFile(file, 'utf8');
       const parsed = parseFrontmatter(raw);
-      if (parsed) {
-        const fmSlug = extractFrontmatterValue(parsed.lines, 'slug');
-        if (fmSlug && VALID_POST_SLUG.test(fmSlug)) slug = fmSlug;
-        const fmTitle = extractFrontmatterValue(parsed.lines, 'title');
-        if (fmTitle) title = fmTitle;
-        const fmPrompt = extractFrontmatterValue(parsed.lines, 'heroImagePrompt').trim();
-        const fmHeroAlt = extractFrontmatterValue(parsed.lines, 'heroAlt').trim();
-        const fmLegacyAlt = extractFrontmatterValue(parsed.lines, 'heroImageAlt').trim();
-        const fmHeroImage = extractFrontmatterValue(parsed.lines, 'heroImage').trim();
-        const fmLegacyImage = extractFrontmatterValue(parsed.lines, 'heroImageSrc').trim();
-        if (!VALID_POST_SLUG.test(slug)) continue;
-        items.push({
-          slug,
-          title,
-          heroImagePrompt: fmPrompt || null,
-          heroAlt: fmHeroAlt || null,
-          heroImageAlt: fmLegacyAlt || null,
-          heroImage: fmHeroImage || fmLegacyImage || null,
-        });
-        continue;
-      }
+      const fmSlug = frontmatterString(parsed.data, 'slug');
+      if (fmSlug && VALID_POST_SLUG.test(fmSlug)) slug = fmSlug;
+      const fmTitle = frontmatterString(parsed.data, 'title');
+      if (fmTitle) title = fmTitle;
+      const fmPrompt = frontmatterString(parsed.data, 'heroImagePrompt');
+      const fmHeroAlt = frontmatterString(parsed.data, 'heroAlt');
+      const fmLegacyAlt = frontmatterString(parsed.data, 'heroImageAlt');
+      const fmHeroImage = frontmatterString(parsed.data, 'heroImage');
+      const fmLegacyImage = frontmatterString(parsed.data, 'heroImageSrc');
+      if (!VALID_POST_SLUG.test(slug)) continue;
+      items.push({
+        slug,
+        title,
+        heroImagePrompt: fmPrompt || null,
+        heroAlt: fmHeroAlt || null,
+        heroImageAlt: fmLegacyAlt || null,
+        heroImage: fmHeroImage || fmLegacyImage || null,
+      });
+      continue;
     } catch {
       /* ignore unreadable file */
     }
@@ -232,10 +175,9 @@ function findPostFileBySlug(slug) {
   for (const dir of dirs) {
     const direct = path.join(dir, `${slug}.md`);
     if (fs.existsSync(direct)) {
-      const raw = fs.readFileSync(direct, 'utf8');
-      const parsed = parseFrontmatter(raw);
-      if (!parsed) throw new Error('Frontmatter missing');
-      return { file: direct, lines: parsed.lines, rest: parsed.rest, raw };
+      const parsed = readFrontmatter(direct);
+      if (!Array.isArray(parsed.lines)) throw new Error('Frontmatter missing');
+      return { file: direct, lines: parsed.lines, rest: parsed.rest, raw: parsed.raw, data: parsed.data };
     }
   }
   for (const dir of dirs) {
@@ -245,12 +187,10 @@ function findPostFileBySlug(slug) {
       if (!entry.isFile() || !entry.name.toLowerCase().endsWith('.md')) continue;
       const file = path.join(dir, entry.name);
       try {
-        const raw = fs.readFileSync(file, 'utf8');
-        const parsed = parseFrontmatter(raw);
-        if (!parsed) continue;
-        const fmSlug = extractFrontmatterValue(parsed.lines, 'slug');
+        const parsed = readFrontmatter(file);
+        const fmSlug = frontmatterString(parsed.data, 'slug');
         if (fmSlug && fmSlug === slug) {
-          return { file, lines: parsed.lines, rest: parsed.rest, raw };
+          return { file, lines: parsed.lines, rest: parsed.rest, raw: parsed.raw, data: parsed.data };
         }
       } catch {
         /* ignore read errors */
@@ -260,43 +200,9 @@ function findPostFileBySlug(slug) {
   return null;
 }
 
-function isDirectory(candidate) {
-  try {
-    return fs.statSync(candidate).isDirectory();
-  } catch {
-    return false;
-  }
-}
-
-function directoryHasMarkdown(candidate) {
-  if (!isDirectory(candidate)) return false;
-  try {
-    return fs
-      .readdirSync(candidate, { withFileTypes: true })
-      .some((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.md'));
-  } catch {
-    return false;
-  }
-}
-
 function resolvePrimaryPostsDir() {
-  for (const candidate of POST_DIR_CANDIDATES) {
-    if (directoryHasMarkdown(candidate)) return candidate;
-  }
-  for (const candidate of POST_DIR_CANDIDATES) {
-    if (isDirectory(candidate)) return candidate;
-  }
-  return POST_DIR_CANDIDATES[0];
-}
-
-function listPostDirsForCollisions() {
-  const dirs = [];
-  for (const candidate of POST_DIR_CANDIDATES) {
-    if (isDirectory(candidate)) dirs.push(candidate);
-  }
-  const primary = resolvePrimaryPostsDir();
-  if (!dirs.includes(primary)) dirs.unshift(primary);
-  return dirs;
+  const [first] = listPostDirsForCollisions();
+  return first || path.join(CWD, 'content', 'posts');
 }
 
 function parseBody(req) {
@@ -468,26 +374,13 @@ function buildGenprompt({ topic, words, ads, kofi }) {
         .filter(Boolean)
     : [];
 
-  const existingTitles = [];
-  const seenTitles = new Set();
-  for (const dir of listPostDirsForCollisions()) {
-    if (!fs.existsSync(dir)) continue;
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
-    for (const entry of entries) {
-      if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
-      const file = path.join(dir, entry.name);
-      try {
-        const match = fs.readFileSync(file, 'utf8').match(/^title:\s*(.+)$/m);
-        if (!match) continue;
-        const title = match[1].trim().replace(/^"(.*)"$/, '$1');
-        if (!title || seenTitles.has(title)) continue;
-        seenTitles.add(title);
-        existingTitles.push(title);
-      } catch {
-        /* ignore unreadable file */
-      }
-    }
-  }
+  const metadata = collectPostMetadata(CWD);
+  const existingTitles = metadata.map((item) => item.title).filter(Boolean);
+  const currentSlugs = metadata.map((item) => item.slug).filter(Boolean);
+  const historicSlugs = readSlugHistory(CWD);
+  const mergedSlugSet = new Set([...historicSlugs, ...currentSlugs]);
+  const mergedSlugs = Array.from(mergedSlugSet);
+  writeSlugHistory(CWD, mergedSlugs);
 
   return buildMasterPrompt({
     topic,
@@ -497,6 +390,7 @@ function buildGenprompt({ topic, words, ads, kofi }) {
     brandName: settings.brandName ?? 'WitchClick',
     siteUrl: settings.siteUrl ?? 'https://example.com',
     existingPostTitles: existingTitles,
+    existingPostSlugs: mergedSlugs,
     allowedAffiliateKeys: allowed,
   });
 }

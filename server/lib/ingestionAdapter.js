@@ -1,6 +1,7 @@
 // server/lib/ingestionAdapter.js — conflict-free, deterministic normalizer
 // @ts-check
 
+import { slugify, slugifyId } from '../../scripts/lib/slug.js';
 import { CONTENT_TYPES } from './postSpecSchema.js';
 
 /**
@@ -43,17 +44,6 @@ function normalizeAffiliateKey(key) {
     return AFFILIATE_SYNONYMS[lowered];
   }
   return trimmed;
-}
-
-function slugify(value) {
-  const base = toTrimmedString(value);
-  if (!base) return '';
-  return base
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
 }
 
 function sanitizeStringArray(value) {
@@ -157,7 +147,7 @@ function ensureOpening(outline, sections, report) {
       const rest = normalizedOutline.filter((_, i) => i !== idx);
       if (idx > 0) {
         normalizedOutline = [
-          { heading: OPENING_HEADING, id: entry.id ? slugify(entry.id) || OPENING_ID : OPENING_ID },
+          { heading: OPENING_HEADING, id: entry.id ? slugifyId(entry.id, OPENING_ID) : OPENING_ID },
           ...rest,
         ];
         if (!movedReported) {
@@ -166,7 +156,7 @@ function ensureOpening(outline, sections, report) {
         }
       } else {
         normalizedOutline = [
-          { heading: OPENING_HEADING, id: entry.id ? slugify(entry.id) || OPENING_ID : OPENING_ID },
+          { heading: OPENING_HEADING, id: entry.id ? slugifyId(entry.id, OPENING_ID) : OPENING_ID },
           ...rest,
         ];
       }

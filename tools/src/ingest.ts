@@ -5,12 +5,12 @@ import {
   prepareSpecForPersistence,
   persistPreparedSpec,
 } from '../../server/lib/specPreparation.js';
+import { resolvePostsDirectories } from '../../scripts/lib/contentPaths.js';
 import type { PostSpecV2 } from './types';
 
 // --- path helpers ---
 const CWD = process.cwd();
-const CONTENT_DIR = path.join(CWD, 'content');
-const POSTS_DIR = path.join(CONTENT_DIR, 'posts');
+const postsDirectories = resolvePostsDirectories({ root: CWD });
 
 export async function ingest(args: string[]) {
   const fromIdx = args.indexOf('--from-file');
@@ -38,7 +38,7 @@ export async function ingest(args: string[]) {
 
     const prepared = prepareSpecForPersistence(json, {
       cwd: CWD,
-      postsDirectories: [POSTS_DIR],
+      postsDirectories,
     });
 
     if (!dryRun) {
