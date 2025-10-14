@@ -57,6 +57,13 @@ function deriveSlug(file: string, data: Record<string, any>): string {
   return (fmSlug || file.replace(/\.md$/, "")).toLowerCase();
 }
 
+function isDraft(data: Record<string, any> | null | undefined): boolean {
+  if (!data) return false;
+  if (data.draft === true) return true;
+  if (data.published === false) return true;
+  return false;
+}
+
 function deriveDate(
   filePath: string,
   data: Record<string, any>
@@ -91,21 +98,23 @@ export function loadAllPosts(): LoadedPost[] {
     .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
     .map((entry) => entry.name);
 
-  const posts = files.map((file) => {
-    const fullPath = path.join(dir, file);
-    const raw = fs.readFileSync(fullPath, "utf8");
-    const { data, content } = matter(raw);
-    const slug = deriveSlug(file, data ?? {});
-    const date = deriveDate(fullPath, data ?? {});
+  const posts = files
+    .map((file) => {
+      const fullPath = path.join(dir, file);
+      const raw = fs.readFileSync(fullPath, "utf8");
+      const { data, content } = matter(raw);
+      const slug = deriveSlug(file, data ?? {});
+      const date = deriveDate(fullPath, data ?? {});
 
-    return {
-      slug,
-      title: String(data?.title ?? "Untitled"),
-      data: data ?? {},
-      content,
-      date,
-    } satisfies LoadedPost;
-  });
+      return {
+        slug,
+        title: String(data?.title ?? "Untitled"),
+        data: data ?? {},
+        content,
+        date,
+      } satisfies LoadedPost;
+    })
+    .filter((post) => !isDraft(post.data));
 
   posts.sort((a, b) => +b.date - +a.date);
   if (shouldCache) {
