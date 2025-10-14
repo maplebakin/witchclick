@@ -110,6 +110,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
             class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:outline-none"
             data-alt-input
           />
+          <p class="mt-1 text-xs text-gray-600" data-existing-hero></p>
         </label>
 
         <div class="flex flex-wrap items-center gap-3">
@@ -154,6 +155,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
         const fileInfo = root.querySelector('[data-file-info]');
         const preview = root.querySelector('[data-preview]');
         const altInput = root.querySelector('[data-alt-input]');
+        const existingHeroNote = root.querySelector('[data-existing-hero]');
         const submitButton = root.querySelector('[data-submit]');
         const statusEl = root.querySelector('[data-status]');
         const successEl = root.querySelector('[data-success]');
@@ -164,6 +166,8 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
         let posts = [];
         let selectedFile = null;
         let previewUrl = null;
+        let altDirty = false;
+        let lastPrefilledSlug = null;
 
         const MAX_SIZE = 5 * 1024 * 1024;
         const ACCEPTED_EXT = /\.(png|jpe?g|webp)$/i;
@@ -216,15 +220,61 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           return text.replace(/\s*—\s*hero image$/i, '').trim();
         }
 
+        function cleanHeroPrompt(value) {
+          const text = typeof value === 'string' ? value.trim() : '';
+          return text.replace(/\s*—\s*hero prompt$/i, '').trim();
+        }
+
         function extractHeroDescription(post) {
           if (!post || typeof post !== 'object') return '';
-          const prompt = typeof post.heroImagePrompt === 'string' ? post.heroImagePrompt.trim() : '';
+          const prompt = cleanHeroPrompt(post.heroImagePrompt);
           if (prompt) return prompt;
           const heroAlt = cleanHeroAlt(post.heroAlt);
           if (heroAlt) return heroAlt;
           const legacyAlt = cleanHeroAlt(post.heroImageAlt);
           if (legacyAlt) return legacyAlt;
           return '';
+        }
+
+        function suggestHeroAlt(post) {
+          if (!post || typeof post !== 'object') return '';
+          const heroAlt = cleanHeroAlt(post.heroAlt);
+          if (heroAlt) return heroAlt;
+          const legacyAlt = cleanHeroAlt(post.heroImageAlt);
+          if (legacyAlt) return legacyAlt;
+          const prompt = extractHeroDescription(post);
+          return prompt;
+        }
+
+        function applyAltSuggestion(post, options = {}) {
+          if (!altInput) return;
+          const slug = post?.slug || '';
+          const suggestion = suggestHeroAlt(post);
+          altInput.placeholder = suggestion
+            ? `Try: ${suggestion}`
+            : 'Describe the artwork for screen readers';
+          const force = options.force === true;
+          if (force || !altDirty || slug !== lastPrefilledSlug) {
+            altInput.value = suggestion || '';
+            altDirty = false;
+            lastPrefilledSlug = slug;
+          }
+        }
+
+        function updateExistingHeroNote(post) {
+          if (!existingHeroNote) return;
+          existingHeroNote.classList.remove('text-green-700', 'text-purple-700');
+          if (!post) {
+            existingHeroNote.textContent = 'Select a post to review its current hero details.';
+            return;
+          }
+          if (post.heroImage) {
+            existingHeroNote.textContent = `Existing hero image: ${post.heroImage}. Uploading will replace this reference.`;
+            existingHeroNote.classList.add('text-purple-700');
+          } else {
+            existingHeroNote.textContent = 'No hero image attached yet. Uploading will add one to the post frontmatter.';
+            existingHeroNote.classList.add('text-green-700');
+          }
         }
 
         function updateHeroPromptUI() {
@@ -234,6 +284,8 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
             promptField.classList.add('hidden');
             copyPromptButton.disabled = true;
             setPromptHint('Ingest a post to enable the hero prompt helper.', 'error');
+            updateExistingHeroNote(null);
+            applyAltSuggestion(null, { force: true });
             return;
           }
           if (!select || !select.value) {
@@ -241,10 +293,14 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
             promptField.classList.add('hidden');
             copyPromptButton.disabled = true;
             setPromptHint('Select a post to load the saved hero image prompt (or alt text fallback) for your LLM.', 'neutral');
+            updateExistingHeroNote(null);
+            applyAltSuggestion(null, { force: true });
             return;
           }
           const current = posts.find((post) => post.slug === select.value);
           const description = extractHeroDescription(current);
+          updateExistingHeroNote(current || null);
+          applyAltSuggestion(current || null);
           if (description) {
             promptField.value = description;
             promptField.classList.remove('hidden');
@@ -276,6 +332,9 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           if (copyPromptButton) {
             if (on) copyPromptButton.disabled = true;
             else updateHeroPromptUI();
+          }
+          if (altInput) {
+            altInput.disabled = !!on;
           }
         }
 
@@ -398,6 +457,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
                   heroImagePrompt: typeof item?.heroImagePrompt === 'string' ? item.heroImagePrompt : '',
                   heroAlt: typeof item?.heroAlt === 'string' ? item.heroAlt : '',
                   heroImageAlt: typeof item?.heroImageAlt === 'string' ? item.heroImageAlt : '',
+                  heroImage: typeof item?.heroImage === 'string' ? item.heroImage : '',
                 }))
               : [];
             renderOptions();
@@ -418,7 +478,15 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           select.addEventListener('change', () => {
             clearSuccess();
             setStatus('', '');
+            altDirty = false;
             updateHeroPromptUI();
+          });
+        }
+
+        if (altInput) {
+          altInput.addEventListener('input', () => {
+            altDirty = true;
+            lastPrefilledSlug = select && select.value ? select.value : null;
           });
         }
 
