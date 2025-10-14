@@ -374,20 +374,35 @@ const bodyStyle = `
                 </li>
               );
             })}
-            {secondaryLinks.map((link) => {
-              const active = here === link.href || (link.href !== "/" && here.startsWith(link.href + "/"));
-              return (
-                <li>
-                  <a
+        {secondaryLinks.map((link) => {
+          const active = here === link.href || (link.href !== "/" && here.startsWith(link.href + "/"));
+          return (
+            <li>
+              <a
                     href={link.href}
                     aria-current={active ? "page" : undefined}
                     class="site-nav__link site-nav__link--secondary"
                   >
-                    {link.label}
-                  </a>
-                </li>
-              );
-            })}
+                {link.label}
+              </a>
+            </li>
+          );
+        })}
+        {devLinks.map((link) => {
+          const active = here === link.href || (link.href !== "/" && here.startsWith(link.href + "/"));
+          return (
+            <li>
+              <a
+                href={link.href}
+                rel={link.rel}
+                aria-current={active ? "page" : undefined}
+                class="site-nav__link site-nav__link--secondary site-nav__link--dev"
+              >
+                {link.label}
+              </a>
+            </li>
+          );
+        })}
           </ul>
           <div class="site-nav__actions">
             <SearchBox />
@@ -475,6 +490,11 @@ const bodyStyle = `
               {[...primaryLinks, ...secondaryLinks].map((link) => (
                 <li>
                   <a href={link.href}>{link.label}</a>
+                </li>
+              ))}
+              {devLinks.map((link) => (
+                <li>
+                  <a href={link.href} rel={link.rel} class="site-footer__link--dev">{link.label}</a>
                 </li>
               ))}
             </ul>

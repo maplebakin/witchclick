@@ -112,7 +112,7 @@ main {
 }
 
 p {
-  max-width: 72ch;
+  max-width: 65ch;
 }
 
 h1,
@@ -168,12 +168,19 @@ blockquote {
 
 .wc-container {
   width: min(100% - var(--space-6), 72rem);
+  max-width: 75rem;
   margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+  .wc-container {
+    width: min(100% - var(--space-6), 75rem);
+  }
 }
 
 @media (min-width: 1024px) {
   .wc-container {
-    width: min(100% - var(--space-8), 80rem);
+    width: min(100% - var(--space-8), 75rem);
   }
 }
 
@@ -331,6 +338,16 @@ blockquote {
 
 .site-nav__link--secondary {
   opacity: 0.75;
+}
+
+.site-nav__link--dev {
+  border-style: dashed;
+  opacity: 0.85;
+}
+
+.site-nav__link--dev:hover,
+.site-nav__link--dev:focus-visible {
+  opacity: 1;
 }
 
 .site-nav__link--secondary:hover,
@@ -610,6 +627,15 @@ blockquote {
 .site-footer__nav a:hover,
 .site-footer__nav a:focus-visible {
   color: var(--color-gold);
+}
+
+.site-footer__link--dev {
+  opacity: 0.85;
+}
+
+.site-footer__link--dev:hover,
+.site-footer__link--dev:focus-visible {
+  opacity: 1;
 }
 
 .site-footer__blurb {
