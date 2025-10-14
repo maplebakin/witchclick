@@ -43,15 +43,15 @@ const theme = getTheme();
 const analyticsInjection = buildAnalyticsInjection(settings);
 
 const headerWidthClass = desktopWide
-  ? "max-w-4xl lg:max-w-6xl xl:max-w-7xl"
+  ? "max-w-6xl xl:max-w-7xl 2xl:max-w-screen-2xl"
   : wide
-    ? "max-w-6xl"
-    : "max-w-4xl";
+    ? "max-w-screen-2xl"
+    : "max-w-7xl";
 const mainWidthClass = desktopWide
-  ? "max-w-3xl lg:max-w-5xl xl:max-w-7xl"
+  ? "max-w-6xl xl:max-w-7xl 2xl:max-w-screen-2xl"
   : wide
-    ? "max-w-6xl"
-    : "max-w-3xl";
+    ? "max-w-screen-2xl"
+    : "max-w-6xl";
 const layoutPaddingClass = desktopWide ? "px-4 sm:px-6 lg:px-8 xl:px-12" : "px-4";
 const layoutContentClass = ["layout-content", desktopWide && "layout-content--desktop"].filter(Boolean).join(" ");
 
