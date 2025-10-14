@@ -1,5 +1,8 @@
 ---
 // src/layouts/Base.astro
+import "@/styles/base.css";
+import "@/styles/tailwind.css";
+import "@/styles/cards.css";
 import Header from "@/components/Header.astro";
 
 const {
@@ -15,6 +18,7 @@ const {
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
     {canon && <link rel="canonical" href={canon} />}
+    <slot name="head" />
   </head>
   <body class="min-h-full bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
     <Header />
