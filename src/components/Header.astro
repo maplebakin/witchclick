@@ -1,8 +1,4 @@
 ---
-import HeaderIsland from "@/components/HeaderIsland.tsx";
-import MobileDrawer from "@/components/MobileDrawer.tsx";
-import SearchPanel from "@/components/SearchPanel.tsx";
-
 const nav = [
   { href: "/rituals/", label: "Rituals" },
   { href: "/grimoire/", label: "Entity Library" },
@@ -22,9 +18,169 @@ const nav = [
       ))}
     </nav>
     <div class="md:hidden">
-      <HeaderIsland client:load />
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          class="rounded-xl border px-3 py-2"
+          data-menu-toggle
+          aria-expanded="false"
+        >
+          Menu
+        </button>
+        <button
+          type="button"
+          class="rounded-xl border px-3 py-2"
+          data-search-toggle
+          aria-expanded="false"
+        >
+          Search
+        </button>
+        <button
+          type="button"
+          class="px-2 py-1 text-sm opacity-70 hover:opacity-100"
+          data-reset
+        >
+          Reset
+        </button>
+      </div>
     </div>
   </div>
-  <MobileDrawer nav={nav} client:load />
-  <SearchPanel label="Search posts" client:load />
 </header>
+<div
+  class="fixed inset-0 z-40 hidden md:hidden"
+  aria-hidden="true"
+  data-mobile-drawer
+>
+  <button
+    type="button"
+    class="absolute inset-0 cursor-default bg-black/50"
+    data-mobile-close
+    aria-label="Close menu"
+  />
+  <div class="absolute left-0 top-0 h-full w-80 bg-white p-4 shadow-2xl dark:bg-zinc-900">
+    <div class="mb-4 flex items-center justify-between">
+      <span class="font-semibold">WitchClick Paths</span>
+      <button
+        type="button"
+        class="rounded-xl border px-3 py-1"
+        data-mobile-close
+        aria-label="Close menu"
+      >
+        ✕
+      </button>
+    </div>
+    <ul class="space-y-2">
+      {nav.map((item) => (
+        <li key={item.href}>
+          <a
+            href={item.href}
+            class="block rounded-xl px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            data-mobile-link
+          >
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+<div
+  class="fixed inset-0 z-40 hidden"
+  aria-hidden="true"
+  data-search-panel
+>
+  <button
+    type="button"
+    class="absolute inset-0 cursor-default bg-black/50"
+    data-search-close
+    aria-label="Close search"
+  />
+  <div class="absolute inset-x-0 top-0 mx-auto mt-10 w-full max-w-2xl rounded-2xl bg-white p-4 shadow-xl dark:bg-zinc-900">
+    <div class="mb-3 flex items-center justify-between">
+      <h2 class="text-lg font-semibold">Search posts</h2>
+      <button
+        type="button"
+        class="rounded-xl border px-3 py-1"
+        data-search-close
+        aria-label="Close search"
+      >
+        ✕
+      </button>
+    </div>
+    <input
+      type="search"
+      placeholder="Type to search…"
+      class="w-full rounded-xl border px-3 py-2"
+    />
+  </div>
+</div>
+<script is:inline>
+  const menuToggle = document.querySelector('[data-menu-toggle]');
+  const searchToggle = document.querySelector('[data-search-toggle]');
+  const resetButton = document.querySelector('[data-reset]');
+  const mobileDrawer = document.querySelector('[data-mobile-drawer]');
+  const searchPanel = document.querySelector('[data-search-panel]');
+
+  if (menuToggle && searchToggle && resetButton && mobileDrawer && searchPanel) {
+    const menuCloseTargets = mobileDrawer.querySelectorAll('[data-mobile-close]');
+    const menuLinks = mobileDrawer.querySelectorAll('[data-mobile-link]');
+    const searchCloseTargets = searchPanel.querySelectorAll('[data-search-close]');
+
+    const setMenuOpen = (next) => {
+      mobileDrawer.classList.toggle('hidden', !next);
+      mobileDrawer.setAttribute('aria-hidden', String(!next));
+      menuToggle.setAttribute('aria-expanded', String(next));
+      if (next) {
+        searchPanel.classList.add('hidden');
+        searchPanel.setAttribute('aria-hidden', 'true');
+        searchToggle.setAttribute('aria-expanded', 'false');
+      }
+    };
+
+    const setSearchOpen = (next) => {
+      searchPanel.classList.toggle('hidden', !next);
+      searchPanel.setAttribute('aria-hidden', String(!next));
+      searchToggle.setAttribute('aria-expanded', String(next));
+      if (next) {
+        mobileDrawer.classList.add('hidden');
+        mobileDrawer.setAttribute('aria-hidden', 'true');
+        menuToggle.setAttribute('aria-expanded', 'false');
+      }
+    };
+
+    const closeAll = () => {
+      setMenuOpen(false);
+      setSearchOpen(false);
+    };
+
+    menuToggle.addEventListener('click', () => {
+      const isOpen = menuToggle.getAttribute('aria-expanded') === 'true';
+      setMenuOpen(!isOpen);
+    });
+
+    searchToggle.addEventListener('click', () => {
+      const isOpen = searchToggle.getAttribute('aria-expanded') === 'true';
+      setSearchOpen(!isOpen);
+    });
+
+    resetButton.addEventListener('click', closeAll);
+
+    menuCloseTargets.forEach((target) => {
+      target.addEventListener('click', closeAll);
+    });
+
+    menuLinks.forEach((link) => {
+      link.addEventListener('click', () => setMenuOpen(false));
+    });
+
+    searchCloseTargets.forEach((target) => {
+      target.addEventListener('click', () => setSearchOpen(false));
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeAll();
+      }
+    });
+  }
+</script>
