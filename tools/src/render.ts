@@ -62,7 +62,7 @@ export function renderMarkdown(md:string, opts:RenderOptions){
       const prod = opts.products.find(p=>p.key===a.key);
       if (!prod || !prod.url) continue;
       const target = appendUtm(prod.url, prod.utm);
-      const replacement = `<a href="${escapeAttr(target)}" rel="nofollow sponsored" target="_blank" data-analytics="aff_click">${escapeHtml(a.text)}</a>`;
+      const replacement = `<a href="${escapeAttr(target)}" rel="nofollow sponsored" target="_blank" data-affiliate="true" data-analytics="aff_click">${escapeHtml(a.text)}</a>`;
       const res = linkifyFirst(html, a.text, replacement);
       if (res.changed) {
         injectedAffiliate = true;
@@ -145,7 +145,7 @@ function sanitize(html:string){
       'a','hr','img','table','thead','tbody','tr','th','td','div','span'
     ],
     ALLOWED_ATTR: [
-      'href','title','rel','target','data-analytics','src','alt','loading','class',
+      'href','title','rel','target','data-affiliate','data-analytics','src','alt','loading','class',
       'data-slot','aria-label'
     ]
   });
