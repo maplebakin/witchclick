@@ -1,65 +1,98 @@
 ---
 import Base from "../../layouts/Base.astro";
 import PostCard from "../../components/PostCard.astro";
-import fs from "node:fs";
-import path from "node:path";
-import matter from "gray-matter";
-
+import { loadAllPosts, estimateReadingMinutes, firstParagraph } from "../../utils/posts";
+import { readSettings } from "../../utils/settings";
+import { createCollectionPageSchema } from "../../utils/structuredData";
+import { Fragment } from "astro/jsx-runtime";
 
 export const prerender = true;
 
+export function getStaticPaths() {
+  const posts = loadAllPosts();
+  const tags = new Set<string>();
+  posts.forEach((post) => {
+    const fm = post.data ?? {};
+    const postTags = Array.isArray(fm.tags) ? fm.tags : [];
+    postTags.forEach((tag) => tags.add(String(tag).toLowerCase()));
+  });
 
-export async function getStaticPaths(){
-const dir = path.join(process.cwd(), 'content', 'posts');
-const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f=>f.endsWith('.md')) : [];
-const posts = files.map((file) => {
-const full = path.join(dir, file);
-const raw = fs.readFileSync(full, 'utf8');
-const { data } = matter(raw);
-const slug = (data?.slug ? String(data.slug) : file.replace(/\.md$/, '')).toLowerCase();
-const tags = Array.isArray(data?.tags) ? data.tags.map((t:any)=>String(t).toLowerCase()) : [];
-const dateFront = [data?.publishedAt, data?.pubDate, data?.date, data?.updatedAt].filter(Boolean);
-let date = new Date(dateFront[0] || 0); if (isNaN(+date)) date = fs.statSync(full).mtime;
-return { slug, data: { ...data, tags }, date };
-});
-
-
-const tagSet = new Set<string>();
-posts.forEach(p => p.data.tags?.forEach((t:string)=> tagSet.add(t)));
-const tags = Array.from(tagSet).sort();
-
-
-return tags.map((t) => ({ params: { tag: t }, props: { tag: t } }));
+  return Array.from(tags).map((tag) => ({
+    params: { tag },
+    props: { tag },
+  }));
 }
 
-
 const { tag } = Astro.props as { tag: string };
+const normalizedTag = tag.toLowerCase();
+const settings = readSettings();
+const allPosts = loadAllPosts();
 
+const taggedPosts = allPosts
+  .filter((post) => {
+    const fm = post.data ?? {};
+    const postTags = Array.isArray(fm.tags) ? fm.tags.map((t: any) => String(t).toLowerCase()) : [];
+    return postTags.includes(normalizedTag);
+  })
+  .sort((a, b) => {
+    const dateA = new Date(a.data?.publishedAt ?? a.data?.pubDate ?? a.data?.date ?? 0).getTime();
+    const dateB = new Date(b.data?.publishedAt ?? b.data?.pubDate ?? b.data?.date ?? 0).getTime();
+    return dateB - dateA;
+  });
 
-// Build the filtered list for this tag
-const dir = path.join(process.cwd(), 'content', 'posts');
-const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f=>f.endsWith('.md')) : [];
-const pagePosts = files.map((file) => {
-const full = path.join(dir, file);
-const raw = fs.readFileSync(full, 'utf8');
-const { data } = matter(raw);
-const slug = (data?.slug ? String(data.slug) : file.replace(/\.md$/, '')).toLowerCase();
-const tags = Array.isArray(data?.tags) ? data.tags.map((t:any)=>String(t).toLowerCase()) : [];
-const dateFront = [data?.publishedAt, data?.pubDate, data?.date, data?.updatedAt].filter(Boolean);
-let date = new Date(dateFront[0] || 0); if (isNaN(+date)) date = fs.statSync(full).mtime;
-return { slug, data: { ...data, tags }, date };
-}).filter(p => p.data.tags.includes(tag.toLowerCase()))
-.sort((a,b)=> +b.date - +a.date);
+const cards = taggedPosts.map((post) => {
+  const fm = post.data ?? {};
+  const excerpt = fm.excerpt ?? fm.description ?? fm.metaDescription ?? firstParagraph(post.content);
+  return {
+    slug: post.slug,
+    title: fm.title ?? post.title,
+    excerpt,
+    tags: Array.isArray(fm.tags) ? fm.tags : [],
+    readingMinutes: fm.readingMinutes ?? estimateReadingMinutes(post.content),
+    publishedAt: fm.publishedAt ?? fm.pubDate ?? fm.date ?? undefined,
+  };
+});
+
+const collectionSchema = createCollectionPageSchema(
+  settings,
+  {
+    name: `Tag: ${tag}`,
+    url: `/tag/${normalizedTag}`,
+    description: `Posts filed under the ${tag} tag`,
+    itemType: "Article",
+  },
+  cards.map((card) => ({
+    name: card.title,
+    url: `/post/${card.slug}`,
+    description: card.excerpt,
+  })),
+);
 ---
 <Base title={`Tag: ${tag} — WitchClick`}>
-<h1 class="mb-6">Tag: {tag}</h1>
-{pagePosts.length === 0 ? (
-<p class="text-neutral-400">No posts found for this tag yet. <a class="underline" href="/">Back to home</a>.</p>
-) : (
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-{pagePosts.map((p) => (
-<PostCard post={{ ...p.data, slug: p.slug }} href={`/post/${p.slug}`} />
-))}
-</div>
-)}
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(collectionSchema)} />
+  </Fragment>
+
+  <h1 class="mb-6">Tag: {tag}</h1>
+  {cards.length === 0 ? (
+    <p class="text-neutral-400">
+      No posts found for this tag yet. <a class="underline" href="/">Back to home</a>.
+    </p>
+  ) : (
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {cards.map((card) => (
+        <PostCard
+          post={{
+            slug: card.slug,
+            title: card.title,
+            excerpt: card.excerpt,
+            tags: card.tags,
+            readingMinutes: card.readingMinutes,
+            publishedAt: card.publishedAt,
+          }}
+          href={`/post/${card.slug}`}
+        />
+      ))}
+    </div>
+  )}
 </Base>

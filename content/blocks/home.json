@@ -1,0 +1,32 @@
+{
+  "cta": {
+    "eyebrow": "Stay in the circle",
+    "title": "Sign up for the WitchClick dispatch",
+    "description": "Two gentle emails a month with new rituals, printable drops, and secular tarot spreads. No spam, just cozy prompts.",
+    "form": {
+      "action": "https://witchclick.substack.com/api/v1/free",
+      "method": "post",
+      "emailFieldName": "email",
+      "emailPlaceholder": "you@example.com",
+      "submitLabel": "Send me the cozy notes",
+      "disclaimer": "You can unsubscribe anytime."
+    }
+  },
+  "testimonials": [
+    {
+      "quote": "Every download feels like a little seasonal ritual kit. It's secular witchcraft for exhausted brains.",
+      "author": "Moira G.",
+      "role": "Planner enthusiast"
+    },
+    {
+      "quote": "The prompts are grounded and practical, but still magical enough that I look forward to checking in.",
+      "author": "Hayden B.",
+      "role": "Therapist & tarot reader"
+    },
+    {
+      "quote": "I finally have a ritual that fits my spoons. WitchClick meets me where I am and nudges me gently forward.",
+      "author": "Tori L.",
+      "role": "Creative director"
+    }
+  ]
+}

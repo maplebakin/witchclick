@@ -1,4 +1,6 @@
 ---
+import { getImage } from "astro:assets";
+
 interface CTAButton {
   href: string;
   label: string;
@@ -15,6 +17,7 @@ interface Props {
   backgroundImage?: string;
   imageAlt?: string;
   ctaButtons?: CTAButton[];
+  ctaDescription?: string;
   class?: string;
 }
 
@@ -25,10 +28,40 @@ const {
   backgroundImage,
   imageAlt = title,
   ctaButtons = [],
+  ctaDescription,
   class: className = "",
 } = Astro.props as Props;
 
 const hasImage = Boolean(backgroundImage);
+const hasMultipleCtas = ctaButtons.length > 1;
+const ctaDescriptionId = hasMultipleCtas && ctaDescription
+  ? `hero-cta-description-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "hero"}`
+  : undefined;
+const ctaGroupLabel = hasMultipleCtas ? "Hero actions" : undefined;
+
+let responsiveImage: Awaited<ReturnType<typeof getImage>> | null = null;
+if (hasImage && backgroundImage) {
+  try {
+    const imageUrl = new URL(`../../public${backgroundImage}`, import.meta.url);
+    responsiveImage = await getImage({
+      src: imageUrl,
+      widths: [480, 720, 1080],
+      format: "webp",
+      quality: "mid",
+    });
+  } catch (error) {
+    if (import.meta.env?.DEV) {
+      console.warn(`[Hero] Failed to create responsive image for ${backgroundImage}:`, error);
+    }
+    responsiveImage = null;
+  }
+}
+
+const heroImageSrc = responsiveImage?.src ?? backgroundImage;
+const heroImageSrcSet = responsiveImage?.srcSet?.attribute ?? undefined;
+const heroImageWidth = responsiveImage?.attributes?.width;
+const heroImageHeight = responsiveImage?.attributes?.height;
+const heroImageSizes = "(max-width: 639px) 88vw, (max-width: 1023px) 60vw, 520px";
 ---
 <section
   class:list={[
@@ -42,38 +75,59 @@ const hasImage = Boolean(backgroundImage);
     <h1 class="hero-title font-serif">{title}</h1>
     <p class="hero-summary">{description}</p>
     {ctaButtons.length > 0 && (
-      <div class="hero-actions">
-        {ctaButtons.map((button) => {
-          const variant = button.variant ?? "primary";
-          return (
-            <a
-              href={button.href}
-              aria-label={button.ariaLabel ?? undefined}
-              target={button.target ?? undefined}
-              rel={button.rel ?? undefined}
-              class:list={[
-                "hero-cta",
-                variant === "secondary" ? "hero-cta--secondary" : "hero-cta--primary",
-              ]}
-            >
-              {button.label}
-              {variant !== "secondary" && <span aria-hidden="true">→</span>}
-            </a>
-          );
-        })}
-      </div>
+      <>
+        {ctaDescriptionId && ctaDescription && (
+          <p id={ctaDescriptionId} class="hero-actions-context">
+            {ctaDescription}
+          </p>
+        )}
+        <div
+          class="hero-actions"
+          role="group"
+          aria-label={ctaGroupLabel}
+          aria-describedby={ctaDescriptionId}
+        >
+          {ctaButtons.map((button) => {
+            const variant = button.variant ?? "primary";
+            const analyticsEvent = variant === "secondary" ? "hero_secondary_click" : "hero_primary_click";
+            const analyticsProps = JSON.stringify({ label: button.label });
+            return (
+              <a
+                href={button.href}
+                aria-label={button.ariaLabel ?? undefined}
+                target={button.target ?? undefined}
+                rel={button.rel ?? undefined}
+                class:list={[
+                  "hero-cta",
+                  variant === "secondary" ? "hero-cta--secondary" : "hero-cta--primary",
+                ]}
+                data-analytics={analyticsEvent}
+                data-analytics-props={analyticsProps}
+              >
+                {button.label}
+                {variant !== "secondary" && <span aria-hidden="true">→</span>}
+              </a>
+            );
+          })}
+        </div>
+      </>
     )}
   </div>
   {hasImage && backgroundImage && (
     <div class="hero-media">
       <picture>
-        <source media="(min-width: 1024px)" srcset={backgroundImage} />
-        <source media="(min-width: 640px)" srcset={backgroundImage} />
+        {heroImageSrcSet && (
+          <source type="image/webp" srcset={heroImageSrcSet} sizes={heroImageSizes} />
+        )}
         <img
-          src={backgroundImage}
+          src={heroImageSrc}
+          srcset={heroImageSrcSet}
+          sizes={heroImageSizes}
           alt={imageAlt}
           loading="lazy"
           decoding="async"
+          width={heroImageWidth}
+          height={heroImageHeight}
         />
       </picture>
     </div>
@@ -134,6 +188,13 @@ const hasImage = Boolean(backgroundImage);
     gap: 0.75rem;
   }
 
+  .hero-actions-context {
+    margin: 0;
+    margin-bottom: 0.25rem;
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 70%, white 30%);
+  }
+
   .hero-cta {
     position: relative;
     display: inline-flex;
@@ -148,32 +209,34 @@ const hasImage = Boolean(backgroundImage);
   }
 
   .hero-cta--primary {
-    background: var(--action-primary);
+    background: radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--action-primary) 95%, white 5%), var(--action-primary));
     color: var(--action-primary-text);
-    box-shadow: var(--elevation-tier-1);
+    box-shadow: 0 12px 28px -18px color-mix(in srgb, var(--action-primary) 45%, transparent);
   }
 
   .hero-cta--primary:hover,
   .hero-cta--primary:focus-visible {
     background: var(--action-primary-hover);
-    transform: translateY(-1px);
+    transform: translateY(-1px) scale(1.01);
   }
 
   .hero-cta--secondary {
-    border: 1px solid var(--action-secondary-border);
-    background: var(--action-secondary-surface);
-    color: var(--action-secondary-text);
+    border: 1px solid color-mix(in srgb, var(--action-secondary-border, var(--glass-pill-border)) 90%, transparent);
+    background: color-mix(in srgb, var(--action-secondary-surface, transparent) 70%, white 30%);
+    color: var(--action-secondary-text, var(--glass-pill-text));
+    box-shadow: inset 0 1px 0 color-mix(in srgb, white 65%, transparent);
   }
 
   .hero-cta--secondary:hover,
   .hero-cta--secondary:focus-visible {
-    background: var(--action-secondary-hover);
+    background: color-mix(in srgb, var(--action-secondary-hover, rgba(255, 255, 255, 0.35)) 80%, white 20%);
   }
 
   .hero-cta:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--action-primary) 25%, transparent),
-      0 0 0 5px color-mix(in srgb, white 65%, transparent 35%);
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--action-primary) 25%, transparent),
+      0 0 0 6px color-mix(in srgb, white 70%, transparent 30%);
     transform: translateY(-1px);
   }
 
@@ -199,6 +262,37 @@ const hasImage = Boolean(backgroundImage);
     object-fit: cover;
     max-height: clamp(14rem, 32vw, 20rem);
     box-shadow: inset 0 0 0 1px color-mix(in srgb, white 75%, transparent);
+    aspect-ratio: 4 / 3;
+  }
+
+  @media (max-width: 639px) {
+    .hero-panel {
+      padding: clamp(1.5rem, 6vw, 2.5rem);
+    }
+
+    .hero-actions {
+      gap: 0.6rem;
+    }
+
+    .hero-media {
+      margin-inline: auto;
+      max-width: min(90vw, 22rem);
+    }
+  }
+
+  @media (max-width: 399px) {
+    .hero-panel {
+      padding: 1.25rem;
+    }
+
+    .hero-title {
+      font-size: clamp(1.95rem, 8vw, 2.4rem);
+    }
+
+    .hero-cta {
+      width: 100%;
+      justify-content: center;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {

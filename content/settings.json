@@ -2,7 +2,12 @@
   "siteUrl": "https://witchclick.space",
   "brandName": "WitchClick",
   "kofiUsername": "",
-  "analytics": { "enabled": false },
+  "analytics": {
+    "enabled": false,
+    "provider": "plausible",
+    "domain": "witchclick.space",
+    "apiHost": "https://plausible.witchclick.space"
+  },
   "ads": {
     "provider": "adsense",
     "adsenseClientId": "ca-pub-5789790751393621",

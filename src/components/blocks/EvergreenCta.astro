@@ -1,0 +1,160 @@
+---
+interface FormConfig {
+  action: string;
+  method?: string;
+  emailFieldName?: string;
+  emailPlaceholder?: string;
+  submitLabel?: string;
+  disclaimer?: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  description: string;
+  form: FormConfig;
+}
+
+const { eyebrow, title, description, form } = Astro.props as Props;
+const method = (form.method ?? "post").toLowerCase();
+const emailFieldName = form.emailFieldName ?? "email";
+const emailPlaceholder = form.emailPlaceholder ?? "you@example.com";
+const submitLabel = form.submitLabel ?? "Sign up";
+const disclaimer = form.disclaimer ?? "No spam, just seasonal rituals.";
+const formId = `cta-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "newsletter"}`;
+---
+<section class="evergreen-cta panel" aria-labelledby={`${formId}-title`}>
+  {eyebrow && <p class="cta-eyebrow">{eyebrow}</p>}
+  <h2 id={`${formId}-title`} class="cta-title font-serif">{title}</h2>
+  <p class="cta-description">{description}</p>
+  <form class="cta-form" method={method} action={form.action} target="_blank">
+    <label class="sr-only" for={`${formId}-email`}>
+      Email address
+    </label>
+    <div class="cta-form-fields">
+      <input
+        id={`${formId}-email`}
+        name={emailFieldName}
+        type="email"
+        required
+        autocomplete="email"
+        inputmode="email"
+        placeholder={emailPlaceholder}
+      />
+      <button
+        type="submit"
+        class="cta-submit"
+        data-analytics="newsletter_submit"
+        data-analytics-props={JSON.stringify({ form: formId })}
+      >
+        {submitLabel}
+      </button>
+    </div>
+    {disclaimer && <p class="cta-disclaimer">{disclaimer}</p>}
+  </form>
+</section>
+
+<style>
+  .evergreen-cta {
+    display: grid;
+    gap: clamp(0.85rem, 2.5vw, 1.4rem);
+    padding: clamp(1.6rem, 4vw, 2.4rem);
+    border-radius: clamp(1.5rem, 3vw, 1.9rem);
+    background: linear-gradient(160deg, color-mix(in srgb, var(--glass-panel-overlay, #ede9fe) 85%, transparent) 0%, rgba(255, 255, 255, 0.92) 100%);
+    border: 1px solid color-mix(in srgb, var(--glass-panel-border, rgba(124, 58, 237, 0.35)) 70%, transparent);
+    box-shadow: var(--elevation-tier-1);
+  }
+
+  .cta-eyebrow {
+    margin: 0;
+    font-size: 0.7rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 72%, white 28%);
+  }
+
+  .cta-title {
+    margin: 0;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    color: var(--ink-strong, currentColor);
+  }
+
+  .cta-description {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--ink-body, currentColor) 92%, white 8%);
+  }
+
+  .cta-form {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .cta-form-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .cta-form-fields input {
+    flex: 1 1 16rem;
+    min-width: 0;
+    padding: 0.75rem 1rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--glass-pill-border) 85%, transparent);
+    background: rgba(255, 255, 255, 0.85);
+    font-size: 0.95rem;
+    color: inherit;
+    transition: border-color 180ms ease, box-shadow 180ms ease;
+  }
+
+  .cta-form-fields input:focus-visible {
+    outline: none;
+    border-color: color-mix(in srgb, var(--glass-pill-border-active) 88%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--glass-pill-border-active) 20%, transparent);
+  }
+
+  .cta-submit {
+    flex: 0 0 auto;
+    padding: 0.75rem 1.4rem;
+    border-radius: 999px;
+    border: none;
+    background: var(--action-primary);
+    color: var(--action-primary-text);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+    box-shadow: 0 12px 28px -18px color-mix(in srgb, var(--action-primary) 50%, transparent);
+  }
+
+  .cta-submit:hover,
+  .cta-submit:focus-visible {
+    background: var(--action-primary-hover);
+    transform: translateY(-1px);
+  }
+
+  .cta-submit:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--action-primary) 25%, transparent),
+      0 0 0 6px color-mix(in srgb, white 70%, transparent 30%);
+  }
+
+  .cta-disclaimer {
+    margin: 0;
+    font-size: 0.8rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 68%, white 32%);
+  }
+
+  @media (max-width: 540px) {
+    .cta-form-fields {
+      flex-direction: column;
+    }
+
+    .cta-submit {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>

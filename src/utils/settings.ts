@@ -1,8 +1,15 @@
 import fs from "node:fs";
 import path from "node:path";
 
+export type AnalyticsProvider = "plausible" | "fathom";
+
 export interface AnalyticsSettings {
   enabled: boolean;
+  provider?: AnalyticsProvider;
+  domain?: string;
+  siteId?: string;
+  scriptUrl?: string;
+  apiHost?: string;
   endpoint?: string;
 }
 
@@ -28,7 +35,7 @@ const DEFAULT_SETTINGS: SiteSettings = {
   brandName: "WitchClick",
   disclosure:
     "As an affiliate, we may earn a small commission if you purchase through our links.",
-  analytics: { enabled: false },
+  analytics: { enabled: false, provider: "plausible" },
 };
 
 let cached: SiteSettings | null = null;
@@ -51,6 +58,11 @@ function deepMergeSettings(base: SiteSettings, next: Partial<SiteSettings>): Sit
   };
 }
 
+export function validateSettings(input: unknown): SiteSettings {
+  const sanitized = sanitizeSettings(input);
+  return deepMergeSettings({ ...DEFAULT_SETTINGS }, sanitized);
+}
+
 export function readSettings(): SiteSettings {
   if (cached) return cached;
 
@@ -60,8 +72,7 @@ export function readSettings(): SiteSettings {
   try {
     const raw = fs.readFileSync(filePath, "utf8");
     const parsed = JSON.parse(raw);
-    const sanitized = sanitizeSettings(parsed);
-    loaded = deepMergeSettings(loaded, sanitized);
+    loaded = validateSettings(parsed);
   } catch (error) {
     if (isNotFoundError(error)) {
       if (!warned && process.env.NODE_ENV !== "production") {
@@ -163,9 +174,63 @@ function sanitizeAnalytics(value: unknown, errors: string[]): AnalyticsSettings 
   }
 
   const analytics: AnalyticsSettings = { enabled: enabledRaw };
+
+  if ("provider" in data) {
+    const provider = expectString(data.provider, "analytics.provider", errors);
+    if (provider) {
+      if (provider !== "plausible" && provider !== "fathom") {
+        errors.push("analytics.provider must be either 'plausible' or 'fathom'");
+      } else {
+        analytics.provider = provider;
+      }
+    }
+  }
+
+  if ("domain" in data) {
+    const domain = expectString(data.domain, "analytics.domain", errors);
+    if (domain) analytics.domain = domain;
+  }
+
+  if ("siteId" in data) {
+    const siteId = expectString(data.siteId, "analytics.siteId", errors);
+    if (siteId) analytics.siteId = siteId;
+  }
+
+  if ("scriptUrl" in data) {
+    const script = expectString(data.scriptUrl, "analytics.scriptUrl", errors);
+    if (script) {
+      if (!isValidUrl(script) && !script.startsWith("/")) {
+        errors.push("analytics.scriptUrl must be an absolute URL or rooted path");
+      } else {
+        analytics.scriptUrl = script;
+      }
+    }
+  }
+
+  if ("apiHost" in data) {
+    const apiHost = expectString(data.apiHost, "analytics.apiHost", errors);
+    if (apiHost) {
+      if (!isValidUrl(apiHost)) {
+        errors.push("analytics.apiHost must be an absolute URL");
+      } else {
+        analytics.apiHost = apiHost.replace(/\/$/, "");
+      }
+    }
+  }
+
   if ("endpoint" in data) {
     const endpoint = expectString(data.endpoint, "analytics.endpoint", errors);
     if (endpoint) analytics.endpoint = endpoint;
+  }
+
+  if (analytics.enabled) {
+    const provider = analytics.provider ?? "plausible";
+    if (provider === "plausible" && !analytics.domain) {
+      errors.push("analytics.domain is required when analytics.provider is 'plausible'");
+    }
+    if (provider === "fathom" && !analytics.siteId) {
+      errors.push("analytics.siteId is required when analytics.provider is 'fathom'");
+    }
   }
 
   return analytics;
