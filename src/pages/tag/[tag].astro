@@ -3,7 +3,10 @@ import Base from "../../layouts/Base.astro";
 import PostCard from "../../components/PostCard.astro";
 import { loadAllPosts, estimateReadingMinutes, firstParagraph } from "../../utils/posts";
 import { readSettings } from "../../utils/settings";
-import { createCollectionPageSchema } from "../../utils/structuredData";
+import {
+  createCollectionPageSchema,
+  serializeStructuredData,
+} from "../../utils/structuredData";
 import { Fragment } from "astro/jsx-runtime";
 
 export const prerender = true;
@@ -70,7 +73,10 @@ const collectionSchema = createCollectionPageSchema(
 ---
 <Base title={`Tag: ${tag} — WitchClick`}>
   <Fragment slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(collectionSchema)} />
+    <script
+      type="application/ld+json"
+      set:html={serializeStructuredData(collectionSchema)}
+    />
   </Fragment>
 
   <h1 class="mb-6">Tag: {tag}</h1>

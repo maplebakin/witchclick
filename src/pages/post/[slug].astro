@@ -17,6 +17,7 @@ import { JSDOM } from "jsdom";
 import { autoLinkAffiliates } from "../../../tools/src/auto-affiliate";
 import { readSettings, getSiteOrigin, toAbsoluteUrl } from "../../utils/settings";
 import { loadAllPosts, estimateReadingMinutes, firstParagraph } from "../../utils/posts";
+import { serializeStructuredData } from "../../utils/structuredData";
 
 const dom = new JSDOM("<body></body>");
 const DOMPurify = createDOMPurify(dom.window);
@@ -166,7 +167,10 @@ const jsonLd = {
     {modifiedAt && (
       <meta property="article:modified_time" content={new Date(modifiedAt).toISOString()} />
     )}
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script
+      type="application/ld+json"
+      set:html={serializeStructuredData(jsonLd)}
+    />
   </Fragment>
 
   <div class="grimoire-bg min-h-screen">
