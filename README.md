@@ -8,16 +8,18 @@ Editors can reference the following affiliate keys in post specs and frontmatter
 
 | Key | Product name | Intended use |
 | --- | --- | --- |
-| `ritual-journal` | Ember & Ash Ritual Journal | Long-form reflections, tarot notes, or therapy debriefs. |
-| `micro-notebook` | Pocket Sparks Dot Grid Notebook | Quick wins, pocket capture, on-the-go scripting. |
-| `grounding-stone` | Smoky Quartz Grounding Stone | Tactile grounding objects for rituals and anxiety resets. |
-| `cozy-game` | LoFi Cozy Game Library | Low-stakes digital breaks between ritual steps. |
-| `tarot-deck` | Everyday Pattern Tarot Deck | Core deck recommendation for spreads and prompts. |
-| `tarot-cloth` | Reversible Tarot Spread Cloth | Portable surfaces for laying spreads or altar setups. |
-| `focus-tea` | Peppermint Rosemary Focus Tea | Herbal blend for focus rituals and calming resets. |
-| `herbal-kit` | Countertop Herb Drying Kit | Prep and store ritual herbs or tea ingredients. |
-| `planner-pad` | Undated Focus Planner Pad | Micro-step planning, post-ritual action tracking. |
-| `led-candle` | Rechargeable LED Ritual Candle | Fire-safe ambience for shared or low-spoon spaces. |
+| `sustainable-incense` | Sustainable Incense Stick Set | Eco-friendly cleansing and scent rituals. |
+| `altar-kit` | Altar Kit (Cloth, Chalice & Ritual Candles) | Build or refresh a sacred workspace. |
+| `gemstone-candle` | Gemstone-Infused Aromatherapy Candle | Blend aromatherapy with crystal support. |
+| `aroma-diffuser` | Ceramic Essential Oil Diffuser | Gentle aromatic support for meditation and rest. |
+| `tumbled-stones` | Tumbled Stone Crystal Set | Versatile crystals for grids and grounding. |
+| `himalayan-salt-lamp` | Himalayan Salt Lamp | Ambient glow with air-cleansing lore. |
+| `singing-bowl` | Tibetan Singing Bowl Set | Sound healing, meditation cues, and breath pacing. |
+| `mindfulness-journal` | Guided Mindfulness Journal | Prompted reflections for mindful routines. |
+| `chakra-bracelet` | Chakra Bracelet / Mala Beads | Wearable reminders for intention setting. |
+| `smudge-kit` | White Sage & Palo Santo Smudge Kit | Traditional smoke cleansing for home rituals. |
+| `crystal-bible` | The Crystal Bible (Judy Hall) | Trusted crystal reference for correspondences. |
+| `moonology` | Moonology (Yasmin Boland) | Lunar planning guidance for monthly rituals. |
 
 ## Publishing workflow
 
