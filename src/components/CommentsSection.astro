@@ -65,8 +65,8 @@ const configId = `${sectionId}-config`;
   {JSON.stringify({ slug, title })}
 </script>
 
-<script type="module">
-  const configEl = document.getElementById("{configId}");
+<script type="module" define:vars={{ sectionId, configId }}>
+  const configEl = document.getElementById(configId);
   if (!configEl) {
     console.warn("Comments configuration missing");
   }
@@ -77,7 +77,7 @@ const configId = `${sectionId}-config`;
     console.warn("Comments slug missing");
   }
 
-  const section = document.getElementById("{sectionId}");
+  const section = document.getElementById(sectionId);
   if (!section || !slug) {
     return;
   }
