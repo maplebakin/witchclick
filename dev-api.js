@@ -71,17 +71,48 @@ function parseFrontmatter(content) {
 
 function extractFrontmatterValue(lines, key) {
   const prefix = `${key}:`;
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     if (!line || typeof line !== 'string') continue;
-    if (!line.trim().startsWith(prefix)) continue;
-    const raw = line.trim().slice(prefix.length).trim();
-    if (!raw) return '';
-    const first = raw[0];
-    const last = raw[raw.length - 1];
-    if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
-      return raw.slice(1, -1);
+    const trimmed = line.trim();
+    if (!trimmed.startsWith(prefix)) continue;
+    const remainder = trimmed.slice(prefix.length).trim();
+    if (!remainder) return '';
+    if (remainder === '|' || remainder === '|-' || remainder === '>' || remainder === '>-') {
+      const baseIndent = line.length - line.trimStart().length;
+      let blockIndent = null;
+      const blockLines = [];
+      for (let j = i + 1; j < lines.length; j++) {
+        const candidate = lines[j];
+        if (typeof candidate !== 'string') continue;
+        if (!candidate.trim()) {
+          blockLines.push('');
+          continue;
+        }
+        const candidateIndent = candidate.length - candidate.trimStart().length;
+        if (candidateIndent <= baseIndent) break;
+        if (blockIndent == null) blockIndent = candidateIndent;
+        if (candidateIndent < blockIndent) break;
+        blockLines.push(candidate.slice(blockIndent));
+      }
+      let text = blockLines.join('\n');
+      if (remainder.startsWith('>')) {
+        text = text
+          .replace(/\s*\n\s*/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      } else {
+        text = text.replace(/\r?\n/g, '\n').trim();
+      }
+      return text;
     }
-    return raw;
+    if (/^(null|NULL|~)$/.test(remainder)) return '';
+    const first = remainder[0];
+    const last = remainder[remainder.length - 1];
+    if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
+      return remainder.slice(1, -1);
+    }
+    return remainder;
   }
   return '';
 }
@@ -170,12 +201,27 @@ async function listPostsForHero() {
         if (fmSlug && VALID_POST_SLUG.test(fmSlug)) slug = fmSlug;
         const fmTitle = extractFrontmatterValue(parsed.lines, 'title');
         if (fmTitle) title = fmTitle;
+        const fmPrompt = extractFrontmatterValue(parsed.lines, 'heroImagePrompt').trim();
+        const fmHeroAlt = extractFrontmatterValue(parsed.lines, 'heroAlt').trim();
+        const fmLegacyAlt = extractFrontmatterValue(parsed.lines, 'heroImageAlt').trim();
+        const fmHeroImage = extractFrontmatterValue(parsed.lines, 'heroImage').trim();
+        const fmLegacyImage = extractFrontmatterValue(parsed.lines, 'heroImageSrc').trim();
+        if (!VALID_POST_SLUG.test(slug)) continue;
+        items.push({
+          slug,
+          title,
+          heroImagePrompt: fmPrompt || null,
+          heroAlt: fmHeroAlt || null,
+          heroImageAlt: fmLegacyAlt || null,
+          heroImage: fmHeroImage || fmLegacyImage || null,
+        });
+        continue;
       }
     } catch {
       /* ignore unreadable file */
     }
     if (!VALID_POST_SLUG.test(slug)) continue;
-    items.push({ slug, title });
+    items.push({ slug, title, heroImagePrompt: null, heroAlt: null, heroImageAlt: null, heroImage: null });
   }
   items.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }));
   return items;
