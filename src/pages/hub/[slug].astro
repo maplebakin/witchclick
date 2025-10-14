@@ -1,0 +1,463 @@
+---
+import Base from "@/layouts/Base.astro";
+import PostCard from "@/components/PostCard.astro";
+import PartnerProductCard from "@/components/PartnerProductCard.astro";
+import { createCollectionPageSchema } from "@/utils/structuredData";
+import { readSettings } from "@/utils/settings";
+import { getPostBySlug } from "@/utils/posts";
+import { readPartnerBlocks } from "@/utils/partners";
+import { readEditorialCalendar } from "@/utils/editorialCalendar";
+import { Fragment } from "astro/jsx-runtime";
+
+interface CuratedSection {
+  title: string;
+  description: string;
+  posts: string[];
+}
+
+interface HubDefinition {
+  slug: string;
+  hero: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+  };
+  ambient: string;
+  seoDescription: string;
+  sections: CuratedSection[];
+  partnerHighlight?: {
+    slug: string;
+    blurb: string;
+  };
+  seasonSlug?: string;
+}
+
+const HUB_DEFINITIONS: Record<string, HubDefinition> = {
+  release: {
+    slug: "release",
+    ambient: "#f97316",
+    hero: {
+      eyebrow: "Letting go with softness",
+      title: "Release rituals & composting practices",
+      lead:
+        "Compost burnout, honour endings, and invite fresh energy with rituals that meet you where you are—whether you have 90 seconds or a weekend pocket.",
+    },
+    seoDescription:
+      "Explore WitchClick's Release hub for gentle cord-cutting rituals, boundary prompts, and seasonal partner offerings that help you let go without collapse.",
+    sections: [
+      {
+        title: "Start with a gentle exhale",
+        description: "Short rituals and essays to open the door to release days.",
+        posts: [
+          "release-hub-intro",
+          "cozy-cursing-ritual-release-anger-banishment",
+          "energy-return-ritual-restore-balance",
+        ],
+      },
+      {
+        title: "Keep the boundary loving",
+        description: "When you are ready for deeper shifts, these guides help you protect the space you just cleared.",
+        posts: [
+          "anxiety-from-avoiding-responsibilities-gentle-rituals",
+          "knowing-when-to-give-up",
+        ],
+      },
+    ],
+    partnerHighlight: {
+      slug: "moonlit-bath-bundle",
+      blurb: "A Moonlit Bath Release Bundle from Ember & Loom pairs beautifully with the energy return ritual—refillable, low-waste, and infused with calendula."
+    },
+    seasonSlug: "fall-boundaries-in-bloom",
+  },
+  focus: {
+    slug: "focus",
+    ambient: "#2563eb",
+    hero: {
+      eyebrow: "Return to attention",
+      title: "Focus rituals & gentle accountability",
+      lead:
+        "Somatic warm-ups, micro-plans, and co-working support for attention that feels kind and sustainable.",
+    },
+    seoDescription:
+      "Explore WitchClick's Focus hub for ADHD-friendly rituals, body-led planning, and partner offerings that nourish concentration without force.",
+    sections: [
+      {
+        title: "Ease into momentum",
+        description: "Begin with rituals that reconnect you to curiosity and forward motion.",
+        posts: ["focus-hub-intro", "tea-ritual-for-focus", "focus-tea-rituals-gentle-brains"],
+      },
+      {
+        title: "Support your nervous system",
+        description: "Keep the focus gentle with body-led prompts and creative spreads.",
+        posts: [
+          "anxiety-from-avoiding-responsibilities-gentle-rituals",
+          "creativity-tarot-ritual",
+        ],
+      },
+    ],
+    partnerHighlight: {
+      slug: "focus-ritual-deck",
+      blurb: "Micah's Micro Focus Ritual Deck adds tactile accountability—each card offers a stretch, a check-in, or a celebratory pause.",
+    },
+    seasonSlug: "fall-boundaries-in-bloom",
+  },
+  calm: {
+    slug: "calm",
+    ambient: "#22c55e",
+    hero: {
+      eyebrow: "Collective soothing",
+      title: "Calm rituals & community care",
+      lead:
+        "Grounding practices, repair scripts, and mutual-aid highlights so you can stay resourced alongside your people.",
+    },
+    seoDescription:
+      "Explore WitchClick's Calm hub for nervous-system care, community soothing rituals, and partner offerings that redistribute rest.",
+    sections: [
+      {
+        title: "Ground and soothe",
+        description: "Arrive gently with practices that steady your body and breath.",
+        posts: [
+          "calm-hub-intro",
+          "calm-space-during-political-unrest-2",
+          "calming-strategies-when-partner-pisses-you-off",
+        ],
+      },
+      {
+        title: "Restore together",
+        description: "Share calm with your pod through mutual-aid minded rituals.",
+        posts: [
+          "energy-return-ritual-restore-balance",
+          "day-after-acupuncture-recovery-gentle-body-awareness",
+        ],
+      },
+    ],
+    partnerHighlight: {
+      slug: "calm-breathing-orb",
+      blurb: "The Calm Breathing Orb guides paced breathing with gentle light—ideal for collective grounding before tough conversations.",
+    },
+    seasonSlug: "fall-boundaries-in-bloom",
+  },
+};
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return Object.keys(HUB_DEFINITIONS).map((slug) => ({
+    params: { slug },
+  }));
+}
+
+const slug = Astro.params.slug as string;
+const hub = HUB_DEFINITIONS[slug];
+
+if (!hub) {
+  throw new Error(`Unknown hub: ${slug}`);
+}
+
+const partnerBlocks = readPartnerBlocks();
+const partnerHighlight = hub.partnerHighlight
+  ? partnerBlocks.affiliateHighlights.find((item) => item.slug === hub.partnerHighlight?.slug)
+  : null;
+
+const sections = hub.sections.map((section) => {
+  const posts = section.posts
+    .map((postSlug) => getPostBySlug(postSlug))
+    .filter((post): post is NonNullable<ReturnType<typeof getPostBySlug>> => Boolean(post));
+
+  return { ...section, posts };
+});
+
+const uniquePosts = new Map<string, ReturnType<typeof getPostBySlug>>();
+for (const section of sections) {
+  for (const post of section.posts) {
+    if (!post) continue;
+    if (!uniquePosts.has(post.slug)) {
+      uniquePosts.set(post.slug, post);
+    }
+  }
+}
+
+const settings = readSettings();
+const collectionItems = Array.from(uniquePosts.values()).map((post) => ({
+  name: post.title,
+  url: `/post/${post.slug}`,
+  description: post.data?.excerpt ?? post.data?.metaDescription ?? "",
+}));
+
+const jsonLd = createCollectionPageSchema(
+  settings,
+  {
+    name: `${hub.hero.title} — WitchClick`,
+    url: `/hub/${hub.slug}`,
+    description: hub.seoDescription,
+    collectionType: "CollectionPage",
+  },
+  collectionItems,
+);
+
+const calendar = readEditorialCalendar();
+const season = hub.seasonSlug ? calendar.seasons.find((entry) => entry.slug === hub.seasonSlug) ?? null : null;
+---
+<Base
+  title={`${hub.hero.title} — WitchClick`}
+  description={hub.seoDescription}
+  ambientColor={hub.ambient}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+
+  <section class="hub-hero">
+    <div class="hub-hero__inner">
+      <p class="hub-hero__eyebrow">{hub.hero.eyebrow}</p>
+      <h1 class="hub-hero__title">{hub.hero.title}</h1>
+      <p class="hub-hero__lead">{hub.hero.lead}</p>
+    </div>
+  </section>
+
+  {sections.map((section) => (
+    <section class="hub-section">
+      <header class="hub-section__header">
+        <h2>{section.title}</h2>
+        <p>{section.description}</p>
+      </header>
+      <div class="hub-section__grid">
+        {section.posts.map((post) => (
+          <PostCard
+            post={{
+              slug: post.slug,
+              title: post.title,
+              excerpt: post.data?.excerpt ?? post.data?.metaDescription ?? "",
+              tags: post.data?.tags ?? [],
+              readingMinutes: post.data?.readingMinutes,
+              publishedAt: post.data?.publishedAt ?? post.data?.pubDate ?? post.data?.date,
+              spoonLevel: post.data?.spoonLevel,
+            }}
+          />
+        ))}
+      </div>
+    </section>
+  ))}
+
+  {partnerHighlight && hub.partnerHighlight && (
+    <section class="hub-partner">
+      <div class="hub-partner__inner">
+        <div class="hub-partner__content">
+          <h2>Partner spotlight</h2>
+          <p>{hub.partnerHighlight.blurb}</p>
+          <p class="hub-partner__cta">
+            Explore more community collaborations in our <a href="/partners/">Partners directory</a>.
+          </p>
+        </div>
+        <PartnerProductCard product={partnerHighlight} />
+      </div>
+    </section>
+  )}
+
+  {season && (
+    <section class="hub-season">
+      <div class="hub-season__inner">
+        <h2>{season.season}: {season.theme}</h2>
+        <p class="hub-season__focus">{season.focus}</p>
+        <div class="hub-season__grid">
+          <div class="hub-season__panel">
+            <h3>Anchor posts</h3>
+            <ul>
+              {season.anchorPosts.map((anchor) => (
+                <li>
+                  <a href={`/post/${anchor.slug}`}>{anchor.title}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="hub-season__panel">
+            <h3>Upcoming rituals</h3>
+            <ul>
+              {season.rituals.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </div>
+          {season.notes && (
+            <div class="hub-season__panel hub-season__panel--notes">
+              <h3>Editorial note</h3>
+              <p>{season.notes}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .hub-hero {
+    margin: clamp(2rem, 6vw, 3.75rem) auto;
+    padding: clamp(2rem, 6vw, 3.5rem);
+    border-radius: 3rem;
+    background:
+      radial-gradient(circle at top right, color-mix(in srgb, var(--ambient-color, #7c3aed) 20%, transparent 80%), transparent),
+      linear-gradient(135deg, rgba(255, 252, 247, 0.95), rgba(229, 231, 235, 0.92));
+    color: color-mix(in srgb, var(--ink-body, #1f1a2b) 92%, white 8%);
+  }
+
+  .hub-hero__inner {
+    max-width: 52rem;
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .hub-hero__eyebrow {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--ambient-color, #7c3aed) 68%, var(--ink-strong, currentColor) 32%);
+  }
+
+  .hub-hero__title {
+    margin: 0;
+    font-size: clamp(2.25rem, 5vw, 3rem);
+  }
+
+  .hub-hero__lead {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
+  }
+
+  .hub-section {
+    margin: clamp(2rem, 6vw, 3.5rem) auto;
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  .hub-section__header {
+    display: grid;
+    gap: 0.5rem;
+    max-width: 48rem;
+  }
+
+  .hub-section__header h2 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.4rem);
+    color: color-mix(in srgb, var(--ink-strong, currentColor) 88%, white 12%);
+  }
+
+  .hub-section__header p {
+    margin: 0;
+    font-size: 1rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
+  }
+
+  .hub-section__grid {
+    display: grid;
+    gap: clamp(1rem, 3vw, 1.6rem);
+  }
+
+  .hub-partner {
+    margin: clamp(2rem, 6vw, 4rem) auto;
+    padding: clamp(2rem, 6vw, 3.5rem);
+    border-radius: 3rem;
+    background:
+      radial-gradient(circle at top left, rgba(255, 255, 255, 0.4), transparent 70%),
+      linear-gradient(140deg, rgba(240, 253, 250, 0.92), rgba(236, 254, 255, 0.95));
+  }
+
+  .hub-partner__inner {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .hub-partner__content {
+    display: grid;
+    gap: 0.75rem;
+    max-width: 38rem;
+  }
+
+  .hub-partner__content h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 3.5vw, 2rem);
+  }
+
+  .hub-partner__content p {
+    margin: 0;
+    font-size: 1rem;
+    color: color-mix(in srgb, var(--ink-body, currentColor) 85%, white 15%);
+  }
+
+  .hub-partner__cta {
+    font-size: 0.95rem;
+  }
+
+  .hub-partner__cta a {
+    font-weight: 600;
+    color: color-mix(in srgb, var(--ambient-color, #7c3aed) 70%, var(--ink-strong, currentColor) 30%);
+  }
+
+  .hub-season {
+    margin: clamp(2rem, 6vw, 4rem) auto;
+    padding: clamp(2rem, 6vw, 3.5rem);
+    border-radius: 3rem;
+    background:
+      radial-gradient(circle at top right, rgba(94, 234, 212, 0.18), transparent 60%),
+      linear-gradient(135deg, rgba(248, 250, 252, 0.94), rgba(226, 232, 240, 0.9));
+  }
+
+  .hub-season__inner {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .hub-season__focus {
+    margin: 0;
+    max-width: 48rem;
+    font-size: 1.05rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 76%, white 24%);
+  }
+
+  .hub-season__grid {
+    display: grid;
+    gap: clamp(1rem, 3vw, 1.75rem);
+  }
+
+  .hub-season__panel {
+    padding: clamp(1.25rem, 3vw, 1.85rem);
+    border-radius: 1.75rem;
+    background: #ffffff;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    box-shadow: 0 18px 28px rgba(148, 163, 184, 0.12);
+  }
+
+  .hub-season__panel h3 {
+    margin: 0 0 0.65rem 0;
+  }
+
+  .hub-season__panel ul {
+    margin: 0;
+    padding-left: 1.15rem;
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .hub-season__panel--notes {
+    background: rgba(221, 214, 254, 0.35);
+    border-color: rgba(124, 58, 237, 0.25);
+  }
+
+  @media (min-width: 768px) {
+    .hub-section__grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .hub-partner__inner {
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      align-items: center;
+    }
+
+    .hub-season__grid {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+  }
+</style>

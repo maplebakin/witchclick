@@ -1,0 +1,96 @@
+---
+import Base from "@/layouts/Base.astro";
+import AuthorSpotlight from "@/components/AuthorSpotlight.astro";
+import { loadAuthors } from "@/utils/authors";
+import { getPostsByAuthor } from "@/utils/posts";
+
+const authors = loadAuthors();
+const authorSummaries = authors.map((author) => {
+  const posts = getPostsByAuthor(author.slug);
+  return {
+    author,
+    postCount: posts.length,
+  };
+});
+---
+<Base
+  title="WitchClick Contributors"
+  description="Meet the writers, facilitators, and community cartographers who keep WitchClick cozy."
+  ambientColor="#a855f7"
+>
+  <section class="author-index-hero">
+    <div class="author-index-hero__inner">
+      <p class="author-index-hero__eyebrow">Contributors</p>
+      <h1 class="author-index-hero__title">The voices behind our hubs</h1>
+      <p class="author-index-hero__lead">
+        Each author tends a different part of the WitchClick ecosystem—from ritual composting to somatic focus and community calm.
+        Explore their profiles and dive into the stories they are weaving.
+      </p>
+    </div>
+  </section>
+
+  <section class="author-index-grid">
+    {authorSummaries.map(({ author, postCount }) => (
+      <AuthorSpotlight
+        author={author}
+        postCount={postCount}
+        compact={false}
+        linkToProfile={true}
+        class="author-index-card"
+      />
+    ))}
+  </section>
+</Base>
+
+<style>
+  .author-index-hero {
+    margin: clamp(2rem, 6vw, 3.5rem) auto;
+    padding: clamp(2rem, 6vw, 3.5rem);
+    border-radius: 3rem;
+    background:
+      radial-gradient(circle at top right, rgba(168, 85, 247, 0.18), transparent 60%),
+      linear-gradient(140deg, rgba(250, 245, 255, 0.94), rgba(237, 233, 254, 0.92));
+  }
+
+  .author-index-hero__inner {
+    max-width: 52rem;
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .author-index-hero__eyebrow {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--ambient-color, #a855f7) 70%, var(--ink-strong, currentColor) 30%);
+  }
+
+  .author-index-hero__title {
+    margin: 0;
+    font-size: clamp(2.3rem, 5vw, 3.1rem);
+  }
+
+  .author-index-hero__lead {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
+  }
+
+  .author-index-grid {
+    margin: clamp(2rem, 6vw, 3.5rem) auto;
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .author-index-card {
+    width: 100%;
+  }
+
+  @media (min-width: 768px) {
+    .author-index-grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+  }
+</style>

@@ -1,0 +1,89 @@
+---
+import type { AffiliateHighlight } from "@/utils/partners";
+
+interface Props {
+  product: AffiliateHighlight;
+  class?: string;
+}
+
+const { product, class: className } = Astro.props as Props;
+const impactLabel = product.impactTag?.trim();
+const ethicalNote = product.ethicalNote?.trim();
+const ctaLabel = product.ctaLabel?.trim() || "Explore";
+---
+<a class:list={["partner-product-card", className]} href={product.url} target="_blank" rel="nofollow noopener">
+  <div class="partner-product-card__body">
+    {impactLabel && <span class="partner-product-card__impact">{impactLabel}</span>}
+    <h3 class="partner-product-card__title">{product.name}</h3>
+    <p class="partner-product-card__description">{product.description}</p>
+    {ethicalNote && <p class="partner-product-card__note">{ethicalNote}</p>}
+    <span class="partner-product-card__cta">{ctaLabel} ↗</span>
+  </div>
+</a>
+
+<style>
+  .partner-product-card {
+    display: block;
+    position: relative;
+    border-radius: 1.85rem;
+    padding: clamp(1.25rem, 3vw, 1.9rem);
+    background:
+      radial-gradient(circle at top right, rgba(147, 51, 234, 0.18), transparent 60%),
+      linear-gradient(145deg, rgba(253, 244, 255, 0.95), rgba(236, 233, 252, 0.98));
+    color: color-mix(in srgb, var(--ink-body, #1f1a2b) 92%, white 8%);
+    border: 1px solid color-mix(in srgb, rgba(147, 51, 234, 0.35) 45%, white 55%);
+    text-decoration: none;
+    box-shadow: 0 24px 38px rgba(76, 29, 149, 0.12);
+    transition: transform 180ms ease, box-shadow 180ms ease;
+  }
+
+  .partner-product-card:hover,
+  .partner-product-card:focus-visible {
+    transform: translateY(-4px);
+    box-shadow: 0 28px 44px rgba(76, 29, 149, 0.18);
+  }
+
+  .partner-product-card__body {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .partner-product-card__impact {
+    align-self: start;
+    display: inline-flex;
+    width: fit-content;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: color-mix(in srgb, var(--ink-strong, #0f172a) 82%, white 18%);
+    background: color-mix(in srgb, rgba(22, 163, 74, 0.12) 60%, white 40%);
+    border: 1px solid rgba(22, 163, 74, 0.25);
+  }
+
+  .partner-product-card__title {
+    margin: 0;
+    font-size: clamp(1.15rem, 2.5vw, 1.4rem);
+    color: color-mix(in srgb, var(--ink-strong, #111827) 88%, white 12%);
+  }
+
+  .partner-product-card__description {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--ink-body, #1f1a2b) 80%, white 20%);
+  }
+
+  .partner-product-card__note {
+    margin: 0;
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--ink-muted, #475569) 82%, white 18%);
+  }
+
+  .partner-product-card__cta {
+    font-weight: 600;
+    color: color-mix(in srgb, rgba(99, 102, 241, 0.9) 70%, var(--ink-strong, #111827) 30%);
+    font-size: 0.95rem;
+  }
+</style>

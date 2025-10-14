@@ -1,0 +1,19 @@
+{
+  "slug": "sol-rivera",
+  "name": "Sol Rivera",
+  "title": "Community Care Cartographer",
+  "pronouns": "they/them",
+  "bio": "Sol tends mutual aid maps, calming rituals, and gentle conflict repair scripts so exhausted organizers can stay resourced.",
+  "focus": "Collective nervous system care",
+  "specialties": ["calm rituals", "mutual aid weaving", "repair scripts"],
+  "links": [
+    {
+      "title": "Community calm toolkit",
+      "url": "https://solrivera.care/toolkit"
+    },
+    {
+      "title": "Mutual aid mapping studio",
+      "url": "https://www.patreon.com/solrivera"
+    }
+  ]
+}

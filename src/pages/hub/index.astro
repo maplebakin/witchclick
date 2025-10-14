@@ -1,0 +1,355 @@
+---
+import Base from "@/layouts/Base.astro";
+import PostCard from "@/components/PostCard.astro";
+import { readEditorialCalendar } from "@/utils/editorialCalendar";
+import { createCollectionPageSchema } from "@/utils/structuredData";
+import { readSettings } from "@/utils/settings";
+import { getPostBySlug } from "@/utils/posts";
+import { Fragment } from "astro/jsx-runtime";
+
+const HUBS = [
+  {
+    slug: "release",
+    title: "Release",
+    description: "Let go without self-punishment. Rituals, prompts, and partner offerings that help you compost what is complete.",
+    introSlug: "release-hub-intro",
+    accent: "#f97316",
+  },
+  {
+    slug: "focus",
+    title: "Focus",
+    description: "Somatic resets, micro-accountability, and cozy planning spreads for attention that feels kind.",
+    introSlug: "focus-hub-intro",
+    accent: "#2563eb",
+  },
+  {
+    slug: "calm",
+    title: "Calm",
+    description: "Collective soothing practices, repair scripts, and mutual-aid highlights for staying resourced together.",
+    introSlug: "calm-hub-intro",
+    accent: "#22c55e",
+  },
+] as const;
+
+type HubConfig = (typeof HUBS)[number];
+
+function resolveIntro(hub: HubConfig) {
+  const post = getPostBySlug(hub.introSlug);
+  if (!post) return null;
+  return {
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.data?.excerpt ?? post.data?.metaDescription ?? "",
+    tags: post.data?.tags ?? [],
+    readingMinutes: post.data?.readingMinutes,
+    publishedAt: post.data?.publishedAt ?? post.data?.pubDate ?? post.data?.date,
+  };
+}
+
+const hubCards = HUBS.map((hub) => ({
+  ...hub,
+  intro: resolveIntro(hub),
+}));
+
+const calendar = readEditorialCalendar();
+const currentSeason = calendar.seasons[0] ?? null;
+
+const settings = readSettings();
+const collectionItems = hubCards.map((hub) => ({
+  name: `${hub.title} Hub`,
+  url: `/hub/${hub.slug}`,
+  description: hub.description,
+}));
+
+const jsonLd = createCollectionPageSchema(
+  settings,
+  {
+    name: "WitchClick Hub Constellation",
+    url: "/hub",
+    description: "Seasonal landing pages for Release, Focus, and Calm rituals.",
+  },
+  collectionItems,
+);
+---
+<Base
+  title="Hub Constellation — Release, Focus, Calm"
+  description="Navigate WitchClick's hubs: Release, Focus, and Calm. Explore curated rituals, seasonal stories, and collaborative offerings."
+  ambientColor="#7c3aed"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+
+  <section class="hub-index-hero">
+    <div class="hub-index-hero__inner">
+      <p class="hub-index-hero__eyebrow">Hub constellation</p>
+      <h1 class="hub-index-hero__title">Seasonal rooms for soft structure</h1>
+      <p class="hub-index-hero__lead">
+        Choose the hub that fits the moment—Release for composting, Focus for momentum, Calm for collective soothing. Each
+        landing page gathers rituals, essays, and partner offerings you can return to anytime.
+      </p>
+    </div>
+  </section>
+
+  <section class="hub-index-grid">
+    <div class="hub-index-grid__inner">
+      {hubCards.map((hub) => (
+        <article class="hub-card" style={`--hub-accent: ${hub.accent}`}> 
+          <div class="hub-card__header">
+            <p class="hub-card__eyebrow">{hub.title} hub</p>
+            <h2 class="hub-card__title">{hub.title}</h2>
+            <p class="hub-card__description">{hub.description}</p>
+          </div>
+          <div class="hub-card__actions">
+            <a class="hub-card__primary" href={`/hub/${hub.slug}`}>Enter the hub ↗</a>
+            {hub.intro && (
+              <PostCard
+                class="hub-card__post"
+                post={{
+                  slug: hub.intro.slug,
+                  title: hub.intro.title,
+                  excerpt: hub.intro.excerpt,
+                  tags: hub.intro.tags,
+                  readingMinutes: hub.intro.readingMinutes,
+                  publishedAt: hub.intro.publishedAt,
+                }}
+              />
+            )}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="hub-index-season">
+    <div class="hub-index-season__inner">
+      <header>
+        <p class="hub-index-season__eyebrow">Seasonal editorial arc</p>
+        <h2>{currentSeason ? `${currentSeason.season}: ${currentSeason.theme}` : "Seasonal calendar"}</h2>
+        {currentSeason?.focus && <p class="hub-index-season__lead">{currentSeason.focus}</p>}
+      </header>
+
+      {currentSeason ? (
+        <div class="hub-index-season__grid">
+          <div class="hub-index-season__panel">
+            <h3>Anchor stories</h3>
+            <ul>
+              {currentSeason.anchorPosts.map((anchor) => (
+                <li>
+                  <a href={`/post/${anchor.slug}`}>{anchor.title}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="hub-index-season__panel">
+            <h3>Ritual calendar</h3>
+            <ul>
+              {currentSeason.rituals.map((ritual) => (
+                <li>{ritual}</li>
+              ))}
+            </ul>
+          </div>
+          {currentSeason.notes && (
+            <div class="hub-index-season__panel hub-index-season__panel--highlight">
+              <h3>Partner spotlight</h3>
+              <p>{currentSeason.notes}</p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <p class="hub-index-season__placeholder">Our next seasonal arc is brewing—peek back soon for fresh rituals.</p>
+      )}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hub-index-hero {
+    margin: clamp(2rem, 6vw, 3.5rem) auto;
+    padding: clamp(2rem, 6vw, 3.5rem);
+    border-radius: 3rem;
+    background:
+      radial-gradient(circle at top right, rgba(124, 58, 237, 0.18), transparent 60%),
+      linear-gradient(140deg, rgba(250, 245, 255, 0.95), rgba(226, 232, 240, 0.92));
+    color: color-mix(in srgb, var(--ink-body, #1f1a2b) 90%, white 10%);
+  }
+
+  .hub-index-hero__inner {
+    max-width: 52rem;
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .hub-index-hero__eyebrow {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--ambient-color, #7c3aed) 70%, var(--ink-strong, currentColor) 30%);
+  }
+
+  .hub-index-hero__title {
+    margin: 0;
+    font-size: clamp(2.25rem, 5vw, 3rem);
+  }
+
+  .hub-index-hero__lead {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
+  }
+
+  .hub-index-grid {
+    margin: clamp(2rem, 6vw, 3.5rem) auto;
+  }
+
+  .hub-index-grid__inner {
+    display: grid;
+    gap: clamp(1.75rem, 4vw, 2.5rem);
+  }
+
+  .hub-card {
+    position: relative;
+    display: grid;
+    gap: clamp(1rem, 3vw, 1.5rem);
+    padding: clamp(1.75rem, 4vw, 2.5rem);
+    border-radius: 2.25rem;
+    background:
+      radial-gradient(circle at top left, color-mix(in srgb, var(--hub-accent, #a855f7) 18%, transparent 82%), transparent),
+      #fffbff;
+    border: 1px solid color-mix(in srgb, var(--hub-accent, #a855f7) 28%, white 72%);
+    box-shadow: 0 24px 38px rgba(76, 29, 149, 0.08);
+  }
+
+  .hub-card__header {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .hub-card__eyebrow {
+    margin: 0;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: color-mix(in srgb, var(--hub-accent, #a855f7) 65%, var(--ink-strong, currentColor) 35%);
+  }
+
+  .hub-card__title {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.3rem);
+    color: color-mix(in srgb, var(--ink-strong, currentColor) 88%, white 12%);
+  }
+
+  .hub-card__description {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: color-mix(in srgb, var(--ink-body, currentColor) 80%, white 20%);
+  }
+
+  .hub-card__actions {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .hub-card__primary {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.35rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--hub-accent, #a855f7) 18%, white 82%);
+    border: 1px solid color-mix(in srgb, var(--hub-accent, #a855f7) 35%, white 65%);
+    font-weight: 600;
+    color: color-mix(in srgb, var(--hub-accent, #a855f7) 70%, var(--ink-strong, currentColor) 30%);
+    text-decoration: none;
+  }
+
+  .hub-card__primary:hover,
+  .hub-card__primary:focus-visible {
+    background: color-mix(in srgb, var(--hub-accent, #a855f7) 28%, white 72%);
+  }
+
+  .hub-card__post {
+    display: block;
+  }
+
+  .hub-index-season {
+    margin: clamp(2rem, 6vw, 4rem) auto;
+    padding: clamp(2rem, 6vw, 3.5rem);
+    border-radius: 3rem;
+    background:
+      radial-gradient(circle at top left, rgba(59, 130, 246, 0.15), transparent 60%),
+      linear-gradient(140deg, rgba(248, 250, 252, 0.97), rgba(226, 232, 240, 0.92));
+  }
+
+  .hub-index-season__inner {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .hub-index-season__eyebrow {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 0.8rem;
+    color: color-mix(in srgb, rgba(59, 130, 246, 0.85) 65%, var(--ink-strong, currentColor) 35%);
+  }
+
+  .hub-index-season__lead {
+    margin: 0;
+    font-size: 1.05rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
+    max-width: 48rem;
+  }
+
+  .hub-index-season__grid {
+    display: grid;
+    gap: clamp(1rem, 3vw, 1.75rem);
+  }
+
+  .hub-index-season__panel {
+    padding: clamp(1.35rem, 3.5vw, 2rem);
+    border-radius: 1.85rem;
+    background: #ffffff;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    box-shadow: 0 18px 30px rgba(148, 163, 184, 0.12);
+  }
+
+  .hub-index-season__panel h3 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+  }
+
+  .hub-index-season__panel ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: grid;
+    gap: 0.45rem;
+    color: color-mix(in srgb, var(--ink-body, currentColor) 85%, white 15%);
+  }
+
+  .hub-index-season__panel--highlight {
+    background: rgba(221, 214, 254, 0.38);
+    border-color: rgba(124, 58, 237, 0.28);
+  }
+
+  .hub-index-season__placeholder {
+    margin: 0;
+    font-size: 0.95rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
+  }
+
+  @media (min-width: 768px) {
+    .hub-index-grid__inner {
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+
+    .hub-index-season__grid {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+  }
+</style>

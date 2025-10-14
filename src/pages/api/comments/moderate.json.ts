@@ -1,6 +1,6 @@
 export const prerender = false;
 
-import { listComments, setCommentStatus } from "../../../server/lib/commentsStore.js";
+import { listComments, setCommentStatus } from "../../../../server/lib/commentsStore.js";
 
 function toJson(data: unknown, init: ResponseInit = {}) {
   const headers = new Headers(init.headers || {});

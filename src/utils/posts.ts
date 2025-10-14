@@ -2,6 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 
+import { normalizeAuthorSlug } from "./authors";
+
 export interface LoadedPost {
   slug: string;
   title: string;
@@ -132,6 +134,55 @@ export function resetPostCache() {
 export function getPostBySlug(slug: string): LoadedPost | null {
   const normalized = slug.toLowerCase();
   return loadAllPosts().find((post) => post.slug === normalized) ?? null;
+}
+
+export function extractAuthorSlugs(data: Record<string, any> | null | undefined): string[] {
+  if (!data || typeof data !== "object") return [];
+
+  const authorsRaw: unknown[] = [];
+
+  if (Array.isArray((data as any).authors)) {
+    authorsRaw.push(...((data as any).authors as unknown[]));
+  }
+
+  if ((data as any).author) {
+    authorsRaw.push((data as any).author);
+  }
+
+  const normalized = new Set<string>();
+
+  for (const item of authorsRaw) {
+    if (!item) continue;
+    if (typeof item === "string") {
+      const slug = normalizeAuthorSlug(item);
+      if (slug) normalized.add(slug);
+      continue;
+    }
+
+    if (typeof item === "object") {
+      const record = item as Record<string, unknown>;
+      if (typeof record.slug === "string" && record.slug.trim()) {
+        normalized.add(normalizeAuthorSlug(record.slug));
+        continue;
+      }
+
+      if (typeof record.name === "string" && record.name.trim()) {
+        normalized.add(normalizeAuthorSlug(record.name));
+      }
+    }
+  }
+
+  return Array.from(normalized);
+}
+
+export function getPostsByAuthor(slug: string): LoadedPost[] {
+  const target = normalizeAuthorSlug(slug);
+  if (!target) return [];
+
+  return loadAllPosts().filter((post) => {
+    const authors = extractAuthorSlugs(post.data ?? {});
+    return authors.includes(target);
+  });
 }
 
 export function getPrevNext(slug: string): {

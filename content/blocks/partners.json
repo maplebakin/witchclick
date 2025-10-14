@@ -1,0 +1,103 @@
+{
+  "updatedAt": "2025-09-20",
+  "sections": [
+    {
+      "slug": "shops",
+      "title": "Community shops & makers",
+      "summary": "Queer, disabled, and BIPOC-led shops we love supporting with every seasonal hub.",
+      "partners": [
+        {
+          "slug": "ember-and-loom",
+          "name": "Ember & Loom Apothecary",
+          "description": "Small-batch ritual kits, hand-dyed altar cloths, and refill programs that keep release rituals low-waste.",
+          "url": "https://emberloom.shop/witchclick",
+          "location": "Detroit, MI",
+          "impactTag": "Queer & disabled-owned",
+          "offerings": ["Smoke bundles", "Release ritual kits", "Sliding scale refills"],
+          "notes": "Ships plastic-free with compostable packaging."
+        },
+        {
+          "slug": "luna-larder",
+          "name": "Luna Larder Pantry",
+          "description": "Herbal teas, spice blends, and grounding snacks sourced from cooperative farms.",
+          "url": "https://lunalarder.co/witchclick",
+          "location": "Taos Pueblo land",
+          "impactTag": "Indigenous cooperative",
+          "offerings": ["Focus teas", "Calming broths", "Mutual aid bundles"],
+          "notes": "10% of every sale funds the Cozy Nights mutual aid pot."
+        }
+      ]
+    },
+    {
+      "slug": "mutual-aid",
+      "title": "Mutual aid & funds",
+      "summary": "Sliding-scale circles and emergency funds we boost each season.",
+      "partners": [
+        {
+          "slug": "cozy-nights-fund",
+          "name": "Cozy Nights Mutual Aid Fund",
+          "description": "Provides hotel rooms, hot meals, and healing stipends for trans femmes in the Great Lakes region.",
+          "url": "https://withfriends.co/cozy-nights",
+          "impactTag": "Trans-led mutual aid",
+          "offerings": ["Emergency lodging", "Restorative stipends"],
+          "notes": "Needs monthly sustainers to cover winter lodging."
+        },
+        {
+          "slug": "care-doula-collective",
+          "name": "Care Doula Collective",
+          "description": "Volunteer network offering rides, meal trains, and respite care for organizers navigating burnout.",
+          "url": "https://caredoula.co/support",
+          "impactTag": "Community-powered",
+          "offerings": ["Meal trains", "Transportation", "Rest circles"],
+          "notes": "Accepting both funds and volunteer hours; DM for onboarding."
+        }
+      ]
+    },
+    {
+      "slug": "practitioners",
+      "title": "Practitioners & partner services",
+      "summary": "Collaborators offering workshops, breathwork, and planning sessions for our hubs.",
+      "partners": [
+        {
+          "slug": "gentle-horizon-breathwork",
+          "name": "Gentle Horizon Breathwork",
+          "description": "Slow, consent-based breathwork sessions designed to downshift nervous systems before ritual work.",
+          "url": "https://gentlehorizon.space/book",
+          "location": "Virtual",
+          "impactTag": "Sliding scale available",
+          "offerings": ["Group breathwork", "1:1 nervous system consults"],
+          "notes": "Partnered with WitchClick for seasonal calm circles."
+        }
+      ]
+    }
+  ],
+  "affiliateHighlights": [
+    {
+      "slug": "moonlit-bath-bundle",
+      "name": "Moonlit Bath Release Bundle",
+      "description": "Sea salt soak, candle trio, and printable release script curated with Ember & Loom.",
+      "url": "https://partner.emberloom.shop/moonlit-bath?utm_source=witchclick",
+      "impactTag": "5% to Cozy Nights Fund",
+      "ethicalNote": "Certified cruelty-free ingredients with local sourcing.",
+      "ctaLabel": "Shop the release bundle"
+    },
+    {
+      "slug": "focus-ritual-deck",
+      "name": "Micro Focus Ritual Deck",
+      "description": "54-card deck with Micah's somatic prompts, stretch timers, and accountability check-ins.",
+      "url": "https://micahreed.studio/deck?ref=witchclick",
+      "impactTag": "Printed on recycled stock",
+      "ethicalNote": "Profits fund free ADHD-friendly coworking seats.",
+      "ctaLabel": "Flip through the deck"
+    },
+    {
+      "slug": "calm-breathing-orb",
+      "name": "Calm Breathing Orb",
+      "description": "Hand-thrown ceramic orb that guides paced breathing with gentle light pulses.",
+      "url": "https://calmorbitals.com/shop/orb?partner=witchclick",
+      "impactTag": "Made by disabled potters",
+      "ethicalNote": "10% of proceeds donated to trauma-informed therapy scholarships.",
+      "ctaLabel": "Bring an orb home"
+    }
+  ]
+}
