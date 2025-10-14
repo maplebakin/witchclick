@@ -139,7 +139,7 @@ const ogImage = data.ogImage
     ? `${siteOrigin}/og/${effectiveSlug}.jpg`
     : "";
 
-let hasAffiliates = false;
+let hasAffiliates = productRecommendations.length > 0;
 
 const frontAnchors = Array.isArray(data.affiliateAnchors) ? data.affiliateAnchors : [];
 if (frontAnchors.length > 0) {
