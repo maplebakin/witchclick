@@ -1,49 +1,30 @@
 ---
-import HeaderIsland from './HeaderIsland.tsx';
-import { menuOpen } from '@/lib/uiState';
-import SearchPanel from './SearchPanel.astro';
+import HeaderIsland from "@/components/HeaderIsland.tsx";
+import MobileDrawer from "@/components/MobileDrawer.tsx";
+import SearchPanel from "@/components/SearchPanel.tsx";
 
-// Edit links as needed
 const nav = [
-  { href: '/rituals/', label: 'Rituals' },
-  { href: '/grimoire/', label: 'Entity Library' },
-  { href: '/tools/', label: 'Tools & Prints' },
-  { href: '/about/', label: 'About' },
-  { href: '/contact/', label: 'Contact' },
-  // Add Downloads later if it has content
+  { href: "/rituals/", label: "Rituals" },
+  { href: "/grimoire/", label: "Entity Library" },
+  { href: "/tools/", label: "Tools & Prints" },
+  { href: "/about/", label: "About" },
+  { href: "/contact/", label: "Contact" },
 ];
 ---
 <header class="sticky top-0 z-50 border-b bg-white/80 backdrop-blur dark:bg-zinc-950/80">
   <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
     <a href="/" class="text-xl font-bold">WitchClick</a>
     <nav class="hidden items-center gap-6 md:flex">
-      {nav.map(n => <a href={n.href} class="hover:underline">{n.label}</a>)}
+      {nav.map((item) => (
+        <a href={item.href} class="hover:underline">
+          {item.label}
+        </a>
+      ))}
     </nav>
     <div class="md:hidden">
       <HeaderIsland client:load />
     </div>
   </div>
-
-  <!-- Mobile drawer: fixed + hidden by default -->
-  <div class={`fixed inset-0 z-40 md:hidden ${menuOpen.value ? 'block' : 'hidden'}`} aria-hidden={!menuOpen.value}>
-    <div class="absolute inset-0 bg-black/50"></div>
-    <div class="absolute left-0 top-0 h-full w-80 bg-white p-4 shadow-2xl dark:bg-zinc-900">
-      <div class="mb-4 flex items-center justify-between">
-        <span class="font-semibold">WitchClick Paths</span>
-        <button class="rounded-xl border px-3 py-1" aria-label="Close menu" onClick={() => (menuOpen.value = false)} client:load>✕</button>
-      </div>
-      <ul class="space-y-2">
-        {nav.map(n => (
-          <li>
-            <a href={n.href} class="block rounded-xl px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800" onClick={() => (menuOpen.value = false)}>
-              {n.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </div>
-
-  <!-- One global, fixed search panel -->
-  <SearchPanel label="Search posts" />
+  <MobileDrawer nav={nav} client:load />
+  <SearchPanel label="Search posts" client:load />
 </header>
