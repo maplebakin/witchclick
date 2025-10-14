@@ -4,6 +4,7 @@ import Base from "../../layouts/Base.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
 import generatorStyles from "../../../server/lib/generatorStyles.js";
 import { generatorPresetOptions } from "../../../server/lib/generatorPresets.js";
+import normalizeDraftSpecScript from "../../scripts/normalizeDraftSpec.ts";
 import {
   CURSE_TARGETS,
   CURSE_TONES,
@@ -277,7 +278,9 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
   )}
 
   {canUse && (
-    <script is:inline>
+    <>
+      <script type="module" src={Astro.resolve(normalizeDraftSpecScript)}></script>
+      <script is:inline>
       (function(){
         var root = document.querySelector('[data-panel-root]');
         var DEV_API = root?.getAttribute('data-dev-api') || 'http://localhost:8787';
@@ -648,6 +651,21 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
         function normalizeSpec(spec){
           if (!spec || typeof spec !== 'object') return spec;
+
+          try {
+            var shared = window.WitchClick && window.WitchClick.normalizeDraftSpec;
+            if (typeof shared === 'function') {
+              var result = shared(spec);
+              if (result && typeof result === 'object' && result.spec && typeof result.spec === 'object') {
+                if (Array.isArray(result.warnings) && result.warnings.length) {
+                  console.info('Normalize warnings:', result.warnings);
+                }
+                return result.spec;
+              }
+            }
+          } catch (err) {
+            console.warn('Shared normalizer failed; falling back to legacy normalization.', err);
+          }
 
           if (typeof spec.specVersion === 'string') {
             var parsedVersion = Number(spec.specVersion);
@@ -1198,6 +1216,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           });
         }
       })();
-    </script>
+      </script>
+    </>
   )}
 </Base>

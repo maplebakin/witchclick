@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 
+import { ensureUniqueSlug, slugify } from '../../scripts/lib/slug.js';
 import { normalizePostSpec } from './ingestionAdapter.js';
 import { PostSpecV2Schema } from './postSpecSchema.js';
 import { validatePostSpec } from './postSpecValidator.js';
@@ -22,16 +23,6 @@ function readJSON(file) {
 
 function ensureDirSync(dir) {
   fs.mkdirSync(dir, { recursive: true });
-}
-
-function slugify(value) {
-  const base = typeof value === 'string' ? value : String(value || '');
-  return base
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
 }
 
 function readingMinutes(words) {
@@ -103,18 +94,6 @@ function dedupe(items) {
     out.push(item);
   }
   return out;
-}
-
-function ensureUniqueSlug(baseSlug, directories) {
-  const safe = baseSlug || 'post';
-  let attempt = safe;
-  let counter = 2;
-  const exists = (candidate) =>
-    directories.some((dir) => dir && fs.existsSync(path.join(dir, `${candidate}.md`)));
-  while (exists(attempt)) {
-    attempt = `${safe}-${counter++}`;
-  }
-  return attempt;
 }
 
 function createEntityStubRecords(cwd, entities) {
@@ -194,7 +173,7 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
   const combinedWarnings = dedupe([...normalizationWarningsList, ...enforcement.warnings, ...structure.warnings]);
 
   const baseSlug = slugify(spec.slug || spec.title);
-  const uniqueSlug = ensureUniqueSlug(baseSlug, postsDirectories);
+  const uniqueSlug = ensureUniqueSlug(baseSlug, postsDirectories, { fallback: 'post' });
   if (uniqueSlug !== spec.slug) {
     normalizationReport.push(`slug→${uniqueSlug}`);
     spec.slug = uniqueSlug;

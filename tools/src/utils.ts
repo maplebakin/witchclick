@@ -2,6 +2,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { ensureUniqueSlug as sharedEnsureUniqueSlug, slugify as sharedSlugify } from '../../scripts/lib/slug.js';
+
 export function readJSON<T = any>(p: string, fallback?: T): T {
   try {
     return JSON.parse(fs.readFileSync(p, 'utf8')) as T;
@@ -19,14 +21,7 @@ export function ensureDirSync(dir: string) {
   fs.mkdirSync(dir, { recursive: true });
 }
 
-export function slugify(s: string) {
-  return String(s)
-    .normalize('NFKD')               // split accents
-    .replace(/[\u0300-\u036f]/g, '') // strip diacritics
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
+export const slugify = sharedSlugify;
 
 export function wordCountFromMarkdown(md: string) {
   // strip code blocks and inline code
@@ -120,13 +115,7 @@ export function ensureUniqueSlug(
   baseSlug: string,
   postsDir = path.join(process.cwd(), 'content', 'posts'),
 ) {
-  const safe = slugify(baseSlug);
-  let slug = safe || 'post';
-  let n = 2;
-  while (fs.existsSync(path.join(postsDir, `${slug}.md`))) {
-    slug = `${safe}-${n++}`;
-  }
-  return slug;
+  return sharedEnsureUniqueSlug(baseSlug, [postsDir]);
 }
 
 export function clamp(n: number, lo: number, hi: number) {

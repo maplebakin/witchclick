@@ -6,6 +6,7 @@ export interface MasterPromptOptions {
   brandName: string;
   siteUrl: string;
   existingPostTitles?: string[];
+  existingPostSlugs?: string[];
   allowedAffiliateKeys?: string[];
   strictJsonRules?: string[];
 }

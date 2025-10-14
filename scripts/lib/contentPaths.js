@@ -3,6 +3,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { slugify as sharedSlugify } from "./slug.js";
+
 /**
  * Build the list of candidate post directories for a project root.
  * @param {string} root
@@ -102,11 +104,6 @@ export function resolvePostsDirectories(options = {}) {
  * @param {string} value
  * @returns {string}
  */
-export function slugify(value) {
-  return value
-    .normalize("NFKD")
-    .replace(/[^\w\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
-}
+export const slugify = sharedSlugify;
+
+export { ensureUniqueSlug, slugifyId } from "./slug.js";
