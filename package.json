@@ -5,47 +5,23 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "dev:host": "astro dev --host",
     "build": "astro build",
     "preview": "astro preview",
-    "start": "astro preview",
-    "postinstall": "node scripts/build-tools.js",
-    "genprompt": "node tools/wc.js genprompt",
-    "curses": "node tools/wc.js curses",
-    "ingest": "node scripts/ingest.mjs",
-    "ingest:curses": "node tools/wc.js curses:ingest",
-    "export:curses": "node tools/wc.js curses:export",
-    "ingest:queue": "node scripts/ingest-queue.mjs",
-    "check": "node scripts/run-check.mjs",
-    "zip": "zip -r witchclick_snapshot_$(date +%F).zip astro.config.mjs package.json src content public tools scripts -x \"**/node_modules/**\" -x \"**/.git/**\"",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "dev:all": "concurrently -n api,web -c blue,magenta \"node dev-api.js\" \"astro dev --host\"",
-    "ship": "scripts/ship.sh"
+    "format": "prettier -w .",
+    "test": "vitest"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.1.3",
-    "@astrojs/tailwind": "^5.1.0",
-    "astro": "^4.15.0",
-    "dompurify": "^3.1.6",
-    "fast-glob": "^3.3.2",
-    "fs-extra": "^11.2.0",
-    "gray-matter": "^4.0.3",
-    "jsdom": "^24.1.0",
-    "marked": "^12.0.2",
-    "undici": "^6.19.8",
-    "yargs": "^17.7.2",
-    "zod": "^3.25.0"
+    "astro": "^4.16.19",
+    "@astrojs/tailwind": "^5.1.0"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.16",
-    "@types/node": "^22.5.4",
-    "autoprefixer": "^10.4.20",
-    "concurrently": "^9.2.1",
-    "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.14",
-    "tsx": "^4.20.5",
-    "typescript": "^5.6.2",
-    "vitest": "^2.0.5"
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/node": "^22.18.10",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.18",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.9"
   }
 }
