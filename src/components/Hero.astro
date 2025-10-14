@@ -9,23 +9,107 @@ const {
   secondaryLabel = 'Explore printable tools'
 } = Astro.props;
 ---
-<section role="banner" class="relative">
-  <div class="mx-auto max-w-6xl px-4 py-12 md:py-16 lg:py-20">
-    <p class="mb-2 text-sm uppercase tracking-wide opacity-70">{kicker}</p>
-    <h1 class="mb-4 text-3xl/tight font-bold md:text-5xl/tight">
-      {title}
-    </h1>
-    <p class="mb-8 max-w-3xl text-base opacity-90 md:text-lg">
-      {blurb}
-    </p>
-    <div class="flex flex-wrap gap-3">
-      <a href={primaryHref} class="inline-flex items-center rounded-xl border px-4 py-2 font-medium hover:shadow">
+<section role="banner" class="home-hero" aria-labelledby="home-hero-title">
+  <div class="home-hero__backdrop" aria-hidden="true"></div>
+  <div class="wc-container home-hero__inner">
+    <p class="home-hero__eyebrow">{kicker}</p>
+    <h1 id="home-hero-title" class="home-hero__title">{title}</h1>
+    <p class="home-hero__blurb">{blurb}</p>
+    <div class="home-hero__actions">
+      <a class="hero-cta hero-cta--primary" href={primaryHref} data-analytics="hero_primary">
         {primaryLabel}
       </a>
-      <a href={secondaryHref} class="inline-flex items-center rounded-xl border px-4 py-2 font-medium hover:shadow">
+      <a class="hero-cta hero-cta--secondary" href={secondaryHref} data-analytics="hero_secondary">
         {secondaryLabel}
       </a>
     </div>
   </div>
-  <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 -z-10 top-0 h-[40vh] bg-gradient-to-b from-zinc-100 to-transparent dark:from-zinc-900"></div>
 </section>
+
+<style>
+  .home-hero {
+    position: relative;
+    padding-block: clamp(3.5rem, 8vw, 6rem);
+    overflow: hidden;
+  }
+
+  .home-hero__backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(75% 60% at 15% 10%, rgba(212, 175, 55, 0.28), transparent 70%),
+      radial-gradient(85% 65% at 85% 0%, rgba(124, 78, 176, 0.35), transparent 70%),
+      linear-gradient(160deg, rgba(26, 14, 38, 0.92), rgba(12, 5, 23, 0.85));
+    filter: saturate(1.1);
+    opacity: 0.95;
+  }
+
+  .home-hero::after {
+    content: "";
+    position: absolute;
+    inset: -20% 10% auto;
+    height: 65%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.2), transparent 70%);
+    filter: blur(40px);
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .home-hero__inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: clamp(1.2rem, 4vw, 2rem);
+    max-width: 72rem;
+  }
+
+  .home-hero__eyebrow {
+    margin: 0;
+    font-size: 0.75rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(244, 241, 255, 0.75);
+  }
+
+  .home-hero__title {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    line-height: 1.05;
+    color: rgba(244, 241, 255, 0.94);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .home-hero__blurb {
+    margin: 0;
+    max-width: 58ch;
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    line-height: 1.75;
+    color: rgba(244, 241, 255, 0.78);
+  }
+
+  .home-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3, 0.75rem);
+  }
+
+  .hero-cta {
+    min-width: 0;
+  }
+
+  @media (max-width: 640px) {
+    .home-hero__actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .hero-cta {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
