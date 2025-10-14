@@ -1,5 +1,6 @@
 ---
 /* src/layouts/Base.astro */
+import "../styles/base.css";
 import "../styles/tailwind.css";
 import "../styles/cards.css";
 import SearchBox from "../components/SearchBox.astro";
@@ -60,26 +61,43 @@ const grimoireChapters = Object.entries(typeMetadata).map(([type, metadata]) => 
   href: `/entities/${type}`,
 }));
 
-const links = [
-  { href: "/", label: "Home" },
-  { href: "/downloads", label: "Downloads" },
-  ...(import.meta.env.DEV
-    ? [
-        { href: "/admin", label: "Post Generator", rel: "nofollow" },
-        { href: "/admin/write", label: "Write", rel: "nofollow" },
-        { href: "/admin/entities", label: "Entities Admin", rel: "nofollow" },
-        { href: "/admin/downloads", label: "Downloads Admin", rel: "nofollow" },
-        { href: "/admin/hero", label: "Hero Uploader", rel: "nofollow" },
-      ]
-    : []),
+const headingFont = "Cinzel";
+const accentFont = "Cormorant Garamond";
+const bodyFont = "Lora";
+
+const primaryLinks = [
+  { href: "/", label: "Rituals" },
+  { href: "/entities", label: "Entity Library" },
+  { href: "/downloads", label: "Tools & Prints" },
+];
+
+const secondaryLinks = [
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+];
+
+const devLinks = import.meta.env.DEV
+  ? [
+      { href: "/admin", label: "Post Generator", rel: "nofollow" },
+      { href: "/admin/write", label: "Write", rel: "nofollow" },
+      { href: "/admin/entities", label: "Entities Admin", rel: "nofollow" },
+      { href: "/admin/downloads", label: "Downloads Admin", rel: "nofollow" },
+      { href: "/admin/hero", label: "Hero Uploader", rel: "nofollow" },
+    ]
+  : [];
+
+const navLinks = [...primaryLinks, ...secondaryLinks, ...devLinks];
+const footerUtilityLinks = [
+  { href: "/rss.xml", label: "RSS" },
+  { href: "/sitemap-index.xml", label: "Sitemap" },
+  { href: "/privacy", label: "Privacy" },
 ];
 
 const backgroundLayers = [
-  "var(--wc-bg-layer-1, var(--body-overlay, var(--surface-parchment-overlay)))",
-  "var(--wc-bg-layer-2, transparent)",
-  "var(--body-texture, var(--surface-starfield))",
-  "var(--body-surface, var(--surface-parchment))",
-  "var(--color-background, transparent)",
+  "radial-gradient(120% 180% at 50% 0%, rgba(212, 175, 55, 0.16) 0%, transparent 65%)",
+  "radial-gradient(150% 120% at 12% 22%, rgba(124, 78, 176, 0.18) 0%, transparent 72%)",
+  "radial-gradient(180% 150% at 88% -12%, rgba(59, 31, 89, 0.32) 0%, transparent 70%)",
+  "linear-gradient(180deg, #07020f 0%, #120725 100%)",
 ].join(", ");
 
 const ambientBase = ambientColor ?? theme.primary;
@@ -115,8 +133,11 @@ const bodyStyle = `
   --color-primary: ${theme.primary};
   --color-accent: ${theme.accent};
   --color-background: ${theme.background};
-  --font-serif: '${theme.fontSerif}', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
-  --font-script: '${theme.fontScript}', cursive;
+  --font-body: '${bodyFont}', '${theme.fontSerif}', 'Lora', 'Crimson Text', Georgia, serif;
+  --font-heading: '${headingFont}', '${theme.fontSerif}', 'Cormorant Garamond', 'Times New Roman', serif;
+  --font-accent: '${accentFont}', '${theme.fontScript}', '${theme.fontSerif}', serif;
+  --font-serif: var(--font-heading);
+  --font-script: '${accentFont}', '${theme.fontScript}', cursive;
   --ambient-color: ${ambientBase};
   --glass-panel-overlay: ${ambientGlass};
   --glass-panel-border: ${ambientGlassBorder};
@@ -132,7 +153,7 @@ const bodyStyle = `
   --content-texture: ${contentTexture};
   --grimoire-ring-color: ${grimoireRingColor ?? "var(--glass-pill-border-active)"};
   background: ${backgroundLayers};
-  color: var(--ink-body, #111827);
+  color: var(--color-ink, #f4f1ff);
 `;
 ---
 <html lang="en" class="scroll-smooth">
@@ -166,34 +187,37 @@ const bodyStyle = `
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,300;7..72,400;7..72,700&family=Parisienne&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap"
     />
 
     {analyticsInjection?.head && <Fragment set:html={analyticsInjection.head} />}
 
     <style is:inline>
       :root {
-        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-family: var(--font-body);
         --glass-panel-radius: 1.75rem;
-        --glass-panel-border: rgba(124, 58, 237, 0.28);
-        --glass-panel-blur: 18px;
-        --glass-panel-surface: rgba(255, 255, 255, 0.88);
-        --glass-panel-overlay: rgba(124, 58, 237, 0.12);
-        --glass-panel-shadow: 0 20px 45px -25px rgba(15, 23, 42, 0.35);
-        --glass-panel-shadow-hover: 0 25px 60px -30px rgba(15, 23, 42, 0.45);
-        --glass-pill-gradient-start: rgba(246, 241, 255, 0.9);
-        --glass-pill-gradient-end: rgba(221, 214, 254, 0.55);
-        --glass-pill-border: rgba(124, 58, 237, 0.35);
-        --glass-pill-border-active: rgba(91, 33, 182, 0.48);
-        --glass-pill-text: rgba(76, 29, 149, 0.85);
-        --glass-pill-text-active: rgba(59, 7, 100, 0.95);
-        --panel-muted-surface: rgba(255, 255, 255, 0.84);
-        --panel-muted-border: rgba(148, 163, 184, 0.35);
-        --panel-muted-text: rgba(71, 85, 105, 0.85);
-        --panel-muted-heading: #1f2937;
+        --glass-panel-border: rgba(126, 90, 173, 0.35);
+        --glass-panel-blur: 20px;
+        --glass-panel-surface: rgba(28, 14, 38, 0.92);
+        --glass-panel-overlay: rgba(124, 78, 176, 0.18);
+        --glass-panel-shadow: 0 20px 45px -25px rgba(3, 2, 12, 0.55);
+        --glass-panel-shadow-hover: 0 28px 60px -28px rgba(3, 2, 12, 0.68);
+        --glass-pill-gradient-start: rgba(212, 175, 55, 0.8);
+        --glass-pill-gradient-end: rgba(124, 78, 176, 0.6);
+        --glass-pill-border: rgba(212, 175, 55, 0.45);
+        --glass-pill-border-active: rgba(212, 175, 55, 0.65);
+        --glass-pill-text: rgba(244, 241, 255, 0.85);
+        --glass-pill-text-active: rgba(7, 2, 15, 0.92);
+        --panel-muted-surface: rgba(21, 8, 32, 0.85);
+        --panel-muted-border: rgba(124, 78, 176, 0.25);
+        --panel-muted-text: rgba(244, 241, 255, 0.78);
+        --panel-muted-heading: rgba(212, 175, 55, 0.95);
       }
 
-      h1, h2, h3, .font-serif {
+      h1,
+      h2,
+      h3,
+      .font-serif {
         font-family: var(--font-serif);
       }
 
@@ -209,269 +233,6 @@ const bodyStyle = `
         transition: background 420ms ease, color 220ms ease;
       }
 
-      body[data-type] .grimoire-header-panel,
-      body[data-type] .layout-footer,
-      body[data-type] .layout-content::before {
-        transition: background 320ms ease, box-shadow 320ms ease, border-color 320ms ease, opacity 320ms ease;
-      }
-
-      .grimoire-header-panel {
-        position: relative;
-        overflow: hidden;
-        border-radius: var(--glass-panel-radius);
-        border: 1px solid var(--glass-panel-border);
-        background: linear-gradient(145deg, var(--glass-panel-surface), rgba(255, 255, 255, 0.65));
-        backdrop-filter: blur(var(--glass-panel-blur));
-        -webkit-backdrop-filter: blur(var(--glass-panel-blur));
-        box-shadow: var(--glass-panel-shadow);
-      }
-
-      .grimoire-header-panel::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(140deg, var(--glass-panel-overlay), transparent 65%);
-        mix-blend-mode: multiply;
-        pointer-events: none;
-        z-index: 0;
-      }
-
-      .grimoire-header-panel::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.35), transparent 65%);
-        z-index: 0;
-      }
-
-      .grimoire-header-content {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1.25rem;
-        padding: clamp(1.25rem, 4vw, 2rem) clamp(1.5rem, 4vw, 2.75rem);
-      }
-
-      .grimoire-brand {
-        color: var(--glass-pill-text-active);
-        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
-      }
-
-      .grimoire-nav {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 0.75rem;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-      }
-
-      .grimoire-nav-item {
-        position: relative;
-      }
-
-      .grimoire-nav-link {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.35rem;
-        padding: 0.55rem 1.15rem;
-        border-radius: calc(var(--glass-panel-radius) / 2.2);
-        border: 1px solid var(--glass-pill-border);
-        background: linear-gradient(135deg, var(--glass-pill-gradient-start), var(--glass-pill-gradient-end));
-        color: var(--wc-ink-label, var(--glass-pill-text));
-        text-transform: uppercase;
-        font-variant: small-caps;
-        font-variant-caps: all-small-caps;
-        letter-spacing: 0.22em;
-        font-size: 0.72rem;
-        line-height: 1;
-        transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease, color 220ms ease,
-          background 220ms ease;
-        box-shadow: var(--glass-panel-shadow);
-        text-decoration: none;
-      }
-
-      .grimoire-nav-toggle-icon {
-        font-size: 0.8em;
-        transition: transform 220ms ease;
-      }
-
-      .grimoire-nav-link:hover,
-      .grimoire-nav-link:focus-visible,
-      .grimoire-nav-link.is-active {
-        transform: translateY(-4px);
-        border-color: var(--glass-pill-border-active);
-        box-shadow: var(--glass-panel-shadow-hover);
-        color: var(--ink-strong, var(--glass-pill-text-active));
-        background: linear-gradient(140deg, rgba(255, 255, 255, 0.95), rgba(221, 214, 254, 0.7));
-      }
-
-      .grimoire-nav-item.is-open > .grimoire-nav-link {
-        transform: translateY(-4px);
-      }
-
-      .grimoire-nav-item.is-open > .grimoire-nav-link .grimoire-nav-toggle-icon {
-        transform: rotateX(180deg);
-      }
-
-      .grimoire-nav-link:focus-visible {
-        outline: none;
-        box-shadow: var(--glass-panel-shadow-hover), 0 0 0 3px rgba(221, 214, 254, 0.75);
-      }
-
-      .grimoire-nav-link::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
-        opacity: 0.9;
-        pointer-events: none;
-      }
-
-      .grimoire-menu-panel {
-        position: absolute;
-        top: calc(100% + 0.5rem);
-        right: 0;
-        transform: translateY(-0.35rem);
-        min-width: 18rem;
-        padding: 0.95rem;
-        border-radius: calc(var(--glass-panel-radius) / 1.8);
-        border: 1px solid var(--glass-panel-border);
-        background: linear-gradient(150deg, var(--glass-panel-surface), var(--glass-panel-overlay));
-        box-shadow: var(--glass-panel-shadow-hover);
-        backdrop-filter: blur(var(--glass-panel-blur));
-        -webkit-backdrop-filter: blur(var(--glass-panel-blur));
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 180ms ease, transform 200ms ease;
-        transform-origin: top right;
-      }
-
-      .grimoire-menu-panel.is-open {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-      }
-
-      .grimoire-menu-panel[data-floating="true"] {
-        position: fixed;
-        inset: auto;
-        min-width: 220px;
-        max-width: 92vw;
-        max-height: min(60vh, calc(100vh - 24px));
-        overflow: auto;
-        margin: 0;
-        z-index: 70;
-      }
-
-      .grimoire-menu-list {
-        display: grid;
-        gap: 0.35rem;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-      }
-
-      .grimoire-menu-link {
-        display: flex;
-        align-items: center;
-        gap: 0.65rem;
-        padding: 0.55rem 0.75rem;
-        border-radius: 0.85rem;
-        border: 1px solid transparent;
-        text-decoration: none;
-        color: var(--panel-muted-heading);
-        font-size: 0.9rem;
-        line-height: 1.35;
-        transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease, color 160ms ease;
-      }
-
-      .grimoire-menu-link:hover,
-      .grimoire-menu-link:focus-visible {
-        outline: none;
-        background: rgba(255, 255, 255, 0.65);
-        border-color: var(--glass-pill-border-active);
-        box-shadow: 0 0 0 2px var(--grimoire-ring-color);
-        color: var(--glass-pill-text-active);
-      }
-
-      .grimoire-menu-link:focus-visible {
-        box-shadow: 0 0 0 3px rgba(221, 214, 254, 0.75), 0 0 0 6px var(--grimoire-ring-color);
-      }
-
-      .grimoire-menu-icon {
-        font-size: 1.05rem;
-      }
-
-      .grimoire-menu-subtitle {
-        display: block;
-        font-size: 0.72rem;
-        text-transform: uppercase;
-        letter-spacing: 0.18em;
-        color: var(--panel-muted-text);
-      }
-
-      @media (max-width: 639px) {
-        .grimoire-header-content {
-          padding-inline: 1.25rem;
-          padding-block: 1.15rem;
-        }
-
-        .grimoire-header-content nav {
-          flex-basis: 100%;
-        }
-
-        .grimoire-nav {
-          gap: 0.5rem;
-        }
-
-        .grimoire-nav-link {
-          padding-inline: 1rem;
-          padding-block: 0.5rem;
-          letter-spacing: 0.18em;
-        }
-
-        .grimoire-nav-item {
-          flex-basis: 100%;
-        }
-
-        .grimoire-menu-panel {
-          position: static;
-          transform: none;
-          opacity: 1;
-          visibility: visible;
-          margin-top: 0.25rem;
-          min-width: 0;
-          width: 100%;
-          max-width: none;
-          max-height: none;
-          overflow: visible;
-        }
-
-        .grimoire-menu-panel:not(.is-open) {
-          display: none;
-        }
-
-        .grimoire-menu-list {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-
-        .grimoire-menu-link {
-          padding: 0.85rem 1rem;
-          font-size: 1rem;
-        }
-      }
-
       .layout-content {
         position: relative;
         z-index: 0;
@@ -481,12 +242,12 @@ const bodyStyle = `
         content: "";
         position: absolute;
         inset: -1.5rem 0 0;
-        border-radius: clamp(2rem, 4vw, 3rem);
-        background-image: var(--content-texture), var(--surface-parchment-overlay);
-        background-size: 120% 120%, cover;
-        background-repeat: no-repeat, no-repeat;
-        opacity: 0.35;
-        mix-blend-mode: multiply;
+        border-radius: clamp(2rem, 6vw, 3.5rem);
+        background:
+          radial-gradient(120% 120% at 18% 6%, rgba(212, 175, 55, 0.22), transparent 72%),
+          radial-gradient(140% 120% at 88% 8%, rgba(124, 78, 176, 0.28), transparent 75%),
+          linear-gradient(180deg, rgba(7, 2, 15, 0.55), rgba(7, 2, 15, 0.9));
+        opacity: 0.32;
         pointer-events: none;
         z-index: -1;
       }
@@ -495,7 +256,7 @@ const bodyStyle = `
         content: "";
         position: absolute;
         inset: -2rem;
-        border-radius: clamp(2.5rem, 6vw, 3.5rem);
+        border-radius: clamp(2.5rem, 6vw, 3.75rem);
         pointer-events: none;
         opacity: 0;
         z-index: -1;
@@ -506,70 +267,15 @@ const bodyStyle = `
         .layout-content--desktop::after {
           opacity: 1;
           background:
-            radial-gradient(70% 90% at 15% 20%, color-mix(in srgb, var(--ambient-color, var(--color-primary)) 18%, transparent) 0%, transparent 72%),
-            radial-gradient(75% 85% at 90% 10%, color-mix(in srgb, white 18%, transparent) 0%, transparent 68%),
-            radial-gradient(65% 80% at 90% 85%, color-mix(in srgb, var(--ambient-color, var(--color-primary)) 12%, transparent) 0%, transparent 74%);
+            radial-gradient(70% 90% at 15% 18%, rgba(212, 175, 55, 0.25), transparent 72%),
+            radial-gradient(80% 85% at 90% 15%, rgba(124, 78, 176, 0.25), transparent 68%),
+            linear-gradient(180deg, rgba(18, 7, 37, 0.25), transparent 65%);
         }
       }
 
       .layout-content > * {
         position: relative;
         z-index: 1;
-      }
-
-      .layout-footer {
-        margin-top: auto;
-        position: relative;
-        padding: clamp(2rem, 5vw, 3rem) 0;
-        background: transparent;
-      }
-
-      .layout-footer::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background:
-          radial-gradient(140% 120% at 10% 0%, color-mix(in srgb, white 55%, transparent) 0%, transparent 72%),
-          radial-gradient(135% 125% at 95% 120%, color-mix(in srgb, var(--glow-horizon, transparent) 65%, transparent) 0%, transparent 78%);
-        opacity: 0.45;
-        pointer-events: none;
-      }
-
-      .layout-footer-panel {
-        position: relative;
-        z-index: 1;
-        color: var(--panel-muted-text);
-      }
-
-      .layout-footer h2 {
-        color: var(--panel-muted-heading);
-      }
-
-      .footer-link {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-        padding: 0.1rem 0.35rem;
-        border-radius: 9999px;
-        color: inherit;
-        text-decoration: underline;
-        text-decoration-color: color-mix(in srgb, currentColor 65%, transparent);
-        text-decoration-thickness: 1px;
-        text-underline-offset: 6px;
-        transition: color 220ms ease, text-decoration-color 220ms ease, box-shadow 220ms ease;
-      }
-
-      .footer-link:hover,
-      .footer-link:focus-visible {
-        color: color-mix(in srgb, var(--panel-muted-heading) 65%, #111827 35%);
-        text-decoration: none;
-      }
-
-      .footer-link:focus-visible {
-        outline: none;
-        box-shadow: 0 0 0 2px color-mix(in srgb, #ffffff 40%, var(--ambient-color) 60%),
-          0 0 0 5px color-mix(in srgb, var(--panel-muted-border) 70%, transparent);
       }
     </style>
 
@@ -584,14 +290,13 @@ const bodyStyle = `
       :global(html),
       :global(body) {
         background:
-          var(--wc-bg-layer-1, var(--body-overlay, var(--surface-parchment-overlay))),
-          var(--wc-bg-layer-2, transparent),
-          var(--body-texture, var(--surface-starfield)),
-          var(--body-surface, var(--surface-parchment)),
-          var(--color-background, transparent);
-        background-attachment: fixed, fixed, fixed, fixed, fixed;
-        background-repeat: no-repeat, no-repeat, repeat, no-repeat, no-repeat;
-        background-size: cover, cover, auto, auto, auto;
+          radial-gradient(120% 180% at 50% 0%, rgba(212, 175, 55, 0.16) 0%, transparent 65%),
+          radial-gradient(150% 120% at 12% 22%, rgba(124, 78, 176, 0.18) 0%, transparent 72%),
+          radial-gradient(180% 150% at 88% -12%, rgba(59, 31, 89, 0.32) 0%, transparent 70%),
+          linear-gradient(180deg, #07020f 0%, #120725 100%);
+        background-attachment: fixed, fixed, fixed, fixed;
+        background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+        background-size: cover, cover, cover, cover;
       }
     </style>
     {/* Skip link for a11y */}
@@ -602,100 +307,197 @@ const bodyStyle = `
       Skip to content
     </a>
 
-    <header class={`mx-auto ${headerWidthClass} ${layoutPaddingClass} pb-6 pt-6`}>
-      <div class="grimoire-header-panel">
-        <div class="grimoire-header-content">
-          <a href="/" class="grimoire-brand text-3xl font-script text-[var(--color-primary)]">{brandName}</a>
-          <nav aria-label="Primary">
-            <ul class="grimoire-nav">
-              <li class="grimoire-nav-item" data-grimoire-menu>
-                <button
-                  type="button"
-                  class="grimoire-nav-link"
-                  data-grimoire-toggle
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                  aria-controls="grimoire-menu"
-                >
-                  Grimoire
-                  <span class="grimoire-nav-toggle-icon" aria-hidden="true">⌄</span>
-                </button>
-                <div
-                  id="grimoire-menu"
-                  role="menu"
-                  aria-label="Grimoire chapters"
-                  class="grimoire-menu-panel"
-                  data-grimoire-panel
-                  hidden
-                >
-                  <ul class="grimoire-menu-list">
-                    {grimoireChapters.map((chapter) => (
-                      <li>
-                        <a
-                          href={chapter.href}
-                          role="menuitem"
-                          class="grimoire-menu-link"
-                          data-grimoire-item
-                        >
-                          <span class="grimoire-menu-icon" aria-hidden="true">{chapter.icon}</span>
-                          <span>
-                            {chapter.title}
-                            <span class="grimoire-menu-subtitle">Chapter</span>
-                          </span>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </li>
-              {links.map((l) => {
-                const active = here === l.href || (l.href !== "/" && here.startsWith(l.href + "/"));
-                return (
-                  <li class="grimoire-nav-item">
-                    <a
-                      href={l.href}
-                      rel={l.rel}
-                      aria-current={active ? "page" : undefined}
-                      class:list={["grimoire-nav-link", active && "is-active"]}
-                    >
-                      {l.label}
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-          <div class="hidden sm:block"><SearchBox /></div>
-        </div>
+    <header class="site-header">
+      <div class:list={["wc-container site-header__inner", layoutPaddingClass]}>
+        <a href="/" class="site-logo">
+          <span aria-hidden="true">☾</span>
+          <span>{brandName}</span>
+        </a>
+        <nav class="site-nav" aria-label="Primary navigation">
+          <button
+            type="button"
+            class="site-nav__toggle"
+            data-nav-toggle
+            aria-expanded="false"
+            aria-controls="site-nav-mobile"
+          >
+            <span class="sr-only">Toggle navigation</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <ul class="site-nav__list">
+            <li class="site-nav__item" data-nav-dropdown-container>
+              <button
+                type="button"
+                class="site-nav__button"
+                data-nav-dropdown
+                aria-expanded="false"
+                aria-controls="grimoire-menu"
+              >
+                Grimoire
+                <span aria-hidden="true">⌄</span>
+              </button>
+              <div
+                id="grimoire-menu"
+                class="site-nav__submenu"
+                data-nav-submenu
+                role="menu"
+                hidden
+              >
+                <ul class="site-nav__submenu-list">
+                  {grimoireChapters.map((chapter) => (
+                    <li>
+                      <a href={chapter.href} class="site-nav__submenu-link" data-nav-submenu-item>
+                        <span class="site-nav__submenu-icon" aria-hidden="true">{chapter.icon}</span>
+                        <span>
+                          <span class="site-nav__submenu-label">{chapter.title}</span>
+                          <span class="site-nav__submenu-meta">Chapter</span>
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+            {primaryLinks.map((link) => {
+              const active = here === link.href || (link.href !== "/" && here.startsWith(link.href + "/"));
+              return (
+                <li>
+                  <a
+                    href={link.href}
+                    aria-current={active ? "page" : undefined}
+                    class="site-nav__link"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              );
+            })}
+            {secondaryLinks.map((link) => {
+              const active = here === link.href || (link.href !== "/" && here.startsWith(link.href + "/"));
+              return (
+                <li>
+                  <a
+                    href={link.href}
+                    aria-current={active ? "page" : undefined}
+                    class="site-nav__link site-nav__link--secondary"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+          <div class="site-nav__actions">
+            <SearchBox />
+          </div>
+        </nav>
       </div>
     </header>
 
-    <main id="main" class={`mx-auto ${mainWidthClass} ${layoutPaddingClass} pb-16 ${layoutContentClass}`}>
-      <div class="sm:hidden mb-6"><SearchBox /></div>
+    <div id="site-nav-mobile" class="site-nav__mobile" data-nav-mobile aria-hidden="true">
+      <div class="site-nav__mobile-header">
+        <p class="section-title">WitchClick Paths</p>
+        <button type="button" class="wc-button wc-button--ghost" data-nav-close>
+          Close ✕
+        </button>
+      </div>
+      <div class="site-nav__mobile-search">
+        <SearchBox />
+      </div>
+      <nav aria-label="Mobile navigation">
+        <p class="site-footer__title">Grimoire chapters</p>
+        <ul class="site-nav__mobile-list">
+          {grimoireChapters.map((chapter) => (
+            <li>
+              <a href={chapter.href} class="site-nav__mobile-link">
+                {chapter.icon} {chapter.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div class="section-divider" aria-hidden="true"></div>
+        <p class="site-footer__title">Explore</p>
+        <ul class="site-nav__mobile-list">
+          {navLinks.map((link) => {
+            const active = here === link.href || (link.href !== "/" && here.startsWith(link.href + "/"));
+            return (
+              <li>
+                <a
+                  href={link.href}
+                  rel={link.rel}
+                  aria-current={active ? "page" : undefined}
+                  class="site-nav__mobile-link"
+                >
+                  {link.label}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </div>
+
+    <main
+      id="main"
+      class:list={["wc-container", mainWidthClass, layoutPaddingClass, "pb-16", layoutContentClass]}
+    >
       <slot />
     </main>
 
     {/* CTA slot (filled only on posts) */}
     <slot name="cta" />
 
-    <footer class="layout-footer">
-      <div
-        class={`layout-footer-panel panel-muted shadow-1 mx-auto ${mainWidthClass} ${layoutPaddingClass} py-8 text-sm leading-relaxed`}
-      >
-        <h2 class="font-serif text-base tracking-tight">WitchClick Grimoire</h2>
-        {settings.disclosure && <p class="mt-3 text-xs sm:text-sm">{settings.disclosure}</p>}
-        <p class="mt-4 flex flex-wrap items-center gap-3 text-sm">
-          <a class="footer-link" href="/rss.xml">RSS</a>
-          <span aria-hidden="true">•</span>
-          <a class="footer-link" href="/sitemap-index.xml">Sitemap</a>
-          {canonicalUrl && (
-            <span class="inline-flex items-center gap-3">
-              <span aria-hidden="true">•</span>
-              <a class="footer-link" href={canonicalUrl}>Permalink</a>
-            </span>
-          )}
-        </p>
-        <p class="mt-4 text-xs uppercase tracking-[0.2em] text-slate-600/80">© {new Date().getFullYear()} {brandName}.</p>
+    <footer class="site-footer">
+      <div class:list={["wc-container site-footer__inner", layoutPaddingClass]}>
+        <div class="site-footer__grid">
+          <div>
+            <p class="site-footer__title">WitchClick Grimoire</p>
+            <p class="site-footer__blurb">
+              Cozy secular rituals, printable planners, and gentle tools to keep your routines feeling enchanted and sustainable.
+            </p>
+            {settings.disclosure && <p class="site-footer__disclosure">{settings.disclosure}</p>}
+          </div>
+          <div>
+            <p class="site-footer__title">Chapters</p>
+            <ul class="site-footer__nav">
+              {grimoireChapters.map((chapter) => (
+                <li>
+                  <a href={chapter.href}>{chapter.title}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p class="site-footer__title">Quick links</p>
+            <ul class="site-footer__nav">
+              {[...primaryLinks, ...secondaryLinks].map((link) => (
+                <li>
+                  <a href={link.href}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <div class="section-divider" aria-hidden="true"></div>
+        <div class="site-footer__meta">
+          <ul class="site-footer__nav site-footer__nav--inline">
+            {footerUtilityLinks.map((link) => (
+              <li>
+                <a href={link.href}>{link.label}</a>
+              </li>
+            ))}
+            {canonicalUrl && (
+              <li>
+                <a href={canonicalUrl}>Permalink</a>
+              </li>
+            )}
+          </ul>
+          <p class="site-footer__copyright">
+            © {new Date().getFullYear()} {brandName}. Crafted under a moonlit sky.
+          </p>
+        </div>
       </div>
     </footer>
 
@@ -708,331 +510,152 @@ const bodyStyle = `
 
     <script is:inline>
       (() => {
-        const menu = document.querySelector("[data-grimoire-menu]");
-        if (!menu) return;
+        const body = document.body;
+        const navToggle = document.querySelector("[data-nav-toggle]");
+        const mobilePanel = document.querySelector("[data-nav-mobile]");
+        const dropdownToggle = document.querySelector("[data-nav-dropdown]");
+        const dropdown = document.querySelector("[data-nav-submenu]");
+        const dropdownContainer = dropdownToggle?.closest("[data-nav-dropdown-container]");
+        const closeButtons = document.querySelectorAll("[data-nav-close]");
+        const mobileQuery = window.matchMedia("(min-width: 921px)");
+        let mobileOpen = false;
+        let dropdownOpen = false;
 
-        const button = menu.querySelector("[data-grimoire-toggle]");
-        const panel = menu.querySelector("[data-grimoire-panel]");
-        const panelList = panel ? panel.querySelector(".grimoire-menu-list") : null;
-        const pointerQuery = window.matchMedia("(pointer: fine)");
-        const mobileQuery = window.matchMedia("(max-width: 639px)");
-        let open = false;
-        let closeTimeout = null;
-
-        const placeholder = panel && panel.parentNode ? document.createElement("div") : null;
-        if (panel && placeholder && panel.parentNode) {
-          placeholder.style.display = "none";
-          panel.parentNode.insertBefore(placeholder, panel);
-        }
-
-        const viewportMargin = 12;
-
-        const getItems = () => {
-          if (!panel) return [];
-          return Array.from(panel.querySelectorAll("[data-grimoire-item]"));
-        };
-        const getFocusables = () => {
-          const items = getItems();
-          const focusables = [];
-          if (button instanceof HTMLElement) {
-            focusables.push(button);
-          }
-          items.forEach((item) => {
-            if (item instanceof HTMLElement) {
-              focusables.push(item);
-            }
-          });
-          return focusables;
-        };
-
-        const focusElement = (element) => {
-          if (element instanceof HTMLElement) {
-            element.focus();
+        const setMobileState = (open) => {
+          mobileOpen = open;
+          if (!mobilePanel || !navToggle) return;
+          if (open) {
+            mobilePanel.classList.add("is-open");
+            mobilePanel.setAttribute("aria-hidden", "false");
+            navToggle.setAttribute("aria-expanded", "true");
+            body?.setAttribute("data-menu-open", "true");
+          } else {
+            mobilePanel.classList.remove("is-open");
+            mobilePanel.setAttribute("aria-hidden", "true");
+            navToggle.setAttribute("aria-expanded", "false");
+            body?.removeAttribute("data-menu-open");
           }
         };
 
-        const setAria = (expanded) => {
-          if (button) {
-            button.setAttribute("aria-expanded", expanded ? "true" : "false");
-          }
-          if (panel) {
-            if (expanded) {
-              panel.removeAttribute("hidden");
-            } else {
-              panel.setAttribute("hidden", "");
-            }
-          }
+        const getDropdownItems = () => {
+          if (!dropdown) return [];
+          return Array.from(dropdown.querySelectorAll("[data-nav-submenu-item]"));
         };
 
-        const isWithinMenu = (node) => {
-          if (!(node instanceof Node)) return false;
-          if (menu.contains(node)) return true;
-          if (panel && panel.contains(node)) return true;
-          return false;
+        const openDropdown = () => {
+          if (!dropdown || !dropdownToggle) return;
+          dropdownOpen = true;
+          dropdown.classList.add("is-open");
+          dropdown.removeAttribute("hidden");
+          dropdownToggle.setAttribute("aria-expanded", "true");
         };
 
-        const updateFloatingState = () => {
-          if (!panel) return;
-          const shouldFloat = !mobileQuery.matches;
-          if (shouldFloat) {
-            if (panel.dataset.floating !== "true") {
-              panel.setAttribute("data-floating", "true");
-              document.body.appendChild(panel);
-            }
-          } else if (panel.dataset.floating === "true") {
-            panel.removeAttribute("data-floating");
-            if (placeholder && placeholder.parentNode) {
-              const parent = placeholder.parentNode;
-              if (placeholder.nextSibling) {
-                parent.insertBefore(panel, placeholder.nextSibling);
-              } else {
-                parent.appendChild(panel);
-              }
-            }
-            panel.style.removeProperty("top");
-            panel.style.removeProperty("left");
-            panel.style.removeProperty("right");
-            panel.style.removeProperty("bottom");
+        const closeDropdown = () => {
+          if (!dropdown || !dropdownToggle) return;
+          dropdownOpen = false;
+          dropdown.classList.remove("is-open");
+          dropdown.setAttribute("hidden", "");
+          dropdownToggle.setAttribute("aria-expanded", "false");
+        };
+
+        const toggleDropdown = () => {
+          if (dropdownOpen) {
+            closeDropdown();
+          } else {
+            openDropdown();
           }
         };
 
-        const positionPanel = () => {
-          if (!panel || panel.dataset.floating !== "true" || !button || panel.hasAttribute("hidden")) {
-            return;
-          }
+        navToggle?.addEventListener("click", () => {
+          setMobileState(!mobileOpen);
+        });
 
-          const previousVisibility = panel.style.visibility;
-          const previousDisplay = panel.style.display;
+        closeButtons.forEach((button) => {
+          button.addEventListener("click", () => setMobileState(false));
+        });
 
-          panel.style.visibility = "hidden";
-          panel.style.display = "block";
-          panel.style.left = "auto";
-          panel.style.right = "auto";
-          panel.style.top = "auto";
-          panel.style.bottom = "auto";
-
-          const triggerRect = button.getBoundingClientRect();
-          const panelWidth = panel.offsetWidth;
-          const panelHeight = panel.offsetHeight;
-          const viewportWidth = window.innerWidth;
-          const viewportHeight = window.innerHeight;
-
-          let left = triggerRect.right - panelWidth;
-          if (left + panelWidth > viewportWidth - viewportMargin) {
-            left = Math.min(triggerRect.left, viewportWidth - viewportMargin - panelWidth);
-          }
-          if (left < viewportMargin) {
-            left = viewportMargin;
-          }
-
-          let top = triggerRect.bottom + 8;
-          if (top + panelHeight > viewportHeight - viewportMargin) {
-            top = Math.max(viewportMargin, viewportHeight - viewportMargin - panelHeight);
-          }
-          top = Math.max(viewportMargin, top);
-
-          panel.style.top = `${top}px`;
-          panel.style.left = `${left}px`;
-          panel.style.right = "auto";
-          panel.style.bottom = "auto";
-          panel.style.visibility = previousVisibility;
-          panel.style.display = previousDisplay;
-        };
-
-        updateFloatingState();
-
-        const openMenu = () => {
-          if (open) return;
-          open = true;
-          menu.classList.add("is-open");
-          if (panel) {
-            panel.classList.add("is-open");
-          }
-          updateFloatingState();
-          setAria(true);
-          positionPanel();
-        };
-
-        const closeMenu = (focusButton = false) => {
-          if (!open) return;
-          open = false;
-          menu.classList.remove("is-open");
-          if (panel) {
-            panel.classList.remove("is-open");
-            panel.style.removeProperty("top");
-            panel.style.removeProperty("left");
-            panel.style.removeProperty("right");
-            panel.style.removeProperty("bottom");
-          }
-          setAria(false);
-          if (focusButton) {
-            focusElement(button);
-          }
-        };
-
-        const clearCloseTimeout = () => {
-          if (closeTimeout !== null) {
-            window.clearTimeout(closeTimeout);
-            closeTimeout = null;
-          }
-        };
-
-        const scheduleClose = () => {
-          clearCloseTimeout();
-          closeTimeout = window.setTimeout(() => {
-            closeMenu();
-          }, 120);
-        };
-
-        if (button) {
-          button.addEventListener("click", () => {
-            if (open) {
-              closeMenu();
-            } else {
-              openMenu();
-              focusElement(getItems()[0]);
-            }
-          });
-        }
-
-        const handlePointerEnter = () => {
-          if (!pointerQuery.matches) return;
-          clearCloseTimeout();
-          openMenu();
-        };
-
-        const handlePointerLeave = () => {
-          if (!pointerQuery.matches) return;
-          scheduleClose();
-        };
-
-        menu.addEventListener("pointerenter", handlePointerEnter);
-        menu.addEventListener("pointerleave", handlePointerLeave);
-        if (panel) {
-          panel.addEventListener("pointerenter", handlePointerEnter);
-          panel.addEventListener("pointerleave", handlePointerLeave);
-        }
-
-        const handleFocusIn = () => {
-          clearCloseTimeout();
-          openMenu();
-        };
-
-        const handleFocusOut = (event) => {
-          const nextTarget = event.relatedTarget;
-          if (!isWithinMenu(nextTarget)) {
-            scheduleClose();
-          }
-        };
-
-        menu.addEventListener("focusin", handleFocusIn);
-        menu.addEventListener("focusout", handleFocusOut);
-        if (panel) {
-          panel.addEventListener("focusin", handleFocusIn);
-          panel.addEventListener("focusout", handleFocusOut);
-        }
-
-        document.addEventListener("pointerdown", (event) => {
-          if (!open) return;
-          if (!(event.target instanceof Node) || !isWithinMenu(event.target)) {
-            closeMenu();
+        mobilePanel?.addEventListener("click", (event) => {
+          const target = event.target;
+          if (target instanceof HTMLElement && target.tagName === "A") {
+            setMobileState(false);
           }
         });
 
-        if (panelList) {
-          panelList.addEventListener("click", (event) => {
-            const target = event.target;
-            if (target instanceof Element) {
-              const item = target.closest("[data-grimoire-item]");
-              if (item) {
-                closeMenu();
-              }
-            }
-          });
-        }
+        dropdownToggle?.addEventListener("click", (event) => {
+          event.preventDefault();
+          toggleDropdown();
+        });
 
-        const handleKeyDown = (event) => {
-          if (!button) return;
-
-          if (event.target === button && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
+        dropdownToggle?.addEventListener("keydown", (event) => {
+          if (event.key === "ArrowDown") {
             event.preventDefault();
-            openMenu();
-            const items = getItems();
-            if (!items.length) return;
-            const targetItem = event.key === "ArrowDown" ? items[0] : items[items.length - 1];
-            focusElement(targetItem);
+            if (!dropdownOpen) openDropdown();
+            const items = getDropdownItems();
+            if (items.length) {
+              (items[0]).focus();
+            }
+          }
+        });
+
+        dropdown?.addEventListener("keydown", (event) => {
+          const items = getDropdownItems();
+          if (!items.length) return;
+          const current = document.activeElement;
+          const index = current instanceof HTMLElement ? items.indexOf(current) : -1;
+          if (event.key === "ArrowDown") {
+            event.preventDefault();
+            const next = index === -1 ? 0 : (index + 1) % items.length;
+            items[next].focus();
+          } else if (event.key === "ArrowUp") {
+            event.preventDefault();
+            const prev = index === -1 ? items.length - 1 : (index - 1 + items.length) % items.length;
+            items[prev].focus();
+          } else if (event.key === "Escape") {
+            event.preventDefault();
+            closeDropdown();
+            dropdownToggle?.focus();
+          }
+        });
+
+        dropdownContainer?.addEventListener("focusout", (event) => {
+          const next = event.relatedTarget;
+          if (!dropdownOpen) return;
+          if (!(next instanceof HTMLElement)) {
+            closeDropdown();
             return;
           }
+          if (!dropdownContainer.contains(next)) {
+            closeDropdown();
+          }
+        });
 
-          if (!open) return;
+        document.addEventListener("click", (event) => {
+          const target = event.target;
+          if (dropdownOpen && dropdown && dropdownToggle) {
+            const within = target instanceof Node && (dropdown.contains(target) || dropdownToggle.contains(target));
+            if (!within) {
+              closeDropdown();
+            }
+          }
+        });
 
+        document.addEventListener("keydown", (event) => {
           if (event.key === "Escape") {
-            event.preventDefault();
-            closeMenu(true);
-            return;
-          }
-
-          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-            const items = getItems();
-            if (!items.length) return;
-            event.preventDefault();
-            const current = document.activeElement;
-            let index = current instanceof Element ? items.indexOf(current) : -1;
-            if (index === -1) {
-              index = event.key === "ArrowDown" ? -1 : 0;
+            if (mobileOpen) {
+              setMobileState(false);
             }
-            const nextIndex =
-              event.key === "ArrowDown"
-                ? (index + 1) % items.length
-                : (index - 1 + items.length) % items.length;
-            focusElement(items[nextIndex]);
-            return;
-          }
-
-          if (event.key === "Tab") {
-            const focusables = getFocusables();
-            const active = document.activeElement;
-            const index = active instanceof HTMLElement ? focusables.indexOf(active) : -1;
-            if (index === -1) return;
-            event.preventDefault();
-            const nextIndex = event.shiftKey
-              ? (index - 1 + focusables.length) % focusables.length
-              : (index + 1) % focusables.length;
-            focusElement(focusables[nextIndex]);
-          }
-        };
-
-        menu.addEventListener("keydown", handleKeyDown);
-        if (panel) {
-          panel.addEventListener("keydown", (event) => {
-            if (panel.dataset.floating !== "true") {
-              return;
+            if (dropdownOpen) {
+              closeDropdown();
+              dropdownToggle?.focus();
             }
-            handleKeyDown(event);
-          });
-        }
-
-        pointerQuery.addEventListener("change", () => {
-          if (!pointerQuery.matches) {
-            clearCloseTimeout();
           }
         });
 
         mobileQuery.addEventListener("change", () => {
-          updateFloatingState();
-          if (open) {
-            positionPanel();
+          if (mobileQuery.matches) {
+            setMobileState(false);
           }
         });
-
-        const handleViewportChange = () => {
-          if (open) {
-            positionPanel();
-          }
-        };
-
-        window.addEventListener("resize", handleViewportChange);
-        window.addEventListener("scroll", handleViewportChange, true);
       })();
     </script>
   </body>

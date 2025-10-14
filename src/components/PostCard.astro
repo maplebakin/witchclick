@@ -42,23 +42,30 @@ function formatDate(value?: string){
 <a
   href={link}
   class:list={[
-    "card-panel card-tier-1 card-panel-soft focus-visible:outline-none text-purple-900",
+    "card-panel card-tier-1 card-panel-soft focus-visible:outline-none ritual-card",
     className,
   ]}
 >
   <span aria-hidden class="card-radial card-radial-top" />
   <span aria-hidden class="card-radial card-radial-bottom" />
-  <div class="relative z-10 flex flex-col gap-4">
-    {_dateLabel && <p class="card-eyebrow text-[var(--entity-label, rgba(88,28,135,0.65))]">{_dateLabel}</p>}
-    <div class="space-y-2">
-      <h3 class="card-heading text-lg font-semibold sm:text-xl">{_title}</h3>
-      {_excerpt && <p class="card-subtle text-sm leading-relaxed line-clamp-3">{_excerpt}</p>}
+  <div class="card-figure" aria-hidden="true"></div>
+  <div class="card-body">
+    {_dateLabel && (
+      <div class="card-metadata">
+        <span>{_dateLabel}</span>
+        {_mins && <span>{_mins} min ritual</span>}
+      </div>
+    )}
+    <div class="card-text">
+      <h3 class="card-heading">{_title}</h3>
+      {_excerpt && <p class="card-subtle">{_excerpt}</p>}
     </div>
-    <div class="mt-auto flex flex-wrap gap-2">
-      {_mins && <span class="card-pill card-badge">⏱️ {_mins} min</span>}
-      {_tags.slice(0, 6).map((t) => (
-        <span class="card-pill card-tag">#{String(t).toLowerCase()}</span>
-      ))}
-    </div>
+    {_tags.length > 0 && (
+      <div class="card-tags">
+        {_tags.slice(0, 6).map((t) => (
+          <span class="card-pill card-tag">#{String(t).toLowerCase()}</span>
+        ))}
+      </div>
+    )}
   </div>
 </a>
