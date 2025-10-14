@@ -1,0 +1,167 @@
+---
+import Base from "@/layouts/Base.astro";
+import PostCard from "@/components/PostCard.astro";
+import AuthorSpotlight from "@/components/AuthorSpotlight.astro";
+import { loadAuthors, getAuthorBySlug } from "@/utils/authors";
+import { getPostsByAuthor } from "@/utils/posts";
+import { createCollectionPageSchema } from "@/utils/structuredData";
+import { readSettings } from "@/utils/settings";
+import { Fragment } from "astro/jsx-runtime";
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return loadAuthors().map((author) => ({
+    params: { slug: author.slug },
+  }));
+}
+
+const slug = Astro.params.slug as string;
+const author = getAuthorBySlug(slug);
+
+if (!author) {
+  throw new Error(`Author not found: ${slug}`);
+}
+
+const posts = getPostsByAuthor(author.slug);
+const settings = readSettings();
+const jsonLd = createCollectionPageSchema(
+  settings,
+  {
+    name: `${author.name} — WitchClick`,
+    url: `/author/${author.slug}`,
+    description: author.bio ?? `${author.name} on WitchClick`,
+    collectionType: "ProfilePage",
+  },
+  posts.map((post) => ({
+    name: post.title,
+    url: `/post/${post.slug}`,
+    description: post.data?.excerpt ?? post.data?.metaDescription ?? "",
+  })),
+);
+---
+<Base
+  title={`${author.name} — WitchClick`}
+  description={author.bio ?? `${author.name}'s stories on WitchClick`}
+  ambientColor="#c084fc"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+
+  <section class="author-page-hero">
+    <div class="author-page-hero__inner">
+      <p class="author-page-hero__eyebrow">Contributor</p>
+      <h1 class="author-page-hero__title">{author.name}</h1>
+      {author.focus && <p class="author-page-hero__focus">{author.focus}</p>}
+    </div>
+  </section>
+
+  <section class="author-page-profile">
+    <AuthorSpotlight author={author} linkToProfile={false} postCount={posts.length} />
+  </section>
+
+  <section class="author-page-posts">
+    <header>
+      <h2>Recent stories</h2>
+      <p>{posts.length === 0 ? `${author.name} is preparing their first piece.` : `Browse ${posts.length} ${posts.length === 1 ? "story" : "stories"} from ${author.name}.`}</p>
+    </header>
+    {posts.length > 0 ? (
+      <div class="author-page-posts__grid">
+        {posts.map((post) => (
+          <PostCard
+            post={{
+              slug: post.slug,
+              title: post.title,
+              excerpt: post.data?.excerpt ?? post.data?.metaDescription ?? "",
+              tags: post.data?.tags ?? [],
+              readingMinutes: post.data?.readingMinutes,
+              publishedAt: post.data?.publishedAt ?? post.data?.pubDate ?? post.data?.date,
+              spoonLevel: post.data?.spoonLevel,
+            }}
+          />
+        ))}
+      </div>
+    ) : (
+      <p class="author-page-posts__empty">Circle back soon—new work is on the way.</p>
+    )}
+  </section>
+</Base>
+
+<style>
+  .author-page-hero {
+    margin: clamp(2rem, 6vw, 3.5rem) auto;
+    padding: clamp(2rem, 6vw, 3.5rem);
+    border-radius: 3rem;
+    background:
+      radial-gradient(circle at top right, rgba(192, 132, 252, 0.2), transparent 65%),
+      linear-gradient(135deg, rgba(253, 246, 255, 0.95), rgba(237, 233, 254, 0.92));
+  }
+
+  .author-page-hero__inner {
+    max-width: 48rem;
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .author-page-hero__eyebrow {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 0.8rem;
+    color: color-mix(in srgb, var(--ambient-color, #c084fc) 68%, var(--ink-strong, currentColor) 32%);
+  }
+
+  .author-page-hero__title {
+    margin: 0;
+    font-size: clamp(2.2rem, 5vw, 3rem);
+  }
+
+  .author-page-hero__focus {
+    margin: 0;
+    font-size: 1.05rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
+  }
+
+  .author-page-profile {
+    margin: clamp(2rem, 6vw, 3.5rem) auto;
+    max-width: 48rem;
+  }
+
+  .author-page-posts {
+    margin: clamp(2rem, 6vw, 3.5rem) auto;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .author-page-posts header {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .author-page-posts h2 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.2rem);
+  }
+
+  .author-page-posts p {
+    margin: 0;
+    font-size: 1rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
+  }
+
+  .author-page-posts__grid {
+    display: grid;
+    gap: clamp(1rem, 3vw, 1.6rem);
+  }
+
+  .author-page-posts__empty {
+    font-size: 0.95rem;
+  }
+
+  @media (min-width: 720px) {
+    .author-page-posts__grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+  }
+</style>

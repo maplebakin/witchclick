@@ -1,0 +1,279 @@
+---
+import Base from "@/layouts/Base.astro";
+import PartnerProductCard from "@/components/PartnerProductCard.astro";
+import { readPartnerBlocks } from "@/utils/partners";
+import { createItemListSchema } from "@/utils/structuredData";
+import { readSettings } from "@/utils/settings";
+import { Fragment } from "astro/jsx-runtime";
+
+const partnerBlocks = readPartnerBlocks();
+const settings = readSettings();
+
+const communityItems = partnerBlocks.sections.flatMap((section) =>
+  section.partners.map((partner) => ({
+    name: partner.name,
+    url: partner.url,
+    description: partner.description,
+  })),
+);
+
+const jsonLd = createItemListSchema(
+  settings,
+  {
+    name: "WitchClick Partner Directory",
+    url: "/partners",
+    description: "Community shops, mutual aid funds, and collaborative services curated by WitchClick.",
+    itemType: "Organization",
+  },
+  communityItems,
+);
+---
+<Base
+  title="Partners & Mutual Aid — WitchClick"
+  description="Meet the makers, mutual aid funds, and practitioners we partner with across WitchClick hubs."
+  ambientColor="#6366f1"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+
+  <section class="partners-hero">
+    <div class="partners-hero__inner">
+      <p class="partners-hero__eyebrow">Partnership constellation</p>
+      <h1 class="partners-hero__title">Shops, funds, and practitioners we trust</h1>
+      <p class="partners-hero__lead">
+        Every listing here is a relationship built through ritual collaborations, mutual aid, or seasonal co-creation. Browse by
+        focus, support a fund, or explore affiliate highlights with clear impact tags.
+      </p>
+    </div>
+  </section>
+
+  {partnerBlocks.sections.map((section) => (
+    <section class="partners-section" id={section.slug}>
+      <header class="partners-section__header">
+        <h2>{section.title}</h2>
+        {section.summary && <p>{section.summary}</p>}
+      </header>
+      <div class="partners-section__grid">
+        {section.partners.map((partner) => (
+          <article class="partner-card">
+            <header class="partner-card__header">
+              <h3>{partner.name}</h3>
+              {partner.impactTag && <span class="partner-card__impact">{partner.impactTag}</span>}
+            </header>
+            <p class="partner-card__description">{partner.description}</p>
+            {partner.offerings?.length > 0 && (
+              <ul class="partner-card__offerings">
+                {partner.offerings.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            )}
+            {partner.location && <p class="partner-card__meta">Based in {partner.location}</p>}
+            <p class="partner-card__actions">
+              <a href={partner.url} target="_blank" rel="noopener">Visit partner ↗</a>
+              {partner.notes && <span>{partner.notes}</span>}
+            </p>
+          </article>
+        ))}
+      </div>
+    </section>
+  ))}
+
+  {partnerBlocks.affiliateHighlights.length > 0 && (
+    <section class="partners-affiliates">
+      <header class="partners-affiliates__header">
+        <h2>Affiliate highlights</h2>
+        <p>We receive a small commission when you purchase through these links. Each product includes an impact note so you know who benefits.</p>
+      </header>
+      <div class="partners-affiliates__grid">
+        {partnerBlocks.affiliateHighlights.map((product) => (
+          <PartnerProductCard product={product} />
+        ))}
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .partners-hero {
+    margin: clamp(2rem, 6vw, 3.5rem) auto;
+    padding: clamp(2rem, 6vw, 3.5rem);
+    border-radius: 3rem;
+    background:
+      radial-gradient(circle at top right, rgba(99, 102, 241, 0.2), transparent 60%),
+      linear-gradient(135deg, rgba(245, 243, 255, 0.94), rgba(219, 234, 254, 0.92));
+  }
+
+  .partners-hero__inner {
+    max-width: 52rem;
+    display: grid;
+    gap: 0.85rem;
+    color: color-mix(in srgb, var(--ink-body, #1f1a2b) 92%, white 8%);
+  }
+
+  .partners-hero__eyebrow {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--ambient-color, #6366f1) 70%, var(--ink-strong, currentColor) 30%);
+  }
+
+  .partners-hero__title {
+    margin: 0;
+    font-size: clamp(2.3rem, 5vw, 3.1rem);
+  }
+
+  .partners-hero__lead {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 80%, white 20%);
+  }
+
+  .partners-section {
+    margin: clamp(2rem, 6vw, 3.5rem) auto;
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  .partners-section__header {
+    display: grid;
+    gap: 0.5rem;
+    max-width: 48rem;
+  }
+
+  .partners-section__header h2 {
+    margin: 0;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+  }
+
+  .partners-section__header p {
+    margin: 0;
+    font-size: 1rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
+  }
+
+  .partners-section__grid {
+    display: grid;
+    gap: clamp(1.25rem, 3vw, 1.75rem);
+  }
+
+  .partner-card {
+    padding: clamp(1.35rem, 3vw, 1.85rem);
+    border-radius: 1.85rem;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    background: #ffffff;
+    box-shadow: 0 18px 36px rgba(99, 102, 241, 0.08);
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .partner-card__header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    align-items: baseline;
+  }
+
+  .partner-card__header h3 {
+    margin: 0;
+    font-size: 1.35rem;
+  }
+
+  .partner-card__impact {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    background: rgba(99, 102, 241, 0.1);
+    color: color-mix(in srgb, rgba(79, 70, 229, 0.9) 70%, var(--ink-strong, #1f1a2b) 30%);
+  }
+
+  .partner-card__description {
+    margin: 0;
+    font-size: 0.95rem;
+    color: color-mix(in srgb, var(--ink-body, currentColor) 85%, white 15%);
+  }
+
+  .partner-card__offerings {
+    margin: 0;
+    padding-left: 1.15rem;
+    display: grid;
+    gap: 0.35rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
+  }
+
+  .partner-card__meta {
+    margin: 0;
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 75%, white 25%);
+  }
+
+  .partner-card__actions {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .partner-card__actions a {
+    font-weight: 600;
+    color: color-mix(in srgb, rgba(99, 102, 241, 0.9) 70%, var(--ink-strong, currentColor) 30%);
+    text-decoration: none;
+  }
+
+  .partner-card__actions a:hover,
+  .partner-card__actions a:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .partners-affiliates {
+    margin: clamp(2rem, 6vw, 4rem) auto;
+    padding: clamp(2rem, 6vw, 3.5rem);
+    border-radius: 3rem;
+    background:
+      radial-gradient(circle at top left, rgba(20, 184, 166, 0.16), transparent 60%),
+      linear-gradient(140deg, rgba(240, 253, 250, 0.94), rgba(236, 254, 255, 0.9));
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .partners-affiliates__header {
+    display: grid;
+    gap: 0.5rem;
+    max-width: 48rem;
+  }
+
+  .partners-affiliates__header h2 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.3rem);
+  }
+
+  .partners-affiliates__header p {
+    margin: 0;
+    font-size: 1rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
+  }
+
+  .partners-affiliates__grid {
+    display: grid;
+    gap: clamp(1.25rem, 3vw, 1.75rem);
+  }
+
+  @media (min-width: 768px) {
+    .partners-section__grid {
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    .partners-affiliates__grid {
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+  }
+</style>

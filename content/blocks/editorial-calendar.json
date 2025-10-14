@@ -1,0 +1,28 @@
+{
+  "updatedAt": "2025-09-20",
+  "seasons": [
+    {
+      "slug": "fall-boundaries-in-bloom",
+      "season": "Fall",
+      "theme": "Boundaries in Bloom",
+      "focus": "Tending tender boundaries and creative stamina before year-end busy season.",
+      "window": "September – November",
+      "anchorPosts": [
+        {
+          "title": "Release Hub: A Soft Landing for Letting Go",
+          "slug": "release-hub-intro"
+        },
+        {
+          "title": "Focus Hub: Micro-Rituals for Returning to Attention",
+          "slug": "focus-hub-intro"
+        }
+      ],
+      "rituals": [
+        "Oct 3: Moonlit boundary-mapping spread in the Focus hub",
+        "Nov 7: Gentle co-working salon with Micah & Aurora",
+        "Nov 21: Community mutual-aid spotlight — Cozy Nights Fund"
+      ],
+      "notes": "Seasonal partner feature: Ember & Loom provides limited-run release bundles with sliding scale refills."
+    }
+  ]
+}
