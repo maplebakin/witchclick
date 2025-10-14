@@ -6,6 +6,12 @@ import "@/styles/tailwind.css";
 
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+import {
+  primaryNavLinks,
+  secondaryNavLinks,
+  headerUtilityLinks,
+  footerUtilityLinks,
+} from "@/data/navigation";
 import { readSettings, getSiteOrigin, toAbsoluteUrl } from "@/utils/settings";
 import { buildAnalyticsInjection } from "@/utils/analytics";
 import { Fragment } from "astro/jsx-runtime";
@@ -43,24 +49,10 @@ const ogUrl = ogImage ? toAbsoluteUrl(ogImage, settings) : "";
 const currentPath = Astro.url?.pathname ?? "/";
 const canonicalUrl = canon || (siteOrigin ? `${siteOrigin}${currentPath}` : "");
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/hub/", label: "Hubs" },
-  { href: "/curses/", label: "Curses" },
-  { href: "/entities/", label: "Entities" },
-  { href: "/salon/", label: "Salon" },
-  { href: "/tools/", label: "Tools & Prints" },
-  { href: "/partners/", label: "Partners" },
-  { href: "/about/", label: "About" },
-  { href: "/account/", label: "Account" },
-  { href: "/contact/", label: "Contact" },
-];
-
-const utilityLinks = [
-  { href: "/privacy", label: "Privacy" },
-  { href: "/feed.json", label: "Feed" },
-  { href: "/rss.xml", label: "RSS" },
-];
+const navLinks = primaryNavLinks;
+const secondaryLinks = secondaryNavLinks;
+const headerUtility = headerUtilityLinks;
+const footerUtilities = footerUtilityLinks;
 
 const isDev = import.meta.env.DEV;
 const adminLinks = isDev
@@ -173,6 +165,8 @@ const comfortFontToggleId = `comfort-font-${comfortId}`;
     <Header
       brandName={brandName}
       navLinks={navLinks}
+      secondaryLinks={secondaryLinks}
+      utilityLinks={headerUtility}
       adminLinks={adminLinks}
       currentPath={currentPath}
     />
@@ -219,7 +213,8 @@ const comfortFontToggleId = `comfort-font-${comfortId}`;
     <Footer
       brandName={brandName}
       navLinks={navLinks}
-      utilityLinks={utilityLinks}
+      secondaryNavLinks={secondaryLinks}
+      utilityLinks={footerUtilities}
       adminLinks={adminLinks}
       disclosure={disclosure}
     />

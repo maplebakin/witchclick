@@ -8,6 +8,7 @@ interface NavLink {
 interface Props {
   brandName: string;
   navLinks?: NavLink[];
+  secondaryNavLinks?: NavLink[];
   utilityLinks?: NavLink[];
   adminLinks?: NavLink[];
   disclosure?: string;
@@ -16,6 +17,7 @@ interface Props {
 const {
   brandName,
   navLinks = [],
+  secondaryNavLinks = [],
   utilityLinks = [],
   adminLinks = [],
   disclosure = "",
@@ -38,6 +40,18 @@ const hasDisclosure = typeof disclosure === "string" && disclosure.trim().length
           <p class="site-footer__title">Explore</p>
           <ul class="site-footer__nav">
             {navLinks.map((link) => (
+              <li>
+                <a href={link.href} rel={link.rel}>{link.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {secondaryNavLinks.length > 0 && (
+        <div>
+          <p class="site-footer__title">Community</p>
+          <ul class="site-footer__nav">
+            {secondaryNavLinks.map((link) => (
               <li>
                 <a href={link.href} rel={link.rel}>{link.label}</a>
               </li>

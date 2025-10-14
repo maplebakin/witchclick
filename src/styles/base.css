@@ -746,7 +746,7 @@ blockquote {
 
 @media (min-width: 768px) {
   .site-footer__grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
   }
 }
 
