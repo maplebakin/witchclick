@@ -2,7 +2,10 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] },
+    "paths": {
+      "@/*": ["src/*"],
+      "@preact/signals": ["src/lib/signalsShim.ts"]
+    },
     "types": ["node", "astro/client"],
     "module": "ES2022",
     "target": "ES2022",

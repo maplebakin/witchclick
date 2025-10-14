@@ -84,6 +84,7 @@ export default defineConfig(({ command }) => {
       resolve: {
         alias: {
           '@': fileURLToPath(new URL('./src', import.meta.url)),
+          '@preact/signals': fileURLToPath(new URL('./src/lib/signalsShim.ts', import.meta.url)),
         },
       },
       // optimizeDeps: { include: [] },

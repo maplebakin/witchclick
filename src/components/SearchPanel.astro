@@ -1,0 +1,5 @@
+---
+import SearchPanelIsland from './SearchPanelIsland.tsx';
+const label = Astro.props?.label ?? 'Search posts';
+---
+<SearchPanelIsland client:load {label} />

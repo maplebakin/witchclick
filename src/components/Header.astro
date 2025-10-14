@@ -1,0 +1,33 @@
+---
+import HeaderIsland from './HeaderIsland.tsx';
+import MobileMenuIsland from './MobileMenuIsland.tsx';
+import SearchPanel from './SearchPanel.astro';
+
+// Nav links — edit destinations as needed.
+const nav = [
+  { href: '/', label: 'Rituals' },
+  { href: '/entities/', label: 'Entity Library' },
+  { href: '/tools/', label: 'Tools & Prints' },
+  { href: '/about/', label: 'About' },
+  { href: '/contact/', label: 'Contact' },
+];
+---
+<header class="sticky top-0 z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur border-b">
+  <div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
+    <a href="/" class="font-bold text-xl">WitchClick</a>
+    <nav class="hidden md:flex items-center gap-6">
+      {nav.map(n => (
+        <a href={n.href} class="hover:underline">{n.label}</a>
+      ))}
+    </nav>
+    <div class="md:hidden">
+      <HeaderIsland client:load />
+    </div>
+  </div>
+
+  <!-- Mobile drawer -->
+  <MobileMenuIsland client:load items={nav} />
+
+  <!-- One global search panel only -->
+  <SearchPanel label="Search posts" />
+</header>
