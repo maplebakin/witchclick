@@ -1,0 +1,431 @@
+---
+import Base from "../../layouts/Base.astro";
+import fs from "node:fs";
+import path from "node:path";
+import { collectUnique, loadRitualLabEntries } from "../../utils/ritualLab";
+
+const title = "Ritual Lab";
+const description = "Choose your intention, available time, and tools to receive a tailored ritual flow—then capture it as a printable or calendar reminder.";
+
+const entries = loadRitualLabEntries();
+const intents = collectUnique(entries.map((entry) => entry.intents));
+const toolOptionsRaw = collectUnique(entries.map((entry) => [...entry.tools, ...entry.tags]));
+const toolOptions = toolOptionsRaw.map((value) => ({ value, label: toLabel(value) }));
+const timeOptions = [
+  { value: 10, label: "Quick reset (≤10 min)" },
+  { value: 20, label: "Focused refresh (≤20 min)" },
+  { value: 40, label: "Deep dive (≤40 min)" },
+];
+
+const defaultIntent = intents[0] ?? "reset";
+const defaultTime = timeOptions[0]?.value ?? 15;
+
+const downloadsDirectory = "./content/downloads";
+const downloadFiles = fs.existsSync(downloadsDirectory)
+  ? fs
+      .readdirSync(downloadsDirectory)
+      .filter((item) => item.endsWith(".json"))
+      .map((file) => {
+        try {
+          const raw = fs.readFileSync(path.join(downloadsDirectory, file), "utf8");
+          return JSON.parse(raw) as {
+            slug?: string;
+            name?: string;
+            summary?: string;
+            file?: string;
+            url?: string;
+            features?: string[];
+            tags?: string[];
+          };
+        } catch (error) {
+          console.warn(`Unable to parse download file ${file}:`, error);
+          return null;
+        }
+      })
+      .filter(Boolean)
+  : [];
+
+const downloads = (downloadFiles as {
+  slug?: string;
+  name?: string;
+  summary?: string;
+  file?: string;
+  url?: string;
+  features?: string[];
+  tags?: string[];
+}[]).filter((item) => {
+  if (!item) return false;
+  const target = typeof item.file === "string" && item.file.trim().length > 0 ? item.file : item.url;
+  if (typeof target !== "string" || target.trim().length === 0) return false;
+  return !target.startsWith("/home/");
+});
+
+const automationIdeas = [
+  "Save your chosen ritual to a shared calendar using the reminder download.",
+  "Schedule a weekly email to yourself with Buttondown's digest feature and paste the ritual steps there.",
+  "Batch print three copies of the sampler planner so you can circle back whenever you feel foggy.",
+];
+
+function toLabel(value: string): string {
+  return value
+    .split(/[\s_-]+/)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+const ritualData = entries.map((entry) => ({
+  slug: entry.slug,
+  title: entry.title,
+  summary: entry.summary,
+  intents: entry.intents,
+  tools: entry.tools,
+  tags: entry.tags,
+  durationMinutes: entry.durationMinutes,
+  materials: entry.materials,
+  steps: entry.steps,
+}));
+---
+<Base {title} {description}>
+  <section class="mx-auto max-w-5xl space-y-6 py-12">
+    <header class="space-y-3 text-center">
+      <p class="text-sm uppercase tracking-widest text-purple-500">Phase 2 Lab</p>
+      <h1 class="font-serif text-4xl">Prototype Ritual Generator</h1>
+      <p class="mx-auto max-w-2xl text-base opacity-80">
+        Pair your current intention with the tools you have on hand. The ritual lab suggests a sequence, offers alternates, and shares printable exports so you can carry the flow into your week.
+      </p>
+    </header>
+
+    <div class="grid gap-8 lg:grid-cols-[320px_1fr]">
+      <form id="lab-form" class="space-y-6 rounded-3xl border border-purple-200/60 bg-white/80 p-6 shadow-lg backdrop-blur dark:border-purple-900/40 dark:bg-zinc-900/70">
+        <div class="space-y-2">
+          <label for="intent" class="block text-sm font-semibold uppercase tracking-wide text-purple-600">
+            Intention
+          </label>
+          <select
+            id="intent"
+            name="intent"
+            class="w-full rounded-2xl border border-purple-200 bg-white px-4 py-3 text-sm font-medium text-purple-900 shadow-sm focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-400/60 dark:border-purple-700 dark:bg-zinc-950 dark:text-purple-100"
+          >
+            {intents.map((intent) => (
+              <option value={intent} selected={intent === defaultIntent}>
+                {toLabel(intent)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div class="space-y-2">
+          <span class="block text-sm font-semibold uppercase tracking-wide text-purple-600">Tools & Texture</span>
+          <p class="text-xs opacity-70">Pick what you have nearby—sound gear, journals, or group energy.</p>
+          <div class="mt-3 grid gap-2">
+            {toolOptions.map((tool) => (
+              <label class="flex items-center gap-3 rounded-2xl border border-purple-200/80 bg-purple-50/80 px-3 py-2 text-sm font-medium text-purple-900 transition hover:border-purple-400 dark:border-purple-700/60 dark:bg-purple-950/30 dark:text-purple-100">
+                <input type="checkbox" name="tools" value={tool.value} class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500" />
+                <span>{tool.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label for="time" class="block text-sm font-semibold uppercase tracking-wide text-purple-600">
+            Available Time
+          </label>
+          <select
+            id="time"
+            name="time"
+            class="w-full rounded-2xl border border-purple-200 bg-white px-4 py-3 text-sm font-medium text-purple-900 shadow-sm focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-400/60 dark:border-purple-700 dark:bg-zinc-950 dark:text-purple-100"
+          >
+            {timeOptions.map((option) => (
+              <option value={option.value} selected={option.value === defaultTime}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <button
+          type="button"
+          id="generate-btn"
+          class="w-full rounded-2xl bg-purple-600 px-4 py-3 text-sm font-semibold uppercase tracking-wide text-white shadow-md transition hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
+        >
+          Refresh Ritual
+        </button>
+      </form>
+
+      <div class="space-y-6">
+        <section class="rounded-3xl border border-purple-200/60 bg-white/90 p-6 shadow-lg backdrop-blur dark:border-purple-900/50 dark:bg-zinc-900/70">
+          <h2 class="font-serif text-2xl">Your Ritual Draft</h2>
+          <div id="ritual-output" class="mt-4 space-y-4 text-base"></div>
+        </section>
+
+        <section class="rounded-3xl border border-purple-200/60 bg-white/90 p-6 shadow-lg backdrop-blur dark:border-purple-900/50 dark:bg-zinc-900/70">
+          <h3 class="font-serif text-xl">Quick Automation Seeds</h3>
+          <ul class="mt-3 list-disc space-y-2 pl-6 text-sm opacity-80">
+            {automationIdeas.map((idea) => (
+              <li>{idea}</li>
+            ))}
+          </ul>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <section id="printables" class="mx-auto max-w-5xl space-y-6 py-12">
+    <header class="space-y-2 text-center">
+      <h2 class="font-serif text-3xl">Printables & Planner Exports</h2>
+      <p class="mx-auto max-w-2xl text-base opacity-80">
+        Download ready-to-print planners or open them in your browser, then export to PDF. Leave your email if you want updates when new printables land—skipping is perfectly fine.
+      </p>
+    </header>
+
+    <form
+      class="mx-auto max-w-2xl space-y-3 rounded-3xl border border-purple-200/70 bg-purple-50/80 p-6 shadow-lg backdrop-blur dark:border-purple-800/60 dark:bg-purple-950/40"
+      name="ritual-lab-downloads"
+      method="POST"
+      data-netlify="true"
+    >
+      <input type="hidden" name="form-name" value="ritual-lab-downloads" />
+      <label class="block text-sm font-medium text-purple-900 dark:text-purple-100">
+        Email (optional)
+        <input
+          type="email"
+          name="email"
+          inputmode="email"
+          placeholder="you@example.com"
+          class="mt-2 w-full rounded-2xl border border-purple-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-400/60 dark:border-purple-700 dark:bg-zinc-950 dark:text-purple-100"
+        />
+      </label>
+      <div class="flex flex-wrap items-center gap-3 text-xs opacity-70">
+        <button type="submit" class="rounded-full bg-purple-600 px-4 py-2 text-white shadow hover:bg-purple-500">
+          Send me future printables
+        </button>
+        <span>or</span>
+        <a class="rounded-full border border-purple-300 px-4 py-2 font-medium text-purple-700 hover:border-purple-500" href="#downloads">
+          Skip & browse downloads
+        </a>
+      </div>
+    </form>
+
+    <div id="downloads" class="grid gap-6 md:grid-cols-2">
+      {downloads.length === 0 ? (
+        <p class="text-center text-base opacity-70">New printables are brewing—check back soon.</p>
+      ) : (
+        downloads.map((item) => (
+          <article class="flex h-full flex-col justify-between rounded-3xl border border-purple-200/60 bg-white/90 p-6 shadow-lg backdrop-blur dark:border-purple-900/50 dark:bg-zinc-900/70">
+            <div class="space-y-3">
+              <h3 class="font-serif text-xl">{item.name}</h3>
+              {item.summary && <p class="text-sm opacity-80">{item.summary}</p>}
+              {item.features && item.features.length > 0 && (
+                <ul class="list-disc space-y-1 pl-5 text-xs opacity-70">
+                  {item.features.map((feature) => (
+                    <li>{feature}</li>
+                  ))}
+                </ul>
+              )}
+              {item.tags && item.tags.length > 0 && (
+                <div class="flex flex-wrap gap-2">
+                  {item.tags.map((tag) => (
+                    <span class="rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-800 dark:bg-purple-900/40 dark:text-purple-100">
+                      {toLabel(tag)}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div class="mt-4 flex items-center gap-3">
+              <a
+                class="inline-flex items-center gap-2 rounded-full bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-purple-500"
+                href={item.file || item.url}
+              >
+                Open Download
+                <span aria-hidden>↗</span>
+              </a>
+              <a
+                class="text-xs font-medium text-purple-700 underline hover:text-purple-500"
+                href="/lab/three-day-sampler"
+              >
+                View printable preview
+              </a>
+            </div>
+          </article>
+        ))
+      )}
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-5xl space-y-4 py-12">
+    <h2 class="font-serif text-3xl">Reminders</h2>
+    <p class="max-w-3xl text-base opacity-80">
+      Prefer nudges over memory? Download the static reminder file below to add the three-day sampler to your calendar of choice. You can also copy the ritual steps into your task manager—no tracking pixels required.
+    </p>
+    <a
+      class="inline-flex items-center gap-2 rounded-full border border-purple-400 px-5 py-2 text-sm font-semibold text-purple-800 transition hover:bg-purple-100 dark:border-purple-700 dark:text-purple-100 dark:hover:bg-purple-900/40"
+      href="/reminders/three-day-ritual-sampler.ics"
+    >
+      Download .ics reminders
+      <span aria-hidden>↓</span>
+    </a>
+  </section>
+
+  <script type="application/json" id="ritual-lab-data">{JSON.stringify({ entries: ritualData })}</script>
+  <script type="module">
+    const dataEl = document.getElementById("ritual-lab-data");
+    const form = document.getElementById("lab-form");
+    const output = document.getElementById("ritual-output");
+    const generateBtn = document.getElementById("generate-btn");
+
+    if (dataEl && form && output && generateBtn) {
+      const payload = JSON.parse(dataEl.textContent || "{}");
+      const entries = Array.isArray(payload.entries) ? payload.entries : [];
+
+      const renderEntry = (entry) => {
+        const container = document.createElement("div");
+        container.className = "space-y-4";
+
+        const heading = document.createElement("div");
+        heading.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 class="font-serif text-xl">${entry.title}</h3>
+              ${entry.summary ? `<p class="text-sm opacity-80">${entry.summary}</p>` : ""}
+            </div>
+            ${entry.durationMinutes ? `<span class="rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-800">${entry.durationMinutes} min</span>` : ""}
+          </div>
+        `;
+        container.appendChild(heading);
+
+        if (entry.materials && entry.materials.length > 0) {
+          const materials = document.createElement("div");
+          materials.innerHTML = `
+            <p class="text-xs font-semibold uppercase tracking-wide text-purple-600">Materials</p>
+            <ul class="mt-1 flex flex-wrap gap-2 text-xs opacity-80">
+              ${entry.materials
+                .map((item) => `<li class="rounded-full bg-purple-50 px-3 py-1 text-purple-800">${toTitle(item)}</li>`)
+                .join("")}
+            </ul>
+          `;
+          container.appendChild(materials);
+        }
+
+        if (entry.steps && entry.steps.length > 0) {
+          const list = document.createElement("ol");
+          list.className = "space-y-3 border-t border-purple-100 pt-4 text-sm";
+          entry.steps.forEach((step, index) => {
+            const item = document.createElement("li");
+            item.innerHTML = `
+              <div class="space-y-1">
+                <div class="flex items-center gap-3">
+                  <span class="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100 font-semibold text-purple-800">${index + 1}</span>
+                  <div>
+                    <p class="font-semibold">${step.title || `Step ${index + 1}`}</p>
+                    ${step.duration ? `<p class="text-xs opacity-70">${step.duration}</p>` : ""}
+                  </div>
+                </div>
+                <p class="pl-11 leading-relaxed opacity-90">${step.description}</p>
+              </div>
+            `;
+            list.appendChild(item);
+          });
+          container.appendChild(list);
+        }
+
+        return container;
+      };
+
+      const toTitle = (value) => value.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+      const scoreEntry = (entry, state) => {
+        let score = 0;
+        if (state.intent && entry.intents.includes(state.intent.toLowerCase())) score += 5;
+        if (state.tools.length > 0) {
+          const matched = state.tools.filter((tool) => entry.tools.includes(tool.toLowerCase()));
+          score += matched.length * 2;
+        }
+        if (
+          Number.isFinite(state.maxMinutes) &&
+          Number.isFinite(entry.durationMinutes) &&
+          entry.durationMinutes <= state.maxMinutes
+        ) {
+          score += 3;
+        }
+        if (state.tools.includes("sound") && entry.tags.includes("sound")) score += 1;
+        if (state.tools.includes("nosound") && entry.tags.includes("nosound")) score += 1;
+        if (state.tools.includes("group") && entry.tags.includes("group")) score += 1;
+        if (state.tools.includes("solo") && entry.tags.includes("solo")) score += 1;
+        return score;
+      };
+
+      const buildPlan = (state) => {
+        const scored = entries
+          .map((entry) => ({ entry, score: scoreEntry(entry, state) }))
+          .sort((a, b) => b.score - a.score || a.entry.title.localeCompare(b.entry.title));
+        const primary = scored.find((item) => item.score > 0)?.entry;
+        const alternates = scored
+          .filter((item) => item.entry !== primary && item.score > 0)
+          .slice(0, 3)
+          .map((item) => item.entry);
+        return { primary, alternates };
+      };
+
+      const update = () => {
+        const formData = new FormData(form);
+        const intent = (formData.get("intent") || "").toString();
+        const maxMinutesValue = parseInt((formData.get("time") || "0").toString(), 10);
+        const tools = Array.from(form.querySelectorAll('input[name="tools"]:checked')).map((input) => input.value);
+        const state = {
+          intent,
+          maxMinutes: Number.isFinite(maxMinutesValue) ? maxMinutesValue : undefined,
+          tools,
+        };
+
+        const plan = buildPlan(state);
+        output.innerHTML = "";
+
+        if (plan.primary) {
+          const primaryHeader = document.createElement("p");
+          primaryHeader.className = "text-xs font-semibold uppercase tracking-wide text-purple-600";
+          primaryHeader.textContent = "Primary match";
+          output.appendChild(primaryHeader);
+          output.appendChild(renderEntry(plan.primary));
+        } else {
+          const empty = document.createElement("p");
+          empty.className = "text-sm opacity-70";
+          empty.textContent = "No exact matches yet. Try toggling different tools or a longer time window.";
+          output.appendChild(empty);
+        }
+
+        if (plan.alternates && plan.alternates.length > 0) {
+          const altHeading = document.createElement("p");
+          altHeading.className = "text-xs font-semibold uppercase tracking-wide text-purple-600";
+          altHeading.textContent = "Other ideas";
+          output.appendChild(altHeading);
+          plan.alternates.forEach((entry) => {
+            const wrapper = document.createElement("div");
+            wrapper.className = "rounded-2xl border border-purple-100/80 bg-purple-50/60 p-4";
+            wrapper.appendChild(renderEntry(entry));
+            output.appendChild(wrapper);
+          });
+        }
+      };
+
+      generateBtn.addEventListener("click", update);
+      form.addEventListener("change", (event) => {
+        if ((event.target instanceof HTMLSelectElement && event.target.name !== "tools") || event.target instanceof HTMLInputElement) {
+          update();
+        }
+      });
+
+      // Seed initial plan
+      output.innerHTML = "";
+      if (payload.entries.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "text-sm opacity-70";
+        empty.textContent = "Ritual data not found. Add labRitual metadata to content/posts entries to populate this space.";
+        output.appendChild(empty);
+      } else {
+        update();
+      }
+    }
+  </script>
+</Base>

@@ -1,0 +1,26 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//WitchClick//Ritual Lab//EN
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:ritual-lab-day1@witchclick.space
+DTSTAMP:20250101T090000Z
+SUMMARY:Ritual Sampler — Day One Arrive
+DESCRIPTION:Morning journaling (6 minutes), midday sensory break, evening gratitude candle.
+DURATION:PT15M
+END:VEVENT
+BEGIN:VEVENT
+UID:ritual-lab-day2@witchclick.space
+DTSTAMP:20250102T090000Z
+SUMMARY:Ritual Sampler — Day Two Deepen
+DESCRIPTION:Sigil word in morning, sky-gazing midday, evening soak gratitude.
+DURATION:PT20M
+END:VEVENT
+BEGIN:VEVENT
+UID:ritual-lab-day3@witchclick.space
+DTSTAMP:20250103T090000Z
+SUMMARY:Ritual Sampler — Day Three Share
+DESCRIPTION:Voice note support, grounding stone check-in, closing reflection.
+DURATION:PT20M
+END:VEVENT
+END:VCALENDAR
