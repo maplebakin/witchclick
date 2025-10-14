@@ -1,80 +1,113 @@
 ---
-const nav = [
-  { href: "/rituals/", label: "Rituals" },
-  { href: "/grimoire/", label: "Entity Library" },
-  { href: "/tools/", label: "Tools & Prints" },
-  { href: "/about/", label: "About" },
-  { href: "/contact/", label: "Contact" },
-];
+import SearchBox from "./SearchBox.astro";
+
+interface NavLink {
+  href: string;
+  label: string;
+  rel?: string;
+}
+
+interface Props {
+  brandName: string;
+  navLinks: NavLink[];
+  adminLinks?: NavLink[];
+  currentPath?: string;
+}
+
+const {
+  brandName,
+  navLinks = [],
+  adminLinks = [],
+  currentPath = "/",
+} = Astro.props as Props;
+
+const normalizedPath = currentPath.endsWith("/") && currentPath.length > 1
+  ? currentPath
+  : `${currentPath.replace(/\/$/, "")}/`;
+
+const visibleAdmin = adminLinks.filter((link) => link && typeof link.href === "string");
+
+function isActive(href: string): boolean {
+  if (!href) return false;
+  const normalized = href.endsWith("/") ? href : `${href}/`;
+  if (normalized === "/") {
+    return normalizedPath === normalized;
+  }
+  return normalizedPath.startsWith(normalized);
+}
 ---
-<header class="sticky top-0 z-50 border-b bg-white/80 backdrop-blur dark:bg-zinc-950/80">
-  <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-    <a href="/" class="text-xl font-bold">WitchClick</a>
-    <nav class="hidden items-center gap-6 md:flex">
-      {nav.map((item) => (
-        <a href={item.href} class="hover:underline">
-          {item.label}
-        </a>
-      ))}
-    </nav>
-    <div class="md:hidden">
-      <div class="flex items-center gap-2">
+<header class="site-header" data-site-header>
+  <div class="wc-container site-header__inner">
+    <a class="site-logo" href="/">{brandName}</a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <button
+        class="site-nav__toggle"
+        type="button"
+        data-menu-toggle
+        aria-expanded="false"
+        aria-controls="mobile-navigation"
+      >
+        <span class="sr-only">Open menu</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M4 6h16a1 1 0 1 0 0-2H4a1 1 0 0 0 0 2Zm0 7h16a1 1 0 1 0 0-2H4a1 1 0 0 0 0 2Zm0 7h16a1 1 0 1 0 0-2H4a1 1 0 0 0 0 2Z"
+          />
+        </svg>
+      </button>
+      <ul class="site-nav__list">
+        {navLinks.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              rel={item.rel}
+              class="site-nav__link"
+              aria-current={isActive(item.href) ? "page" : undefined}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <div class="site-nav__actions">
         <button
           type="button"
-          class="rounded-xl border px-3 py-2"
-          data-menu-toggle
-          aria-expanded="false"
-        >
-          Menu
-        </button>
-        <button
-          type="button"
-          class="rounded-xl border px-3 py-2"
+          class="site-nav__button"
           data-search-toggle
           aria-expanded="false"
+          aria-controls="site-search-panel"
         >
           Search
         </button>
-        <button
-          type="button"
-          class="px-2 py-1 text-sm opacity-70 hover:opacity-100"
-          data-reset
-        >
-          Reset
-        </button>
+        <a class="site-nav__button site-nav__link--secondary" href="/feed.json" rel="alternate">
+          RSS
+        </a>
       </div>
-    </div>
+    </nav>
   </div>
-</header>
-<div
-  class="fixed inset-0 z-40 hidden md:hidden"
-  aria-hidden="true"
-  data-mobile-drawer
->
-  <button
-    type="button"
-    class="absolute inset-0 cursor-default bg-black/50"
-    data-mobile-close
-    aria-label="Close menu"
-  />
-  <div class="absolute left-0 top-0 h-full w-80 bg-white p-4 shadow-2xl dark:bg-zinc-900">
-    <div class="mb-4 flex items-center justify-between">
-      <span class="font-semibold">WitchClick Paths</span>
-      <button
-        type="button"
-        class="rounded-xl border px-3 py-1"
-        data-mobile-close
-        aria-label="Close menu"
-      >
+  <div
+    id="mobile-navigation"
+    class="site-nav__mobile"
+    data-mobile-drawer
+    aria-hidden="true"
+  >
+    <div class="site-nav__mobile-header">
+      <span class="site-logo">{brandName}</span>
+      <button type="button" class="site-nav__toggle" data-mobile-close aria-label="Close menu">
         ✕
       </button>
     </div>
-    <ul class="space-y-2">
-      {nav.map((item) => (
-        <li key={item.href}>
+    <div class="site-nav__mobile-search">
+      <SearchBox />
+    </div>
+    <ul class="site-nav__mobile-list">
+      {navLinks.map((item) => (
+        <li>
           <a
             href={item.href}
-            class="block rounded-xl px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            rel={item.rel}
+            class="site-nav__mobile-link"
+            aria-current={isActive(item.href) ? "page" : undefined}
             data-mobile-link
           >
             {item.label}
@@ -82,105 +115,194 @@ const nav = [
         </li>
       ))}
     </ul>
+    {visibleAdmin.length > 0 && (
+      <div class="site-nav__mobile-admin">
+        <p class="site-footer__title">Dev shortcuts</p>
+        <ul class="site-nav__nav--stacked">
+          {visibleAdmin.map((item) => (
+            <li>
+              <a class="site-nav__mobile-link" href={item.href} rel={item.rel}>
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
   </div>
-</div>
-<div
-  class="fixed inset-0 z-40 hidden"
-  aria-hidden="true"
-  data-search-panel
->
-  <button
-    type="button"
-    class="absolute inset-0 cursor-default bg-black/50"
-    data-search-close
-    aria-label="Close search"
-  />
-  <div class="absolute inset-x-0 top-0 mx-auto mt-10 w-full max-w-2xl rounded-2xl bg-white p-4 shadow-xl dark:bg-zinc-900">
-    <div class="mb-3 flex items-center justify-between">
-      <h2 class="text-lg font-semibold">Search posts</h2>
-      <button
-        type="button"
-        class="rounded-xl border px-3 py-1"
-        data-search-close
-        aria-label="Close search"
-      >
-        ✕
-      </button>
+  <div
+    id="site-search-panel"
+    class="site-search-panel"
+    data-search-panel
+    aria-hidden="true"
+  >
+    <div class="site-search-panel__backdrop" data-search-close aria-hidden="true"></div>
+    <div class="site-search-panel__dialog" role="dialog" aria-modal="true">
+      <div class="site-search-panel__header">
+        <h2>Search WitchClick</h2>
+        <button type="button" class="site-nav__toggle" data-search-close aria-label="Close search">
+          ✕
+        </button>
+      </div>
+      <SearchBox />
     </div>
-    <input
-      type="search"
-      placeholder="Type to search…"
-      class="w-full rounded-xl border px-3 py-2"
-    />
   </div>
-</div>
+</header>
+
 <script is:inline>
+  const body = document.body;
   const menuToggle = document.querySelector('[data-menu-toggle]');
-  const searchToggle = document.querySelector('[data-search-toggle]');
-  const resetButton = document.querySelector('[data-reset]');
   const mobileDrawer = document.querySelector('[data-mobile-drawer]');
+  const searchToggle = document.querySelector('[data-search-toggle]');
   const searchPanel = document.querySelector('[data-search-panel]');
 
-  if (menuToggle && searchToggle && resetButton && mobileDrawer && searchPanel) {
-    const menuCloseTargets = mobileDrawer.querySelectorAll('[data-mobile-close]');
-    const menuLinks = mobileDrawer.querySelectorAll('[data-mobile-link]');
-    const searchCloseTargets = searchPanel.querySelectorAll('[data-search-close]');
+  const mobileCloseButtons = document.querySelectorAll('[data-mobile-close]');
+  const mobileLinks = document.querySelectorAll('[data-mobile-link]');
+  const searchCloseButtons = document.querySelectorAll('[data-search-close]');
 
-    const setMenuOpen = (next) => {
-      mobileDrawer.classList.toggle('hidden', !next);
-      mobileDrawer.setAttribute('aria-hidden', String(!next));
-      menuToggle.setAttribute('aria-expanded', String(next));
-      if (next) {
-        searchPanel.classList.add('hidden');
-        searchPanel.setAttribute('aria-hidden', 'true');
-        searchToggle.setAttribute('aria-expanded', 'false');
+  function setMenuOpen(open) {
+    if (mobileDrawer) {
+      mobileDrawer.classList.toggle('is-open', open);
+      mobileDrawer.setAttribute('aria-hidden', String(!open));
+    }
+    if (menuToggle) {
+      menuToggle.setAttribute('aria-expanded', String(open));
+    }
+    if (body) {
+      body.setAttribute('data-menu-open', open ? 'true' : 'false');
+    }
+    if (open) {
+      setSearchOpen(false);
+    }
+  }
+
+  function setSearchOpen(open) {
+    if (searchPanel) {
+      searchPanel.classList.toggle('is-open', open);
+      searchPanel.setAttribute('aria-hidden', String(!open));
+    }
+    if (searchToggle) {
+      searchToggle.setAttribute('aria-expanded', String(open));
+    }
+    if (body) {
+      body.setAttribute('data-search-open', open ? 'true' : 'false');
+    }
+    if (open) {
+      setMenuOpen(false);
+      const input = searchPanel?.querySelector('input');
+      if (input) {
+        window.setTimeout(() => input.focus(), 120);
       }
-    };
+    }
+  }
 
-    const setSearchOpen = (next) => {
-      searchPanel.classList.toggle('hidden', !next);
-      searchPanel.setAttribute('aria-hidden', String(!next));
-      searchToggle.setAttribute('aria-expanded', String(next));
-      if (next) {
-        mobileDrawer.classList.add('hidden');
-        mobileDrawer.setAttribute('aria-hidden', 'true');
-        menuToggle.setAttribute('aria-expanded', 'false');
-      }
-    };
+  menuToggle?.addEventListener('click', () => {
+    const next = menuToggle.getAttribute('aria-expanded') !== 'true';
+    setMenuOpen(next);
+  });
 
-    const closeAll = () => {
+  searchToggle?.addEventListener('click', () => {
+    const next = searchToggle.getAttribute('aria-expanded') !== 'true';
+    setSearchOpen(next);
+  });
+
+  mobileCloseButtons.forEach((button) => {
+    button.addEventListener('click', () => setMenuOpen(false));
+  });
+
+  mobileLinks.forEach((link) => {
+    link.addEventListener('click', () => setMenuOpen(false));
+  });
+
+  searchCloseButtons.forEach((button) => {
+    button.addEventListener('click', () => setSearchOpen(false));
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
       setMenuOpen(false);
       setSearchOpen(false);
-    };
-
-    menuToggle.addEventListener('click', () => {
-      const isOpen = menuToggle.getAttribute('aria-expanded') === 'true';
-      setMenuOpen(!isOpen);
-    });
-
-    searchToggle.addEventListener('click', () => {
-      const isOpen = searchToggle.getAttribute('aria-expanded') === 'true';
-      setSearchOpen(!isOpen);
-    });
-
-    resetButton.addEventListener('click', closeAll);
-
-    menuCloseTargets.forEach((target) => {
-      target.addEventListener('click', closeAll);
-    });
-
-    menuLinks.forEach((link) => {
-      link.addEventListener('click', () => setMenuOpen(false));
-    });
-
-    searchCloseTargets.forEach((target) => {
-      target.addEventListener('click', () => setSearchOpen(false));
-    });
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        closeAll();
-      }
-    });
-  }
+    }
+  });
 </script>
+
+<style is:inline>
+  .site-nav__actions {
+    display: none;
+  }
+
+  @media (min-width: 921px) {
+    .site-nav__actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2, 0.5rem);
+    }
+  }
+
+  .site-nav__mobile-admin {
+    margin-top: var(--space-6, 1.5rem);
+    padding-top: var(--space-4, 1rem);
+    border-top: 1px solid rgba(212, 175, 55, 0.18);
+    display: grid;
+    gap: var(--space-3, 0.75rem);
+  }
+
+  .site-nav__nav--stacked {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-2, 0.5rem);
+  }
+
+  .site-search-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-items: center;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 180ms ease;
+  }
+
+  .site-search-panel.is-open {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .site-search-panel__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(7, 2, 15, 0.78);
+    backdrop-filter: blur(8px);
+  }
+
+  .site-search-panel__dialog {
+    position: relative;
+    width: min(92vw, 36rem);
+    border-radius: 1.5rem;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    background: rgba(12, 5, 23, 0.95);
+    padding: clamp(1.25rem, 4vw, 1.75rem);
+    box-shadow: var(--shadow-2, 0 28px 75px -24px rgba(3, 2, 12, 0.72));
+    z-index: 1;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .site-search-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    color: rgba(244, 241, 255, 0.85);
+  }
+
+  .site-search-panel__header h2 {
+    margin: 0;
+    font-size: 1rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+</style>

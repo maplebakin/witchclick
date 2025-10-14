@@ -1,25 +1,224 @@
 ---
 // src/layouts/Base.astro
+import "@/styles/base.css";
+import "@/styles/cards.css";
+import "@/styles/tailwind.css";
+
 import Header from "@/components/Header.astro";
+import { readSettings, getSiteOrigin, toAbsoluteUrl } from "@/utils/settings";
+import { buildAnalyticsInjection } from "@/utils/analytics";
+import { Fragment } from "astro/jsx-runtime";
+
+type LayoutProps = {
+  title?: string;
+  description?: string;
+  canon?: string;
+  wide?: boolean;
+  desktopWide?: boolean;
+  ogImage?: string;
+  noindex?: boolean;
+  ambientColor?: string;
+  bodyDataType?: string;
+};
 
 const {
   title = "WitchClick",
   description = "",
   canon = "",
-} = Astro.props;
+  wide = false,
+  desktopWide = false,
+  ogImage = "",
+  noindex = false,
+  ambientColor = "",
+  bodyDataType = "",
+} = Astro.props as LayoutProps;
+
+const settings = readSettings();
+const siteOrigin = getSiteOrigin(settings);
+const analytics = buildAnalyticsInjection(settings);
+const brandName = settings.brandName ?? "WitchClick";
+const disclosure = settings.disclosure ?? "";
+const ogUrl = ogImage ? toAbsoluteUrl(ogImage, settings) : "";
+const currentPath = Astro.url?.pathname ?? "/";
+const canonicalUrl = canon || (siteOrigin ? `${siteOrigin}${currentPath}` : "");
+
+const navLinks = [
+  { href: "/", label: "Home" },
+  { href: "/curses/", label: "Curses" },
+  { href: "/entities/", label: "Entities" },
+  { href: "/tools/", label: "Tools & Prints" },
+  { href: "/about/", label: "About" },
+  { href: "/contact/", label: "Contact" },
+];
+
+const utilityLinks = [
+  { href: "/privacy", label: "Privacy" },
+  { href: "/feed.json", label: "Feed" },
+  { href: "/rss.xml", label: "RSS" },
+];
+
+const isDev = import.meta.env.DEV;
+const adminLinks = isDev
+  ? [
+      { href: "/admin/", label: "Admin" },
+      { href: "/admin/write", label: "Write" },
+      { href: "/admin/entities", label: "Entities" },
+      { href: "/admin/downloads", label: "Downloads" },
+      { href: "/admin/hero", label: "Hero Uploads" },
+    ]
+  : [];
+
+const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined;
 ---
 <html lang="en" class="h-full">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
-    {canon && <link rel="canonical" href={canon} />}
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta property="og:site_name" content={brandName} />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+    {ogUrl && <meta property="og:image" content={ogUrl} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#4b2a63" />
+
+    {analytics?.head && <Fragment set:html={analytics.head} />}
+    {analytics?.config && <Fragment set:html={analytics.config} />}
+
+    <slot name="head" />
   </head>
-  <body class="min-h-full bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-    <Header />
-    <main class="mx-auto max-w-6xl px-4 py-10">
-      <slot />
+  <body
+    class:list={["site-shell", wide && "is-wide", desktopWide && "is-desktop-wide"].filter(Boolean)}
+    style={bodyStyle}
+    data-entity-type={bodyDataType || undefined}
+  >
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header
+      brandName={brandName}
+      navLinks={navLinks}
+      adminLinks={adminLinks}
+      currentPath={currentPath}
+    />
+    <main id="main" class="site-main">
+      <div
+        class:list={[
+          "site-main__container",
+          "wc-container",
+          wide && "site-main__container--wide",
+          desktopWide && "site-main__container--desktop-wide",
+        ].filter(Boolean)}
+      >
+        <slot />
+      </div>
     </main>
+    <footer class="site-footer" aria-label="Site footer">
+      <div class="wc-container site-footer__inner">
+        <div class="site-footer__grid">
+          <div>
+            <span class="site-logo" aria-label="{brandName} logo">{brandName}</span>
+            <p class="site-footer__blurb">
+              Cozy secular rituals, printable tools, and mindful planning spells for modern mystics.
+            </p>
+            {disclosure && <p class="site-footer__disclosure">{disclosure}</p>}
+          </div>
+          <div>
+            <p class="site-footer__title">Explore</p>
+            <ul class="site-footer__nav">
+              {navLinks.map((link) => (
+                <li>
+                  <a href={link.href}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p class="site-footer__title">Stay connected</p>
+            <p class="site-footer__blurb">
+              Subscribe for gentle updates or drop by the contact page if you’d like to collaborate.
+            </p>
+            <div class="site-footer__meta">
+              <a class="hero-cta hero-cta--secondary" href="/contact/">Reach out</a>
+            </div>
+          </div>
+        </div>
+        <div class="site-footer__meta">
+          <ul class="site-footer__nav site-footer__nav--inline">
+            {utilityLinks.map((link) => (
+              <li>
+                <a href={link.href}>{link.label}</a>
+              </li>
+            ))}
+            {adminLinks.map((link) => (
+              <li class="site-footer__link--dev">
+                <a href={link.href}>{link.label}</a>
+              </li>
+            ))}
+          </ul>
+          <p class="site-footer__copyright">© {new Date().getFullYear()} {brandName}. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+    {analytics?.runtime && <Fragment set:html={analytics.runtime} />}
   </body>
 </html>
+
+<style is:inline>
+  .skip-link {
+    position: absolute;
+    left: -999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    padding: 0.75rem 1.5rem;
+    border-radius: 999px;
+    background: var(--color-night, #120725);
+    color: var(--color-muted, #f4f1ff);
+    z-index: 100;
+  }
+
+  .skip-link:focus {
+    left: 1rem;
+    top: 1rem;
+    width: auto;
+    height: auto;
+  }
+
+  .site-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background:
+      radial-gradient(120% 160% at 50% 0%, rgba(212, 175, 55, 0.16) 0%, transparent 60%),
+      radial-gradient(140% 200% at 10% 20%, rgba(124, 78, 176, 0.22) 0%, transparent 70%),
+      linear-gradient(180deg, var(--color-midnight, #07020f) 0%, var(--color-night, #120725) 100%);
+    color: var(--color-ink, #f4f1ff);
+  }
+
+  .site-main {
+    flex: 1 1 auto;
+    padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(3rem, 7vw, 4.5rem);
+  }
+
+  .site-main__container {
+    display: block;
+  }
+
+  .site-main__container--wide {
+    max-width: 72rem;
+  }
+
+  .site-main__container--desktop-wide {
+    max-width: 72rem;
+  }
+
+  @media (min-width: 1024px) {
+    .site-main__container--desktop-wide {
+      max-width: 82rem;
+    }
+  }
+</style>
