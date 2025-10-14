@@ -1,18 +1,527 @@
 ---
-import Base from '@/layouts/Base.astro';
-import Hero from '@/components/Hero.astro';
-const title = 'WitchClick — Cozy secular rituals & tools';
+import Base from "@/layouts/Base.astro";
+import Hero from "@/components/Hero.astro";
+import PostCard from "@/components/PostCard.astro";
+import { loadAllPosts, firstParagraph, estimateReadingMinutes } from "@/utils/posts";
+
+const title = "WitchClick — Cozy secular rituals & tools";
+
+type CardPost = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  tags: string[];
+  normalizedTags: string[];
+  readingMinutes: number;
+  publishedAt?: string;
+};
+
+const posts = loadAllPosts();
+
+const cardPosts: CardPost[] = posts.map((post) => {
+  const fm = post.data ?? {};
+  const title = typeof fm.title === "string" && fm.title.trim() ? fm.title : post.title;
+  const excerptCandidate =
+    typeof fm.excerpt === "string" && fm.excerpt.trim()
+      ? fm.excerpt
+      : typeof fm.description === "string" && fm.description.trim()
+        ? fm.description
+        : typeof fm.metaDescription === "string" && fm.metaDescription.trim()
+          ? fm.metaDescription
+          : firstParagraph(post.content);
+
+  const tagsRaw = Array.isArray(fm.tags)
+    ? fm.tags
+    : typeof fm.tags === "string"
+      ? fm.tags.split(",")
+      : [];
+  const tags = Array.from(
+    new Map(
+      tagsRaw
+        .map((tag) => (typeof tag === "string" ? tag.trim() : ""))
+        .filter(Boolean)
+        .map((tag) => [tag.toLowerCase(), tag])
+    ).values()
+  );
+  const normalizedTags = tags.map((tag) => tag.toLowerCase());
+
+  const publishedAtCandidate =
+    fm.publishedAt ?? fm.pubDate ?? fm.date ?? (post.date ? post.date.toISOString() : undefined);
+
+  return {
+    slug: post.slug,
+    title,
+    excerpt: excerptCandidate,
+    tags,
+    normalizedTags,
+    readingMinutes: fm.readingMinutes ?? estimateReadingMinutes(post.content),
+    publishedAt: typeof publishedAtCandidate === "string" ? publishedAtCandidate : undefined,
+  } satisfies CardPost;
+});
+
+const heroPost = cardPosts[0] ?? null;
+const heroKicker = heroPost ? "Newest ritual" : "Fresh from the coven";
+const heroTitle = heroPost?.title ?? "Cozy Cursing Ritual: Release Anger Through Banishment";
+const heroBlurb = heroPost?.excerpt ??
+  "Sometimes anger is the only honest response to betrayal or systemic harm. This ritual gives it a safe container and releases the residue.";
+const heroPrimaryHref = heroPost ? `/post/${heroPost.slug}` : "/page/1";
+const heroPrimaryLabel = heroPost ? "Read this ritual →" : "Browse the latest rituals →";
+
+const usedSlugs = new Set(heroPost ? [heroPost.slug] : []);
+
+function takePosts(candidates: CardPost[], limit: number): CardPost[] {
+  if (limit <= 0) return [];
+  const result: CardPost[] = [];
+  for (const candidate of candidates) {
+    if (usedSlugs.has(candidate.slug)) continue;
+    result.push(candidate);
+    usedSlugs.add(candidate.slug);
+    if (result.length >= limit) break;
+  }
+  return result;
+}
+
+function matchesKeywords(post: CardPost, keywords: string[]): boolean {
+  return post.normalizedTags.some((tag) =>
+    keywords.some((keyword) => tag.includes(keyword))
+  );
+}
+
+const latestRituals = takePosts(cardPosts, 4);
+
+const releaseKeywords = ["curse", "banish", "shadow", "justice", "anger", "boundary"];
+let releasePosts = takePosts(cardPosts.filter((post) => matchesKeywords(post, releaseKeywords)), 3);
+if (releasePosts.length < 3) {
+  releasePosts = releasePosts.concat(takePosts(cardPosts, 3 - releasePosts.length));
+}
+
+const planningKeywords = ["plan", "productivity", "adhd", "schedule", "focus", "checklist", "organize"];
+let planningPosts = takePosts(cardPosts.filter((post) => matchesKeywords(post, planningKeywords)), 3);
+if (planningPosts.length < 3) {
+  planningPosts = planningPosts.concat(takePosts(cardPosts, 3 - planningPosts.length));
+}
+
+const calmKeywords = ["calm", "rest", "restore", "ground", "anxiety", "burnout", "recovery", "soothe"];
+let calmPosts = takePosts(cardPosts.filter((post) => matchesKeywords(post, calmKeywords)), 3);
+if (calmPosts.length < 3) {
+  calmPosts = calmPosts.concat(takePosts(cardPosts, 3 - calmPosts.length));
+}
+
+const encorePosts = takePosts(cardPosts, 3);
+const hasEncore = encorePosts.length > 0;
 ---
 <Base {title}>
   <Hero
-    kicker="Fresh from the coven"
-    title="Cozy Cursing Ritual: Release Anger Through Banishment"
-    blurb="Sometimes anger is the only honest response to betrayal or systemic harm. This ritual gives it a safe container and releases the residue."
-    primaryHref="/posts/cozy-cursing-ritual"
-    primaryLabel="Read the latest guide →"
-    secondaryHref="/tools"
+    kicker={heroKicker}
+    title={heroTitle}
+    blurb={heroBlurb}
+    primaryHref={heroPrimaryHref}
+    primaryLabel={heroPrimaryLabel}
+    secondaryHref="/tools/"
     secondaryLabel="Explore printable tools"
   />
 
-  <!-- Rest of homepage sections go here -->
+  <section class="home-intro" aria-labelledby="home-intro-title">
+    <div class="home-intro__grid">
+      <div class="home-intro__lead">
+        <p class="home-eyebrow">Cozy secular support</p>
+        <h2 id="home-intro-title" class="home-intro__title">Small rituals for when life feels loud</h2>
+        <p class="home-intro__text">
+          WitchClick gathers gentle banishments, practical tarot spreads, and printable planning magic so you have a soft place to land when energy is low.
+          Every ritual is trauma-informed, choice-centered, and kind to neurodivergent brains.
+        </p>
+      </div>
+      <div class="home-intro__list">
+        <h3 class="home-intro__list-title">Inside the circle you&rsquo;ll find:</h3>
+        <ul class="home-intro__bullets">
+          <li>Step-by-step rituals for shadow work, release, and grounding.</li>
+          <li>Printable planners, checklists, and tarot prompts to make follow-through gentle.</li>
+          <li>Research-backed self-care and cozy game recommendations for recovery days.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {latestRituals.length > 0 && (
+    <section class="home-section" aria-labelledby="latest-rituals">
+      <div class="home-section__header">
+        <div>
+          <p class="home-eyebrow">Latest rituals</p>
+          <h2 id="latest-rituals" class="home-section__title">Fresh guidance from the altar</h2>
+          <p class="home-section__description">Recent spells and essays to help you reclaim energy, soften resistance, and make practical magic in daily life.</p>
+        </div>
+        <a class="home-section__link" href="/page/1">Browse the ritual archive ↗</a>
+      </div>
+      <div class="home-section__grid home-section__grid--cards">
+        {latestRituals.map((post) => (
+          <PostCard
+            post={{
+              slug: post.slug,
+              title: post.title,
+              excerpt: post.excerpt,
+              tags: post.tags,
+              readingMinutes: post.readingMinutes,
+              publishedAt: post.publishedAt,
+            }}
+          />
+        ))}
+      </div>
+    </section>
+  )}
+
+  {releasePosts.length > 0 && (
+    <section class="home-section home-section--tone" aria-labelledby="release-rituals">
+      <div class="home-section__header">
+        <div>
+          <p class="home-eyebrow">Shadow work &amp; release</p>
+          <h2 id="release-rituals" class="home-section__title">Rituals when you need to move heavy feelings</h2>
+          <p class="home-section__description">Name what hurt you, set boundaries, and send the residue back without causing harm.</p>
+        </div>
+      </div>
+      <div class="home-section__grid home-section__grid--cards">
+        {releasePosts.map((post) => (
+          <PostCard
+            post={{
+              slug: post.slug,
+              title: post.title,
+              excerpt: post.excerpt,
+              tags: post.tags,
+              readingMinutes: post.readingMinutes,
+              publishedAt: post.publishedAt,
+            }}
+          />
+        ))}
+      </div>
+    </section>
+  )}
+
+  {planningPosts.length > 0 && (
+    <section class="home-section" aria-labelledby="planning-rituals">
+      <div class="home-section__header">
+        <div>
+          <p class="home-eyebrow">Planning &amp; focus</p>
+          <h2 id="planning-rituals" class="home-section__title">Soft structure for neurodivergent days</h2>
+          <p class="home-section__description">Work with your rhythms using tiny accountability rituals, tarot prompts, and gentle productivity spells.</p>
+        </div>
+      </div>
+      <div class="home-section__grid home-section__grid--cards">
+        {planningPosts.map((post) => (
+          <PostCard
+            post={{
+              slug: post.slug,
+              title: post.title,
+              excerpt: post.excerpt,
+              tags: post.tags,
+              readingMinutes: post.readingMinutes,
+              publishedAt: post.publishedAt,
+            }}
+          />
+        ))}
+      </div>
+    </section>
+  )}
+
+  {calmPosts.length > 0 && (
+    <section class="home-section home-section--tone" aria-labelledby="calm-rituals">
+      <div class="home-section__header">
+        <div>
+          <p class="home-eyebrow">Rest &amp; restoration</p>
+          <h2 id="calm-rituals" class="home-section__title">Ground your nervous system with cozy care</h2>
+          <p class="home-section__description">Take a breath with soft resets, sensory grounding, and rituals that remind your body it&rsquo;s safe to unclench.</p>
+        </div>
+      </div>
+      <div class="home-section__grid home-section__grid--cards">
+        {calmPosts.map((post) => (
+          <PostCard
+            post={{
+              slug: post.slug,
+              title: post.title,
+              excerpt: post.excerpt,
+              tags: post.tags,
+              readingMinutes: post.readingMinutes,
+              publishedAt: post.publishedAt,
+            }}
+          />
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="home-cta" aria-labelledby="home-tools">
+    <div class="home-cta__inner">
+      <div class="home-cta__copy">
+        <p class="home-eyebrow">Printable tools</p>
+        <h2 id="home-tools" class="home-section__title">Keep a ritual companion within reach</h2>
+        <p class="home-section__description home-cta__description">
+          Download checklists, spreads, and planners designed for kitchen witches and cozy occultists.
+          Print them, tuck them into your altar, and let them hold the structure so you can rest.
+        </p>
+      </div>
+      <div class="home-cta__actions">
+        <a class="hero-cta hero-cta--primary" href="/tools/">Browse the tool cabinet</a>
+        <a class="hero-cta hero-cta--secondary" href="/contact/">Request a custom ritual</a>
+      </div>
+    </div>
+  </section>
+
+  {hasEncore && (
+    <section class="home-section" aria-labelledby="more-to-explore">
+      <div class="home-section__header">
+        <div>
+          <p class="home-eyebrow">More to explore</p>
+          <h2 id="more-to-explore" class="home-section__title">In case you missed these spells</h2>
+          <p class="home-section__description">A few extra articles the coven keeps returning to when they need a gentle reset.</p>
+        </div>
+      </div>
+      <div class="home-section__grid home-section__grid--cards">
+        {encorePosts.map((post) => (
+          <PostCard
+            post={{
+              slug: post.slug,
+              title: post.title,
+              excerpt: post.excerpt,
+              tags: post.tags,
+              readingMinutes: post.readingMinutes,
+              publishedAt: post.publishedAt,
+            }}
+          />
+        ))}
+      </div>
+    </section>
+  )}
 </Base>
+
+<style>
+  .home-eyebrow {
+    margin: 0;
+    font-size: 0.75rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, rgba(244, 241, 255, 0.75) 90%, transparent 10%);
+  }
+
+  .home-intro {
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+    margin-bottom: clamp(2.5rem, 6vw, 4rem);
+    border-radius: clamp(1.75rem, 4vw, 2.5rem);
+    border: 1px solid color-mix(in srgb, rgba(124, 58, 237, 0.35) 75%, transparent 25%);
+    background:
+      radial-gradient(90% 140% at 10% 0%, rgba(212, 175, 55, 0.18), transparent 70%),
+      radial-gradient(90% 90% at 80% 10%, rgba(124, 78, 176, 0.18), transparent 75%),
+      rgba(255, 255, 255, 0.86);
+    color: color-mix(in srgb, var(--ink-body, #1f1430) 90%, white 10%);
+    padding: clamp(1.75rem, 4vw, 2.75rem);
+    box-shadow: 0 22px 55px -35px rgba(15, 23, 42, 0.35);
+  }
+
+  .home-intro__grid {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .home-intro__title {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--ink-heading, #321056) 92%, white 8%);
+  }
+
+  .home-intro__text {
+    margin-top: 0.85rem;
+    margin-bottom: 0;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    max-width: 64ch;
+    color: color-mix(in srgb, var(--ink-body, #2a1a3f) 92%, white 8%);
+  }
+
+  .home-intro__list {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .home-intro__list-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--ink-heading, #321056) 85%, white 15%);
+  }
+
+  .home-intro__bullets {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .home-intro__bullets li {
+    position: relative;
+    padding-left: 1.8rem;
+    line-height: 1.7;
+    color: color-mix(in srgb, var(--ink-body, #2a1a3f) 90%, white 10%);
+  }
+
+  .home-intro__bullets li::before {
+    content: "✶";
+    position: absolute;
+    left: 0;
+    top: 0.1rem;
+    color: rgba(124, 58, 237, 0.65);
+    font-size: 1rem;
+  }
+
+  .home-section {
+    margin-top: clamp(3rem, 6vw, 4.5rem);
+    margin-bottom: clamp(3rem, 6vw, 4.5rem);
+  }
+
+  .home-section__header {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: clamp(1.8rem, 4vw, 2.4rem);
+  }
+
+  .home-section__title {
+    margin: 0.25rem 0 0;
+    font-family: var(--font-heading);
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--ink-heading, #f4f1ff) 92%, white 8%);
+  }
+
+  .home-section__description {
+    margin: 0.5rem 0 0;
+    max-width: 68ch;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: color-mix(in srgb, var(--ink-body, rgba(244, 241, 255, 0.85)) 90%, white 10%);
+  }
+
+  .home-section__link {
+    align-self: flex-start;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 999px;
+    border: 1px solid rgba(244, 241, 255, 0.4);
+    background: color-mix(in srgb, rgba(244, 241, 255, 0.1) 70%, transparent 30%);
+    color: color-mix(in srgb, rgba(244, 241, 255, 0.94) 95%, white 5%);
+    transition: transform 160ms ease, background 160ms ease, border 160ms ease;
+  }
+
+  .home-section__link:hover,
+  .home-section__link:focus-visible {
+    transform: translateY(-1px);
+    background: color-mix(in srgb, rgba(244, 241, 255, 0.2) 85%, transparent 15%);
+    border-color: rgba(244, 241, 255, 0.55);
+  }
+
+  .home-section__grid {
+    display: grid;
+    gap: clamp(1.25rem, 3vw, 1.85rem);
+  }
+
+  .home-section__grid--cards {
+    grid-template-columns: repeat(auto-fit, minmax(16.5rem, 1fr));
+  }
+
+  .home-section--tone {
+    position: relative;
+  }
+
+  .home-section--tone::before {
+    content: "";
+    position: absolute;
+    inset: -12% 5% auto;
+    height: 60%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 20%, rgba(124, 78, 176, 0.2), transparent 70%);
+    filter: blur(30px);
+    opacity: 0.8;
+    pointer-events: none;
+  }
+
+  .home-cta {
+    margin-top: clamp(3rem, 7vw, 5rem);
+    margin-bottom: clamp(3rem, 7vw, 5rem);
+  }
+
+  .home-cta__inner {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+    padding: clamp(1.8rem, 4vw, 2.8rem);
+    border-radius: clamp(1.85rem, 4vw, 2.6rem);
+    border: 1px solid color-mix(in srgb, rgba(212, 175, 55, 0.32) 80%, transparent 20%);
+    background:
+      radial-gradient(90% 140% at 15% 15%, rgba(212, 175, 55, 0.2), transparent 70%),
+      radial-gradient(90% 120% at 85% 0%, rgba(124, 78, 176, 0.18), transparent 70%),
+      rgba(19, 10, 31, 0.85);
+    box-shadow: 0 25px 65px -30px rgba(12, 5, 23, 0.55);
+  }
+
+  .home-cta__copy {
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .home-cta__description {
+    color: color-mix(in srgb, rgba(244, 241, 255, 0.88) 95%, white 5%);
+  }
+
+  .home-cta__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .home-cta__actions .hero-cta {
+    width: 100%;
+    justify-content: center;
+  }
+
+  @media (min-width: 720px) {
+    .home-intro__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .home-section__header {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .home-section__link {
+      align-self: center;
+    }
+
+    .home-cta__inner {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      align-items: center;
+    }
+
+    .home-cta__actions {
+      align-items: flex-end;
+    }
+
+    .home-cta__actions .hero-cta {
+      width: auto;
+      min-width: 14rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .home-section__grid--cards {
+      grid-template-columns: repeat(3, minmax(18rem, 1fr));
+    }
+  }
+</style>
