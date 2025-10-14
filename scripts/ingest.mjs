@@ -3,7 +3,6 @@
 // Turn a JSON spec into a validated Markdown post.
 // Works with either src/content/posts/ (Content Collections) or content/posts/ (legacy).
 import fs from "node:fs/promises";
-import fssync from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import prompts from "./lib/prompts.js";
@@ -12,16 +11,13 @@ import {
   persistPreparedSpec,
 } from "../server/lib/specPreparation.js";
 import { generateSchemaDocumentation } from "../server/lib/postSpecSchema.js";
+import { resolvePostsDirectories, slugify } from "./lib/contentPaths.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = process.env.WC_PROJECT_ROOT
   ? path.resolve(process.env.WC_PROJECT_ROOT)
   : path.resolve(__dirname, "..");
-const POST_DIR_CANDIDATES = [
-  path.join(PROJECT_ROOT, "src", "content", "posts"),
-  path.join(PROJECT_ROOT, "content", "posts"),
-];
 
 // ---------- CLI args ----------
 const args = process.argv.slice(2);
@@ -57,7 +53,9 @@ export async function ingestFromSpec(input, options = {}) {
   const { dir, dry = false, inputPath, logger } = options;
   const emitLog = createIngestLogger(logger);
 
-  const postsDirectories = await resolvePostsDirectories(dir);
+  const postsDirectories = await Promise.resolve(
+    resolvePostsDirectories({ root: PROJECT_ROOT, preferred: dir })
+  );
 
   let prepared;
   try {
@@ -365,59 +363,6 @@ function parseArgs(a) {
   return out;
 }
 
-async function resolvePostsDirectories(preferred) {
-  if (preferred) {
-    const resolvedPreferred = path.resolve(PROJECT_ROOT, preferred);
-    const extras = POST_DIR_CANDIDATES.filter((candidate) => candidate !== resolvedPreferred && isDirectory(candidate));
-    return [resolvedPreferred, ...extras];
-  }
-
-  const primary = resolvePrimaryPostsDir();
-  const dirs = [];
-  for (const candidate of POST_DIR_CANDIDATES) {
-    if (isDirectory(candidate)) dirs.push(candidate);
-  }
-  if (!dirs.includes(primary)) dirs.unshift(primary);
-  return dirs;
-}
-
-function resolvePrimaryPostsDir() {
-  for (const candidate of POST_DIR_CANDIDATES) {
-    if (directoryHasMarkdown(candidate)) return candidate;
-  }
-  for (const candidate of POST_DIR_CANDIDATES) {
-    if (isDirectory(candidate)) return candidate;
-  }
-  return POST_DIR_CANDIDATES[0];
-}
-
-function isDirectory(candidate) {
-  try {
-    return fssync.statSync(candidate).isDirectory();
-  } catch {
-    return false;
-  }
-}
-
-function directoryHasMarkdown(candidate) {
-  if (!isDirectory(candidate)) return false;
-
-  try {
-    const entries = fssync.readdirSync(candidate, { withFileTypes: true });
-    return entries.some((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".md"));
-  } catch {
-    return false;
-  }
-}
-
-function slugify(s) {
-  return s
-    .normalize("NFKD")
-    .replace(/[^\w\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
-}
 function rel(p) { return path.relative(PROJECT_ROOT, p); }
 function bytes(n) { return `${n} bytes`; }
 function die(msg) { console.error(msg); process.exit(1); }

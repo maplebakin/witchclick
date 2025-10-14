@@ -55,11 +55,14 @@ export function readEvergreenBlocks(filePath = path.join(process.cwd(), "content
     return data;
   } catch (error) {
     if (process.env.NODE_ENV !== "production") {
-      console.warn("[blocks] Failed to load evergreen blocks:", error);
+      console.warn(
+        `[blocks] Failed to load evergreen blocks from ${filePath}:`,
+        error
+      );
     }
-    cachedBlocks = { testimonials: [] };
+    cachedBlocks = null;
     cachedMtimeMs = 0;
-    return cachedBlocks;
+    return { testimonials: [] };
   }
 }
 

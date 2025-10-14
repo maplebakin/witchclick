@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { buildMasterPrompt } from '../../server/lib/promptBuilder.js';
+import { resolvePostsDirectories, slugify } from '../../scripts/lib/contentPaths.js';
 
 function readJSON<T = any>(p: string): T | null {
   try {
@@ -12,17 +13,30 @@ function readJSON<T = any>(p: string): T | null {
   }
 }
 
-function listExistingTitles(postsDir: string) {
-  if (!fs.existsSync(postsDir)) return [] as string[];
-  return fs
-    .readdirSync(postsDir)
-    .filter((file) => file.endsWith('.md'))
-    .map((file) => {
+function listExistingTitles(projectRoot: string) {
+  const directories = resolvePostsDirectories({ root: projectRoot });
+  const seen = new Set<string>();
+  const titles: string[] = [];
+
+  for (const postsDir of directories) {
+    if (!fs.existsSync(postsDir)) continue;
+    const files = fs
+      .readdirSync(postsDir)
+      .filter((file) => file.toLowerCase().endsWith('.md'));
+
+    for (const file of files) {
       const raw = fs.readFileSync(path.join(postsDir, file), 'utf8');
       const match = raw.match(/^title:\s*(.+)$/m);
-      return match ? match[1].trim().replace(/^"|"$/g, '') : '';
-    })
-    .filter(Boolean);
+      const title = match ? match[1].trim().replace(/^"|"$/g, '') : '';
+      if (!title) continue;
+      const normalized = slugify(title).toLowerCase();
+      if (seen.has(normalized)) continue;
+      seen.add(normalized);
+      titles.push(title);
+    }
+  }
+
+  return titles;
 }
 
 export function genprompt({
@@ -53,9 +67,7 @@ export function genprompt({
         .filter(Boolean)
     : [];
 
-  const existingPostTitles = listExistingTitles(
-    path.join(CWD, 'content', 'posts')
-  );
+  const existingPostTitles = listExistingTitles(CWD);
 
   const prompt = buildMasterPrompt({
     topic,
