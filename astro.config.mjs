@@ -1,7 +1,6 @@
 // astro.config.mjs — drop‑in with '@' alias preserved around your existing config
 import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
-import preact from '@astrojs/preact';
 import sitemap from "@astrojs/sitemap";
 import fs from "node:fs";
 import path from "node:path";
@@ -50,7 +49,6 @@ export default defineConfig(({ command }) => {
     compressHTML: true,
 
     integrations: [
-      preact(),
       tailwind(),
       sitemap({
         filter: (page) => {
@@ -60,10 +58,6 @@ export default defineConfig(({ command }) => {
           return true;
         },
       }),
-    ],
-
-    renderers: [
-      "@astrojs/preact"
     ],
 
     markdown: {
