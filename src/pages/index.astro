@@ -1,15 +1,21 @@
 ---
 import Base from "../layouts/Base.astro";
 import Hero from "../components/Hero.astro";
+import EvergreenCta from "../components/blocks/EvergreenCta.astro";
+import Testimonials from "../components/blocks/Testimonials.astro";
 import PostCard from "../components/PostCard.astro";
 import Pagination from "../components/Pagination.astro";
 import { loadAllPosts, estimateReadingMinutes, firstParagraph } from "../utils/posts";
 import { readSettings } from "../utils/settings";
+import { readEvergreenBlocks } from "../utils/blocks";
+import { createItemListSchema } from "../utils/structuredData";
+import { Fragment } from "astro/jsx-runtime";
 
 export const prerender = true;
 
 const settings = readSettings();
 const posts = loadAllPosts();
+const evergreenBlocks = readEvergreenBlocks();
 
 const PAGE_SIZE = 12;
 const totalPages = Math.max(1, Math.ceil(posts.length / PAGE_SIZE));
@@ -47,6 +53,26 @@ const heroCtaButtons = [
 ];
 const gridPosts = heroPost ? pagePosts.slice(1) : pagePosts;
 const hasPosts = pagePosts.length > 0;
+const evergreenCta = evergreenBlocks.cta;
+const evergreenTestimonials = evergreenBlocks.testimonials ?? [];
+const homeStructuredItems = pagePosts.map((post) => {
+  const card = toViewModel(post);
+  return {
+    name: card.title,
+    url: card.href,
+    description: card.excerpt,
+  };
+});
+const homeItemList = createItemListSchema(
+  settings,
+  {
+    name: `${settings.brandName ?? "WitchClick"} — Latest rituals`,
+    url: "/",
+    description: tagline,
+    itemType: "Article",
+  },
+  homeStructuredItems,
+);
 
 function toViewModel(post) {
   const fm = post.data ?? {};
@@ -78,6 +104,10 @@ function resolveDate(data) {
   description={tagline}
   ogImage={heroOgImage ?? ""}
 >
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(homeItemList)} />
+  </Fragment>
+
   <div class="grimoire-bg min-h-screen">
     <section class="home-canvas mx-auto max-w-5xl px-4 py-12 sm:py-16">
       <Hero
@@ -88,7 +118,24 @@ function resolveDate(data) {
         backgroundImage={heroBackgroundImage}
         imageAlt={heroImageAlt}
         ctaButtons={heroCtaButtons}
+        ctaDescription="Pick the path that fits your spoons right now."
       />
+
+      {(evergreenCta || evergreenTestimonials.length > 0) && (
+        <section class="home-evergreen" aria-label="Evergreen invitations">
+          {evergreenCta && (
+            <EvergreenCta
+              eyebrow={evergreenCta.eyebrow}
+              title={evergreenCta.title}
+              description={evergreenCta.description}
+              form={evergreenCta.form}
+            />
+          )}
+          {evergreenTestimonials.length > 0 && (
+            <Testimonials testimonials={evergreenTestimonials} />
+          )}
+        </section>
+      )}
 
       <section class="home-feed panel" aria-labelledby="latest-heading">
         <div class="home-feed-header">
@@ -179,6 +226,15 @@ function resolveDate(data) {
     display: grid;
     gap: clamp(2rem, 5vw, 3.5rem);
     color: var(--ink-body, currentColor);
+  }
+
+  .home-evergreen {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .home-evergreen > * {
+    min-width: 0;
   }
 
   .home-feed {

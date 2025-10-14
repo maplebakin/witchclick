@@ -39,4 +39,17 @@ The WitchClick pipeline turns generated outlines into live posts. Follow this ch
 - Spot check the live page once the deploy finishes.
 - Review analytics and affiliate dashboards (if configured) to measure early performance.
 
+## 8. Configure analytics
+- Toggle privacy-friendly analytics in `content/settings.json` by setting `analytics.enabled` to `true` and choosing a `provider` (`plausible` or `fathom`).
+- Plausible requires a `domain`; self-hosted instances can supply `apiHost` and an alternate `scriptUrl`.
+- Fathom requires a `siteId` (your public key). Optional `scriptUrl` and `apiHost` fields support vanity domains.
+- Invalid combinations fail fast during build and are covered by tests—double-check field names before committing.
+- Outbound affiliate and download buttons already emit analytics events via `data-analytics` attributes.
+
+## 9. Evergreen homepage blocks
+- Edit newsletter copy and Ko‑fi testimonials in `content/blocks/home.json`. Changes render automatically without code tweaks.
+- The `cta` object controls the newsletter module (form action, placeholders, disclaimer text). `testimonials` is an array rendered in the social proof grid.
+- Keep copy short and grounded; the layout expects 2–3 testimonials for visual balance.
+- Remember to localize any external URLs (e.g., a self-hosted email provider) before shipping.
+
 Keep this document updated as the workflow evolves so new contributors can publish confidently.

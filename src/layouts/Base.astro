@@ -5,8 +5,10 @@ import "../styles/cards.css";
 import SearchBox from "../components/SearchBox.astro";
 import { typeMetadata } from "../data/typeMetadata";
 import { readSettings, getSiteOrigin, toAbsoluteUrl } from "../utils/settings";
+import { buildAnalyticsInjection } from "../utils/analytics";
 import { getTheme } from "../utils/theme";
 import { mixColors, resolveTailwindColor, toRgba } from "../utils/color";
+import { Fragment } from "astro/jsx-runtime";
 
 const props = Astro.props || {};
 const {
@@ -36,6 +38,7 @@ const canonicalUrl = canon
 const pageTitle = title && title !== brandName ? `${title} — ${brandName}` : brandName;
 const ogImg = ogImage ? toAbsoluteUrl(ogImage, settings) : (siteOrigin ? `${siteOrigin}/og-default.png` : "");
 const theme = getTheme();
+const analyticsInjection = buildAnalyticsInjection(settings);
 
 const headerWidthClass = wide ? "max-w-6xl" : "max-w-4xl";
 const mainWidthClass = wide ? "max-w-6xl" : "max-w-3xl";
@@ -154,6 +157,8 @@ const bodyStyle = `
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,300;7..72,400;7..72,700&family=Parisienne&display=swap"
     />
+
+    {analyticsInjection?.head && <Fragment set:html={analyticsInjection.head} />}
 
     <style is:inline>
       :root {
@@ -541,6 +546,8 @@ const bodyStyle = `
   </head>
 
   <body class="min-h-screen" style={bodyStyle} data-type={bodyDataType}>
+    {analyticsInjection?.config && <Fragment set:html={analyticsInjection.config} />}
+
     <style is:inline>
       :global(html),
       :global(body) {
@@ -660,6 +667,8 @@ const bodyStyle = `
 
     {/* Optional page-tail slot for per-page scripts */}
     <slot name="foot" />
+
+    {analyticsInjection?.runtime && <Fragment set:html={analyticsInjection.runtime} />}
 
     <script is:inline>
       (() => {

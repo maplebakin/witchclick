@@ -23,6 +23,25 @@
               "type": "boolean",
               "default": false
             },
+            "provider": {
+              "type": "string",
+              "enum": [
+                "plausible",
+                "fathom"
+              ]
+            },
+            "domain": {
+              "type": "string"
+            },
+            "siteId": {
+              "type": "string"
+            },
+            "scriptUrl": {
+              "type": "string"
+            },
+            "apiHost": {
+              "type": "string"
+            },
             "endpoint": {
               "type": "string",
               "format": "uri"

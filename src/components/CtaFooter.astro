@@ -24,17 +24,84 @@ if (type === 'kofi') {
 }
 ---
 {type !== 'none' && text && href && (
-  <section class="mt-10 rounded-2xl border border-neutral-200/60 bg-neutral-50 p-5 dark:border-neutral-800 dark:bg-neutral-900">
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-      <p class="text-base leading-relaxed text-neutral-800 dark:text-neutral-200">{text}</p>
+  <section class="cta-footer" aria-label="Support invitation">
+    <div class="cta-footer-content">
+      <p class="cta-footer-copy">{text}</p>
       <a
         href={href}
-        class="inline-flex shrink-0 items-center justify-center rounded-xl px-4 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-0"
-        style="background: linear-gradient(135deg, #7c4dff, #e91e63);"
+        class="cta-footer-button"
         rel="noopener noreferrer"
+        data-analytics={type === 'kofi' ? 'kofi_click' : 'post_download_cta'}
+        data-analytics-meta={type}
       >
         {type === 'kofi' ? 'Support on Ko‑fi' : 'Download'}
       </a>
     </div>
   </section>
 )}
+
+<style>
+  .cta-footer {
+    margin-top: 2.5rem;
+    border-radius: clamp(1.5rem, 3vw, 1.85rem);
+    border: 1px solid color-mix(in srgb, var(--glass-panel-border, rgba(124, 58, 237, 0.32)) 70%, transparent);
+    background: linear-gradient(160deg, color-mix(in srgb, var(--glass-panel-overlay, rgba(124, 58, 237, 0.16)) 88%, transparent) 0%, rgba(255, 255, 255, 0.94) 100%);
+    padding: clamp(1.25rem, 3vw, 1.75rem);
+  }
+
+  .cta-footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  @media (min-width: 640px) {
+    .cta-footer-content {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1.25rem;
+    }
+  }
+
+  .cta-footer-copy {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--ink-body, currentColor) 92%, white 8%);
+  }
+
+  .cta-footer-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 0.7rem 1.6rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    background: radial-gradient(circle at 15% 15%, color-mix(in srgb, var(--action-primary) 95%, white 5%), var(--action-primary));
+    color: var(--action-primary-text);
+    box-shadow: 0 14px 32px -20px color-mix(in srgb, var(--action-primary) 55%, transparent);
+    transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+  }
+
+  .cta-footer-button:hover,
+  .cta-footer-button:focus-visible {
+    background: var(--action-primary-hover);
+    transform: translateY(-1px);
+  }
+
+  .cta-footer-button:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--action-primary) 25%, transparent),
+      0 0 0 6px color-mix(in srgb, white 70%, transparent 30%);
+  }
+
+  @media (max-width: 639px) {
+    .cta-footer-button {
+      width: 100%;
+    }
+  }
+</style>

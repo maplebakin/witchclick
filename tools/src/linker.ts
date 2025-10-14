@@ -124,7 +124,7 @@ export function autoLink(inputHtml: string, options: AutoLinkOptions = {}): Auto
       replacement: (m) =>
         `<a href="${escapeAttr(href)}" rel="${escapeAttr(rel)}" target="${escapeAttr(
           target
-        )}" data-analytics="aff_click">${m}</a>`,
+        )}" data-analytics="aff_click" data-analytics-meta="${escapeAttr(prod.key)}">${m}</a>`,
     });
 
     if (out.linked > 0) {

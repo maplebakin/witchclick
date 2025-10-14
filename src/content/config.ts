@@ -75,6 +75,11 @@ const settings = defineCollection({
     analytics: z
       .object({
         enabled: z.boolean().default(false),
+        provider: z.enum(["plausible", "fathom"]).optional(),
+        domain: z.string().optional(),
+        siteId: z.string().optional(),
+        scriptUrl: z.string().optional(),
+        apiHost: z.string().optional(),
         endpoint: z.string().url().optional(),
       })
       .optional(),

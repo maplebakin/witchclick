@@ -3,6 +3,9 @@ import Base from "../../layouts/Base.astro";
 import PostCard from "../../components/PostCard.astro";
 import Pagination from "../../components/Pagination.astro";
 import { loadAllPosts, paginatePosts, estimateReadingMinutes, firstParagraph } from "../../utils/posts";
+import { readSettings } from "../../utils/settings";
+import { createCollectionPageSchema } from "../../utils/structuredData";
+import { Fragment } from "astro/jsx-runtime";
 
 export const prerender = true;
 
@@ -27,6 +30,26 @@ const { page, totalPages, pagePosts } = Astro.props as {
   pagePosts: ReturnType<typeof loadAllPosts>;
 };
 
+const settings = readSettings();
+const pageUrl = page > 1 ? `/page/${page}` : "/";
+const pageItemList = createCollectionPageSchema(
+  settings,
+  {
+    name: `Archive — Page ${page}`,
+    url: pageUrl,
+    description: `Latest rituals and guides — page ${page}`,
+    itemType: "Article",
+  },
+  pagePosts.map((post) => {
+    const card = toCard(post);
+    return {
+      name: card.title,
+      url: `/post/${card.slug}`,
+      description: card.excerpt,
+    };
+  }),
+);
+
 function toCard(post) {
   const fm = post.data ?? {};
   return {
@@ -40,6 +63,10 @@ function toCard(post) {
 }
 ---
 <Base title={`WitchClick — Page ${page}`}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(pageItemList)} />
+  </Fragment>
+
   <h1 class="mb-6 text-2xl font-semibold text-purple-900">Latest posts — page {page}</h1>
   <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
     {pagePosts.map((post) => {
