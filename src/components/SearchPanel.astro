@@ -1,34 +1,17 @@
 ---
-const { label = 'Search posts', panelId = 'global-search-panel' } = Astro.props;
-const titleId = `${panelId}-title`;
+import { searchOpen } from '@/lib/uiState';
+const label = Astro.props?.label ?? 'Search posts';
 ---
-<div
-  id={panelId}
-  class="fixed inset-0 z-40 hidden"
-  role="dialog"
-  aria-modal="true"
-  aria-hidden="true"
-  aria-labelledby={titleId}
-  data-search-panel
->
-  <div class="absolute inset-0 bg-black/50" data-search-backdrop></div>
-  <div class="absolute inset-x-0 top-0 mx-auto mt-10 w-full max-w-2xl rounded-2xl bg-white p-4 shadow-xl dark:bg-zinc-900">
+<div class={`fixed inset-0 z-40 ${searchOpen.value ? 'block' : 'hidden'}`} aria-hidden={!searchOpen.value}>
+  <div class="absolute inset-0 bg-black/50"></div>
+  <div class="absolute inset-x-0 top-0 mx-auto mt-10 w-full max-w-2xl rounded-2xl bg-white dark:bg-zinc-900 p-4 shadow-xl">
     <div class="mb-3 flex items-center justify-between">
-      <h2 class="text-lg font-semibold" id={titleId}>{label}</h2>
-      <button
-        type="button"
-        class="rounded-xl border px-3 py-1"
-        aria-label="Close search"
-        data-action="close-search"
-      >
+      <h2 class="text-lg font-semibold">{label}</h2>
+      <button class="px-3 py-1 rounded-xl border" aria-label="Close search" onClick={() => (searchOpen.value = false)} client:load>
         ✕
       </button>
     </div>
-    <input
-      type="search"
-      placeholder="Type to search…"
-      class="w-full rounded-xl border px-3 py-2"
-      data-search-input
-    />
+    <!-- Replace with real search control when ready -->
+    <input type="search" placeholder="Type to search…" class="w-full rounded-xl border px-3 py-2" />
   </div>
 </div>
