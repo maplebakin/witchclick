@@ -8,14 +8,19 @@
     "build": "astro build",
     "preview": "astro preview",
     "format": "prettier -w .",
-    "test": "vitest"
+    "test": "vitest",
+    "postinstall": "node scripts/build-tools.js",
+    "genprompt": "node tools/wc.js genprompt"
   },
   "dependencies": {
     "@astrojs/tailwind": "^5.1.0",
     "astro": "^4.16.19",
     "dompurify": "^3.3.0",
+    "gray-matter": "^4.0.3",
     "jsdom": "^27.0.0",
     "marked": "^16.4.0",
+    "sharp": "^0.33.5",
+    "undici": "^6.19.8",
     "zod": "^4.1.12"
   },
   "devDependencies": {
