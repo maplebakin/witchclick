@@ -7,6 +7,7 @@ import DownloadCard from "../../components/DownloadCard.astro";
 import RelatedPosts from "../../components/RelatedPosts.astro";
 import CtaFooter from "../../components/CtaFooter.astro";
 import ProductRecommendations from "../../components/ProductRecommendations.astro";
+import Accordion from "../../components/Accordion.astro";
 import { readEntity } from "../../utils/entities";
 
 import fs from "node:fs";
@@ -79,6 +80,43 @@ const heroAlt =
   typeof data.heroAlt === "string" && data.heroAlt.trim().length
     ? data.heroAlt.trim()
     : title;
+
+function cleanSummaryText(value: unknown): string {
+  if (typeof value !== "string") return "";
+  return value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/[`*_>#\-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+const tldrSource = data.tldr ?? data.tldrPoints ?? null;
+const tldrSummaryCandidate =
+  typeof data.tldrSummary === "string"
+    ? data.tldrSummary
+    : typeof tldrSource === "string"
+      ? tldrSource
+      : typeof data.excerpt === "string"
+        ? data.excerpt
+        : description;
+
+const tldrSummaryRaw = cleanSummaryText(tldrSummaryCandidate);
+const tldrSummary =
+  tldrSummaryRaw.length > 220 ? `${tldrSummaryRaw.slice(0, 217)}…` : tldrSummaryRaw;
+
+const tldrItemsRaw = Array.isArray(tldrSource)
+  ? tldrSource
+  : Array.isArray(data.tldrList)
+    ? data.tldrList
+    : Array.isArray(data.outline)
+      ? data.outline.slice(0, 3)
+      : [];
+
+const tldrItems = tldrItemsRaw
+  .map((item: unknown) => cleanSummaryText(item))
+  .filter(Boolean);
+
+const hasTldr = Boolean(tldrSummary) || tldrItems.length > 0;
 
 let ctaType: "kofi" | "download" | "none" = "none";
 let ctaId: string | undefined;
@@ -240,6 +278,19 @@ const jsonLd = {
                   <span class="rounded-full border border-purple-200 bg-purple-50 px-3 py-0.5">#{String(tag).toLowerCase()}</span>
                 ))}
             </div>
+
+            {hasTldr && (
+              <Accordion title="TL;DR" open={true}>
+                {tldrSummary && <p class="wc-accordion__lead">{tldrSummary}</p>}
+                {tldrItems.length > 0 && (
+                  <ul class="wc-accordion__list">
+                    {tldrItems.map((item) => (
+                      <li>{item}</li>
+                    ))}
+                  </ul>
+                )}
+              </Accordion>
+            )}
 
             {productRecommendations.length > 0 && (
               <ProductRecommendations products={productRecommendations} class="mb-8" />

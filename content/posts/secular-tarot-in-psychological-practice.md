@@ -1,15 +1,11 @@
 ---
 title: 'Secular Tarot in Psychological Practice: A Gentle Guide'
 slug: secular-tarot-in-psychological-practice
-excerpt: >-
-  A cozy, ethics-first guide to using tarot as a secular reflection tool beside
-  therapy or personal growth work. Includes a 5-minute check-in, a deeper
-  spread, accessibility tweaks, and a simple checklist.
+excerpt: 'A cozy, ethics-first guide to using tarot as a secular reflection tool beside therapy or personal growth work. Includes a 5-minute check-in, a deeper spread, accessibility tweaks, and a simple checklist.'
 metaTitle: 'Secular Tarot in Psychological Practice: A Gentle Guide'
-metaDescription: >-
-  How to use secular tarot as a reflective tool alongside therapy or self-care.
-  Two versions (5-minute and deep dive), plus accessibility tips and ethics.
+metaDescription: 'How to use secular tarot as a reflective tool alongside therapy or self-care. Two versions (5-minute and deep dive), plus accessibility tips and ethics.'
 tags:
+  - calm
   - secular tarot
   - psychology
   - journaling
@@ -62,6 +58,7 @@ internalLinkHints:
   - 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
 heroImageSrc: /hero-images/secular-tarot-in-psychological-practice.png
 heroImageAlt: 'Secular Tarot in Psychological Practice: A Gentle Guide — hero image'
+spoonLevel: low
 ---
 ## Opening Reflection
 

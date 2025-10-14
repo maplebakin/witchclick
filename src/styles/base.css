@@ -1,8 +1,11 @@
 :root {
-  --font-body: "Lora", "Crimson Text", Georgia, serif;
+  --font-body-serif: "Lora", "Crimson Text", Georgia, serif;
+  --font-body: var(--font-body-serif);
   --font-heading: "Cinzel", "Cormorant Garamond", "Times New Roman", serif;
   --font-accent: "Cormorant Garamond", "Cinzel", serif;
   --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-body-ui: var(--font-body);
+  --font-body-letter-spacing: normal;
 
   --space-0: 0;
   --space-1: 0.25rem;
@@ -33,6 +36,11 @@
   --shadow-strong: 0 28px 75px -24px rgba(3, 2, 12, 0.72);
 
   color-scheme: dark light;
+}
+
+:root[data-comfort-font="sans"] {
+  --font-body-ui: var(--font-sans);
+  --font-body-letter-spacing: 0.01em;
 }
 
 :root[data-comfort-theme="dawn"] {
@@ -71,10 +79,11 @@ html:focus-within {
 
 body {
   min-height: 100vh;
-  font-family: var(--font-body);
+  font-family: var(--font-body-ui, var(--font-body));
   line-height: 1.7;
   font-size: 1rem;
   color: var(--color-ink);
+  letter-spacing: var(--font-body-letter-spacing, normal);
   background:
     radial-gradient(120% 160% at 50% 0%, rgba(212, 175, 55, 0.16) 0%, transparent 60%),
     radial-gradient(140% 200% at 10% 20%, rgba(124, 78, 176, 0.22) 0%, transparent 70%),
@@ -82,11 +91,6 @@ body {
   background-attachment: fixed;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-}
-
-:root[data-comfort-font="sans"] body {
-  font-family: var(--font-sans);
-  letter-spacing: 0.01em;
 }
 
 :root[data-comfort-theme="dawn"] body {

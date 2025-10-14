@@ -14,6 +14,7 @@ type CardPost = {
   normalizedTags: string[];
   readingMinutes: number;
   publishedAt?: string;
+  spoonLevel?: string;
 };
 
 const posts = loadAllPosts();
@@ -56,6 +57,7 @@ const cardPosts: CardPost[] = posts.map((post) => {
     normalizedTags,
     readingMinutes: fm.readingMinutes ?? estimateReadingMinutes(post.content),
     publishedAt: typeof publishedAtCandidate === "string" ? publishedAtCandidate : undefined,
+    spoonLevel: typeof fm.spoonLevel === "string" ? fm.spoonLevel : undefined,
   } satisfies CardPost;
 });
 
@@ -162,6 +164,7 @@ const hasEncore = encorePosts.length > 0;
               tags: post.tags,
               readingMinutes: post.readingMinutes,
               publishedAt: post.publishedAt,
+              spoonLevel: post.spoonLevel,
             }}
           />
         ))}
@@ -188,6 +191,7 @@ const hasEncore = encorePosts.length > 0;
               tags: post.tags,
               readingMinutes: post.readingMinutes,
               publishedAt: post.publishedAt,
+              spoonLevel: post.spoonLevel,
             }}
           />
         ))}
@@ -214,6 +218,7 @@ const hasEncore = encorePosts.length > 0;
               tags: post.tags,
               readingMinutes: post.readingMinutes,
               publishedAt: post.publishedAt,
+              spoonLevel: post.spoonLevel,
             }}
           />
         ))}
@@ -240,6 +245,7 @@ const hasEncore = encorePosts.length > 0;
               tags: post.tags,
               readingMinutes: post.readingMinutes,
               publishedAt: post.publishedAt,
+              spoonLevel: post.spoonLevel,
             }}
           />
         ))}

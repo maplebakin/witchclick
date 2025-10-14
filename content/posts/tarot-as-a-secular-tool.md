@@ -1,15 +1,11 @@
 ---
 title: 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions'
 slug: tarot-as-a-secular-tool
-excerpt: >-
-  Tarot can be a map for your thoughts, no dogma required. Use the cards as
-  prompts, capture what you notice, and choose a next step you can actually do.
+excerpt: 'Tarot can be a map for your thoughts, no dogma required. Use the cards as prompts, capture what you notice, and choose a next step you can actually do.'
 metaTitle: 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions'
-metaDescription: >-
-  A practical, secular guide to using tarot without supernatural claims—use
-  pattern-reading, reflection, and simple rituals to find clarity, plan small
-  next steps, and keep calm.
+metaDescription: 'A practical, secular guide to using tarot without supernatural claims—use pattern-reading, reflection, and simple rituals to find clarity, plan small next steps, and keep calm.'
 tags:
+  - planning
   - tarot
   - secular
   - self-reflection
@@ -67,6 +63,7 @@ internalLinkHints:
   - 'Secular Tarot in Psychological Practice: A Gentle Guide'
 heroImageSrc: /hero-images/tarot-as-a-secular-tool.png
 heroImageAlt: 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions — hero image'
+spoonLevel: medium
 ---
 ## Opening Reflection
 

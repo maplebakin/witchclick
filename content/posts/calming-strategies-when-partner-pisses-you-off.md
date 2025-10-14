@@ -1,20 +1,11 @@
 ---
-title: >-
-  When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the
-  Room
+title: 'When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the Room'
 slug: calming-strategies-when-partner-pisses-you-off
-excerpt: >-
-  You can be mad and still be kind to your nervous system. These calm-first
-  strategies help you cool down, speak clearly, and repair without bulldozing
-  your needs.
-metaTitle: >-
-  When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the
-  Room
-metaDescription: >-
-  Angry and activated? Use gentle, practical rituals to cool down, name the real
-  need, and repair without losing yourself. Scripts, checklists, and cozy resets
-  inside.
+excerpt: 'You can be mad and still be kind to your nervous system. These calm-first strategies help you cool down, speak clearly, and repair without bulldozing your needs.'
+metaTitle: 'When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the Room'
+metaDescription: 'Angry and activated? Use gentle, practical rituals to cool down, name the real need, and repair without losing yourself. Scripts, checklists, and cozy resets inside.'
 tags:
+  - release
   - relationships
   - conflict
   - calming rituals
@@ -74,9 +65,8 @@ internalLinkHints:
   - Secular Tarot Spread When You're Seeking a Clear Sign
   - 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
 heroImageSrc: /hero-images/calming-strategies-when-partner-pisses-you-off.png
-heroImageAlt: >-
-  When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the
-  Room — hero image
+heroImageAlt: 'When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the Room — hero image'
+spoonLevel: high
 ---
 ## Body Before Story: Why You’re Heated
 

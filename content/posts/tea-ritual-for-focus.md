@@ -1,16 +1,11 @@
 ---
 title: 'Brew a Tea Ritual for Focus: Simple Steps That Stick'
 slug: tea-ritual-for-focus
-excerpt: >-
-  A warm mug, a few mindful steps, and a tiny altar on your desk—this simple tea
-  ritual helps you settle, choose one clear intention, and ease into focused
-  work without pressure.
+excerpt: 'A warm mug, a few mindful steps, and a tiny altar on your desk—this simple tea ritual helps you settle, choose one clear intention, and ease into focused work without pressure.'
 metaTitle: 'Brew a Tea Ritual for Focus: Simple Steps That Stick'
-metaDescription: >-
-  Create a gentle tea ritual for focus with easy steps, cozy tools, and mindful
-  cues. Learn herbs to try, timing tips, a quick checklist, and safety notes for
-  a calm, clear work session.
+metaDescription: 'Create a gentle tea ritual for focus with easy steps, cozy tools, and mindful cues. Learn herbs to try, timing tips, a quick checklist, and safety notes for a calm, clear work session.'
 tags:
+  - planning
   - tea ritual
   - focus
   - witchcraft
@@ -84,6 +79,7 @@ internalLinkHints:
   - 'Pre-Interview Grounding Ritual: Quick and Deep Guide'
 heroImageSrc: /hero-images/tea-ritual-for-focus.png
 heroImageAlt: 'Brew a Tea Ritual for Focus: Simple Steps That Stick — hero image'
+spoonLevel: medium
 ---
 
 ## Why a tea ritual helps your attention

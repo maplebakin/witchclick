@@ -1,16 +1,11 @@
 ---
 title: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
 slug: playstation-tarot-spread-and-ritual
-excerpt: >-
-  Blend controller-in-hand comfort with a simple tarot ritual. This spread
-  tracks energy, obstacles, and reset moments so you can enjoy game night with
-  focus and ease.
+excerpt: 'Blend controller-in-hand comfort with a simple tarot ritual. This spread tracks energy, obstacles, and reset moments so you can enjoy game night with focus and ease.'
 metaTitle: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
-metaDescription: >-
-  Turn game night into a gentle ritual with a PlayStation-themed tarot spread.
-  Set the vibe, map momentum, and enjoy mindful breaks. Step-by-step guide plus
-  a short checklist.
+metaDescription: 'Turn game night into a gentle ritual with a PlayStation-themed tarot spread. Set the vibe, map momentum, and enjoy mindful breaks. Step-by-step guide plus a short checklist.'
 tags:
+  - calm
   - tarot
   - PlayStation
   - gaming
@@ -94,6 +89,7 @@ internalLinkHints:
   - 'Create a Calm Space During Political Unrest: A Gentle Guide'
 heroImageSrc: /hero-images/playstation-tarot-spread-and-ritual.png
 heroImageAlt: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual — hero image'
+spoonLevel: low
 ---
 
 ## Why tarot + PlayStation works

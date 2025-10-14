@@ -1,0 +1,76 @@
+---
+interface NavLink {
+  href: string;
+  label: string;
+  rel?: string;
+}
+
+interface Props {
+  brandName: string;
+  navLinks?: NavLink[];
+  utilityLinks?: NavLink[];
+  adminLinks?: NavLink[];
+  disclosure?: string;
+}
+
+const {
+  brandName,
+  navLinks = [],
+  utilityLinks = [],
+  adminLinks = [],
+  disclosure = "",
+} = Astro.props as Props;
+
+const hasDisclosure = typeof disclosure === "string" && disclosure.trim().length > 0;
+---
+<footer class="site-footer" aria-label="Site footer">
+  <div class="wc-container site-footer__inner">
+    <div class="site-footer__grid">
+      <div>
+        <span class="site-logo" aria-label={`${brandName} logo`}>{brandName}</span>
+        <p class="site-footer__blurb">
+          Cozy secular rituals, printable tools, and mindful planning spells for modern mystics.
+        </p>
+        {hasDisclosure && <p class="site-footer__disclosure">{disclosure}</p>}
+      </div>
+      {navLinks.length > 0 && (
+        <div>
+          <p class="site-footer__title">Explore</p>
+          <ul class="site-footer__nav">
+            {navLinks.map((link) => (
+              <li>
+                <a href={link.href} rel={link.rel}>{link.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <div>
+        <p class="site-footer__title">Stay connected</p>
+        <p class="site-footer__blurb">
+          Subscribe for gentle updates or drop by the contact page if you’d like to collaborate.
+        </p>
+        <div class="site-footer__meta">
+          <a class="hero-cta hero-cta--secondary" href="/contact/">Reach out</a>
+        </div>
+      </div>
+    </div>
+    <div class="site-footer__meta">
+      {(utilityLinks.length > 0 || adminLinks.length > 0) && (
+        <ul class="site-footer__nav site-footer__nav--inline">
+          {utilityLinks.map((link) => (
+            <li>
+              <a href={link.href} rel={link.rel}>{link.label}</a>
+            </li>
+          ))}
+          {adminLinks.map((link) => (
+            <li class="site-footer__link--dev">
+              <a href={link.href} rel={link.rel}>{link.label}</a>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p class="site-footer__copyright">© {new Date().getFullYear()} {brandName}. All rights reserved.</p>
+    </div>
+  </div>
+</footer>

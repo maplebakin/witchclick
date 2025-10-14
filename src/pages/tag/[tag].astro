@@ -50,6 +50,7 @@ const cards = taggedPosts.map((post) => {
     tags: Array.isArray(fm.tags) ? fm.tags : [],
     readingMinutes: fm.readingMinutes ?? estimateReadingMinutes(post.content),
     publishedAt: fm.publishedAt ?? fm.pubDate ?? fm.date ?? undefined,
+    spoonLevel: typeof fm.spoonLevel === "string" ? fm.spoonLevel : undefined,
   };
 });
 
@@ -89,6 +90,7 @@ const collectionSchema = createCollectionPageSchema(
             tags: card.tags,
             readingMinutes: card.readingMinutes,
             publishedAt: card.publishedAt,
+            spoonLevel: card.spoonLevel,
           }}
           href={`/post/${card.slug}`}
         />

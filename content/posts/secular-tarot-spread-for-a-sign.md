@@ -1,15 +1,11 @@
 ---
 title: Secular Tarot Spread When You're Seeking a Clear Sign
 slug: secular-tarot-spread-for-a-sign
-excerpt: >-
-  Looking for a nudge without the mystique? This secular spread helps you notice
-  patterns, name options, and choose one small, testable next step.
+excerpt: 'Looking for a nudge without the mystique? This secular spread helps you notice patterns, name options, and choose one small, testable next step.'
 metaTitle: Secular Tarot Spread When You're Seeking a Clear Sign
-metaDescription: >-
-  A gentle, secular tarot spread for when you're seeking a sign. Quick
-  low‑energy steps and a deeper version, plus accessibility tips, ethics, and a
-  simple checklist.
+metaDescription: 'A gentle, secular tarot spread for when you''re seeking a sign. Quick low‑energy steps and a deeper version, plus accessibility tips, ethics, and a simple checklist.'
 tags:
+  - calm
   - secular tarot
   - tarot spreads
   - mindfulness
@@ -62,6 +58,7 @@ internalLinkHints:
   - 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
 heroImageSrc: /hero-images/secular-tarot-spread-for-a-sign.png
 heroImageAlt: Secular Tarot Spread When You're Seeking a Clear Sign — hero image
+spoonLevel: low
 ---
 ## Opening Reflection
 

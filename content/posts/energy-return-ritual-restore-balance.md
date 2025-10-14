@@ -1,22 +1,39 @@
 ---
-title: "Energy Return Ritual: Restore Balance Without Distortion"
-slug: "energy-return-ritual-restore-balance"
-excerpt: "This ritual guides you through releasing energy that doesn't belong to you—worry, responsibility, or emotional weight borrowed from others—back to its rightful source. Practice honoring your boundaries while maintaining compassion."
-metaTitle: "Energy Return Ritual: Restore Balance Without Distortion"
-metaDescription: "A gentle ritual to release borrowed energy back to its source with clear intention, honoring boundaries and balance in every exchange."
-tags: ["energy work","boundaries","releasing","energetic hygiene","intention setting"]
-outline: ["Opening Reflection","Quick Energy Release Variant","Deep Energy Return Ritual","Reflection Prompt","Energy Return Checklist"]
+title: 'Energy Return Ritual: Restore Balance Without Distortion'
+slug: energy-return-ritual-restore-balance
+excerpt: 'This ritual guides you through releasing energy that doesn''t belong to you—worry, responsibility, or emotional weight borrowed from others—back to its rightful source. Practice honoring your boundaries while maintaining compassion.'
+metaTitle: 'Energy Return Ritual: Restore Balance Without Distortion'
+metaDescription: 'A gentle ritual to release borrowed energy back to its source with clear intention, honoring boundaries and balance in every exchange.'
+tags:
+  - release
+  - energy work
+  - boundaries
+  - releasing
+  - energetic hygiene
+  - intention setting
+outline:
+  - Opening Reflection
+  - Quick Energy Release Variant
+  - Deep Energy Return Ritual
+  - Reflection Prompt
+  - Energy Return Checklist
 wordCount: 1084
 readingMinutes: 5
 entities: []
 includeAds: true
 includeKofi: true
-affiliateAnchors: [{"key":"ritual-journal","text":"journal and pen","insertedCount":0}]
-internalLinkHints: ["energetic boundaries","somatic awareness"]
+affiliateAnchors:
+  - key: ritual-journal
+    text: journal and pen
+    insertedCount: 0
+internalLinkHints:
+  - energetic boundaries
+  - somatic awareness
 internalLinks: []
-publishedAt: "2025-10-10T19:26:33.131Z"
-canonicalUrl: "https://witchclick.space/post/energy-return-ritual-restore-balance"
+publishedAt: '2025-10-10T19:26:33.131Z'
+canonicalUrl: 'https://witchclick.space/post/energy-return-ritual-restore-balance'
 specVersion: 2
+spoonLevel: high
 ---
 
 ## Opening Reflection

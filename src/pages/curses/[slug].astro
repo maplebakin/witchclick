@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
 import { loadAllCurses, getCurseBySlug, resetCurseCache } from "../../utils/curses";
+import { Fragment } from "astro/jsx-runtime";
 
 export const prerender = true;
 
@@ -31,9 +32,42 @@ const generator = curse.frontmatter?.generator ?? {};
 const journaling = typeof generator?.journalingFollowUp === "string" ? generator.journalingFollowUp : "";
 const altarItem = typeof generator?.altarItem === "string" ? generator.altarItem : "";
 const sigilName = typeof generator?.sigilName === "string" ? generator.sigilName : "";
+
+function sectionToPlainText(value: string): string {
+  return value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/[`*_>#\-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+const ritualSteps = curse.sections
+  .map((section, index) => ({
+    "@type": "HowToStep",
+    position: index + 1,
+    name: section.label,
+    text: sectionToPlainText(section.content),
+  }))
+  .filter((step) => step.name || step.text);
+
+const ritualJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  name: title,
+  description,
+  url: canonical,
+  step: ritualSteps,
+  author: {
+    "@type": "Organization",
+    name: settings.brandName ?? "WitchClick",
+  },
+};
 ---
 
 <Base title={title} description={description} canon={canonical} wide={true}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(ritualJsonLd)} />
+  </Fragment>
   <article class="mx-auto max-w-3xl space-y-6 py-10">
     <header class="space-y-3 text-center">
       <p class="text-xs uppercase tracking-[0.2em] text-purple-500">White Magic Curse</p>

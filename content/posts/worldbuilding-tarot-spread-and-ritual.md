@@ -1,16 +1,11 @@
 ---
 title: 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore'
 slug: worldbuilding-tarot-spread-and-ritual
-excerpt: >-
-  Use tarot as a friendly world-design engine. This spread and ritual help you
-  sketch setting, power, and conflict while keeping your lore grounded and
-  playable.
+excerpt: 'Use tarot as a friendly world-design engine. This spread and ritual help you sketch setting, power, and conflict while keeping your lore grounded and playable.'
 metaTitle: 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore'
-metaDescription: >-
-  Design richer worlds with a tarot spread and mini ritual that map your
-  setting, stakes, and tone. Step-by-step prompts, timing tips, and a short
-  checklist.
+metaDescription: 'Design richer worlds with a tarot spread and mini ritual that map your setting, stakes, and tone. Step-by-step prompts, timing tips, and a short checklist.'
 tags:
+  - planning
   - tarot
   - worldbuilding
   - writing ritual
@@ -96,6 +91,7 @@ internalLinkHints:
   - 'Brew a Tea Ritual for Focus: Simple Steps That Stick'
 heroImageSrc: /hero-images/worldbuilding-tarot-spread-and-ritual.png
 heroImageAlt: 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore — hero image'
+spoonLevel: medium
 ---
 
 ## Why tarot works for worldbuilding

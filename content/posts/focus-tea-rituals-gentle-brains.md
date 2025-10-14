@@ -1,22 +1,56 @@
 ---
-title: "Focus Tea Rituals for Gentle, Distracted Brains"
-slug: "focus-tea-rituals-gentle-brains"
-excerpt: "Two focus-friendly tea rituals — a five-minute reset and a lingering deep dive — to help you re-enter your work with kindness, cozy structure, and a safety-first mindset."
-metaTitle: "Focus Tea Rituals for Gentle, Distracted Brains"
-metaDescription: "Brew a cozy focus tea ritual with quick and deep options, accessibility tweaks, and gentle reflection prompts to anchor your attention without harsh hustle."
-tags: ["ritual","tea","focus","productivity","mindfulness"]
-outline: ["Opening Reflection","Quick Focus Tea Ritual (5-Minute Reset)","Deep Dive Tea Ceremony for Flow","Accessibility Tweaks & Cozy Variations","Safety, Care, and Gentle Boundaries","Reflection Prompt & Checklist"]
+title: 'Focus Tea Rituals for Gentle, Distracted Brains'
+slug: focus-tea-rituals-gentle-brains
+excerpt: 'Two focus-friendly tea rituals — a five-minute reset and a lingering deep dive — to help you re-enter your work with kindness, cozy structure, and a safety-first mindset.'
+metaTitle: 'Focus Tea Rituals for Gentle, Distracted Brains'
+metaDescription: 'Brew a cozy focus tea ritual with quick and deep options, accessibility tweaks, and gentle reflection prompts to anchor your attention without harsh hustle.'
+tags:
+  - planning
+  - ritual
+  - tea
+  - focus
+  - productivity
+  - mindfulness
+outline:
+  - Opening Reflection
+  - Quick Focus Tea Ritual (5-Minute Reset)
+  - Deep Dive Tea Ceremony for Flow
+  - Accessibility Tweaks & Cozy Variations
+  - 'Safety, Care, and Gentle Boundaries'
+  - Reflection Prompt & Checklist
 wordCount: 1041
 readingMinutes: 5
-entities: [{"type":"herb","slug":"peppermint"},{"type":"herb","slug":"rosemary"}]
+entities:
+  - type: herb
+    slug: peppermint
+  - type: herb
+    slug: rosemary
 includeAds: false
 includeKofi: true
-affiliateAnchors: [{"key":"focus-tea","text":"peppermint rosemary focus tea","insertedCount":0},{"key":"ritual-journal","text":"tea reflection journal","insertedCount":0},{"key":"planner-pad","text":"dotted ritual planner pad","insertedCount":0},{"key":"herbal-kit","text":"countertop herb drying kit","insertedCount":0}]
-internalLinkHints: ["gentle morning planning spread","cozy focus playlist","slow productivity rituals","planner-friendly tarot tracking","anxiety-soothing tea blends"]
+affiliateAnchors:
+  - key: focus-tea
+    text: peppermint rosemary focus tea
+    insertedCount: 0
+  - key: ritual-journal
+    text: tea reflection journal
+    insertedCount: 0
+  - key: planner-pad
+    text: dotted ritual planner pad
+    insertedCount: 0
+  - key: herbal-kit
+    text: countertop herb drying kit
+    insertedCount: 0
+internalLinkHints:
+  - gentle morning planning spread
+  - cozy focus playlist
+  - slow productivity rituals
+  - planner-friendly tarot tracking
+  - anxiety-soothing tea blends
 internalLinks: []
-publishedAt: "2025-09-29T23:57:11.746Z"
-canonicalUrl: "https://witchclick.space/post/focus-tea-rituals-gentle-brains"
+publishedAt: '2025-09-29T23:57:11.746Z'
+canonicalUrl: 'https://witchclick.space/post/focus-tea-rituals-gentle-brains'
 specVersion: 2
+spoonLevel: medium
 ---
 
 ## Opening Reflection
