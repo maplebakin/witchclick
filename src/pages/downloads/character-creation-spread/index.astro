@@ -1,0 +1,584 @@
+---
+import Base from "@/layouts/Base.astro";
+import { getDownloadBySlug } from "@/utils/downloads";
+import { readSettings, getSiteOrigin } from "@/utils/settings";
+import { Fragment } from "astro/jsx-runtime";
+
+const slug = "character-creation-spread";
+const download = getDownloadBySlug(slug);
+const settings = readSettings();
+const site = getSiteOrigin(settings);
+const title = download ? `${download.name} — Printable Worksheet` : "Character Creation Spread — Printable Worksheet";
+const description =
+  download?.summary ??
+  "Print-friendly tarot spread and character worksheet to help you draft nuanced heroes, villains, and NPCs.";
+const canonical = site ? `${site}/downloads/${slug}` : "";
+const structuredData = download
+  ? {
+      "@context": "https://schema.org",
+      "@type": "DigitalDocument",
+      name: download.name,
+      url: canonical || `/downloads/${slug}/`,
+      description,
+      isAccessibleForFree: !download.price || Number.parseFloat(download.price) === 0,
+      keywords: download.tags,
+      learningResourceType: "worksheet",
+    }
+  : null;
+---
+<Base {title} {description} canon={canonical} desktopWide={true}>
+  <Fragment slot="head">
+    {structuredData && <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />}
+  </Fragment>
+
+  <article class="download-page">
+    <header class="download-intro">
+      <p class="download-intro__eyebrow">Printable download</p>
+      <h1>{download?.name ?? "Character Creation Spread"}</h1>
+      <p class="download-intro__summary">
+        Shape evocative characters and story NPCs with a six-card tarot spread, personality palette prompts, and a story worksheet
+        designed for both writers and gamemasters.
+      </p>
+      <div class="download-intro__actions">
+        <a class="download-intro__link" href="#spread" aria-describedby="print-hint">Jump to spread</a>
+        <button type="button" class="download-intro__print" data-print-spread>
+          Print this page
+        </button>
+      </div>
+      <p class="download-intro__note" id="print-hint">
+        Recommended settings: US Letter or A4, portrait orientation, with background graphics enabled for the soft gradient accents.
+      </p>
+    </header>
+
+    <section id="spread" class="spread" aria-labelledby="spread-title">
+      <header class="spread__header">
+        <h2 id="spread-title">Character Creation Tarot Spread</h2>
+        <p>
+          Pull six cards and journal within the prompts to uncover your character&apos;s origin, motivations, and trajectory. Use the
+          notes column to jot extra symbols, quotes, or sensory cues that appear during the reading.
+        </p>
+      </header>
+      <div class="spread__grid">
+        <article class="spread-card">
+          <header>
+            <span class="spread-card__number">1</span>
+            <h3>Origin Flame</h3>
+          </header>
+          <p>What moment forged this character&apos;s core? Name the spark that set their story in motion.</p>
+          <div class="spread-card__notes" aria-label="Notes" />
+        </article>
+        <article class="spread-card">
+          <header>
+            <span class="spread-card__number">2</span>
+            <h3>Heart&apos;s Compass</h3>
+          </header>
+          <p>Which values, vows, or relationships guide their choices even when the path turns dark?</p>
+          <div class="spread-card__notes" aria-label="Notes" />
+        </article>
+        <article class="spread-card">
+          <header>
+            <span class="spread-card__number">3</span>
+            <h3>Shadow Snare</h3>
+          </header>
+          <p>What fear, wound, or secret threatens to unravel them when pressure mounts?</p>
+          <div class="spread-card__notes" aria-label="Notes" />
+        </article>
+        <article class="spread-card">
+          <header>
+            <span class="spread-card__number">4</span>
+            <h3>Trusted Circle</h3>
+          </header>
+          <p>Who stands beside them? Sketch allies, mentors, or communities that keep them anchored.</p>
+          <div class="spread-card__notes" aria-label="Notes" />
+        </article>
+        <article class="spread-card">
+          <header>
+            <span class="spread-card__number">5</span>
+            <h3>Trial Ahead</h3>
+          </header>
+          <p>Identify the obstacle, antagonist, or inner conflict they must face in the chapters to come.</p>
+          <div class="spread-card__notes" aria-label="Notes" />
+        </article>
+        <article class="spread-card">
+          <header>
+            <span class="spread-card__number">6</span>
+            <h3>Destiny Thread</h3>
+          </header>
+          <p>How might their journey transform them? Envision the change that awaits if they embrace their path.</p>
+          <div class="spread-card__notes" aria-label="Notes" />
+        </article>
+      </div>
+    </section>
+
+    <section class="worksheet" aria-labelledby="worksheet-title">
+      <header class="worksheet__header">
+        <h2 id="worksheet-title">Story Sketch Worksheet</h2>
+        <p>Capture quick-reference details after your reading to keep the character ready for play or prose.</p>
+      </header>
+      <div class="worksheet__grid">
+        <div class="worksheet__block">
+          <h3>Identity</h3>
+          <dl>
+            <div>
+              <dt>Name</dt>
+              <dd></dd>
+            </div>
+            <div>
+              <dt>Pronouns</dt>
+              <dd></dd>
+            </div>
+            <div>
+              <dt>Role or Archetype</dt>
+              <dd></dd>
+            </div>
+            <div>
+              <dt>Homeland</dt>
+              <dd></dd>
+            </div>
+          </dl>
+        </div>
+        <div class="worksheet__block">
+          <h3>Motivations</h3>
+          <dl>
+            <div>
+              <dt>Core Desire</dt>
+              <dd></dd>
+            </div>
+            <div>
+              <dt>Greatest Fear</dt>
+              <dd></dd>
+            </div>
+            <div>
+              <dt>Immediate Goal</dt>
+              <dd></dd>
+            </div>
+            <div>
+              <dt>Secret Agenda</dt>
+              <dd></dd>
+            </div>
+          </dl>
+        </div>
+        <div class="worksheet__block">
+          <h3>Personality Palette</h3>
+          <ul class="palette">
+            <li><span>Element</span><span></span></li>
+            <li><span>Season</span><span></span></li>
+            <li><span>Signature Color</span><span></span></li>
+            <li><span>Scent / Texture</span><span></span></li>
+            <li><span>Theme Song</span><span></span></li>
+            <li><span>Tarot Ally</span><span></span></li>
+          </ul>
+        </div>
+        <div class="worksheet__block">
+          <h3>Supporting Cast</h3>
+          <ul class="cast">
+            <li><span>Confidant</span><span></span></li>
+            <li><span>Rival</span><span></span></li>
+            <li><span>Mentor</span><span></span></li>
+            <li><span>Dependents</span><span></span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="story-beats" aria-labelledby="beats-title">
+      <header>
+        <h2 id="beats-title">Story Beats &amp; Scenes</h2>
+        <p>List pivotal moments you&apos;d like to explore. Use the lined space for synopsis notes or session prep.</p>
+      </header>
+      <div class="story-beats__notes" aria-label="Story beat notes"></div>
+    </section>
+
+    <section class="free-notes" aria-labelledby="notes-title">
+      <header>
+        <h2 id="notes-title">Additional Notes</h2>
+        <p>Sketch symbols, record quotes, or chart stat blocks that emerge as you play.</p>
+      </header>
+      <div class="free-notes__grid">
+        <div class="free-notes__panel" aria-label="Notes panel"></div>
+        <div class="free-notes__panel" aria-label="Notes panel"></div>
+      </div>
+    </section>
+  </article>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const button = document.querySelector('[data-print-spread]');
+      if (button) {
+        button.addEventListener('click', () => window.print());
+      }
+    });
+  </script>
+
+  <style>
+    :global(body) {
+      background-color: #f8f5ff;
+    }
+
+    .download-page {
+      display: grid;
+      gap: clamp(2rem, 4vw, 3rem);
+      padding-bottom: clamp(3rem, 6vw, 4rem);
+    }
+
+    .download-intro {
+      display: grid;
+      gap: 1rem;
+      padding: clamp(1.5rem, 4vw, 2.5rem);
+      border-radius: clamp(1.5rem, 3vw, 2rem);
+      background: linear-gradient(160deg, rgba(91, 33, 182, 0.18), rgba(56, 189, 248, 0.12));
+      box-shadow: 0 25px 60px -40px rgba(15, 23, 42, 0.45);
+    }
+
+    .download-intro__eyebrow {
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: rgba(15, 23, 42, 0.6);
+      margin: 0;
+    }
+
+    .download-intro h1 {
+      margin: 0;
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      letter-spacing: 0.04em;
+    }
+
+    .download-intro__summary {
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    .download-intro__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .download-intro__link,
+    .download-intro__print {
+      border-radius: 999px;
+      padding: 0.75rem 1.4rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      cursor: pointer;
+      transition: transform 120ms ease, box-shadow 160ms ease;
+    }
+
+    .download-intro__link {
+      background: white;
+      color: #4c1d95;
+      text-decoration: none;
+      box-shadow: 0 8px 20px -12px rgba(76, 29, 149, 0.55);
+    }
+
+    .download-intro__print {
+      background: #4c1d95;
+      color: white;
+      box-shadow: 0 12px 24px -16px rgba(76, 29, 149, 0.6);
+    }
+
+    .download-intro__link:focus-visible,
+    .download-intro__print:focus-visible {
+      outline: 3px solid rgba(129, 140, 248, 0.65);
+      outline-offset: 3px;
+    }
+
+    .download-intro__link:hover,
+    .download-intro__print:hover {
+      transform: translateY(-2px);
+    }
+
+    .download-intro__note {
+      margin: 0;
+      font-size: 0.9rem;
+      color: rgba(15, 23, 42, 0.7);
+    }
+
+    .spread {
+      padding: clamp(1.5rem, 4vw, 2.5rem);
+      background: white;
+      border-radius: clamp(1.5rem, 3vw, 2rem);
+      box-shadow: 0 16px 48px -32px rgba(15, 23, 42, 0.4);
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .spread__header h2 {
+      margin: 0 0 0.75rem;
+      font-family: var(--font-heading);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 1.6rem;
+    }
+
+    .spread__header p {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .spread__grid {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    @media (min-width: 900px) {
+      .spread__grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .spread-card {
+      border: 1.5px dashed rgba(76, 29, 149, 0.35);
+      border-radius: 1.25rem;
+      padding: 1.25rem;
+      display: grid;
+      gap: 0.75rem;
+      background: rgba(248, 250, 252, 0.9);
+      min-height: 12rem;
+    }
+
+    .spread-card header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .spread-card__number {
+      width: 2rem;
+      height: 2rem;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: rgba(76, 29, 149, 0.12);
+      color: #4c1d95;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .spread-card h3 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .spread-card p {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .spread-card__notes {
+      border-radius: 0.75rem;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      min-height: 3.5rem;
+      background-image: linear-gradient(
+        to bottom,
+        rgba(148, 163, 184, 0.28) 1px,
+        transparent 1px
+      );
+      background-size: 100% 1.4rem;
+    }
+
+    .worksheet {
+      background: white;
+      border-radius: clamp(1.5rem, 3vw, 2rem);
+      padding: clamp(1.5rem, 4vw, 2.5rem);
+      box-shadow: 0 16px 48px -32px rgba(15, 23, 42, 0.35);
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .worksheet__header h2 {
+      margin: 0 0 0.5rem;
+      font-family: var(--font-heading);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 1.45rem;
+    }
+
+    .worksheet__header p {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .worksheet__grid {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    @media (min-width: 900px) {
+      .worksheet__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .worksheet__block {
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      border-radius: 1.25rem;
+      padding: 1.25rem;
+      background: rgba(248, 250, 252, 0.85);
+      display: grid;
+      gap: 0.85rem;
+      min-height: 12rem;
+    }
+
+    .worksheet__block h3 {
+      margin: 0;
+      font-size: 1.05rem;
+      color: #4c1d95;
+    }
+
+    .worksheet__block dl {
+      margin: 0;
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .worksheet__block dt {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(71, 85, 105, 0.9);
+    }
+
+    .worksheet__block dd {
+      margin: 0;
+      min-height: 1.6rem;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.6);
+    }
+
+    .palette,
+    .cast {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0.65rem;
+    }
+
+    .palette li,
+    .cast li {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.5);
+      padding-bottom: 0.4rem;
+      min-height: 1.4rem;
+      font-size: 0.95rem;
+    }
+
+    .palette span:first-child,
+    .cast span:first-child {
+      font-weight: 600;
+      color: rgba(71, 85, 105, 0.95);
+    }
+
+    .story-beats,
+    .free-notes {
+      background: white;
+      border-radius: clamp(1.5rem, 3vw, 2rem);
+      padding: clamp(1.5rem, 4vw, 2.5rem);
+      box-shadow: 0 14px 44px -32px rgba(15, 23, 42, 0.3);
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .story-beats h2,
+    .free-notes h2 {
+      margin: 0 0 0.5rem;
+      font-family: var(--font-heading);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 1.35rem;
+    }
+
+    .story-beats p,
+    .free-notes p {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .story-beats__notes {
+      min-height: 16rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background-image: linear-gradient(
+        to bottom,
+        rgba(148, 163, 184, 0.25) 1px,
+        transparent 1px
+      );
+      background-size: 100% 1.4rem;
+    }
+
+    .free-notes__grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    @media (min-width: 900px) {
+      .free-notes__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .free-notes__panel {
+      min-height: 10rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background-image: linear-gradient(
+        to bottom,
+        rgba(148, 163, 184, 0.22) 1px,
+        transparent 1px
+      );
+      background-size: 100% 1.4rem;
+    }
+
+    @media print {
+      :global(body) {
+        background: white;
+      }
+
+      .download-page {
+        gap: 2rem;
+        padding-bottom: 2rem;
+      }
+
+      .download-intro {
+        box-shadow: none;
+        background: rgba(248, 250, 252, 0.92);
+      }
+
+      .download-intro__actions,
+      .download-intro__note {
+        display: none;
+      }
+
+      .spread,
+      .worksheet,
+      .story-beats,
+      .free-notes {
+        box-shadow: none;
+      }
+
+      .download-intro__link,
+      .download-intro__print {
+        display: none;
+      }
+
+      .spread-card,
+      .worksheet__block,
+      .story-beats__notes,
+      .free-notes__panel {
+        background-color: transparent;
+      }
+    }
+  </style>
+</Base>

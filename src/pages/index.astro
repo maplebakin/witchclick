@@ -1,18 +1,480 @@
 ---
-import Base from '@/layouts/Base.astro';
-import Hero from '@/components/Hero.astro';
-const title = 'WitchClick — Cozy secular rituals & tools';
+import Base from "@/layouts/Base.astro";
+import Hero from "@/components/Hero.astro";
+import PostCard from "@/components/PostCard.astro";
+import EvergreenCta from "@/components/blocks/EvergreenCta.astro";
+import Testimonials from "@/components/blocks/Testimonials.astro";
+import { loadAllPosts, firstParagraph, estimateReadingMinutes } from "@/utils/posts";
+import { loadDownloads } from "@/utils/downloads";
+import { loadAllCurses } from "@/utils/curses";
+import { readEvergreenBlocks } from "@/utils/blocks";
+import { sections as entitySections } from "@/data/typeMetadata";
+import { readSettings } from "@/utils/settings";
+import { createCollectionPageSchema } from "@/utils/structuredData";
+import { Fragment } from "astro/jsx-runtime";
+
+const settings = readSettings();
+const posts = loadAllPosts();
+const downloads = loadDownloads().slice(0, 3);
+const curses = loadAllCurses().slice(0, 3);
+const blocks = readEvergreenBlocks();
+
+const title = "WitchClick — Cozy secular rituals & tools";
+const description =
+  "Ritual guides, tarot spreads, cozy downloads, and affiliate finds to help secular witches plan gentle, intentional days.";
+
+const heroPost = posts[0] ?? null;
+const heroTitle = heroPost?.data?.title ?? heroPost?.title ?? "Cozy Cursing Ritual: Release Anger Through Banishment";
+const heroBlurb = heroPost
+  ? heroPost.data?.excerpt ?? heroPost.data?.description ?? heroPost.data?.metaDescription ?? firstParagraph(heroPost.content)
+  : "Sometimes anger is the only honest response to betrayal or systemic harm. This ritual gives it a safe container and releases the residue.";
+const heroPrimaryHref = heroPost ? `/post/${heroPost.slug}` : "/page/1";
+const heroPrimaryLabel = heroPost ? "Read the latest guide →" : "Browse rituals →";
+const heroSecondaryHref = downloads.length > 0 ? "/downloads" : "/tools";
+const heroSecondaryLabel = downloads.length > 0 ? "Explore printable tools" : "Shop tools";
+
+const cardPosts = (heroPost ? posts.slice(1) : posts).slice(0, 6).map((post) => {
+  const fm = post.data ?? {};
+  return {
+    slug: post.slug,
+    title: fm.title ?? post.title,
+    excerpt: fm.excerpt ?? fm.description ?? fm.metaDescription ?? firstParagraph(post.content),
+    tags: Array.isArray(fm.tags) ? fm.tags : [],
+    readingMinutes: fm.readingMinutes ?? estimateReadingMinutes(post.content),
+    publishedAt: fm.publishedAt ?? fm.pubDate ?? fm.date ?? undefined,
+  };
+});
+
+const itemList = createCollectionPageSchema(
+  settings,
+  {
+    name: "Latest WitchClick rituals",
+    url: "/",
+    description,
+    collectionType: "CollectionPage",
+  },
+  posts.slice(0, 8).map((post) => ({
+    name: post.data?.title ?? post.title,
+    url: `/post/${post.slug}`,
+    description: post.data?.excerpt ?? firstParagraph(post.content),
+  })),
+);
 ---
-<Base {title}>
+<Base {title} {description} desktopWide={true}>
+  <Fragment slot="head">
+    {posts.length > 0 && (
+      <script type="application/ld+json" set:html={JSON.stringify(itemList)} />
+    )}
+  </Fragment>
+
   <Hero
-    kicker="Fresh from the coven"
-    title="Cozy Cursing Ritual: Release Anger Through Banishment"
-    blurb="Sometimes anger is the only honest response to betrayal or systemic harm. This ritual gives it a safe container and releases the residue."
-    primaryHref="/posts/cozy-cursing-ritual"
-    primaryLabel="Read the latest guide →"
-    secondaryHref="/tools"
-    secondaryLabel="Explore printable tools"
+    kicker={heroPost ? "Latest ritual from the coven" : "Fresh from the coven"}
+    title={heroTitle}
+    blurb={heroBlurb}
+    primaryHref={heroPrimaryHref}
+    primaryLabel={heroPrimaryLabel}
+    secondaryHref={heroSecondaryHref}
+    secondaryLabel={heroSecondaryLabel}
   />
 
-  <!-- Rest of homepage sections go here -->
+  <section class="home-section home-posts" aria-labelledby="home-posts-title">
+    <div class="home-section__header">
+      <div>
+        <p class="home-eyebrow">Ritual library</p>
+        <h2 id="home-posts-title">New guides &amp; secular spells</h2>
+        <p class="home-section__intro">
+          Blend tarot spreads, gentle journaling prompts, and pragmatic magic. Every ritual is grounded, accessible, and kind to
+          tender nervous systems.
+        </p>
+      </div>
+      <a class="home-link" href="/page/1">Browse the full archive →</a>
+    </div>
+    <div class="home-post-grid">
+      {cardPosts.map((post) => (
+        <PostCard
+          post={{
+            slug: post.slug,
+            title: post.title,
+            excerpt: post.excerpt,
+            tags: post.tags,
+            readingMinutes: post.readingMinutes,
+            publishedAt: post.publishedAt,
+          }}
+          href={`/post/${post.slug}`}
+        />
+      ))}
+    </div>
+  </section>
+
+  {downloads.length > 0 && (
+    <section class="home-section home-downloads" aria-labelledby="home-downloads-title">
+      <div class="home-section__header">
+        <div>
+          <p class="home-eyebrow">Printable companions</p>
+          <h2 id="home-downloads-title">Downloads to anchor your practice</h2>
+          <p class="home-section__intro">
+            Print-and-go spreads, character planners, and gentle worksheets designed for thoughtful evenings with tea and a stack
+            of pens.
+          </p>
+        </div>
+        <a class="home-link" href="/downloads">See all downloads →</a>
+      </div>
+      <div class="home-download-grid">
+        {downloads.map((download) => (
+          <article class="home-download-card">
+            <header>
+              <p class="home-eyebrow">PDF</p>
+              <h3>{download.name}</h3>
+            </header>
+            {download.summary && <p class="home-download-card__summary">{download.summary}</p>}
+            {download.features.length > 0 && (
+              <ul class="home-download-card__features">
+                {download.features.slice(0, 3).map((feature) => (
+                  <li>
+                    <span aria-hidden>✶</span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <a
+              class="home-download-card__cta"
+              href={download.href}
+              target={download.isExternal ? "_blank" : undefined}
+              rel={download.isExternal ? download.rel ?? "noopener" : undefined}
+            >
+              {download.isExternal ? "View listing" : "Download PDF"}
+            </a>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {curses.length > 0 && (
+    <section class="home-section home-curses" aria-labelledby="home-curses-title">
+      <div class="home-section__header">
+        <div>
+          <p class="home-eyebrow">White magic curses</p>
+          <h2 id="home-curses-title">Ethical energy returns</h2>
+          <p class="home-section__intro">
+            Boundaries can be tender and fierce at the same time. These poetic curses keep you rooted in clarity without courting
+            harm.
+          </p>
+        </div>
+        <a class="home-link" href="/curses">Explore all curses →</a>
+      </div>
+      <div class="home-curse-grid">
+        {curses.map((curse) => (
+          <article class="home-curse-card">
+            <h3>
+              <a href={`/curses/${curse.slug}`}>{curse.title}</a>
+            </h3>
+            {curse.invocation && <p class="home-curse-card__invocation">{curse.invocation}</p>}
+            <ul class="home-curse-card__tags">
+              {curse.tags.slice(0, 5).map((tag) => (
+                <li>#{tag}</li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="home-section home-entities" aria-labelledby="home-entities-title">
+    <div class="home-section__header">
+      <div>
+        <p class="home-eyebrow">The grimoire</p>
+        <h2 id="home-entities-title">Deepen your secular correspondences</h2>
+        <p class="home-section__intro">
+          Crystals, herbs, moon phases, rituals, and tarot entries weave a living reference library. Follow the threads and gather
+          notes for your next working.
+        </p>
+      </div>
+      <a class="home-link" href="/entities">Enter the grimoire →</a>
+    </div>
+    <div class="home-entity-grid">
+      {entitySections.map((section) => (
+        <a class="home-entity-card" href={section.href}>
+          <span class="home-entity-card__icon" aria-hidden>{section.icon}</span>
+          <div>
+            <h3>{section.title}</h3>
+            <p>{section.subtitle}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  {blocks.cta && <EvergreenCta {...blocks.cta} />}
+  {blocks.testimonials.length > 0 && <Testimonials testimonials={blocks.testimonials} />}
 </Base>
+
+<style>
+  .home-section {
+    display: grid;
+    gap: clamp(1.8rem, 4vw, 2.6rem);
+    margin-top: clamp(2.4rem, 6vw, 4rem);
+  }
+
+  .home-section__header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1.5rem;
+    align-items: flex-end;
+  }
+
+  .home-eyebrow {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.7rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 70%, white 30%);
+  }
+
+  .home-section__header h2 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    letter-spacing: 0.06em;
+  }
+
+  .home-section__intro {
+    margin: 0;
+    max-width: 60ch;
+    color: color-mix(in srgb, var(--ink-body, currentColor) 92%, white 8%);
+    line-height: 1.7;
+    font-size: 1.05rem;
+  }
+
+  .home-link {
+    align-self: flex-start;
+    font-weight: 600;
+    color: color-mix(in srgb, rgba(91, 33, 182, 0.85) 85%, white 15%);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+  }
+
+  .home-link:hover,
+  .home-link:focus-visible {
+    text-decoration: underline;
+  }
+
+  .home-post-grid {
+    display: grid;
+    gap: clamp(1.4rem, 3vw, 2rem);
+  }
+
+  @media (min-width: 768px) {
+    .home-post-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .home-post-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .home-download-grid {
+    display: grid;
+    gap: clamp(1.4rem, 3vw, 2rem);
+  }
+
+  @media (min-width: 900px) {
+    .home-download-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .home-download-card {
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1.4rem, 3.5vw, 2rem);
+    border-radius: 1.6rem;
+    background: color-mix(in srgb, rgba(255, 255, 255, 0.92) 80%, rgba(91, 33, 182, 0.18) 20%);
+    border: 1px solid color-mix(in srgb, rgba(91, 33, 182, 0.32) 70%, transparent 30%);
+    box-shadow: 0 20px 48px -30px rgba(15, 23, 42, 0.45);
+  }
+
+  .home-download-card h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-family: var(--font-heading);
+    letter-spacing: 0.04em;
+  }
+
+  .home-download-card__summary {
+    margin: 0;
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--ink-body, currentColor) 92%, white 8%);
+  }
+
+  .home-download-card__features {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+    font-size: 0.95rem;
+  }
+
+  .home-download-card__features li {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .home-download-card__features span:first-child {
+    color: rgba(91, 33, 182, 0.8);
+    font-size: 0.85rem;
+  }
+
+  .home-download-card__cta {
+    justify-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.4rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, rgba(91, 33, 182, 0.92) 88%, rgba(255, 255, 255, 0.12) 12%);
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: transform 200ms ease, background 200ms ease;
+  }
+
+  .home-download-card__cta:hover,
+  .home-download-card__cta:focus-visible {
+    transform: translateY(-1px);
+    background: color-mix(in srgb, rgba(91, 33, 182, 0.88) 70%, rgba(15, 23, 42, 0.12) 30%);
+  }
+
+  .home-curse-grid {
+    display: grid;
+    gap: clamp(1.2rem, 3vw, 2rem);
+  }
+
+  @media (min-width: 900px) {
+    .home-curse-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .home-curse-card {
+    display: grid;
+    gap: 0.75rem;
+    padding: clamp(1.4rem, 3.5vw, 1.9rem);
+    border-radius: 1.5rem;
+    background: color-mix(in srgb, rgba(17, 24, 39, 0.92) 85%, rgba(91, 33, 182, 0.18) 15%);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    box-shadow: 0 18px 40px -30px rgba(15, 23, 42, 0.7);
+  }
+
+  .home-curse-card h3 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    letter-spacing: 0.03em;
+  }
+
+  .home-curse-card h3 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .home-curse-card h3 a:hover,
+  .home-curse-card h3 a:focus-visible {
+    text-decoration: underline;
+  }
+
+  .home-curse-card__invocation {
+    margin: 0;
+    font-style: italic;
+    color: rgba(226, 232, 240, 0.9);
+    line-height: 1.6;
+  }
+
+  .home-curse-card__tags {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(165, 180, 252, 0.85);
+  }
+
+  .home-entity-grid {
+    display: grid;
+    gap: clamp(1.2rem, 3vw, 2rem);
+  }
+
+  @media (min-width: 768px) {
+    .home-entity-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .home-entity-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .home-entity-card {
+    display: grid;
+    gap: 0.8rem;
+    padding: clamp(1.4rem, 3.5vw, 2rem);
+    border-radius: 1.6rem;
+    background: color-mix(in srgb, rgba(255, 255, 255, 0.92) 80%, rgba(147, 51, 234, 0.15) 20%);
+    border: 1px solid color-mix(in srgb, rgba(124, 58, 237, 0.28) 70%, transparent 30%);
+    text-decoration: none;
+    color: inherit;
+    min-height: 100%;
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+
+  .home-entity-card:hover,
+  .home-entity-card:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 24px 48px -30px rgba(91, 33, 182, 0.4);
+  }
+
+  .home-entity-card__icon {
+    font-size: 2rem;
+  }
+
+  .home-entity-card h3 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    letter-spacing: 0.04em;
+  }
+
+  .home-entity-card p {
+    margin: 0;
+    color: color-mix(in srgb, var(--ink-body, currentColor) 92%, white 8%);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 720px) {
+    .home-section__header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .home-link {
+      order: 3;
+    }
+  }
+</style>

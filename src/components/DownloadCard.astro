@@ -1,33 +1,43 @@
 ---
-import fs from 'node:fs';
-interface Props { id?: string }
-const { id = '' } = Astro.props as Props;
-if (!id) { return; }
+import { getDownloadBySlug } from "@/utils/downloads";
 
-const dir = './content/downloads';
-let data: any = null;
-try {
-  const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
-  for (const f of files) {
-    const j = JSON.parse(fs.readFileSync(`${dir}/${f}`,'utf8'));
-    if (j.id === id || j.slug === id) { data = j; break; }
-  }
-} catch {}
+interface Props {
+  id?: string;
+}
 
-if (!data) { return; }
-const hasExternal = !!(data.url && data.url.trim());
-const href = hasExternal ? data.url : (data.file || '#');
-const target = hasExternal ? '_blank' : undefined;
-const rel = hasExternal ? 'noopener' : undefined;
+const { id = "" } = Astro.props as Props;
+if (!id) {
+  return;
+}
+
+const download = getDownloadBySlug(id);
+if (!download) {
+  return;
+}
+
+const hasExternal = download.isExternal;
+const href = download.href || "#";
+const target = hasExternal ? "_blank" : undefined;
+const rel = hasExternal ? download.rel ?? "noopener" : undefined;
+const hasFile = Boolean(download.file);
+const ctaLabel = hasExternal ? "Buy now" : hasFile ? "Download" : "Open printable";
+const priceLabel =
+  download.price && download.currency
+    ? new Intl.NumberFormat(undefined, { style: "currency", currency: download.currency }).format(
+        parseFloat(download.price),
+      )
+    : download.price && !download.currency
+      ? download.price
+      : "Free";
 ---
 <aside class="my-8">
   <div class="card-panel card-tier-2 card-panel-strong card-panel-static">
     <span aria-hidden class="card-radial card-radial-soft" />
     <div class="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-start">
-      {data.cover && (
+      {download.cover && (
         <img
-          src={data.cover}
-          alt={`${data.name} cover`}
+          src={download.cover}
+          alt={`${download.name} cover`}
           class="h-24 w-24 flex-none rounded-xl border border-white/60 object-cover shadow-sm"
           loading="lazy"
         />
@@ -35,36 +45,30 @@ const rel = hasExternal ? 'noopener' : undefined;
       <div class="min-w-0 space-y-4">
         <header class="space-y-2">
           <p class="card-eyebrow">Download</p>
-          <h3 class="card-heading text-xl font-semibold">{data.name}</h3>
+          <h3 class="card-heading text-xl font-semibold">{download.name}</h3>
         </header>
-        {data.summary && <p class="card-subtle text-sm leading-relaxed">{data.summary}</p>}
-        {Array.isArray(data.features) && data.features.length > 0 && (
+        {download.summary && <p class="card-subtle text-sm leading-relaxed">{download.summary}</p>}
+        {download.features.length > 0 && (
           <ul class="grid gap-2 text-sm text-purple-900/90 sm:list-none sm:gap-1">
-            {data.features.slice(0, 3).map((f: string) => (
+            {download.features.slice(0, 3).map((feature) => (
               <li class="flex items-start gap-2">
                 <span aria-hidden class="mt-1 text-xs text-purple-500">✶</span>
-                <span>{f}</span>
+                <span>{feature}</span>
               </li>
             ))}
           </ul>
         )}
         <div class="flex flex-wrap items-center gap-3">
-          <span class="card-pill card-badge">
-            {(data.price && data.currency)
-              ? new Intl.NumberFormat(undefined, { style: "currency", currency: data.currency }).format(
-                  parseFloat(data.price)
-                )
-              : "Free"}
-          </span>
+          <span class="card-pill card-badge">{priceLabel}</span>
           <a
             href={href}
             target={target}
             rel={rel}
             class="inline-flex items-center justify-center rounded-full bg-purple-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300 focus-visible:ring-offset-2"
             data-analytics="download_click"
-            data-analytics-meta={data.id}
+            data-analytics-meta={download.id}
           >
-            {hasExternal ? "Buy now" : "Download"}
+            {ctaLabel}
           </a>
           <a
             href="/tools/"

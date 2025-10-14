@@ -68,6 +68,18 @@ function isActive(href: string): boolean {
             </a>
           </li>
         ))}
+        {visibleAdmin.map((item) => (
+          <li class="site-nav__item--dev">
+            <a
+              href={item.href}
+              rel={item.rel}
+              class="site-nav__link site-nav__link--dev"
+              aria-current={isActive(item.href) ? "page" : undefined}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
       </ul>
       <div class="site-nav__actions">
         <button

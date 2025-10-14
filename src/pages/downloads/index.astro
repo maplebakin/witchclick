@@ -1,0 +1,306 @@
+---
+import Base from "@/layouts/Base.astro";
+import { loadDownloads, type DownloadEntry } from "@/utils/downloads";
+import { readSettings, getSiteOrigin } from "@/utils/settings";
+import { createCollectionPageSchema } from "@/utils/structuredData";
+import { Fragment } from "astro/jsx-runtime";
+
+const downloads = loadDownloads();
+const settings = readSettings();
+const site = getSiteOrigin(settings);
+const title = "Downloads & Printables — WitchClick";
+const description =
+  "Printable spreads, ritual planners, and cozy tools for secular witches and gentle creatives.";
+const canonical = site ? `${site}/downloads` : "";
+
+const collectionSchema = createCollectionPageSchema(
+  settings,
+  {
+    name: "WitchClick downloads & printables",
+    url: "/downloads",
+    description,
+    collectionType: "CollectionPage",
+  },
+  downloads.map((download) => ({
+    name: download.name,
+    url: download.href,
+    description: download.summary,
+  })),
+);
+
+function formatPrice(download: DownloadEntry): string {
+  if (!download.price || Number.parseFloat(download.price) === 0) {
+    return "Free";
+  }
+  if (download.currency) {
+    try {
+      return new Intl.NumberFormat(undefined, {
+        style: "currency",
+        currency: download.currency,
+      }).format(Number.parseFloat(download.price));
+    } catch {
+      // ignore formatting failure
+    }
+  }
+  return download.price;
+}
+---
+<Base {title} {description} canon={canonical} desktopWide={true}>
+  <Fragment slot="head">
+    {downloads.length > 0 && (
+      <script type="application/ld+json" set:html={JSON.stringify(collectionSchema)} />
+    )}
+  </Fragment>
+
+  <section class="download-hero">
+    <div class="download-hero__copy">
+      <h1>Printable ritual companions</h1>
+      <p>
+        Keep your altar stocked with lovingly designed PDFs, planners, and spreads. Each download is ready to print and pair with
+        your favorite pens, stickers, or tea ritual.
+      </p>
+      <p class="download-hero__note">
+        Need something custom for your circle or clients? Drop us a note on the contact page and we&apos;ll see what we can conjure.
+      </p>
+    </div>
+  </section>
+
+  {downloads.length > 0 ? (
+    <section class="download-grid" aria-label="Available downloads">
+      <ul>
+        {downloads.map((download) => (
+          <li class="download-card">
+            <div class="download-card__inner">
+              {download.cover && (
+                <div class="download-card__art">
+                  <img src={download.cover} alt="" loading="lazy" />
+                </div>
+              )}
+              <div class="download-card__body">
+                <header>
+                  <p class="download-card__eyebrow">Digital download</p>
+                  <h2>{download.name}</h2>
+                  {download.summary && <p class="download-card__summary">{download.summary}</p>}
+                </header>
+                {download.features.length > 0 && (
+                  <ul class="download-card__features">
+                    {download.features.slice(0, 4).map((feature) => (
+                      <li>
+                        <span aria-hidden>✶</span>
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {download.tags.length > 0 && (
+                  <ul class="download-card__tags">
+                    {download.tags.slice(0, 6).map((tag) => (
+                      <li>#{tag}</li>
+                    ))}
+                  </ul>
+                )}
+                <div class="download-card__footer">
+                  <span class="download-card__price">{formatPrice(download)}</span>
+                  <a
+                    class="download-card__cta"
+                    href={download.href}
+                    target={download.isExternal ? "_blank" : undefined}
+                    rel={download.isExternal ? download.rel ?? "noopener" : undefined}
+                  >
+                    {download.isExternal
+                      ? "View listing"
+                      : download.file
+                        ? "Download PDF"
+                        : "Open printable"}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ) : (
+    <p class="download-empty">Our printable library is brewing. Check back after the next full moon.</p>
+  )}
+</Base>
+
+<style>
+  .download-hero {
+    margin-bottom: clamp(2rem, 6vw, 3rem);
+    border-radius: clamp(1.6rem, 4vw, 2.4rem);
+    background: linear-gradient(160deg, rgba(91, 33, 182, 0.16), rgba(56, 189, 248, 0.12));
+    padding: clamp(1.8rem, 4.5vw, 3rem);
+    box-shadow: 0 25px 60px -35px rgba(15, 23, 42, 0.45);
+  }
+
+  .download-hero__copy {
+    display: grid;
+    gap: 1rem;
+    max-width: 54ch;
+  }
+
+  .download-hero h1 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-family: var(--font-heading);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .download-hero p {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+
+  .download-hero__note {
+    font-size: 0.95rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
+  }
+
+  .download-grid ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  @media (min-width: 768px) {
+    .download-grid ul {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .download-grid ul {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .download-card {
+    height: 100%;
+  }
+
+  .download-card__inner {
+    position: relative;
+    display: grid;
+    gap: 1.2rem;
+    padding: clamp(1.5rem, 3.5vw, 2rem);
+    border-radius: 1.75rem;
+    background: color-mix(in srgb, rgba(255, 255, 255, 0.92) 80%, rgba(91, 33, 182, 0.18) 20%);
+    border: 1px solid color-mix(in srgb, rgba(91, 33, 182, 0.35) 65%, transparent 35%);
+    box-shadow: 0 22px 48px -30px rgba(15, 23, 42, 0.45);
+    height: 100%;
+  }
+
+  .download-card__art img {
+    width: 100%;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 12px 24px -20px rgba(15, 23, 42, 0.6);
+  }
+
+  .download-card__body {
+    display: grid;
+    gap: 1.1rem;
+  }
+
+  .download-card__eyebrow {
+    margin: 0 0 0.3rem 0;
+    font-size: 0.7rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, rgba(91, 33, 182, 0.75) 80%, white 20%);
+  }
+
+  .download-card__body h2 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 1.6rem;
+    letter-spacing: 0.04em;
+  }
+
+  .download-card__summary {
+    margin: 0;
+    color: color-mix(in srgb, var(--ink-body, currentColor) 90%, white 10%);
+    line-height: 1.7;
+  }
+
+  .download-card__features {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.95rem;
+  }
+
+  .download-card__features li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+
+  .download-card__features span:first-child {
+    color: rgba(91, 33, 182, 0.8);
+    font-size: 0.9rem;
+  }
+
+  .download-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, rgba(91, 33, 182, 0.7) 70%, white 30%);
+  }
+
+  .download-card__footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    align-items: center;
+  }
+
+  .download-card__price {
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .download-card__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.4rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    background: color-mix(in srgb, rgba(91, 33, 182, 0.92) 88%, rgba(255, 255, 255, 0.08) 12%);
+    color: white;
+    transition: transform 200ms ease, background 200ms ease, box-shadow 200ms ease;
+    box-shadow: 0 18px 32px -24px rgba(79, 70, 229, 0.7);
+  }
+
+  .download-card__cta:hover,
+  .download-card__cta:focus-visible {
+    transform: translateY(-1px);
+    background: color-mix(in srgb, rgba(91, 33, 182, 0.88) 70%, rgba(15, 23, 42, 0.12) 30%);
+  }
+
+  .download-empty {
+    margin-top: 3rem;
+    font-size: 1rem;
+    text-align: center;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
+  }
+</style>

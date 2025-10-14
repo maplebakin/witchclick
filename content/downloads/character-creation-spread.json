@@ -3,10 +3,20 @@
   "name": "Character Creation Spread",
   "price": "0",
   "currency": "USD",
-  "summary": "Character Creation Spread for Narrative World Building",
-  "cover": "/home/maddie/Documents/code/witchclick/content/downloads/Character Spread.pdf",
-  "file": "/home/maddie/Documents/code/witchclick/content/downloads/Character Spread.pdf",
-  "url": "",
-  "features": [],
-  "tags": []
+  "summary": "A printable tarot worksheet for building richly layered characters and story NPCs.",
+  "cover": "",
+  "file": "",
+  "url": "/downloads/character-creation-spread/",
+  "features": [
+    "Six-card tarot spread to map a character's past, present, and destiny",
+    "Story sketch worksheet for goals, obstacles, and supporting cast",
+    "Personality palette prompts and sensory anchors",
+    "Printer-friendly layout with optional print helper tips"
+  ],
+  "tags": [
+    "tarot",
+    "character creation",
+    "worldbuilding",
+    "story planning"
+  ]
 }
