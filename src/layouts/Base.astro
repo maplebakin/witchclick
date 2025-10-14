@@ -16,6 +16,7 @@ const {
   description = "",
   canon = "",
   wide = false,
+  desktopWide = false,
   ogImage = "",
   noindex = false,
   bodyDataType = undefined,
@@ -40,8 +41,18 @@ const ogImg = ogImage ? toAbsoluteUrl(ogImage, settings) : (siteOrigin ? `${site
 const theme = getTheme();
 const analyticsInjection = buildAnalyticsInjection(settings);
 
-const headerWidthClass = wide ? "max-w-6xl" : "max-w-4xl";
-const mainWidthClass = wide ? "max-w-6xl" : "max-w-3xl";
+const headerWidthClass = desktopWide
+  ? "max-w-4xl lg:max-w-6xl xl:max-w-7xl"
+  : wide
+    ? "max-w-6xl"
+    : "max-w-4xl";
+const mainWidthClass = desktopWide
+  ? "max-w-3xl lg:max-w-5xl xl:max-w-7xl"
+  : wide
+    ? "max-w-6xl"
+    : "max-w-3xl";
+const layoutPaddingClass = desktopWide ? "px-4 sm:px-6 lg:px-8 xl:px-12" : "px-4";
+const layoutContentClass = ["layout-content", desktopWide && "layout-content--desktop"].filter(Boolean).join(" ");
 
 const grimoireChapters = Object.entries(typeMetadata).map(([type, metadata]) => ({
   title: metadata.title,
@@ -480,6 +491,27 @@ const bodyStyle = `
         z-index: -1;
       }
 
+      .layout-content--desktop::after {
+        content: "";
+        position: absolute;
+        inset: -2rem;
+        border-radius: clamp(2.5rem, 6vw, 3.5rem);
+        pointer-events: none;
+        opacity: 0;
+        z-index: -1;
+        transition: opacity 320ms ease;
+      }
+
+      @media (min-width: 1024px) {
+        .layout-content--desktop::after {
+          opacity: 1;
+          background:
+            radial-gradient(70% 90% at 15% 20%, color-mix(in srgb, var(--ambient-color, var(--color-primary)) 18%, transparent) 0%, transparent 72%),
+            radial-gradient(75% 85% at 90% 10%, color-mix(in srgb, white 18%, transparent) 0%, transparent 68%),
+            radial-gradient(65% 80% at 90% 85%, color-mix(in srgb, var(--ambient-color, var(--color-primary)) 12%, transparent) 0%, transparent 74%);
+        }
+      }
+
       .layout-content > * {
         position: relative;
         z-index: 1;
@@ -570,7 +602,7 @@ const bodyStyle = `
       Skip to content
     </a>
 
-    <header class={`mx-auto ${headerWidthClass} px-4 pb-6 pt-6`}>
+    <header class={`mx-auto ${headerWidthClass} ${layoutPaddingClass} pb-6 pt-6`}>
       <div class="grimoire-header-panel">
         <div class="grimoire-header-content">
           <a href="/" class="grimoire-brand text-3xl font-script text-[var(--color-primary)]">{brandName}</a>
@@ -638,7 +670,7 @@ const bodyStyle = `
       </div>
     </header>
 
-    <main id="main" class={`mx-auto ${mainWidthClass} px-4 pb-16 layout-content`}>
+    <main id="main" class={`mx-auto ${mainWidthClass} ${layoutPaddingClass} pb-16 ${layoutContentClass}`}>
       <div class="sm:hidden mb-6"><SearchBox /></div>
       <slot />
     </main>
@@ -647,7 +679,9 @@ const bodyStyle = `
     <slot name="cta" />
 
     <footer class="layout-footer">
-      <div class={`layout-footer-panel panel-muted shadow-1 mx-auto ${mainWidthClass} px-4 py-8 text-sm leading-relaxed`}>
+      <div
+        class={`layout-footer-panel panel-muted shadow-1 mx-auto ${mainWidthClass} ${layoutPaddingClass} py-8 text-sm leading-relaxed`}
+      >
         <h2 class="font-serif text-base tracking-tight">WitchClick Grimoire</h2>
         {settings.disclosure && <p class="mt-3 text-xs sm:text-sm">{settings.disclosure}</p>}
         <p class="mt-4 flex flex-wrap items-center gap-3 text-sm">

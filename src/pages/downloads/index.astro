@@ -46,17 +46,24 @@ const downloadsSchema = createCollectionPageSchema(
   title="Downloads"
   description="Printable planners and cozy tools."
   canon={site ? `${site}/downloads` : ""}
+  desktopWide={true}
 >
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(downloadsSchema)} />
   </Fragment>
 
   <div class="grimoire-bg min-h-screen">
-    <section class="downloads-canvas mx-auto max-w-5xl px-4 py-12 sm:py-16">
+    <section class="downloads-canvas mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 xl:max-w-7xl xl:px-12">
       <section class="downloads-panel panel" aria-labelledby="downloads-heading">
         <header class="downloads-header">
-          <h1 id="downloads-heading" class="font-serif">Downloads</h1>
-          <p>Printable planners and cozy tools.</p>
+          <div class="downloads-heading">
+            <h1 id="downloads-heading" class="font-serif">Downloads</h1>
+            <p>Printable planners and cozy tools.</p>
+          </div>
+          <div class="downloads-header-visual" aria-hidden="true">
+            <span class="downloads-header-glyph">✂️</span>
+            <span class="downloads-header-note">Ready-to-print rituals for your desk.</span>
+          </div>
         </header>
 
         {items.length === 0 ? (
@@ -78,7 +85,7 @@ const downloadsSchema = createCollectionPageSchema(
                     <img
                       src={item.cover}
                       alt={`${item.name} cover`}
-                      class="h-20 w-20 flex-none rounded-xl border border-white/60 object-cover shadow-sm"
+                      class="h-24 w-24 flex-none rounded-xl border border-white/60 object-cover shadow-sm lg:h-28 lg:w-28"
                       loading="lazy"
                     />
                   )}
@@ -117,20 +124,41 @@ const downloadsSchema = createCollectionPageSchema(
 
   .downloads-header {
     display: grid;
-    gap: 0.75rem;
+    gap: clamp(0.75rem, 2vw, 1.25rem);
+    align-items: start;
   }
 
-  .downloads-header h1 {
+  .downloads-heading {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .downloads-heading h1 {
     margin: 0;
     font-size: clamp(2.25rem, 4vw, 2.85rem);
     color: var(--ink-strong, currentColor);
   }
 
-  .downloads-header p {
+  .downloads-heading p {
     margin: 0;
     max-width: 40ch;
     font-size: 1rem;
     color: color-mix(in srgb, var(--ink-body, currentColor) 90%, white 10%);
+  }
+
+  .downloads-header-visual {
+    display: none;
+  }
+
+  .downloads-header-glyph {
+    font-size: clamp(2rem, 3.5vw, 2.75rem);
+    filter: drop-shadow(0 12px 28px rgba(79, 70, 229, 0.25));
+  }
+
+  .downloads-header-note {
+    font-size: 0.95rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 75%, white 25%);
+    max-width: 24ch;
   }
 
   .downloads-grid {
@@ -138,9 +166,44 @@ const downloadsSchema = createCollectionPageSchema(
     gap: clamp(1.5rem, 3vw, 2rem);
   }
 
+  .downloads-grid > * {
+    min-width: 0;
+  }
+
   @media (min-width: 768px) {
     .downloads-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .downloads-header {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      align-items: center;
+    }
+
+    .downloads-heading {
+      grid-column: span 7;
+    }
+
+    .downloads-header-visual {
+      display: flex;
+      grid-column: span 5;
+      justify-self: end;
+      align-items: center;
+      gap: 0.75rem;
+      padding-left: 1.5rem;
+      border-left: 1px solid color-mix(in srgb, var(--ambient-color, var(--color-primary)) 30%, transparent);
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .downloads-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .downloads-header-note {
+      max-width: 28ch;
     }
   }
 

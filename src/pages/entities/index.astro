@@ -7,33 +7,33 @@ const labelFor = (type: string) =>
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (char) => char.toUpperCase());
 ---
-<Base title="The Grimoire — WitchClick">
+<Base title="The Grimoire — WitchClick" desktopWide={true}>
   <div class="grimoire-bg min-h-screen">
-    <section class="mx-auto max-w-5xl px-4 py-12 sm:py-16">
+    <section class="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 xl:max-w-7xl xl:px-12">
       <h1 class="font-serif text-4xl tracking-tight text-[color:var(--ink-strong)] sm:text-5xl">The Grimoire</h1>
       <p class="mt-4 max-w-2xl text-lg text-[color:var(--ink-body)]">
         Choose your path through this digital grimoire — each chapter holds whispered wisdom waiting to unfold.
       </p>
 
-      <div class="mt-10 grid gap-6 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="entity-grid mt-12">
         {sections.map((section) => (
           <a
             href={section.href}
-            class="entity-hub-card group flex h-full flex-col justify-between rounded-2xl border p-6 shadow-sm transition-transform duration-300 ease-out hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--glass-pill-border-active)] focus-visible:ring-offset-2"
+            class="entity-hub-card group grid gap-6 rounded-2xl border p-6 shadow-sm transition-transform duration-300 ease-out hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--glass-pill-border-active)] focus-visible:ring-offset-2"
           >
-            <div>
-              <div class="flex items-center gap-3 text-3xl" aria-hidden="true">
-                <span>{section.icon}</span>
-                <span class="text-xs font-medium uppercase tracking-[0.2em] text-[color:var(--wc-ink-label)]">
-                  {labelFor(section.type)}
-                </span>
+            <div class="entity-card">
+              <div class="entity-card-ribbon" aria-hidden="true">
+                <span class="entity-card-icon">{section.icon}</span>
+                <span class="entity-card-label">{labelFor(section.type)}</span>
               </div>
-              <h2 class="mt-4 font-serif text-2xl text-[color:var(--ink-strong)] transition-colors duration-300 group-hover:text-[color:var(--ink-strong)]">
-                {section.title}
-              </h2>
-              <p class="mt-2 text-base text-[color:var(--ink-body)]">{section.subtitle}</p>
+              <div class="entity-card-body">
+                <h2 class="font-serif text-2xl text-[color:var(--ink-strong)] transition-colors duration-300 group-hover:text-[color:var(--ink-strong)]">
+                  {section.title}
+                </h2>
+                <p class="mt-3 text-base text-[color:var(--ink-body)]">{section.subtitle}</p>
+              </div>
             </div>
-            <span class="mt-6 inline-flex items-center gap-2 text-sm font-medium text-[color:var(--wc-ink-label)] transition-colors duration-300 group-hover:text-[color:var(--ink-strong)]">
+            <span class="entity-card-cta">
               Enter this chapter
               <span aria-hidden="true">→</span>
             </span>
@@ -45,11 +45,29 @@ const labelFor = (type: string) =>
 </Base>
 
 <style>
+  .entity-grid {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  @media (min-width: 640px) {
+    .entity-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .entity-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
   .entity-hub-card {
     border-color: var(--panel-border-soft, rgba(124, 58, 237, 0.16));
     background: color-mix(in oklab, white 78%, var(--surface-tint, hsl(270 55% 62%)) 22%);
     color: var(--ink-body, currentColor);
     box-shadow: var(--wc-shadow-soft, 0 20px 45px -25px rgba(15, 23, 42, 0.35));
+    min-height: 100%;
   }
 
   .entity-hub-card:hover,
@@ -60,5 +78,79 @@ const labelFor = (type: string) =>
 
   .entity-hub-card:focus-visible {
     box-shadow: var(--wc-shadow-strong, 0 25px 60px -30px rgba(15, 23, 42, 0.45)), 0 0 0 3px var(--glass-pill-border-active);
+  }
+
+  .entity-card {
+    display: grid;
+    gap: clamp(1.25rem, 3vw, 2rem);
+    align-items: start;
+  }
+
+  @media (min-width: 1024px) {
+    .entity-card {
+      grid-template-columns: minmax(0, 0.4fr) minmax(0, 1fr);
+      gap: clamp(1.5rem, 3vw, 2.25rem);
+      align-items: stretch;
+    }
+  }
+
+  .entity-card-ribbon {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 80%, white 20%);
+  }
+
+  .entity-card-icon {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    filter: drop-shadow(0 6px 18px rgba(79, 70, 229, 0.25));
+  }
+
+  .entity-card-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 1024px) {
+    .entity-card-ribbon {
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid color-mix(in srgb, var(--ambient-color, var(--color-primary)) 28%, transparent);
+      padding-right: 1rem;
+      margin-right: clamp(1rem, 2vw, 1.5rem);
+    }
+
+    .entity-card-label {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      letter-spacing: 0.4em;
+    }
+  }
+
+  .entity-card-body h2 {
+    margin: 0;
+  }
+
+  .entity-card-body p {
+    margin-bottom: 0;
+    line-height: 1.65;
+  }
+
+  .entity-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: color-mix(in srgb, var(--wc-ink-label) 68%, var(--ink-body, currentColor) 32%);
+    transition: color 220ms ease;
+  }
+
+  .entity-hub-card:hover .entity-card-cta,
+  .entity-hub-card:focus-visible .entity-card-cta {
+    color: color-mix(in srgb, var(--ink-strong, currentColor) 85%, var(--ambient-color, var(--color-primary)) 15%);
   }
 </style>
