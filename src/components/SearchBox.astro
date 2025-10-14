@@ -3,13 +3,13 @@
 const uid = `search-${globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2)}`;
 const resultsId = `${uid}-results`;
 ---
-<div class="relative w-full max-w-xs" data-search>
+<div class="search-control" data-search>
   <label class="sr-only" for={uid}>Search posts</label>
   <input
     id={uid}
     type="search"
     placeholder="Search posts…"
-    class="w-full rounded-full border border-purple-200 bg-white/70 px-4 py-1.5 text-sm outline-none placeholder:text-purple-400 focus:border-purple-400"
+    class="search-input"
     role="combobox"
     aria-autocomplete="list"
     aria-expanded="false"
@@ -17,7 +17,7 @@ const resultsId = `${uid}-results`;
   />
   <div
     id={resultsId}
-    class="absolute left-0 right-0 z-50 mt-2 hidden overflow-hidden rounded-xl border border-purple-200 bg-white shadow-lg"
+    class="search-results hidden"
     role="listbox"
     data-results
   ></div>
@@ -63,9 +63,9 @@ const resultsId = `${uid}-results`;
     input.setAttribute('aria-expanded', 'true');
     results.classList.remove('hidden');
     results.innerHTML = items.slice(0,8).map(item => `
-      <a class="block px-3 py-2 text-sm hover:bg-purple-50 focus:bg-purple-100 focus:outline-none" href="/post/${escapeHtml(item.slug)}" role="option">
-        <div class="font-medium text-purple-900">${escapeHtml(item.title)}</div>
-        ${item.excerpt ? `<div class=\"text-xs text-purple-600 line-clamp-2\">${escapeHtml(item.excerpt)}</div>` : ''}
+      <a class="search-result" href="/post/${escapeHtml(item.slug)}" role="option">
+        <div class="search-result__title">${escapeHtml(item.title)}</div>
+        ${item.excerpt ? `<div class=\"search-result__excerpt\">${escapeHtml(item.excerpt)}</div>` : ''}
       </a>
     `).join('');
   }
