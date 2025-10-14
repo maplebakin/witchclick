@@ -1,7 +1,7 @@
 ---
 import HeaderIsland from './HeaderIsland.tsx';
-import { menuOpen } from '@/lib/uiState';
-import SearchPanel from './SearchPanel.astro';
+import MenuOverlay from './MenuOverlay.tsx';
+import SearchPanel from './SearchPanel.tsx';
 
 // Edit links as needed
 const nav = [
@@ -24,26 +24,8 @@ const nav = [
     </div>
   </div>
 
-  <!-- Mobile drawer: fixed + hidden by default -->
-  <div class={`fixed inset-0 z-40 md:hidden ${menuOpen.value ? 'block' : 'hidden'}`} aria-hidden={!menuOpen.value}>
-    <div class="absolute inset-0 bg-black/50"></div>
-    <div class="absolute left-0 top-0 h-full w-80 bg-white p-4 shadow-2xl dark:bg-zinc-900">
-      <div class="mb-4 flex items-center justify-between">
-        <span class="font-semibold">WitchClick Paths</span>
-        <button class="rounded-xl border px-3 py-1" aria-label="Close menu" onClick={() => (menuOpen.value = false)} client:load>✕</button>
-      </div>
-      <ul class="space-y-2">
-        {nav.map(n => (
-          <li>
-            <a href={n.href} class="block rounded-xl px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800" onClick={() => (menuOpen.value = false)}>
-              {n.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </div>
+  <MenuOverlay client:load nav={nav} />
 
   <!-- One global, fixed search panel -->
-  <SearchPanel label="Search posts" />
+  <SearchPanel client:load label="Search posts" />
 </header>
