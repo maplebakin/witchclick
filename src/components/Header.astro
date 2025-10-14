@@ -11,6 +11,8 @@ interface NavLink {
 interface Props {
   brandName: string;
   navLinks: NavLink[];
+  secondaryLinks?: NavLink[];
+  utilityLinks?: NavLink[];
   adminLinks?: NavLink[];
   currentPath?: string;
 }
@@ -18,6 +20,8 @@ interface Props {
 const {
   brandName,
   navLinks = [],
+  secondaryLinks = [],
+  utilityLinks = [],
   adminLinks = [],
   currentPath = "/",
 } = Astro.props as Props;
@@ -27,6 +31,8 @@ const normalizedPath = currentPath.endsWith("/") && currentPath.length > 1
   : `${currentPath.replace(/\/$/, "")}/`;
 
 const visibleAdmin = adminLinks.filter((link) => link && typeof link.href === "string");
+const visibleSecondary = secondaryLinks.filter((link) => link && typeof link.href === "string");
+const visibleUtility = utilityLinks.filter((link) => link && typeof link.href === "string");
 
 function isActive(href: string): boolean {
   if (!href) return false;
@@ -69,8 +75,53 @@ function isActive(href: string): boolean {
             </a>
           </li>
         ))}
+        {visibleSecondary.length > 0 && (
+          <li class="site-nav__item site-nav__item--submenu">
+            <button
+              type="button"
+              class="site-nav__button site-nav__button--more"
+              data-submenu-toggle
+              aria-expanded="false"
+              aria-controls="site-nav-secondary"
+            >
+              More
+              <svg class="site-nav__button-caret" viewBox="0 0 12 8" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M10.59.59a2 2 0 0 1 0 2.82l-3.3 3.29a2 2 0 0 1-2.82 0L1.17 3.41A2 2 0 0 1 4 1.59l2 2 2-2a2 2 0 0 1 2.59 0Z"
+                />
+              </svg>
+            </button>
+            <div
+              id="site-nav-secondary"
+              class="site-nav__submenu"
+              data-submenu
+              aria-hidden="true"
+            >
+              <ul class="site-nav__submenu-list">
+                {visibleSecondary.map((item) => (
+                  <li>
+                    <a class="site-nav__submenu-link" href={item.href} rel={item.rel}>
+                      <span class="site-nav__submenu-label">{item.label}</span>
+                      <span class="site-nav__submenu-meta">Dive deeper into {item.label}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </li>
+        )}
       </ul>
       <div class="site-nav__actions">
+        {visibleUtility.length > 0 && (
+          <div class="site-nav__utility">
+            {visibleUtility.map((item) => (
+              <a class="site-nav__button site-nav__button--utility" href={item.href} rel={item.rel}>
+                {item.label}
+              </a>
+            ))}
+          </div>
+        )}
         <ComfortSettings />
         {visibleAdmin.length > 0 && (
           <details class="site-nav__dev" data-dev-menu>
@@ -142,6 +193,25 @@ function isActive(href: string): boolean {
         </li>
       ))}
     </ul>
+    {visibleSecondary.length > 0 && (
+      <div class="site-nav__mobile-section">
+        <p class="site-footer__title">More from WitchClick</p>
+        <ul class="site-nav__mobile-subnav">
+          {visibleSecondary.map((item) => (
+            <li>
+              <a
+                class="site-nav__mobile-link site-nav__mobile-link--plain"
+                href={item.href}
+                rel={item.rel}
+                data-mobile-link
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
     {visibleAdmin.length > 0 && (
       <div class="site-nav__mobile-admin">
         <p class="site-footer__title">Dev shortcuts</p>
@@ -149,6 +219,25 @@ function isActive(href: string): boolean {
           {visibleAdmin.map((item) => (
             <li>
               <a class="site-nav__mobile-link" href={item.href} rel={item.rel}>
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+    {visibleUtility.length > 0 && (
+      <div class="site-nav__mobile-section">
+        <p class="site-footer__title">Quick links</p>
+        <ul class="site-nav__mobile-subnav">
+          {visibleUtility.map((item) => (
+            <li>
+              <a
+                class="site-nav__mobile-link site-nav__mobile-link--plain"
+                href={item.href}
+                rel={item.rel}
+                data-mobile-link
+              >
                 {item.label}
               </a>
             </li>
@@ -189,6 +278,9 @@ function isActive(href: string): boolean {
   const mobileCloseButtons = document.querySelectorAll('[data-mobile-close]');
   const mobileLinks = document.querySelectorAll('[data-mobile-link]');
   const searchCloseButtons = document.querySelectorAll('[data-search-close]');
+  const submenuToggle = document.querySelector('[data-submenu-toggle]');
+  const submenuPanel = document.querySelector('[data-submenu]');
+  const submenuLinks = submenuPanel ? Array.from(submenuPanel.querySelectorAll('a')) : [];
 
   function setMenuOpen(open) {
     if (mobileDrawer) {
@@ -203,6 +295,7 @@ function isActive(href: string): boolean {
     }
     if (open) {
       setSearchOpen(false);
+      setSubmenuOpen(false);
     }
   }
 
@@ -223,6 +316,21 @@ function isActive(href: string): boolean {
       if (input) {
         window.setTimeout(() => input.focus(), 120);
       }
+      setSubmenuOpen(false);
+    }
+  }
+
+  function setSubmenuOpen(open) {
+    if (submenuPanel) {
+      submenuPanel.classList.toggle('is-open', open);
+      submenuPanel.setAttribute('aria-hidden', String(!open));
+    }
+    if (submenuToggle) {
+      submenuToggle.setAttribute('aria-expanded', String(open));
+    }
+    if (open) {
+      setMenuOpen(false);
+      setSearchOpen(false);
     }
   }
 
@@ -248,15 +356,85 @@ function isActive(href: string): boolean {
     button.addEventListener('click', () => setSearchOpen(false));
   });
 
+  submenuToggle?.addEventListener('click', (event) => {
+    event.preventDefault();
+    const next = submenuToggle.getAttribute('aria-expanded') !== 'true';
+    setSubmenuOpen(next);
+  });
+
+  submenuLinks.forEach((link) => {
+    link.addEventListener('click', () => setSubmenuOpen(false));
+  });
+
+  const closeSubmenuOnOutsideClick = (event) => {
+    if (!submenuPanel || !submenuToggle) return;
+    if (!submenuPanel.classList.contains('is-open')) return;
+    if (submenuToggle.contains(event.target)) return;
+    if (submenuPanel.contains(event.target)) return;
+    setSubmenuOpen(false);
+  };
+
+  document.addEventListener('click', closeSubmenuOnOutsideClick);
+
+  const closeSubmenuOnBlur = () => {
+    window.setTimeout(() => {
+      if (!submenuPanel || !submenuToggle) return;
+      const active = document.activeElement;
+      if (active && (submenuPanel.contains(active) || submenuToggle.contains(active))) {
+        return;
+      }
+      setSubmenuOpen(false);
+    }, 0);
+  };
+
+  submenuPanel?.addEventListener('focusout', closeSubmenuOnBlur);
+  submenuToggle?.addEventListener('blur', closeSubmenuOnBlur);
+
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       setMenuOpen(false);
       setSearchOpen(false);
+      setSubmenuOpen(false);
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth < 921) {
+      setSubmenuOpen(false);
     }
   });
 </script>
 
 <style is:inline>
+  .site-header__inner {
+    flex-wrap: wrap;
+    row-gap: var(--space-3, 0.75rem);
+  }
+
+  .site-header__inner > .site-nav {
+    flex: 1 1 100%;
+  }
+
+  @media (min-width: 1024px) {
+    .site-header__inner {
+      flex-wrap: nowrap;
+    }
+
+    .site-header__inner > .site-nav {
+      flex: 1 1 auto;
+    }
+  }
+
+  .site-nav__list {
+    column-gap: var(--space-3, 0.75rem);
+  }
+
+  @media (max-width: 1200px) {
+    .site-nav__list {
+      column-gap: var(--space-2, 0.5rem);
+    }
+  }
+
   .site-nav__actions {
     display: none;
   }
@@ -266,12 +444,46 @@ function isActive(href: string): boolean {
       display: flex;
       align-items: center;
       gap: var(--space-2, 0.5rem);
+      flex-wrap: wrap;
     }
+  }
+
+  .site-nav__utility {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 0.5rem);
+  }
+
+  .site-nav__button--utility {
+    background: rgba(124, 78, 176, 0.18);
+  }
+
+  .site-nav__button--utility:hover,
+  .site-nav__button--utility:focus-visible {
+    background: rgba(124, 78, 176, 0.32);
   }
 
   .site-nav__button--dev {
     border-style: dashed;
     color: rgba(244, 241, 255, 0.8);
+  }
+
+  .site-nav__item--submenu {
+    position: relative;
+  }
+
+  .site-nav__button--more {
+    gap: var(--space-2, 0.5rem);
+  }
+
+  .site-nav__button-caret {
+    width: 0.75rem;
+    height: 0.75rem;
+    transition: transform 160ms ease;
+  }
+
+  .site-nav__button[aria-expanded="true"] .site-nav__button-caret {
+    transform: rotate(180deg);
   }
 
   .site-nav__dev {
@@ -368,6 +580,27 @@ function isActive(href: string): boolean {
     margin: 0;
     display: grid;
     gap: var(--space-2, 0.5rem);
+  }
+
+  .site-nav__mobile-section {
+    margin-top: var(--space-6, 1.5rem);
+    padding-top: var(--space-4, 1rem);
+    border-top: 1px solid rgba(212, 175, 55, 0.18);
+    display: grid;
+    gap: var(--space-3, 0.75rem);
+  }
+
+  .site-nav__mobile-subnav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-2, 0.5rem);
+  }
+
+  .site-nav__mobile-link--plain {
+    border-bottom: 0;
+    padding-block: var(--space-1, 0.25rem);
   }
 
   .site-search-panel {
