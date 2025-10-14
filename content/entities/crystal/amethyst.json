@@ -2,7 +2,13 @@
   "type": "crystal",
   "name": "Amethyst",
   "slug": "amethyst",
-  "summary": "",
-  "properties": {},
-  "related": []
+  "summary": "Violet quartz that calms screen fatigue, deepens intuition, and keeps workspace energy soothed.",
+  "properties": {
+    "keywords": ["focus", "clarity", "warding"],
+    "chakra": "Third eye",
+    "element": "Air"
+  },
+  "related": [
+    "ritual:desk-altar"
+  ]
 }

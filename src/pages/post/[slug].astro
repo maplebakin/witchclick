@@ -8,6 +8,7 @@ import RelatedPosts from "../../components/RelatedPosts.astro";
 import CtaFooter from "../../components/CtaFooter.astro";
 import ProductRecommendations from "../../components/ProductRecommendations.astro";
 import Accordion from "../../components/Accordion.astro";
+import CommentsSection from "../../components/CommentsSection.astro";
 import { readEntity } from "../../utils/entities";
 
 import fs from "node:fs";
@@ -332,6 +333,7 @@ const jsonLd = {
       </div>
 
       <RelatedPosts currentSlug={effectiveSlug} tags={data.tags || []} prev={prev} next={next} />
+      <CommentsSection slug={effectiveSlug} title={title} />
     </section>
   </div>
 </Base>

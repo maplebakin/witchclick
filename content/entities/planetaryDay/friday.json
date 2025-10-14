@@ -1,8 +1,13 @@
 {
   "type": "planetaryDay",
-  "name": "friday",
+  "name": "Friday",
   "slug": "friday",
-  "summary": "friday — stub entity",
-  "properties": {},
-  "related": []
+  "summary": "Day of Venus—perfect for beauty spells, relational repair, and grounding into pleasure.",
+  "properties": {
+    "planet": "Venus",
+    "keywords": ["connection", "artistry", "restoration"]
+  },
+  "related": [
+    "ritual:candle-grounding"
+  ]
 }

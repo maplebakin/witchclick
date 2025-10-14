@@ -2,7 +2,15 @@
   "type": "herb",
   "name": "Chamomile",
   "slug": "chamomile",
-  "summary": "",
-  "properties": {},
-  "related": []
+  "summary": "Golden blossoms that soften nerves, soothe the throat, and prepare the body for restorative rest.",
+  "properties": {
+    "element": "Water",
+    "correspondences": {
+      "planets": ["Moon"],
+      "uses": ["calming", "dreamwork", "peace"]
+    }
+  },
+  "related": [
+    "ritual:candle-grounding"
+  ]
 }

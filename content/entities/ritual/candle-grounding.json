@@ -1,8 +1,17 @@
 {
   "type": "ritual",
-  "name": "candle grounding",
+  "name": "Candle Grounding",
   "slug": "candle-grounding",
-  "summary": "candle grounding — stub entity",
-  "properties": {},
-  "related": []
+  "summary": "Center your body with flame gazing, breath cycles, and root-chakra affirmations before or after intense energy spikes.",
+  "properties": {
+    "duration": "12 minutes",
+    "idealTimes": ["Friday evenings", "Post-reading decompression"],
+    "supplies": ["grounding candle", "mug of chamomile"],
+    "mantra": "I anchor, soften, and release."
+  },
+  "related": [
+    "crystal:black-tourmaline",
+    "herb:chamomile",
+    "planetaryDay:friday"
+  ]
 }

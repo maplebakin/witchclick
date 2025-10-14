@@ -1,8 +1,13 @@
 {
   "type": "moonPhase",
-  "name": "waning moon",
+  "name": "Waning Moon",
   "slug": "waning-moon",
-  "summary": "waning moon — stub entity",
-  "properties": {},
-  "related": []
+  "summary": "Time for clearing, release, and tidying energetic boundaries as the light recedes.",
+  "properties": {
+    "keywords": ["release", "simplify", "closure"],
+    "ritualIdeas": ["desk altar reset", "gentle banishing smoke"]
+  },
+  "related": [
+    "ritual:desk-altar"
+  ]
 }

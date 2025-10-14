@@ -1,0 +1,356 @@
+---
+import Base from "../../layouts/Base.astro";
+
+const upcomingSalons = [
+  {
+    slug: "waning-moon-release",
+    title: "Waning Moon Release Salon",
+    date: "Sunday, February 9",
+    time: "8:00 PM Eastern",
+    focus: "Smoke cleansing, letting-go sigils, and gentle accountability for uncluttering emotional debris.",
+    zoomLink: "https://zoom.us/my/witchclicksalon?pwd=waning",
+    notionDoc: "https://www.notion.so/witchclick/Waning-Moon-Release-Prep-00000000000000000000000000000000",
+  },
+  {
+    slug: "creative-embers",
+    title: "Creative Embers Co-Working Circle",
+    date: "Thursday, February 20",
+    time: "12:30 PM Eastern",
+    focus: "Body-led stretches, candle gazing, and sprint planning for makers who crave ritualized momentum.",
+    zoomLink: "https://zoom.us/my/witchclicksalon?pwd=embers",
+    notionDoc: "https://www.notion.so/witchclick/Creative-Embers-Run-of-Show-00000000000000000000000000000000",
+  },
+  {
+    slug: "equinox-harmonics",
+    title: "Equinox Harmonics Salon",
+    date: "Saturday, March 22",
+    time: "4:00 PM Eastern",
+    focus: "Sound bath check-ins, tarot spreads for balance, and planning micro-actions for the next six weeks.",
+    zoomLink: "https://zoom.us/my/witchclicksalon?pwd=harmony",
+    notionDoc: "https://www.notion.so/witchclick/Equinox-Harmonics-Agenda-00000000000000000000000000000000",
+  },
+];
+
+const embedLinks = {
+  zoom: "https://zoom.us/wc/join/1234567890",
+  notion:
+    "https://www.notion.so/embed?src=https%3A%2F%2Fwww.notion.so%2Fwitchclick%2FRitual-Salon-Calendar-Template-00000000000000000000000000000000",
+};
+---
+<Base
+  title="Ritual Salon Schedule — WitchClick"
+  description="Plan your live ritual salons, join the Zoom room, and access shared Notion notes for co-creating the circle."
+  ambientColor="#2563eb"
+  wide={true}
+>
+  <section class="salon-hero">
+    <div class="salon-hero__inner">
+      <p class="salon-hero__eyebrow">Live circle gatherings</p>
+      <h1 class="salon-hero__title">Ritual salons &amp; shared practice rooms</h1>
+      <p class="salon-hero__lead">
+        Each salon blends a guided ritual, collective check-ins, and soft co-working. Save the upcoming dates, peek at prep
+        notes, and join us live—then bring a friend for the printable gift waiting in your member account.
+      </p>
+    </div>
+  </section>
+
+  <section class="salon-schedule">
+    <header class="salon-section__header">
+      <h2>Upcoming salons</h2>
+      <p>Click a card to copy the Zoom link or dive into the shared Notion prep doc.</p>
+    </header>
+    <div class="salon-schedule__grid">
+      {upcomingSalons.map((salon) => (
+        <article class="salon-card" data-zoom={salon.zoomLink}>
+          <header class="salon-card__header">
+            <h3>{salon.title}</h3>
+            <p class="salon-card__time">{salon.date} · {salon.time}</p>
+          </header>
+          <p class="salon-card__focus">{salon.focus}</p>
+          <div class="salon-card__actions">
+            <button type="button" class="salon-card__action" data-action="copy-zoom">
+              Copy Zoom link
+            </button>
+            <a class="salon-card__action" href={salon.notionDoc} target="_blank" rel="noopener">
+              View Notion prep
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="salon-embeds">
+    <div class="salon-embed">
+      <h2>Zoom quick join</h2>
+      <p>Use this embed during live sessions—keep your camera muted until the check-in round begins.</p>
+      <div class="salon-embed__frame">
+        <iframe
+          src={embedLinks.zoom}
+          title="WitchClick ritual salon Zoom room"
+          allow="camera; microphone; fullscreen"
+          referrerpolicy="no-referrer"
+        ></iframe>
+      </div>
+    </div>
+    <div class="salon-embed">
+      <h2>Shared Notion board</h2>
+      <p>Live notes, prompts, and playlists land here. Feel free to drop gentle ideas between salons.</p>
+      <div class="salon-embed__frame">
+        <iframe
+          src={embedLinks.notion}
+          title="Ritual salon shared Notion workspace"
+          loading="lazy"
+          referrerpolicy="no-referrer"
+        ></iframe>
+      </div>
+    </div>
+  </section>
+
+  <section class="salon-prep">
+    <div class="salon-prep__card">
+      <h2>How to prepare</h2>
+      <ul>
+        <li><strong>Bring a touchstone:</strong> a candle, crystal, or herb aligned with the salon theme.</li>
+        <li><strong>Set the vibe:</strong> dim lights, cue a playlist, and open your journal or sketchbook.</li>
+        <li><strong>Check tech gently:</strong> update Zoom beforehand and test your microphone if you plan to share.</li>
+        <li><strong>Invite a friend:</strong> every referral gifts them the printable sampler linked in your member account.</li>
+      </ul>
+    </div>
+    <div class="salon-prep__card">
+      <h2>Soft commitments</h2>
+      <p>
+        Salons are a co-created space. Arrive with curiosity, keep cameras optional, and honour consent—ask before coaching
+        or offering spiritual reads. Every voice is welcome, so we leave space for quieter members to speak first.
+      </p>
+    </div>
+  </section>
+
+  <script type="module">
+    const copyButtons = document.querySelectorAll("[data-action='copy-zoom']");
+
+    copyButtons.forEach((button) => {
+      button.addEventListener("click", async () => {
+        const card = button.closest("[data-zoom]");
+        const link = card?.getAttribute("data-zoom");
+        if (!link) return;
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(link);
+            button.classList.add("is-copied");
+            button.textContent = "Link copied";
+            setTimeout(() => {
+              button.classList.remove("is-copied");
+              button.textContent = "Copy Zoom link";
+            }, 3200);
+          } else {
+            prompt("Copy this Zoom link", link);
+          }
+        } catch (error) {
+          console.warn("Unable to copy Zoom link", error);
+        }
+      });
+    });
+  </script>
+
+  <style>
+    .salon-hero {
+      margin-top: clamp(1.5rem, 5vw, 2.5rem);
+      border-radius: 2.5rem;
+      background: linear-gradient(125deg, rgba(37, 99, 235, 0.18), rgba(191, 219, 254, 0.95));
+      padding: clamp(2rem, 6vw, 3.75rem);
+      box-shadow: 0 35px 80px -45px rgba(37, 99, 235, 0.45);
+    }
+
+    .salon-hero__eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.32em;
+      font-size: 0.75rem;
+      color: rgba(37, 99, 235, 0.8);
+      margin-bottom: 0.75rem;
+    }
+
+    .salon-hero__title {
+      margin: 0;
+      font-size: clamp(2.1rem, 5vw, 2.9rem);
+      font-family: var(--font-heading, "Fraunces", serif);
+      color: color-mix(in srgb, var(--ambient-color, #2563eb) 70%, #0f172a 30%);
+    }
+
+    .salon-hero__lead {
+      max-width: 70ch;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: color-mix(in srgb, var(--ink-body, #1f2937) 78%, white 22%);
+    }
+
+    .salon-schedule {
+      margin-top: clamp(2.5rem, 6vw, 3.5rem);
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .salon-section__header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: rgba(37, 99, 235, 0.95);
+    }
+
+    .salon-section__header p {
+      margin: 0.35rem 0 0;
+      color: rgba(30, 64, 175, 0.8);
+    }
+
+    .salon-schedule__grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 960px) {
+      .salon-schedule__grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .salon-card {
+      border-radius: 1.75rem;
+      border: 1px solid rgba(191, 219, 254, 0.9);
+      background: rgba(255, 255, 255, 0.96);
+      padding: 1.5rem;
+      display: grid;
+      gap: 0.9rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .salon-card:hover,
+    .salon-card:focus-within {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px -30px rgba(37, 99, 235, 0.55);
+    }
+
+    .salon-card__header h3 {
+      margin: 0;
+      font-size: 1.15rem;
+      color: rgba(30, 64, 175, 0.95);
+    }
+
+    .salon-card__time {
+      margin: 0.4rem 0 0;
+      font-size: 0.95rem;
+      color: rgba(30, 64, 175, 0.75);
+    }
+
+    .salon-card__focus {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: rgba(51, 65, 85, 0.95);
+    }
+
+    .salon-card__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .salon-card__action {
+      border-radius: 999px;
+      border: 0;
+      padding: 0.4rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: rgba(37, 99, 235, 0.12);
+      color: rgba(30, 64, 175, 0.95);
+      text-decoration: none;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .salon-card__action:hover,
+    .salon-card__action:focus-visible {
+      background: rgba(37, 99, 235, 0.2);
+      color: rgba(30, 64, 175, 1);
+    }
+
+    .salon-card__action.is-copied {
+      background: rgba(74, 222, 128, 0.2);
+      color: rgba(22, 163, 74, 0.95);
+    }
+
+    .salon-embeds {
+      margin-top: clamp(2.75rem, 6vw, 3.75rem);
+      display: grid;
+      gap: 2rem;
+    }
+
+    @media (min-width: 960px) {
+      .salon-embeds {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .salon-embed {
+      border-radius: 2rem;
+      border: 1px solid rgba(191, 219, 254, 0.8);
+      background: rgba(255, 255, 255, 0.94);
+      padding: clamp(1.5rem, 4vw, 2rem);
+      display: grid;
+      gap: 1rem;
+    }
+
+    .salon-embed__frame {
+      aspect-ratio: 16 / 9;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      background: rgba(226, 232, 240, 0.6);
+      position: relative;
+    }
+
+    .salon-embed__frame iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .salon-prep {
+      margin-top: clamp(2.5rem, 6vw, 3.5rem);
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 960px) {
+      .salon-prep {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .salon-prep__card {
+      border-radius: 2rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(255, 255, 255, 0.95);
+      padding: clamp(1.75rem, 4vw, 2.25rem);
+      display: grid;
+      gap: 0.9rem;
+    }
+
+    .salon-prep__card h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: rgba(30, 64, 175, 0.95);
+    }
+
+    .salon-prep__card ul {
+      margin: 0;
+      padding-left: 1.1rem;
+      color: rgba(51, 65, 85, 0.95);
+      display: grid;
+      gap: 0.6rem;
+    }
+
+    .salon-prep__card p {
+      margin: 0;
+      color: rgba(51, 65, 85, 0.95);
+      line-height: 1.65;
+    }
+  </style>
+</Base>

@@ -7,6 +7,12 @@ import { getTypeMetadata } from "../../../data/typeMetadata";
 import { resolveTailwindColor, mixColors, toRgba } from "../../../utils/color";
 import { toCssVariables } from "../../../utils/style";
 import { getPostsForEntity } from "../../../utils/entityPosts";
+import EntityRelationshipGraph from "../../../components/EntityRelationshipGraph.astro";
+import {
+  resolveEntityRefs,
+  findInboundRelations,
+  combineRelations,
+} from "../../../utils/entityRelations";
 
 export const prerender = true;
 
@@ -84,9 +90,51 @@ const typeLabel = ent.type
   .map((part) => (part ? part[0].toUpperCase() + part.slice(1) : ""))
   .join(" ");
 
+function startCase(value: string): string {
+  return value
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((part) => part[0].toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function formatRelationType(value: string): string {
+  return startCase(value);
+}
+
+const entityDisplayName = startCase(
+  typeof ent.name === "string" && ent.name.trim() ? ent.name.trim() : ent.slug,
+);
+
+const outboundHeading = ent.type === "ritual"
+  ? "Tools woven into this ritual"
+  : "Allies woven into this lore";
+
+const inboundHeading = ent.type === "ritual"
+  ? "Companion rituals & lore"
+  : "Rituals that call on this ally";
+
 const propertyEntries = ent.properties && typeof ent.properties === "object"
   ? Object.entries(ent.properties)
   : [];
+
+const outboundRelations = resolveEntityRefs(ent.related ?? []);
+const inboundRelations = findInboundRelations(ent.type, ent.slug);
+const relationNeighbors = combineRelations(outboundRelations, inboundRelations);
+const graphNeighbors = relationNeighbors.map((relation) => ({
+  type: relation.type,
+  slug: relation.slug,
+  name: relation.name,
+  summary: relation.summary,
+  direction: relation.direction,
+}));
+const centerNode = {
+  type: ent.type,
+  slug: ent.slug,
+  name: entityDisplayName,
+  summary: summaryText || metadata.stubLine,
+};
+const hasRelations = outboundRelations.length > 0 || inboundRelations.length > 0;
 
 let relatedPosts: Array<{ title: string; href: string; excerpt?: string }> = [];
 try {
@@ -115,7 +163,7 @@ function pretty(v: unknown) {
         <span class="entity-hero-icon" aria-hidden="true">{metadata.icon}</span>
         <div class="entity-hero-heading">
           <p class="entity-hero-type" data-label={typeLabel}>{typeLabel}</p>
-          <h1 class="entity-hero-title">{ent.name}</h1>
+          <h1 class="entity-hero-title">{entityDisplayName}</h1>
         </div>
         {summaryText && !isStub && (
           <p class="entity-hero-summary">{summaryText}</p>
@@ -152,8 +200,58 @@ function pretty(v: unknown) {
           </div>
         )}
 
-        {/* Future enhancement: render related entities using ent.related for richer cross-links. */}
+        {hasRelations && (
+          <div class="entity-relations">
+            {outboundRelations.length > 0 && (
+              <section class="entity-relations-section">
+                <h2 class="entity-section-title">{outboundHeading}</h2>
+                <ul class="entity-relations-list">
+                  {outboundRelations.map((relation) => (
+                    <li>
+                      <a
+                        class="entity-relations-link"
+                        href={`/entities/${relation.type}/${relation.slug}`}
+                      >
+                        <span class="entity-relations-name">{relation.name}</span>
+                        <span class="entity-relations-type">{formatRelationType(relation.type)}</span>
+                      </a>
+                      {relation.summary && (
+                        <p class="entity-relations-summary">{relation.summary}</p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {inboundRelations.length > 0 && (
+              <section class="entity-relations-section">
+                <h2 class="entity-section-title">{inboundHeading}</h2>
+                <ul class="entity-relations-list">
+                  {inboundRelations.map((relation) => (
+                    <li>
+                      <a
+                        class="entity-relations-link inbound"
+                        href={`/entities/${relation.type}/${relation.slug}`}
+                      >
+                        <span class="entity-relations-name">{relation.name}</span>
+                        <span class="entity-relations-type">{formatRelationType(relation.type)}</span>
+                      </a>
+                      {relation.summary && (
+                        <p class="entity-relations-summary">{relation.summary}</p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+          </div>
+        )}
       </section>
+    )}
+
+    {graphNeighbors.length > 0 && (
+      <EntityRelationshipGraph center={centerNode} neighbors={graphNeighbors} />
     )}
 
     <section class="entity-related">
