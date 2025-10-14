@@ -56,6 +56,7 @@ function readJSON(p) {
 function ensureDir(p) { fs.mkdirSync(p, { recursive: true }); }
 
 const HERO_IMAGE_ROOT = path.join(CWD, 'public', 'images', 'hero');
+const DOWNLOADS_ROOT = path.join(CWD, 'public', 'downloads');
 const VALID_POST_SLUG = /^[a-z0-9-]+$/;
 
 const FRONTMATTER_REGEX = /^---\n([\s\S]*?)\n---\n?/;
@@ -90,6 +91,7 @@ const MIME_EXTENSION_MAP = {
   'image/jpg': '.jpg',
   'image/png': '.png',
   'image/webp': '.webp',
+  'application/pdf': '.pdf',
 };
 
 function normalizeExtension(ext, fallback) {
@@ -132,6 +134,16 @@ function parseImageDataUrl(value) {
   const base64 = match[2] ? match[2].trim() : '';
   if (!base64) return null;
   return { mime, base64: base64.replace(/\s+/g, '') };
+}
+
+function parseDataUrl(value) {
+  const str = String(value || '');
+  const match = /^data:([a-z0-9.+-\/]+);base64,(.*)$/i.exec(str);
+  if (!match) return null;
+  const mime = match[1].toLowerCase();
+  const base64 = (match[2] || '').trim().replace(/\s+/g, '');
+  if (!base64) return null;
+  return { mime, base64 };
 }
 
 async function listPostsForHero() {
@@ -1016,6 +1028,95 @@ const server = http.createServer(async (req, res) => {
         return send(res, 500, { ok: false, error: e?.message || String(e) });
       }
     }
+
+    // POST /upload/download-file
+    // Body: { slug, filename, contentBase64 } where contentBase64 is a data: URL
+    // Accepts: application/pdf, image/png, image/jpg, image/webp (maps via MIME_EXTENSION_MAP)
+    // Writes to: public/downloads/<slug>/files/<unique>.<ext>
+    if (req.method === 'POST' && req.url === '/upload/download-file') {
+      try {
+        const body = await parseBody(req);
+        if (!body || typeof body !== 'object') return send(res, 400, { ok: false, error: 'Invalid JSON body' });
+
+        const slug = String(body.slug || '').trim();
+        if (!VALID_POST_SLUG.test(slug)) return send(res, 400, { ok: false, error: 'Invalid slug' });
+
+        const parsed = parseDataUrl(body.contentBase64);
+        if (!parsed) return send(res, 400, { ok: false, error: 'contentBase64 must be a base64 data: URL' });
+
+        const fallbackExt = MIME_EXTENSION_MAP[parsed.mime];
+        if (!fallbackExt || !['.pdf', '.png', '.jpg', '.webp'].includes(fallbackExt)) {
+          return send(res, 400, { ok: false, error: 'Unsupported mime; allowed: PDF or PNG/JPG/WEBP images' });
+        }
+
+        const { base, ext } = sanitizeHeroFilename(body.filename, fallbackExt);
+        const buffer = Buffer.from(parsed.base64, 'base64');
+        if (!buffer.length) return send(res, 400, { ok: false, error: 'File data was empty' });
+
+        const targetDir = path.join(DOWNLOADS_ROOT, slug, 'files');
+        ensureDir(targetDir);
+        const finalName = ensureUniqueFilename(targetDir, base, ext);
+        const filePath = path.join(targetDir, finalName);
+        await fsp.writeFile(filePath, buffer);
+
+        const relativePath = `/downloads/${slug}/files/${finalName}`.replace(/\\+/g, '/');
+        return send(res, 200, { ok: true, path: relativePath });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    // POST /upload/download-cover
+    // Body: { slug, filename, contentBase64 } where contentBase64 is a data:image/... URL
+    // Writes to: public/downloads/<slug>/cover/<unique>.<ext>
+    if (req.method === 'POST' && req.url === '/upload/download-cover') {
+      try {
+        const body = await parseBody(req);
+        if (!body || typeof body !== 'object') return send(res, 400, { ok: false, error: 'Invalid JSON body' });
+
+        const slug = String(body.slug || '').trim();
+        if (!VALID_POST_SLUG.test(slug)) return send(res, 400, { ok: false, error: 'Invalid slug' });
+
+        const parsed = parseDataUrl(body.contentBase64);
+        if (!parsed || !parsed.mime.startsWith('image/')) {
+          return send(res, 400, { ok: false, error: 'contentBase64 must be a data:image/... URL' });
+        }
+
+        const fallbackExt = MIME_EXTENSION_MAP[parsed.mime];
+        if (!fallbackExt) return send(res, 400, { ok: false, error: 'Unsupported image mime type' });
+
+        const { base, ext } = sanitizeHeroFilename(body.filename, fallbackExt);
+        const buffer = Buffer.from(parsed.base64, 'base64');
+        if (!buffer.length) return send(res, 400, { ok: false, error: 'Image data was empty' });
+
+        const targetDir = path.join(DOWNLOADS_ROOT, slug, 'cover');
+        ensureDir(targetDir);
+        const finalName = ensureUniqueFilename(targetDir, base, ext);
+        const filePath = path.join(targetDir, finalName);
+        await fsp.writeFile(filePath, buffer);
+
+        const relativePath = `/downloads/${slug}/cover/${finalName}`.replace(/\\+/g, '/');
+        return send(res, 200, { ok: true, path: relativePath });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    /*
+     * Admin UI usage:
+     * 1) Cover upload flow:
+     *    - Convert selected image to a base64 data URL in the browser (FileReader.readAsDataURL).
+     *    - POST to /upload/download-cover with { slug, filename, contentBase64 }.
+     *    - Take response.path and set it into the 'cover' field when calling /downloads/save.
+     *
+     * 2) File upload flow (PDF preferred):
+     *    - Convert the PDF (or image) to a base64 data URL (FileReader.readAsDataURL).
+     *    - POST to /upload/download-file with { slug, filename, contentBase64 }.
+     *    - Take response.path and set it into the 'file' field when calling /downloads/save.
+     *
+     * 3) Static serving:
+     *    - Astro serves files from /public. These will be accessible at /downloads/<slug>/... in production.
+     */
 
     // ---- Downloads
     if (req.method === 'POST' && req.url === '/downloads/list') {
