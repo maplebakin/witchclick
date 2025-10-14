@@ -43,16 +43,16 @@ const theme = getTheme();
 const analyticsInjection = buildAnalyticsInjection(settings);
 
 const headerWidthClass = desktopWide
-  ? "max-w-6xl xl:max-w-7xl 2xl:max-w-screen-2xl"
+  ? "w-full max-w-7xl 2xl:max-w-[92rem]"
   : wide
-    ? "max-w-screen-2xl"
-    : "max-w-7xl";
+    ? "w-full max-w-6xl xl:max-w-7xl"
+    : "w-full max-w-5xl lg:max-w-6xl";
 const mainWidthClass = desktopWide
-  ? "max-w-6xl xl:max-w-7xl 2xl:max-w-screen-2xl"
+  ? "w-full max-w-7xl 2xl:max-w-[92rem]"
   : wide
-    ? "max-w-screen-2xl"
-    : "max-w-6xl";
-const layoutPaddingClass = desktopWide ? "px-4 sm:px-6 lg:px-8 xl:px-12" : "px-4";
+    ? "w-full max-w-6xl xl:max-w-7xl"
+    : "w-full max-w-5xl lg:max-w-6xl";
+const layoutPaddingClass = desktopWide ? "px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16" : "px-4";
 const layoutContentClass = ["layout-content", desktopWide && "layout-content--desktop"].filter(Boolean).join(" ");
 
 const grimoireChapters = Object.entries(typeMetadata).map(([type, metadata]) => ({
