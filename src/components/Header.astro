@@ -1,9 +1,6 @@
 ---
-import HeaderIsland from './HeaderIsland.tsx';
-import MobileMenuIsland from './MobileMenuIsland.tsx';
 import SearchPanel from './SearchPanel.astro';
 
-// Nav links — edit destinations as needed.
 const nav = [
   { href: '/', label: 'Rituals' },
   { href: '/entities/', label: 'Entity Library' },
@@ -11,23 +8,251 @@ const nav = [
   { href: '/about/', label: 'About' },
   { href: '/contact/', label: 'Contact' },
 ];
+const menuId = 'mobile-menu-panel';
+const searchId = 'global-search-panel';
 ---
 <header class="sticky top-0 z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur border-b">
   <div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
     <a href="/" class="font-bold text-xl">WitchClick</a>
     <nav class="hidden md:flex items-center gap-6">
-      {nav.map(n => (
+      {nav.map((n) => (
         <a href={n.href} class="hover:underline">{n.label}</a>
       ))}
     </nav>
-    <div class="md:hidden">
-      <HeaderIsland client:load />
+    <div class="md:hidden" data-header-controls>
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          class="px-3 py-2 rounded-xl border"
+          data-action="toggle-menu"
+          aria-controls={menuId}
+          aria-expanded="false"
+        >
+          Menu
+        </button>
+        <button
+          type="button"
+          class="px-3 py-2 rounded-xl border"
+          data-action="toggle-search"
+          aria-controls={searchId}
+          aria-expanded="false"
+        >
+          Search
+        </button>
+        <button
+          type="button"
+          class="px-2 py-1 text-sm opacity-70 hover:opacity-100"
+          data-action="reset"
+        >
+          Reset
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Mobile drawer -->
-  <MobileMenuIsland client:load items={nav} />
+  <div
+    id={menuId}
+    class="md:hidden fixed inset-0 z-40 hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-hidden="true"
+    data-mobile-menu
+  >
+    <div class="absolute inset-0 bg-black/50" data-menu-backdrop></div>
+    <div class="absolute left-0 top-0 h-full w-80 bg-white p-4 shadow-2xl dark:bg-zinc-900">
+      <div class="mb-4 flex items-center justify-between">
+        <span class="font-semibold">WitchClick Paths</span>
+        <button
+          class="rounded-xl border px-3 py-1"
+          aria-label="Close menu"
+          type="button"
+          data-action="close-menu"
+        >
+          ✕
+        </button>
+      </div>
+      <ul class="space-y-2">
+        {nav.map((n) => (
+          <li>
+            <a
+              href={n.href}
+              class="block rounded-xl px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              data-menu-link
+            >
+              {n.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
 
-  <!-- One global search panel only -->
-  <SearchPanel label="Search posts" />
+  <SearchPanel label="Search posts" panelId={searchId} />
 </header>
+
+<script is:inline>
+  (() => {
+    const attach = () => {
+      const controls = document.querySelector('[data-header-controls]');
+      if (!controls || controls.hasAttribute('data-bound')) return;
+      controls.setAttribute('data-bound', 'true');
+
+      let menuOpen = false;
+      let searchOpen = false;
+
+      const menuToggle = controls.querySelector('[data-action="toggle-menu"]');
+      const searchToggle = controls.querySelector('[data-action="toggle-search"]');
+      const resetButton = controls.querySelector('[data-action="reset"]');
+
+      const menuPanel = document.querySelector('[data-mobile-menu]');
+      const menuBackdrop = menuPanel?.querySelector('[data-menu-backdrop]');
+      const menuClose = menuPanel?.querySelector('[data-action="close-menu"]');
+      const menuLinks = menuPanel ? Array.from(menuPanel.querySelectorAll('[data-menu-link]')) : [];
+
+      const searchPanel = document.querySelector('[data-search-panel]');
+      const searchBackdrop = searchPanel?.querySelector('[data-search-backdrop]');
+      const searchClose = searchPanel?.querySelector('[data-action="close-search"]');
+      const searchInput = searchPanel?.querySelector('[data-search-input]');
+
+      const syncBodyScroll = () => {
+        const body = document.body;
+        if (menuOpen || searchOpen) {
+          body.classList.add('overflow-hidden');
+        } else {
+          body.classList.remove('overflow-hidden');
+        }
+      };
+
+      const updateMenu = () => {
+        if (!menuPanel || !menuToggle) return;
+        menuPanel.classList.toggle('hidden', !menuOpen);
+        menuPanel.classList.toggle('block', menuOpen);
+        menuPanel.setAttribute('aria-hidden', String(!menuOpen));
+        menuToggle.setAttribute('aria-expanded', String(menuOpen));
+        syncBodyScroll();
+      };
+
+      const updateSearch = () => {
+        if (!searchPanel || !searchToggle) return;
+        searchPanel.classList.toggle('hidden', !searchOpen);
+        searchPanel.classList.toggle('block', searchOpen);
+        searchPanel.setAttribute('aria-hidden', String(!searchOpen));
+        searchToggle.setAttribute('aria-expanded', String(searchOpen));
+        if (searchOpen && searchInput instanceof HTMLInputElement) {
+          window.setTimeout(() => {
+            searchInput.focus({ preventScroll: true });
+          }, 0);
+        }
+        syncBodyScroll();
+      };
+
+      const closeMenu = () => {
+        if (!menuOpen) return;
+        menuOpen = false;
+        updateMenu();
+      };
+
+      const closeSearch = () => {
+        if (!searchOpen) return;
+        searchOpen = false;
+        updateSearch();
+      };
+
+      const toggleMenu = () => {
+        if (menuOpen) {
+          closeMenu();
+        } else {
+          menuOpen = true;
+          if (searchOpen) {
+            searchOpen = false;
+            updateSearch();
+          }
+          updateMenu();
+        }
+      };
+
+      const toggleSearch = () => {
+        if (searchOpen) {
+          closeSearch();
+        } else {
+          searchOpen = true;
+          if (menuOpen) {
+            menuOpen = false;
+            updateMenu();
+          }
+          updateSearch();
+        }
+      };
+
+      const resetAll = () => {
+        const changed = menuOpen || searchOpen;
+        menuOpen = false;
+        searchOpen = false;
+        if (changed) {
+          updateMenu();
+          updateSearch();
+        } else {
+          syncBodyScroll();
+        }
+      };
+
+      menuToggle?.addEventListener('click', (event) => {
+        event.preventDefault();
+        toggleMenu();
+      });
+
+      searchToggle?.addEventListener('click', (event) => {
+        event.preventDefault();
+        toggleSearch();
+      });
+
+      resetButton?.addEventListener('click', (event) => {
+        event.preventDefault();
+        resetAll();
+      });
+
+      menuBackdrop?.addEventListener('click', closeMenu);
+      menuClose?.addEventListener('click', (event) => {
+        event.preventDefault();
+        closeMenu();
+      });
+      menuLinks.forEach((link) => {
+        link.addEventListener('click', closeMenu);
+      });
+
+      searchBackdrop?.addEventListener('click', closeSearch);
+      searchClose?.addEventListener('click', (event) => {
+        event.preventDefault();
+        closeSearch();
+      });
+
+      const handleKeydown = (event) => {
+        if (event.key === 'Escape' && (menuOpen || searchOpen)) {
+          event.preventDefault();
+          resetAll();
+        }
+      };
+
+      document.addEventListener('keydown', handleKeydown);
+
+      const handleBeforeSwap = () => {
+        resetAll();
+        document.removeEventListener('keydown', handleKeydown);
+        controls.removeAttribute('data-bound');
+      };
+
+      document.addEventListener('astro:before-swap', handleBeforeSwap, { once: true });
+
+      updateMenu();
+      updateSearch();
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', attach, { once: true });
+    } else {
+      attach();
+    }
+
+    document.addEventListener('astro:after-swap', attach);
+  })();
+</script>
