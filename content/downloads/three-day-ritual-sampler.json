@@ -1,0 +1,14 @@
+{
+  "slug": "three-day-ritual-sampler",
+  "name": "Three-Day Ritual Sampler Planner",
+  "price": "0",
+  "currency": "USD",
+  "summary": "Printable planner that guides you through a three-day onboarding sequence with morning, midday, and evening rituals.",
+  "file": "/lab/three-day-sampler",
+  "tags": ["planner", "sampler", "ritual"],
+  "features": [
+    "Morning, midday, and evening prompts",
+    "Space for reflections and next-step commitments",
+    "Print-friendly layout designed for PDF export"
+  ]
+}

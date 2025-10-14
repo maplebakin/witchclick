@@ -1,0 +1,50 @@
+---
+import PrintablePlanner from "../../layouts/PrintablePlanner.astro";
+import { loadRitualLabEntries } from "../../utils/ritualLab";
+
+const entries = loadRitualLabEntries();
+const sampler = entries.find((entry) => entry.slug === "lab-three-day-sampler");
+const steps = sampler?.steps ?? [];
+const summary = sampler?.summary ?? "Follow three gentle days of rituals that build confidence without overwhelm.";
+
+function parseLines(description?: string) {
+  if (!description) return [] as string[];
+  return description
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => line.replace(/\*\*/g, ""));
+}
+---
+<PrintablePlanner title="Three-Day Ritual Sampler" description={summary}>
+  <section class="grid three-columns">
+    {steps.map((step) => (
+      <article class="card">
+        <h3>{step.title}</h3>
+        <ul>
+          {parseLines(step.description).map((line) => (
+            <li class="checkbox-row">
+              <span>{line}</span>
+              <span class="checkbox" aria-hidden="true"></span>
+            </li>
+          ))}
+        </ul>
+      </article>
+    ))}
+  </section>
+
+  <section style="margin-top: 2rem;">
+    <h2>Reflection Prompts</h2>
+    <p>Use this space to note micro-wins, sensations, or patterns that surfaced across the three days.</p>
+    <div style="border: 2px dashed rgba(124, 58, 237, 0.35); border-radius: 16px; padding: 1.5rem; min-height: 240px;"></div>
+  </section>
+
+  <section style="margin-top: 2rem;">
+    <h2>Next Ritual Anchor</h2>
+    <p>Circle the ritual that felt most nourishing and jot down when you'll revisit it.</p>
+    <div class="grid" style="grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem;">
+      <div style="border: 2px solid rgba(124, 58, 237, 0.4); border-radius: 12px; padding: 1.25rem; min-height: 140px;"></div>
+      <div style="border: 2px solid rgba(124, 58, 237, 0.4); border-radius: 12px; padding: 1.25rem; min-height: 140px;"></div>
+    </div>
+  </section>
+</PrintablePlanner>
