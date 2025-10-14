@@ -89,6 +89,26 @@ const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined
     {analytics?.head && <Fragment set:html={analytics.head} />}
     {analytics?.config && <Fragment set:html={analytics.config} />}
 
+    <script is:inline>
+      try {
+        const stored = localStorage.getItem('witchclick-comfort');
+        if (stored) {
+          const prefs = JSON.parse(stored);
+          const root = document.documentElement;
+          if (prefs && typeof prefs === 'object') {
+            if (prefs.theme === 'dawn') {
+              root.setAttribute('data-comfort-theme', 'dawn');
+            }
+            if (prefs.font === 'sans') {
+              root.setAttribute('data-comfort-font', 'sans');
+            }
+          }
+        }
+      } catch (error) {
+        /* no-op */
+      }
+    </script>
+
     <slot name="head" />
   </head>
   <body

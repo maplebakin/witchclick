@@ -1,5 +1,6 @@
 ---
 import SearchBox from "./SearchBox.astro";
+import ComfortSettings from "./ComfortSettings.astro";
 
 interface NavLink {
   href: string;
@@ -70,6 +71,7 @@ function isActive(href: string): boolean {
         ))}
       </ul>
       <div class="site-nav__actions">
+        <ComfortSettings />
         {visibleAdmin.length > 0 && (
           <details class="site-nav__dev" data-dev-menu>
             <summary class="site-nav__button site-nav__button--dev">
@@ -154,6 +156,9 @@ function isActive(href: string): boolean {
         </ul>
       </div>
     )}
+    <div class="site-nav__mobile-comfort">
+      <ComfortSettings variant="stacked" />
+    </div>
   </div>
   <div
     id="site-search-panel"

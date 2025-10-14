@@ -24,6 +24,31 @@
   --card-tag-text: rgba(244, 241, 255, 0.85);
 }
 
+:root[data-comfort-theme="dawn"] {
+  --card-panel-surface: rgba(255, 252, 247, 0.92);
+  --card-panel-surface-strong: rgba(245, 238, 232, 0.95);
+  --card-panel-border: rgba(122, 94, 154, 0.28);
+  --card-panel-border-strong: rgba(122, 94, 154, 0.42);
+  --card-panel-border-soft: rgba(166, 138, 198, 0.25);
+  --card-hover-translate: -0.3rem;
+  --card-focus-ring: 0 0 0 3px rgba(122, 94, 154, 0.28);
+  --card-focus-ring-strong: 0 0 0 3px rgba(122, 94, 154, 0.4);
+  --card-highlight: radial-gradient(circle at 15% -25%, rgba(173, 147, 211, 0.24), transparent 60%);
+  --card-highlight-alt: radial-gradient(circle at 85% -10%, rgba(235, 220, 255, 0.3), transparent 70%);
+  --card-highlight-soft: radial-gradient(circle at 50% 0%, rgba(204, 186, 228, 0.28), transparent 70%);
+  --elevation-tier-1: 0 18px 45px -28px rgba(74, 58, 104, 0.18);
+  --elevation-tier-2: 0 25px 60px -32px rgba(74, 58, 104, 0.24);
+  --elevation-tier-3: 0 35px 75px -34px rgba(74, 58, 104, 0.28);
+  --elevation-tier-ambient: 0 15px 40px -28px rgba(74, 58, 104, 0.18);
+  --card-badge-bg: rgba(194, 168, 222, 0.28);
+  --card-badge-border: rgba(122, 94, 154, 0.38);
+  --card-badge-text: rgba(62, 39, 92, 0.85);
+  --card-tag-bg: rgba(204, 186, 228, 0.32);
+  --card-tag-border: rgba(122, 94, 154, 0.35);
+  --card-tag-text: rgba(62, 39, 92, 0.82);
+  --card-pill-shadow: 0 2px 6px rgba(74, 58, 104, 0.14);
+}
+
 .card-panel {
   position: relative;
   display: block;
