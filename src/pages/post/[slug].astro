@@ -483,6 +483,11 @@ const jsonLd = {
 
   .post-panel {
     padding: clamp(1.85rem, 4.5vw, 2.85rem);
+    --ambient-color: color-mix(
+      in srgb,
+      var(--surface-tint, hsl(270 55% 62%)) 55%,
+      black 45%
+    );
     color: var(--ink-body, currentColor);
   }
 
@@ -493,6 +498,39 @@ const jsonLd = {
 
   .post-article h1 {
     color: var(--ink-strong, currentColor);
+  }
+
+  .post-article .prose {
+    color: var(--ink-body, currentColor);
+  }
+
+  .post-article .prose :where(p, li, figcaption, blockquote, code, span) {
+    color: inherit;
+  }
+
+  .post-article .prose :where(h2, h3, h4, h5, h6) {
+    color: var(--ink-strong, currentColor);
+  }
+
+  .post-article .prose a {
+    color: var(--action-primary, var(--ink-strong, currentColor));
+    text-decoration: underline;
+    text-decoration-color: color-mix(
+      in srgb,
+      var(--action-primary, currentColor) 65%,
+      transparent 35%
+    );
+    text-decoration-thickness: 1.5px;
+  }
+
+  .post-article .prose a:hover,
+  .post-article .prose a:focus-visible {
+    color: var(--action-primary-hover, var(--ink-strong, currentColor));
+    text-decoration-color: color-mix(
+      in srgb,
+      var(--action-primary-hover, currentColor) 65%,
+      transparent 35%
+    );
   }
 
   .post-meta {

@@ -82,7 +82,7 @@ body {
   font-family: var(--font-body-ui, var(--font-body));
   line-height: 1.7;
   font-size: 1rem;
-  color: var(--color-ink);
+  color: var(--ink-body, #1f1633);
   letter-spacing: var(--font-body-letter-spacing, normal);
   background:
     radial-gradient(120% 160% at 50% 0%, rgba(212, 175, 55, 0.16) 0%, transparent 60%),
@@ -94,7 +94,7 @@ body {
 }
 
 :root[data-comfort-theme="dawn"] body {
-  color: var(--color-ink);
+  color: var(--ink-body, #2c1b3d);
   background:
     radial-gradient(120% 160% at 50% 0%, rgba(180, 156, 214, 0.16) 0%, transparent 60%),
     radial-gradient(140% 200% at 10% 20%, rgba(214, 200, 236, 0.32) 0%, transparent 70%),
@@ -127,7 +127,7 @@ a {
 
 a:hover,
 a:focus-visible {
-  color: var(--color-gold);
+  color: var(--action-primary, var(--ink-strong, currentColor));
 }
 
 img,
@@ -163,7 +163,7 @@ h5,
 h6 {
   font-family: var(--font-heading);
   letter-spacing: 0.045em;
-  color: var(--color-muted);
+  color: var(--ink-strong, #1a102c);
   text-transform: uppercase;
 }
 
@@ -198,6 +198,7 @@ blockquote {
   border-left: 3px solid var(--color-gold);
   background: rgba(14, 6, 26, 0.6);
   border-radius: 0.75rem;
+  color: color-mix(in srgb, var(--action-primary-text, #f7f5ff) 94%, white 6%);
   font-style: italic;
 }
 
