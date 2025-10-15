@@ -496,17 +496,29 @@ const jsonLd = {
   }
 
   .post-meta {
-    color: color-mix(in srgb, var(--ink-muted, currentColor) 82%, white 18%);
+    color: color-mix(
+      in srgb,
+      var(--ink-muted, currentColor) 90%,
+      var(--ink-body, currentColor) 10%
+    );
   }
 
   .post-byline {
     margin: -0.35rem 0 1.75rem;
     font-size: 0.95rem;
-    color: color-mix(in srgb, var(--ink-muted, currentColor) 80%, white 20%);
+    color: color-mix(
+      in srgb,
+      var(--ink-body, currentColor) 88%,
+      var(--ink-muted, currentColor) 12%
+    );
   }
 
   .post-byline__link {
-    color: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 65%, var(--ink-strong, currentColor) 35%);
+    color: color-mix(
+      in srgb,
+      var(--ambient-color, var(--color-primary)) 55%,
+      var(--ink-strong, currentColor) 45%
+    );
     font-weight: 600;
     text-decoration: none;
   }
@@ -522,7 +534,11 @@ const jsonLd = {
   }
 
   .post-byline__separator {
-    color: color-mix(in srgb, var(--ink-muted, currentColor) 80%, white 20%);
+    color: color-mix(
+      in srgb,
+      var(--ink-muted, currentColor) 88%,
+      var(--ink-body, currentColor) 12%
+    );
   }
 
   .post-sidebar .soft-card {
@@ -537,7 +553,11 @@ const jsonLd = {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.32em;
-    color: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 68%, var(--ink-body, currentColor) 32%);
+    color: color-mix(
+      in srgb,
+      var(--ambient-color, var(--color-primary)) 45%,
+      var(--ink-strong, currentColor) 55%
+    );
   }
 
   .post-entities-list {
@@ -547,12 +567,20 @@ const jsonLd = {
     display: grid;
     gap: 0.85rem;
     font-size: 0.9rem;
-    color: color-mix(in srgb, var(--ink-body, currentColor) 88%, white 12%);
+    color: color-mix(
+      in srgb,
+      var(--ink-body, currentColor) 94%,
+      var(--ink-strong, currentColor) 6%
+    );
   }
 
   .post-entities-link {
     font-weight: 600;
-    color: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 70%, var(--ink-strong, currentColor) 30%);
+    color: color-mix(
+      in srgb,
+      var(--ambient-color, var(--color-primary)) 58%,
+      var(--ink-strong, currentColor) 42%
+    );
     text-decoration: none;
   }
 
@@ -574,7 +602,11 @@ const jsonLd = {
     margin: 0;
     font-size: clamp(1.1rem, 2.4vw, 1.35rem);
     font-weight: 700;
-    color: color-mix(in srgb, var(--ink-strong, currentColor) 88%, white 12%);
+    color: color-mix(
+      in srgb,
+      var(--ink-strong, currentColor) 94%,
+      var(--ink-body, currentColor) 6%
+    );
   }
 
   .post-author-spotlights__grid {
@@ -591,7 +623,11 @@ const jsonLd = {
   .post-entities-summary {
     margin: 0.35rem 0 0;
     font-size: 0.8rem;
-    color: color-mix(in srgb, var(--ink-muted, currentColor) 80%, white 20%);
+    color: color-mix(
+      in srgb,
+      var(--ink-muted, currentColor) 88%,
+      var(--ink-body, currentColor) 12%
+    );
   }
 
   @media (min-width: 1024px) {
