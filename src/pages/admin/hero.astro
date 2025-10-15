@@ -42,93 +42,179 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
         </p>
       </header>
 
-      <div class="grid gap-5">
-        <label class="block">
-          <span class="text-xs font-medium uppercase tracking-wide text-gray-600">Post</span>
-          <select
-            class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-purple-500 focus:outline-none"
-            data-post-select
-            disabled
-          >
-            <option>Loading posts…</option>
-          </select>
-        </label>
-
-        <div
-          class="rounded-lg border border-purple-100 bg-purple-50 p-4 text-sm text-purple-900"
-          data-hero-prompt-card
-        >
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <span class="font-medium">Hero prompt helper</span>
-            <button
-              class="rounded-md bg-purple-600 px-3 py-1 text-xs font-medium text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-60"
-              data-copy-prompt
-              disabled
-            >
-              Copy prompt
-            </button>
+      <ol class="space-y-6">
+        <li class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div class="flex items-start gap-4">
+            <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 text-sm font-semibold text-purple-700">
+              1
+            </span>
+            <div class="flex-1 space-y-3">
+              <div class="space-y-1">
+                <h2 class="text-base font-semibold text-gray-900">Step 1 — Select a post</h2>
+                <p class="text-sm text-gray-600">
+                  Choose an existing post that should receive a fresh hero image.
+                </p>
+              </div>
+              <label class="block">
+                <span class="text-xs font-medium uppercase tracking-wide text-gray-600">Post</span>
+                <select
+                  class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-purple-500 focus:outline-none"
+                  data-post-select
+                  disabled
+                >
+                  <option>Loading posts…</option>
+                </select>
+              </label>
+            </div>
           </div>
-          <p class="mt-2 text-xs" data-hero-prompt-hint>
-            Select a post to load the saved hero image prompt (or alt text fallback) for your LLM.
-          </p>
-          <textarea
-            class="mt-3 hidden h-28 w-full resize-y rounded-md border border-purple-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-purple-500 focus:outline-none"
-            readonly
-            data-hero-prompt
-          ></textarea>
-        </div>
+        </li>
 
-        <div
-          class="rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-6 py-10 text-center transition"
-          data-drop-zone
-        >
-          <input
-            type="file"
-            accept="image/png,image/jpeg,image/jpg,image/webp"
-            class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-            data-file-input
-            aria-label="Upload hero image"
-          />
-          <p class="text-sm font-medium text-gray-800">Drag &amp; drop hero artwork, or click to browse</p>
-          <p class="mt-2 text-xs text-gray-600">
-            Accepted: PNG, JPG, WEBP. Maximum size: 5&nbsp;MB. A preview appears below once selected.
-          </p>
-          <p class="mt-4 text-xs text-gray-700" data-file-info></p>
-        </div>
+        <li class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div class="flex items-start gap-4">
+            <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 text-sm font-semibold text-purple-700">
+              2
+            </span>
+            <div class="flex-1 space-y-3">
+              <div class="space-y-1">
+                <h2 class="text-base font-semibold text-gray-900">Step 2 — Load the hero prompt</h2>
+                <p class="text-sm text-gray-600">
+                  We pull the saved hero prompt (or fallback alt text) so you can paste it into your image model.
+                </p>
+              </div>
+              <div
+                class="rounded-xl border border-purple-100 bg-purple-50 p-4 text-sm text-purple-900"
+                data-hero-prompt-card
+              >
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <span class="font-medium">Hero prompt helper</span>
+                  <button
+                    class="rounded-md bg-purple-600 px-3 py-1 text-xs font-medium text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    data-copy-prompt
+                    disabled
+                  >
+                    Copy prompt
+                  </button>
+                </div>
+                <p class="mt-2 text-xs" data-hero-prompt-hint>
+                  Select a post to load the saved hero image prompt (or alt text fallback) for your LLM.
+                </p>
+                <textarea
+                  class="mt-3 hidden h-28 w-full resize-y rounded-md border border-purple-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-purple-500 focus:outline-none"
+                  readonly
+                  data-hero-prompt
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </li>
 
-        <img
-          data-preview
-          alt="Selected hero preview"
-          class="hidden w-full rounded-xl border border-gray-200 object-cover shadow-sm"
-        />
+        <li class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div class="flex items-start gap-4">
+            <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 text-sm font-semibold text-purple-700">
+              3
+            </span>
+            <div class="flex-1 space-y-4">
+              <div class="space-y-1">
+                <h2 class="text-base font-semibold text-gray-900">Step 3 — Upload hero artwork</h2>
+                <p class="text-sm text-gray-600">
+                  With the prompt in hand, render a new hero image and import it from your device.
+                </p>
+              </div>
+              <div class="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+                <div class="relative">
+                  <div
+                    class="relative flex h-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-6 py-10 text-center transition"
+                    data-drop-zone
+                  >
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg,image/webp"
+                      class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                      data-file-input
+                      aria-label="Upload hero image"
+                      disabled
+                    />
+                    <div
+                      class="pointer-events-none absolute inset-0 flex items-center justify-center rounded-xl bg-white/80 text-sm font-semibold text-purple-700"
+                      data-drop-overlay
+                    >
+                      Select a post above to unlock uploads.
+                    </div>
+                    <div class="space-y-2">
+                      <p class="text-sm font-medium text-gray-800">Drag &amp; drop hero artwork, or click to browse</p>
+                      <p class="text-xs text-gray-600" data-drop-hint>
+                        Once a post is selected, you can upload PNG, JPG, or WEBP files up to 5&nbsp;MB.
+                      </p>
+                      <p class="text-xs text-gray-700" data-file-info></p>
+                    </div>
+                  </div>
+                </div>
+                <figure class="space-y-3">
+                  <div class="relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                    <div
+                      class="flex aspect-[3/2] items-center justify-center text-sm font-medium text-gray-500"
+                      data-preview-placeholder
+                    >
+                      Your preview will appear here once you choose an image.
+                    </div>
+                    <img
+                      data-preview
+                      alt="Selected hero preview"
+                      class="hidden h-full w-full object-cover"
+                    />
+                  </div>
+                  <figcaption class="text-xs text-gray-600" data-existing-hero>
+                    Select a post to review its current hero details.
+                  </figcaption>
+                </figure>
+              </div>
+              <label class="block">
+                <span class="text-xs font-medium uppercase tracking-wide text-gray-600">Alt text</span>
+                <input
+                  type="text"
+                  placeholder="Cozy cauldron simmering beside tarot cards on a window seat"
+                  class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                  data-alt-input
+                  disabled
+                />
+                <p class="mt-1 text-xs text-gray-500">
+                  Alt text helps screen readers understand the imagery—tweak it after uploading if needed.
+                </p>
+              </label>
+            </div>
+          </div>
+        </li>
 
-        <label class="block">
-          <span class="text-xs font-medium uppercase tracking-wide text-gray-600">Alt text</span>
-          <input
-            type="text"
-            placeholder="Cozy cauldron simmering beside tarot cards on a window seat"
-            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:outline-none"
-            data-alt-input
-          />
-          <p class="mt-1 text-xs text-gray-600" data-existing-hero></p>
-        </label>
-
-        <div class="flex flex-wrap items-center gap-3">
-          <button
-            class="rounded-lg bg-purple-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-purple-800 disabled:cursor-not-allowed disabled:opacity-60"
-            data-submit
-            disabled
-          >
-            Upload &amp; Attach
-          </button>
-          <span class="text-sm text-gray-600" data-status></span>
-        </div>
-
-        <div
-          class="hidden rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800"
-          data-success
-        ></div>
-      </div>
+        <li class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div class="flex items-start gap-4">
+            <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 text-sm font-semibold text-purple-700">
+              4
+            </span>
+            <div class="flex-1 space-y-4">
+              <div class="space-y-1">
+                <h2 class="text-base font-semibold text-gray-900">Step 4 — Attach and verify</h2>
+                <p class="text-sm text-gray-600">
+                  When the preview and alt text look right, attach the hero image to update the post everywhere.
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center gap-3">
+                <button
+                  class="rounded-lg bg-purple-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-purple-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  data-submit
+                  disabled
+                >
+                  Upload &amp; Attach
+                </button>
+                <span class="text-sm text-gray-600" data-status></span>
+              </div>
+              <div
+                class="hidden rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800"
+                data-success
+              ></div>
+            </div>
+          </div>
+        </li>
+      </ol>
     </section>
   ) : (
     <section class="mx-auto max-w-3xl rounded-2xl border border-purple-100 bg-white p-6 text-center shadow-sm">
@@ -153,7 +239,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
         const dropZone = root.querySelector('[data-drop-zone]');
         const fileInput = root.querySelector('[data-file-input]');
         const fileInfo = root.querySelector('[data-file-info]');
+        const dropOverlay = root.querySelector('[data-drop-overlay]');
+        const dropHint = root.querySelector('[data-drop-hint]');
         const preview = root.querySelector('[data-preview]');
+        const previewPlaceholder = root.querySelector('[data-preview-placeholder]');
         const altInput = root.querySelector('[data-alt-input]');
         const existingHeroNote = root.querySelector('[data-existing-hero]');
         const submitButton = root.querySelector('[data-submit]');
@@ -168,9 +257,100 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
         let previewUrl = null;
         let altDirty = false;
         let lastPrefilledSlug = null;
+        let isBusy = false;
+        let dropEnabled = false;
 
         const MAX_SIZE = 5 * 1024 * 1024;
         const ACCEPTED_EXT = /\.(png|jpe?g|webp)$/i;
+
+        function showPreviewPlaceholder(show) {
+          const shouldShow = !!show;
+          if (previewPlaceholder) {
+            previewPlaceholder.classList.toggle('hidden', !shouldShow);
+          }
+          if (preview) {
+            preview.classList.toggle('hidden', shouldShow);
+          }
+        }
+
+        function clearFileSelection(options = {}) {
+          selectedFile = null;
+          if (fileInfo && !options.keepInfo) {
+            fileInfo.textContent = '';
+          }
+          if (!options.keepPreview) {
+            if (preview) {
+              preview.removeAttribute('src');
+              preview.removeAttribute('srcset');
+            }
+            showPreviewPlaceholder(true);
+          }
+          revokePreview();
+          if (fileInput && !options.keepInput) {
+            try {
+              fileInput.value = '';
+            } catch (err) {
+              /* ignore */
+            }
+          }
+        }
+
+        function toAbsoluteHeroPath(path) {
+          const value = String(path || '').trim();
+          if (!value) return '';
+          if (/^https?:/i.test(value)) return value;
+          const site = SITE_ORIGIN.replace(/\/$/, '');
+          if (value.startsWith('/')) return `${site}${value}`;
+          return `${site}/${value}`;
+        }
+
+        function setAltInputDisabled(disabled) {
+          if (!altInput) return;
+          const on = !!disabled;
+          altInput.disabled = on;
+          altInput.classList.toggle('cursor-not-allowed', on);
+          altInput.classList.toggle('opacity-60', on);
+        }
+
+        function refreshAltAvailability() {
+          const disabled = isBusy || !(select && select.value);
+          setAltInputDisabled(disabled);
+        }
+
+        function refreshDropZoneAvailability() {
+          const hasPost = !!(select && select.value);
+          dropEnabled = hasPost && !isBusy;
+          if (fileInput) {
+            fileInput.disabled = !dropEnabled;
+          }
+          if (dropZone) {
+            dropZone.classList.toggle('opacity-60', !dropEnabled);
+            dropZone.classList.toggle('cursor-not-allowed', !dropEnabled);
+            dropZone.setAttribute('aria-disabled', dropEnabled ? 'false' : 'true');
+          }
+          let overlayMessage = '';
+          if (!dropEnabled) {
+            overlayMessage = hasPost
+              ? 'Working… finish the current upload first.'
+              : 'Select a post above to unlock uploads.';
+          }
+          if (dropOverlay) {
+            dropOverlay.textContent = overlayMessage;
+            dropOverlay.classList.toggle('hidden', dropEnabled);
+          }
+          if (dropHint) {
+            dropHint.textContent = dropEnabled
+              ? 'PNG, JPG, or WEBP up to 5 MB. Drag & drop or click to choose an image.'
+              : hasPost
+              ? 'Uploads are temporarily disabled while we process your image.'
+              : 'Once a post is selected, you can upload PNG, JPG, or WEBP files up to 5 MB.';
+          }
+        }
+
+        function refreshFormAvailability() {
+          refreshDropZoneAvailability();
+          refreshAltAvailability();
+        }
 
         function setStatus(message, tone) {
           if (!statusEl) return;
@@ -203,6 +383,29 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
             <a class="ml-1 text-green-900 underline" href="${href}" target="_blank" rel="noopener">View post →</a>
           `;
           successEl.classList.remove('hidden');
+
+          const absolutePath = toAbsoluteHeroPath(safePath);
+          if (preview && absolutePath) {
+            preview.src = absolutePath;
+            showPreviewPlaceholder(false);
+          }
+          if (fileInfo && safePath) {
+            fileInfo.textContent = `Stored at ${safePath}`;
+          }
+          clearFileSelection({ keepPreview: true, keepInfo: true, keepInput: true });
+
+          const index = posts.findIndex((post) => post.slug === slug);
+          if (index >= 0) {
+            const updated = { ...posts[index] };
+            updated.heroImage = safePath;
+            if (altInput) {
+              updated.heroAlt = altInput.value ? altInput.value.trim() : '';
+            }
+            posts[index] = updated;
+            updateExistingHeroNote(updated);
+          }
+          altDirty = false;
+          lastPrefilledSlug = slug || null;
         }
 
         function setPromptHint(message, tone) {
@@ -278,7 +481,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
         }
 
         function updateHeroPromptUI() {
-          if (!promptField || !copyPromptButton) return;
+          if (!promptField || !copyPromptButton) {
+            refreshFormAvailability();
+            return;
+          }
           if (!posts.length) {
             promptField.value = '';
             promptField.classList.add('hidden');
@@ -286,6 +492,8 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
             setPromptHint('Ingest a post to enable the hero prompt helper.', 'error');
             updateExistingHeroNote(null);
             applyAltSuggestion(null, { force: true });
+            clearFileSelection();
+            refreshFormAvailability();
             return;
           }
           if (!select || !select.value) {
@@ -295,12 +503,27 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
             setPromptHint('Select a post to load the saved hero image prompt (or alt text fallback) for your LLM.', 'neutral');
             updateExistingHeroNote(null);
             applyAltSuggestion(null, { force: true });
+            clearFileSelection();
+            refreshFormAvailability();
             return;
           }
           const current = posts.find((post) => post.slug === select.value);
           const description = extractHeroDescription(current);
           updateExistingHeroNote(current || null);
           applyAltSuggestion(current || null);
+          if (!selectedFile && !previewUrl) {
+            const heroPath = current && current.heroImage ? toAbsoluteHeroPath(current.heroImage) : '';
+            if (heroPath && preview) {
+              preview.src = heroPath;
+              preview.alt = current && current.heroAlt ? current.heroAlt : 'Hero image preview';
+              showPreviewPlaceholder(false);
+              if (fileInfo) {
+                fileInfo.textContent = `Current hero: ${current.heroImage}`;
+              }
+            } else {
+              clearFileSelection();
+            }
+          }
           if (description) {
             promptField.value = description;
             promptField.classList.remove('hidden');
@@ -312,30 +535,27 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
             copyPromptButton.disabled = true;
             setPromptHint('No hero prompt or alt text found yet. Add one in the post frontmatter.', 'error');
           }
+          refreshFormAvailability();
         }
 
         function setBusy(on) {
+          isBusy = !!on;
           if (submitButton) {
-            submitButton.disabled = !!on;
-            submitButton.textContent = on ? 'Uploading…' : 'Upload & Attach';
-            submitButton.classList.toggle('opacity-60', !!on);
+            submitButton.disabled = isBusy;
+            submitButton.textContent = isBusy ? 'Uploading…' : 'Upload & Attach';
+            submitButton.classList.toggle('opacity-60', isBusy);
           }
           if (select) {
-            select.disabled = !!on || posts.length === 0;
-          }
-          if (fileInput) {
-            fileInput.disabled = !!on;
+            select.disabled = isBusy || posts.length === 0;
           }
           if (dropZone) {
-            dropZone.classList.toggle('opacity-70', !!on);
+            dropZone.classList.toggle('opacity-70', isBusy);
           }
           if (copyPromptButton) {
-            if (on) copyPromptButton.disabled = true;
+            if (isBusy) copyPromptButton.disabled = true;
             else updateHeroPromptUI();
           }
-          if (altInput) {
-            altInput.disabled = !!on;
-          }
+          refreshFormAvailability();
         }
 
         function renderOptions() {
@@ -350,6 +570,8 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
             select.appendChild(option);
             select.disabled = true;
             if (submitButton) submitButton.disabled = true;
+            updateHeroPromptUI();
+            refreshFormAvailability();
             return;
           }
           const placeholder = document.createElement('option');
@@ -379,30 +601,39 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
 
         function useFile(file) {
           clearSuccess();
-          if (!file || !fileInfo || !preview) return;
+          if (!fileInfo || !preview) return;
+          if (!file) {
+            clearFileSelection();
+            return;
+          }
+          if (!dropEnabled) {
+            setStatus(
+              isBusy
+                ? 'Uploads are disabled while we finish the current request.'
+                : 'Pick a post first.',
+              'error'
+            );
+            clearFileSelection();
+            return;
+          }
           if (file.size > MAX_SIZE) {
             setStatus('Image must be 5 MB or smaller.', 'error');
-            selectedFile = null;
-            fileInfo.textContent = '';
-            preview.classList.add('hidden');
-            revokePreview();
+            clearFileSelection();
             return;
           }
           const typeOk = file.type ? file.type.startsWith('image/') : ACCEPTED_EXT.test(file.name);
           const extOk = ACCEPTED_EXT.test(file.name || '');
           if (!typeOk || !extOk) {
             setStatus('Please choose a PNG, JPG, or WEBP image.', 'error');
-            selectedFile = null;
-            fileInfo.textContent = '';
-            preview.classList.add('hidden');
-            revokePreview();
+            clearFileSelection();
             return;
           }
           selectedFile = file;
           revokePreview();
           previewUrl = URL.createObjectURL(file);
           preview.src = previewUrl;
-          preview.classList.remove('hidden');
+          preview.alt = altInput && altInput.value ? altInput.value : 'Selected hero preview';
+          showPreviewPlaceholder(false);
           const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
           fileInfo.textContent = `${file.name} • ${sizeMb} MB`;
           setStatus('Preview ready. Add alt text and click Upload & Attach.', 'progress');
@@ -471,6 +702,8 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           } catch (err) {
             setStatus(err && err.message ? err.message : 'Could not load posts.', 'error');
             setPromptHint('Could not load posts. Hero prompt helper is unavailable.', 'error');
+            clearFileSelection();
+            refreshFormAvailability();
           }
         }
 
@@ -479,7 +712,9 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
             clearSuccess();
             setStatus('', '');
             altDirty = false;
+            clearFileSelection();
             updateHeroPromptUI();
+            refreshFormAvailability();
           });
         }
 
@@ -502,6 +737,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           ['dragenter', 'dragover'].forEach((evt) => {
             dropZone.addEventListener(evt, (event) => {
               event.preventDefault();
+              if (!dropEnabled) return;
               dropZone.classList.add('border-purple-400', 'bg-purple-50');
             });
           });
@@ -513,6 +749,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           });
           dropZone.addEventListener('drop', (event) => {
             event.preventDefault();
+            if (!dropEnabled) return;
             const dt = event.dataTransfer;
             if (dt && dt.files && dt.files.length) {
               const file = dt.files[0];
@@ -588,6 +825,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           });
         }
 
+        refreshFormAvailability();
         updateHeroPromptUI();
         loadPosts();
       })();
