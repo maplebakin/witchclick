@@ -10,6 +10,7 @@ import { validateStructure } from '../../../server/lib/structureValidation.js';
 import { PostSpecV2Schema, type PostSpecV2 } from '../../lib/postSpecSchema';
 import type { EntityType } from '../../lib/postSpecSchema';
 import { validatePostSpec } from '../../lib/postSpecValidator';
+import { slugify } from '../../../shared/slugify.js';
 
 /* ---------- helpers ---------- */
 
@@ -18,12 +19,6 @@ function safeReadJSON<T=any>(p:string, fallback:T): T {
 }
 
 function ensureDirSync(dir:string){ fs.mkdirSync(dir, { recursive: true }); }
-
-function slugify(s:string){
-  return String(s||'')
-    .normalize('NFKD').replace(/[\u0300-\u036f]/g,'')
-    .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-}
 
 function ensureUniqueSlug(base:string, postsDir:string){
   const safe = slugify(base) || 'post';

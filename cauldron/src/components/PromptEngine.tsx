@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { marked } from 'marked';
 import type { DraftSpec, LoadedDraft, PromptBlueprint, Section } from '../types/draft';
+import { slugify as sharedSlugify } from '../../../shared/slugify.js';
 
 const LOCAL_STORAGE_KEY = 'cauldron.promptEngine.drafts.v1';
 
@@ -43,17 +44,6 @@ interface PromptEngineProps {
 
 marked.setOptions({ breaks: true, gfm: true });
 
-function slugify(value: string): string {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9-\s]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+/, '')
-    .replace(/-+$/, '');
-}
-
 function cloneSpec(spec?: DraftSpec): DraftSpec {
   if (!spec) return JSON.parse(JSON.stringify(EMPTY_SPEC));
   return JSON.parse(JSON.stringify({ ...EMPTY_SPEC, ...spec }));
@@ -75,7 +65,7 @@ function formatOutline(outline: DraftSpec['outline']): string {
   return outline
     .map((item) => {
       const heading = item.heading ?? '';
-      const id = item.id ?? slugify(heading);
+      const id = item.id ?? sharedSlugify(heading);
       return id ? `${heading}|${id}` : heading;
     })
     .join('\n');
@@ -89,14 +79,14 @@ function parseOutline(input: string) {
     .map((line) => {
       const [rawHeading, rawId] = line.split('|');
       const heading = rawHeading?.trim() ?? '';
-      const id = rawId?.trim() || (heading ? slugify(heading) : '');
+      const id = rawId?.trim() || (heading ? sharedSlugify(heading) : '');
       return { heading, id };
     });
 }
 
 function sanitizeSpec(spec: DraftSpec, tagsInput: string, outlineInput: string): DraftSpec {
   const trimmedTitle = spec.title?.trim() ?? '';
-  const slug = slugify(spec.slug ?? trimmedTitle);
+  const slug = sharedSlugify(spec.slug ?? trimmedTitle);
   const tags = parseTags(tagsInput);
   const outline = parseOutline(outlineInput);
   const sections: Section[] = (spec.sections ?? []).map((section) => ({

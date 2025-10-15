@@ -1,5 +1,7 @@
 // server/lib/ingestionAdapter.js — conflict-free, deterministic normalizer
 
+import { slugify as sharedSlugify } from '../../shared/slugify.js';
+
 const OPENING_HEADING = 'Opening Reflection';
 const OPENING_ID = 'opening-reflection';
 const VALID_AD_PLACEMENTS = new Set(['lead', 'mid', 'end']);
@@ -17,12 +19,7 @@ function toTrimmedString(value) {
 function slugify(value) {
   const base = toTrimmedString(value);
   if (!base) return '';
-  return base
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+  return sharedSlugify(base);
 }
 
 function sanitizeStringArray(value) {

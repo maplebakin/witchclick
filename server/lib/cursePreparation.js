@@ -7,16 +7,7 @@ import path from 'node:path';
 import CurseSpecSchema, {
   CURSE_TAGS,
 } from './curseSpecSchema.js';
-
-function slugify(value) {
-  const base = typeof value === 'string' ? value : String(value || '');
-  return base
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
+import { slugify } from '../../shared/slugify.js';
 
 function ensureDirSync(dir) {
   fs.mkdirSync(dir, { recursive: true });
