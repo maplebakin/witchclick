@@ -320,3 +320,5 @@ if (document.readyState === 'loading') {
 } else {
   initEntitiesAdmin();
 }
+
+export default initEntitiesAdmin;
