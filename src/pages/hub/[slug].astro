@@ -1,5 +1,6 @@
 ---
 import Base from "@/layouts/Base.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import PostCard from "@/components/PostCard.astro";
 import PartnerProductCard from "@/components/PartnerProductCard.astro";
 import { createCollectionPageSchema } from "@/utils/structuredData";
@@ -68,12 +69,20 @@ const jsonLd = createCollectionPageSchema(
 
 const calendar = readEditorialCalendar();
 const season = hub.seasonSlug ? calendar.seasons.find((entry) => entry.slug === hub.seasonSlug) ?? null : null;
+
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Hubs", href: "/hub/" },
+  { label: hub.hero.title },
+];
 ---
+
 <Base
   title={`${hub.hero.title} — WitchClick`}
   description={hub.seoDescription}
   ambientColor={hub.ambient}
 >
+  <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </Fragment>

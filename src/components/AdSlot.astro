@@ -54,3 +54,7 @@ const baseClass = `ad ad--${slot} ${className}`;
     </p>
   </aside>
 )}
+
+{provider === 'adsense' && !isAdsense && (
+  <div class={`${baseClass} ad--placeholder`} aria-hidden="true" style="display: none;"></div>
+)}

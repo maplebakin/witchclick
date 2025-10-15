@@ -9,7 +9,7 @@ interface Props {
 const { product, class: className } = Astro.props as Props;
 const impactLabel = product.impactTag?.trim();
 const ethicalNote = product.ethicalNote?.trim();
-const ctaLabel = product.ctaLabel?.trim() || "Explore";
+const ctaLabel = product.ctaLabel?.trim() || "Visit partner";
 ---
 <a class:list={["partner-product-card", className]} href={product.url} target="_blank" rel="nofollow noopener">
   <div class="partner-product-card__body">

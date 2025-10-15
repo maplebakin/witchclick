@@ -1,0 +1,104 @@
+---
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+const { items = [] } = Astro.props as { items?: BreadcrumbItem[] };
+const trail = Array.isArray(items)
+  ? items.filter((item): item is BreadcrumbItem => Boolean(item?.label))
+  : [];
+
+if (trail.length === 0) {
+  return null;
+}
+
+const previous = trail.length > 1 ? trail[trail.length - 2] : null;
+const previousHref = previous?.href;
+---
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  {previousHref && (
+    <a class="breadcrumbs__back focus-ring" href={previousHref}>
+      <span aria-hidden="true">←</span>
+      <span>Back to {previous.label}</span>
+    </a>
+  )}
+  <ol class="breadcrumbs__list">
+    {trail.map((item, index) => {
+      const isCurrent = index === trail.length - 1;
+      return (
+        <li class="breadcrumbs__item">
+          {item.href && !isCurrent ? (
+            <a class="breadcrumbs__link focus-ring" href={item.href}>
+              {item.label}
+            </a>
+          ) : (
+            <span class="breadcrumbs__current" aria-current={isCurrent ? "page" : undefined}>
+              {item.label}
+            </span>
+          )}
+        </li>
+      );
+    })}
+  </ol>
+</nav>
+
+<style>
+  .breadcrumbs {
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.875rem;
+    color: var(--ink-muted, rgba(244, 241, 255, 0.72));
+  }
+
+  .breadcrumbs__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    color: var(--ink-muted, rgba(244, 241, 255, 0.72));
+  }
+
+  .breadcrumbs__list {
+    display: none;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .breadcrumbs__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--ink-muted, rgba(244, 241, 255, 0.72));
+  }
+
+  .breadcrumbs__item:not(:first-child)::before {
+    content: "›";
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 80%, transparent 20%);
+    font-size: 0.75rem;
+  }
+
+  .breadcrumbs__link {
+    color: inherit;
+    font-weight: 500;
+  }
+
+  .breadcrumbs__current {
+    color: var(--ink-strong, #1a102c);
+    font-weight: 600;
+  }
+
+  @media (min-width: 640px) {
+    .breadcrumbs__back {
+      display: none;
+    }
+
+    .breadcrumbs__list {
+      display: inline-flex;
+    }
+  }
+</style>

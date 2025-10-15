@@ -1,6 +1,7 @@
 ---
 // src/pages/entities/[type]/[slug].astro — static build friendly
 import Base from "../../../layouts/Base.astro";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 import fs from "node:fs";
 import path from "node:path";
 import { getTypeMetadata } from "../../../data/typeMetadata";
@@ -106,6 +107,13 @@ const entityDisplayName = startCase(
   typeof ent.name === "string" && ent.name.trim() ? ent.name.trim() : ent.slug,
 );
 
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Entities", href: "/entities/" },
+  { label: typeLabel, href: `/entities/${ent.type}/` },
+  { label: entityDisplayName },
+];
+
 const outboundHeading = ent.type === "ritual"
   ? "Tools woven into this ritual"
   : "Allies woven into this lore";
@@ -156,6 +164,7 @@ function pretty(v: unknown) {
 }
 ---
 <Base title={`${ent.name} — ${typeLabel} — WitchClick`} wide ambientColor={accentHex}>
+  <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <article class="entity-page" style={themeVarString ? `${themeVarString};` : undefined}>
     <header class="entity-hero">
       <div class="entity-hero-sheen" aria-hidden="true" />

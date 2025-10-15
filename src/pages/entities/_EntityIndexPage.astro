@@ -1,5 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import EntityCard from "../../components/EntityCard.astro";
 import { getTypeMetadata } from "../../data/typeMetadata";
 import { getEntitiesForType } from "../../utils/entityIndex";
@@ -43,8 +44,14 @@ const sectionVars = toCssVariables({
 const sectionStyle = sectionVars ? `${sectionVars};` : undefined;
 const typeLabel = formatTypeLabel(type);
 const lowerTypeLabel = typeLabel.toLowerCase();
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Entities", href: "/entities/" },
+  { label: typeLabel },
+];
 ---
 <Base title={metadata.title} description={metadata.subtitle} ambientColor={accentHex} bodyDataType={type}>
+  <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <section class="entity-index py-12" style={sectionStyle}>
     <header class="entity-header space-y-4">
       <h1 class="entity-heading text-4xl font-serif leading-tight">
@@ -57,8 +64,9 @@ const lowerTypeLabel = typeLabel.toLowerCase();
 
     {entities.length === 0 ? (
       <p class="entity-empty mt-10 rounded-2xl border border-dashed p-6 text-sm">
-        No {lowerTypeLabel} entries have been catalogued yet. Add JSON files under
-        <code class="entity-empty-code">content/entities/{type}</code> to begin weaving this index.
+        No {lowerTypeLabel} entries are live yet. Share a note with the
+        <a class="entity-empty-link" href="/about/">WitchClick team</a>
+        to request a feature or check back soon for fresh lore.
       </p>
     ) : (
       <div class="entity-grid grid sm:grid-cols-2">
@@ -120,11 +128,10 @@ const lowerTypeLabel = typeLabel.toLowerCase();
     color: var(--index-accent-body, #4b5563);
   }
 
-  .entity-empty code {
-    background-color: rgba(255, 255, 255, 0.7);
-    padding: 0.2rem 0.4rem;
-    border-radius: 0.5rem;
-    color: inherit;
+  .entity-empty-link {
+    color: var(--index-accent-strong, #4c1d95);
+    font-weight: 600;
+    text-decoration: underline;
   }
 
   .entity-grid {

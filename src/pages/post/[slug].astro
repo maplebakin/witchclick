@@ -10,6 +10,7 @@ import ProductRecommendations from "../../components/ProductRecommendations.astr
 import Accordion from "../../components/Accordion.astro";
 import CommentsSection from "../../components/CommentsSection.astro";
 import AuthorSpotlight from "../../components/AuthorSpotlight.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { readEntity } from "../../utils/entities";
 import { Fragment } from "astro/jsx-runtime";
 
@@ -78,6 +79,12 @@ const description =
 const publishedAt = data.publishedAt ?? data.pubDate ?? data.date ?? undefined;
 const modifiedAt = data.updatedAt ?? publishedAt ?? undefined;
 const canonical = `${siteOrigin}/post/${effectiveSlug}`;
+
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Archive", href: "/page/1" },
+  { label: title },
+];
 
 const readingMinutes = data.readingMinutes ?? estimateReadingMinutes(content);
 
@@ -343,6 +350,8 @@ const jsonLd = {
     )}
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </Fragment>
+
+  <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
 
   <div class="grimoire-bg min-h-screen">
     <section class="post-canvas mx-auto max-w-6xl px-4 py-12 lg:py-16">

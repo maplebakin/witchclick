@@ -48,7 +48,7 @@ function isActive(href: string): boolean {
     <a class="site-logo" href="/">{brandName}</a>
     <nav class="site-nav" aria-label="Primary navigation">
       <button
-        class="site-nav__toggle"
+        class="site-nav__toggle focus-ring"
         type="button"
         data-menu-toggle
         aria-expanded="false"
@@ -79,7 +79,7 @@ function isActive(href: string): boolean {
           <li class="site-nav__item site-nav__item--submenu">
             <button
               type="button"
-              class="site-nav__button site-nav__button--more"
+              class="site-nav__button site-nav__button--more focus-ring"
               data-submenu-toggle
               aria-expanded="false"
               aria-controls="site-nav-secondary"
@@ -116,7 +116,7 @@ function isActive(href: string): boolean {
         {visibleUtility.length > 0 && (
           <div class="site-nav__utility">
             {visibleUtility.map((item) => (
-              <a class="site-nav__button site-nav__button--utility" href={item.href} rel={item.rel}>
+              <a class="site-nav__button site-nav__button--utility focus-ring" href={item.href} rel={item.rel}>
                 {item.label}
               </a>
             ))}
@@ -125,7 +125,7 @@ function isActive(href: string): boolean {
         <ComfortSettings />
         {visibleAdmin.length > 0 && (
           <details class="site-nav__dev" data-dev-menu>
-            <summary class="site-nav__button site-nav__button--dev">
+            <summary class="site-nav__button site-nav__button--dev focus-ring">
               Dev shortcuts
               <svg class="site-nav__dev-caret" viewBox="0 0 12 8" aria-hidden="true">
                 <path
@@ -150,14 +150,14 @@ function isActive(href: string): boolean {
         )}
         <button
           type="button"
-          class="site-nav__button"
+          class="site-nav__button focus-ring"
           data-search-toggle
           aria-expanded="false"
           aria-controls="site-search-panel"
         >
           Search
         </button>
-        <a class="site-nav__button site-nav__link--secondary" href="/feed.json" rel="alternate">
+        <a class="site-nav__button site-nav__link--secondary focus-ring" href="/feed.json" rel="alternate">
           RSS
         </a>
       </div>
@@ -171,7 +171,7 @@ function isActive(href: string): boolean {
   >
     <div class="site-nav__mobile-header">
       <span class="site-logo">{brandName}</span>
-      <button type="button" class="site-nav__toggle" data-mobile-close aria-label="Close menu">
+      <button type="button" class="site-nav__toggle focus-ring" data-mobile-close aria-label="Close menu">
         ✕
       </button>
     </div>
@@ -184,7 +184,7 @@ function isActive(href: string): boolean {
           <a
             href={item.href}
             rel={item.rel}
-            class="site-nav__mobile-link"
+            class="site-nav__mobile-link focus-ring"
             aria-current={isActive(item.href) ? "page" : undefined}
             data-mobile-link
           >
@@ -200,7 +200,7 @@ function isActive(href: string): boolean {
           {visibleSecondary.map((item) => (
             <li>
               <a
-                class="site-nav__mobile-link site-nav__mobile-link--plain"
+                class="site-nav__mobile-link site-nav__mobile-link--plain focus-ring"
                 href={item.href}
                 rel={item.rel}
                 data-mobile-link
@@ -218,7 +218,7 @@ function isActive(href: string): boolean {
         <ul class="site-nav__nav--stacked">
           {visibleAdmin.map((item) => (
             <li>
-              <a class="site-nav__mobile-link" href={item.href} rel={item.rel}>
+              <a class="site-nav__mobile-link focus-ring" href={item.href} rel={item.rel}>
                 {item.label}
               </a>
             </li>
@@ -233,7 +233,7 @@ function isActive(href: string): boolean {
           {visibleUtility.map((item) => (
             <li>
               <a
-                class="site-nav__mobile-link site-nav__mobile-link--plain"
+                class="site-nav__mobile-link site-nav__mobile-link--plain focus-ring"
                 href={item.href}
                 rel={item.rel}
                 data-mobile-link
@@ -259,7 +259,7 @@ function isActive(href: string): boolean {
     <div class="site-search-panel__dialog" role="dialog" aria-modal="true">
       <div class="site-search-panel__header">
         <h2>Search WitchClick</h2>
-        <button type="button" class="site-nav__toggle" data-search-close aria-label="Close search">
+        <button type="button" class="site-nav__toggle focus-ring" data-search-close aria-label="Close search">
           ✕
         </button>
       </div>

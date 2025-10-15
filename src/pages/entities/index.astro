@@ -1,13 +1,21 @@
 ---
 import Base from "../../layouts/Base.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { sections } from "../../data/typeMetadata";
 
 const labelFor = (type: string) =>
   type
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (char) => char.toUpperCase());
+
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Entities" },
+];
 ---
+
 <Base title="The Grimoire — WitchClick" desktopWide={true}>
+  <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <div class="grimoire-bg min-h-screen">
     <section class="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 xl:max-w-7xl xl:px-12">
       <h1 class="font-serif text-4xl tracking-tight text-[color:var(--ink-strong)] sm:text-5xl">The Grimoire</h1>
@@ -34,7 +42,7 @@ const labelFor = (type: string) =>
               </div>
             </div>
             <span class="entity-card-cta">
-              Enter this chapter
+              Explore
               <span aria-hidden="true">→</span>
             </span>
           </a>
