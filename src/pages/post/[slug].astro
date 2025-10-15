@@ -333,85 +333,90 @@ const jsonLd = {
 
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
 
-  <div class="grimoire-bg min-h-screen">
-    <section class="post-canvas mx-auto max-w-6xl px-4 py-12 lg:py-16">
-      <div class="post-panel panel">
-        <div class="post-layout grid grid-cols-1 lg:grid-cols-12">
-          <article class="post-article prose prose-neutral max-w-none lg:col-span-8">
-            {heroImage && (
-              <figure class="mb-6 overflow-hidden rounded-3xl border border-line-subtle bg-surface-muted shadow-sm">
-                <img
-                  src={heroImage}
-                  alt={heroAlt}
-                  loading="eager"
-                  class="h-auto w-full object-cover"
-                />
-              </figure>
-            )}
-            <h1 class="mb-2">{title}</h1>
-            <p class="post-meta mt-0 mb-4 text-sm">
-              {publishedAt && (
-                <time datetime={new Date(publishedAt).toISOString()}>
-                  {new Date(publishedAt).toLocaleDateString(undefined, {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </time>
+  <div class="grimoire-bg">
+    <div class="post-shell">
+      <div class="post-layout">
+        <article class="post-article" aria-labelledby="post-title">
+          <header class="post-hero">
+            <div class:list={["post-hero__layout", !heroImage && "post-hero__layout--text"]}>
+              {heroImage && (
+                <figure class="post-hero__media">
+                  <img src={heroImage} alt={heroAlt} loading="eager" />
+                </figure>
               )}
-              {(publishedAt || readingMinutes) && <span> · </span>}
-              {readingMinutes && <span>{readingMinutes} minute read</span>}
-            </p>
+              <div class="post-hero__content">
+                <p class="post-hero__meta">
+                  {publishedAt && (
+                    <time datetime={new Date(publishedAt).toISOString()}>
+                      {new Date(publishedAt).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </time>
+                  )}
+                  {(publishedAt || readingMinutes) && <span aria-hidden="true">•</span>}
+                  {readingMinutes && <span>{readingMinutes} minute read</span>}
+                </p>
 
-            {authorLinks.length > 0 && (
-              <p class="post-byline">
-                By
-                {authorLinks.map((author, index) => (
-                  <Fragment>
-                    {index > 0 &&
-                      (authorLinks.length === 2 ? (
-                        <span class="post-byline__separator">&nbsp;&amp;&nbsp;</span>
-                      ) : index === authorLinks.length - 1 ? (
-                        <span class="post-byline__separator">,&nbsp;&amp;&nbsp;</span>
-                      ) : (
-                        <span class="post-byline__separator">,&nbsp;</span>
-                      ))}
-                    {author.href ? (
-                      <a class="post-byline__link" href={author.href}>
-                        {author.label}
-                      </a>
-                    ) : (
-                      <span class="post-byline__name">{author.label}</span>
+                <h1 id="post-title" class="post-hero__title">{title}</h1>
+
+                {authorLinks.length > 0 && (
+                  <p class="post-byline">
+                    By
+                    {authorLinks.map((author, index) => (
+                      <Fragment key={author.slug || author.label}>
+                        {index > 0 &&
+                          (authorLinks.length === 2 ? (
+                            <span class="post-byline__separator">&nbsp;&amp;&nbsp;</span>
+                          ) : index === authorLinks.length - 1 ? (
+                            <span class="post-byline__separator">,&nbsp;&amp;&nbsp;</span>
+                          ) : (
+                            <span class="post-byline__separator">,&nbsp;</span>
+                          ))}
+                        {author.href ? (
+                          <a class="post-byline__link" href={author.href}>
+                            {author.label}
+                          </a>
+                        ) : (
+                          <span class="post-byline__name">{author.label}</span>
+                        )}
+                      </Fragment>
+                    ))}
+                  </p>
+                )}
+
+                {Array.isArray(data.tags) && data.tags.length > 0 && (
+                  <ul class="post-tags">
+                    {data.tags.map((tag: any) => (
+                      <li>
+                        <span>#{String(tag).toLowerCase()}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {(spoonLevel || tldr) && (
+                  <div class="post-callouts">
+                    {spoonLevel && <SpoonsBadge level={spoonLevel} class="post-callouts__badge" />}
+                    {tldr && (
+                      <aside class="post-callouts__summary" aria-label="TL;DR">
+                        <span class="post-callouts__label">TL;DR</span>
+                        <p>{tldr}</p>
+                      </aside>
                     )}
-                  </Fragment>
-                ))}
-              </p>
-            )}
-
-            <div class="mb-6 flex flex-wrap gap-2 text-xs uppercase tracking-wide text-tertiary">
-              {Array.isArray(data.tags) &&
-                data.tags.map((tag: any) => (
-                  <span class="rounded-full border border-line-muted bg-surface-muted px-3 py-0.5">#{String(tag).toLowerCase()}</span>
-                ))}
-            </div>
-
-            {(spoonLevel || tldr) && (
-              <div class="post-lede-callouts">
-                {spoonLevel && <SpoonsBadge level={spoonLevel} class="post-lede-callouts__badge" />}
-                {tldr && (
-                  <aside class="post-lede-callouts__summary" aria-label="TL;DR">
-                    <span class="post-lede-callouts__label">TL;DR</span>
-                    <p>{tldr}</p>
-                  </aside>
+                  </div>
                 )}
               </div>
-            )}
+            </div>
+          </header>
 
-            {productRecommendations.length > 0 && (
-              <ProductRecommendations products={productRecommendations} class="mb-8" />
-            )}
+          {productRecommendations.length > 0 && (
+            <ProductRecommendations products={productRecommendations} class="post-product-recs" />
+          )}
 
-            <div class="prose prose-neutral max-w-none" set:html={html} />
+          <div class="post-body panel">
+            <div class="post-body__content prose prose-neutral max-w-none" set:html={html} />
 
             <Disclosure show={hasAffiliates} />
 
@@ -419,278 +424,193 @@ const jsonLd = {
               <DownloadCard id={String(data.downloadId)} />
             ) : null}
 
-            <AdSlot slot="end" class="mt-10" />
+            <AdSlot slot="end" class="post-body__ad" />
 
             {authorsWithProfiles.length > 0 && (
-              <section class="post-author-spotlights">
-                <h2 class="post-author-spotlights__title">About the author{authorsWithProfiles.length > 1 ? "s" : ""}</h2>
-                <div class="post-author-spotlights__grid">
+              <section class="post-authors">
+                <h2 class="post-authors__title">About the author{authorsWithProfiles.length > 1 ? "s" : ""}</h2>
+                <div class="post-authors__grid">
                   {authorsWithProfiles.map((author) => (
-                    <AuthorSpotlight author={author} compact={true} />
+                    <AuthorSpotlight author={author} compact={true} key={author.slug} />
                   ))}
                 </div>
               </section>
             )}
-          </article>
+          </div>
+        </article>
 
-          <aside class="post-sidebar lg:col-span-4 lg:pl-6">
-            <div class="sticky top-24 space-y-6">
+        <aside class="post-sidebar" aria-label="Post sidebar">
+          <div class="post-sidebar__stack">
+            <div class="post-sidebar__card soft-card">
               <AdSlot slot="side" />
-              <CtaFooter type={ctaType} id={ctaId} />
-              {resolvedEntities.length > 0 && (
-                <section class="post-entities soft-card">
-                  <h2 class="post-entities-title">Referenced entities</h2>
-                  <ul class="post-entities-list">
-                    {resolvedEntities.map((entity: any) => (
-                      <li>
-                        <a class="post-entities-link" href={entity.href}>
-                          {entity.name}
-                        </a>
-                        {entity.description && <p class="post-entities-summary">{entity.description}</p>}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              )}
             </div>
-          </aside>
-        </div>
+            <CtaFooter type={ctaType} id={ctaId} />
+            {resolvedEntities.length > 0 && (
+              <section class="post-entities soft-card">
+                <h2 class="post-entities__title">Referenced entities</h2>
+                <ul class="post-entities__list">
+                  {resolvedEntities.map((entity: any) => (
+                    <li key={entity.href}>
+                      <a class="post-entities__link" href={entity.href}>
+                        {entity.name}
+                      </a>
+                      {entity.description && <p class="post-entities__summary">{entity.description}</p>}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+          </div>
+        </aside>
       </div>
 
-      <RelatedPosts currentSlug={effectiveSlug} tags={data.tags || []} prev={prev} next={next} />
-      <CommentsSection slug={effectiveSlug} title={title} />
-    </section>
+      <div class="post-related panel">
+        <RelatedPosts currentSlug={effectiveSlug} tags={data.tags || []} prev={prev} next={next} />
+      </div>
+
+      <div class="post-comments panel">
+        <CommentsSection slug={effectiveSlug} title={title} />
+      </div>
+    </div>
   </div>
 </Base>
 
 <style>
-  .post-canvas {
+  .post-shell {
+    width: min(1100px, 100%);
+    margin: 0 auto;
+    padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.25rem, 5vw, 3.5rem) clamp(4rem, 8vw, 6rem);
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 3.75rem);
+    min-height: 100vh;
+    color: var(--ink-body, #1f1633);
+  }
+
+  .post-layout {
+    display: grid;
+    gap: clamp(2rem, 5vw, 3.25rem);
+  }
+
+  @media (min-width: 1024px) {
+    .post-layout {
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr);
+      align-items: start;
+      gap: clamp(2.5rem, 5vw, 3.5rem);
+    }
+  }
+
+  .post-article {
     display: grid;
     gap: clamp(2rem, 5vw, 3rem);
   }
 
-  .post-panel {
-    padding: clamp(1.85rem, 4.5vw, 2.85rem);
-    --surface-tint: oklch(0.83 0.07 304);
-    --ambient-color: color-mix(
-      in srgb,
-      var(--surface-tint) 52%,
-      #241136 48%
-    );
-    --panel-surface-strong: color-mix(in srgb, white 95%, var(--surface-tint) 5%);
-    --panel-surface-soft: color-mix(in srgb, white 93%, var(--surface-tint) 7%);
-    --panel-border-strong: color-mix(
-      in srgb,
-      var(--surface-tint) 32%,
-      rgba(24, 12, 36, 0.12)
-    );
-    --panel-border-soft: color-mix(
-      in srgb,
-      var(--surface-tint) 26%,
-      rgba(24, 12, 36, 0.08)
-    );
-    --surface-muted: color-mix(in srgb, var(--surface-tint) 18%, white 82%);
-    --glass-pill-border-active: color-mix(
-      in srgb,
-      var(--surface-tint) 36%,
-      rgba(24, 12, 36, 0.12)
-    );
-    --action-primary: color-mix(in srgb, var(--ambient-color) 82%, #140826 18%);
-    --action-primary-hover: color-mix(in srgb, var(--ambient-color) 90%, #0c031a 10%);
-    --action-primary-text: color-mix(in srgb, white 94%, var(--ambient-color) 6%);
-    border-color: color-mix(in srgb, var(--panel-border-strong) 82%, transparent 18%);
+  .post-hero {
+    position: relative;
+    padding: clamp(2rem, 5vw, 3.5rem);
+    border-radius: clamp(1.85rem, 4vw, 2.75rem);
+    border: 1px solid color-mix(in srgb, var(--panel-border-strong, rgba(124, 58, 237, 0.35)) 80%, transparent 20%);
     background:
       radial-gradient(
-        120% 120% at 16% -18%,
-        color-mix(in srgb, var(--surface-tint) 28%, transparent) 0%,
-        transparent 72%
+        135% 120% at 8% -12%,
+        color-mix(in srgb, var(--ambient-color, hsl(270 60% 62%)) 18%, transparent) 0%,
+        transparent 70%
+      ),
+      radial-gradient(
+        120% 120% at 95% -18%,
+        color-mix(in srgb, rgba(255, 255, 255, 0.7) 65%, transparent) 0%,
+        transparent 74%
       ),
       linear-gradient(
-        180deg,
-        color-mix(in srgb, white 97%, var(--surface-tint) 3%) 0%,
-        color-mix(in srgb, white 92%, var(--surface-tint) 8%) 100%
+        170deg,
+        color-mix(in srgb, white 94%, var(--ambient-color, hsl(270 60% 62%)) 6%) 0%,
+        color-mix(in srgb, white 88%, var(--ambient-color, hsl(270 60% 62%)) 12%) 100%
       );
-    box-shadow: 0 26px 70px -40px rgba(31, 24, 56, 0.32);
-    color: var(--ink-body, currentColor);
+    box-shadow: 0 28px 70px -36px color-mix(in srgb, var(--ambient-color, hsl(270 60% 62%)) 32%, transparent 68%);
+    overflow: hidden;
   }
 
-  .post-layout {
-    align-items: start;
-    gap: clamp(1.75rem, 4vw, 2.75rem);
+  .post-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(140deg, rgba(255, 255, 255, 0.4), transparent 65%);
+    mix-blend-mode: screen;
+    opacity: 0.4;
+    pointer-events: none;
   }
 
-  .post-article h1 {
-    color: var(--ink-strong, currentColor);
-  }
-
-  .post-article .prose {
-    color: var(--ink-body, currentColor);
-    font-size: 1.05rem;
-    line-height: 1.8;
-    letter-spacing: 0.01em;
-  }
-
-  .post-article .prose :where(p, li, figcaption, blockquote, code, span) {
-    color: inherit;
-  }
-
-  .post-article .prose :where(h2, h3, h4, h5, h6) {
-    color: var(--ink-strong, currentColor);
-  }
-
-  .post-article .prose :where(blockquote) {
-    margin: 1.75rem 0;
-    padding: 1.25rem 1.5rem;
-    border-left: 4px solid
-      color-mix(in srgb, var(--ambient-color, var(--color-primary)) 55%, transparent 45%);
-    background: color-mix(
-      in srgb,
-      var(--surface-muted, rgba(124, 58, 237, 0.08)) 70%,
-      white 30%
-    );
-    border-radius: 1.1rem;
-    color: color-mix(
-      in srgb,
-      var(--ink-strong, currentColor) 94%,
-      var(--ink-body, currentColor) 6%
-    );
-  }
-
-  .post-article .prose :where(code):not(:where(pre code)) {
-    background: color-mix(
-      in srgb,
-      var(--surface-muted, rgba(124, 58, 237, 0.08)) 75%,
-      white 25%
-    );
-    color: color-mix(
-      in srgb,
-      var(--ink-strong, currentColor) 90%,
-      var(--ambient-color, var(--color-primary)) 10%
-    );
-    padding: 0.15rem 0.45rem;
-    border-radius: 0.4rem;
-    font-size: 0.9em;
-  }
-
-  .post-article .prose :where(pre) {
-    background: color-mix(
-      in srgb,
-      rgba(19, 11, 38, 0.92) 88%,
-      var(--ambient-color, var(--color-primary)) 12%
-    );
-    color: color-mix(in srgb, white 94%, var(--ambient-color, var(--color-primary)) 6%);
-    padding: 1.4rem 1.6rem;
-    border-radius: 1.25rem;
-    box-shadow: 0 22px 58px -36px rgba(18, 14, 40, 0.55);
-  }
-
-  .post-lede-callouts {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 2.5rem;
-  }
-
-  .post-lede-callouts__badge {
-    margin-bottom: 0;
-  }
-
-  .post-lede-callouts__summary {
-    border-radius: 1rem;
-    padding: 1rem 1.25rem;
-    background: color-mix(
-      in srgb,
-      var(--surface-muted, rgba(124, 58, 237, 0.08)) 75%,
-      white 25%
-    );
-    border: 1px solid
-      color-mix(in srgb, var(--ambient-color, var(--color-primary)) 32%, transparent 68%);
-    box-shadow: 0 12px 32px -28px rgba(17, 24, 39, 0.45);
-  }
-
-  .post-lede-callouts__summary p {
-    margin: 0;
-    font-size: 0.95rem;
-    line-height: 1.55;
-    color: var(--ink-body, currentColor);
-  }
-
-  .post-lede-callouts__label {
-    display: inline-flex;
+  .post-hero__layout {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
     align-items: center;
-    gap: 0.4rem;
-    margin-bottom: 0.35rem;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.18em;
+  }
+
+  @media (min-width: 1024px) {
+    .post-hero__layout {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    }
+
+    .post-hero__layout--text {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .post-hero__media {
+    position: relative;
+    border-radius: clamp(1.5rem, 3.5vw, 2.25rem);
+    overflow: hidden;
+    box-shadow: 0 26px 50px -32px rgba(17, 24, 39, 0.25);
+    border: 1px solid color-mix(in srgb, rgba(124, 58, 237, 0.28) 80%, transparent 20%);
+  }
+
+  .post-hero__media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .post-hero__content {
+    display: grid;
+    gap: clamp(1rem, 3vw, 1.75rem);
+    color: color-mix(in srgb, #2b1a3f 88%, var(--ambient-color, hsl(270 60% 62%)) 12%);
+  }
+
+  .post-hero__meta {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: color-mix(
-      in srgb,
-      var(--ambient-color, var(--color-primary)) 65%,
-      var(--ink-body, currentColor) 35%
-    );
+    color: color-mix(in srgb, var(--ink-muted, rgba(55, 33, 81, 0.7)) 85%, white 15%);
   }
 
-  @media (min-width: 768px) {
-    .post-lede-callouts {
-      flex-direction: row;
-      align-items: stretch;
-    }
-
-    .post-lede-callouts__badge {
-      align-self: flex-start;
-    }
-
-    .post-lede-callouts__summary {
-      flex: 1;
-    }
+  .post-hero__meta span[aria-hidden="true"] {
+    font-size: 0.7rem;
+    opacity: 0.6;
   }
 
-  .post-article .prose a {
-    color: var(--action-primary, var(--ink-strong, currentColor));
-    text-decoration: underline;
-    text-decoration-color: color-mix(
-      in srgb,
-      var(--action-primary, currentColor) 65%,
-      transparent 35%
-    );
-    text-decoration-thickness: 1.5px;
-  }
-
-  .post-article .prose a:hover,
-  .post-article .prose a:focus-visible {
-    color: var(--action-primary-hover, var(--ink-strong, currentColor));
-    text-decoration-color: color-mix(
-      in srgb,
-      var(--action-primary-hover, currentColor) 65%,
-      transparent 35%
-    );
-  }
-
-  .post-meta {
-    color: color-mix(
-      in srgb,
-      var(--ink-muted, currentColor) 90%,
-      var(--ink-body, currentColor) 10%
-    );
+  .post-hero__title {
+    margin: 0;
+    font-size: clamp(2.25rem, 4vw, 3.35rem);
+    line-height: 1.08;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--ink-strong, #3a1f57) 92%, var(--ambient-color, hsl(270 60% 62%)) 8%);
   }
 
   .post-byline {
-    margin: -0.35rem 0 1.75rem;
+    margin: -0.25rem 0 0;
     font-size: 0.95rem;
-    color: color-mix(
-      in srgb,
-      var(--ink-body, currentColor) 88%,
-      var(--ink-muted, currentColor) 12%
-    );
+    color: color-mix(in srgb, var(--ink-body, #3a274f) 88%, var(--ink-muted, #5b4c69) 12%);
   }
 
   .post-byline__link {
-    color: color-mix(
-      in srgb,
-      var(--ambient-color, var(--color-primary)) 55%,
-      var(--ink-strong, currentColor) 45%
-    );
+    color: color-mix(in srgb, var(--ambient-color, hsl(270 60% 62%)) 55%, var(--ink-strong, #2b1a3f) 45%);
     font-weight: 600;
     text-decoration: none;
   }
@@ -706,105 +626,325 @@ const jsonLd = {
   }
 
   .post-byline__separator {
-    color: color-mix(
-      in srgb,
-      var(--ink-muted, currentColor) 88%,
-      var(--ink-body, currentColor) 12%
-    );
+    color: color-mix(in srgb, var(--ink-muted, #5b4c69) 88%, var(--ink-body, #3a274f) 12%);
   }
 
-  .post-sidebar .soft-card {
-    padding: clamp(1.4rem, 3.5vw, 1.95rem);
-    display: grid;
-    gap: 0.9rem;
-  }
-
-  .post-entities-title {
-    margin: 0;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.32em;
-    color: color-mix(
-      in srgb,
-      var(--ambient-color, var(--color-primary)) 45%,
-      var(--ink-strong, currentColor) 55%
-    );
-  }
-
-  .post-entities-list {
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+
+  .post-tags li span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    background: color-mix(in srgb, rgba(124, 58, 237, 0.14) 82%, rgba(255, 255, 255, 0.92) 18%);
+    border: 1px solid color-mix(in srgb, rgba(124, 58, 237, 0.3) 80%, transparent 20%);
+    color: color-mix(in srgb, var(--ambient-color, hsl(270 60% 62%)) 58%, var(--ink-strong, #2b1a3f) 42%);
+  }
+
+  .post-callouts {
     display: grid;
-    gap: 0.85rem;
-    font-size: 0.9rem;
-    color: color-mix(
-      in srgb,
-      var(--ink-body, currentColor) 94%,
-      var(--ink-strong, currentColor) 6%
-    );
+    gap: 1rem;
+    align-items: start;
   }
 
-  .post-entities-link {
-    font-weight: 600;
-    color: color-mix(
-      in srgb,
-      var(--ambient-color, var(--color-primary)) 58%,
-      var(--ink-strong, currentColor) 42%
-    );
-    text-decoration: none;
+  @media (min-width: 640px) {
+    .post-callouts {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 1.5rem;
+    }
+
+    .post-callouts__badge {
+      align-self: start;
+    }
   }
 
-  .post-entities-link:hover,
-  .post-entities-link:focus-visible {
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
-
-  .post-author-spotlights {
-    margin-top: clamp(2.75rem, 6vw, 3.75rem);
-    padding-top: clamp(1.5rem, 4vw, 2.5rem);
-    border-top: 1px solid color-mix(in srgb, rgba(148, 163, 184, 0.22) 70%, white 30%);
-    display: grid;
-    gap: 1.5rem;
-  }
-
-  .post-author-spotlights__title {
+  .post-callouts__summary {
     margin: 0;
-    font-size: clamp(1.1rem, 2.4vw, 1.35rem);
-    font-weight: 700;
-    color: color-mix(
-      in srgb,
-      var(--ink-strong, currentColor) 94%,
-      var(--ink-body, currentColor) 6%
-    );
+    padding: clamp(1.2rem, 3vw, 1.75rem);
+    border-radius: clamp(1.35rem, 3vw, 1.8rem);
+    background:
+      radial-gradient(
+        130% 120% at 12% -8%,
+        color-mix(in srgb, rgba(255, 255, 255, 0.88) 92%, rgba(124, 58, 237, 0.14) 8%) 0%,
+        transparent 75%
+      ),
+      linear-gradient(
+        160deg,
+        color-mix(in srgb, rgba(255, 255, 255, 0.94) 92%, rgba(124, 58, 237, 0.08) 8%) 0%,
+        color-mix(in srgb, rgba(255, 255, 255, 0.88) 90%, rgba(124, 58, 237, 0.16) 10%) 100%
+      );
+    border: 1px solid color-mix(in srgb, rgba(124, 58, 237, 0.22) 78%, transparent 22%);
+    box-shadow: 0 18px 45px -30px rgba(76, 29, 149, 0.22);
   }
 
-  .post-author-spotlights__grid {
+  .post-callouts__summary p {
+    margin: 0.45rem 0 0;
+    color: color-mix(in srgb, var(--ink-body, #3a274f) 88%, var(--ink-muted, #5b4c69) 12%);
+    line-height: 1.65;
+  }
+
+  .post-callouts__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    background: color-mix(in srgb, rgba(124, 58, 237, 0.22) 70%, rgba(255, 255, 255, 0.9) 30%);
+    color: color-mix(in srgb, var(--ambient-color, hsl(270 60% 62%)) 62%, var(--ink-strong, #2b1a3f) 38%);
+    box-shadow: 0 12px 28px -20px rgba(76, 29, 149, 0.32);
+  }
+
+  .post-callouts__label::before {
+    content: "✶";
+    font-size: 0.8rem;
+  }
+
+  .post-product-recs {
+    margin-top: -0.75rem;
+  }
+
+  .post-body {
+    border-radius: clamp(1.75rem, 4vw, 2.5rem);
+    padding: clamp(2.1rem, 5vw, 3rem);
+    display: grid;
+    gap: clamp(2rem, 4vw, 2.75rem);
+    background:
+      radial-gradient(
+        130% 120% at 12% -12%,
+        color-mix(in srgb, var(--ambient-color, hsl(270 60% 62%)) 14%, transparent) 0%,
+        transparent 72%
+      ),
+      linear-gradient(
+        170deg,
+        color-mix(in srgb, var(--panel-surface-strong, rgba(32, 18, 44, 0.92)) 85%, rgba(255, 255, 255, 0.06) 15%) 0%,
+        color-mix(in srgb, var(--panel-surface-soft, rgba(39, 21, 52, 0.9)) 82%, rgba(0, 0, 0, 0.12) 18%) 100%
+      );
+    border: 1px solid color-mix(in srgb, var(--panel-border-strong, rgba(124, 58, 237, 0.35)) 78%, transparent 22%);
+    box-shadow: var(--wc-shadow-strong, 0 26px 68px -34px rgba(17, 24, 39, 0.35));
+    color: color-mix(in srgb, var(--ink-body, #f4f1ff) 92%, rgba(0, 0, 0, 0.08) 8%);
+  }
+
+  .post-body__content {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .post-body__content :where(p, li) {
+    color: color-mix(in srgb, rgba(244, 241, 255, 0.95) 90%, rgba(221, 214, 255, 0.4) 10%);
+  }
+
+  .post-body__content :where(h2, h3, h4, h5, h6) {
+    color: color-mix(in srgb, rgba(255, 255, 255, 0.98) 92%, rgba(186, 170, 255, 0.35) 8%);
+  }
+
+  .post-body__content a {
+    color: color-mix(in srgb, rgba(217, 196, 255, 0.95) 80%, rgba(255, 255, 255, 0.9) 20%);
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: color-mix(in srgb, rgba(217, 196, 255, 0.8) 60%, transparent 40%);
+  }
+
+  .post-body__content a:hover,
+  .post-body__content a:focus-visible {
+    color: color-mix(in srgb, rgba(236, 220, 255, 0.95) 82%, rgba(255, 255, 255, 0.92) 18%);
+  }
+
+  .post-body__ad {
+    margin-top: clamp(1.5rem, 4vw, 2.25rem);
+  }
+
+  .post-authors {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.25rem);
+    padding-top: clamp(1.75rem, 4vw, 2.5rem);
+    border-top: 1px solid color-mix(in srgb, rgba(255, 255, 255, 0.24) 75%, transparent 25%);
+  }
+
+  .post-authors__title {
+    margin: 0;
+    font-size: clamp(1.1rem, 2.2vw, 1.35rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, rgba(255, 255, 255, 0.96) 90%, rgba(210, 188, 255, 0.45) 10%);
+  }
+
+  .post-authors__grid {
     display: grid;
     gap: clamp(1rem, 3vw, 1.5rem);
   }
 
   @media (min-width: 720px) {
-    .post-author-spotlights__grid {
+    .post-authors__grid {
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     }
   }
 
-  .post-entities-summary {
-    margin: 0.35rem 0 0;
-    font-size: 0.8rem;
-    color: color-mix(
-      in srgb,
-      var(--ink-muted, currentColor) 88%,
-      var(--ink-body, currentColor) 12%
-    );
+  .post-sidebar {
+    position: relative;
   }
 
-  @media (min-width: 1024px) {
-    .post-sidebar .soft-card {
-      position: relative;
-    }
+  .post-sidebar__stack {
+    position: sticky;
+    top: clamp(6rem, 12vw, 7.5rem);
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .post-sidebar__card {
+    padding: clamp(1.4rem, 3.5vw, 1.95rem);
+    display: grid;
+    gap: 1rem;
+  }
+
+  .post-sidebar__card .ad {
+    margin: 0;
+  }
+
+  .post-entities {
+    display: grid;
+    gap: 1.1rem;
+    padding: clamp(1.5rem, 3.5vw, 2rem);
+  }
+
+  .post-entities__title {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--ambient-color, hsl(270 60% 62%)) 45%, var(--ink-strong, #2b1a3f) 55%);
+  }
+
+  .post-entities__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: color-mix(in srgb, var(--ink-body, #3a274f) 94%, var(--ink-muted, #5b4c69) 6%);
+  }
+
+  .post-entities__link {
+    font-weight: 600;
+    color: color-mix(in srgb, var(--ambient-color, hsl(270 60% 62%)) 58%, var(--ink-strong, #2b1a3f) 42%);
+    text-decoration: none;
+  }
+
+  .post-entities__link:hover,
+  .post-entities__link:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .post-entities__summary {
+    margin: 0.35rem 0 0;
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--ink-muted, #5b4c69) 88%, var(--ink-body, #3a274f) 12%);
+    line-height: 1.6;
+  }
+
+  .post-related,
+  .post-comments {
+    border-radius: clamp(1.75rem, 4vw, 2.5rem);
+    padding: clamp(2rem, 5vw, 3rem);
+    background:
+      radial-gradient(
+        140% 120% at 12% -15%,
+        color-mix(in srgb, rgba(124, 58, 237, 0.18) 70%, transparent) 0%,
+        transparent 72%
+      ),
+      linear-gradient(
+        170deg,
+        color-mix(in srgb, rgba(255, 255, 255, 0.92) 92%, rgba(124, 58, 237, 0.08) 8%) 0%,
+        color-mix(in srgb, rgba(255, 255, 255, 0.88) 88%, rgba(124, 58, 237, 0.14) 12%) 100%
+      );
+    border: 1px solid color-mix(in srgb, rgba(124, 58, 237, 0.24) 80%, transparent 20%);
+    box-shadow: 0 22px 55px -32px rgba(17, 24, 39, 0.28);
+  }
+
+  .post-related > section {
+    margin: 0;
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  .post-related h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--ink-strong, #2b1a3f) 92%, var(--ambient-color, hsl(270 60% 62%)) 8%);
+  }
+
+  .post-related .grid {
+    gap: clamp(1rem, 3vw, 1.5rem);
+  }
+
+  .post-comments {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .post-comments .comments {
+    margin: 0;
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .post-comments .comments__intro {
+    display: grid;
+    gap: 0.65rem;
+    color: color-mix(in srgb, var(--ink-body, #3a274f) 88%, var(--ink-muted, #5b4c69) 12%);
+  }
+
+  .post-comments .comments__title {
+    margin: 0;
+    font-size: clamp(1.1rem, 2.2vw, 1.35rem);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .post-comments .comments__summary {
+    margin: 0;
+    color: color-mix(in srgb, var(--ink-muted, #5b4c69) 88%, var(--ink-body, #3a274f) 12%);
+  }
+
+  .post-comments fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .post-comments .comments__form {
+    display: grid;
+    gap: 1.25rem;
+    padding: clamp(1.5rem, 3.5vw, 2.1rem);
+    border-radius: clamp(1.35rem, 3vw, 1.8rem);
+    background: color-mix(in srgb, rgba(255, 255, 255, 0.9) 92%, rgba(124, 58, 237, 0.12) 8%);
+    border: 1px solid color-mix(in srgb, rgba(124, 58, 237, 0.18) 75%, transparent 25%);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  }
+
+  .post-comments .comments__thread {
+    padding: clamp(1.5rem, 3.5vw, 2.1rem);
+    border-radius: clamp(1.35rem, 3vw, 1.8rem);
+    background: color-mix(in srgb, rgba(255, 255, 255, 0.96) 90%, rgba(124, 58, 237, 0.1) 10%);
+    border: 1px solid color-mix(in srgb, rgba(124, 58, 237, 0.18) 70%, transparent 30%);
   }
 </style>
