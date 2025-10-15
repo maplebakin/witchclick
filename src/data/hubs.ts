@@ -38,7 +38,7 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
         title: "Start with a gentle exhale",
         description: "Short rituals and essays to open the door to release days.",
         posts: [
-          "release-hub-intro",
+          "clean-cursing-return-energy-to-origin",
           "cozy-cursing-ritual-release-anger-banishment",
           "energy-return-ritual-restore-balance",
         ],
@@ -106,9 +106,9 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
         title: "Ground and soothe",
         description: "Arrive gently with practices that steady your body and breath.",
         posts: [
-          "calm-hub-intro",
           "calm-space-during-political-unrest-2",
           "calming-strategies-when-partner-pisses-you-off",
+          "when-to-let-yourself-rest",
         ],
       },
       {
@@ -117,6 +117,7 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
         posts: [
           "energy-return-ritual-restore-balance",
           "day-after-acupuncture-recovery-gentle-body-awareness",
+          "pre-interview-grounding-ritual",
         ],
       },
     ],
