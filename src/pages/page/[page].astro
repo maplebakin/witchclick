@@ -80,28 +80,63 @@ function toCard(post) {
     <script type="application/ld+json" set:html={JSON.stringify(pageItemList)} />
   </Fragment>
 
-  <h1 class="mb-6 text-2xl font-semibold text-primary">Latest posts — page {page}</h1>
-  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-    {pagePosts.map((post) => {
-      const card = toCard(post);
-      return (
-          <PostCard
-            post={{
-              slug: card.slug,
-              title: card.title,
-              excerpt: card.excerpt,
-              tldr: card.tldr,
-              tags: card.tags,
-              readingMinutes: card.readingMinutes,
-              publishedAt: card.publishedAt,
-              spoonLevel: card.spoonLevel,
-              spoons: card.spoons,
-            }}
-            href={`/post/${card.slug}`}
-          />
-      );
-    })}
-  </div>
+  <section class="archive-section wc-section-shell">
+    <h1 class="archive-title">Latest posts — page {page}</h1>
+    <div class="archive-grid">
+      {pagePosts.map((post) => {
+        const card = toCard(post);
+        return (
+            <PostCard
+              post={{
+                slug: card.slug,
+                title: card.title,
+                excerpt: card.excerpt,
+                tldr: card.tldr,
+                tags: card.tags,
+                readingMinutes: card.readingMinutes,
+                publishedAt: card.publishedAt,
+                spoonLevel: card.spoonLevel,
+                spoons: card.spoons,
+              }}
+              href={`/post/${card.slug}`}
+            />
+        );
+      })}
+    </div>
 
-  <Pagination page={page} totalPages={totalPages} baseHref="/page" />
+    <Pagination page={page} totalPages={totalPages} baseHref="/page" />
+  </section>
 </Base>
+
+<style>
+  .archive-section {
+    width: min(100%, 76rem);
+    margin-inline: auto;
+    display: grid;
+    gap: clamp(2rem, 5vw, 2.75rem);
+  }
+
+  .archive-title {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(2.1rem, 5vw, 2.85rem);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--section-heading, rgba(67, 33, 122, 0.96)) 92%, black 8%);
+  }
+
+  .archive-grid {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  @media (min-width: 640px) {
+    .archive-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .archive-section :global(nav[aria-label="Pagination"]) {
+    margin-top: clamp(2.25rem, 5vw, 3rem);
+  }
+</style>
