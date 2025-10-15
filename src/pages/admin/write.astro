@@ -1,7 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
-import adminWriteScript from "../../scripts/adminWrite.ts";
+import adminWriteScript from "../../scripts/adminWrite.ts?url";
 
 export const prerender = false; // never emit in static builds
 
@@ -28,7 +28,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
   </Fragment>
 
   {canUse ? (
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-12" data-dev-api={DEV_API}>
+    <div
+      class="grid grid-cols-1 gap-6 lg:grid-cols-12"
+      data-dev-api={DEV_API}
+      data-site-origin={site}
+    >
       <section class="lg:col-span-8 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
         <h1 class="mb-3 text-xl font-semibold">Write a Post</h1>
 
@@ -47,12 +51,31 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           <label class="block md:col-span-2">
             <span class="text-xs font-medium">Excerpt</span>
             <input id="excerpt" class="mt-1 w-full rounded-lg border px-3 py-2" />
-            <p class="mt-1 text-[11px] text-body-subtle">Leave blank to auto-generate from your Markdown.</p>
+            <p id="excerptHint" class="mt-1 text-[11px] text-body-subtle">
+              Aim for around 220 characters so your intro stays readable in feeds. Leave blank to auto-generate from your
+              Markdown.
+            </p>
           </label>
           <label class="block md:col-span-2">
             <span class="text-xs font-medium">Meta Description</span>
             <input id="meta" class="mt-1 w-full rounded-lg border px-3 py-2" />
-            <p class="mt-1 text-[11px] text-body-subtle">Leave blank for an SEO-friendly summary (≈155 characters).</p>
+            <p id="metaHint" class="mt-1 text-[11px] text-body-subtle">
+              Aim for 120–160 characters. Keep it concise, actionable, and include your primary keywords. Leave blank for an
+              auto-generated summary.
+            </p>
+            <div
+              id="searchPreview"
+              class="mt-3 rounded-lg border border-line-subtle bg-surface-sunken px-3 py-2 text-left text-sm shadow-inner"
+            >
+              <p class="text-[10px] font-semibold uppercase tracking-wide text-body-faint">Search snippet preview</p>
+              <p id="searchPreviewTitle" class="mt-1 text-sm font-semibold text-surface-accent-deep">
+                Your post title will appear here
+              </p>
+              <p id="searchPreviewUrl" class="text-[11px] text-body-muted">spacebarcollective.com/post/your-slug</p>
+              <p id="searchPreviewDescription" class="mt-1 text-sm text-body-subtle">
+                Your meta description or excerpt will appear here so you can check the length.
+              </p>
+            </div>
           </label>
           <label class="block md:col-span-2">
             <span class="text-xs font-medium">Tags (comma or newline separated, 4–7 ideal)</span>
@@ -92,7 +115,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           <li>Use <code>##</code> for section headings; they become the outline.</li>
           <li>4–7 tags is a sweet spot for SEO.</li>
           <li>Entities format: <code>type:slug</code> — valid types: herb, crystal, moonPhase, tarot, planetaryDay, ritual.</li>
-          <li>Slug, excerpt, and meta description can be left blank — they&#39;ll be auto-generated from your title and Markdown.</li>
+          <li>
+            Slug, excerpt (~220 chars), and meta description (120–160 chars) can be left blank — they&#39;ll be auto-generated from
+            your title and Markdown.
+          </li>
         </ul>
       </aside>
     </div>
@@ -105,6 +131,6 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
   )}
 
   {canUse && (
-    <script type="module" src={Astro.resolve(adminWriteScript)}></script>
+    <script type="module" src={adminWriteScript}></script>
   )}
 </Base>
