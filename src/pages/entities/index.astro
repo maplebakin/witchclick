@@ -2,11 +2,43 @@
 import Base from "../../layouts/Base.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { sections } from "../../data/typeMetadata";
+import { mixColors, resolveTailwindColor, toRgba } from "../../utils/color";
 
 const labelFor = (type: string) =>
   type
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (char) => char.toUpperCase());
+
+const themedSections = sections.map((section) => {
+  const accent = resolveTailwindColor(section.themeColor);
+  const glow = toRgba(accent, 0.16);
+  const border = toRgba(accent, 0.32);
+  const highlight = mixColors("#ffffff", accent, 0.12);
+  const surfaceTop = mixColors("#ffffff", accent, 0.08);
+  const surfaceBottom = mixColors("#f3edff", accent, 0.22);
+  const heading = mixColors(accent, "#140b1e", 0.28);
+  const text = mixColors(accent, "#1a102b", 0.18);
+  const ribbon = mixColors(accent, "#ffffff", 0.48);
+  const cta = mixColors(accent, "#201333", 0.32);
+  const ctaHover = mixColors(accent, "#120824", 0.18);
+  const iconShadow = toRgba(accent, 0.35);
+
+  return {
+    ...section,
+    accent,
+    glow,
+    border,
+    highlight,
+    surfaceTop,
+    surfaceBottom,
+    heading,
+    text,
+    ribbon,
+    cta,
+    ctaHover,
+    iconShadow,
+  };
+});
 
 const breadcrumbs = [
   { label: "Home", href: "/" },
@@ -28,10 +60,11 @@ const breadcrumbs = [
     </header>
 
     <div class="entity-grid">
-      {sections.map((section) => (
+      {themedSections.map((section) => (
         <a
           href={section.href}
           class="entity-hub-card group grid gap-6 rounded-2xl border p-6 shadow-sm transition-transform duration-300 ease-out hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--glass-pill-border-active)] focus-visible:ring-offset-2"
+          style={`--entity-card-border: ${section.border}; --entity-card-glow: ${section.glow}; --entity-card-highlight: ${section.highlight}; --entity-card-surface-top: ${section.surfaceTop}; --entity-card-surface-bottom: ${section.surfaceBottom}; --entity-card-heading: ${section.heading}; --entity-card-text: ${section.text}; --entity-card-label: ${section.ribbon}; --entity-card-cta: ${section.cta}; --entity-card-cta-hover: ${section.ctaHover}; --entity-card-icon: ${section.accent}; --entity-card-icon-shadow: ${section.iconShadow};`}
         >
           <div class="entity-card">
             <div class="entity-card-ribbon" aria-hidden="true">
@@ -102,11 +135,27 @@ const breadcrumbs = [
   }
 
   .entity-hub-card {
-    border-color: color-mix(in srgb, var(--section-border, rgba(124, 58, 237, 0.18)) 85%, transparent 15%);
+    --entity-card-border: rgba(124, 58, 237, 0.28);
+    --entity-card-glow: rgba(124, 58, 237, 0.16);
+    --entity-card-highlight: #f7f0ff;
+    --entity-card-surface-top: #fefbff;
+    --entity-card-surface-bottom: #f9f2ff;
+    --entity-card-heading: color-mix(in srgb, #3b1b70 90%, black 10%);
+    --entity-card-text: color-mix(in srgb, #3c2a55 90%, black 10%);
+    --entity-card-label: color-mix(in srgb, var(--ink-muted, currentColor) 80%, white 20%);
+    --entity-card-cta: color-mix(in srgb, var(--wc-ink-label) 68%, var(--ink-body, currentColor) 32%);
+    --entity-card-cta-hover: color-mix(in srgb, var(--ink-strong, currentColor) 85%, var(--ambient-color, var(--color-primary)) 15%);
+    --entity-card-icon: var(--ambient-color, var(--color-primary));
+    --entity-card-icon-shadow: rgba(79, 70, 229, 0.28);
+    border-color: color-mix(in srgb, var(--entity-card-border) 85%, transparent 15%);
     background:
-      radial-gradient(120% 120% at 18% -15%, color-mix(in srgb, rgba(124, 58, 237, 0.16) 85%, transparent) 0%, transparent 70%),
-      linear-gradient(180deg, color-mix(in srgb, rgba(255, 255, 255, 0.95) 92%, rgba(248, 244, 255, 0.98) 8%) 0%, rgba(252, 248, 255, 0.95) 100%);
-    color: color-mix(in srgb, #2a1a3f 92%, black 8%);
+      radial-gradient(120% 120% at 18% -15%, color-mix(in srgb, var(--entity-card-glow) 85%, transparent) 0%, transparent 70%),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--entity-card-surface-top) 92%, var(--entity-card-highlight) 8%) 0%,
+        color-mix(in srgb, var(--entity-card-surface-bottom) 94%, white 6%) 100%
+      );
+    color: var(--entity-card-text);
     box-shadow: var(--wc-shadow-soft, 0 20px 45px -25px rgba(15, 23, 42, 0.35));
     min-height: 100%;
   }
@@ -139,12 +188,13 @@ const breadcrumbs = [
     display: flex;
     align-items: center;
     gap: 1rem;
-    color: color-mix(in srgb, var(--ink-muted, currentColor) 80%, white 20%);
+    color: var(--entity-card-label);
   }
 
   .entity-card-icon {
     font-size: clamp(1.75rem, 3vw, 2.25rem);
-    filter: drop-shadow(0 6px 18px rgba(79, 70, 229, 0.25));
+    color: var(--entity-card-icon);
+    filter: drop-shadow(0 6px 18px var(--entity-card-icon-shadow));
   }
 
   .entity-card-label {
@@ -175,14 +225,14 @@ const breadcrumbs = [
     font-size: clamp(1.65rem, 4vw, 2.15rem);
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    color: color-mix(in srgb, #3b1b70 90%, black 10%);
+    color: var(--entity-card-heading);
   }
 
   .entity-card-body p {
     margin-bottom: 0;
     line-height: 1.65;
     font-size: 1rem;
-    color: color-mix(in srgb, #3c2a55 90%, black 10%);
+    color: var(--entity-card-text);
   }
 
   .entity-card-cta {
@@ -193,12 +243,12 @@ const breadcrumbs = [
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    color: color-mix(in srgb, var(--wc-ink-label) 68%, var(--ink-body, currentColor) 32%);
+    color: var(--entity-card-cta);
     transition: color 220ms ease;
   }
 
   .entity-hub-card:hover .entity-card-cta,
   .entity-hub-card:focus-visible .entity-card-cta {
-    color: color-mix(in srgb, var(--ink-strong, currentColor) 85%, var(--ambient-color, var(--color-primary)) 15%);
+    color: var(--entity-card-cta-hover);
   }
 </style>
