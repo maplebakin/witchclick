@@ -29,8 +29,8 @@
   --ink-strong: color-mix(in srgb, black 38%, var(--ambient-color, var(--color-primary)) 24%);
   --ink-body: color-mix(in srgb, black 28%, var(--ambient-color, var(--color-primary)) 18%);
   --ink-muted: color-mix(in srgb, black 18%, var(--ambient-color, var(--color-primary)) 14%);
-  --panel-surface-strong: color-mix(in oklab, white 65%, var(--surface-tint) 35%);
-  --panel-surface-soft: color-mix(in oklab, white 72%, var(--surface-tint) 28%);
+  --panel-surface-strong: color-mix(in srgb, var(--color-night, #120725) 78%, var(--surface-tint) 22%);
+  --panel-surface-soft: color-mix(in srgb, var(--color-dusk, #271534) 72%, var(--surface-tint) 28%);
   --panel-border-strong: hsl(270 30% 75% / 0.35);
   --panel-border-soft: hsl(270 30% 82% / 0.3);
   --shadow-1: var(--elevation-tier-1);
@@ -131,7 +131,17 @@ a {
     position: relative;
     border-radius: var(--wc-radius-xl, var(--glass-panel-radius, 1.75rem));
     border: 1px solid var(--panel-border-strong);
-    background: color-mix(in oklab, white 65%, var(--surface-tint, hsl(270 50% 60%)) 35%);
+    background:
+      radial-gradient(
+        130% 120% at 18% -12%,
+        color-mix(in srgb, var(--surface-tint, hsl(270 55% 62%)) 24%, transparent) 0%,
+        transparent 72%
+      ),
+      linear-gradient(
+        160deg,
+        color-mix(in srgb, var(--panel-surface-strong) 88%, var(--color-night, #120725) 12%) 0%,
+        color-mix(in srgb, var(--color-night, #120725) 85%, black 15%) 100%
+      );
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     box-shadow: var(--wc-shadow-soft, var(--shadow-2));
@@ -140,7 +150,17 @@ a {
 
   .soft-card {
     border-color: var(--panel-border-soft);
-    background: color-mix(in oklab, white 72%, var(--surface-tint, hsl(270 50% 60%)) 28%);
+    background:
+      radial-gradient(
+        130% 120% at 18% -12%,
+        color-mix(in srgb, var(--surface-tint, hsl(270 55% 62%)) 18%, transparent) 0%,
+        transparent 72%
+      ),
+      linear-gradient(
+        160deg,
+        color-mix(in srgb, var(--panel-surface-soft) 88%, var(--color-night, #120725) 12%) 0%,
+        color-mix(in srgb, var(--color-dusk, #271534) 82%, black 18%) 100%
+      );
     box-shadow: var(--wc-shadow-soft, var(--shadow-1));
   }
 
