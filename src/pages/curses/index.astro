@@ -4,6 +4,8 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import PrimaryButton from "../../components/buttons/PrimaryButton.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
 import { loadAllCurses } from "../../utils/curses";
+import SpoonsBadge from "../../components/SpoonsBadge.astro";
+import { normalizeSpoonLevel, summarizeMarkdown } from "../../utils/augment";
 
 const settings = readSettings();
 const site = getSiteOrigin(settings) || "https://example.com";
@@ -31,32 +33,50 @@ const breadcrumbs = [
 
     <div class="grid gap-6">
       {curses.length ? (
-        curses.map((curse) => (
-          <article class="rounded-2xl border border-line-subtle bg-surface-base p-5 shadow-sm transition hover:shadow-md">
-            <h2 class="text-xl font-semibold text-primary">
-              <a class="curses-card__link" href={`/curses/${curse.slug}`}>{curse.title}</a>
-            </h2>
-            {curse.invocation && (
-              <p class="mt-2 text-sm italic text-secondary">{curse.invocation}</p>
-            )}
-            <p class="mt-3 text-sm text-muted-strong">
-              {curse.sections.find((section) => section.label.toLowerCase().includes("opening"))?.content
-                ?.split("\n")
-                .slice(0, 2)
-                .join(" ") ?? ""}
-            </p>
-            <div class="mt-3 flex flex-wrap gap-2 text-[11px] uppercase tracking-wide text-tertiary">
-              {curse.tags.map((tag) => (
-                <span class="rounded-full border border-line-muted px-2 py-0.5">{tag}</span>
-              ))}
-            </div>
-            <div class="mt-4">
-              <PrimaryButton href={`/curses/${curse.slug}`} iconAfter="→">
-                Read ritual
-              </PrimaryButton>
-            </div>
-          </article>
-        ))
+        curses.map((curse) => {
+          const spoonLevel = normalizeSpoonLevel(
+            curse.spoons ?? curse.frontmatter?.spoons ?? curse.frontmatter?.spoonLevel
+          );
+          const fallbackSummary = summarizeMarkdown(
+            curse.sections.map((section) => section.content).join("\n\n")
+          );
+          const summarySource =
+            typeof curse.tldr === "string" && curse.tldr.trim()
+              ? curse.tldr.trim()
+              : fallbackSummary;
+          const summaryText = summarySource.length > 120
+            ? `${summarySource.slice(0, 117)}…`
+            : summarySource;
+
+          return (
+            <article class="rounded-2xl border border-line-subtle bg-surface-base p-5 shadow-sm transition hover:shadow-md">
+              <h2 class="text-xl font-semibold text-primary">
+                <a class="curses-card__link" href={`/curses/${curse.slug}`}>{curse.title}</a>
+              </h2>
+              {spoonLevel && (
+                <div class="mt-3">
+                  <SpoonsBadge level={spoonLevel} />
+                </div>
+              )}
+              {summaryText && (
+                <p class="curses-card__summary">{summaryText}</p>
+              )}
+              {curse.invocation && (
+                <p class="mt-2 text-sm italic text-secondary">{curse.invocation}</p>
+              )}
+              <div class="mt-3 flex flex-wrap gap-2 text-[11px] uppercase tracking-wide text-tertiary">
+                {curse.tags.map((tag) => (
+                  <span class="rounded-full border border-line-muted px-2 py-0.5">{tag}</span>
+                ))}
+              </div>
+              <div class="mt-4">
+                <PrimaryButton href={`/curses/${curse.slug}`} iconAfter="→">
+                  Read ritual
+                </PrimaryButton>
+              </div>
+            </article>
+          );
+        })
       ) : (
         <p class="text-center text-sm text-muted">
           No curses are written yet. Start with the
@@ -77,6 +97,13 @@ const breadcrumbs = [
   .curses-card__link:focus-visible {
     text-decoration: underline;
     text-underline-offset: 4px;
+  }
+
+  .curses-card__summary {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--ink-body, var(--text-muted, rgba(71, 85, 105, 0.88)));
   }
 
   .grid .wc-button {

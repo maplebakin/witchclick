@@ -160,4 +160,60 @@ describe("posts utilities", () => {
 
     expect(result.spec.contentType).toBe("guide");
   });
+
+  it("auto-fills TL;DR and spoons when missing", async () => {
+    const srcDir = path.join(tempDir, "src", "content", "posts");
+    await fs.mkdir(srcDir, { recursive: true });
+
+    const intro = "This ritual is for test coverage. It checks that summaries and spoons are generated.";
+    const filler = Array.from({ length: 200 }, () => "Additional context keeps flowing.").join(" ");
+
+    await fs.writeFile(
+      path.join(srcDir, "auto-summary.md"),
+      `---\ntitle: Auto Summary Check\npubDate: 2024-02-01T00:00:00Z\n---\n${intro}\n\n${filler}`,
+      "utf8",
+    );
+
+    vi.resetModules();
+    const { loadAllPosts } = await import("../src/utils/posts");
+
+    const posts = loadAllPosts();
+    expect(posts).toHaveLength(1);
+    const post = posts[0];
+    expect(post.tldr).toBeTruthy();
+    expect(post.tldr).toMatch(/This ritual is for test coverage/);
+    expect(post.spoons).toBe("medium");
+    expect(post.data.tldr).toBe(post.tldr);
+    expect(post.data.spoons).toBe(post.spoons);
+  });
+
+  it("honors auto summary toggles when disabled", async () => {
+    const srcDir = path.join(tempDir, "src", "content", "posts");
+    await fs.mkdir(srcDir, { recursive: true });
+
+    await fs.writeFile(
+      path.join(srcDir, "manual.md"),
+      `---\ntitle: Manual Summary Only\npubDate: 2024-03-01T00:00:00Z\n---\nA brief intro.`,
+      "utf8",
+    );
+
+    const settingsDir = path.join(tempDir, "content");
+    await fs.mkdir(settingsDir, { recursive: true });
+    await fs.writeFile(
+      path.join(settingsDir, "settings.json"),
+      JSON.stringify({ siteUrl: "https://example.test", autoSummaries: false, autoSpoons: false }),
+      "utf8",
+    );
+
+    vi.resetModules();
+    const { loadAllPosts } = await import("../src/utils/posts");
+
+    const posts = loadAllPosts();
+    expect(posts).toHaveLength(1);
+    const post = posts[0];
+    expect(post.tldr).toBeUndefined();
+    expect(post.spoons).toBeUndefined();
+    expect(post.data.tldr).toBeUndefined();
+    expect(post.data.spoons).toBeUndefined();
+  });
 });

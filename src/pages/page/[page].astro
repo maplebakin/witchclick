@@ -45,7 +45,7 @@ const pageItemList = createCollectionPageSchema(
     return {
       name: card.title,
       url: `/post/${card.slug}`,
-      description: card.excerpt,
+      description: card.tldr ?? card.excerpt,
     };
   }),
 );
@@ -60,6 +60,18 @@ function toCard(post) {
     readingMinutes: fm.readingMinutes ?? estimateReadingMinutes(post.content),
     publishedAt: fm.publishedAt ?? fm.pubDate ?? fm.date ?? undefined,
     spoonLevel: typeof fm.spoonLevel === "string" ? fm.spoonLevel : undefined,
+    spoons:
+      typeof fm.spoons === "string"
+        ? fm.spoons
+        : typeof post.spoons === "string"
+          ? post.spoons
+          : undefined,
+    tldr:
+      typeof post.tldr === "string"
+        ? post.tldr
+        : typeof fm.tldr === "string"
+          ? fm.tldr
+          : undefined,
   };
 }
 ---
@@ -73,18 +85,20 @@ function toCard(post) {
     {pagePosts.map((post) => {
       const card = toCard(post);
       return (
-        <PostCard
-          post={{
-            slug: card.slug,
-            title: card.title,
-            excerpt: card.excerpt,
-            tags: card.tags,
-            readingMinutes: card.readingMinutes,
-            publishedAt: card.publishedAt,
-            spoonLevel: card.spoonLevel,
-          }}
-          href={`/post/${card.slug}`}
-        />
+          <PostCard
+            post={{
+              slug: card.slug,
+              title: card.title,
+              excerpt: card.excerpt,
+              tldr: card.tldr,
+              tags: card.tags,
+              readingMinutes: card.readingMinutes,
+              publishedAt: card.publishedAt,
+              spoonLevel: card.spoonLevel,
+              spoons: card.spoons,
+            }}
+            href={`/post/${card.slug}`}
+          />
       );
     })}
   </div>

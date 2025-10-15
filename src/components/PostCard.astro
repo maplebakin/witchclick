@@ -1,4 +1,5 @@
----
+import SpoonsBadge from "./SpoonsBadge.astro";
+
 export interface Props {
   // Either pass a whole post object (frontmatter-ish)...
   post?: {
@@ -12,19 +13,35 @@ export interface Props {
     publishedAt?: string
     date?: string
     spoonLevel?: string
+    spoons?: string
+    tldr?: string
   }
   // ...or pass these individually:
   href?: string
   title?: string
   excerpt?: string
+  tldr?: string
   tags?: string[]
   readingMinutes?: number
   publishedAt?: string
   spoonLevel?: string
+  spoons?: string
   class?: string
 }
 
-const { post, href, title, excerpt, tags, readingMinutes, publishedAt, spoonLevel, class: className } = Astro.props as Props
+const {
+  post,
+  href,
+  title,
+  excerpt,
+  tldr,
+  tags,
+  readingMinutes,
+  publishedAt,
+  spoonLevel,
+  spoons,
+  class: className,
+} = Astro.props as Props
 
 const link = href || (post?.slug ? `/post/${post.slug}` : '#')
 const _title = (title ?? post?.title ?? 'Untitled')
@@ -33,15 +50,34 @@ const _tags: string[] = Array.isArray(tags ?? post?.tags) ? (tags ?? post?.tags)
 const _mins = (readingMinutes ?? post?.readingMinutes) as number | undefined
 const _publishedAt = (publishedAt ?? post?.publishedAt ?? post?.date) as string | undefined
 const _dateLabel = formatDate(_publishedAt)
-const _spoonRaw = (spoonLevel ?? post?.spoonLevel) as string | undefined
-const _spoon = typeof _spoonRaw === 'string' ? _spoonRaw.trim().toLowerCase() : ''
-const _spoonLabel = _spoon ? `${_spoon.charAt(0).toUpperCase()}${_spoon.slice(1)}` : ''
+const _spoonRaw = (spoons ?? spoonLevel ?? post?.spoons ?? post?.spoonLevel) as string | undefined
+const _spoon = typeof _spoonRaw === 'string' ? normalizeSpoon(_spoonRaw) : ''
+const _tldrRaw = typeof (tldr ?? post?.tldr) === 'string' ? String((tldr ?? post?.tldr) ?? '') : ''
+const _summarySource = _tldrRaw.trim() ? _tldrRaw : _excerpt
+const _summary = truncateSummary(_summarySource)
 
 function formatDate(value?: string){
   if (!value) return '';
   const date = new Date(value);
   if (Number.isNaN(+date)) return '';
   return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function normalizeSpoon(value: string | undefined | null): string {
+  if (!value) return ''
+  const normalized = String(value).trim().toLowerCase()
+  return ['low', 'medium', 'high'].includes(normalized) ? normalized : ''
+}
+
+function truncateSummary(value: string | undefined | null, max = 120): string {
+  const base = typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : ''
+  if (!base) return ''
+  if (base.length <= max) return base
+  const slice = base.slice(0, max)
+  const lastSpace = slice.lastIndexOf(' ')
+  const safe = (lastSpace > 40 ? slice.slice(0, lastSpace) : slice).trim()
+  if (!safe) return base.slice(0, max)
+  return /[.!?…]$/.test(safe) ? safe : `${safe}…`
 }
 ---
 <a
@@ -57,12 +93,7 @@ function formatDate(value?: string){
   <span aria-hidden class="card-radial card-radial-bottom" />
   <div class="card-figure" aria-hidden="true"></div>
   <div class="card-body">
-    {_spoon && (
-      <div class="card-spoon">
-        <span class="card-spoon__icon" aria-hidden="true">🥄</span>
-        <span class="card-spoon__label">Spoon level: {_spoonLabel} day</span>
-      </div>
-    )}
+    {_spoon && <SpoonsBadge level={_spoon} />}
     {_dateLabel && (
       <div class="card-metadata">
         <span>{_dateLabel}</span>
@@ -71,7 +102,7 @@ function formatDate(value?: string){
     )}
     <div class="card-text">
       <h3 class="card-heading">{_title}</h3>
-      {_excerpt && <p class="card-subtle">{_excerpt}</p>}
+      {_summary && <p class="card-subtle">{_summary}</p>}
     </div>
     {_tags.length > 0 && (
       <div class="card-tags">
