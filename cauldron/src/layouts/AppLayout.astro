@@ -21,29 +21,29 @@ const { title = 'Cauldron Workspace', drafts, activeSlug } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title} · Cauldron</title>
   </head>
-  <body class="min-h-screen bg-slate-950 text-slate-100">
-    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-6 focus:top-6 focus:z-50 focus:rounded-md focus:bg-slate-800 focus:px-4 focus:py-2">
+  <body class="min-h-screen bg-surface-inverse text-inverse-soft">
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-6 focus:top-6 focus:z-50 focus:rounded-md focus:bg-surface-inverse-muted focus:px-4 focus:py-2">
       Skip to preview
     </a>
-    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur">
+    <header class="border-b border-line-inverse bg-surface-inverse-soft/80 backdrop-blur">
       <div class="mx-auto flex max-w-cauldron items-center justify-between gap-6 px-6 py-4 xl:px-10">
         <div>
-          <p class="text-xs uppercase tracking-[0.3em] text-slate-400">WitchClick Lab</p>
-          <h1 class="text-2xl font-semibold leading-tight text-slate-100">Cauldron</h1>
+          <p class="text-xs uppercase tracking-[0.3em] text-inverse-faint">WitchClick Lab</p>
+          <h1 class="text-2xl font-semibold leading-tight text-inverse-soft">Cauldron</h1>
         </div>
         <nav class="hidden items-center gap-4 text-sm xl:flex">
-          <a href="/" class="font-medium text-slate-300 hover:text-white focus-visible:text-white">Dashboard</a>
-          <a href="/preview/clean-cursing" class="text-slate-400 hover:text-slate-100 focus-visible:text-slate-100">Preview</a>
-          <a href="https://github.com/" class="text-slate-500 hover:text-slate-200 focus-visible:text-slate-200" rel="noreferrer" target="_blank">GitHub</a>
+          <a href="/" class="font-medium text-inverse-subtle hover:text-inverse focus-visible:text-inverse">Dashboard</a>
+          <a href="/preview/clean-cursing" class="text-inverse-faint hover:text-inverse-soft focus-visible:text-inverse-soft">Preview</a>
+          <a href="https://github.com/" class="text-muted-subtle hover:text-inverse-muted focus-visible:text-inverse-muted" rel="noreferrer" target="_blank">GitHub</a>
         </nav>
       </div>
     </header>
     <main id="main" class="w-full px-4 py-8 xl:px-10">
       <div class="mx-auto flex w-full max-w-screen-2xl flex-col gap-8 xl:flex-row xl:items-start">
-        <aside class="hidden overflow-hidden rounded-xl border border-slate-800 bg-slate-900/60 shadow-lg xl:flex xl:w-80 xl:flex-shrink-0 xl:flex-col">
-          <div class="border-b border-slate-800 px-5 py-4">
-            <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-300">Drafts</h2>
-            <p class="mt-1 text-xs text-slate-500">Use ↑ and ↓ to scan, Enter to open.</p>
+        <aside class="hidden overflow-hidden rounded-xl border border-line-inverse bg-surface-inverse-soft/60 shadow-lg xl:flex xl:w-80 xl:flex-shrink-0 xl:flex-col">
+          <div class="border-b border-line-inverse px-5 py-4">
+            <h2 class="text-sm font-semibold uppercase tracking-wide text-inverse-subtle">Drafts</h2>
+            <p class="mt-1 text-xs text-muted-subtle">Use ↑ and ↓ to scan, Enter to open.</p>
           </div>
           <div class="flex-1 overflow-y-auto">
             <ul class="divide-y divide-slate-800">
@@ -52,15 +52,15 @@ const { title = 'Cauldron Workspace', drafts, activeSlug } = Astro.props;
                   <a
                     href={`/preview/${draft.slug}`}
                     aria-current={draft.slug === activeSlug ? 'page' : undefined}
-                    class={`group flex flex-col gap-1 border-l-2 border-transparent px-5 py-3 text-left transition-colors duration-150 ease-out hover:bg-slate-800/50 focus-visible:bg-slate-800/50 ${
+                    class={`group flex flex-col gap-1 border-l-2 border-transparent px-5 py-3 text-left transition-colors duration-150 ease-out hover:bg-surface-inverse-muted/50 focus-visible:bg-surface-inverse-muted/50 ${
                       draft.slug === activeSlug
-                        ? 'border-indigo-400 bg-slate-800/60 text-white'
-                        : 'text-slate-300'
+                        ? 'border-line-info bg-surface-inverse-muted/60 text-inverse'
+                        : 'text-inverse-subtle'
                     }`}
                   >
-                    <span class="text-sm font-medium leading-tight group-hover:text-white group-focus-visible:text-white">{draft.title}</span>
+                    <span class="text-sm font-medium leading-tight group-hover:text-inverse group-focus-visible:text-inverse">{draft.title}</span>
                     {draft.status && (
-                      <span class="text-xs uppercase tracking-wide text-slate-500">{draft.status}</span>
+                      <span class="text-xs uppercase tracking-wide text-muted-subtle">{draft.status}</span>
                     )}
                   </a>
                 </li>
@@ -68,7 +68,7 @@ const { title = 'Cauldron Workspace', drafts, activeSlug } = Astro.props;
             </ul>
           </div>
         </aside>
-        <section class="min-h-[70vh] flex-1 rounded-xl border border-slate-800 bg-slate-900/40 px-6 py-7 shadow-xl xl:min-w-0">
+        <section class="min-h-[70vh] flex-1 rounded-xl border border-line-inverse bg-surface-inverse-soft/40 px-6 py-7 shadow-xl xl:min-w-0">
           <slot />
         </section>
       </div>

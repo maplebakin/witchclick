@@ -16,7 +16,7 @@ const defaultMetadata: TypeMetadataEntry = {
   icon: "✨",
   themeColor: "violet-500",
   stubLine: "This page is still gathering its energies.",
-  cardStyleClass: "from-slate-500/20 to-slate-900/40",
+  cardStyleClass: "from-gradient-default-start/20 to-gradient-default-end/40",
 };
 
 export const typeMetadata = {
@@ -28,7 +28,7 @@ export const typeMetadata = {
     icon: "🔮",
     themeColor: "violet-500",
     stubLine: "This crystal’s story is still faceting itself.",
-    cardStyleClass: "from-violet-400/30 to-fuchsia-600/40",
+    cardStyleClass: "from-gradient-crystal-start/30 to-gradient-crystal-end/40",
   },
   herb: {
     title: "The Herbal Lexicon",
@@ -38,7 +38,7 @@ export const typeMetadata = {
     icon: "🌿",
     themeColor: "emerald-500",
     stubLine: "This herb is still rooting into the lexicon.",
-    cardStyleClass: "from-emerald-400/30 to-lime-500/40",
+    cardStyleClass: "from-gradient-herb-start/30 to-gradient-herb-end/40",
   },
   moonPhase: {
     title: "Moonlit Phases",
@@ -48,7 +48,7 @@ export const typeMetadata = {
     icon: "🌙",
     themeColor: "sky-400",
     stubLine: "This moon phase is still revealing its glow.",
-    cardStyleClass: "from-sky-400/30 to-indigo-500/40",
+    cardStyleClass: "from-gradient-moon-start/30 to-gradient-moon-end/40",
   },
   ritual: {
     title: "The Ritual Archive",
@@ -58,7 +58,7 @@ export const typeMetadata = {
     icon: "🕯️",
     themeColor: "amber-500",
     stubLine: "This ritual is still setting its sacred stage.",
-    cardStyleClass: "from-amber-400/30 to-orange-600/40",
+    cardStyleClass: "from-gradient-ritual-start/30 to-gradient-ritual-end/40",
   },
   tarot: {
     title: "The Arcana Directory",
@@ -68,7 +68,7 @@ export const typeMetadata = {
     icon: "🃏",
     themeColor: "violet-600",
     stubLine: "This arcana awaits its card to be drawn.",
-    cardStyleClass: "from-violet-500/30 to-rose-500/40",
+    cardStyleClass: "from-gradient-tarot-start/30 to-gradient-tarot-end/40",
   },
 } satisfies Record<string, TypeMetadataEntry>;
 

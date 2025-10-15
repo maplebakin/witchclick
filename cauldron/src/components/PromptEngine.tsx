@@ -329,45 +329,45 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
   }
 
   return (
-    <main class="flex min-h-screen bg-slate-950/40 text-slate-100">
-      <aside class="hidden w-72 min-h-full flex-col border-r border-slate-950/70 bg-slate-950 px-5 py-6 shadow-[inset_0_1px_0_rgba(148,163,184,0.03)] lg:flex">
+    <main class="flex min-h-screen bg-surface-inverse/40 text-inverse-soft">
+      <aside class="hidden w-72 min-h-full flex-col border-r border-line-night/70 bg-surface-inverse px-5 py-6 shadow-[inset_0_1px_0_rgba(148,163,184,0.03)] lg:flex">
         <header>
-          <p class="text-[0.7rem] uppercase tracking-[0.35em] text-slate-500">Draft Library</p>
-          <h2 class="mt-2 text-sm font-semibold text-slate-100">Work-in-progress files</h2>
+          <p class="text-[0.7rem] uppercase tracking-[0.35em] text-muted-subtle">Draft Library</p>
+          <h2 class="mt-2 text-sm font-semibold text-inverse-soft">Work-in-progress files</h2>
         </header>
         <div class="mt-6 space-y-6 text-sm">
           <section>
-            <header class="flex items-center justify-between text-[0.65rem] uppercase tracking-[0.4em] text-slate-500">
+            <header class="flex items-center justify-between text-[0.65rem] uppercase tracking-[0.4em] text-muted-subtle">
               <span>Local drafts</span>
               <button
                 type="button"
-                class="rounded border border-slate-800/80 px-2 py-1 text-[0.6rem] tracking-[0.3em] text-slate-400 hover:text-white"
+                class="rounded border border-line-inverse/80 px-2 py-1 text-[0.6rem] tracking-[0.3em] text-inverse-faint hover:text-inverse"
                 onClick={() => setSelection({ source: 'new', slug: 'fresh-draft' })}
               >
                 New
               </button>
             </header>
-            <ul class="mt-3 space-y-1 border-l border-slate-900/80 pl-4 text-xs">
+            <ul class="mt-3 space-y-1 border-l border-line-inverse-strong/80 pl-4 text-xs">
               {localDraftList.length === 0 ? (
-                <li class="pl-3 text-[0.7rem] italic text-slate-600">No local drafts yet</li>
+                <li class="pl-3 text-[0.7rem] italic text-muted">No local drafts yet</li>
               ) : (
                 localDraftList.map((draft) => (
-                  <li class="flex items-center justify-between gap-2 rounded-md px-2 py-2 hover:bg-slate-900/70">
+                  <li class="flex items-center justify-between gap-2 rounded-md px-2 py-2 hover:bg-surface-inverse-soft/70">
                     <button
                       type="button"
                       class={`flex-1 text-left ${
                         selection.source === 'local' && selection.slug === draft.slug
-                          ? 'font-semibold text-white'
-                          : 'text-slate-300'
+                          ? 'font-semibold text-inverse'
+                          : 'text-inverse-subtle'
                       }`}
                       onClick={() => setSelection({ source: 'local', slug: draft.slug })}
                     >
                       <span class="block truncate">{draft.title}</span>
-                      <span class="text-[0.6rem] uppercase tracking-[0.4em] text-slate-500">{draft.status}</span>
+                      <span class="text-[0.6rem] uppercase tracking-[0.4em] text-muted-subtle">{draft.status}</span>
                     </button>
                     <button
                       type="button"
-                      class="text-[0.65rem] text-slate-500 hover:text-rose-300"
+                      class="text-[0.65rem] text-muted-subtle hover:text-rose-soft"
                       onClick={() => deleteLocal(draft.slug)}
                     >
                       ✕
@@ -378,25 +378,25 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
             </ul>
           </section>
           <section>
-            <header class="text-[0.65rem] uppercase tracking-[0.4em] text-slate-500">Seed drafts</header>
-            <ul class="mt-3 space-y-1 border-l border-slate-900/80 pl-4 text-xs">
+            <header class="text-[0.65rem] uppercase tracking-[0.4em] text-muted-subtle">Seed drafts</header>
+            <ul class="mt-3 space-y-1 border-l border-line-inverse-strong/80 pl-4 text-xs">
               {drafts.length === 0 ? (
-                <li class="pl-3 text-[0.7rem] italic text-slate-600">No seed files yet</li>
+                <li class="pl-3 text-[0.7rem] italic text-muted">No seed files yet</li>
               ) : (
                 drafts.map((draft) => (
                   <li>
                     <button
                       type="button"
-                      class={`flex w-full flex-col gap-1 rounded-md px-2 py-2 text-left transition-colors duration-150 ease-out hover:bg-slate-900/70 ${
+                      class={`flex w-full flex-col gap-1 rounded-md px-2 py-2 text-left transition-colors duration-150 ease-out hover:bg-surface-inverse-soft/70 ${
                         selection.source === 'seed' && selection.slug === draft.slug
-                          ? 'font-semibold text-white'
-                          : 'text-slate-300'
+                          ? 'font-semibold text-inverse'
+                          : 'text-inverse-subtle'
                       }`}
                       onClick={() => setSelection({ source: 'seed', slug: draft.slug })}
                     >
                       <span class="truncate">{draft.title}</span>
                       {draft.status && (
-                        <span class="text-[0.6rem] uppercase tracking-[0.4em] text-slate-500">{draft.status}</span>
+                        <span class="text-[0.6rem] uppercase tracking-[0.4em] text-muted-subtle">{draft.status}</span>
                       )}
                     </button>
                   </li>
@@ -407,113 +407,113 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
         </div>
       </aside>
       <section class="flex min-h-full flex-1 flex-col">
-        <header class="flex flex-wrap items-center gap-3 border-b border-slate-950/60 bg-slate-950/70 px-6 py-4 shadow-[0_1px_0_rgba(15,23,42,0.6)]">
+        <header class="flex flex-wrap items-center gap-3 border-b border-line-night/60 bg-surface-inverse/70 px-6 py-4 shadow-[0_1px_0_rgba(15,23,42,0.6)]">
           <button
             type="button"
-            class="rounded border border-slate-800/60 bg-slate-900/40 px-4 py-2 text-[0.7rem] uppercase tracking-[0.3em] text-slate-200 hover:bg-slate-900"
+            class="rounded border border-line-inverse/60 bg-surface-inverse-soft/40 px-4 py-2 text-[0.7rem] uppercase tracking-[0.3em] text-inverse-muted hover:bg-surface-inverse-soft"
             onClick={handleSave}
           >
             Save Draft
           </button>
           <button
             type="button"
-            class="rounded border border-slate-800/60 bg-slate-900/40 px-4 py-2 text-[0.7rem] uppercase tracking-[0.3em] text-slate-200 hover:bg-slate-900"
+            class="rounded border border-line-inverse/60 bg-surface-inverse-soft/40 px-4 py-2 text-[0.7rem] uppercase tracking-[0.3em] text-inverse-muted hover:bg-surface-inverse-soft"
             onClick={handleCopyJson}
           >
             Copy JSON
           </button>
           <button
             type="button"
-            class="rounded border border-slate-800/60 bg-slate-900/40 px-4 py-2 text-[0.7rem] uppercase tracking-[0.3em] text-slate-200 hover:bg-slate-900"
+            class="rounded border border-line-inverse/60 bg-surface-inverse-soft/40 px-4 py-2 text-[0.7rem] uppercase tracking-[0.3em] text-inverse-muted hover:bg-surface-inverse-soft"
             onClick={handleDownload}
           >
             Download Draft
           </button>
-          {statusMessage && <span class="text-xs uppercase tracking-[0.3em] text-indigo-300">{statusMessage}</span>}
+          {statusMessage && <span class="text-xs uppercase tracking-[0.3em] text-info-soft">{statusMessage}</span>}
         </header>
-        <div class="flex flex-1 flex-col bg-slate-950/20 lg:flex-row">
-          <div class="flex-1 overflow-y-auto border-r border-slate-950/60 bg-slate-950/30 px-6 py-6">
+        <div class="flex flex-1 flex-col bg-surface-inverse/20 lg:flex-row">
+          <div class="flex-1 overflow-y-auto border-r border-line-night/60 bg-surface-inverse/30 px-6 py-6">
             <div class="space-y-10">
               <section class="space-y-4">
                 <header>
-                  <p class="text-[0.65rem] uppercase tracking-[0.35em] text-slate-500">Prompt Blueprint</p>
-                  <h2 class="text-lg font-semibold text-slate-100">Shape the generation request</h2>
-                  <p class="text-sm text-slate-400">
+                  <p class="text-[0.65rem] uppercase tracking-[0.35em] text-muted-subtle">Prompt Blueprint</p>
+                  <h2 class="text-lg font-semibold text-inverse-soft">Shape the generation request</h2>
+                  <p class="text-sm text-inverse-faint">
                     Capture the intent before you ask an AI for help. The prompt is tailored as you tweak metadata and outline
                     details.
                   </p>
                 </header>
                 <div class="grid gap-4 lg:grid-cols-2">
                   <label class="flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Topic or headline</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">Topic or headline</span>
                     <input
                       type="text"
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={blueprint.topic}
                       onInput={(event) => setBlueprint((prev) => ({ ...prev, topic: event.currentTarget.value }))}
                     />
                   </label>
                   <label class="flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Audience</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">Audience</span>
                     <input
                       type="text"
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={blueprint.audience}
                       onInput={(event) => setBlueprint((prev) => ({ ...prev, audience: event.currentTarget.value }))}
                     />
                   </label>
                   <label class="lg:col-span-2 flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Tone</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">Tone</span>
                     <input
                       type="text"
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={blueprint.tone}
                       onInput={(event) => setBlueprint((prev) => ({ ...prev, tone: event.currentTarget.value }))}
                     />
                   </label>
                   <label class="lg:col-span-2 flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Primary goal</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">Primary goal</span>
                     <textarea
                       rows={2}
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={blueprint.primaryGoal}
                       onInput={(event) => setBlueprint((prev) => ({ ...prev, primaryGoal: event.currentTarget.value }))}
                     />
                   </label>
                   <label class="flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Ritual focus</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">Ritual focus</span>
                     <textarea
                       rows={2}
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={blueprint.ritualFocus}
                       onInput={(event) => setBlueprint((prev) => ({ ...prev, ritualFocus: event.currentTarget.value }))}
                     />
                   </label>
                   <label class="flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Affiliate focus</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">Affiliate focus</span>
                     <textarea
                       rows={2}
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={blueprint.affiliateFocus}
                       onInput={(event) => setBlueprint((prev) => ({ ...prev, affiliateFocus: event.currentTarget.value }))}
                     />
                   </label>
                   <label class="lg:col-span-2 flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Extra notes</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">Extra notes</span>
                     <textarea
                       rows={2}
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={blueprint.extraNotes}
                       onInput={(event) => setBlueprint((prev) => ({ ...prev, extraNotes: event.currentTarget.value }))}
                     />
                   </label>
                 </div>
                 <label class="flex flex-col gap-2 text-sm">
-                  <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Generated prompt</span>
+                  <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">Generated prompt</span>
                   <textarea
                     readOnly
                     rows={8}
-                    class="rounded border border-indigo-500/40 bg-slate-950/80 px-3 py-3 text-xs leading-relaxed text-indigo-100"
+                    class="rounded border border-line-info-strong/40 bg-surface-inverse/80 px-3 py-3 text-xs leading-relaxed text-info-haze"
                     value={promptText}
                   />
                 </label>
@@ -521,33 +521,33 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
 
               <section class="space-y-6">
                 <header>
-                  <p class="text-[0.65rem] uppercase tracking-[0.35em] text-slate-500">Draft metadata</p>
-                  <h2 class="text-lg font-semibold text-slate-100">Shape the PostSpec details</h2>
+                  <p class="text-[0.65rem] uppercase tracking-[0.35em] text-muted-subtle">Draft metadata</p>
+                  <h2 class="text-lg font-semibold text-inverse-soft">Shape the PostSpec details</h2>
                 </header>
                 <div class="grid gap-4 lg:grid-cols-2">
                   <label class="flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Title</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">Title</span>
                     <input
                       type="text"
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={currentSpec.title ?? ''}
                       onInput={(event) => handleTitleChange(event.currentTarget.value)}
                     />
                   </label>
                   <label class="flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Slug</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">Slug</span>
                     <input
                       type="text"
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={currentSpec.slug ?? ''}
                       onInput={(event) => handleSlugChange(event.currentTarget.value)}
                     />
                   </label>
                   <label class="flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Status</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">Status</span>
                     <input
                       type="text"
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={currentSpec.status ?? ''}
                       onInput={(event) =>
                         setCurrentSpec((prev) => ({ ...prev, status: event.currentTarget.value }))
@@ -555,19 +555,19 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
                     />
                   </label>
                   <label class="flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Tags</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">Tags</span>
                     <input
                       type="text"
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={tagsInput}
                       onInput={(event) => setTagsInput(event.currentTarget.value)}
                     />
                   </label>
                   <label class="lg:col-span-2 flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Excerpt</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">Excerpt</span>
                     <textarea
                       rows={3}
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={currentSpec.excerpt ?? ''}
                       onInput={(event) =>
                         setCurrentSpec((prev) => ({ ...prev, excerpt: event.currentTarget.value }))
@@ -575,10 +575,10 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
                     />
                   </label>
                   <label class="lg:col-span-2 flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Meta description</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">Meta description</span>
                     <textarea
                       rows={2}
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={currentSpec.metaDescription ?? ''}
                       onInput={(event) =>
                         setCurrentSpec((prev) => ({ ...prev, metaDescription: event.currentTarget.value }))
@@ -588,10 +588,10 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
                 </div>
 
                 <label class="flex flex-col gap-2 text-sm">
-                  <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Outline (one per line, optional `Heading|anchor`)</span>
+                  <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">Outline (one per line, optional `Heading|anchor`)</span>
                   <textarea
                     rows={4}
-                    class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                    class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                     value={outlineInput}
                     onInput={(event) => setOutlineInput(event.currentTarget.value)}
                   />
@@ -600,12 +600,12 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
                 <div class="space-y-4">
                   <header class="flex items-center justify-between">
                     <div>
-                      <h3 class="text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">Sections</h3>
-                      <p class="text-xs text-slate-500">Markdown will appear in the live preview.</p>
+                      <h3 class="text-sm font-semibold uppercase tracking-[0.3em] text-inverse-faint">Sections</h3>
+                      <p class="text-xs text-muted-subtle">Markdown will appear in the live preview.</p>
                     </div>
                     <button
                       type="button"
-                      class="rounded border border-slate-800/60 px-3 py-1 text-[0.65rem] uppercase tracking-[0.35em] text-slate-300 hover:bg-slate-900"
+                      class="rounded border border-line-inverse/60 px-3 py-1 text-[0.65rem] uppercase tracking-[0.35em] text-inverse-subtle hover:bg-surface-inverse-soft"
                       onClick={addSection}
                     >
                       Add section
@@ -613,31 +613,31 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
                   </header>
                   <div class="space-y-4">
                     {(currentSpec.sections ?? []).map((section, index) => (
-                      <div class="rounded-lg border border-slate-800 bg-slate-950/70 p-4">
+                      <div class="rounded-lg border border-line-inverse bg-surface-inverse/70 p-4">
                         <div class="flex items-start gap-3">
-                          <span class="mt-2 text-xs font-semibold uppercase tracking-[0.35em] text-slate-500">{index + 1}</span>
+                          <span class="mt-2 text-xs font-semibold uppercase tracking-[0.35em] text-muted-subtle">{index + 1}</span>
                           <div class="flex-1 space-y-3 text-sm">
                             <label class="flex flex-col gap-1">
-                              <span class="text-[0.6rem] uppercase tracking-[0.35em] text-slate-500">Heading</span>
+                              <span class="text-[0.6rem] uppercase tracking-[0.35em] text-muted-subtle">Heading</span>
                               <input
                                 type="text"
-                                class="rounded border border-slate-800 bg-slate-900/60 px-3 py-2 text-slate-100"
+                                class="rounded border border-line-inverse bg-surface-inverse-soft/60 px-3 py-2 text-inverse-soft"
                                 value={section.heading ?? ''}
                                 onInput={(event) => updateSection(index, 'heading', event.currentTarget.value)}
                               />
                             </label>
                             <label class="flex flex-col gap-1">
-                              <span class="text-[0.6rem] uppercase tracking-[0.35em] text-slate-500">Markdown</span>
+                              <span class="text-[0.6rem] uppercase tracking-[0.35em] text-muted-subtle">Markdown</span>
                               <textarea
                                 rows={4}
-                                class="rounded border border-slate-800 bg-slate-900/60 px-3 py-2 text-slate-100"
+                                class="rounded border border-line-inverse bg-surface-inverse-soft/60 px-3 py-2 text-inverse-soft"
                                 value={section.markdown ?? ''}
                                 onInput={(event) => updateSection(index, 'markdown', event.currentTarget.value)}
                               />
                             </label>
                             <button
                               type="button"
-                              class="text-[0.65rem] uppercase tracking-[0.35em] text-rose-300"
+                              class="text-[0.65rem] uppercase tracking-[0.35em] text-rose-soft"
                               onClick={() => removeSection(index)}
                             >
                               Remove
@@ -651,10 +651,10 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
 
                 <div class="grid gap-4 lg:grid-cols-2">
                   <label class="flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Hero image prompt</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">Hero image prompt</span>
                     <textarea
                       rows={2}
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={currentSpec.heroImagePrompt ?? ''}
                       onInput={(event) =>
                         setCurrentSpec((prev) => ({ ...prev, heroImagePrompt: event.currentTarget.value }))
@@ -662,10 +662,10 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
                     />
                   </label>
                   <label class="flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Ad placements</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">Ad placements</span>
                     <input
                       type="text"
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={(currentSpec.adPlacements ?? []).join(', ')}
                       onInput={(event) =>
                         setCurrentSpec((prev) => ({ ...prev, adPlacements: parseTags(event.currentTarget.value) }))
@@ -673,10 +673,10 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
                     />
                   </label>
                   <label class="flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">CTA type</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">CTA type</span>
                     <input
                       type="text"
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={currentSpec.cta?.type ?? ''}
                       onInput={(event) =>
                         setCurrentSpec((prev) => ({ ...prev, cta: { ...prev.cta, type: event.currentTarget.value } }))
@@ -684,10 +684,10 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
                     />
                   </label>
                   <label class="flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">CTA headline</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">CTA headline</span>
                     <input
                       type="text"
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={currentSpec.cta?.headline ?? ''}
                       onInput={(event) =>
                         setCurrentSpec((prev) => ({ ...prev, cta: { ...prev.cta, headline: event.currentTarget.value } }))
@@ -695,10 +695,10 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
                     />
                   </label>
                   <label class="lg:col-span-2 flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">CTA body</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">CTA body</span>
                     <textarea
                       rows={3}
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={currentSpec.cta?.body ?? ''}
                       onInput={(event) =>
                         setCurrentSpec((prev) => ({ ...prev, cta: { ...prev.cta, body: event.currentTarget.value } }))
@@ -706,10 +706,10 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
                     />
                   </label>
                   <label class="flex flex-col gap-2 text-sm">
-                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">CTA button</span>
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-muted-subtle">CTA button</span>
                     <input
                       type="text"
-                      class="rounded border border-slate-800 bg-slate-950/80 px-3 py-2 text-slate-100"
+                      class="rounded border border-line-inverse bg-surface-inverse/80 px-3 py-2 text-inverse-soft"
                       value={currentSpec.cta?.buttonLabel ?? ''}
                       onInput={(event) =>
                         setCurrentSpec((prev) => ({ ...prev, cta: { ...prev.cta, buttonLabel: event.currentTarget.value } }))
@@ -720,37 +720,37 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
               </section>
             </div>
           </div>
-          <aside class="w-full min-w-[320px] border-t border-slate-950/60 bg-slate-950/35 px-6 py-6 text-slate-200 lg:w-[360px] lg:border-t-0 lg:border-l">
+          <aside class="w-full min-w-[320px] border-t border-line-night/60 bg-surface-inverse/35 px-6 py-6 text-inverse-muted lg:w-[360px] lg:border-t-0 lg:border-l">
             <header class="space-y-1">
-              <p class="text-[0.7rem] uppercase tracking-[0.35em] text-slate-500">Preview</p>
-              <h2 class="text-lg font-semibold text-slate-100">Live PostSpec rendering</h2>
-              <p class="text-sm text-slate-400">Update fields on the left to see this preview refresh instantly.</p>
+              <p class="text-[0.7rem] uppercase tracking-[0.35em] text-muted-subtle">Preview</p>
+              <h2 class="text-lg font-semibold text-inverse-soft">Live PostSpec rendering</h2>
+              <p class="text-sm text-inverse-faint">Update fields on the left to see this preview refresh instantly.</p>
             </header>
-            <article class="mt-6 space-y-5 rounded-xl border border-slate-900/60 bg-slate-950/40 px-5 py-5 shadow-[0_12px_30px_rgba(15,23,42,0.45)]">
+            <article class="mt-6 space-y-5 rounded-xl border border-line-inverse-strong/60 bg-surface-inverse/40 px-5 py-5 shadow-[0_12px_30px_rgba(15,23,42,0.45)]">
               <div class="space-y-2">
-                <h1 class="text-2xl font-semibold text-slate-100">{sanitizedSpec.title || 'Untitled draft'}</h1>
-                <p class="text-sm text-slate-400">{sanitizedSpec.excerpt || 'Add an excerpt to set the hook.'}</p>
-                <p class="text-xs uppercase tracking-[0.35em] text-slate-500">Slug: {sanitizedSpec.slug || 'pending'}</p>
+                <h1 class="text-2xl font-semibold text-inverse-soft">{sanitizedSpec.title || 'Untitled draft'}</h1>
+                <p class="text-sm text-inverse-faint">{sanitizedSpec.excerpt || 'Add an excerpt to set the hook.'}</p>
+                <p class="text-xs uppercase tracking-[0.35em] text-muted-subtle">Slug: {sanitizedSpec.slug || 'pending'}</p>
               </div>
               <div class="space-y-4 text-sm leading-relaxed">
                 {(sanitizedSpec.sections ?? []).map((section) => (
-                  <section class="rounded-lg border border-slate-900/60 bg-slate-950/50 px-4 py-3">
-                    <h3 class="text-base font-semibold text-slate-100">{section.heading || 'Untitled section'}</h3>
+                  <section class="rounded-lg border border-line-inverse-strong/60 bg-surface-inverse/50 px-4 py-3">
+                    <h3 class="text-base font-semibold text-inverse-soft">{section.heading || 'Untitled section'}</h3>
                     <div
-                      class="prose prose-invert prose-sm mt-2 max-w-none text-slate-300"
+                      class="prose prose-invert prose-sm mt-2 max-w-none text-inverse-subtle"
                       dangerouslySetInnerHTML={{ __html: renderMarkdown(section.markdown ?? '') }}
                     />
                   </section>
                 ))}
               </div>
-              <section class="space-y-2 text-xs text-slate-400">
-                <p><span class="font-semibold text-slate-300">Tags:</span> {sanitizedSpec.tags?.join(', ') || '—'}</p>
-                <p><span class="font-semibold text-slate-300">Ad placements:</span> {sanitizedSpec.adPlacements?.join(', ') || '—'}</p>
-                <p><span class="font-semibold text-slate-300">CTA:</span> {sanitizedSpec.cta?.type || '—'}</p>
+              <section class="space-y-2 text-xs text-inverse-faint">
+                <p><span class="font-semibold text-inverse-subtle">Tags:</span> {sanitizedSpec.tags?.join(', ') || '—'}</p>
+                <p><span class="font-semibold text-inverse-subtle">Ad placements:</span> {sanitizedSpec.adPlacements?.join(', ') || '—'}</p>
+                <p><span class="font-semibold text-inverse-subtle">CTA:</span> {sanitizedSpec.cta?.type || '—'}</p>
               </section>
-              <details class="rounded border border-slate-900/60 bg-slate-950/40 px-4 py-3 text-xs text-slate-400">
-                <summary class="cursor-pointer text-slate-200">Raw JSON</summary>
-                <pre class="mt-3 max-h-72 overflow-auto text-[11px] leading-relaxed text-slate-300">{JSON.stringify(sanitizedSpec, null, 2)}</pre>
+              <details class="rounded border border-line-inverse-strong/60 bg-surface-inverse/40 px-4 py-3 text-xs text-inverse-faint">
+                <summary class="cursor-pointer text-inverse-muted">Raw JSON</summary>
+                <pre class="mt-3 max-h-72 overflow-auto text-[11px] leading-relaxed text-inverse-subtle">{JSON.stringify(sanitizedSpec, null, 2)}</pre>
               </details>
             </article>
           </aside>

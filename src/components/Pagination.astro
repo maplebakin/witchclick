@@ -12,30 +12,30 @@ const p = Number(page);
 <nav class="mt-12 flex flex-wrap items-center justify-center gap-3" aria-label="Pagination">
   {p > 1 ? (
     <a
-      class="inline-flex items-center gap-1 rounded-full border border-purple-200 bg-white/80 px-4 py-2 text-sm font-medium text-purple-700 transition hover:border-purple-300 hover:bg-purple-50"
+      class="inline-flex items-center gap-1 rounded-full border border-line-muted bg-surface-base/80 px-4 py-2 text-sm font-medium text-secondary transition hover:border-line-strong hover:bg-surface-muted"
       href={`${baseHref}/${p - 1}`}
       rel="prev"
     >
       ← Previous
     </a>
   ) : (
-    <span class="inline-flex items-center gap-1 rounded-full border border-purple-100 px-4 py-2 text-sm text-purple-300" aria-disabled="true">
+    <span class="inline-flex items-center gap-1 rounded-full border border-line-subtle px-4 py-2 text-sm text-accent-soft" aria-disabled="true">
       ← Previous
     </span>
   )}
 
-  <span class="text-sm text-purple-700/80">Page {p} of {totalPages}</span>
+  <span class="text-sm text-secondary/80">Page {p} of {totalPages}</span>
 
   {p < totalPages ? (
     <a
-      class="inline-flex items-center gap-1 rounded-full border border-purple-200 bg-white/80 px-4 py-2 text-sm font-medium text-purple-700 transition hover:border-purple-300 hover:bg-purple-50"
+      class="inline-flex items-center gap-1 rounded-full border border-line-muted bg-surface-base/80 px-4 py-2 text-sm font-medium text-secondary transition hover:border-line-strong hover:bg-surface-muted"
       href={`${baseHref}/${p + 1}`}
       rel="next"
     >
       Next →
     </a>
   ) : (
-    <span class="inline-flex items-center gap-1 rounded-full border border-purple-100 px-4 py-2 text-sm text-purple-300" aria-disabled="true">
+    <span class="inline-flex items-center gap-1 rounded-full border border-line-subtle px-4 py-2 text-sm text-accent-soft" aria-disabled="true">
       Next →
     </span>
   )}

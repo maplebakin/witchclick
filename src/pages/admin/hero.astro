@@ -29,36 +29,36 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
   {canUse ? (
     <section
       id="heroUploader"
-      class="mx-auto max-w-4xl space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+      class="mx-auto max-w-4xl space-y-6 rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm"
       data-dev-api={DEV_API}
       data-site-origin={site}
     >
       <header class="space-y-2">
-        <h1 class="text-2xl font-semibold text-gray-900">Admin → Hero Image Uploader</h1>
-        <p class="text-sm text-gray-700">
+        <h1 class="text-2xl font-semibold text-body-strong">Admin → Hero Image Uploader</h1>
+        <p class="text-sm text-body-muted">
           Choose a post, drop in artwork (PNG, JPG, or WEBP up to 5&nbsp;MB), add alt text, and the uploader will
-          store the file under <code class="rounded bg-gray-100 px-1 py-0.5 text-[11px]">/public/images/hero/&lt;slug&gt;</code>
+          store the file under <code class="rounded bg-surface-neutral-tint px-1 py-0.5 text-[11px]">/public/images/hero/&lt;slug&gt;</code>
           before wiring the frontmatter.
         </p>
       </header>
 
       <ol class="space-y-6">
-        <li class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <li class="rounded-2xl border border-line-neutral bg-surface-base p-5 shadow-sm">
           <div class="flex items-start gap-4">
-            <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 text-sm font-semibold text-purple-700">
+            <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-surface-soft text-sm font-semibold text-secondary">
               1
             </span>
             <div class="flex-1 space-y-3">
               <div class="space-y-1">
-                <h2 class="text-base font-semibold text-gray-900">Step 1 — Select a post</h2>
-                <p class="text-sm text-gray-600">
+                <h2 class="text-base font-semibold text-body-strong">Step 1 — Select a post</h2>
+                <p class="text-sm text-body-subtle">
                   Choose an existing post that should receive a fresh hero image.
                 </p>
               </div>
               <label class="block">
-                <span class="text-xs font-medium uppercase tracking-wide text-gray-600">Post</span>
+                <span class="text-xs font-medium uppercase tracking-wide text-body-subtle">Post</span>
                 <select
-                  class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-purple-500 focus:outline-none"
+                  class="mt-1 w-full rounded-lg border border-line-neutral-strong bg-surface-base px-3 py-2 text-sm focus:border-line-bold focus:outline-none"
                   data-post-select
                   disabled
                 >
@@ -69,26 +69,26 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           </div>
         </li>
 
-        <li class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <li class="rounded-2xl border border-line-neutral bg-surface-base p-5 shadow-sm">
           <div class="flex items-start gap-4">
-            <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 text-sm font-semibold text-purple-700">
+            <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-surface-soft text-sm font-semibold text-secondary">
               2
             </span>
             <div class="flex-1 space-y-3">
               <div class="space-y-1">
-                <h2 class="text-base font-semibold text-gray-900">Step 2 — Load the hero prompt</h2>
-                <p class="text-sm text-gray-600">
+                <h2 class="text-base font-semibold text-body-strong">Step 2 — Load the hero prompt</h2>
+                <p class="text-sm text-body-subtle">
                   We pull the saved hero prompt (or fallback alt text) so you can paste it into your image model.
                 </p>
               </div>
               <div
-                class="rounded-xl border border-purple-100 bg-purple-50 p-4 text-sm text-purple-900"
+                class="rounded-xl border border-line-subtle bg-surface-muted p-4 text-sm text-primary"
                 data-hero-prompt-card
               >
                 <div class="flex flex-wrap items-center justify-between gap-2">
                   <span class="font-medium">Hero prompt helper</span>
                   <button
-                    class="rounded-md bg-purple-600 px-3 py-1 text-xs font-medium text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    class="rounded-md bg-surface-accent-strong px-3 py-1 text-xs font-medium text-inverse transition hover:bg-surface-accent-bolder disabled:cursor-not-allowed disabled:opacity-60"
                     data-copy-prompt
                     disabled
                   >
@@ -99,7 +99,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
                   Select a post to load the saved hero image prompt (or alt text fallback) for your LLM.
                 </p>
                 <textarea
-                  class="mt-3 hidden h-28 w-full resize-y rounded-md border border-purple-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-purple-500 focus:outline-none"
+                  class="mt-3 hidden h-28 w-full resize-y rounded-md border border-line-muted bg-surface-base px-3 py-2 text-sm text-body focus:border-line-bold focus:outline-none"
                   readonly
                   data-hero-prompt
                 ></textarea>
@@ -108,22 +108,22 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           </div>
         </li>
 
-        <li class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <li class="rounded-2xl border border-line-neutral bg-surface-base p-5 shadow-sm">
           <div class="flex items-start gap-4">
-            <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 text-sm font-semibold text-purple-700">
+            <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-surface-soft text-sm font-semibold text-secondary">
               3
             </span>
             <div class="flex-1 space-y-4">
               <div class="space-y-1">
-                <h2 class="text-base font-semibold text-gray-900">Step 3 — Upload hero artwork</h2>
-                <p class="text-sm text-gray-600">
+                <h2 class="text-base font-semibold text-body-strong">Step 3 — Upload hero artwork</h2>
+                <p class="text-sm text-body-subtle">
                   With the prompt in hand, render a new hero image and import it from your device.
                 </p>
               </div>
               <div class="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
                 <div class="relative">
                   <div
-                    class="relative flex h-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-6 py-10 text-center transition"
+                    class="relative flex h-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-line-neutral-strong bg-surface-neutral-soft px-6 py-10 text-center transition"
                     data-drop-zone
                   >
                     <input
@@ -135,24 +135,24 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
                       disabled
                     />
                     <div
-                      class="pointer-events-none absolute inset-0 flex items-center justify-center rounded-xl bg-white/80 text-sm font-semibold text-purple-700"
+                      class="pointer-events-none absolute inset-0 flex items-center justify-center rounded-xl bg-surface-base/80 text-sm font-semibold text-secondary"
                       data-drop-overlay
                     >
                       Select a post above to unlock uploads.
                     </div>
                     <div class="space-y-2">
-                      <p class="text-sm font-medium text-gray-800">Drag &amp; drop hero artwork, or click to browse</p>
-                      <p class="text-xs text-gray-600" data-drop-hint>
+                      <p class="text-sm font-medium text-body">Drag &amp; drop hero artwork, or click to browse</p>
+                      <p class="text-xs text-body-subtle" data-drop-hint>
                         Once a post is selected, you can upload PNG, JPG, or WEBP files up to 5&nbsp;MB.
                       </p>
-                      <p class="text-xs text-gray-700" data-file-info></p>
+                      <p class="text-xs text-body-muted" data-file-info></p>
                     </div>
                   </div>
                 </div>
                 <figure class="space-y-3">
-                  <div class="relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                  <div class="relative overflow-hidden rounded-xl border border-line-neutral bg-surface-base shadow-sm">
                     <div
-                      class="flex aspect-[3/2] items-center justify-center text-sm font-medium text-gray-500"
+                      class="flex aspect-[3/2] items-center justify-center text-sm font-medium text-body-faint"
                       data-preview-placeholder
                     >
                       Your preview will appear here once you choose an image.
@@ -163,21 +163,21 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
                       class="hidden h-full w-full object-cover"
                     />
                   </div>
-                  <figcaption class="text-xs text-gray-600" data-existing-hero>
+                  <figcaption class="text-xs text-body-subtle" data-existing-hero>
                     Select a post to review its current hero details.
                   </figcaption>
                 </figure>
               </div>
               <label class="block">
-                <span class="text-xs font-medium uppercase tracking-wide text-gray-600">Alt text</span>
+                <span class="text-xs font-medium uppercase tracking-wide text-body-subtle">Alt text</span>
                 <input
                   type="text"
                   placeholder="Cozy cauldron simmering beside tarot cards on a window seat"
-                  class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                  class="mt-1 w-full rounded-lg border border-line-neutral-strong px-3 py-2 text-sm focus:border-line-bold focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
                   data-alt-input
                   disabled
                 />
-                <p class="mt-1 text-xs text-gray-500">
+                <p class="mt-1 text-xs text-body-faint">
                   Alt text helps screen readers understand the imagery—tweak it after uploading if needed.
                 </p>
               </label>
@@ -185,30 +185,30 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           </div>
         </li>
 
-        <li class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <li class="rounded-2xl border border-line-neutral bg-surface-base p-5 shadow-sm">
           <div class="flex items-start gap-4">
-            <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 text-sm font-semibold text-purple-700">
+            <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-surface-soft text-sm font-semibold text-secondary">
               4
             </span>
             <div class="flex-1 space-y-4">
               <div class="space-y-1">
-                <h2 class="text-base font-semibold text-gray-900">Step 4 — Attach and verify</h2>
-                <p class="text-sm text-gray-600">
+                <h2 class="text-base font-semibold text-body-strong">Step 4 — Attach and verify</h2>
+                <p class="text-sm text-body-subtle">
                   When the preview and alt text look right, attach the hero image to update the post everywhere.
                 </p>
               </div>
               <div class="flex flex-wrap items-center gap-3">
                 <button
-                  class="rounded-lg bg-purple-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-purple-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  class="rounded-lg bg-surface-accent-bolder px-4 py-2 text-sm font-medium text-inverse transition hover:bg-surface-accent-deep disabled:cursor-not-allowed disabled:opacity-60"
                   data-submit
                   disabled
                 >
                   Upload &amp; Attach
                 </button>
-                <span class="text-sm text-gray-600" data-status></span>
+                <span class="text-sm text-body-subtle" data-status></span>
               </div>
               <div
-                class="hidden rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800"
+                class="hidden rounded-lg border border-line-success-soft bg-surface-success-soft px-4 py-3 text-sm text-success-strong"
                 data-success
               ></div>
             </div>
@@ -217,10 +217,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
       </ol>
     </section>
   ) : (
-    <section class="mx-auto max-w-3xl rounded-2xl border border-purple-100 bg-white p-6 text-center shadow-sm">
+    <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
       <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
-      <p class="text-gray-700">These tools only run in <strong>development</strong> (or with a temporary key when hosted).</p>
-      <ol class="mx-auto mt-4 list-decimal space-y-2 text-left text-sm text-gray-700">
+      <p class="text-body-muted">These tools only run in <strong>development</strong> (or with a temporary key when hosted).</p>
+      <ol class="mx-auto mt-4 list-decimal space-y-2 text-left text-sm text-body-muted">
         <li>Run <code>npm run dev:all</code> locally to start Astro + the admin API.</li>
         <li>Visit <code>/admin/hero</code> from the local site.</li>
         <li>If you later host with an adapter, set <code>PUBLIC_ADMIN_KEY</code> and append <code>?key=…</code>.</li>
@@ -355,15 +355,15 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
         function setStatus(message, tone) {
           if (!statusEl) return;
           statusEl.textContent = message || '';
-          statusEl.classList.remove('text-gray-600', 'text-red-700', 'text-green-700', 'text-indigo-700');
+          statusEl.classList.remove('text-body-subtle', 'text-danger', 'text-success', 'text-info');
           if (!message) {
-            statusEl.classList.add('text-gray-600');
+            statusEl.classList.add('text-body-subtle');
             return;
           }
-          if (tone === 'error') statusEl.classList.add('text-red-700');
-          else if (tone === 'success') statusEl.classList.add('text-green-700');
-          else if (tone === 'progress') statusEl.classList.add('text-indigo-700');
-          else statusEl.classList.add('text-gray-600');
+          if (tone === 'error') statusEl.classList.add('text-danger');
+          else if (tone === 'success') statusEl.classList.add('text-success');
+          else if (tone === 'progress') statusEl.classList.add('text-info');
+          else statusEl.classList.add('text-body-subtle');
         }
 
         function clearSuccess() {
@@ -379,8 +379,8 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           const href = `${SITE_ORIGIN.replace(/\/$/, '')}/post/${safeSlug}`;
           successEl.innerHTML = `
             <strong class="font-semibold">Success!</strong>
-            Hero saved to <code class="rounded bg-green-100 px-1 py-0.5 text-[11px] text-green-900">${safePath}</code>.
-            <a class="ml-1 text-green-900 underline" href="${href}" target="_blank" rel="noopener">View post →</a>
+            Hero saved to <code class="rounded bg-surface-success-tint px-1 py-0.5 text-[11px] text-success-deep">${safePath}</code>.
+            <a class="ml-1 text-success-deep underline" href="${href}" target="_blank" rel="noopener">View post →</a>
           `;
           successEl.classList.remove('hidden');
 
@@ -411,10 +411,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
         function setPromptHint(message, tone) {
           if (!promptHint) return;
           promptHint.textContent = message || '';
-          promptHint.classList.remove('text-purple-900', 'text-green-700', 'text-red-700');
-          if (tone === 'success') promptHint.classList.add('text-green-700');
-          else if (tone === 'error') promptHint.classList.add('text-red-700');
-          else promptHint.classList.add('text-purple-900');
+          promptHint.classList.remove('text-primary', 'text-success', 'text-danger');
+          if (tone === 'success') promptHint.classList.add('text-success');
+          else if (tone === 'error') promptHint.classList.add('text-danger');
+          else promptHint.classList.add('text-primary');
         }
 
         function cleanHeroAlt(value) {
@@ -466,17 +466,17 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
 
         function updateExistingHeroNote(post) {
           if (!existingHeroNote) return;
-          existingHeroNote.classList.remove('text-green-700', 'text-purple-700');
+          existingHeroNote.classList.remove('text-success', 'text-secondary');
           if (!post) {
             existingHeroNote.textContent = 'Select a post to review its current hero details.';
             return;
           }
           if (post.heroImage) {
             existingHeroNote.textContent = `Existing hero image: ${post.heroImage}. Uploading will replace this reference.`;
-            existingHeroNote.classList.add('text-purple-700');
+            existingHeroNote.classList.add('text-secondary');
           } else {
             existingHeroNote.textContent = 'No hero image attached yet. Uploading will add one to the post frontmatter.';
-            existingHeroNote.classList.add('text-green-700');
+            existingHeroNote.classList.add('text-success');
           }
         }
 
@@ -738,13 +738,13 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
             dropZone.addEventListener(evt, (event) => {
               event.preventDefault();
               if (!dropEnabled) return;
-              dropZone.classList.add('border-purple-400', 'bg-purple-50');
+              dropZone.classList.add('border-line-bolder', 'bg-surface-muted');
             });
           });
           ['dragleave', 'dragend', 'drop'].forEach((evt) => {
             dropZone.addEventListener(evt, (event) => {
               event.preventDefault();
-              dropZone.classList.remove('border-purple-400', 'bg-purple-50');
+              dropZone.classList.remove('border-line-bolder', 'bg-surface-muted');
             });
           });
           dropZone.addEventListener('drop', (event) => {

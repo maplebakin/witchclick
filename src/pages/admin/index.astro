@@ -73,7 +73,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
   {canUse ? (
     <div class="space-y-6">
-      <nav aria-label="Admin shortcuts" class="rounded-2xl border border-purple-100 bg-purple-50 px-4 py-3 text-sm text-purple-900">
+      <nav aria-label="Admin shortcuts" class="rounded-2xl border border-line-subtle bg-surface-muted px-4 py-3 text-sm text-primary">
         <span class="font-medium">Quick tools:</span>
         <a class="ml-3 underline underline-offset-4 hover:no-underline" href="/admin/entities">Entities Admin</a>
         <span aria-hidden="true" class="mx-2">•</span>
@@ -82,19 +82,19 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         <a class="underline underline-offset-4 hover:no-underline" href="/admin/hero">Hero Image Uploader</a>
       </nav>
 
-      <div class="rounded-2xl border border-purple-100 bg-white/40 p-1 text-sm text-purple-900">
+      <div class="rounded-2xl border border-line-subtle bg-surface-base/40 p-1 text-sm text-primary">
         <span class="mr-3 font-medium">Panel:</span>
         <button
           type="button"
           data-panel-toggle="posts"
-          class="rounded-lg px-3 py-1 text-sm font-medium text-purple-900 hover:bg-purple-100"
+          class="rounded-lg px-3 py-1 text-sm font-medium text-primary hover:bg-surface-soft"
         >
           Posts
         </button>
         <button
           type="button"
           data-panel-toggle="curses"
-          class="rounded-lg px-3 py-1 text-sm font-medium text-purple-900 hover:bg-purple-100"
+          class="rounded-lg px-3 py-1 text-sm font-medium text-primary hover:bg-surface-soft"
         >
           Curses
         </button>
@@ -113,7 +113,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         data-curse-tags={JSON.stringify(curseTags)}
       >
         <div id="postsPanel" data-panel="posts" class="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          <section class="lg:col-span-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+          <section class="lg:col-span-5 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
             <h1 class="mb-3 text-xl font-semibold">1) Build Post Generator Prompt</h1>
             <div class="grid gap-3">
               <label class="block">
@@ -132,7 +132,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
                     <option value={option.key}>{option.label}</option>
                   ))}
                 </select>
-                <p id="modeHelp" class="mt-1 text-[11px] text-gray-600">{defaultModeDescription}</p>
+                <p id="modeHelp" class="mt-1 text-[11px] text-body-subtle">{defaultModeDescription}</p>
               </label>
               <label class="block">
                 <span class="text-xs font-medium">Writing style</span>
@@ -143,7 +143,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
                     </option>
                   ))}
                 </select>
-                <p id="styleHelp" class="mt-1 text-[11px] text-gray-600">{defaultStyleDescription}</p>
+                <p id="styleHelp" class="mt-1 text-[11px] text-body-subtle">{defaultStyleDescription}</p>
               </label>
               <div class="flex gap-4 text-sm">
                 <label class="inline-flex items-center gap-2">
@@ -154,15 +154,15 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
                 </label>
               </div>
               <div class="flex gap-2">
-                <button id="genPrompt" class="rounded-lg bg-purple-700 px-3 py-2 text-white hover:bg-purple-800">Generate Prompt</button>
+                <button id="genPrompt" class="rounded-lg bg-surface-accent-bolder px-3 py-2 text-inverse hover:bg-surface-accent-deep">Generate Prompt</button>
                 <button id="copyPrompt" class="rounded-lg border px-3 py-2">Copy</button>
               </div>
               <textarea id="promptOut" class="mt-2 h-64 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder="Prompt will appear here…"></textarea>
-              <p class="text-xs text-gray-600">Paste this into your LLM → get JSON → paste into the box on the right.</p>
+              <p class="text-xs text-body-subtle">Paste this into your LLM → get JSON → paste into the box on the right.</p>
             </div>
           </section>
 
-          <section class="lg:col-span-7 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+          <section class="lg:col-span-7 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
             <h2 class="mb-3 text-xl font-semibold">2) Paste PostSpec JSON → Preview → Ingest → Publish</h2>
 
             <textarea id="spec" class="h-56 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder='Paste the PostSpec v2 JSON here'></textarea>
@@ -170,18 +170,18 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             <div class="mt-3 flex flex-wrap gap-2">
               <button id="validateBtn" class="rounded-lg border px-3 py-2 text-sm">Validate</button>
               <button id="previewBtn" class="rounded-lg border px-3 py-2 text-sm">Preview</button>
-              <button id="ingestBtn" class="rounded-lg bg-green-600 px-3 py-2 text-sm text-white hover:bg-green-700">Ingest</button>
-              <button id="ingestPublishBtn" class="rounded-lg bg-indigo-600 px-3 py-2 text-sm text-white hover:bg-indigo-700">Ingest + Publish</button>
+              <button id="ingestBtn" class="rounded-lg bg-surface-success px-3 py-2 text-sm text-inverse hover:bg-surface-success-strong">Ingest</button>
+              <button id="ingestPublishBtn" class="rounded-lg bg-surface-info px-3 py-2 text-sm text-inverse hover:bg-surface-info-strong">Ingest + Publish</button>
               <button id="clearBtn" class="rounded-lg border px-3 py-2 text-sm">Clear</button>
             </div>
             <div class="mt-3 flex flex-col gap-3">
               <div
                 id="status"
-                class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700"
+                class="rounded-lg border border-line-slate bg-surface-cool-soft px-3 py-2 text-sm text-muted-strong"
               ></div>
               <div
                 id="specSummary"
-                class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-[11px] text-gray-700"
+                class="rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[11px] text-body-muted"
               ></div>
             </div>
 
@@ -190,7 +190,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         </div>
 
         <div id="cursesPanel" data-panel="curses" class="hidden grid grid-cols-1 gap-6 lg:grid-cols-12">
-          <section class="lg:col-span-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+          <section class="lg:col-span-5 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
             <h2 class="mb-3 text-xl font-semibold">1) Build Curse Prompt</h2>
             <div class="grid gap-3">
               <label class="block">
@@ -230,33 +230,33 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
                 <input id="curseJournal" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="What truth rose when the echo returned?" />
               </label>
               <div class="flex gap-2">
-                <button id="curseGenPrompt" class="rounded-lg bg-purple-700 px-3 py-2 text-white hover:bg-purple-800">Generate Prompt</button>
+                <button id="curseGenPrompt" class="rounded-lg bg-surface-accent-bolder px-3 py-2 text-inverse hover:bg-surface-accent-deep">Generate Prompt</button>
                 <button id="curseCopyPrompt" class="rounded-lg border px-3 py-2">Copy</button>
               </div>
               <textarea id="cursePromptOut" class="mt-2 h-64 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder="Prompt will appear here…"></textarea>
-              <p class="text-xs text-gray-600">Canonical tags: {curseTags.join(", ")}</p>
+              <p class="text-xs text-body-subtle">Canonical tags: {curseTags.join(", ")}</p>
             </div>
           </section>
 
-          <section class="lg:col-span-7 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+          <section class="lg:col-span-7 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
             <h2 class="mb-3 text-xl font-semibold">2) Paste CurseSpec JSON → Validate → Ingest</h2>
 
             <textarea id="curseSpec" class="h-56 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder='Paste the CurseSpec JSON here'></textarea>
 
             <div class="mt-3 flex flex-wrap gap-2">
               <button id="curseValidateBtn" class="rounded-lg border px-3 py-2 text-sm">Validate</button>
-              <button id="curseIngestBtn" class="rounded-lg bg-green-600 px-3 py-2 text-sm text-white hover:bg-green-700">Ingest</button>
+              <button id="curseIngestBtn" class="rounded-lg bg-surface-success px-3 py-2 text-sm text-inverse hover:bg-surface-success-strong">Ingest</button>
               <button id="curseClearBtn" class="rounded-lg border px-3 py-2 text-sm">Clear</button>
             </div>
 
             <div class="mt-3 flex flex-col gap-3">
               <div
                 id="curseStatus"
-                class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700"
+                class="rounded-lg border border-line-slate bg-surface-cool-soft px-3 py-2 text-sm text-muted-strong"
               ></div>
               <div
                 id="curseSummary"
-                class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-[11px] text-gray-700"
+                class="rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[11px] text-body-muted"
               ></div>
             </div>
 
@@ -266,10 +266,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
       </div>
       </div>
     ) : (
-    <section class="mx-auto max-w-3xl rounded-2xl border border-purple-100 bg-white p-6 text-center shadow-sm">
+    <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
       <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
-      <p class="text-gray-700">These tools only run in <strong>development</strong> (or with a temporary key when hosted on a server adapter).</p>
-      <ol class="mx-auto mt-4 list-decimal space-y-2 text-left text-sm text-gray-700">
+      <p class="text-body-muted">These tools only run in <strong>development</strong> (or with a temporary key when hosted on a server adapter).</p>
+      <ol class="mx-auto mt-4 list-decimal space-y-2 text-left text-sm text-body-muted">
         <li>Run <code>npm run dev</code> locally.</li>
         <li>Use the ingestion CLI: <code>npm run ingest ./path/to/post.json</code>.</li>
         <li>If you later switch to serverless, set <code>PUBLIC_ADMIN_KEY</code> and visit <code>/admin?key=…</code>.</li>
@@ -320,10 +320,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           panelButtons.forEach(function(button){
             var active = button.getAttribute('data-panel-toggle') === name;
             if (active) {
-              button.classList.add('bg-white', 'shadow');
+              button.classList.add('bg-surface-base', 'shadow');
               button.setAttribute('aria-pressed', 'true');
             } else {
-              button.classList.remove('bg-white', 'shadow');
+              button.classList.remove('bg-surface-base', 'shadow');
               button.setAttribute('aria-pressed', 'false');
             }
           });
@@ -342,11 +342,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           if (!el) return;
           var base='rounded-lg border px-3 py-2 text-sm';
           if (ok === false) {
-            el.className = base + ' border-red-200 bg-red-50 text-red-700';
+            el.className = base + ' border-line-danger bg-surface-danger-soft text-danger';
           } else if (ok === true) {
-            el.className = base + ' border-emerald-200 bg-emerald-50 text-emerald-700';
+            el.className = base + ' border-line-emerald bg-surface-emerald-soft text-success-emerald';
           } else {
-            el.className = base + ' border-slate-200 bg-slate-50 text-slate-700';
+            el.className = base + ' border-line-slate bg-surface-cool-soft text-muted-strong';
           }
           el.innerHTML='';
 
@@ -373,9 +373,9 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             el.appendChild(list);
           }
 
-          appendList('Errors', errors, 'text-red-700');
-          appendList('Warnings', warnings, 'text-amber-700');
-          appendList('Notes', notes, 'text-slate-600');
+          appendList('Errors', errors, 'text-danger');
+          appendList('Warnings', warnings, 'text-warning');
+          appendList('Notes', notes, 'text-muted');
 
           if (!msg && !(Array.isArray(warnings) && warnings.length) && !(Array.isArray(notes) && notes.length)) {
             el.textContent='Ready for PostSpec JSON.';
@@ -387,11 +387,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           if (!el) return;
           var base='rounded-lg border px-3 py-2 text-sm';
           if (ok === false) {
-            el.className = base + ' border-red-200 bg-red-50 text-red-700';
+            el.className = base + ' border-line-danger bg-surface-danger-soft text-danger';
           } else if (ok === true) {
-            el.className = base + ' border-emerald-200 bg-emerald-50 text-emerald-700';
+            el.className = base + ' border-line-emerald bg-surface-emerald-soft text-success-emerald';
           } else {
-            el.className = base + ' border-slate-200 bg-slate-50 text-slate-700';
+            el.className = base + ' border-line-slate bg-surface-cool-soft text-muted-strong';
           }
           el.innerHTML='';
 
@@ -404,7 +404,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
           if (Array.isArray(errors) && errors.length) {
             var list=document.createElement('ul');
-            list.className='mt-2 list-disc pl-5 text-[11px] text-red-700';
+            list.className='mt-2 list-disc pl-5 text-[11px] text-danger';
             errors.forEach(function(item){
               var li=document.createElement('li');
               li.textContent=String(item);
@@ -446,18 +446,18 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           var panel = $('specSummary');
           if (!panel) return;
           panel.innerHTML='';
-          var baseClass='rounded-lg border border-gray-200 bg-gray-50 p-3 text-[11px]';
+          var baseClass='rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[11px]';
           if (!spec) {
-            panel.className = baseClass + ' text-gray-600';
+            panel.className = baseClass + ' text-body-subtle';
             var empty=document.createElement('p');
             empty.textContent='No PostSpec parsed yet. Paste JSON to inspect the structure.';
             panel.appendChild(empty);
             return;
           }
 
-          panel.className = baseClass + ' text-gray-700';
+          panel.className = baseClass + ' text-body-muted';
           var title=document.createElement('p');
-          title.className='text-xs font-semibold uppercase tracking-wide text-gray-500';
+          title.className='text-xs font-semibold uppercase tracking-wide text-body-faint';
           title.textContent='Spec Summary';
           panel.appendChild(title);
 
@@ -480,10 +480,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             var row=document.createElement('div');
             row.className='grid grid-cols-[120px_1fr] gap-2';
             var dt=document.createElement('dt');
-            dt.className='text-[11px] font-medium text-gray-500';
+            dt.className='text-[11px] font-medium text-body-faint';
             dt.textContent=label;
             var dd=document.createElement('dd');
-            dd.className='text-[11px] text-gray-800';
+            dd.className='text-[11px] text-body';
             dd.textContent=value;
             row.appendChild(dt);
             row.appendChild(dd);
@@ -514,18 +514,18 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           var panel = $('curseSummary');
           if (!panel) return;
           panel.innerHTML='';
-          var baseClass='rounded-lg border border-gray-200 bg-gray-50 p-3 text-[11px]';
+          var baseClass='rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[11px]';
           if (!spec) {
-            panel.className = baseClass + ' text-gray-600';
+            panel.className = baseClass + ' text-body-subtle';
             var empty=document.createElement('p');
             empty.textContent='No CurseSpec parsed yet. Paste JSON to inspect the structure.';
             panel.appendChild(empty);
             return;
           }
 
-          panel.className = baseClass + ' text-gray-700';
+          panel.className = baseClass + ' text-body-muted';
           var title=document.createElement('p');
-          title.className='text-xs font-semibold uppercase tracking-wide text-gray-500';
+          title.className='text-xs font-semibold uppercase tracking-wide text-body-faint';
           title.textContent='Curse Summary';
           panel.appendChild(title);
 
@@ -533,10 +533,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             var row=document.createElement('div');
             row.className='grid grid-cols-[120px_1fr] gap-2';
             var dt=document.createElement('dt');
-            dt.className='text-[11px] font-medium text-gray-500';
+            dt.className='text-[11px] font-medium text-body-faint';
             dt.textContent=label;
             var dd=document.createElement('dd');
-            dd.className='text-[11px] text-gray-800';
+            dd.className='text-[11px] text-body';
             dd.textContent=value;
             row.appendChild(dt);
             row.appendChild(dd);
@@ -986,7 +986,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         function renderPreview(spec){
           var el = $('preview'); el.innerHTML = '';
           var h1 = document.createElement('h1'); h1.textContent = spec.title || '(untitled)'; el.appendChild(h1);
-          if (Array.isArray(spec.tags)){ var p = document.createElement('p'); p.className='text-sm text-gray-600'; p.textContent='Tags: ' + spec.tags.join(', '); el.appendChild(p); }
+          if (Array.isArray(spec.tags)){ var p = document.createElement('p'); p.className='text-sm text-body-subtle'; p.textContent='Tags: ' + spec.tags.join(', '); el.appendChild(p); }
           var totalWords = 0;
           for (var i=0;i<(spec.sections||[]).length;i++){
             var sec = spec.sections[i];
@@ -998,7 +998,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             totalWords += wordCount(sec.markdown||'');
           }
           var meta = document.createElement('p');
-          meta.className='mt-4 text-xs text-gray-500';
+          meta.className='mt-4 text-xs text-body-faint';
           meta.textContent = '~' + totalWords + ' words • ~' + Math.max(1, Math.round(totalWords/200)) + ' min read';
           el.appendChild(meta);
         }
@@ -1016,7 +1016,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           var tags = Array.isArray(spec.tags) ? spec.tags : [];
           if (tags.length) {
             var tagLine=document.createElement('p');
-            tagLine.className='text-sm text-gray-600';
+            tagLine.className='text-sm text-body-subtle';
             tagLine.textContent='Tags: ' + tags.join(', ');
             el.appendChild(tagLine);
           }
