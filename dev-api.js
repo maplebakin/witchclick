@@ -208,8 +208,18 @@ function resolvePrimaryPostsDir() {
 function parseBody(req) {
   return new Promise((resolve, reject) => {
     let buf = '';
-    req.on('data', (c) => { buf += c; });
+    let size = 0;
+    req.on('data', (chunk) => {
+      if (typeof chunk === 'string') {
+        size += Buffer.byteLength(chunk);
+        buf += chunk;
+      } else {
+        size += chunk.length;
+        buf += chunk.toString();
+      }
+    });
     req.on('end', () => {
+      req._observedBodySize = size;
       if (!buf.trim()) return resolve(null);
 
       // Helper: remove backslashes before []{} only when OUTSIDE strings
@@ -661,9 +671,67 @@ async function saveEntity({ type, slug, name, summary, properties, related }) {
   return { path: `content/entities/${type}/${s}.json`, slug: s, type };
 }
 
+function getObservedSize(req) {
+  if (typeof req._observedBodySize === 'number' && Number.isFinite(req._observedBodySize)) {
+    return req._observedBodySize;
+  }
+  const header = req.headers?.['content-length'];
+  if (!header) return 0;
+  const first = Array.isArray(header) ? header[0] : header;
+  const parsed = Number.parseInt(first, 10);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function logRequestError(req, error, status) {
+  const method = req.method || 'UNKNOWN';
+  const route = req.url || '';
+  const size = getObservedSize(req);
+  const stack = error && typeof error === 'object' && 'stack' in error ? error.stack : undefined;
+  const message = error && typeof error === 'object' && 'message' in error ? error.message : String(error);
+  console.error('[dev-api:error]', {
+    method,
+    route,
+    status,
+    inputSize: size,
+    message,
+    stack,
+  });
+}
+
+async function withRequestBoundary(req, res, handler) {
+  try {
+    await handler();
+  } catch (error) {
+    const status = typeof error?.statusCode === 'number'
+      ? error.statusCode
+      : typeof error?.status === 'number'
+        ? error.status
+        : 500;
+
+    logRequestError(req, error, status);
+
+    if (!res.headersSent) {
+      const payload = { ok: false, error: error?.message || String(error) };
+      if (Array.isArray(error?.errors)) {
+        payload.errors = error.errors;
+      }
+      if (Array.isArray(error?.warnings)) {
+        payload.warnings = error.warnings;
+      }
+      send(res, status, payload);
+    } else {
+      try {
+        res.end();
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+}
+
 // ---------- HTTP SERVER ----------
 const server = http.createServer(async (req, res) => {
-  try {
+  await withRequestBoundary(req, res, async () => {
     if (req.method === 'OPTIONS') return send(res, 204, { ok: true });
 
     if (req.method === 'POST' && req.url === '/ping') {
@@ -1153,9 +1221,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     return send(res, 404, { ok: false, error: 'Not found' });
-  } catch (e) {
-    return send(res, 500, { ok: false, error: e.message || String(e) });
-  }
+  });
 });
 
 if (process.env.VITEST !== 'true') {

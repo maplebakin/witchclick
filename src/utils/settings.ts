@@ -21,6 +21,14 @@ export interface AdsSettings {
   endSlotId?: string;
 }
 
+export type ObservabilityEnvironment = "production" | "staging" | "development";
+
+export interface ObservabilitySettings {
+  enabled: boolean;
+  dsn?: string | null;
+  environment?: ObservabilityEnvironment;
+}
+
 export interface SiteSettings {
   siteUrl: string;
   brandName?: string;
@@ -29,6 +37,8 @@ export interface SiteSettings {
   showAccountLink?: boolean;
   analytics?: AnalyticsSettings;
   ads?: AdsSettings;
+  observability?: ObservabilitySettings;
+  clientErrorEndpoint?: string | null;
 }
 
 const DEFAULT_SETTINGS: SiteSettings = {
@@ -38,6 +48,8 @@ const DEFAULT_SETTINGS: SiteSettings = {
     "As an affiliate, we may earn a small commission if you purchase through our links.",
   analytics: { enabled: false, provider: "plausible" },
   showAccountLink: false,
+  observability: { enabled: false, dsn: null, environment: "production" },
+  clientErrorEndpoint: null,
 };
 
 let cached: SiteSettings | null = null;
@@ -52,12 +64,24 @@ function deepMergeSettings(base: SiteSettings, next: Partial<SiteSettings>): Sit
     ? { ...(base.ads ?? {}), ...next.ads }
     : base.ads;
 
+  const observability: ObservabilitySettings | undefined = next.observability
+    ? {
+        ...(base.observability ?? { enabled: false, dsn: null, environment: "production" }),
+        ...next.observability,
+      }
+    : base.observability;
+
   return {
     ...base,
     ...next,
     showAccountLink: next.showAccountLink ?? base.showAccountLink ?? false,
     analytics,
     ads,
+    observability,
+    clientErrorEndpoint:
+      next.clientErrorEndpoint === undefined
+        ? base.clientErrorEndpoint ?? null
+        : next.clientErrorEndpoint,
   };
 }
 
@@ -165,11 +189,73 @@ function sanitizeSettings(input: unknown): Partial<SiteSettings> {
     if (value) out.ads = value;
   }
 
+  if ("observability" in data) {
+    const value = sanitizeObservability(data.observability, errors);
+    if (value) out.observability = value;
+  }
+
+  if ("clientErrorEndpoint" in data) {
+    const raw = data.clientErrorEndpoint;
+    if (raw === null) {
+      out.clientErrorEndpoint = null;
+    } else {
+      const endpoint = expectString(raw, "clientErrorEndpoint", errors);
+      if (endpoint) {
+        if (!isValidEndpoint(endpoint)) {
+          errors.push("clientErrorEndpoint must be a rooted path or absolute URL");
+        } else {
+          out.clientErrorEndpoint = endpoint;
+        }
+      }
+    }
+  }
+
   if (errors.length) {
     throw new Error(`Invalid settings.json: ${errors.join("; ")}`);
   }
 
   return out;
+}
+
+function sanitizeObservability(value: unknown, errors: string[]): ObservabilitySettings | undefined {
+  if (value === undefined) return undefined;
+  if (!value || typeof value !== "object") {
+    errors.push("observability must be an object");
+    return undefined;
+  }
+
+  const data = value as Record<string, unknown>;
+  const enabledRaw = data.enabled;
+  if (typeof enabledRaw !== "boolean") {
+    errors.push("observability.enabled must be a boolean");
+    return undefined;
+  }
+
+  const observability: ObservabilitySettings = { enabled: enabledRaw };
+
+  if ("dsn" in data) {
+    const rawDsn = data.dsn;
+    if (rawDsn === null) {
+      observability.dsn = null;
+    } else {
+      const dsn = expectString(rawDsn, "observability.dsn", errors);
+      if (dsn) observability.dsn = dsn;
+    }
+  }
+
+  if ("environment" in data) {
+    const env = expectString(data.environment, "observability.environment", errors);
+    if (env) {
+      const normalized = env.toLowerCase();
+      if (normalized === "production" || normalized === "staging" || normalized === "development") {
+        observability.environment = normalized as ObservabilityEnvironment;
+      } else {
+        errors.push("observability.environment must be 'production', 'staging', or 'development'");
+      }
+    }
+  }
+
+  return observability;
 }
 
 function sanitizeAnalytics(value: unknown, errors: string[]): AnalyticsSettings | undefined {
@@ -311,6 +397,12 @@ function expectString(
     return undefined;
   }
   return allowEmpty ? value : trimmed;
+}
+
+function isValidEndpoint(value: string): boolean {
+  if (!value) return false;
+  if (value.startsWith("/")) return true;
+  return isValidUrl(value);
 }
 
 function isValidUrl(value: string): boolean {
