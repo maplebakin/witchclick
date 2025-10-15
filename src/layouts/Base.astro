@@ -66,9 +66,6 @@ const adminLinks = isDev
   : [];
 
 const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined;
-const comfortId = Math.random().toString(36).slice(2, 10);
-const comfortThemeToggleId = `comfort-theme-${comfortId}`;
-const comfortFontToggleId = `comfort-font-${comfortId}`;
 ---
 <html lang="en" class="h-full">
   <head>
@@ -170,34 +167,6 @@ const comfortFontToggleId = `comfort-font-${comfortId}`;
       adminLinks={adminLinks}
       currentPath={currentPath}
     />
-    <div class="comfort-toolbar" role="region" aria-label="Display comfort preferences">
-      <div class="wc-container comfort-toolbar__inner">
-        <div class="comfort-toolbar__group" role="group" aria-label="Theme and contrast">
-          <input
-            id={comfortThemeToggleId}
-            class="comfort-toolbar__control"
-            type="checkbox"
-            data-comfort-theme-toggle
-          />
-          <label class="comfort-toolbar__label" for={comfortThemeToggleId}>
-            <span class="comfort-toolbar__title">Gentle dawn theme</span>
-            <span class="comfort-toolbar__hint">Softer contrast, parchment glow</span>
-          </label>
-        </div>
-        <div class="comfort-toolbar__group" role="group" aria-label="Body font preference">
-          <input
-            id={comfortFontToggleId}
-            class="comfort-toolbar__control"
-            type="checkbox"
-            data-comfort-font-toggle
-          />
-          <label class="comfort-toolbar__label" for={comfortFontToggleId}>
-            <span class="comfort-toolbar__title">Sans-serif body text</span>
-            <span class="comfort-toolbar__hint">Switch to Inter for easy scanning</span>
-          </label>
-        </div>
-      </div>
-    </div>
     <main id="main" class="site-main">
       <div
         class:list={[
@@ -242,105 +211,6 @@ const comfortFontToggleId = `comfort-font-${comfortId}`;
     top: 1rem;
     width: auto;
     height: auto;
-  }
-
-  .comfort-toolbar {
-    background: rgba(10, 4, 20, 0.6);
-    border-bottom: 1px solid rgba(212, 175, 55, 0.22);
-    box-shadow: inset 0 -1px 0 rgba(12, 5, 23, 0.35);
-  }
-
-  .comfort-toolbar__inner {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: stretch;
-    justify-content: flex-end;
-    padding: 0.75rem 1.5rem;
-  }
-
-  .comfort-toolbar__group {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem 0.85rem;
-    border-radius: 999px;
-    border: 1px solid rgba(212, 175, 55, 0.32);
-    background: rgba(18, 7, 37, 0.72);
-    backdrop-filter: blur(12px);
-  }
-
-  .comfort-toolbar__control {
-    width: 1.25rem;
-    height: 1.25rem;
-    border-radius: 0.35rem;
-    border: 1px solid rgba(212, 175, 55, 0.45);
-    background: rgba(6, 3, 12, 0.8);
-    appearance: none;
-    display: grid;
-    place-content: center;
-    cursor: pointer;
-  }
-
-  .comfort-toolbar__control::after {
-    content: "";
-    width: 0.65rem;
-    height: 0.65rem;
-    border-radius: 0.2rem;
-    background: rgba(212, 175, 55, 0.7);
-    transform: scale(0);
-    transition: transform 160ms ease;
-  }
-
-  .comfort-toolbar__control:checked::after {
-    transform: scale(1);
-  }
-
-  .comfort-toolbar__control:focus-visible {
-    outline: 2px solid rgba(212, 175, 55, 0.65);
-    outline-offset: 3px;
-  }
-
-  .comfort-toolbar__label {
-    display: grid;
-    gap: 0.25rem;
-    font-family: var(--font-body-ui, var(--font-body));
-    cursor: pointer;
-  }
-
-  .comfort-toolbar__title {
-    font-size: 0.75rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .comfort-toolbar__hint {
-    font-size: 0.65rem;
-    opacity: 0.75;
-  }
-
-  :root[data-comfort-theme="dawn"] .comfort-toolbar {
-    background: rgba(250, 245, 236, 0.82);
-    border-bottom-color: rgba(122, 94, 154, 0.28);
-    box-shadow: inset 0 -1px 0 rgba(214, 200, 236, 0.35);
-  }
-
-  :root[data-comfort-theme="dawn"] .comfort-toolbar__group {
-    border-color: rgba(122, 94, 154, 0.38);
-    background: rgba(255, 252, 247, 0.82);
-  }
-
-  :root[data-comfort-theme="dawn"] .comfort-toolbar__control {
-    border-color: rgba(122, 94, 154, 0.5);
-    background: rgba(247, 240, 232, 0.85);
-  }
-
-  :root[data-comfort-theme="dawn"] .comfort-toolbar__control::after {
-    background: rgba(122, 94, 154, 0.6);
-  }
-
-  :root[data-comfort-theme="dawn"] .comfort-toolbar__hint {
-    opacity: 0.85;
   }
 
   .site-shell {

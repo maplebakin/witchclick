@@ -216,10 +216,10 @@ const jsonLd = createCollectionPageSchema(
     padding: clamp(1.75rem, 4vw, 2.5rem);
     border-radius: 2.25rem;
     background:
-      radial-gradient(circle at top left, color-mix(in srgb, var(--hub-accent, #a855f7) 18%, transparent 82%), transparent),
-      #fffbff;
-    border: 1px solid color-mix(in srgb, var(--hub-accent, #a855f7) 28%, white 72%);
-    box-shadow: 0 24px 38px rgba(76, 29, 149, 0.08);
+      radial-gradient(circle at top left, color-mix(in srgb, var(--hub-accent, #a855f7) 22%, transparent 78%), transparent),
+      color-mix(in srgb, var(--color-night, #120725) 74%, var(--color-dusk, #271534) 26%);
+    border: 1px solid color-mix(in srgb, var(--hub-accent, #a855f7) 28%, var(--color-ink, #f4f1ff) 72%);
+    box-shadow: 0 24px 38px rgba(12, 5, 23, 0.5);
   }
 
   .hub-card__header {
@@ -260,8 +260,8 @@ const jsonLd = createCollectionPageSchema(
     gap: 0.4rem;
     padding: 0.6rem 1.35rem;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--hub-accent, #a855f7) 18%, white 82%);
-    border: 1px solid color-mix(in srgb, var(--hub-accent, #a855f7) 35%, white 65%);
+    background: color-mix(in srgb, var(--hub-accent, #a855f7) 45%, var(--color-rune, #f8f3ff) 55%);
+    border: 1px solid color-mix(in srgb, var(--hub-accent, #a855f7) 38%, var(--color-ink, #f4f1ff) 62%);
     font-weight: 600;
     color: color-mix(in srgb, var(--hub-accent, #a855f7) 70%, var(--ink-strong, currentColor) 30%);
     text-decoration: none;
@@ -269,7 +269,7 @@ const jsonLd = createCollectionPageSchema(
 
   .hub-card__primary:hover,
   .hub-card__primary:focus-visible {
-    background: color-mix(in srgb, var(--hub-accent, #a855f7) 28%, white 72%);
+    background: color-mix(in srgb, var(--hub-accent, #a855f7) 55%, var(--color-rune, #f8f3ff) 45%);
   }
 
   .hub-card__post {
@@ -281,8 +281,14 @@ const jsonLd = createCollectionPageSchema(
     padding: clamp(2rem, 6vw, 3.5rem);
     border-radius: 3rem;
     background:
-      radial-gradient(circle at top left, rgba(59, 130, 246, 0.15), transparent 60%),
-      linear-gradient(140deg, rgba(248, 250, 252, 0.97), rgba(226, 232, 240, 0.92));
+      radial-gradient(circle at top left, color-mix(in srgb, var(--hub-accent, #a855f7) 18%, transparent 82%), transparent),
+      linear-gradient(
+        140deg,
+        color-mix(in srgb, var(--color-night, #120725) 65%, var(--color-dusk, #271534) 35%),
+        color-mix(in srgb, var(--color-night, #120725) 52%, var(--color-ink, #f4f1ff) 48%)
+      );
+    border: 1px solid color-mix(in srgb, var(--hub-accent, #a855f7) 24%, var(--color-ink, #f4f1ff) 76%);
+    box-shadow: 0 24px 40px rgba(12, 5, 23, 0.45);
   }
 
   .hub-index-season__inner {
@@ -313,9 +319,9 @@ const jsonLd = createCollectionPageSchema(
   .hub-index-season__panel {
     padding: clamp(1.35rem, 3.5vw, 2rem);
     border-radius: 1.85rem;
-    background: #ffffff;
-    border: 1px solid rgba(148, 163, 184, 0.28);
-    box-shadow: 0 18px 30px rgba(148, 163, 184, 0.12);
+    background: color-mix(in srgb, var(--color-rune, #f8f3ff) 68%, var(--color-night, #120725) 32%);
+    border: 1px solid color-mix(in srgb, var(--hub-accent, #a855f7) 26%, var(--color-ink, #f4f1ff) 74%);
+    box-shadow: 0 18px 30px rgba(12, 5, 23, 0.45);
   }
 
   .hub-index-season__panel h3 {
@@ -333,8 +339,8 @@ const jsonLd = createCollectionPageSchema(
   }
 
   .hub-index-season__panel--highlight {
-    background: rgba(221, 214, 254, 0.38);
-    border-color: rgba(124, 58, 237, 0.28);
+    background: color-mix(in srgb, var(--hub-accent, #a855f7) 52%, var(--color-rune, #f8f3ff) 48%);
+    border-color: color-mix(in srgb, var(--hub-accent, #a855f7) 48%, var(--color-ink, #f4f1ff) 52%);
   }
 
   .hub-index-season__placeholder {
