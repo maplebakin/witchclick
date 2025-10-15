@@ -57,6 +57,18 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             </p>
           </label>
           <label class="block md:col-span-2">
+            <span class="text-xs font-medium">TL;DR (optional)</span>
+            <textarea
+              id="tldr"
+              class="mt-1 w-full rounded-lg border px-3 py-2"
+              rows="2"
+              placeholder="One or two sentences that capture the core insight"
+            ></textarea>
+            <p class="mt-1 text-[11px] text-body-subtle">
+              Keep it to 1–2 sentences. Leave blank to let the build pipeline summarize automatically.
+            </p>
+          </label>
+          <label class="block md:col-span-2">
             <span class="text-xs font-medium">Meta Description</span>
             <input id="meta" class="mt-1 w-full rounded-lg border px-3 py-2" />
             <p id="metaHint" class="mt-1 text-[11px] text-body-subtle">
@@ -80,6 +92,16 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           <label class="block md:col-span-2">
             <span class="text-xs font-medium">Tags (comma or newline separated, 4–7 ideal)</span>
             <input id="tags" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="tea, ritual, focus, study" />
+          </label>
+          <label class="block md:col-span-1">
+            <span class="text-xs font-medium">Spoons (optional)</span>
+            <select id="spoons" class="mt-1 w-full rounded-lg border px-3 py-2">
+              <option value="">Auto-detect from length</option>
+              <option value="low">Low — quick read</option>
+              <option value="medium">Medium — moderate focus</option>
+              <option value="high">High — deep dive</option>
+            </select>
+            <p class="mt-1 text-[11px] text-body-subtle">Override the automatic energy estimate if you already know the pace.</p>
           </label>
         </div>
 
@@ -119,6 +141,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             Slug, excerpt (~220 chars), and meta description (120–160 chars) can be left blank — they&#39;ll be auto-generated from
             your title and Markdown.
           </li>
+          <li>Opinionated pieces benefit from a 1-sentence TL;DR. If you skip it here, the build step will draft one for you.</li>
         </ul>
       </aside>
     </div>

@@ -3,6 +3,7 @@ import path from "node:path";
 import matter from "gray-matter";
 
 import { normalizeAuthorSlug } from "./authors";
+import { augmentPost, normalizeSpoonLevel, type SpoonLevel } from "./augment";
 
 export interface LoadedPost {
   slug: string;
@@ -10,6 +11,8 @@ export interface LoadedPost {
   data: Record<string, any>;
   content: string;
   date: Date;
+  tldr?: string;
+  spoons?: SpoonLevel;
 }
 
 let cachedPosts: LoadedPost[] | null = null;
@@ -107,13 +110,19 @@ export function loadAllPosts(): LoadedPost[] {
       const { data, content } = matter(raw);
       const slug = deriveSlug(file, data ?? {});
       const date = deriveDate(fullPath, data ?? {});
+      const augmented = augmentPost(data ?? {}, content);
+      const postData = augmented.data;
+      const tldr = typeof postData.tldr === "string" ? postData.tldr : augmented.tldr;
+      const spoons = normalizeSpoonLevel(postData.spoons ?? postData.spoonLevel ?? augmented.spoons);
 
       return {
         slug,
-        title: String(data?.title ?? "Untitled"),
-        data: data ?? {},
+        title: String(postData?.title ?? data?.title ?? "Untitled"),
+        data: postData,
         content,
         date,
+        tldr: tldr || undefined,
+        spoons: spoons || undefined,
       } satisfies LoadedPost;
     })
     .filter((post) => !isDraft(post.data));

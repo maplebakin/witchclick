@@ -51,6 +51,18 @@ const cards = taggedPosts.map((post) => {
     readingMinutes: fm.readingMinutes ?? estimateReadingMinutes(post.content),
     publishedAt: fm.publishedAt ?? fm.pubDate ?? fm.date ?? undefined,
     spoonLevel: typeof fm.spoonLevel === "string" ? fm.spoonLevel : undefined,
+    spoons:
+      typeof fm.spoons === "string"
+        ? fm.spoons
+        : typeof post.spoons === "string"
+          ? post.spoons
+          : undefined,
+    tldr:
+      typeof post.tldr === "string"
+        ? post.tldr
+        : typeof fm.tldr === "string"
+          ? fm.tldr
+          : undefined,
   };
 });
 
@@ -65,7 +77,7 @@ const collectionSchema = createCollectionPageSchema(
   cards.map((card) => ({
     name: card.title,
     url: `/post/${card.slug}`,
-    description: card.excerpt,
+    description: card.tldr ?? card.excerpt,
   })),
 );
 ---
@@ -87,10 +99,12 @@ const collectionSchema = createCollectionPageSchema(
             slug: card.slug,
             title: card.title,
             excerpt: card.excerpt,
+            tldr: card.tldr,
             tags: card.tags,
             readingMinutes: card.readingMinutes,
             publishedAt: card.publishedAt,
             spoonLevel: card.spoonLevel,
+            spoons: card.spoons,
           }}
           href={`/post/${card.slug}`}
         />

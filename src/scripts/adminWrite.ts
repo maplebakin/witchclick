@@ -249,14 +249,20 @@ function initWriteAdmin() {
     }
 
     const state = evaluateSlug();
+    const tldrValue = ($<HTMLTextAreaElement>('tldr')?.value ?? '').trim();
+    const spoonsValueRaw = ($<HTMLSelectElement>('spoons')?.value ?? '').trim().toLowerCase();
+    const spoonsValue = ['low', 'medium', 'high'].includes(spoonsValueRaw) ? spoonsValueRaw : '';
+
     const payload = {
       title: titleInput?.value ?? '',
       slug: state.manualProvided && state.slug ? state.slug : '',
       excerpt: ($<HTMLInputElement>('excerpt')?.value ?? ''),
       metaDescription: ($<HTMLInputElement>('meta')?.value ?? ''),
+      tldr: tldrValue || undefined,
       tags: ($<HTMLInputElement>('tags')?.value ?? ''),
       includeAds: Boolean($<HTMLInputElement>('ads')?.checked),
       includeKofi: Boolean($<HTMLInputElement>('kofi')?.checked),
+      spoons: spoonsValue || undefined,
       entities: ($<HTMLInputElement>('entities')?.value ?? ''),
       markdown: ($<HTMLTextAreaElement>('markdown')?.value ?? ''),
     };

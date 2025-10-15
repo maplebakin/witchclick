@@ -1,6 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import { z } from "zod";
+
+import { augmentCurse, normalizeSpoonLevel, type SpoonLevel } from "./augment";
 
 export interface LoadedCurse {
   slug: string;
@@ -12,7 +15,21 @@ export interface LoadedCurse {
     label: string;
     content: string;
   }[];
+  tldr?: string;
+  spoons?: SpoonLevel;
+  totalTime?: string;
 }
+
+const curseFrontmatterSchema = z
+  .object({
+    title: z.string().optional(),
+    slug: z.string().optional(),
+    invocation: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    tldr: z.string().optional(),
+    spoons: z.enum(["low", "medium", "high"]).optional(),
+  })
+  .passthrough();
 
 let cachedCurses: LoadedCurse[] | null = null;
 
@@ -74,14 +91,31 @@ export function loadAllCurses(): LoadedCurse[] {
     const slug = String(data?.slug ?? file.replace(/\.md$/, "")).toLowerCase();
 
     const sections = parseSections(content ?? "");
+    const parsed = curseFrontmatterSchema.safeParse(data ?? {});
+    const frontmatter = parsed.success ? parsed.data : (data ?? {});
+    const rawTags = Array.isArray(frontmatter?.tags)
+      ? frontmatter.tags
+      : Array.isArray(data?.tags)
+        ? data.tags
+        : [];
+    const tags = rawTags.map((tag: unknown) => String(tag));
+
+    const augmented = augmentCurse(frontmatter ?? {}, content ?? "", sections, tags);
+    const finalFrontmatter = augmented.frontmatter;
+    const finalTags = Array.isArray(finalFrontmatter?.tags)
+      ? finalFrontmatter.tags.map((tag: unknown) => String(tag))
+      : tags;
 
     return {
       slug,
-      title: String(data?.title ?? slug),
-      invocation: String(data?.invocation ?? ""),
-      tags: Array.isArray(data?.tags) ? data.tags.map((tag: unknown) => String(tag)) : [],
-      frontmatter: data ?? {},
+      title: String(finalFrontmatter?.title ?? data?.title ?? slug),
+      invocation: String(finalFrontmatter?.invocation ?? data?.invocation ?? ""),
+      tags: finalTags,
+      frontmatter: finalFrontmatter,
       sections,
+      tldr: augmented.tldr ?? (typeof finalFrontmatter?.tldr === "string" ? finalFrontmatter.tldr : undefined),
+      spoons: normalizeSpoonLevel(finalFrontmatter?.spoons ?? finalFrontmatter?.spoonLevel ?? augmented.spoons) || undefined,
+      totalTime: augmented.totalTime,
     } satisfies LoadedCurse;
   });
 

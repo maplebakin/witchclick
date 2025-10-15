@@ -108,10 +108,17 @@ const breadcrumbs = [
               slug: post.slug,
               title: post.title,
               excerpt: post.data?.excerpt ?? post.data?.metaDescription ?? "",
+              tldr: typeof post.tldr === "string" ? post.tldr : post.data?.tldr,
               tags: post.data?.tags ?? [],
               readingMinutes: post.data?.readingMinutes,
               publishedAt: post.data?.publishedAt ?? post.data?.pubDate ?? post.data?.date,
               spoonLevel: post.data?.spoonLevel,
+              spoons:
+                typeof post.spoons === "string"
+                  ? post.spoons
+                  : typeof post.data?.spoons === "string"
+                    ? post.data.spoons
+                    : undefined,
             }}
           />
         ))}

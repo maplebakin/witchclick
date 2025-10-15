@@ -39,6 +39,8 @@ export interface SiteSettings {
   ads?: AdsSettings;
   observability?: ObservabilitySettings;
   clientErrorEndpoint?: string | null;
+  autoSummaries?: boolean;
+  autoSpoons?: boolean;
 }
 
 const DEFAULT_SETTINGS: SiteSettings = {
@@ -50,6 +52,8 @@ const DEFAULT_SETTINGS: SiteSettings = {
   showAccountLink: false,
   observability: { enabled: false, dsn: null, environment: "production" },
   clientErrorEndpoint: null,
+  autoSummaries: true,
+  autoSpoons: true,
 };
 
 let cached: SiteSettings | null = null;
@@ -75,6 +79,8 @@ function deepMergeSettings(base: SiteSettings, next: Partial<SiteSettings>): Sit
     ...base,
     ...next,
     showAccountLink: next.showAccountLink ?? base.showAccountLink ?? false,
+    autoSummaries: next.autoSummaries ?? base.autoSummaries ?? true,
+    autoSpoons: next.autoSpoons ?? base.autoSpoons ?? true,
     analytics,
     ads,
     observability,
@@ -182,6 +188,24 @@ function sanitizeSettings(input: unknown): Partial<SiteSettings> {
   if ("analytics" in data) {
     const value = sanitizeAnalytics(data.analytics, errors);
     if (value) out.analytics = value;
+  }
+
+  if ("autoSummaries" in data) {
+    const raw = data.autoSummaries;
+    if (typeof raw === "boolean") {
+      out.autoSummaries = raw;
+    } else {
+      errors.push("autoSummaries must be a boolean");
+    }
+  }
+
+  if ("autoSpoons" in data) {
+    const raw = data.autoSpoons;
+    if (typeof raw === "boolean") {
+      out.autoSpoons = raw;
+    } else {
+      errors.push("autoSpoons must be a boolean");
+    }
   }
 
   if ("ads" in data) {

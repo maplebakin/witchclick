@@ -22,6 +22,11 @@ const posts = defineCollection({
     canonical: z.string().url().optional(),
     ogImage: z.string().optional(),
     readingMinutes: z.number().int().positive().optional(),
+    tldr: z
+      .string()
+      .max(320, "Keep TL;DR summaries concise")
+      .optional(),
+    spoons: z.enum(["low", "medium", "high"]).optional(),
 
     // Monetization helpers
     affiliateAnchors: z
@@ -83,6 +88,8 @@ const settings = defineCollection({
         endpoint: z.string().url().optional(),
       })
       .optional(),
+    autoSummaries: z.boolean().default(true),
+    autoSpoons: z.boolean().default(true),
     ads: z
       .object({
         provider: z.string().optional(), // e.g., "adsense"

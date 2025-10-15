@@ -7,12 +7,12 @@ import DownloadCard from "../../components/DownloadCard.astro";
 import RelatedPosts from "../../components/RelatedPosts.astro";
 import CtaFooter from "../../components/CtaFooter.astro";
 import ProductRecommendations from "../../components/ProductRecommendations.astro";
-import Accordion from "../../components/Accordion.astro";
 import CommentsSection from "../../components/CommentsSection.astro";
 import AuthorSpotlight from "../../components/AuthorSpotlight.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { readEntity } from "../../utils/entities";
 import { Fragment } from "astro/jsx-runtime";
+import SpoonsBadge from "../../components/SpoonsBadge.astro";
 
 import fs from "node:fs";
 import path from "node:path";
@@ -22,6 +22,7 @@ import { JSDOM } from "jsdom";
 
 import { autoLinkAffiliates } from "../../../tools/src/auto-affiliate";
 import { readSettings, getSiteOrigin, toAbsoluteUrl } from "../../utils/settings";
+import { normalizeSpoonLevel } from "../../utils/augment";
 import {
   loadAllPosts,
   estimateReadingMinutes,
@@ -57,6 +58,8 @@ export async function getStaticPaths() {
         effectiveSlug: post.slug,
         prev,
         next,
+        tldr: post.tldr,
+        spoons: post.spoons,
       },
     };
   });
@@ -68,6 +71,8 @@ const {
   effectiveSlug = Astro.params.slug as string,
   prev = null as PrevNext,
   next = null as PrevNext,
+  tldr: injectedTldr,
+  spoons: injectedSpoons,
 } = Astro.props;
 
 const settings = readSettings();
@@ -97,42 +102,16 @@ const heroAlt =
     ? data.heroAlt.trim()
     : title;
 
-function cleanSummaryText(value: unknown): string {
-  if (typeof value !== "string") return "";
-  return value
-    .replace(/<[^>]*>/g, " ")
-    .replace(/[`*_>#\-]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
+const providedTldr =
+  typeof data.tldr === "string"
+    ? data.tldr
+    : typeof injectedTldr === "string"
+      ? injectedTldr
+      : "";
+const tldr = providedTldr.trim();
 
-const tldrSource = data.tldr ?? data.tldrPoints ?? null;
-const tldrSummaryCandidate =
-  typeof data.tldrSummary === "string"
-    ? data.tldrSummary
-    : typeof tldrSource === "string"
-      ? tldrSource
-      : typeof data.excerpt === "string"
-        ? data.excerpt
-        : description;
-
-const tldrSummaryRaw = cleanSummaryText(tldrSummaryCandidate);
-const tldrSummary =
-  tldrSummaryRaw.length > 220 ? `${tldrSummaryRaw.slice(0, 217)}…` : tldrSummaryRaw;
-
-const tldrItemsRaw = Array.isArray(tldrSource)
-  ? tldrSource
-  : Array.isArray(data.tldrList)
-    ? data.tldrList
-    : Array.isArray(data.outline)
-      ? data.outline.slice(0, 3)
-      : [];
-
-const tldrItems = tldrItemsRaw
-  .map((item: unknown) => cleanSummaryText(item))
-  .filter(Boolean);
-
-const hasTldr = Boolean(tldrSummary) || tldrItems.length > 0;
+const spoonsRaw = data.spoons ?? data.spoonLevel ?? injectedSpoons ?? null;
+const spoonLevel = normalizeSpoonLevel(spoonsRaw);
 
 let ctaType: "kofi" | "download" | "none" = "none";
 let ctaId: string | undefined;
@@ -327,9 +306,10 @@ const resolvedEntities = entList
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "BlogPosting",
+  "@type": "Article",
   headline: title,
   description,
+  abstract: tldr || undefined,
   datePublished: publishedAt ? new Date(publishedAt).toISOString() : undefined,
   dateModified: modifiedAt ? new Date(modifiedAt).toISOString() : undefined,
   url: canonical,
@@ -415,17 +395,16 @@ const jsonLd = {
                 ))}
             </div>
 
-            {hasTldr && (
-              <Accordion title="TL;DR" open={true}>
-                {tldrSummary && <p class="wc-accordion__lead">{tldrSummary}</p>}
-                {tldrItems.length > 0 && (
-                  <ul class="wc-accordion__list">
-                    {tldrItems.map((item) => (
-                      <li>{item}</li>
-                    ))}
-                  </ul>
+            {(spoonLevel || tldr) && (
+              <div class="post-lede-callouts">
+                {spoonLevel && <SpoonsBadge level={spoonLevel} class="post-lede-callouts__badge" />}
+                {tldr && (
+                  <aside class="post-lede-callouts__summary" aria-label="TL;DR">
+                    <span class="post-lede-callouts__label">TL;DR</span>
+                    <p>{tldr}</p>
+                  </aside>
                 )}
-              </Accordion>
+              </div>
             )}
 
             {productRecommendations.length > 0 && (
@@ -519,6 +498,59 @@ const jsonLd = {
 
   .post-article .prose :where(h2, h3, h4, h5, h6) {
     color: var(--ink-strong, currentColor);
+  }
+
+  .post-lede-callouts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .post-lede-callouts__badge {
+    margin-bottom: 0;
+  }
+
+  .post-lede-callouts__summary {
+    border-radius: 1rem;
+    padding: 1rem 1.25rem;
+    background: color-mix(in srgb, var(--surface-muted, rgba(124, 58, 237, 0.08)) 65%, transparent 35%);
+    border: 1px solid color-mix(in srgb, var(--color-iris, #7c3aed) 25%, transparent);
+    box-shadow: 0 12px 32px -28px rgba(17, 24, 39, 0.45);
+  }
+
+  .post-lede-callouts__summary p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--ink-body, currentColor);
+  }
+
+  .post-lede-callouts__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.35rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-iris, #7c3aed) 65%, var(--ink-body, currentColor) 35%);
+  }
+
+  @media (min-width: 768px) {
+    .post-lede-callouts {
+      flex-direction: row;
+      align-items: stretch;
+    }
+
+    .post-lede-callouts__badge {
+      align-self: flex-start;
+    }
+
+    .post-lede-callouts__summary {
+      flex: 1;
+    }
   }
 
   .post-article .prose a {

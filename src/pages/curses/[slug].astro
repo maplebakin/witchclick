@@ -4,6 +4,8 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
 import { loadAllCurses, getCurseBySlug, resetCurseCache } from "../../utils/curses";
 import { Fragment } from "astro/jsx-runtime";
+import SpoonsBadge from "../../components/SpoonsBadge.astro";
+import { normalizeSpoonLevel } from "../../utils/augment";
 
 export const prerender = true;
 
@@ -33,6 +35,8 @@ const generator = curse.frontmatter?.generator ?? {};
 const journaling = typeof generator?.journalingFollowUp === "string" ? generator.journalingFollowUp : "";
 const altarItem = typeof generator?.altarItem === "string" ? generator.altarItem : "";
 const sigilName = typeof generator?.sigilName === "string" ? generator.sigilName : "";
+const tldr = typeof curse.tldr === "string" ? curse.tldr : typeof curse.frontmatter?.tldr === "string" ? curse.frontmatter.tldr : "";
+const spoonLevel = normalizeSpoonLevel(curse.spoons ?? curse.frontmatter?.spoons ?? curse.frontmatter?.spoonLevel);
 
 function sectionToPlainText(value: string): string {
   return value
@@ -58,6 +62,7 @@ const ritualJsonLd = {
   description,
   url: canonical,
   step: ritualSteps,
+  totalTime: curse.totalTime ?? undefined,
   author: {
     "@type": "Organization",
     name: settings.brandName ?? "WitchClick",
@@ -88,6 +93,17 @@ const breadcrumbs = [
           <span class="rounded-full border border-line-muted px-2 py-0.5">{tag}</span>
         ))}
       </div>
+      {(spoonLevel || tldr) && (
+        <div class="curse-lede-callouts">
+          {spoonLevel && <SpoonsBadge level={spoonLevel} class="curse-lede-callouts__badge" />}
+          {tldr && (
+            <aside class="curse-lede-callouts__summary" aria-label="TL;DR">
+              <span class="curse-lede-callouts__label">TL;DR</span>
+              <p>{tldr}</p>
+            </aside>
+          )}
+        </div>
+      )}
       <dl class="mx-auto grid max-w-xl grid-cols-1 gap-2 text-[11px] text-muted sm:grid-cols-2">
         <div>
           <dt class="font-semibold uppercase tracking-wide text-tertiary">Type</dt>
@@ -140,3 +156,63 @@ const breadcrumbs = [
     )}
   </article>
 </Base>
+
+<style>
+  .curse-lede-callouts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .curse-lede-callouts__badge {
+    margin-bottom: 0;
+    justify-content: center;
+  }
+
+  .curse-lede-callouts__summary {
+    border-radius: 1rem;
+    padding: 1rem 1.25rem;
+    background: color-mix(in srgb, var(--surface-muted, rgba(124, 58, 237, 0.08)) 60%, transparent 40%);
+    border: 1px solid color-mix(in srgb, var(--color-iris, #7c3aed) 20%, transparent);
+    box-shadow: 0 10px 28px -24px rgba(17, 24, 39, 0.45);
+    text-align: left;
+  }
+
+  .curse-lede-callouts__summary p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--ink-body, currentColor);
+  }
+
+  .curse-lede-callouts__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.35rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-iris, #7c3aed) 60%, var(--ink-body, currentColor) 40%);
+  }
+
+  @media (min-width: 768px) {
+    .curse-lede-callouts {
+      flex-direction: row;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .curse-lede-callouts__badge {
+      align-self: flex-start;
+    }
+
+    .curse-lede-callouts__summary {
+      flex: 1;
+      max-width: 520px;
+    }
+  }
+</style>

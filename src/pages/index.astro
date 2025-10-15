@@ -10,11 +10,13 @@ type CardPost = {
   slug: string;
   title: string;
   excerpt: string;
+  tldr?: string;
   tags: string[];
   normalizedTags: string[];
   readingMinutes: number;
   publishedAt?: string;
   spoonLevel?: string;
+  spoons?: string;
 };
 
 const posts = loadAllPosts();
@@ -49,22 +51,40 @@ const cardPosts: CardPost[] = posts.map((post) => {
   const publishedAtCandidate =
     fm.publishedAt ?? fm.pubDate ?? fm.date ?? (post.date ? post.date.toISOString() : undefined);
 
+  const spoonsValue =
+    typeof fm.spoons === "string"
+      ? fm.spoons
+      : typeof post.spoons === "string"
+        ? post.spoons
+        : typeof fm.spoonLevel === "string"
+          ? fm.spoonLevel
+          : undefined;
+
+  const tldrValue =
+    typeof post.tldr === "string"
+      ? post.tldr
+      : typeof fm.tldr === "string"
+        ? fm.tldr
+        : undefined;
+
   return {
     slug: post.slug,
     title,
     excerpt: excerptCandidate,
+    tldr: tldrValue,
     tags,
     normalizedTags,
     readingMinutes: fm.readingMinutes ?? estimateReadingMinutes(post.content),
     publishedAt: typeof publishedAtCandidate === "string" ? publishedAtCandidate : undefined,
     spoonLevel: typeof fm.spoonLevel === "string" ? fm.spoonLevel : undefined,
+    spoons: spoonsValue,
   } satisfies CardPost;
 });
 
 const heroPost = cardPosts[0] ?? null;
 const heroKicker = heroPost ? "Newest ritual" : "Fresh from the coven";
 const heroTitle = heroPost?.title ?? "Cozy Cursing Ritual: Release Anger Through Banishment";
-const heroBlurb = heroPost?.excerpt ??
+const heroBlurb = heroPost?.tldr ?? heroPost?.excerpt ??
   "Sometimes anger is the only honest response to betrayal or systemic harm. This ritual gives it a safe container and releases the residue.";
 const heroPrimaryHref = heroPost ? `/post/${heroPost.slug}` : "/page/1";
 const heroPrimaryLabel = heroPost ? "Read this ritual →" : "Browse the latest rituals →";
@@ -161,10 +181,12 @@ const hasEncore = encorePosts.length > 0;
               slug: post.slug,
               title: post.title,
               excerpt: post.excerpt,
+              tldr: post.tldr,
               tags: post.tags,
               readingMinutes: post.readingMinutes,
               publishedAt: post.publishedAt,
               spoonLevel: post.spoonLevel,
+              spoons: post.spoons,
             }}
           />
         ))}
@@ -188,10 +210,12 @@ const hasEncore = encorePosts.length > 0;
               slug: post.slug,
               title: post.title,
               excerpt: post.excerpt,
+              tldr: post.tldr,
               tags: post.tags,
               readingMinutes: post.readingMinutes,
               publishedAt: post.publishedAt,
               spoonLevel: post.spoonLevel,
+              spoons: post.spoons,
             }}
           />
         ))}
@@ -215,10 +239,12 @@ const hasEncore = encorePosts.length > 0;
               slug: post.slug,
               title: post.title,
               excerpt: post.excerpt,
+              tldr: post.tldr,
               tags: post.tags,
               readingMinutes: post.readingMinutes,
               publishedAt: post.publishedAt,
               spoonLevel: post.spoonLevel,
+              spoons: post.spoons,
             }}
           />
         ))}
@@ -242,10 +268,12 @@ const hasEncore = encorePosts.length > 0;
               slug: post.slug,
               title: post.title,
               excerpt: post.excerpt,
+              tldr: post.tldr,
               tags: post.tags,
               readingMinutes: post.readingMinutes,
               publishedAt: post.publishedAt,
               spoonLevel: post.spoonLevel,
+              spoons: post.spoons,
             }}
           />
         ))}
@@ -286,9 +314,11 @@ const hasEncore = encorePosts.length > 0;
               slug: post.slug,
               title: post.title,
               excerpt: post.excerpt,
+              tldr: post.tldr,
               tags: post.tags,
               readingMinutes: post.readingMinutes,
               publishedAt: post.publishedAt,
+              spoons: post.spoons,
             }}
           />
         ))}
