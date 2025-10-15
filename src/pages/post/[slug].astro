@@ -471,11 +471,46 @@ const jsonLd = {
 
   .post-panel {
     padding: clamp(1.85rem, 4.5vw, 2.85rem);
+    --surface-tint: oklch(0.83 0.07 304);
     --ambient-color: color-mix(
       in srgb,
-      var(--surface-tint, hsl(270 55% 62%)) 55%,
-      black 45%
+      var(--surface-tint) 52%,
+      #241136 48%
     );
+    --panel-surface-strong: color-mix(in srgb, white 95%, var(--surface-tint) 5%);
+    --panel-surface-soft: color-mix(in srgb, white 93%, var(--surface-tint) 7%);
+    --panel-border-strong: color-mix(
+      in srgb,
+      var(--surface-tint) 32%,
+      rgba(24, 12, 36, 0.12)
+    );
+    --panel-border-soft: color-mix(
+      in srgb,
+      var(--surface-tint) 26%,
+      rgba(24, 12, 36, 0.08)
+    );
+    --surface-muted: color-mix(in srgb, var(--surface-tint) 18%, white 82%);
+    --glass-pill-border-active: color-mix(
+      in srgb,
+      var(--surface-tint) 36%,
+      rgba(24, 12, 36, 0.12)
+    );
+    --action-primary: color-mix(in srgb, var(--ambient-color) 82%, #140826 18%);
+    --action-primary-hover: color-mix(in srgb, var(--ambient-color) 90%, #0c031a 10%);
+    --action-primary-text: color-mix(in srgb, white 94%, var(--ambient-color) 6%);
+    border-color: color-mix(in srgb, var(--panel-border-strong) 82%, transparent 18%);
+    background:
+      radial-gradient(
+        120% 120% at 16% -18%,
+        color-mix(in srgb, var(--surface-tint) 28%, transparent) 0%,
+        transparent 72%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, white 97%, var(--surface-tint) 3%) 0%,
+        color-mix(in srgb, white 92%, var(--surface-tint) 8%) 100%
+      );
+    box-shadow: 0 26px 70px -40px rgba(31, 24, 56, 0.32);
     color: var(--ink-body, currentColor);
   }
 
@@ -490,6 +525,9 @@ const jsonLd = {
 
   .post-article .prose {
     color: var(--ink-body, currentColor);
+    font-size: 1.05rem;
+    line-height: 1.8;
+    letter-spacing: 0.01em;
   }
 
   .post-article .prose :where(p, li, figcaption, blockquote, code, span) {
@@ -498,6 +536,52 @@ const jsonLd = {
 
   .post-article .prose :where(h2, h3, h4, h5, h6) {
     color: var(--ink-strong, currentColor);
+  }
+
+  .post-article .prose :where(blockquote) {
+    margin: 1.75rem 0;
+    padding: 1.25rem 1.5rem;
+    border-left: 4px solid
+      color-mix(in srgb, var(--ambient-color, var(--color-primary)) 55%, transparent 45%);
+    background: color-mix(
+      in srgb,
+      var(--surface-muted, rgba(124, 58, 237, 0.08)) 70%,
+      white 30%
+    );
+    border-radius: 1.1rem;
+    color: color-mix(
+      in srgb,
+      var(--ink-strong, currentColor) 94%,
+      var(--ink-body, currentColor) 6%
+    );
+  }
+
+  .post-article .prose :where(code):not(:where(pre code)) {
+    background: color-mix(
+      in srgb,
+      var(--surface-muted, rgba(124, 58, 237, 0.08)) 75%,
+      white 25%
+    );
+    color: color-mix(
+      in srgb,
+      var(--ink-strong, currentColor) 90%,
+      var(--ambient-color, var(--color-primary)) 10%
+    );
+    padding: 0.15rem 0.45rem;
+    border-radius: 0.4rem;
+    font-size: 0.9em;
+  }
+
+  .post-article .prose :where(pre) {
+    background: color-mix(
+      in srgb,
+      rgba(19, 11, 38, 0.92) 88%,
+      var(--ambient-color, var(--color-primary)) 12%
+    );
+    color: color-mix(in srgb, white 94%, var(--ambient-color, var(--color-primary)) 6%);
+    padding: 1.4rem 1.6rem;
+    border-radius: 1.25rem;
+    box-shadow: 0 22px 58px -36px rgba(18, 14, 40, 0.55);
   }
 
   .post-lede-callouts {
@@ -514,8 +598,13 @@ const jsonLd = {
   .post-lede-callouts__summary {
     border-radius: 1rem;
     padding: 1rem 1.25rem;
-    background: color-mix(in srgb, var(--surface-muted, rgba(124, 58, 237, 0.08)) 65%, transparent 35%);
-    border: 1px solid color-mix(in srgb, var(--color-iris, #7c3aed) 25%, transparent);
+    background: color-mix(
+      in srgb,
+      var(--surface-muted, rgba(124, 58, 237, 0.08)) 75%,
+      white 25%
+    );
+    border: 1px solid
+      color-mix(in srgb, var(--ambient-color, var(--color-primary)) 32%, transparent 68%);
     box-shadow: 0 12px 32px -28px rgba(17, 24, 39, 0.45);
   }
 
@@ -535,7 +624,11 @@ const jsonLd = {
     font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--color-iris, #7c3aed) 65%, var(--ink-body, currentColor) 35%);
+    color: color-mix(
+      in srgb,
+      var(--ambient-color, var(--color-primary)) 65%,
+      var(--ink-body, currentColor) 35%
+    );
   }
 
   @media (min-width: 768px) {
