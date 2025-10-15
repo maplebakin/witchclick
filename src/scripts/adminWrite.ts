@@ -12,6 +12,28 @@ function initWriteAdmin() {
   const slugStatus = $<HTMLParagraphElement>('slugStatus');
   const slugStatusBase = slugStatus?.className ?? '';
   const statusEl = $<HTMLDivElement>('status');
+  const excerptInput = $<HTMLInputElement>('excerpt');
+  const metaInput = $<HTMLInputElement>('meta');
+  const excerptHint = $<HTMLParagraphElement>('excerptHint');
+  const metaHint = $<HTMLParagraphElement>('metaHint');
+  const excerptHintBase = excerptHint?.className ?? 'mt-1 text-[11px] text-body-subtle';
+  const metaHintBase = metaHint?.className ?? 'mt-1 text-[11px] text-body-subtle';
+  const searchPreview = $<HTMLDivElement>('searchPreview');
+  const searchPreviewTitle = $<HTMLParagraphElement>('searchPreviewTitle');
+  const searchPreviewUrl = $<HTMLParagraphElement>('searchPreviewUrl');
+  const searchPreviewDescription = $<HTMLParagraphElement>('searchPreviewDescription');
+  const siteOriginAttr = root?.getAttribute('data-site-origin') ?? '';
+  let previewHost = '';
+  if (siteOriginAttr) {
+    try {
+      previewHost = new URL(siteOriginAttr).host;
+    } catch (err) {
+      previewHost = siteOriginAttr.replace(/^https?:\/\//, '');
+    }
+  }
+  if (!previewHost) {
+    previewHost = 'spacebarcollective.com';
+  }
 
   let slugTouched = false;
 
@@ -96,6 +118,59 @@ function initWriteAdmin() {
     return { slug: '', source: 'empty', changed: false, manualProvided: false };
   }
 
+  function updateExcerptHint() {
+    if (!excerptHint) return;
+    const length = excerptInput?.value.trim().length ?? 0;
+    let message = 'Aim for around 220 characters so your intro stays readable in feeds.';
+    let className = excerptHintBase;
+    if (length === 0) {
+      message += ' Leave blank to auto-generate from your Markdown.';
+    } else {
+      message += ` Current length: ${length}.`;
+      if (length > 240) {
+        message += ' This may be truncated in summaries.';
+        className += ' text-warning';
+      }
+    }
+    excerptHint.textContent = message;
+    excerptHint.className = className;
+  }
+
+  function updateMetaHint() {
+    if (!metaHint) return;
+    const length = metaInput?.value.trim().length ?? 0;
+    let message = 'Aim for 120–160 characters. Keep it concise, actionable, and include your primary keywords.';
+    let className = metaHintBase;
+    if (length === 0) {
+      message += ' Leave blank for an auto-generated summary.';
+    } else {
+      message += ` Current length: ${length}.`;
+      if (length < 120) {
+        message += ' Consider adding a touch more detail.';
+        className += ' text-warning';
+      } else if (length > 160) {
+        message += ' This may be truncated in search results.';
+        className += ' text-warning';
+      }
+    }
+    metaHint.textContent = message;
+    metaHint.className = className;
+  }
+
+  function updateSearchPreview(state?: SlugState) {
+    if (!searchPreview || !searchPreviewTitle || !searchPreviewUrl || !searchPreviewDescription) {
+      return;
+    }
+    const slugState = state ?? evaluateSlug();
+    const title = (titleInput?.value ?? '').trim();
+    const meta = (metaInput?.value ?? '').trim();
+    const excerpt = (excerptInput?.value ?? '').trim();
+    searchPreviewTitle.textContent = title || 'Your post title will appear here';
+    searchPreviewUrl.textContent = `${previewHost}/post/${slugState.slug || 'your-slug'}`;
+    searchPreviewDescription.textContent =
+      meta || excerpt || 'Your meta description or excerpt will appear here so you can check the length.';
+  }
+
   function renderSlugState() {
     if (!slugPreview || !slugStatus) return;
     const state = evaluateSlug();
@@ -120,6 +195,8 @@ function initWriteAdmin() {
       slugStatus.className += ' text-warning';
       slugStatus.textContent = 'Slug becomes empty after normalization. Adjust it or provide a title.';
     }
+
+    updateSearchPreview(state);
   }
 
   function normalizeManualSlug() {
@@ -150,6 +227,20 @@ function initWriteAdmin() {
 
     renderSlugState();
   }
+
+  excerptInput?.addEventListener('input', () => {
+    updateExcerptHint();
+    updateSearchPreview();
+  });
+
+  metaInput?.addEventListener('input', () => {
+    updateMetaHint();
+    updateSearchPreview();
+  });
+
+  updateExcerptHint();
+  updateMetaHint();
+  updateSearchPreview();
 
   async function savePost() {
     if (slugInput) {
@@ -217,8 +308,10 @@ function initWriteAdmin() {
   });
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initWriteAdmin);
-} else {
-  initWriteAdmin();
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initWriteAdmin);
+  } else {
+    initWriteAdmin();
+  }
 }
