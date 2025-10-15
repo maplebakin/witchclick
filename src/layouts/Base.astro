@@ -51,6 +51,31 @@ const canonicalUrl = canon || (siteOrigin ? `${siteOrigin}${currentPath}` : "");
 
 const showAccountLink = settings.showAccountLink ?? false;
 
+const observabilitySettings = settings.observability ?? { enabled: false };
+const debugQuery = Astro.url?.searchParams.get("debug") ?? "";
+const debugMode = debugQuery === "1";
+const siteEnvironment = observabilitySettings.environment ?? (import.meta.env.DEV ? "development" : "production");
+const shouldLoadObservability =
+  debugMode || (observabilitySettings.enabled && !import.meta.env.DEV);
+const observabilityConfig = shouldLoadObservability
+  ? {
+      enabled: Boolean(observabilitySettings.enabled),
+      dsn: observabilitySettings.dsn ?? null,
+      environment: observabilitySettings.environment ?? null,
+      clientErrorEndpoint:
+        observabilitySettings.enabled && settings.clientErrorEndpoint
+          ? settings.clientErrorEndpoint
+          : null,
+      debug: debugMode,
+      siteEnvironment,
+      featureFlags: {
+        observability: Boolean(observabilitySettings.enabled),
+        analytics: Boolean(settings.analytics?.enabled),
+        ads: Boolean(settings.ads?.provider),
+      },
+    }
+  : null;
+
 const normalizeAccountLink = (link: { href: string; label: string; rel?: string }) => {
   if (link.href !== "/account/") return link;
   if (!showAccountLink) return null;
@@ -206,6 +231,12 @@ const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined
       disclosure={disclosure}
     />
     {analytics?.runtime && <Fragment set:html={analytics.runtime} />}
+    {observabilityConfig && (
+      <script type="module" define:vars={{ observabilityConfig }}>
+        import { initObservability } from "@/utils/observability";
+        initObservability(observabilityConfig);
+      </script>
+    )}
   </body>
 </html>
 
