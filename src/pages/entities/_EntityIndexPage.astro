@@ -29,6 +29,10 @@ const accentBorder = toRgba(accentHex, 0.35);
 const accentPanelBg = toRgba(accentHex, 0.12);
 const accentPanelBorder = toRgba(accentHex, 0.25);
 const accentIcon = toRgba(accentHex, 0.25);
+const accentVeil = toRgba(accentHex, 0.18);
+
+const sectionSurfaceTop = "rgba(255, 255, 255, 0.96)";
+const sectionSurfaceBottom = "rgba(248, 244, 255, 0.99)";
 
 const sectionVars = toCssVariables({
   "index-accent": accentHex,
@@ -39,6 +43,15 @@ const sectionVars = toCssVariables({
   "index-accent-panel-bg": accentPanelBg,
   "index-accent-panel-border": accentPanelBorder,
   "index-accent-icon": accentIcon,
+  "section-border": accentPanelBorder,
+  "section-glow": accentPanelBg,
+  "section-highlight": accentVeil,
+  "section-veil": toRgba(accentHex, 0.14),
+  "section-text": accentBody,
+  "section-heading": accentStrong,
+  "section-subheading": accentMuted,
+  "section-surface-top": sectionSurfaceTop,
+  "section-surface-bottom": sectionSurfaceBottom,
 });
 
 const sectionStyle = sectionVars ? `${sectionVars};` : undefined;
@@ -52,7 +65,7 @@ const breadcrumbs = [
 ---
 <Base title={metadata.title} description={metadata.subtitle} ambientColor={accentHex} bodyDataType={type}>
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
-  <section class="entity-index py-12" style={sectionStyle}>
+  <section class="entity-index wc-section-shell" style={sectionStyle}>
     <header class="entity-header space-y-4">
       <h1 class="entity-heading text-4xl font-serif leading-tight">
         <span class="entity-heading-icon" aria-hidden="true">{metadata.icon}</span>
@@ -89,7 +102,10 @@ const breadcrumbs = [
 
 <style>
   .entity-index {
-    color: #1f2933;
+    width: min(100%, 76rem);
+    margin-inline: auto;
+    display: grid;
+    gap: clamp(2rem, 4vw, 2.75rem);
   }
 
   .entity-heading {
@@ -106,7 +122,7 @@ const breadcrumbs = [
   }
 
   .entity-heading-text {
-    color: var(--index-accent-strong, #4c1d95);
+    color: var(--section-heading, var(--index-accent-strong, #4c1d95));
     display: inline-flex;
     align-items: center;
     gap: 0.75rem;
@@ -115,26 +131,27 @@ const breadcrumbs = [
   .entity-heading-subtitle {
     font-size: 1.05rem;
     font-weight: 400;
-    color: var(--index-accent-muted, rgba(124, 58, 237, 0.75));
+    color: var(--section-subheading, var(--index-accent-muted, rgba(124, 58, 237, 0.75)));
   }
 
   .entity-intro {
-    color: var(--index-accent-body, #4b5563);
+    color: var(--section-text, var(--index-accent-body, #4b5563));
   }
 
   .entity-empty {
     border-color: var(--index-accent-border, rgba(124, 58, 237, 0.35));
-    background-color: var(--index-accent-panel-bg, rgba(124, 58, 237, 0.12));
-    color: var(--index-accent-body, #4b5563);
+    background: color-mix(in srgb, var(--index-accent-panel-bg, rgba(124, 58, 237, 0.12)) 80%, white 20%);
+    color: var(--section-text, var(--index-accent-body, #4b5563));
   }
 
   .entity-empty-link {
-    color: var(--index-accent-strong, #4c1d95);
+    color: var(--section-heading, var(--index-accent-strong, #4c1d95));
     font-weight: 600;
     text-decoration: underline;
   }
 
   .entity-grid {
+    display: grid;
     position: relative;
     gap: clamp(1.75rem, 3vw, 2.35rem);
     margin-top: clamp(2rem, 4vw, 2.5rem);
