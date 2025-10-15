@@ -1,5 +1,9 @@
 export const prerender = false;
 
+export function getStaticPaths() {
+  return [];
+}
+
 import { addComment, listComments } from "../../../../server/lib/commentsStore.js";
 
 function toJson(data: unknown, init: ResponseInit = {}) {
