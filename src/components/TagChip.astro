@@ -3,7 +3,7 @@ interface Props { tag: string }
 const { tag } = Astro.props as Props;
 const slug = String(tag).toLowerCase();
 ---
-<a href={`/tag/${slug}`} class="inline-flex items-center gap-1 rounded-full border border-purple-200 bg-white/70 px-2.5 py-0.5 text-xs text-purple-800 hover:bg-purple-50">
+<a href={`/tag/${slug}`} class="inline-flex items-center gap-1 rounded-full border border-line-muted bg-surface-base/70 px-2.5 py-0.5 text-xs text-primary-strong hover:bg-surface-muted">
 <span>#</span>
 <span>{slug}</span>
 </a>

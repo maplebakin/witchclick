@@ -68,7 +68,7 @@ function toCard(post) {
     <script type="application/ld+json" set:html={JSON.stringify(pageItemList)} />
   </Fragment>
 
-  <h1 class="mb-6 text-2xl font-semibold text-purple-900">Latest posts — page {page}</h1>
+  <h1 class="mb-6 text-2xl font-semibold text-primary">Latest posts — page {page}</h1>
   <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
     {pagePosts.map((post) => {
       const card = toCard(post);

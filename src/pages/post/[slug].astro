@@ -350,7 +350,7 @@ const jsonLd = {
         <div class="post-layout grid grid-cols-1 lg:grid-cols-12">
           <article class="post-article prose prose-neutral max-w-none lg:col-span-8">
             {heroImage && (
-              <figure class="mb-6 overflow-hidden rounded-3xl border border-purple-100 bg-purple-50 shadow-sm">
+              <figure class="mb-6 overflow-hidden rounded-3xl border border-line-subtle bg-surface-muted shadow-sm">
                 <img
                   src={heroImage}
                   alt={heroAlt}
@@ -399,10 +399,10 @@ const jsonLd = {
               </p>
             )}
 
-            <div class="mb-6 flex flex-wrap gap-2 text-xs uppercase tracking-wide text-purple-600">
+            <div class="mb-6 flex flex-wrap gap-2 text-xs uppercase tracking-wide text-tertiary">
               {Array.isArray(data.tags) &&
                 data.tags.map((tag: any) => (
-                  <span class="rounded-full border border-purple-200 bg-purple-50 px-3 py-0.5">#{String(tag).toLowerCase()}</span>
+                  <span class="rounded-full border border-line-muted bg-surface-muted px-3 py-0.5">#{String(tag).toLowerCase()}</span>
                 ))}
             </div>
 

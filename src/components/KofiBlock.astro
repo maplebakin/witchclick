@@ -4,7 +4,7 @@ const settings = readSettings();
 const user = settings.kofiUsername || '';
 if (!user) return;
 ---
-<div class="my-8 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+<div class="my-8 rounded-xl border border-line-warning bg-surface-warning-soft p-4 text-sm text-warning-strong">
   If this was helpful, you can fuel the tea kettle on Ko-fi:
   <a class="ml-1 underline" href={`https://ko-fi.com/${user}`} target="_blank" rel="noopener">ko-fi.com/{user}</a>.
 </div>

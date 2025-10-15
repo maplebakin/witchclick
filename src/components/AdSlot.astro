@@ -34,8 +34,8 @@ const baseClass = `ad ad--${slot} ${className}`;
 )}
 
 {isHouse && slot === 'side' && (
-  <aside class={`${baseClass} my-6 rounded-xl border border-purple-200 bg-purple-50 p-4`} role="complementary" aria-label="Sponsored sidebar">
-    <p class="m-0 text-sm text-purple-900">Cozy tools that support this guide:</p>
+  <aside class={`${baseClass} my-6 rounded-xl border border-line-muted bg-surface-muted p-4`} role="complementary" aria-label="Sponsored sidebar">
+    <p class="m-0 text-sm text-primary">Cozy tools that support this guide:</p>
     <ul class="mt-2 space-y-1 text-sm">
       <li>• <a class="underline" href="/go/journal" rel="sponsored nofollow">linen journal</a></li>
       <li>• <a class="underline" href="/go/notebooks" rel="sponsored nofollow">dotted notebook</a></li>
@@ -45,8 +45,8 @@ const baseClass = `ad ad--${slot} ${className}`;
 )}
 
 {isHouse && slot !== 'side' && (
-  <aside class={`${baseClass} my-6 rounded-xl border border-purple-200 bg-purple-50 p-4`} role="complementary" aria-label="Sponsored">
-    <p class="m-0 text-sm text-purple-900">
+  <aside class={`${baseClass} my-6 rounded-xl border border-line-muted bg-surface-muted p-4`} role="complementary" aria-label="Sponsored">
+    <p class="m-0 text-sm text-primary">
       Thanks for reading. Support WitchClick with a
       <a class="ml-1 underline" href="/go/notebooks" rel="sponsored nofollow">dotted notebook</a>
       or a
