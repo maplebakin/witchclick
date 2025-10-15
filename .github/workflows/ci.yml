@@ -28,6 +28,9 @@ jobs:
       - name: Type, lint, and astro checks
         run: npm run check
 
+      - name: Unit tests
+        run: npm test
+
       - name: Build
         run: npm run build
 
