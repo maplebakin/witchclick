@@ -1,6 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
+import adminWriteScript from "../../scripts/adminWrite.ts";
 
 export const prerender = false; // never emit in static builds
 
@@ -41,6 +42,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             <input id="slug" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="tea-ritual-for-focus" />
             <p class="mt-1 text-[11px] text-body-subtle">Leave blank to auto-generate from the title.</p>
             <p id="slugPreview" class="mt-1 text-[11px] font-mono text-body-faint"></p>
+            <p id="slugStatus" class="mt-1 text-[11px] text-body-subtle"></p>
           </label>
           <label class="block md:col-span-2">
             <span class="text-xs font-medium">Excerpt</span>
@@ -103,155 +105,6 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
   )}
 
   {canUse && (
-    <script is:inline>
-      (function(){
-        var $ = function(id){ return document.getElementById(id); };
-        var root = document.querySelector('[data-dev-api]');
-        var DEV_API = root?.getAttribute('data-dev-api') || 'http://localhost:8787';
-
-        function setStatus(msg, ok, warnings){
-          var el = $('status');
-          if (!el) return;
-          el.innerHTML = '';
-          el.style.color = ok === false ? '#7f1d1d' : '#065f46';
-          if (msg) {
-            var span = document.createElement('span');
-            span.textContent = msg;
-            el.appendChild(span);
-          }
-          if (Array.isArray(warnings) && warnings.length) {
-            var list = document.createElement('ul');
-            list.className = 'mt-1 list-disc pl-4 text-[11px] text-warning';
-            warnings.forEach(function(note){
-              var li = document.createElement('li');
-              li.textContent = note;
-              list.appendChild(li);
-            });
-            el.appendChild(list);
-          }
-        }
-
-        function slugify(value){
-          var base = String(value || '').toLowerCase();
-          if (typeof base.normalize === 'function') {
-            base = base.normalize('NFKD');
-          }
-          base = base.replace(/[\u0300-\u036f]/g, '');
-          return base
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/(^-|-$)/g, '');
-        }
-
-        var titleInput = $('title');
-        var slugInput = $('slug');
-        var slugPreview = $('slugPreview');
-        var slugTouched = false;
-
-        function currentSlug(){
-          if (!slugInput) return '';
-          var manual = slugify(slugInput.value);
-          if (manual) return manual;
-          if (titleInput) return slugify(titleInput.value);
-          return '';
-        }
-
-        function renderSlug(){
-          if (!slugPreview) return;
-          var slug = currentSlug();
-          if (slug) {
-            slugPreview.textContent = 'Preview: /post/' + slug;
-          } else {
-            slugPreview.textContent = 'Slug will be generated from the title.';
-          }
-        }
-
-        if (titleInput && slugInput) {
-          titleInput.addEventListener('input', function(){
-            if (!slugTouched) {
-              slugInput.value = slugify(titleInput.value);
-            }
-            renderSlug();
-          });
-
-          slugInput.addEventListener('input', function(){
-            slugTouched = slugInput.value.trim().length > 0;
-            renderSlug();
-          });
-
-          slugInput.addEventListener('blur', function(){
-            slugInput.value = slugify(slugInput.value);
-            slugTouched = slugInput.value.trim().length > 0;
-            renderSlug();
-          });
-
-          renderSlug();
-        }
-
-        function summarizeEntities(list){
-          if (!Array.isArray(list) || !list.length) return '';
-          return list
-            .map(function(item){
-              var type = item && item.type ? item.type : '?';
-              var slug = item && item.slug ? item.slug : '?';
-              return type + ':' + slug;
-            })
-            .join(', ');
-        }
-
-        async function savePost() {
-          if (slugInput) {
-            slugInput.value = slugify(slugInput.value);
-            slugTouched = slugInput.value.trim().length > 0;
-            renderSlug();
-          }
-          var payload = {
-            title: $('title').value,
-            slug: $('slug').value,
-            excerpt: $('excerpt').value,
-            metaDescription: $('meta').value,
-            tags: $('tags').value,
-            includeAds: $('ads').checked,
-            includeKofi: $('kofi').checked,
-            entities: $('entities').value,
-            markdown: $('markdown').value
-          };
-          var res = await fetch(DEV_API + '/posts/save', {
-            method: 'POST',
-            headers: { 'Content-Type':'application/json' },
-            body: JSON.stringify(payload)
-          });
-          var data = await res.json();
-          if (!data.ok) throw new Error(data.error || 'save failed');
-          return data;
-        }
-
-        $('save').addEventListener('click', async function(){
-          try {
-            setStatus('Saving...');
-            var data = await savePost();
-            var summary = summarizeEntities(data.entities);
-            var message = 'Saved → ' + data.path + (summary ? ' · Entities: ' + summary : '');
-            setStatus(message, true, data.warnings);
-          }
-          catch (e) { setStatus('Save error: ' + (e.message || String(e)), false); }
-        });
-
-        $('savePublish').addEventListener('click', async function(){
-          try {
-            setStatus('Saving...');
-            var data = await savePost();
-            var summary = summarizeEntities(data.entities);
-            setStatus('Saved. Publishing...', true, data.warnings);
-            var res = await fetch(DEV_API + '/bundle', { method:'POST' });
-            var b = await res.json();
-            if (!b.ok) throw new Error((b.steps && b.steps.map(function(s){return s.err;}).join('\n')) || b.error || 'bundle failed');
-            var publishMsg = 'Published ✓  Open post: /post/' + data.slug + (summary ? ' · Entities: ' + summary : '');
-            setStatus(publishMsg, true, data.warnings);
-          } catch (e) {
-            setStatus('Publish error: ' + (e.message || String(e)), false);
-          }
-        });
-      })();
-    </script>
+    <script type="module" src={Astro.resolve(adminWriteScript)}></script>
   )}
 </Base>

@@ -26,6 +26,7 @@ import { resolvePostsDirectories } from './scripts/lib/contentPaths.js';
 import { frontmatterString, parseFrontmatter, readFrontmatter } from './scripts/lib/frontmatter.js';
 import { collectPostMetadata } from './scripts/lib/postInventory.js';
 import { readSlugHistory, writeSlugHistory } from './scripts/lib/slugHistory.js';
+import { isValidSlug, slugify } from './shared/slugify.js';
 import {
   prepareSpecForPersistence,
   persistPreparedSpec,
@@ -60,7 +61,6 @@ function ensureDir(p) { fs.mkdirSync(p, { recursive: true }); }
 
 const HERO_IMAGE_ROOT = path.join(CWD, 'public', 'images', 'hero');
 const DOWNLOADS_ROOT = path.join(CWD, 'public', 'downloads');
-const VALID_POST_SLUG = /^[a-z0-9-]+$/;
 
 const MIME_EXTENSION_MAP = {
   'image/jpeg': '.jpg',
@@ -142,7 +142,7 @@ async function listPostsForHero() {
       const raw = await fsp.readFile(file, 'utf8');
       const parsed = parseFrontmatter(raw);
       const fmSlug = frontmatterString(parsed.data, 'slug');
-      if (fmSlug && VALID_POST_SLUG.test(fmSlug)) slug = fmSlug;
+      if (fmSlug && isValidSlug(fmSlug)) slug = fmSlug;
       const fmTitle = frontmatterString(parsed.data, 'title');
       if (fmTitle) title = fmTitle;
       const fmPrompt = frontmatterString(parsed.data, 'heroImagePrompt');
@@ -150,7 +150,7 @@ async function listPostsForHero() {
       const fmLegacyAlt = frontmatterString(parsed.data, 'heroImageAlt');
       const fmHeroImage = frontmatterString(parsed.data, 'heroImage');
       const fmLegacyImage = frontmatterString(parsed.data, 'heroImageSrc');
-      if (!VALID_POST_SLUG.test(slug)) continue;
+      if (!isValidSlug(slug)) continue;
       items.push({
         slug,
         title,
@@ -163,7 +163,7 @@ async function listPostsForHero() {
     } catch {
       /* ignore unreadable file */
     }
-    if (!VALID_POST_SLUG.test(slug)) continue;
+    if (!isValidSlug(slug)) continue;
     items.push({ slug, title, heroImagePrompt: null, heroAlt: null, heroImageAlt: null, heroImage: null });
   }
   items.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }));
@@ -269,13 +269,6 @@ function parseBody(req) {
 const yq = (v) => JSON.stringify(String(v ?? '').replace(/\r\n?/g, '\n')); // JSON string literal (YAML 1.2-valid)
 const ya = (arr) =>
   '[' + (Array.isArray(arr) ? arr : []).map((s) => JSON.stringify(String(s))).join(', ') + ']';
-
-const slugify = (s) =>
-  String(s || '')
-    .toLowerCase()
-    .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
 
 function markdownToPlainText(md) {
   return String(md || '')
@@ -890,7 +883,7 @@ const server = http.createServer(async (req, res) => {
           return send(res, 400, { ok: false, error: 'Invalid JSON body' });
         }
         const slug = String(body.slug || '').trim();
-        if (!VALID_POST_SLUG.test(slug)) {
+        if (!isValidSlug(slug)) {
           return send(res, 400, { ok: false, error: 'Invalid slug' });
         }
         const parsed = parseImageDataUrl(body.contentBase64);
@@ -927,7 +920,7 @@ const server = http.createServer(async (req, res) => {
           return send(res, 400, { ok: false, error: 'Invalid JSON body' });
         }
         const slug = String(body.slug || '').trim();
-        if (!VALID_POST_SLUG.test(slug)) {
+        if (!isValidSlug(slug)) {
           return send(res, 400, { ok: false, error: 'Invalid slug' });
         }
         const heroImage = String(body.heroImage || '').trim();
@@ -979,7 +972,7 @@ const server = http.createServer(async (req, res) => {
         if (!body || typeof body !== 'object') return send(res, 400, { ok: false, error: 'Invalid JSON body' });
 
         const slug = String(body.slug || '').trim();
-        if (!VALID_POST_SLUG.test(slug)) return send(res, 400, { ok: false, error: 'Invalid slug' });
+        if (!isValidSlug(slug)) return send(res, 400, { ok: false, error: 'Invalid slug' });
 
         const parsed = parseDataUrl(body.contentBase64);
         if (!parsed) return send(res, 400, { ok: false, error: 'contentBase64 must be a base64 data: URL' });
@@ -1015,7 +1008,7 @@ const server = http.createServer(async (req, res) => {
         if (!body || typeof body !== 'object') return send(res, 400, { ok: false, error: 'Invalid JSON body' });
 
         const slug = String(body.slug || '').trim();
-        if (!VALID_POST_SLUG.test(slug)) return send(res, 400, { ok: false, error: 'Invalid slug' });
+        if (!isValidSlug(slug)) return send(res, 400, { ok: false, error: 'Invalid slug' });
 
         const parsed = parseDataUrl(body.contentBase64);
         if (!parsed || !parsed.mime.startsWith('image/')) {

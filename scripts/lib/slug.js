@@ -2,21 +2,10 @@
 // Normalized slug helpers shared across Node and browser builds.
 import fs from 'node:fs';
 import path from 'node:path';
+import { slugify, slugifyId } from '../../shared/slugify.js';
 
-/**
- * Normalize any string value into a URL-safe slug.
- * @param {unknown} value
- * @returns {string}
- */
-export function slugify(value) {
-  const base = typeof value === 'string' ? value : String(value ?? '');
-  return base
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
+export { slugify, slugifyId } from '../../shared/slugify.js';
+export { analyzeSlug, isValidSlug, VALID_SLUG_PATTERN } from '../../shared/slugify.js';
 
 /**
  * Ensure a slug is unique across a list of post directories.
@@ -40,18 +29,6 @@ export function ensureUniqueSlug(candidate, directories, options = {}) {
   }
 
   return attempt;
-}
-
-/**
- * Convert arbitrary input into a slug suitable for section ids.
- * Falls back to the provided default when empty.
- * @param {unknown} value
- * @param {string} fallback
- * @returns {string}
- */
-export function slugifyId(value, fallback) {
-  const slug = slugify(value);
-  return slug || fallback;
 }
 
 export default {
