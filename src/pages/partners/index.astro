@@ -1,10 +1,13 @@
 ---
 import Base from "@/layouts/Base.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import PrimaryButton from "@/components/buttons/PrimaryButton.astro";
 import PartnerProductCard from "@/components/PartnerProductCard.astro";
 import { readPartnerBlocks } from "@/utils/partners";
 import { createItemListSchema } from "@/utils/structuredData";
 import { readSettings } from "@/utils/settings";
 import { Fragment } from "astro/jsx-runtime";
+import { getLastUpdatedMeta } from "@/utils/lastUpdated";
 
 const partnerBlocks = readPartnerBlocks();
 const settings = readSettings();
@@ -27,12 +30,20 @@ const jsonLd = createItemListSchema(
   },
   communityItems,
 );
+
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Partners" },
+];
+
+const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerBlocks.updatedAt });
 ---
 <Base
   title="Partners & Mutual Aid — WitchClick"
   description="Meet the makers, mutual aid funds, and practitioners we partner with across WitchClick hubs."
   ambientColor="#6366f1"
 >
+  <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </Fragment>
@@ -45,6 +56,12 @@ const jsonLd = createItemListSchema(
         Every listing here is a relationship built through ritual collaborations, mutual aid, or seasonal co-creation. Browse by
         focus, support a fund, or explore affiliate highlights with clear impact tags.
       </p>
+      {lastUpdated && (
+        <p class="partners-hero__meta">
+          Last updated <time datetime={lastUpdated.iso}>{lastUpdated.formatted}</time>
+          {lastUpdated.isStale && <span class="partners-hero__stale">refresh in progress</span>}
+        </p>
+      )}
     </div>
   </section>
 
@@ -55,27 +72,38 @@ const jsonLd = createItemListSchema(
         {section.summary && <p>{section.summary}</p>}
       </header>
       <div class="partners-section__grid">
-        {section.partners.map((partner) => (
-          <article class="partner-card">
-            <header class="partner-card__header">
-              <h3>{partner.name}</h3>
-              {partner.impactTag && <span class="partner-card__impact">{partner.impactTag}</span>}
-            </header>
-            <p class="partner-card__description">{partner.description}</p>
-            {partner.offerings?.length > 0 && (
-              <ul class="partner-card__offerings">
-                {partner.offerings.map((item) => (
-                  <li>{item}</li>
-                ))}
-              </ul>
-            )}
-            {partner.location && <p class="partner-card__meta">Based in {partner.location}</p>}
-            <p class="partner-card__actions">
-              <a href={partner.url} target="_blank" rel="noopener">Visit partner ↗</a>
-              {partner.notes && <span>{partner.notes}</span>}
-            </p>
-          </article>
-        ))}
+        {section.partners.length > 0 ? (
+          section.partners.map((partner) => (
+            <article class="partner-card">
+              {partner.image && (
+                <div class="partner-card__media">
+                  <img src={partner.image} alt={`Preview of ${partner.name}`} loading="lazy" />
+                </div>
+              )}
+              <header class="partner-card__header">
+                <h3>{partner.name}</h3>
+                {partner.impactTag && <span class="partner-card__impact">{partner.impactTag}</span>}
+              </header>
+              <p class="partner-card__description">{partner.description}</p>
+              {partner.offerings?.length > 0 && (
+                <ul class="partner-card__offerings">
+                  {partner.offerings.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              )}
+              {partner.location && <p class="partner-card__meta">Based in {partner.location}</p>}
+              <div class="partner-card__actions">
+                <PrimaryButton href={partner.url} target="_blank" rel="noopener" iconAfter="↗">
+                  Visit partner
+                </PrimaryButton>
+                {partner.notes && <span>{partner.notes}</span>}
+              </div>
+            </article>
+          ))
+        ) : (
+          <p class="partner-card__empty">We'll be adding allies for this constellation soon.</p>
+        )}
       </div>
     </section>
   ))}
@@ -132,6 +160,32 @@ const jsonLd = createItemListSchema(
     color: color-mix(in srgb, var(--ink-muted, currentColor) 80%, white 20%);
   }
 
+  .partners-hero__meta {
+    margin: 0;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 82%, white 18%);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .partners-hero__meta time {
+    font-weight: 600;
+    color: color-mix(in srgb, var(--ink-strong, currentColor) 85%, white 15%);
+  }
+
+  .partners-hero__stale {
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--color-gold) 45%, transparent 55%);
+    background: color-mix(in srgb, var(--color-night) 70%, var(--color-gold) 30%);
+    color: var(--color-ink);
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+  }
+
   .partners-section {
     margin: clamp(2rem, 6vw, 3.5rem) auto;
     display: grid;
@@ -168,6 +222,20 @@ const jsonLd = createItemListSchema(
     box-shadow: 0 18px 36px rgba(12, 5, 23, 0.45);
     display: grid;
     gap: 0.75rem;
+  }
+
+  .partner-card__media {
+    border-radius: 1.25rem;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--color-iris) 35%, transparent 65%);
+    background: color-mix(in srgb, var(--color-night) 60%, var(--color-ink) 40%);
+    aspect-ratio: 4 / 3;
+  }
+
+  .partner-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .partner-card__header {
@@ -220,18 +288,26 @@ const jsonLd = createItemListSchema(
     flex-wrap: wrap;
     gap: 0.75rem;
     font-size: 0.9rem;
+    align-items: center;
   }
 
-  .partner-card__actions a {
-    font-weight: 600;
-    color: color-mix(in srgb, rgba(99, 102, 241, 0.9) 70%, var(--ink-strong, currentColor) 30%);
-    text-decoration: none;
+  .partner-card__actions span {
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 75%, white 25%);
   }
 
-  .partner-card__actions a:hover,
-  .partner-card__actions a:focus-visible {
-    text-decoration: underline;
-    text-underline-offset: 4px;
+  .partner-card__actions .wc-button {
+    --btn-bg: color-mix(in srgb, rgba(99, 102, 241, 0.85) 55%, var(--color-night) 45%);
+    --btn-bg-hover: color-mix(in srgb, rgba(99, 102, 241, 0.9) 65%, var(--color-night) 35%);
+  }
+
+  .partner-card__empty {
+    margin: 0;
+    font-size: 0.9rem;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 80%, white 20%);
+    padding: 1.25rem;
+    border-radius: 1.5rem;
+    border: 1px dashed color-mix(in srgb, rgba(99, 102, 241, 0.45) 60%, transparent 40%);
+    text-align: center;
   }
 
   .partners-affiliates {

@@ -26,6 +26,7 @@ export interface SiteSettings {
   brandName?: string;
   disclosure?: string;
   kofiUsername?: string;
+  showAccountLink?: boolean;
   analytics?: AnalyticsSettings;
   ads?: AdsSettings;
 }
@@ -36,6 +37,7 @@ const DEFAULT_SETTINGS: SiteSettings = {
   disclosure:
     "As an affiliate, we may earn a small commission if you purchase through our links.",
   analytics: { enabled: false, provider: "plausible" },
+  showAccountLink: false,
 };
 
 let cached: SiteSettings | null = null;
@@ -53,6 +55,7 @@ function deepMergeSettings(base: SiteSettings, next: Partial<SiteSettings>): Sit
   return {
     ...base,
     ...next,
+    showAccountLink: next.showAccountLink ?? base.showAccountLink ?? false,
     analytics,
     ads,
   };
@@ -141,6 +144,15 @@ function sanitizeSettings(input: unknown): Partial<SiteSettings> {
   if ("kofiUsername" in data) {
     const value = expectString(data.kofiUsername, "kofiUsername", errors, { allowEmpty: true });
     if (value !== undefined) out.kofiUsername = value;
+  }
+
+  if ("showAccountLink" in data) {
+    const raw = (data as Record<string, unknown>).showAccountLink;
+    if (typeof raw === "boolean") {
+      out.showAccountLink = raw;
+    } else {
+      errors.push("showAccountLink must be a boolean");
+    }
   }
 
   if ("analytics" in data) {

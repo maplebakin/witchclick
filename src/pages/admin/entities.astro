@@ -2,7 +2,10 @@
 /* Admin: Entities CRUD */
 import Base from "../../layouts/Base.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
-import adminEntitiesScript from "../../scripts/adminEntities.ts";
+
+if (!import.meta.env.SSR) {
+  await import("../../scripts/adminEntities.ts");
+}
 
 export const prerender = false; // never emit in static builds
 

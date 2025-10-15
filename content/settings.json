@@ -3,6 +3,7 @@
   "brandName": "WitchClick",
   "disclosure": "This grimoire shares affiliate links for cozy tools. If you choose to purchase, we may earn a small commission at no extra cost to you.",
   "kofiUsername": "",
+  "showAccountLink": false,
   "analytics": {
     "enabled": false,
     "provider": "plausible",

@@ -1,5 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
+import { getLastUpdatedMeta } from "../../utils/lastUpdated";
 
 const upcomingSalons = [
   {
@@ -36,6 +37,8 @@ const embedLinks = {
   notion:
     "https://www.notion.so/embed?src=https%3A%2F%2Fwww.notion.so%2Fwitchclick%2FRitual-Salon-Calendar-Template-00000000000000000000000000000000",
 };
+
+const lastUpdated = getLastUpdatedMeta(import.meta.url);
 ---
 <Base
   title="Ritual Salon Schedule — WitchClick"
@@ -51,6 +54,12 @@ const embedLinks = {
         Each salon blends a guided ritual, collective check-ins, and soft co-working. Save the upcoming dates, peek at prep
         notes, and join us live—then bring a friend for the printable gift waiting in your member account.
       </p>
+      {lastUpdated && (
+        <p class="salon-hero__meta">
+          Last updated <time datetime={lastUpdated.iso}>{lastUpdated.formatted}</time>
+          {lastUpdated.isStale && <span class="salon-hero__stale">refreshing soon</span>}
+        </p>
+      )}
     </div>
   </section>
 
@@ -182,6 +191,34 @@ const embedLinks = {
       font-size: 1.05rem;
       line-height: 1.75;
       color: color-mix(in srgb, var(--ink-body, #1f2937) 78%, white 22%);
+    }
+
+    .salon-hero__meta {
+      margin: 0;
+      margin-top: 0.75rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--ink-muted, currentColor) 82%, white 18%);
+      display: inline-flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .salon-hero__meta time {
+      font-weight: 600;
+      color: color-mix(in srgb, var(--ink-strong, currentColor) 85%, white 15%);
+    }
+
+    .salon-hero__stale {
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid color-mix(in srgb, var(--color-gold) 45%, transparent 55%);
+      background: color-mix(in srgb, var(--color-night) 70%, var(--color-gold) 30%);
+      color: var(--color-ink);
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
     }
 
     .salon-schedule {

@@ -1,11 +1,17 @@
 ---
 import Base from "../../layouts/Base.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import PrimaryButton from "../../components/buttons/PrimaryButton.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
 import { loadAllCurses } from "../../utils/curses";
 
 const settings = readSettings();
 const site = getSiteOrigin(settings) || "https://example.com";
 const curses = loadAllCurses();
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Curses" },
+];
 ---
 
 <Base
@@ -14,6 +20,7 @@ const curses = loadAllCurses();
   canon={`${site}/curses`}
   wide={true}
 >
+  <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <section class="mx-auto max-w-4xl space-y-6 py-8">
     <header class="space-y-2 text-center">
       <h1 class="text-3xl font-semibold tracking-tight text-primary">White Magic Curses</h1>
@@ -27,7 +34,7 @@ const curses = loadAllCurses();
         curses.map((curse) => (
           <article class="rounded-2xl border border-line-subtle bg-surface-base p-5 shadow-sm transition hover:shadow-md">
             <h2 class="text-xl font-semibold text-primary">
-              <a href={`/curses/${curse.slug}`}>{curse.title}</a>
+              <a class="curses-card__link" href={`/curses/${curse.slug}`}>{curse.title}</a>
             </h2>
             {curse.invocation && (
               <p class="mt-2 text-sm italic text-secondary">{curse.invocation}</p>
@@ -43,11 +50,37 @@ const curses = loadAllCurses();
                 <span class="rounded-full border border-line-muted px-2 py-0.5">{tag}</span>
               ))}
             </div>
+            <div class="mt-4">
+              <PrimaryButton href={`/curses/${curse.slug}`} iconAfter="→">
+                Read ritual
+              </PrimaryButton>
+            </div>
           </article>
         ))
       ) : (
-        <p class="text-center text-sm text-muted">No curses published yet. Check back soon.</p>
+        <p class="text-center text-sm text-muted">
+          No curses are written yet. Start with the
+          <a class="ml-1 underline" href="/about/">About page</a>
+          to see how to request a ritual.
+        </p>
       )}
     </div>
   </section>
 </Base>
+
+<style>
+  .curses-card__link {
+    color: inherit;
+  }
+
+  .curses-card__link:hover,
+  .curses-card__link:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .grid .wc-button {
+    --btn-bg: color-mix(in srgb, var(--color-iris) 60%, var(--color-night) 40%);
+    --btn-bg-hover: color-mix(in srgb, var(--color-iris) 70%, var(--color-night) 30%);
+  }
+</style>

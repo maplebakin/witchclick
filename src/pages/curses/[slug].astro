@@ -1,5 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
 import { loadAllCurses, getCurseBySlug, resetCurseCache } from "../../utils/curses";
 import { Fragment } from "astro/jsx-runtime";
@@ -62,12 +63,19 @@ const ritualJsonLd = {
     name: settings.brandName ?? "WitchClick",
   },
 };
+
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Curses", href: "/curses/" },
+  { label: title },
+];
 ---
 
 <Base title={title} description={description} canon={canonical} wide={true}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(ritualJsonLd)} />
   </Fragment>
+  <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <article class="mx-auto max-w-3xl space-y-6 py-10">
     <header class="space-y-3 text-center">
       <p class="text-xs uppercase tracking-[0.2em] text-accent">White Magic Curse</p>

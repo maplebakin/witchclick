@@ -35,6 +35,15 @@
   --shadow-soft: 0 18px 45px -28px rgba(11, 6, 20, 0.55);
   --shadow-strong: 0 28px 75px -24px rgba(3, 2, 12, 0.72);
 
+  --ink-body: color-mix(in srgb, var(--color-ink) 70%, var(--color-night) 30%);
+  --ink-strong: color-mix(in srgb, var(--color-ink) 85%, var(--color-night) 15%);
+  --ink-muted: color-mix(in srgb, var(--color-ink) 55%, white 45%);
+  --link-color: color-mix(in srgb, var(--color-fog) 55%, var(--color-gold) 45%);
+  --focus-ring-color: color-mix(in srgb, var(--color-gold) 65%, var(--color-ink) 35%);
+  --focus-ring-offset: 3px;
+  --focus-ring-shadow: 0 0 0 2px color-mix(in srgb, var(--color-night) 65%, transparent 35%),
+    0 0 0 4px color-mix(in srgb, var(--focus-ring-color) 80%, white 20%);
+
   color-scheme: dark light;
 }
 
@@ -59,6 +68,12 @@
   --color-overlay: rgba(242, 236, 229, 0.65);
   --shadow-soft: 0 18px 45px -28px rgba(63, 49, 86, 0.22);
   --shadow-strong: 0 28px 75px -24px rgba(63, 49, 86, 0.32);
+
+  --ink-body: color-mix(in srgb, var(--color-ink) 80%, var(--color-night) 20%);
+  --ink-strong: color-mix(in srgb, var(--color-ink) 90%, var(--color-night) 10%);
+  --ink-muted: color-mix(in srgb, var(--color-ink) 60%, white 40%);
+  --link-color: color-mix(in srgb, var(--color-iris) 45%, var(--color-gold) 55%);
+  --focus-ring-color: color-mix(in srgb, var(--color-iris) 55%, var(--color-gold) 45%);
 }
 
 /* Modern CSS reset */
@@ -91,6 +106,7 @@ body {
   background-attachment: fixed;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 220ms ease, color 180ms ease, background 320ms ease;
 }
 
 :root[data-comfort-theme="dawn"] body {
@@ -121,13 +137,14 @@ body[data-menu-open="true"] {
 }
 
 a {
-  color: inherit;
+  color: var(--link-color);
   text-decoration: none;
+  transition: color 160ms ease;
 }
 
 a:hover,
 a:focus-visible {
-  color: var(--action-primary, var(--ink-strong, currentColor));
+  color: color-mix(in srgb, var(--focus-ring-color) 60%, var(--link-color) 40%);
 }
 
 img,
@@ -145,6 +162,20 @@ select,
 textarea {
   font: inherit;
   color: inherit;
+}
+
+:where(a, button, input, select, textarea, summary, [role="button"]):focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring-shadow);
 }
 
 main {
@@ -409,6 +440,7 @@ blockquote {
   font-size: 0.75rem;
   letter-spacing: 0.24em;
   text-transform: uppercase;
+  color: var(--color-ink);
   transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
 }
 
@@ -463,6 +495,12 @@ blockquote {
   bottom: calc(-1 * var(--space-1));
   height: 2px;
   background: linear-gradient(90deg, transparent 0%, var(--color-gold) 50%, transparent 100%);
+}
+
+.site-nav__link[aria-current="page"],
+.site-nav__button[aria-current="page"] {
+  color: var(--color-gold);
+  font-weight: 600;
 }
 
 .site-nav__toggle {
@@ -766,21 +804,22 @@ blockquote {
   font-size: 0.875rem;
 }
 
-.site-footer__nav a {
+.site-footer__link {
   color: var(--color-muted);
+  transition: color 160ms ease;
 }
 
-:root[data-comfort-theme="dawn"] .site-footer__nav a {
-  color: rgba(60, 37, 92, 0.85);
+:root[data-comfort-theme="dawn"] .site-footer__link {
+  color: color-mix(in srgb, var(--color-ink) 80%, var(--color-iris) 20%);
 }
 
-.site-footer__nav a:hover,
-.site-footer__nav a:focus-visible {
+.site-footer__link:hover,
+.site-footer__link:focus-visible {
   color: var(--color-gold);
 }
 
-:root[data-comfort-theme="dawn"] .site-footer__nav a:hover,
-:root[data-comfort-theme="dawn"] .site-footer__nav a:focus-visible {
+:root[data-comfort-theme="dawn"] .site-footer__link:hover,
+:root[data-comfort-theme="dawn"] .site-footer__link:focus-visible {
   color: var(--color-ink);
 }
 
@@ -819,6 +858,35 @@ blockquote {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
+}
+
+.site-footer__tail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.site-footer__top {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+:root[data-comfort-theme="dawn"] .site-footer__top {
+  color: color-mix(in srgb, var(--color-ink) 70%, var(--color-iris) 30%);
+}
+
+@media (min-width: 640px) {
+  .site-footer__tail {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
 
 .site-footer__nav--inline li {

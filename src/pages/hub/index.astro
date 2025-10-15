@@ -1,5 +1,7 @@
 ---
 import Base from "@/layouts/Base.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import PrimaryButton from "@/components/buttons/PrimaryButton.astro";
 import PostCard from "@/components/PostCard.astro";
 import { readEditorialCalendar } from "@/utils/editorialCalendar";
 import { createCollectionPageSchema } from "@/utils/structuredData";
@@ -70,12 +72,19 @@ const jsonLd = createCollectionPageSchema(
   },
   collectionItems,
 );
+
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Hubs" },
+];
 ---
+
 <Base
   title="Hub Constellation — Release, Focus, Calm"
   description="Navigate WitchClick's hubs: Release, Focus, and Calm. Explore curated rituals, seasonal stories, and collaborative offerings."
   ambientColor="#7c3aed"
 >
+  <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </Fragment>
@@ -101,7 +110,9 @@ const jsonLd = createCollectionPageSchema(
             <p class="hub-card__description">{hub.description}</p>
           </div>
           <div class="hub-card__actions">
-            <a class="hub-card__primary" href={`/hub/${hub.slug}`}>Enter the hub ↗</a>
+            <PrimaryButton href={`/hub/${hub.slug}`} iconAfter="↗">
+              Explore
+            </PrimaryButton>
             {hub.intro && (
               <PostCard
                 class="hub-card__post"
@@ -253,23 +264,11 @@ const jsonLd = createCollectionPageSchema(
     gap: 1.25rem;
   }
 
-  .hub-card__primary {
+  .hub-card__actions .wc-button {
     justify-self: start;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.6rem 1.35rem;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--hub-accent, #a855f7) 45%, var(--color-rune, #f8f3ff) 55%);
-    border: 1px solid color-mix(in srgb, var(--hub-accent, #a855f7) 38%, var(--color-ink, #f4f1ff) 62%);
-    font-weight: 600;
-    color: color-mix(in srgb, var(--hub-accent, #a855f7) 70%, var(--ink-strong, currentColor) 30%);
-    text-decoration: none;
-  }
-
-  .hub-card__primary:hover,
-  .hub-card__primary:focus-visible {
-    background: color-mix(in srgb, var(--hub-accent, #a855f7) 55%, var(--color-rune, #f8f3ff) 45%);
+    --btn-bg: color-mix(in srgb, var(--hub-accent, #a855f7) 60%, var(--color-night, #120725) 40%);
+    --btn-bg-hover: color-mix(in srgb, var(--hub-accent, #a855f7) 68%, var(--color-night, #120725) 32%);
+    --btn-border: color-mix(in srgb, var(--hub-accent, #a855f7) 45%, transparent 55%);
   }
 
   .hub-card__post {

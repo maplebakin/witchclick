@@ -49,10 +49,22 @@ const ogUrl = ogImage ? toAbsoluteUrl(ogImage, settings) : "";
 const currentPath = Astro.url?.pathname ?? "/";
 const canonicalUrl = canon || (siteOrigin ? `${siteOrigin}${currentPath}` : "");
 
+const showAccountLink = settings.showAccountLink ?? false;
+
+const normalizeAccountLink = (link: { href: string; label: string; rel?: string }) => {
+  if (link.href !== "/account/") return link;
+  if (!showAccountLink) return null;
+  return { ...link, href: "/about/#membership" };
+};
+
 const navLinks = primaryNavLinks;
 const secondaryLinks = secondaryNavLinks;
-const headerUtility = headerUtilityLinks;
-const footerUtilities = footerUtilityLinks;
+const headerUtility = headerUtilityLinks
+  .map(normalizeAccountLink)
+  .filter((link): link is typeof headerUtilityLinks[number] => Boolean(link));
+const footerUtilities = footerUtilityLinks
+  .map(normalizeAccountLink)
+  .filter((link): link is typeof footerUtilityLinks[number] => Boolean(link));
 
 const isDev = import.meta.env.DEV;
 const adminLinks = isDev
@@ -154,6 +166,7 @@ const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined
     <slot name="head" />
   </head>
   <body
+    id="top"
     class:list={["site-shell", wide && "is-wide", desktopWide && "is-desktop-wide"].filter(Boolean)}
     style={bodyStyle}
     data-entity-type={bodyDataType || undefined}
@@ -176,7 +189,12 @@ const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined
           desktopWide && "site-main__container--desktop-wide",
         ].filter(Boolean)}
       >
-        <slot />
+        <div class="site-main__breadcrumbs">
+          <slot name="breadcrumbs" />
+        </div>
+        <div class="site-main__content">
+          <slot />
+        </div>
       </div>
     </main>
     <Footer
@@ -230,7 +248,17 @@ const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined
   }
 
   .site-main__container {
-    display: block;
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .site-main__breadcrumbs:empty {
+    display: none;
+  }
+
+  .site-main__content {
+    display: grid;
+    gap: clamp(2rem, 5vw, 3rem);
   }
 
   .site-main__container--wide {
