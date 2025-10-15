@@ -82,7 +82,7 @@ body {
   font-family: var(--font-body-ui, var(--font-body));
   line-height: 1.7;
   font-size: 1rem;
-  color: var(--ink-body, #1f1633);
+  color: var(--ink-body, var(--color-ink));
   letter-spacing: var(--font-body-letter-spacing, normal);
   background:
     radial-gradient(120% 160% at 50% 0%, rgba(212, 175, 55, 0.16) 0%, transparent 60%),
@@ -94,7 +94,7 @@ body {
 }
 
 :root[data-comfort-theme="dawn"] body {
-  color: var(--ink-body, #2c1b3d);
+  color: var(--ink-body, var(--color-ink));
   background:
     radial-gradient(120% 160% at 50% 0%, rgba(180, 156, 214, 0.16) 0%, transparent 60%),
     radial-gradient(140% 200% at 10% 20%, rgba(214, 200, 236, 0.32) 0%, transparent 70%),
@@ -163,7 +163,7 @@ h5,
 h6 {
   font-family: var(--font-heading);
   letter-spacing: 0.045em;
-  color: var(--ink-strong, #1a102c);
+  color: var(--ink-strong, var(--color-muted));
   text-transform: uppercase;
 }
 
