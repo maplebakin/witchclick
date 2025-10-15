@@ -1,24 +1,6 @@
 ---
-title: "Focus Hub: Micro-Rituals for Returning to Attention"
-slug: focus-hub-intro
-excerpt: "Welcome to the Focus hub—a cozy lab of somatic resets, gentle accountability, and seasonal planning that nourishes attention instead of policing it."
-metaDescription: "Step into the Focus hub for ADHD-friendly rituals, co-working circles, and body-led prompts that bring your attention home."
-tags:
-  - focus
-  - attention
-  - ritual
-  - somatic
-  - productivity
-readingMinutes: 7
-publishedAt: "2025-09-22T09:00:00.000Z"
-author:
-  slug: micah-reed
-  name: Micah Reed
-  role: Somatic Focus Facilitator
-hub: focus
-heroImageSrc: /hero-images/focus-hub-intro.png
-heroImageAlt: "Soft desk with tea, timer, and morning sunlight"
-specVersion: 2
+heroImage: "/images/hero/focus-hub-intro/tea-and-light-in-the-morning.png"
+heroAlt: "Soft desk with tea, timer, and morning sunlight"
 ---
 
 ## Cozy focus is allowed
