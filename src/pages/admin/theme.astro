@@ -1,0 +1,635 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readSettings, getSiteOrigin } from "../../utils/settings";
+
+export const prerender = false;
+
+const settings = readSettings();
+const site = getSiteOrigin(settings) || "https://example.com";
+
+const isDev = import.meta.env.DEV;
+const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
+const url = new URL(Astro.request.url);
+const keyOk = ADMIN_KEY && url.searchParams.get('key') === ADMIN_KEY;
+const canUse = isDev || !!keyOk;
+
+const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+
+const defaultMidnight = {
+  primary: "#6b21a8",
+  accent: "#d9b2c4",
+  background: "#faf7f5",
+  fontSerif: "Literata",
+  fontScript: "Parisienne",
+};
+
+const defaultDawn = {
+  primary: "#9b86c8",
+  accent: "#caa043",
+  background: "#f6f0e8",
+  fontSerif: "Literata",
+  fontScript: "Parisienne",
+};
+---
+<Base
+  title="WitchClick — Theme Dashboard"
+  description="Craft, save, and activate WitchClick theme palettes."
+  canon={`${site}/admin/theme`}
+  wide={true}
+  noindex={true}
+>
+  <Fragment slot="head">
+    <meta name="robots" content="noindex" />
+  </Fragment>
+
+  {canUse ? (
+    <div
+      class="grid grid-cols-1 gap-6 lg:grid-cols-12"
+      data-theme-admin
+      data-dev-api={DEV_API}
+      data-default-midnight={JSON.stringify(defaultMidnight)}
+      data-default-dawn={JSON.stringify(defaultDawn)}
+    >
+      <section class="lg:col-span-4 space-y-6 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
+        <header>
+          <h1 class="text-xl font-semibold text-primary">Theme Dashboard</h1>
+          <p class="mt-1 text-sm text-body-muted">
+            Adjust palettes, typography, and assign active comfort themes for midnight and dawn.
+          </p>
+        </header>
+
+        <dl class="space-y-2 text-sm">
+          <div class="flex items-center justify-between gap-3">
+            <dt class="text-body-muted">Active midnight theme</dt>
+            <dd class="font-medium text-primary" data-active="midnight">—</dd>
+          </div>
+          <div class="flex items-center justify-between gap-3">
+            <dt class="text-body-muted">Active dawn theme</dt>
+            <dd class="font-medium text-primary" data-active="dawn">—</dd>
+          </div>
+        </dl>
+
+        <div class="space-y-5">
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <h2 class="text-[13px] font-semibold uppercase tracking-wide text-body-muted">Midnight themes</h2>
+              <button
+                type="button"
+                class="rounded-lg border border-line-neutral px-3 py-1 text-xs font-medium hover:bg-surface-soft"
+                data-new-theme="midnight"
+              >
+                New
+              </button>
+            </div>
+            <div class="mt-2 space-y-2" data-theme-list="midnight"></div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <h2 class="text-[13px] font-semibold uppercase tracking-wide text-body-muted">Dawn themes</h2>
+              <button
+                type="button"
+                class="rounded-lg border border-line-neutral px-3 py-1 text-xs font-medium hover:bg-surface-soft"
+                data-new-theme="dawn"
+              >
+                New
+              </button>
+            </div>
+            <div class="mt-2 space-y-2" data-theme-list="dawn"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lg:col-span-8 space-y-4 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
+        <header>
+          <h2 class="text-lg font-semibold text-primary">Theme editor</h2>
+          <p class="mt-1 text-sm text-body-muted">
+            Update individual colour tokens and fonts, then save them as reusable themes.
+          </p>
+        </header>
+
+        <div class="grid gap-3 md:grid-cols-2">
+          <label class="block text-sm">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Comfort mode</span>
+            <select id="themeMode" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2">
+              <option value="midnight">Midnight (dark)</option>
+              <option value="dawn">Dawn (light)</option>
+            </select>
+          </label>
+          <label class="block text-sm">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Theme name</span>
+            <input
+              id="themeLabel"
+              class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2"
+              placeholder="Cozy Midnight"
+            />
+          </label>
+          <label class="block text-sm md:col-span-2">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Slug</span>
+            <input
+              id="themeSlug"
+              class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2"
+              placeholder="cozy-midnight"
+            />
+            <p class="mt-1 text-xs text-body-muted">Leave blank to generate from the theme name.</p>
+          </label>
+        </div>
+
+        <div class="grid gap-3 md:grid-cols-2">
+          <label class="block text-sm">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Primary colour</span>
+            <div class="mt-1 flex items-center gap-2">
+              <input type="color" data-color-picker="primary" class="h-9 w-12 rounded border border-line-neutral" />
+              <input
+                data-color-input="primary"
+                class="w-full rounded-lg border border-line-neutral px-3 py-2"
+                placeholder="#6b21a8"
+              />
+            </div>
+          </label>
+          <label class="block text-sm">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Accent colour</span>
+            <div class="mt-1 flex items-center gap-2">
+              <input type="color" data-color-picker="accent" class="h-9 w-12 rounded border border-line-neutral" />
+              <input
+                data-color-input="accent"
+                class="w-full rounded-lg border border-line-neutral px-3 py-2"
+                placeholder="#d9b2c4"
+              />
+            </div>
+          </label>
+          <label class="block text-sm md:col-span-2">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Background colour</span>
+            <div class="mt-1 flex items-center gap-2">
+              <input type="color" data-color-picker="background" class="h-9 w-12 rounded border border-line-neutral" />
+              <input
+                data-color-input="background"
+                class="w-full rounded-lg border border-line-neutral px-3 py-2"
+                placeholder="#120725"
+              />
+            </div>
+          </label>
+        </div>
+
+        <div class="grid gap-3 md:grid-cols-2">
+          <label class="block text-sm">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Serif body font</span>
+            <input
+              id="themeFontSerif"
+              class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2"
+              placeholder="Literata"
+            />
+          </label>
+          <label class="block text-sm">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Script accent font</span>
+            <input
+              id="themeFontScript"
+              class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2"
+              placeholder="Parisienne"
+            />
+          </label>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            id="saveThemeBtn"
+            class="rounded-lg bg-surface-success px-4 py-2 text-sm font-medium text-inverse hover:bg-surface-success-strong"
+          >
+            Save theme
+          </button>
+          <button
+            type="button"
+            id="setActiveThemeBtn"
+            class="rounded-lg bg-surface-info px-4 py-2 text-sm font-medium text-inverse hover:bg-surface-info-strong"
+          >
+            Set as active midnight theme
+          </button>
+          <button
+            type="button"
+            id="loadActiveThemeBtn"
+            class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft"
+          >
+            Load active theme
+          </button>
+          <button
+            type="button"
+            id="resetThemeBtn"
+            class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft"
+          >
+            Load defaults
+          </button>
+        </div>
+
+        <p class="mt-2 text-sm text-body-muted" data-status></p>
+      </section>
+    </div>
+  ) : (
+    <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
+      <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
+      <p class="text-body-muted">This dashboard is only available in <strong>development</strong> (or with a temporary key).</p>
+      <p class="mt-3 text-sm text-body-muted">Update <code>content/themes/*.json</code> manually when the panel is unavailable.</p>
+    </section>
+  )}
+
+  {canUse && (
+    <script is:inline>
+      {`
+        (function(){
+          const root = document.querySelector('[data-theme-admin]');
+          if (!root) return;
+
+          const devApi = root.getAttribute('data-dev-api') || 'http://localhost:8787';
+          const defaults = {
+            midnight: parseDefaults(root.getAttribute('data-default-midnight'), {
+              primary: '#6b21a8',
+              accent: '#d9b2c4',
+              background: '#faf7f5',
+              fontSerif: 'Literata',
+              fontScript: 'Parisienne'
+            }),
+            dawn: parseDefaults(root.getAttribute('data-default-dawn'), {
+              primary: '#9b86c8',
+              accent: '#caa043',
+              background: '#f6f0e8',
+              fontSerif: 'Literata',
+              fontScript: 'Parisienne'
+            })
+          };
+
+          const lists = {
+            midnight: root.querySelector('[data-theme-list="midnight"]'),
+            dawn: root.querySelector('[data-theme-list="dawn"]')
+          };
+
+          const activeLabels = {
+            midnight: root.querySelector('[data-active="midnight"]'),
+            dawn: root.querySelector('[data-active="dawn"]')
+          };
+
+          const modeSelect = root.querySelector('#themeMode');
+          const labelInput = root.querySelector('#themeLabel');
+          const slugInput = root.querySelector('#themeSlug');
+          const fontSerifInput = root.querySelector('#themeFontSerif');
+          const fontScriptInput = root.querySelector('#themeFontScript');
+          const statusEl = root.querySelector('[data-status]');
+
+          const colorFields = ['primary','accent','background'].reduce((acc, key) => {
+            acc[key] = {
+              picker: root.querySelector('[data-color-picker="' + key + '"]'),
+              input: root.querySelector('[data-color-input="' + key + '"]')
+            };
+            return acc;
+          }, {});
+
+          const saveBtn = root.querySelector('#saveThemeBtn');
+          const setActiveBtn = root.querySelector('#setActiveThemeBtn');
+          const resetBtn = root.querySelector('#resetThemeBtn');
+          const loadActiveBtn = root.querySelector('#loadActiveThemeBtn');
+          const newButtons = Array.from(root.querySelectorAll('[data-new-theme]'));
+
+          let state = {
+            items: { midnight: [], dawn: [] },
+            active: { midnight: null, dawn: null }
+          };
+          let current = null;
+
+          function parseDefaults(raw, fallback){
+            try {
+              const parsed = JSON.parse(raw || 'null');
+              if (parsed && typeof parsed === 'object') {
+                const result = { ...fallback };
+                ['primary','accent','background','fontSerif','fontScript'].forEach((key) => {
+                  if (typeof parsed[key] === 'string' && parsed[key].trim()) {
+                    result[key] = parsed[key];
+                  }
+                });
+                return result;
+              }
+            } catch {}
+            return { ...fallback };
+          }
+
+          function setStatus(message, tone){
+            if (!statusEl) return;
+            const base = 'mt-2 text-sm';
+            if (!message) {
+              statusEl.textContent = '';
+              statusEl.className = base + ' text-body-muted';
+              return;
+            }
+            if (tone === 'error') {
+              statusEl.className = base + ' text-danger';
+            } else if (tone === 'success') {
+              statusEl.className = base + ' text-success';
+            } else {
+              statusEl.className = base + ' text-body-muted';
+            }
+            statusEl.textContent = message;
+          }
+
+          function normalizeHex(value){
+            const str = String(value || '').trim();
+            const match = /^#?([0-9a-fA-F]{6})$/.exec(str);
+            return match ? '#' + match[1].toLowerCase() : '';
+          }
+
+          function setColorField(key, value){
+            const field = colorFields[key];
+            if (!field) return;
+            const normalized = typeof value === 'string' ? value.trim() : '';
+            const hex = normalizeHex(normalized);
+            if (field.picker) {
+              if (hex) {
+                field.picker.value = hex;
+              } else if (defaults[current?.mode || 'midnight']) {
+                const fallback = normalizeHex(defaults[current?.mode || 'midnight'][key]);
+                if (fallback) field.picker.value = fallback;
+              }
+            }
+            if (field.input) {
+              field.input.value = normalized;
+            }
+          }
+
+          function collectForm(){
+            const mode = modeSelect && modeSelect.value === 'dawn' ? 'dawn' : 'midnight';
+            const payload = {
+              mode,
+              label: labelInput ? labelInput.value.trim() : '',
+              slug: slugInput ? slugInput.value.trim() : '',
+              settings: {
+                primary: colorFields.primary?.input?.value.trim() || '',
+                accent: colorFields.accent?.input?.value.trim() || '',
+                background: colorFields.background?.input?.value.trim() || '',
+                fontSerif: fontSerifInput ? fontSerifInput.value.trim() : '',
+                fontScript: fontScriptInput ? fontScriptInput.value.trim() : ''
+              }
+            };
+            return payload;
+          }
+
+          function populateForm(theme){
+            current = theme ? { ...theme, settings: { ...theme.settings } } : null;
+            const mode = theme?.mode || 'midnight';
+            if (modeSelect) modeSelect.value = mode;
+            if (labelInput) labelInput.value = theme?.label || '';
+            if (slugInput) slugInput.value = theme?.slug || '';
+            if (fontSerifInput) fontSerifInput.value = theme?.settings?.fontSerif || defaults[mode].fontSerif;
+            if (fontScriptInput) fontScriptInput.value = theme?.settings?.fontScript || defaults[mode].fontScript;
+            setColorField('primary', theme?.settings?.primary ?? defaults[mode].primary);
+            setColorField('accent', theme?.settings?.accent ?? defaults[mode].accent);
+            setColorField('background', theme?.settings?.background ?? defaults[mode].background);
+            updateSetActiveLabel();
+          }
+
+          function updateSetActiveLabel(){
+            if (!setActiveBtn) return;
+            const mode = modeSelect && modeSelect.value === 'dawn' ? 'dawn' : 'midnight';
+            setActiveBtn.textContent = mode === 'dawn' ? 'Set as active dawn theme' : 'Set as active midnight theme';
+          }
+
+          function updateActiveLabels(){
+            (['midnight','dawn']).forEach((mode) => {
+              if (!activeLabels[mode]) return;
+              const slug = state.active[mode];
+              if (!slug) {
+                activeLabels[mode].textContent = '—';
+                return;
+              }
+              const theme = findTheme(mode, slug);
+              activeLabels[mode].textContent = theme ? theme.label : slug;
+            });
+          }
+
+          function findTheme(mode, slug){
+            const list = state.items[mode] || [];
+            return list.find((item) => item.slug === slug) || null;
+          }
+
+          function renderLists(){
+            ['midnight','dawn'].forEach((mode) => {
+              const listEl = lists[mode];
+              if (!listEl) return;
+              const themes = state.items[mode] || [];
+              listEl.innerHTML = '';
+              if (!themes.length) {
+                const empty = document.createElement('p');
+                empty.className = 'text-xs text-body-muted';
+                empty.textContent = 'No saved themes yet.';
+                listEl.appendChild(empty);
+                return;
+              }
+              themes.forEach((theme) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'w-full rounded-lg border px-3 py-2 text-left text-sm transition hover:bg-surface-soft';
+                button.setAttribute('data-theme-item', theme.slug);
+                button.addEventListener('click', () => {
+                  populateForm(theme);
+                  setStatus('Loaded "' + theme.label + '".', 'success');
+                });
+
+                if (state.active[mode] === theme.slug) {
+                  button.classList.add('border-line-emerald', 'bg-surface-emerald-soft');
+                } else {
+                  button.classList.add('border-line-neutral');
+                }
+
+                const title = document.createElement('div');
+                title.className = 'flex items-center justify-between gap-3';
+                const labelSpan = document.createElement('span');
+                labelSpan.className = 'font-medium text-primary';
+                labelSpan.textContent = theme.label;
+                title.appendChild(labelSpan);
+                if (state.active[mode] === theme.slug) {
+                  const badge = document.createElement('span');
+                  badge.className = 'rounded bg-surface-success px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-inverse';
+                  badge.textContent = 'Active';
+                  title.appendChild(badge);
+                }
+
+                const slugLine = document.createElement('p');
+                slugLine.className = 'mt-1 text-[11px] text-body-muted';
+                slugLine.textContent = theme.slug;
+
+                button.appendChild(title);
+                button.appendChild(slugLine);
+                listEl.appendChild(button);
+              });
+            });
+          }
+
+          function toJSON(response){
+            return response.json().catch(() => ({}));
+          }
+
+          async function fetchThemes(){
+            const res = await fetch(devApi + '/themes/list', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: '{}'
+            });
+            const json = await toJSON(res);
+            if (!json || json.ok !== true) {
+              throw new Error(json?.error || 'Unable to load themes');
+            }
+            return json;
+          }
+
+          async function refresh(preferredMode, preferredSlug, options){
+            const announce = options && options.showStatus;
+            if (announce) {
+              setStatus('Loading themes…');
+            }
+            try {
+              const data = await fetchThemes();
+              state = {
+                items: data.items || { midnight: [], dawn: [] },
+                active: data.active || { midnight: null, dawn: null }
+              };
+              renderLists();
+              updateActiveLabels();
+              const mode = preferredMode || current?.mode || 'midnight';
+              const slug = preferredSlug || current?.slug || state.active[mode];
+              if (slug) {
+                const theme = findTheme(mode, slug);
+                if (theme) {
+                  populateForm(theme);
+                } else {
+                  startNewTheme(mode, true);
+                }
+              } else {
+                startNewTheme(mode, true);
+              }
+              if (announce) {
+                setStatus('Themes refreshed.', 'success');
+              }
+            } catch (error) {
+              setStatus(error?.message || 'Failed to load themes.', 'error');
+            }
+          }
+
+          function startNewTheme(mode, silent){
+            const safeMode = mode === 'dawn' ? 'dawn' : 'midnight';
+            const base = defaults[safeMode];
+            populateForm({
+              slug: '',
+              label: '',
+              mode: safeMode,
+              settings: { ...base }
+            });
+            if (!silent) {
+              setStatus('Ready to craft a new ' + (safeMode === 'dawn' ? 'dawn' : 'midnight') + ' theme.', null);
+            }
+          }
+
+          async function saveTheme(){
+            const payload = collectForm();
+            try {
+              setStatus('Saving theme…');
+              const res = await fetch(devApi + '/themes/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+              const json = await toJSON(res);
+              if (!json || json.ok !== true) {
+                throw new Error(json?.error || 'Theme save failed');
+              }
+              const theme = json.theme;
+              setStatus('Saved "' + (theme?.label || payload.label || payload.slug) + '".', 'success');
+              await refresh(theme?.mode || payload.mode, theme?.slug || payload.slug);
+            } catch (error) {
+              setStatus(error?.message || 'Theme save failed.', 'error');
+            }
+          }
+
+          async function activateTheme(){
+            const payload = collectForm();
+            if (!payload.slug) {
+              setStatus('Save the theme before activating it.', 'error');
+              return;
+            }
+            try {
+              setStatus('Setting active theme…');
+              const res = await fetch(devApi + '/themes/set-active', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mode: payload.mode, slug: payload.slug })
+              });
+              const json = await toJSON(res);
+              if (!json || json.ok !== true) {
+                throw new Error(json?.error || 'Unable to set active theme');
+              }
+              setStatus('Activated "' + (json?.theme?.label || payload.slug) + '" for ' + payload.mode + '.', 'success');
+              await refresh(payload.mode, payload.slug);
+            } catch (error) {
+              setStatus(error?.message || 'Failed to activate theme.', 'error');
+            }
+          }
+
+          function loadActiveTheme(){
+            const mode = modeSelect && modeSelect.value === 'dawn' ? 'dawn' : 'midnight';
+            const slug = state.active[mode];
+            if (!slug) {
+              startNewTheme(mode);
+              setStatus('No active theme yet — loaded defaults.', null);
+              return;
+            }
+            const theme = findTheme(mode, slug);
+            if (theme) {
+              populateForm(theme);
+              setStatus('Loaded active ' + mode + ' theme.', 'success');
+            } else {
+              startNewTheme(mode);
+              setStatus('Active theme file missing — restored defaults.', 'error');
+            }
+          }
+
+          if (modeSelect) {
+            modeSelect.addEventListener('change', () => {
+              updateSetActiveLabel();
+            });
+          }
+
+          Object.keys(colorFields).forEach((key) => {
+            const field = colorFields[key];
+            if (field.picker) {
+              field.picker.addEventListener('input', () => {
+                if (field.input) {
+                  field.input.value = field.picker.value;
+                }
+              });
+            }
+            if (field.input) {
+              field.input.addEventListener('blur', () => {
+                const hex = normalizeHex(field.input.value);
+                if (hex && field.picker) {
+                  field.picker.value = hex;
+                }
+              });
+            }
+          });
+
+          if (saveBtn) saveBtn.addEventListener('click', saveTheme);
+          if (setActiveBtn) setActiveBtn.addEventListener('click', activateTheme);
+          if (resetBtn) resetBtn.addEventListener('click', () => {
+            const mode = modeSelect && modeSelect.value === 'dawn' ? 'dawn' : 'midnight';
+            startNewTheme(mode);
+          });
+          if (loadActiveBtn) loadActiveBtn.addEventListener('click', loadActiveTheme);
+
+          newButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+              const mode = button.getAttribute('data-new-theme') === 'dawn' ? 'dawn' : 'midnight';
+              startNewTheme(mode);
+            });
+          });
+
+          refresh(undefined, undefined, { showStatus: true });
+        })();
+      `}
+    </script>
+  )}
+</Base>

@@ -61,6 +61,27 @@ function ensureDir(p) { fs.mkdirSync(p, { recursive: true }); }
 
 const HERO_IMAGE_ROOT = path.join(CWD, 'public', 'images', 'hero');
 const DOWNLOADS_ROOT = path.join(CWD, 'public', 'downloads');
+const THEMES_DIR = path.join(CWD, 'content', 'themes');
+const ACTIVE_THEME_FILE = path.join(THEMES_DIR, 'active.json');
+const LEGACY_THEME_FILE = path.join(CWD, 'content', 'theme.json');
+
+const THEME_REQUIRED_FIELDS = ['primary', 'accent', 'background', 'fontSerif', 'fontScript'];
+const DEFAULT_THEME_SETTINGS = {
+  midnight: {
+    primary: '#6b21a8',
+    accent: '#d9b2c4',
+    background: '#faf7f5',
+    fontSerif: 'Literata',
+    fontScript: 'Parisienne'
+  },
+  dawn: {
+    primary: '#9b86c8',
+    accent: '#caa043',
+    background: '#f6f0e8',
+    fontSerif: 'Literata',
+    fontScript: 'Parisienne'
+  }
+};
 
 const MIME_EXTENSION_MAP = {
   'image/jpeg': '.jpg',
@@ -702,6 +723,189 @@ function run(cmd, args, cwd = CWD) {
   });
 }
 
+// ---------- THEMES ----------
+async function listThemes() {
+  ensureDir(THEMES_DIR);
+  let files = [];
+  try {
+    files = fs.readdirSync(THEMES_DIR).filter((f) => f.endsWith('.json') && f !== 'active.json');
+  } catch {
+    files = [];
+  }
+
+  const items = { midnight: [], dawn: [] };
+  for (const file of files) {
+    const filePath = path.join(THEMES_DIR, file);
+    try {
+      const theme = readThemeRecord(filePath);
+      items[theme.mode].push(theme);
+    } catch {
+      // ignore malformed theme files
+    }
+  }
+
+  items.midnight.sort((a, b) => a.label.localeCompare(b.label));
+  items.dawn.sort((a, b) => a.label.localeCompare(b.label));
+
+  const active = readActiveThemeMapping();
+  return { items, active };
+}
+
+async function saveThemeRecord(payload) {
+  const mode = normalizeThemeMode(payload?.mode);
+  const label = typeof payload?.label === 'string' ? payload.label.trim() : '';
+  const slugInput = typeof payload?.slug === 'string' ? payload.slug : '';
+  const slug = slugify(slugInput || label);
+  if (!slug) throw new Error('label or slug required');
+
+  const settingsSource = {
+    ...extractThemeValues(payload),
+    ...extractThemeValues(payload?.settings),
+  };
+
+  const settings = mergeThemeSettings(settingsSource, mode, `theme payload (${slug})`);
+  const record = {
+    slug,
+    label: label || toTitleCase(slug),
+    mode,
+    settings,
+  };
+
+  ensureDir(THEMES_DIR);
+  const filePath = path.join(THEMES_DIR, `${slug}.json`);
+  await fsp.writeFile(filePath, JSON.stringify(record, null, 2), 'utf8');
+
+  const active = readActiveThemeMapping();
+  if (active.midnight === record.slug && record.mode === 'midnight') {
+    ensureDir(path.dirname(LEGACY_THEME_FILE));
+    await fsp.writeFile(LEGACY_THEME_FILE, JSON.stringify(record.settings, null, 2), 'utf8');
+  }
+
+  return record;
+}
+
+async function setActiveThemeRecord(payload) {
+  const mode = normalizeThemeMode(payload?.mode);
+  const slug = typeof payload?.slug === 'string' ? payload.slug.trim() : '';
+  if (!slug) throw new Error('slug required');
+
+  const filePath = path.join(THEMES_DIR, `${slug}.json`);
+  if (!fs.existsSync(filePath)) throw new Error('theme not found');
+
+  const theme = readThemeRecord(filePath);
+  if (theme.mode !== mode) {
+    throw new Error(`Theme ${theme.slug} is configured for ${theme.mode}, not ${mode}.`);
+  }
+
+  const active = readActiveThemeMapping();
+  const next = {
+    midnight: active.midnight,
+    dawn: active.dawn,
+  };
+  next[mode] = theme.slug;
+
+  ensureDir(THEMES_DIR);
+  await fsp.writeFile(ACTIVE_THEME_FILE, JSON.stringify(next, null, 2), 'utf8');
+
+  if (mode === 'midnight') {
+    ensureDir(path.dirname(LEGACY_THEME_FILE));
+    await fsp.writeFile(LEGACY_THEME_FILE, JSON.stringify(theme.settings, null, 2), 'utf8');
+  }
+
+  return { active: next, theme };
+}
+
+function readThemeRecord(filePath) {
+  const raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  if (!raw || typeof raw !== 'object') throw new Error('Invalid theme file');
+
+  const slugRaw = typeof raw.slug === 'string' ? raw.slug.trim() : '';
+  const slug = slugRaw || path.basename(filePath, path.extname(filePath));
+  const mode = normalizeThemeMode(raw.mode);
+  const labelRaw = typeof raw.label === 'string' ? raw.label.trim() : '';
+  const label = labelRaw || toTitleCase(slug);
+  const settingsSource = {
+    ...extractThemeValues(raw),
+    ...extractThemeValues(raw.settings),
+  };
+  const settings = mergeThemeSettings(settingsSource, mode, filePath);
+
+  return { slug, label, mode, settings };
+}
+
+function readActiveThemeMapping() {
+  try {
+    const raw = JSON.parse(fs.readFileSync(ACTIVE_THEME_FILE, 'utf8'));
+    if (!raw || typeof raw !== 'object') return { midnight: null, dawn: null };
+    const midnight = typeof raw.midnight === 'string' ? raw.midnight.trim() : '';
+    const dawn = typeof raw.dawn === 'string' ? raw.dawn.trim() : '';
+    return {
+      midnight: midnight || null,
+      dawn: dawn || null,
+    };
+  } catch {
+    return { midnight: null, dawn: null };
+  }
+}
+
+function extractThemeValues(source) {
+  const values = {};
+  if (!source || typeof source !== 'object') return values;
+  for (const key of THEME_REQUIRED_FIELDS) {
+    const value = source[key];
+    if (typeof value === 'string' && value.trim()) {
+      values[key] = value;
+    }
+  }
+  return values;
+}
+
+function mergeThemeSettings(raw, mode, sourceName) {
+  const base = { ...DEFAULT_THEME_SETTINGS[mode] };
+  if (!base) {
+    throw new Error(`Unknown theme mode: ${mode}`);
+  }
+
+  const entries = raw && typeof raw === 'object' ? Object.entries(raw) : [];
+  for (const [key, value] of entries) {
+    if (!THEME_REQUIRED_FIELDS.includes(key)) continue;
+    if (value === undefined || value === null) continue;
+    if (typeof value !== 'string') {
+      throw new Error(`[themes] ${key} in ${sourceName} must be a string.`);
+    }
+    const trimmed = value.trim();
+    if (!trimmed) {
+      throw new Error(`[themes] ${key} in ${sourceName} cannot be empty.`);
+    }
+    base[key] = trimmed;
+  }
+
+  const missing = THEME_REQUIRED_FIELDS.filter((key) => !base[key] || !String(base[key]).trim());
+  if (missing.length) {
+    throw new Error(`[themes] Missing values for ${missing.join(', ')} in ${sourceName}.`);
+  }
+
+  return {
+    primary: base.primary,
+    accent: base.accent,
+    background: base.background,
+    fontSerif: base.fontSerif,
+    fontScript: base.fontScript,
+  };
+}
+
+function normalizeThemeMode(value) {
+  return value === 'dawn' ? 'dawn' : 'midnight';
+}
+
+function toTitleCase(value) {
+  return String(value || '')
+    .replace(/[-_]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 // ---------- DOWNLOADS ----------
 async function listDownloads() {
   const base = path.join(CWD, 'content', 'downloads');
@@ -1334,6 +1538,36 @@ const server = http.createServer(async (req, res) => {
      * 3) Static serving:
      *    - Astro serves files from /public. These will be accessible at /downloads/<slug>/... in production.
      */
+
+    // ---- Themes
+    if (req.method === 'POST' && req.url === '/themes/list') {
+      try {
+        const data = await listThemes();
+        return send(res, 200, { ok: true, ...data });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/themes/save') {
+      try {
+        const body = await parseBody(req);
+        const theme = await saveThemeRecord(body || {});
+        return send(res, 200, { ok: true, theme });
+      } catch (e) {
+        return send(res, 400, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/themes/set-active') {
+      try {
+        const body = await parseBody(req);
+        const data = await setActiveThemeRecord(body || {});
+        return send(res, 200, { ok: true, ...data });
+      } catch (e) {
+        return send(res, 400, { ok: false, error: e?.message || String(e) });
+      }
+    }
 
     // ---- Downloads
     if (req.method === 'POST' && req.url === '/downloads/list') {

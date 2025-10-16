@@ -1,0 +1,12 @@
+{
+  "slug": "cozy-dawn",
+  "label": "Cozy Dawn",
+  "mode": "dawn",
+  "settings": {
+    "primary": "#9b86c8",
+    "accent": "#caa043",
+    "background": "#f6f0e8",
+    "fontSerif": "Literata",
+    "fontScript": "Parisienne"
+  }
+}
