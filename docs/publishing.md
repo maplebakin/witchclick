@@ -23,6 +23,7 @@ The WitchClick pipeline turns generated outlines into live posts. Follow this ch
 - Open the post in `npm run dev` and confirm rich content, downloads, and affiliate anchors render as expected.
 - Execute `npm run test` and `npm run check` before committing. Tests cover post loading, pagination, and ingestion edge cases.
 - Update related entities, downloads, or settings in `content/` as needed.
+- If you rely on corporate proxies, swap to `HTTPS_PROXY`/`npm_config_https_proxy`; the build now blocks when `npm_config_http_proxy` is present.
 
 ## 5. Commit and deploy
 - Use conventional commit messages (for example, `feat: add moon bath ritual`).
