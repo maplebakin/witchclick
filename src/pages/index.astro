@@ -2,7 +2,7 @@
 import Base from "@/layouts/Base.astro";
 import Hero from "@/components/Hero.astro";
 import PostCard from "@/components/PostCard.astro";
-import { loadAllPosts, firstParagraph, estimateReadingMinutes } from "@/utils/posts";
+import { loadAllPosts, firstParagraph, estimateReadingMinutes, extractHeroImage } from "@/utils/posts";
 
 const title = "WitchClick — Cozy secular rituals & tools";
 
@@ -17,6 +17,10 @@ type CardPost = {
   publishedAt?: string;
   spoonLevel?: string;
   spoons?: string;
+  heroImage?: string;
+  heroImageSrc?: string;
+  heroImageAlt?: string;
+  heroAlt?: string;
 };
 
 const posts = loadAllPosts();
@@ -67,6 +71,10 @@ const cardPosts: CardPost[] = posts.map((post) => {
         ? fm.tldr
         : undefined;
 
+  const hero = extractHeroImage(fm);
+  const heroSrc = typeof hero.src === "string" && hero.src.trim() ? hero.src.trim() : undefined;
+  const heroAlt = typeof hero.alt === "string" && hero.alt.trim() ? hero.alt.trim() : undefined;
+
   return {
     slug: post.slug,
     title,
@@ -78,6 +86,10 @@ const cardPosts: CardPost[] = posts.map((post) => {
     publishedAt: typeof publishedAtCandidate === "string" ? publishedAtCandidate : undefined,
     spoonLevel: typeof fm.spoonLevel === "string" ? fm.spoonLevel : undefined,
     spoons: spoonsValue,
+    heroImage: heroSrc,
+    heroImageSrc: heroSrc,
+    heroImageAlt: heroAlt,
+    heroAlt: heroAlt,
   } satisfies CardPost;
 });
 
@@ -187,6 +199,10 @@ const hasEncore = encorePosts.length > 0;
               publishedAt: post.publishedAt,
               spoonLevel: post.spoonLevel,
               spoons: post.spoons,
+              heroImage: post.heroImage,
+              heroImageSrc: post.heroImageSrc,
+              heroImageAlt: post.heroImageAlt,
+              heroAlt: post.heroAlt,
             }}
           />
         ))}
@@ -216,6 +232,10 @@ const hasEncore = encorePosts.length > 0;
               publishedAt: post.publishedAt,
               spoonLevel: post.spoonLevel,
               spoons: post.spoons,
+              heroImage: post.heroImage,
+              heroImageSrc: post.heroImageSrc,
+              heroImageAlt: post.heroImageAlt,
+              heroAlt: post.heroAlt,
             }}
           />
         ))}
@@ -245,6 +265,10 @@ const hasEncore = encorePosts.length > 0;
               publishedAt: post.publishedAt,
               spoonLevel: post.spoonLevel,
               spoons: post.spoons,
+              heroImage: post.heroImage,
+              heroImageSrc: post.heroImageSrc,
+              heroImageAlt: post.heroImageAlt,
+              heroAlt: post.heroAlt,
             }}
           />
         ))}
@@ -274,6 +298,10 @@ const hasEncore = encorePosts.length > 0;
               publishedAt: post.publishedAt,
               spoonLevel: post.spoonLevel,
               spoons: post.spoons,
+              heroImage: post.heroImage,
+              heroImageSrc: post.heroImageSrc,
+              heroImageAlt: post.heroImageAlt,
+              heroAlt: post.heroAlt,
             }}
           />
         ))}
@@ -319,6 +347,10 @@ const hasEncore = encorePosts.length > 0;
               readingMinutes: post.readingMinutes,
               publishedAt: post.publishedAt,
               spoons: post.spoons,
+              heroImage: post.heroImage,
+              heroImageSrc: post.heroImageSrc,
+              heroImageAlt: post.heroImageAlt,
+              heroAlt: post.heroAlt,
             }}
           />
         ))}

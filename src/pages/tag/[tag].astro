@@ -1,7 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import PostCard from "../../components/PostCard.astro";
-import { loadAllPosts, estimateReadingMinutes, firstParagraph } from "../../utils/posts";
+import { loadAllPosts, estimateReadingMinutes, firstParagraph, extractHeroImage } from "../../utils/posts";
 import { readSettings } from "../../utils/settings";
 import { createCollectionPageSchema } from "../../utils/structuredData";
 import { Fragment } from "astro/jsx-runtime";
@@ -43,6 +43,9 @@ const taggedPosts = allPosts
 const cards = taggedPosts.map((post) => {
   const fm = post.data ?? {};
   const excerpt = fm.excerpt ?? fm.description ?? fm.metaDescription ?? firstParagraph(post.content);
+  const hero = extractHeroImage(fm);
+  const heroSrc = typeof hero.src === "string" && hero.src.trim() ? hero.src.trim() : undefined;
+  const heroAlt = typeof hero.alt === "string" && hero.alt.trim() ? hero.alt.trim() : undefined;
   return {
     slug: post.slug,
     title: fm.title ?? post.title,
@@ -63,6 +66,10 @@ const cards = taggedPosts.map((post) => {
         : typeof fm.tldr === "string"
           ? fm.tldr
           : undefined,
+    heroImage: heroSrc,
+    heroImageSrc: heroSrc,
+    heroImageAlt: heroAlt,
+    heroAlt: heroAlt,
   };
 });
 
@@ -105,6 +112,10 @@ const collectionSchema = createCollectionPageSchema(
             publishedAt: card.publishedAt,
             spoonLevel: card.spoonLevel,
             spoons: card.spoons,
+            heroImage: card.heroImage,
+            heroImageSrc: card.heroImageSrc,
+            heroImageAlt: card.heroImageAlt,
+            heroAlt: card.heroAlt,
           }}
           href={`/post/${card.slug}`}
         />

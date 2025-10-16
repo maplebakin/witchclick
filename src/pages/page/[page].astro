@@ -2,7 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import PostCard from "../../components/PostCard.astro";
 import Pagination from "../../components/Pagination.astro";
-import { loadAllPosts, paginatePosts, estimateReadingMinutes, firstParagraph } from "../../utils/posts";
+import { loadAllPosts, paginatePosts, estimateReadingMinutes, firstParagraph, extractHeroImage } from "../../utils/posts";
 import { readSettings } from "../../utils/settings";
 import { createCollectionPageSchema } from "../../utils/structuredData";
 import { Fragment } from "astro/jsx-runtime";
@@ -52,6 +52,9 @@ const pageItemList = createCollectionPageSchema(
 
 function toCard(post) {
   const fm = post.data ?? {};
+  const hero = extractHeroImage(fm);
+  const heroSrc = typeof hero.src === "string" && hero.src.trim() ? hero.src.trim() : undefined;
+  const heroAlt = typeof hero.alt === "string" && hero.alt.trim() ? hero.alt.trim() : undefined;
   return {
     slug: post.slug,
     title: fm.title ?? post.title,
@@ -72,6 +75,10 @@ function toCard(post) {
         : typeof fm.tldr === "string"
           ? fm.tldr
           : undefined,
+    heroImage: heroSrc,
+    heroImageSrc: heroSrc,
+    heroImageAlt: heroAlt,
+    heroAlt: heroAlt,
   };
 }
 ---
@@ -93,13 +100,17 @@ function toCard(post) {
                 excerpt: card.excerpt,
                 tldr: card.tldr,
                 tags: card.tags,
-                readingMinutes: card.readingMinutes,
-                publishedAt: card.publishedAt,
-                spoonLevel: card.spoonLevel,
-                spoons: card.spoons,
-              }}
-              href={`/post/${card.slug}`}
-            />
+              readingMinutes: card.readingMinutes,
+              publishedAt: card.publishedAt,
+              spoonLevel: card.spoonLevel,
+              spoons: card.spoons,
+              heroImage: card.heroImage,
+              heroImageSrc: card.heroImageSrc,
+              heroImageAlt: card.heroImageAlt,
+              heroAlt: card.heroAlt,
+            }}
+            href={`/post/${card.slug}`}
+          />
         );
       })}
     </div>

@@ -250,3 +250,92 @@ export function paginatePosts(page: number, pageSize: number): {
     items: posts.slice(start, start + pageSize),
   };
 }
+
+function extractImageSource(value: unknown): string {
+  if (!value) return "";
+  if (typeof value === "string") return value.trim();
+  if (typeof value !== "object") return "";
+
+  const record = value as Record<string, any>;
+  const directKeys = ["src", "url", "href", "path"] as const;
+
+  for (const key of directKeys) {
+    const candidate = record[key];
+    if (typeof candidate === "string" && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+
+  if (typeof record.image === "string" && record.image.trim()) {
+    return record.image.trim();
+  }
+
+  if (record.image && typeof record.image === "object") {
+    const nested = extractImageSource(record.image);
+    if (nested) return nested;
+  }
+
+  return "";
+}
+
+function extractImageAlt(value: unknown): string {
+  if (!value) return "";
+  if (typeof value === "string") return value.trim();
+  if (typeof value !== "object") return "";
+
+  const record = value as Record<string, any>;
+  const altKeys = ["alt", "text", "label", "title", "description"] as const;
+
+  for (const key of altKeys) {
+    const candidate = record[key];
+    if (typeof candidate === "string" && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+
+  if (record.image && typeof record.image === "object") {
+    const nested = extractImageAlt(record.image);
+    if (nested) return nested;
+  }
+
+  return "";
+}
+
+export function extractHeroImage(
+  data: Record<string, any> | null | undefined,
+): { src?: string; alt?: string } {
+  if (!data || typeof data !== "object") return {};
+
+  const heroCandidates = [
+    (data as any).heroImage,
+    (data as any).heroImageSrc,
+    (data as any).heroImageUrl,
+    (data as any).hero,
+    (data as any).image,
+    (data as any).cardImage,
+  ];
+
+  const src = heroCandidates
+    .map((candidate) => extractImageSource(candidate))
+    .find((value) => value.length > 0);
+
+  const altCandidates = [
+    (data as any).heroImageAlt,
+    (data as any).heroAlt,
+    (data as any).imageAlt,
+    (data as any).cardImageAlt,
+    (data as any).heroImage,
+    (data as any).hero,
+    (data as any).image,
+    (data as any).cardImage,
+  ];
+
+  const alt = altCandidates
+    .map((candidate) => extractImageAlt(candidate))
+    .find((value) => value.length > 0);
+
+  return {
+    src: src || undefined,
+    alt: alt || undefined,
+  };
+}
