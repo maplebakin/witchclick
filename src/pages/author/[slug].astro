@@ -3,7 +3,7 @@ import Base from "@/layouts/Base.astro";
 import PostCard from "@/components/PostCard.astro";
 import AuthorSpotlight from "@/components/AuthorSpotlight.astro";
 import { loadAuthors, getAuthorBySlug } from "@/utils/authors";
-import { getPostsByAuthor } from "@/utils/posts";
+import { getPostsByAuthor, extractHeroImage } from "@/utils/posts";
 import { createCollectionPageSchema } from "@/utils/structuredData";
 import { readSettings } from "@/utils/settings";
 import { Fragment } from "astro/jsx-runtime";
@@ -68,26 +68,33 @@ const jsonLd = createCollectionPageSchema(
     </header>
     {posts.length > 0 ? (
       <div class="author-page-posts__grid">
-        {posts.map((post) => (
-          <PostCard
-            post={{
-              slug: post.slug,
-              title: post.title,
-              excerpt: post.data?.excerpt ?? post.data?.metaDescription ?? "",
-              tldr: typeof post.tldr === "string" ? post.tldr : post.data?.tldr,
-              tags: post.data?.tags ?? [],
-              readingMinutes: post.data?.readingMinutes,
-              publishedAt: post.data?.publishedAt ?? post.data?.pubDate ?? post.data?.date,
-              spoonLevel: post.data?.spoonLevel,
-              spoons:
-                typeof post.spoons === "string"
-                  ? post.spoons
-                  : typeof post.data?.spoons === "string"
-                    ? post.data.spoons
-                    : undefined,
-            }}
-          />
-        ))}
+        {posts.map((post) => {
+          const hero = extractHeroImage(post.data ?? {});
+          return (
+            <PostCard
+              post={{
+                slug: post.slug,
+                title: post.title,
+                excerpt: post.data?.excerpt ?? post.data?.metaDescription ?? "",
+                tldr: typeof post.tldr === "string" ? post.tldr : post.data?.tldr,
+                tags: post.data?.tags ?? [],
+                readingMinutes: post.data?.readingMinutes,
+                publishedAt: post.data?.publishedAt ?? post.data?.pubDate ?? post.data?.date,
+                spoonLevel: post.data?.spoonLevel,
+                spoons:
+                  typeof post.spoons === "string"
+                    ? post.spoons
+                    : typeof post.data?.spoons === "string"
+                      ? post.data.spoons
+                      : undefined,
+                heroImage: hero?.src,
+                heroImageSrc: hero?.src,
+                heroImageAlt: hero?.alt,
+                heroAlt: hero?.alt,
+              }}
+            />
+          );
+        })}
       </div>
     ) : (
       <p class="author-page-posts__empty">Circle back soon—new work is on the way.</p>

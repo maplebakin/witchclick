@@ -6,7 +6,7 @@ import PostCard from "@/components/PostCard.astro";
 import { readEditorialCalendar } from "@/utils/editorialCalendar";
 import { createCollectionPageSchema } from "@/utils/structuredData";
 import { readSettings } from "@/utils/settings";
-import { getPostBySlug } from "@/utils/posts";
+import { getPostBySlug, extractHeroImage } from "@/utils/posts";
 import { Fragment } from "astro/jsx-runtime";
 
 const HUBS = [
@@ -38,6 +38,9 @@ type HubConfig = (typeof HUBS)[number];
 function resolveIntro(hub: HubConfig) {
   const post = getPostBySlug(hub.introSlug);
   if (!post) return null;
+  const hero = extractHeroImage(post.data ?? {});
+  const heroSrc = typeof hero.src === "string" && hero.src.trim() ? hero.src.trim() : undefined;
+  const heroAlt = typeof hero.alt === "string" && hero.alt.trim() ? hero.alt.trim() : undefined;
   return {
     slug: post.slug,
     title: post.title,
@@ -52,6 +55,10 @@ function resolveIntro(hub: HubConfig) {
         : typeof post.data?.spoons === "string"
           ? post.data.spoons
           : undefined,
+    heroImage: heroSrc,
+    heroImageSrc: heroSrc,
+    heroImageAlt: heroAlt,
+    heroAlt: heroAlt,
   };
 }
 
@@ -132,6 +139,10 @@ const breadcrumbs = [
                   readingMinutes: hub.intro.readingMinutes,
                   publishedAt: hub.intro.publishedAt,
                   spoons: hub.intro.spoons,
+                  heroImage: hub.intro.heroImage,
+                  heroImageSrc: hub.intro.heroImageSrc,
+                  heroImageAlt: hub.intro.heroImageAlt,
+                  heroAlt: hub.intro.heroAlt,
                 }}
               />
             )}

@@ -1,5 +1,6 @@
 ---
 import SpoonsBadge from "./SpoonsBadge.astro";
+import { extractHeroImage } from "@/utils/posts";
 
 export interface Props {
   // Either pass a whole post object (frontmatter-ish)...
@@ -16,6 +17,15 @@ export interface Props {
     spoonLevel?: string
     spoons?: string
     tldr?: string
+    heroImage?: unknown
+    heroImageSrc?: unknown
+    heroImageAlt?: unknown
+    heroAlt?: unknown
+    image?: unknown
+    imageSrc?: unknown
+    imageAlt?: unknown
+    cardImage?: unknown
+    cardImageAlt?: unknown
   }
   // ...or pass these individually:
   href?: string
@@ -28,6 +38,15 @@ export interface Props {
   spoonLevel?: string
   spoons?: string
   class?: string
+  heroImage?: unknown
+  heroImageSrc?: unknown
+  heroImageAlt?: string
+  heroAlt?: string
+  image?: unknown
+  imageSrc?: unknown
+  imageAlt?: string
+  cardImage?: unknown
+  cardImageAlt?: string
 }
 
 const {
@@ -42,6 +61,15 @@ const {
   spoonLevel,
   spoons,
   class: className,
+  heroImage,
+  heroImageSrc,
+  heroImageAlt,
+  heroAlt,
+  image,
+  imageSrc,
+  imageAlt,
+  cardImage,
+  cardImageAlt,
 } = Astro.props as Props
 
 const link = href || (post?.slug ? `/post/${post.slug}` : '#')
@@ -56,6 +84,24 @@ const _spoon = typeof _spoonRaw === 'string' ? normalizeSpoon(_spoonRaw) : ''
 const _tldrRaw = typeof (tldr ?? post?.tldr) === 'string' ? String((tldr ?? post?.tldr) ?? '') : ''
 const _summarySource = _tldrRaw.trim() ? _tldrRaw : _excerpt
 const _summary = truncateSummary(_summarySource)
+
+const heroContext = {
+  ...(post && typeof post === 'object' ? post : {}),
+  heroImage: heroImage ?? (post as any)?.heroImage,
+  heroImageSrc: heroImageSrc ?? (post as any)?.heroImageSrc,
+  heroImageAlt: heroImageAlt ?? (post as any)?.heroImageAlt,
+  heroAlt: heroAlt ?? (post as any)?.heroAlt,
+  image: image ?? (post as any)?.image,
+  imageSrc: imageSrc ?? (post as any)?.imageSrc,
+  imageAlt: imageAlt ?? (post as any)?.imageAlt,
+  cardImage: cardImage ?? (post as any)?.cardImage,
+  cardImageAlt: cardImageAlt ?? (post as any)?.cardImageAlt,
+}
+
+const heroImageData = extractHeroImage(heroContext)
+const _heroSrc = typeof heroImageData.src === 'string' ? heroImageData.src : ''
+const _heroAlt = typeof heroImageData.alt === 'string' && heroImageData.alt.trim() ? heroImageData.alt : _title
+const _hasHero = Boolean(_heroSrc)
 
 function formatDate(value?: string){
   if (!value) return '';
@@ -92,7 +138,17 @@ function truncateSummary(value: string | undefined | null, max = 120): string {
 >
   <span aria-hidden class="card-radial card-radial-top" />
   <span aria-hidden class="card-radial card-radial-bottom" />
-  <div class="card-figure" aria-hidden="true"></div>
+  <div class="card-figure" data-has-image={_hasHero ? 'true' : undefined}>
+    {_hasHero && (
+      <img
+        src={_heroSrc}
+        alt={_heroAlt}
+        loading="lazy"
+        decoding="async"
+        class="card-figure__media"
+      />
+    )}
+  </div>
   <div class="card-body">
     {_spoon && <SpoonsBadge level={_spoon} />}
     {_dateLabel && (

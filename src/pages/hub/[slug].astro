@@ -5,7 +5,7 @@ import PostCard from "@/components/PostCard.astro";
 import PartnerProductCard from "@/components/PartnerProductCard.astro";
 import { createCollectionPageSchema } from "@/utils/structuredData";
 import { readSettings } from "@/utils/settings";
-import { getPostBySlug } from "@/utils/posts";
+import { getPostBySlug, extractHeroImage } from "@/utils/posts";
 import { readPartnerBlocks } from "@/utils/partners";
 import { readEditorialCalendar } from "@/utils/editorialCalendar";
 import { Fragment } from "astro/jsx-runtime";
@@ -102,26 +102,33 @@ const breadcrumbs = [
         <p>{section.description}</p>
       </header>
       <div class="hub-section__grid">
-        {section.posts.map((post) => (
-          <PostCard
-            post={{
-              slug: post.slug,
-              title: post.title,
-              excerpt: post.data?.excerpt ?? post.data?.metaDescription ?? "",
-              tldr: typeof post.tldr === "string" ? post.tldr : post.data?.tldr,
-              tags: post.data?.tags ?? [],
-              readingMinutes: post.data?.readingMinutes,
-              publishedAt: post.data?.publishedAt ?? post.data?.pubDate ?? post.data?.date,
-              spoonLevel: post.data?.spoonLevel,
-              spoons:
-                typeof post.spoons === "string"
-                  ? post.spoons
-                  : typeof post.data?.spoons === "string"
-                    ? post.data.spoons
-                    : undefined,
-            }}
-          />
-        ))}
+        {section.posts.map((post) => {
+          const hero = extractHeroImage(post.data ?? {});
+          return (
+            <PostCard
+              post={{
+                slug: post.slug,
+                title: post.title,
+                excerpt: post.data?.excerpt ?? post.data?.metaDescription ?? "",
+                tldr: typeof post.tldr === "string" ? post.tldr : post.data?.tldr,
+                tags: post.data?.tags ?? [],
+                readingMinutes: post.data?.readingMinutes,
+                publishedAt: post.data?.publishedAt ?? post.data?.pubDate ?? post.data?.date,
+                spoonLevel: post.data?.spoonLevel,
+                spoons:
+                  typeof post.spoons === "string"
+                    ? post.spoons
+                    : typeof post.data?.spoons === "string"
+                      ? post.data.spoons
+                      : undefined,
+                heroImage: hero?.src,
+                heroImageSrc: hero?.src,
+                heroImageAlt: hero?.alt,
+                heroAlt: hero?.alt,
+              }}
+            />
+          );
+        })}
       </div>
     </section>
   ))}
