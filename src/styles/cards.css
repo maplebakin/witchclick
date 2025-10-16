@@ -263,3 +263,27 @@
   text-transform: uppercase;
   color: rgba(244, 241, 255, 0.6);
 }
+
+/* --- New Styles for the Unified Post Container --- */
+
+/* This class name should be applied to the main wrapper of your post content */
+.post-article-unified-card {
+  /* Inherit the card variables for consistent look */
+  background-color: var(--color-ink, #f4f1ff);
+  border-radius: var(--card-radius, 1.5rem);
+  padding: clamp(2rem, 5vw, 3rem);
+
+  /* Center the article and limit its width for desktop readability */
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+
+  /* Add a subtle shadow to make it 'float' on the dark background */
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+
+  /* Remove any default Tailwind margins if present */
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* --- End New Styles --- */

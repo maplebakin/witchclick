@@ -1093,3 +1093,14 @@ blockquote {
     display: flex;
   }
 }
+
+/* --- Fix Conflicting Backgrounds (Add to the end of base.css) --- */
+
+.site-main__container,
+.site-main__content {
+  /* Ensure these parents DO NOT have any background color set,
+     so the dark gradient from .site-shell shows through. */
+  background-color: transparent !important;
+}
+
+/* --- End Base CSS Fix --- */
