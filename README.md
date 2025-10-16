@@ -43,3 +43,7 @@ Editors can reference the following affiliate keys in post specs and frontmatter
 - Posts render at `/post/<slug>`.
 - Curses automatically surface at `/curses` with detail pages at `/curses/<slug>`.
 
+## Builds & checks
+
+- `npm run build` now fails fast if legacy `npm_config_http_proxy` env vars are set so maintainers can clean them before Astro runs.
+
