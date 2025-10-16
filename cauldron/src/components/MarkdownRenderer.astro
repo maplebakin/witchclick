@@ -1,0 +1,11 @@
+---
+import { marked } from 'marked';
+
+interface Props {
+  content?: string;
+}
+
+const { content } = Astro.props as Props;
+const rendered = typeof content === 'string' ? marked.parse(content) : '';
+---
+<div set:html={rendered} />
