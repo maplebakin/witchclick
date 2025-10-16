@@ -334,18 +334,22 @@ const jsonLd = {
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
 
   <div class="grimoire-bg">
-    <div class="post-shell">
-      <div class="post-layout">
-        <article class="post-article" aria-labelledby="post-title">
-          <header class="post-hero">
-            <div class:list={["post-hero__layout", !heroImage && "post-hero__layout--text"]}>
+    <div class="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
+      <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
+        <article class="flex min-w-0 flex-col gap-8 lg:gap-10" aria-labelledby="post-title">
+          <header class="card-panel card-tier-2 card-panel-strong card-panel-static overflow-hidden p-6 sm:p-8 lg:p-10">
+            <div
+              class:list={["flex flex-col gap-8 lg:gap-10", heroImage ? "lg:flex-row lg:items-start" : "lg:max-w-3xl"]}
+            >
               {heroImage && (
-                <figure class="post-hero__media">
-                  <img src={heroImage} alt={heroAlt} loading="eager" />
+                <figure
+                  class="relative aspect-[4/3] overflow-hidden rounded-[calc(var(--card-radius,1.5rem)-0.5rem)] border border-line-muted/60 bg-surface-overlay/10 shadow-[var(--wc-shadow-soft)] lg:w-[42%]"
+                >
+                  <img class="h-full w-full object-cover" src={heroImage} alt={heroAlt} loading="eager" />
                 </figure>
               )}
-              <div class="post-hero__content">
-                <p class="post-hero__meta">
+              <div class="flex flex-1 flex-col gap-6 text-inverse">
+                <p class="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-[0.28em] text-inverse-muted">
                   {publishedAt && (
                     <time datetime={new Date(publishedAt).toISOString()}>
                       {new Date(publishedAt).toLocaleDateString(undefined, {
@@ -359,27 +363,32 @@ const jsonLd = {
                   {readingMinutes && <span>{readingMinutes} minute read</span>}
                 </p>
 
-                <h1 id="post-title" class="post-hero__title">{title}</h1>
+                <h1 id="post-title" class="font-serif text-3xl leading-tight text-inverse sm:text-4xl lg:text-5xl">
+                  {title}
+                </h1>
 
                 {authorLinks.length > 0 && (
-                  <p class="post-byline">
+                  <p class="flex flex-wrap items-center gap-y-2 text-sm text-inverse-soft">
                     By
                     {authorLinks.map((author, index) => (
                       <Fragment key={author.slug || author.label}>
                         {index > 0 &&
                           (authorLinks.length === 2 ? (
-                            <span class="post-byline__separator">&nbsp;&amp;&nbsp;</span>
+                            <span class="px-1 text-inverse-muted">&amp;</span>
                           ) : index === authorLinks.length - 1 ? (
-                            <span class="post-byline__separator">,&nbsp;&amp;&nbsp;</span>
+                            <span class="px-1 text-inverse-muted">,&nbsp;&amp;&nbsp;</span>
                           ) : (
-                            <span class="post-byline__separator">,&nbsp;</span>
+                            <span class="px-1 text-inverse-muted">,</span>
                           ))}
                         {author.href ? (
-                          <a class="post-byline__link" href={author.href}>
+                          <a
+                            class="font-semibold text-inverse transition-colors hover:text-accent-soft focus-visible:text-accent-soft"
+                            href={author.href}
+                          >
                             {author.label}
                           </a>
                         ) : (
-                          <span class="post-byline__name">{author.label}</span>
+                          <span class="font-semibold text-inverse">{author.label}</span>
                         )}
                       </Fragment>
                     ))}
@@ -387,22 +396,22 @@ const jsonLd = {
                 )}
 
                 {Array.isArray(data.tags) && data.tags.length > 0 && (
-                  <ul class="post-tags">
+                  <ul class="mt-6 flex flex-wrap gap-2">
                     {data.tags.map((tag: any) => (
                       <li>
-                        <span>#{String(tag).toLowerCase()}</span>
+                        <span class="card-pill card-tag">#{String(tag).toLowerCase()}</span>
                       </li>
                     ))}
                   </ul>
                 )}
 
                 {(spoonLevel || tldr) && (
-                  <div class="post-callouts">
-                    {spoonLevel && <SpoonsBadge level={spoonLevel} class="post-callouts__badge" />}
+                  <div class="mt-6 flex flex-col gap-4 lg:flex-row lg:items-stretch">
+                    {spoonLevel && <SpoonsBadge level={spoonLevel} class="self-start" />}
                     {tldr && (
-                      <aside class="post-callouts__summary" aria-label="TL;DR">
-                        <span class="post-callouts__label">TL;DR</span>
-                        <p>{tldr}</p>
+                      <aside class="soft-card flex-1 space-y-3 p-5 text-inverse sm:p-6" aria-label="TL;DR">
+                        <span class="card-pill card-badge">TL;DR</span>
+                        <p class="text-base leading-relaxed text-inverse-soft">{tldr}</p>
                       </aside>
                     )}
                   </div>
@@ -412,11 +421,14 @@ const jsonLd = {
           </header>
 
           {productRecommendations.length > 0 && (
-            <ProductRecommendations products={productRecommendations} class="post-product-recs" />
+            <ProductRecommendations products={productRecommendations} class="mt-6" />
           )}
 
-          <div class="post-body panel">
-            <div class="post-body__content prose prose-neutral max-w-none" set:html={html} />
+          <div class="panel flex flex-col gap-8 p-6 text-inverse sm:p-8 lg:p-10">
+            <div
+              class="prose prose-lg prose-invert max-w-none prose-headings:font-serif prose-headings:text-inverse prose-a:text-accent-soft prose-strong:text-inverse prose-em:text-inverse-soft prose-blockquote:border-line-accent/40 prose-blockquote:text-inverse-soft prose-hr:border-line-inverse/50 prose-code:text-inverse prose-pre:bg-surface-inverse-soft prose-pre:text-inverse prose-figcaption:text-inverse-muted"
+              set:html={html}
+            />
 
             <Disclosure show={hasAffiliates} />
 
@@ -424,12 +436,14 @@ const jsonLd = {
               <DownloadCard id={String(data.downloadId)} />
             ) : null}
 
-            <AdSlot slot="end" class="post-body__ad" />
+            <AdSlot slot="end" class="mt-4" />
 
             {authorsWithProfiles.length > 0 && (
-              <section class="post-authors">
-                <h2 class="post-authors__title">About the author{authorsWithProfiles.length > 1 ? "s" : ""}</h2>
-                <div class="post-authors__grid">
+              <section class="border-t border-line-inverse/30 pt-6 sm:pt-8">
+                <h2 class="text-sm font-semibold uppercase tracking-[0.26em] text-inverse-soft">
+                  About the author{authorsWithProfiles.length > 1 ? "s" : ""}
+                </h2>
+                <div class="mt-4 grid gap-4 sm:grid-cols-2">
                   {authorsWithProfiles.map((author) => (
                     <AuthorSpotlight author={author} compact={true} key={author.slug} />
                   ))}
@@ -439,22 +453,27 @@ const jsonLd = {
           </div>
         </article>
 
-        <aside class="post-sidebar" aria-label="Post sidebar">
-          <div class="post-sidebar__stack">
-            <div class="post-sidebar__card soft-card">
+        <aside class="relative" aria-label="Post sidebar">
+          <div class="flex flex-col gap-6 lg:sticky lg:top-28">
+            <div class="soft-card p-6 text-inverse">
               <AdSlot slot="side" />
             </div>
             <CtaFooter type={ctaType} id={ctaId} />
             {resolvedEntities.length > 0 && (
-              <section class="post-entities soft-card">
-                <h2 class="post-entities__title">Referenced entities</h2>
-                <ul class="post-entities__list">
+              <section class="soft-card space-y-4 p-6 text-inverse">
+                <h2 class="text-xs font-semibold uppercase tracking-[0.32em] text-inverse">Referenced entities</h2>
+                <ul class="space-y-4 text-sm text-inverse-soft">
                   {resolvedEntities.map((entity: any) => (
                     <li key={entity.href}>
-                      <a class="post-entities__link" href={entity.href}>
+                      <a
+                        class="font-semibold text-accent-soft transition-colors hover:text-accent focus-visible:text-accent"
+                        href={entity.href}
+                      >
                         {entity.name}
                       </a>
-                      {entity.description && <p class="post-entities__summary">{entity.description}</p>}
+                      {entity.description && (
+                        <p class="mt-2 text-sm leading-relaxed text-inverse-muted">{entity.description}</p>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -464,530 +483,15 @@ const jsonLd = {
         </aside>
       </div>
 
-      <div class="post-related panel">
+      <div class="panel flex flex-col gap-6 p-6 text-inverse sm:p-8 lg:p-10">
         <RelatedPosts currentSlug={effectiveSlug} tags={data.tags || []} prev={prev} next={next} />
       </div>
 
-      <div class="post-comments panel">
+      <div class="panel flex flex-col gap-6 p-6 text-inverse sm:p-8 lg:p-10">
         <CommentsSection slug={effectiveSlug} title={title} />
       </div>
     </div>
   </div>
 </Base>
 
-<style>
-  .post-shell {
-    width: min(1100px, 100%);
-    margin: 0 auto;
-    padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.25rem, 5vw, 3.5rem) clamp(4rem, 8vw, 6rem);
-    display: grid;
-    gap: clamp(2.5rem, 6vw, 3.75rem);
-    min-height: 100vh;
-    --post-text-strong: color-mix(in srgb, var(--ink-strong, #f4f1ff) 96%, white 4%);
-    --post-text-body: color-mix(in srgb, var(--ink-body, #f4f1ff) 96%, white 4%);
-    --post-text-muted: color-mix(in srgb, var(--ink-muted, #d7c8f3) 92%, white 8%);
-    --post-text-inverse-strong: color-mix(in srgb, white 96%, var(--ink-strong, #f4f1ff) 4%);
-    --post-text-inverse-body: color-mix(in srgb, white 90%, var(--ink-body, #f4f1ff) 10%);
-    --post-text-inverse-muted: color-mix(in srgb, var(--post-text-inverse-body) 78%, white 22%);
-    --post-accent-strong: color-mix(
-      in srgb,
-      var(--ambient-color, hsl(270 60% 62%)) 48%,
-      var(--post-text-strong) 52%
-    );
-    --post-accent-inverse: color-mix(
-      in srgb,
-      var(--ambient-color, hsl(270 60% 62%)) 55%,
-      var(--post-text-inverse-strong) 45%
-    );
-    color: var(--post-text-body, var(--ink-body, #1f1633));
-  }
 
-  :root[data-comfort-theme="dawn"] .post-shell {
-    --post-text-strong: color-mix(in srgb, var(--ink-strong, #2c1b3d) 94%, black 6%);
-    --post-text-body: color-mix(in srgb, var(--ink-body, #3a274f) 92%, black 8%);
-    --post-text-muted: color-mix(in srgb, var(--ink-muted, #5b4c69) 88%, black 12%);
-    --post-text-inverse-strong: color-mix(
-      in srgb,
-      white 96%,
-      var(--ambient-color, hsl(270 60% 62%)) 4%
-    );
-    --post-text-inverse-body: color-mix(
-      in srgb,
-      white 90%,
-      var(--ambient-color, hsl(270 60% 62%)) 10%
-    );
-    --post-text-inverse-muted: color-mix(in srgb, var(--post-text-inverse-body) 80%, white 20%);
-    --post-accent-strong: color-mix(
-      in srgb,
-      var(--ambient-color, hsl(270 60% 62%)) 42%,
-      var(--post-text-strong) 58%
-    );
-    --post-accent-inverse: color-mix(
-      in srgb,
-      var(--ambient-color, hsl(270 60% 62%)) 58%,
-      var(--post-text-inverse-strong) 42%
-    );
-  }
-
-  .post-layout {
-    display: grid;
-    gap: clamp(2rem, 5vw, 3.25rem);
-  }
-
-  @media (min-width: 1024px) {
-    .post-layout {
-      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr);
-      align-items: start;
-      gap: clamp(2.5rem, 5vw, 3.5rem);
-    }
-  }
-
-  .post-article {
-    display: grid;
-    gap: clamp(2rem, 5vw, 3rem);
-  }
-
-  .post-hero {
-    position: relative;
-    padding: clamp(2rem, 5vw, 3.5rem);
-    border-radius: clamp(1.85rem, 4vw, 2.75rem);
-    border: 1px solid color-mix(in srgb, var(--panel-border-strong, rgba(124, 58, 237, 0.35)) 80%, transparent 20%);
-    background:
-      radial-gradient(
-        135% 120% at 8% -12%,
-        color-mix(in srgb, var(--ambient-color, hsl(270 60% 62%)) 18%, transparent) 0%,
-        transparent 70%
-      ),
-      radial-gradient(
-        120% 120% at 95% -18%,
-        color-mix(in srgb, rgba(255, 255, 255, 0.7) 65%, transparent) 0%,
-        transparent 74%
-      ),
-      linear-gradient(
-        170deg,
-        color-mix(in srgb, white 94%, var(--ambient-color, hsl(270 60% 62%)) 6%) 0%,
-        color-mix(in srgb, white 88%, var(--ambient-color, hsl(270 60% 62%)) 12%) 100%
-      );
-    box-shadow: 0 28px 70px -36px color-mix(in srgb, var(--ambient-color, hsl(270 60% 62%)) 32%, transparent 68%);
-    overflow: hidden;
-  }
-
-  .post-hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(140deg, rgba(255, 255, 255, 0.4), transparent 65%);
-    mix-blend-mode: screen;
-    opacity: 0.4;
-    pointer-events: none;
-  }
-
-  .post-hero__layout {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    gap: clamp(1.5rem, 4vw, 2.5rem);
-    align-items: center;
-  }
-
-  @media (min-width: 1024px) {
-    .post-hero__layout {
-      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-    }
-
-    .post-hero__layout--text {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-
-  .post-hero__media {
-    position: relative;
-    border-radius: clamp(1.5rem, 3.5vw, 2.25rem);
-    overflow: hidden;
-    box-shadow: 0 26px 50px -32px rgba(17, 24, 39, 0.25);
-    border: 1px solid color-mix(in srgb, rgba(124, 58, 237, 0.28) 80%, transparent 20%);
-  }
-
-  .post-hero__media img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .post-hero__content {
-    display: grid;
-    gap: clamp(1rem, 3vw, 1.75rem);
-    color: var(--post-text-body);
-  }
-
-  .post-hero__meta {
-    display: inline-flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-    align-items: center;
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--post-text-muted);
-  }
-
-  .post-hero__meta span[aria-hidden="true"] {
-    font-size: 0.7rem;
-    opacity: 0.6;
-  }
-
-  .post-hero__title {
-    margin: 0;
-    font-size: clamp(2.25rem, 4vw, 3.35rem);
-    line-height: 1.08;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--post-text-strong);
-  }
-
-  .post-byline {
-    margin: -0.25rem 0 0;
-    font-size: 0.95rem;
-    color: var(--post-text-body);
-  }
-
-  .post-byline__link {
-    color: var(--post-accent-strong);
-    font-weight: 600;
-    text-decoration: none;
-  }
-
-  .post-byline__link:hover,
-  .post-byline__link:focus-visible {
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
-
-  .post-byline__name {
-    font-weight: 600;
-  }
-
-  .post-byline__separator {
-    color: var(--post-text-muted);
-  }
-
-  .post-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .post-tags li span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.35rem 0.8rem;
-    border-radius: 999px;
-    font-size: 0.7rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    background: color-mix(in srgb, rgba(124, 58, 237, 0.14) 82%, rgba(255, 255, 255, 0.92) 18%);
-    border: 1px solid color-mix(in srgb, rgba(124, 58, 237, 0.3) 80%, transparent 20%);
-    color: var(--post-text-strong);
-  }
-
-  .post-callouts {
-    display: grid;
-    gap: 1rem;
-    align-items: start;
-  }
-
-  @media (min-width: 640px) {
-    .post-callouts {
-      grid-template-columns: auto minmax(0, 1fr);
-      gap: 1.5rem;
-    }
-
-    .post-callouts__badge {
-      align-self: start;
-    }
-  }
-
-  .post-callouts__summary {
-    margin: 0;
-    padding: clamp(1.2rem, 3vw, 1.75rem);
-    border-radius: clamp(1.35rem, 3vw, 1.8rem);
-    background:
-      radial-gradient(
-        130% 120% at 12% -8%,
-        color-mix(in srgb, rgba(255, 255, 255, 0.88) 92%, rgba(124, 58, 237, 0.14) 8%) 0%,
-        transparent 75%
-      ),
-      linear-gradient(
-        160deg,
-        color-mix(in srgb, rgba(255, 255, 255, 0.94) 92%, rgba(124, 58, 237, 0.08) 8%) 0%,
-        color-mix(in srgb, rgba(255, 255, 255, 0.88) 90%, rgba(124, 58, 237, 0.16) 10%) 100%
-      );
-    border: 1px solid color-mix(in srgb, rgba(124, 58, 237, 0.22) 78%, transparent 22%);
-    box-shadow: 0 18px 45px -30px rgba(76, 29, 149, 0.22);
-  }
-
-  .post-callouts__summary p {
-    margin: 0.45rem 0 0;
-    color: var(--post-text-body);
-    line-height: 1.65;
-  }
-
-  .post-callouts__label {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.35rem 0.9rem;
-    border-radius: 999px;
-    font-size: 0.68rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    background: color-mix(in srgb, rgba(124, 58, 237, 0.22) 70%, rgba(255, 255, 255, 0.9) 30%);
-    color: var(--post-text-strong);
-    box-shadow: 0 12px 28px -20px rgba(76, 29, 149, 0.32);
-  }
-
-  .post-callouts__label::before {
-    content: "✶";
-    font-size: 0.8rem;
-  }
-
-  .post-product-recs {
-    margin-top: -0.75rem;
-  }
-
-  .post-body {
-    border-radius: clamp(1.75rem, 4vw, 2.5rem);
-    padding: clamp(2.1rem, 5vw, 3rem);
-    display: grid;
-    gap: clamp(2rem, 4vw, 2.75rem);
-    background:
-      radial-gradient(
-        130% 120% at 12% -12%,
-        color-mix(in srgb, var(--ambient-color, hsl(270 60% 62%)) 14%, transparent) 0%,
-        transparent 72%
-      ),
-      linear-gradient(
-        170deg,
-        color-mix(in srgb, var(--panel-surface-strong, rgba(32, 18, 44, 0.92)) 85%, rgba(255, 255, 255, 0.06) 15%) 0%,
-        color-mix(in srgb, var(--panel-surface-soft, rgba(39, 21, 52, 0.9)) 82%, rgba(0, 0, 0, 0.12) 18%) 100%
-      );
-    border: 1px solid color-mix(in srgb, var(--panel-border-strong, rgba(124, 58, 237, 0.35)) 78%, transparent 22%);
-    box-shadow: var(--wc-shadow-strong, 0 26px 68px -34px rgba(17, 24, 39, 0.35));
-    color: var(--post-text-inverse-body);
-  }
-
-  .post-body__content {
-    display: grid;
-    gap: clamp(1.5rem, 3vw, 2.25rem);
-  }
-
-  .post-body__content :where(p, li) {
-    color: var(--post-text-inverse-body);
-  }
-
-  .post-body__content :where(h2, h3, h4, h5, h6) {
-    color: var(--post-text-inverse-strong);
-  }
-
-  .post-body__content a {
-    color: var(--post-accent-inverse);
-    text-decoration: underline;
-    text-decoration-thickness: 1.5px;
-    text-decoration-color: color-mix(in srgb, var(--post-accent-inverse) 60%, transparent 40%);
-  }
-
-  .post-body__content a:hover,
-  .post-body__content a:focus-visible {
-    color: color-mix(in srgb, var(--post-accent-inverse) 78%, var(--post-text-inverse-strong) 22%);
-  }
-
-  .post-body__ad {
-    margin-top: clamp(1.5rem, 4vw, 2.25rem);
-  }
-
-  .post-authors {
-    display: grid;
-    gap: clamp(1.5rem, 3vw, 2.25rem);
-    padding-top: clamp(1.75rem, 4vw, 2.5rem);
-    border-top: 1px solid color-mix(in srgb, rgba(255, 255, 255, 0.24) 75%, transparent 25%);
-  }
-
-  .post-authors__title {
-    margin: 0;
-    font-size: clamp(1.1rem, 2.2vw, 1.35rem);
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--post-text-inverse-strong);
-  }
-
-  .post-authors__grid {
-    display: grid;
-    gap: clamp(1rem, 3vw, 1.5rem);
-  }
-
-  @media (min-width: 720px) {
-    .post-authors__grid {
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    }
-  }
-
-  .post-sidebar {
-    position: relative;
-  }
-
-  .post-sidebar__stack {
-    position: sticky;
-    top: clamp(6rem, 12vw, 7.5rem);
-    display: grid;
-    gap: clamp(1.5rem, 4vw, 2.5rem);
-  }
-
-  .post-sidebar__card {
-    padding: clamp(1.4rem, 3.5vw, 1.95rem);
-    display: grid;
-    gap: 1rem;
-  }
-
-  .post-sidebar__card .ad {
-    margin: 0;
-  }
-
-  .post-entities {
-    display: grid;
-    gap: 1.1rem;
-    padding: clamp(1.5rem, 3.5vw, 2rem);
-  }
-
-  .post-entities__title {
-    margin: 0;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    color: var(--post-text-strong);
-  }
-
-  .post-entities__list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: grid;
-    gap: 1rem;
-    font-size: 0.9rem;
-    color: var(--post-text-body);
-  }
-
-  .post-entities__link {
-    font-weight: 600;
-    color: var(--post-accent-strong);
-    text-decoration: none;
-  }
-
-  .post-entities__link:hover,
-  .post-entities__link:focus-visible {
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
-
-  .post-entities__summary {
-    margin: 0.35rem 0 0;
-    font-size: 0.85rem;
-    color: var(--post-text-muted);
-    line-height: 1.6;
-  }
-
-  .post-related,
-  .post-comments {
-    border-radius: clamp(1.75rem, 4vw, 2.5rem);
-    padding: clamp(2rem, 5vw, 3rem);
-    background:
-      radial-gradient(
-        140% 120% at 12% -15%,
-        color-mix(in srgb, rgba(124, 58, 237, 0.18) 70%, transparent) 0%,
-        transparent 72%
-      ),
-      linear-gradient(
-        170deg,
-        color-mix(in srgb, rgba(255, 255, 255, 0.92) 92%, rgba(124, 58, 237, 0.08) 8%) 0%,
-        color-mix(in srgb, rgba(255, 255, 255, 0.88) 88%, rgba(124, 58, 237, 0.14) 12%) 100%
-      );
-    border: 1px solid color-mix(in srgb, rgba(124, 58, 237, 0.24) 80%, transparent 20%);
-    box-shadow: 0 22px 55px -32px rgba(17, 24, 39, 0.28);
-  }
-
-  .post-related > section {
-    margin: 0;
-    display: grid;
-    gap: 1.75rem;
-  }
-
-  .post-related h2 {
-    margin: 0;
-    font-size: 1.1rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--post-text-strong);
-  }
-
-  .post-related .grid {
-    gap: clamp(1rem, 3vw, 1.5rem);
-  }
-
-  .post-comments {
-    display: grid;
-    gap: clamp(1.5rem, 3vw, 2.25rem);
-  }
-
-  .post-comments .comments {
-    margin: 0;
-    display: grid;
-    gap: clamp(1.5rem, 3vw, 2.25rem);
-  }
-
-  .post-comments .comments__intro {
-    display: grid;
-    gap: 0.65rem;
-    color: var(--post-text-body);
-  }
-
-  .post-comments .comments__title {
-    margin: 0;
-    font-size: clamp(1.1rem, 2.2vw, 1.35rem);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-
-  .post-comments .comments__summary {
-    margin: 0;
-    color: var(--post-text-muted);
-  }
-
-  .post-comments fieldset {
-    border: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .post-comments .comments__form {
-    display: grid;
-    gap: 1.25rem;
-    padding: clamp(1.5rem, 3.5vw, 2.1rem);
-    border-radius: clamp(1.35rem, 3vw, 1.8rem);
-    background: color-mix(in srgb, rgba(255, 255, 255, 0.9) 92%, rgba(124, 58, 237, 0.12) 8%);
-    border: 1px solid color-mix(in srgb, rgba(124, 58, 237, 0.18) 75%, transparent 25%);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
-  }
-
-  .post-comments .comments__thread {
-    padding: clamp(1.5rem, 3.5vw, 2.1rem);
-    border-radius: clamp(1.35rem, 3vw, 1.8rem);
-    background: color-mix(in srgb, rgba(255, 255, 255, 0.96) 90%, rgba(124, 58, 237, 0.1) 10%);
-    border: 1px solid color-mix(in srgb, rgba(124, 58, 237, 0.18) 70%, transparent 30%);
-  }
-</style>
