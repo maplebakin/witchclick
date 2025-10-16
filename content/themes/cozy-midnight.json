@@ -1,0 +1,12 @@
+{
+  "slug": "cozy-midnight",
+  "label": "Cozy Midnight",
+  "mode": "midnight",
+  "settings": {
+    "primary": "#8b7e8f",
+    "accent": "#d9b2c4",
+    "background": "#120725",
+    "fontSerif": "Literata",
+    "fontScript": "Parisienne"
+  }
+}
