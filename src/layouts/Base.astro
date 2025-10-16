@@ -14,6 +14,7 @@ import {
 } from "@/data/navigation";
 import { readSettings, getSiteOrigin, toAbsoluteUrl } from "@/utils/settings";
 import { buildAnalyticsInjection } from "@/utils/analytics";
+import { getActiveThemes } from "@/utils/theme";
 import { Fragment } from "astro/jsx-runtime";
 
 type LayoutProps = {
@@ -48,6 +49,85 @@ const disclosure = settings.disclosure ?? "";
 const ogUrl = ogImage ? toAbsoluteUrl(ogImage, settings) : "";
 const currentPath = Astro.url?.pathname ?? "/";
 const canonicalUrl = canon || (siteOrigin ? `${siteOrigin}${currentPath}` : "");
+
+const { midnight: midnightTheme, dawn: dawnTheme } = getActiveThemes();
+
+const FALLBACK_COLORS = {
+  midnight: {
+    primary: "#4b2a63",
+    accent: "#d4af37",
+    background: "#07020f",
+  },
+  dawn: {
+    primary: "#9b86c8",
+    accent: "#caa043",
+    background: "#f6f0e8",
+  },
+} as const;
+
+const FALLBACK_SERIF = '"Lora", "Crimson Text", Georgia, serif';
+const FALLBACK_SCRIPT = '"Cormorant Garamond", "Cinzel", serif';
+
+type ModeFallback = (typeof FALLBACK_COLORS)[keyof typeof FALLBACK_COLORS];
+
+const sanitizeColor = (value: string | null | undefined, fallback: string) => {
+  const trimmed = typeof value === "string" ? value.trim() : "";
+  return /^#[0-9a-fA-F]{3,8}$/.test(trimmed) ? trimmed : fallback;
+};
+
+const formatFontStack = (value: string | null | undefined, fallback: string) => {
+  const trimmed = typeof value === "string" ? value.trim() : "";
+  if (!trimmed) return fallback;
+  const sanitized = trimmed.replace(/[<>]/g, "");
+  const escaped = sanitized.replace(/["\\]/g, "\\$&");
+  const needsQuotes = /[\s,]/.test(escaped);
+  const primary = needsQuotes ? `"${escaped}"` : escaped;
+  return `${primary}, ${fallback}`;
+};
+
+const buildThemeCss = (
+  theme: typeof midnightTheme,
+  selector: string,
+  fallbacks: ModeFallback,
+) => {
+  const primary = sanitizeColor(theme?.primary, fallbacks.primary);
+  const accent = sanitizeColor(theme?.accent, fallbacks.accent);
+  const background = sanitizeColor(theme?.background, fallbacks.background);
+  const serifStack = formatFontStack(theme?.fontSerif, FALLBACK_SERIF);
+  const scriptStack = formatFontStack(theme?.fontScript, FALLBACK_SCRIPT);
+
+  return `${selector} {
+  --color-midnight: ${background};
+  --color-night: color-mix(in srgb, ${background} 85%, black 15%);
+  --color-dusk: color-mix(in srgb, ${background} 65%, white 35%);
+  --color-iris: ${primary};
+  --color-amethyst: color-mix(in srgb, ${primary} 70%, white 30%);
+  --color-fog: color-mix(in srgb, ${primary} 30%, white 70%);
+  --color-gold: ${accent};
+  --color-rune: color-mix(in srgb, ${background} 12%, white 88%);
+  --color-ink: color-mix(in srgb, ${background} 18%, black 82%);
+  --color-muted: color-mix(in srgb, ${primary} 18%, transparent 82%);
+  --color-border: color-mix(in srgb, ${primary} 28%, transparent 72%);
+  --color-border-strong: color-mix(in srgb, ${primary} 42%, transparent 58%);
+  --color-overlay: color-mix(in srgb, ${background} 65%, transparent 35%);
+  --ink-body: color-mix(in srgb, var(--color-ink) 70%, var(--color-night) 30%);
+  --ink-strong: color-mix(in srgb, var(--color-ink) 85%, var(--color-night) 15%);
+  --ink-muted: color-mix(in srgb, var(--color-ink) 55%, white 45%);
+  --link-color: color-mix(in srgb, var(--color-iris) 55%, var(--color-gold) 45%);
+  --focus-ring-color: color-mix(in srgb, var(--color-iris) 60%, var(--color-gold) 40%);
+  --focus-ring-shadow: 0 0 0 2px color-mix(in srgb, var(--color-night) 65%, transparent 35%),
+    0 0 0 4px color-mix(in srgb, var(--focus-ring-color) 80%, white 20%);
+  --font-body-serif: ${serifStack};
+  --font-body: ${serifStack};
+  --font-heading: ${serifStack};
+  --font-accent: ${scriptStack};
+}`;
+};
+
+const midnightCss = buildThemeCss(midnightTheme, ":root", FALLBACK_COLORS.midnight);
+const dawnCss = buildThemeCss(dawnTheme, ':root[data-comfort-theme="dawn"]', FALLBACK_COLORS.dawn);
+const themeStyle = `${midnightCss}\n\n${dawnCss}`;
+const themeMetaColor = sanitizeColor(midnightTheme?.primary, FALLBACK_COLORS.midnight.primary);
 
 const showAccountLink = settings.showAccountLink ?? false;
 
@@ -118,10 +198,12 @@ const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined
     {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
     {ogUrl && <meta property="og:image" content={ogUrl} />}
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#4b2a63" />
+    <meta name="theme-color" content={themeMetaColor} />
 
     {analytics?.head && <Fragment set:html={analytics.head} />}
     {analytics?.config && <Fragment set:html={analytics.config} />}
+
+    {themeStyle && <style is:inline set:html={themeStyle} />}
 
     <script is:inline>
       try {
