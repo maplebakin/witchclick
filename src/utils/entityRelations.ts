@@ -20,7 +20,10 @@ const STUB_PATTERN = /stub entity/i;
 function toTitleCase(value: string): string {
   return value
     .split(/[-_\s]+/)
-    .map((part) => (part ? part[0].toUpperCase() + part.slice(1) : ""))
+    .map((part) => {
+      const first = part.charAt(0);
+      return first ? first.toUpperCase() + part.slice(1) : "";
+    })
     .join(" ");
 }
 

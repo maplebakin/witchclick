@@ -228,8 +228,9 @@ export function firstParagraph(md: string): string {
     .map((block) => block.trim())
     .filter(Boolean);
 
-  if (!paragraphs.length) return "";
-  const first = paragraphs[0]
+  const firstParagraph = paragraphs[0];
+  if (!firstParagraph) return "";
+  const first = firstParagraph
     .replace(/[#>*_`~\-]+/g, " ")
     .replace(/\[(.*?)\]\((.*?)\)/g, "$1")
     .replace(/\s+/g, " ")

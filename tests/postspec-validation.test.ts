@@ -100,7 +100,10 @@ describe('validatePostSpec', () => {
   it('warns when word count outside tolerance', () => {
     const spec = createSpec();
     const condensed = 'focus anchor low energy anchor anchor sequence prompt question anchor items anchor';
-    spec.sections = spec.sections.map((section) => ({ ...section, markdown: condensed }));
+    spec.sections = spec.sections.map((section: PostSpecV2["sections"][number]) => ({
+      ...section,
+      markdown: condensed,
+    }));
     const result = validatePostSpec(spec, { allowedAffiliateKeys: [], targetWordCount: 200 });
     expect(result.valid).toBe(true);
     expect(result.warnings.some((msg) => msg.includes('Word count'))).toBe(true);

@@ -57,7 +57,9 @@ describe("posts utilities", () => {
 
     const posts = loadAllPosts();
     expect(posts).toHaveLength(1);
-    expect(posts[0].slug).toBe("source");
+    const firstPost = posts[0];
+    expect(firstPost).toBeDefined();
+    expect(firstPost?.slug).toBe("source");
   });
 
   it("refreshes posts on subsequent reads when caching is disabled", async () => {
@@ -107,7 +109,12 @@ describe("posts utilities", () => {
     const { totalPages, items } = paginatePosts(2, 2);
     expect(totalPages).toBe(3);
     expect(items).toHaveLength(2);
-    expect(items[0].date.getTime()).toBeGreaterThanOrEqual(items[1].date.getTime());
+    const [firstItem, secondItem] = items;
+    expect(firstItem).toBeDefined();
+    expect(secondItem).toBeDefined();
+    if (firstItem && secondItem) {
+      expect(firstItem.date.getTime()).toBeGreaterThanOrEqual(secondItem.date.getTime());
+    }
   });
 
   it("ingests posts into the directory used by loadAllPosts", async () => {
@@ -180,6 +187,9 @@ describe("posts utilities", () => {
     const posts = loadAllPosts();
     expect(posts).toHaveLength(1);
     const post = posts[0];
+    if (!post) {
+      throw new Error("Expected at least one post for summary assertions");
+    }
     expect(post.tldr).toBeTruthy();
     expect(post.tldr).toMatch(/This ritual is for test coverage/);
     expect(post.spoons).toBe("medium");
@@ -211,6 +221,9 @@ describe("posts utilities", () => {
     const posts = loadAllPosts();
     expect(posts).toHaveLength(1);
     const post = posts[0];
+    if (!post) {
+      throw new Error("Expected at least one post for manual summary assertions");
+    }
     expect(post.tldr).toBeUndefined();
     expect(post.spoons).toBeUndefined();
     expect(post.data.tldr).toBeUndefined();

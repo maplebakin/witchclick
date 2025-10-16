@@ -42,8 +42,11 @@ export async function GET() {
     const frontDates = [data?.publishedAt, data?.pubDate, data?.date, data?.updatedAt].filter(Boolean) as string[];
     let publishedAt: string | null = null;
     if (frontDates.length) {
-      const d = new Date(frontDates[0]);
-      if (!isNaN(+d)) publishedAt = d.toISOString();
+      const firstDate = frontDates[0];
+      if (firstDate) {
+        const d = new Date(firstDate);
+        if (!Number.isNaN(+d)) publishedAt = d.toISOString();
+      }
     }
     if (!publishedAt) {
       try { publishedAt = fs.statSync(full).mtime.toISOString(); } catch {}

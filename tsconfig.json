@@ -3,17 +3,19 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "../scripts/ingest.mjs": ["scripts/ingest.d.mts"]
     },
     "types": ["node", "astro/client", "@playwright/test", "vitest"],
     "module": "ES2022",
     "target": "ES2022",
     "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
     "jsx": "react-jsx",
     "skipLibCheck": true,
     "strict": true,
     "noUncheckedIndexedAccess": true
   },
-  "include": ["src/**/*", "tests/**/*.ts", "playwright.config.ts"],
+  "include": ["src/**/*", "tests/**/*.ts", "tests/**/*.d.ts", "scripts/**/*.d.ts", "playwright.config.ts"],
   "exclude": ["node_modules","tools/_compiled","dist"]
 }

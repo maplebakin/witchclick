@@ -46,7 +46,9 @@ describe('validateStructure contentType handling', () => {
 
   it('requires variants for ritual posts', () => {
     const spec = createBaseSpec();
-    spec.sections = spec.sections.filter((section) => !/Quick|Deep/.test(section.heading));
+    spec.sections = spec.sections.filter(
+      (section: PostSpecV2["sections"][number]) => !/Quick|Deep/.test(section.heading),
+    );
 
     const result = validateStructure(spec, 0);
 
@@ -56,7 +58,9 @@ describe('validateStructure contentType handling', () => {
   it('allows non-ritual posts without ritual variants', () => {
     const spec = createBaseSpec();
     spec.contentType = 'guide';
-    spec.sections = spec.sections.filter((section) => !/Quick|Deep/.test(section.heading));
+    spec.sections = spec.sections.filter(
+      (section: PostSpecV2["sections"][number]) => !/Quick|Deep/.test(section.heading),
+    );
 
     const result = validateStructure(spec, 0);
 

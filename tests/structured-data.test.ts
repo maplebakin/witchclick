@@ -18,7 +18,8 @@ describe("structured data helpers", () => {
     );
 
     expect(result["@type"]).toBe("ItemList");
-    expect(result.itemListElement[0].item.url).toBe("https://witchclick.space/post/example");
+    const firstElement = result.itemListElement[0];
+    expect(firstElement?.item.url).toBe("https://witchclick.space/post/example");
   });
 
   it("wraps an item list inside a collection page", () => {

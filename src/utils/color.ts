@@ -23,11 +23,17 @@ export function resolveTailwindColor(token: string | undefined | null): string {
   }
 
   if (palette && shade && shade in palette) {
-    return palette[shade];
+    const shadeValue = palette[shade];
+    if (typeof shadeValue === "string" && shadeValue.trim()) {
+      return shadeValue;
+    }
   }
 
   if (palette && "500" in palette) {
-    return palette["500"];
+    const defaultShade = palette["500"];
+    if (typeof defaultShade === "string" && defaultShade.trim()) {
+      return defaultShade;
+    }
   }
 
   return FALLBACK_COLOR;

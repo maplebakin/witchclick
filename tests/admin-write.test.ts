@@ -79,13 +79,20 @@ describe("admin write pipeline", () => {
     const metaLine = contents.match(/^metaDescription: (.+)$/m);
     const tagsLine = contents.match(/^tags: (.+)$/m);
 
-    expect(descriptionLine).not.toBeNull();
-    expect(metaLine).not.toBeNull();
-    expect(tagsLine).not.toBeNull();
+    if (!descriptionLine || !metaLine || !tagsLine) {
+      throw new Error("Expected excerpt, meta description, and tags in frontmatter");
+    }
 
-    const excerpt = descriptionLine ? JSON.parse(descriptionLine[1]) : "";
-    const meta = metaLine ? JSON.parse(metaLine[1]) : "";
-    const tags = tagsLine ? JSON.parse(tagsLine[1]) : [];
+    const [, descriptionValue] = descriptionLine;
+    const [, metaValue] = metaLine;
+    const [, tagsValue] = tagsLine;
+    if (!descriptionValue || !metaValue || !tagsValue) {
+      throw new Error("Expected serialized values in frontmatter lines");
+    }
+
+    const excerpt = JSON.parse(descriptionValue);
+    const meta = JSON.parse(metaValue);
+    const tags = JSON.parse(tagsValue);
 
     expect(excerpt.length).toBeGreaterThan(0);
     expect(meta.length).toBeGreaterThan(0);

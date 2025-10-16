@@ -6,8 +6,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 let tempDir: string;
 let cwdSpy: ReturnType<typeof vi.spyOn> | undefined;
-let prepareSpecForPersistence: (payload: any) => any;
-let persistPreparedSpec: (prepared: any) => Promise<{ postPath: string; createdEntities: string[] }>;
+let prepareSpecForPersistence: (
+  payload: any,
+  options?: Record<string, unknown>,
+) => any;
+let persistPreparedSpec: (
+  prepared: any,
+) => Promise<{ postPath: string; createdEntities: string[] }>;
 
 async function prepareTempDir() {
   tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "wc-admin-generator-"));
