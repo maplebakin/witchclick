@@ -96,7 +96,8 @@ test.describe("site smoke", () => {
     });
     expect.soft(inaccessibleHome, "Home interactive elements should be keyboard focusable").toHaveLength(0);
 
-    const secondaryRoute = routes.find((route) => route !== "/") ?? routes[0];
+    const fallbackRoute = routes[0] ?? "/";
+    const secondaryRoute = routes.find((route) => route !== "/") ?? fallbackRoute;
     await page.goto(secondaryRoute, { waitUntil: "domcontentloaded" });
     const inaccessibleSecondary = await page.evaluate(() => {
       const focusables = Array.from(

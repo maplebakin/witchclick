@@ -55,7 +55,11 @@ describe('ingestCurse CLI helper', () => {
 
     const files = fs.readdirSync(path.join(tmpDir, 'content', 'white-magic-curses'));
     expect(files.length).toBe(1);
-    const saved = fs.readFileSync(path.join(tmpDir, 'content', 'white-magic-curses', files[0]), 'utf8');
+    const firstFile = files[0];
+    if (!firstFile) {
+      throw new Error('Expected generated curse markdown file');
+    }
+    const saved = fs.readFileSync(path.join(tmpDir, 'content', 'white-magic-curses', firstFile), 'utf8');
     expect(saved).toContain('Opening Reflection');
   });
 });

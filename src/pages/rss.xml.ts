@@ -34,7 +34,13 @@ const slug = (data?.slug ? String(data.slug) : file.replace(/\.md$/, '')).toLowe
 const url = `${site}/post/${slug}`;
 const fronts = [data?.publishedAt, data?.pubDate, data?.date, data?.updatedAt].filter(Boolean) as string[];
 let pub: string | undefined;
-if (fronts.length) { const d = new Date(fronts[0]); if (!isNaN(+d)) pub = d.toUTCString(); }
+if (fronts.length) {
+  const firstDate = fronts[0];
+  if (firstDate) {
+    const d = new Date(firstDate);
+    if (!Number.isNaN(+d)) pub = d.toUTCString();
+  }
+}
 if (!pub) { try { pub = fs.statSync(full).mtime.toUTCString(); } catch {}
 }
 const title = String(data?.title || slug);

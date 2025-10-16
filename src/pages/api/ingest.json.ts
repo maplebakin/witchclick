@@ -11,6 +11,7 @@ import { PostSpecV2Schema, type PostSpecV2 } from '../../lib/postSpecSchema';
 import type { EntityType } from '../../lib/postSpecSchema';
 import { validatePostSpec } from '../../lib/postSpecValidator';
 import { slugify } from '../../../shared/slugify.js';
+import type { ZodIssue } from 'zod';
 
 /* ---------- helpers ---------- */
 
@@ -123,7 +124,7 @@ export async function POST({ request }: { request: Request }) {
 
     const parsed = PostSpecV2Schema.safeParse(normalizedSpec);
     if (!parsed.success) {
-      const schemaErrors = parsed.error.issues.map((issue) => {
+      const schemaErrors = parsed.error.issues.map((issue: ZodIssue) => {
         const path = issue.path.join('.') || 'root';
         return `${path}: ${issue.message}`;
       });
@@ -164,6 +165,21 @@ export async function POST({ request }: { request: Request }) {
     // Frontmatter
     const downloadId = spec.cta?.type === 'download' ? spec.cta.id ?? '' : undefined;
 
+    const outlineHeadings = spec.outline.map(
+      (outlineItem: PostSpecV2["outline"][number]) => outlineItem.heading,
+    );
+    const affiliateAnchors = (spec.affiliateHints || []).map(
+      (hint: PostSpecV2["affiliateHints"][number]) => ({
+        key: hint.key,
+        text: hint.anchor,
+        insertedCount: 0,
+      }),
+    );
+    const internalLinkHints = (spec.internalLinkHints || [])
+      .map((hint: PostSpecV2["internalLinkHints"][number]) =>
+        String(hint?.anchor || "").trim(),
+      )
+      .filter((anchor: string) => anchor.length > 0);
     const fm = {
       title: spec.title,
       slug,
@@ -171,17 +187,15 @@ export async function POST({ request }: { request: Request }) {
       metaTitle: spec.title,
       metaDescription: spec.metaDescription,
       tags: spec.tags,
-      outline: spec.outline.map(o=>o.heading),
+      outline: outlineHeadings,
       wordCount: contentWords,
       readingMinutes: readingMinutes(contentWords),
       entities: spec.entities || [],
       includeAds: !!(spec.adPlacements && spec.adPlacements.length),
       includeKofi: normalizeCta(spec.cta).type === 'kofi',
       downloadId,
-      affiliateAnchors: (spec.affiliateHints||[]).map(h=>({ key:h.key, text:h.anchor, insertedCount:0 })),
-      internalLinkHints: (spec.internalLinkHints||[])
-        .map(h => String(h?.anchor || '').trim())
-        .filter(anchor => anchor.length > 0),
+      affiliateAnchors,
+      internalLinkHints,
       internalLinks: [],
       publishedAt: new Date().toISOString(),
       canonicalUrl: `${String(settings.siteUrl||'').replace(/\/$/,'')}/post/${slug}`,
@@ -190,8 +204,10 @@ export async function POST({ request }: { request: Request }) {
 
     ensureEntityStubs(fm.entities);
 
-    const body = (spec.sections||[])
-      .map(s => `## ${s.heading}\n\n${String(s.markdown||'').trim()}\n`)
+    const body = (spec.sections || [])
+      .map((section: PostSpecV2["sections"][number]) =>
+        `## ${section.heading}\n\n${String(section.markdown || '').trim()}\n`,
+      )
       .join('\n');
 
     const file = `---\n${toFrontmatterYAML(fm)}\n---\n\n${body}\n`;

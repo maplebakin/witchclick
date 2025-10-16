@@ -41,7 +41,9 @@ describe('loadAllCurses', () => {
 
     const curses = loadAllCurses();
     expect(curses.length).toBe(1);
-    expect(curses[0].slug).toBe('mirror-truth');
-    expect(curses[0].sections.length).toBeGreaterThan(0);
+    const firstCurse = curses[0];
+    expect(firstCurse).toBeDefined();
+    expect(firstCurse?.slug).toBe('mirror-truth');
+    expect(firstCurse?.sections.length ?? 0).toBeGreaterThan(0);
   });
 });

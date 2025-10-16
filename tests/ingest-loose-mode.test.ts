@@ -6,7 +6,23 @@ import { validatePostSpec } from '../server/lib/postSpecValidator.js';
 import { prepareSpecForPersistence } from '../server/lib/specPreparation.js';
 import { createPostSpec } from './postSpecTestUtils';
 
-function createBase() {
+type LooseInput = {
+  name?: string;
+  title?: string;
+  summary?: string;
+  metaDescription?: string;
+  tags: string[];
+  sections: Array<{
+    heading: string;
+    body?: string;
+    markdown?: string;
+    content?: string;
+  }>;
+  outline: Array<{ title: string }>;
+  internalLinkHints?: Array<{ anchor: string; rationale: string }>;
+};
+
+function createBase(): LooseInput {
   return {
     name: 'Cozy Focus Ritual',
     summary: 'A gentle ritual to regain focus.',

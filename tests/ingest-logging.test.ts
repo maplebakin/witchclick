@@ -30,17 +30,19 @@ describe("ingest logging", () => {
     const { ingestFromSpec } = await import("../scripts/ingest.mjs");
 
     const spec = createPostSpec({ title: "Loggable Post", slug: "loggable-post" });
-    await ingestFromSpec(spec, { logger: (event) => events.push(event) });
+    await ingestFromSpec(spec, { logger: (event: Record<string, unknown>) => events.push(event) });
 
     expect(events).toHaveLength(1);
-    expect(events[0]).toMatchObject({
+    const firstEvent = events[0];
+    expect(firstEvent).toBeDefined();
+    expect(firstEvent).toMatchObject({
       event: "ingest.post",
       slug: "loggable-post",
       validationStatus: "passed",
       dryRun: false,
     });
-    expect(typeof events[0].timestamp).toBe("string");
-    expect(typeof events[0].bytesWritten).toBe("number");
+    expect(typeof firstEvent?.timestamp).toBe("string");
+    expect(typeof firstEvent?.bytesWritten).toBe("number");
   });
 
   it("records failed validation attempts and propagates the error", async () => {
@@ -48,15 +50,19 @@ describe("ingest logging", () => {
     const { ingestFromSpec, IngestValidationError } = await import("../scripts/ingest.mjs");
 
     const invalidSpec = createPostSpec({ sections: [] });
-    await expect(ingestFromSpec(invalidSpec, { logger: (event) => events.push(event) })).rejects.toBeInstanceOf(
+    await expect(
+      ingestFromSpec(invalidSpec, { logger: (event: Record<string, unknown>) => events.push(event) }),
+    ).rejects.toBeInstanceOf(
       IngestValidationError,
     );
 
     expect(events).toHaveLength(1);
-    expect(events[0]).toMatchObject({
+    const failedEvent = events[0];
+    expect(failedEvent).toBeDefined();
+    expect(failedEvent).toMatchObject({
       event: "ingest.post",
       validationStatus: "failed",
     });
-    expect(Array.isArray(events[0].errors)).toBe(true);
+    expect(Array.isArray(failedEvent?.errors)).toBe(true);
   });
 });

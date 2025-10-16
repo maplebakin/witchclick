@@ -96,13 +96,17 @@ function parseSteps(steps: RawRitualFrontmatter["steps"], body: string): RitualL
         const title = normalizeText(step.title);
         const description = normalizeText(step.description);
         if (!title && !description) return null;
-        return {
+        const normalized: RitualLabStep = {
           title,
           description,
-          duration: normalizeText(step.duration) || undefined,
-        } satisfies RitualLabStep;
+        };
+        const duration = normalizeText(step.duration);
+        if (duration) {
+          normalized.duration = duration;
+        }
+        return normalized;
       })
-      .filter((step): step is RitualLabStep => Boolean(step && (step.title || step.description)));
+      .filter((step): step is RitualLabStep => step !== null);
   }
 
   // Fallback: derive steps from markdown body bullet lists separated by blank lines.
@@ -148,7 +152,7 @@ export function loadRitualLabEntries(): RitualLabEntry[] {
         normalizeText(labMeta.summary) || normalizeText(data.summary) || normalizeText(data.excerpt);
       const steps = parseSteps(data.steps, parsed.content ?? "");
 
-      return {
+      const entry: RitualLabEntry = {
         slug,
         title,
         summary: summary || undefined,
@@ -158,9 +162,10 @@ export function loadRitualLabEntries(): RitualLabEntry[] {
         durationMinutes,
         materials: materials.length > 0 ? materials : undefined,
         steps,
-      } satisfies RitualLabEntry;
+      };
+      return entry;
     })
-    .filter((entry): entry is RitualLabEntry => Boolean(entry));
+    .filter((entry): entry is RitualLabEntry => entry !== null);
 }
 
 export interface RitualLabRequest {

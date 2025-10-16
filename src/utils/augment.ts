@@ -91,10 +91,11 @@ function deriveTldr(
 
   if (!candidate) {
     const sentences = splitIntoSentences(stripMarkdown(body));
-    if (sentences.length === 0) return undefined;
-    candidate = sentences[0];
-    if (candidate.length < 120 && sentences[1]) {
-      candidate = `${candidate} ${sentences[1]}`.trim();
+    const [firstSentence, secondSentence] = sentences;
+    if (!firstSentence) return undefined;
+    candidate = firstSentence;
+    if (candidate.length < 120 && secondSentence) {
+      candidate = `${candidate} ${secondSentence}`.trim();
     }
   }
 
