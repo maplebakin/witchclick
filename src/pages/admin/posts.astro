@@ -1,0 +1,130 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readSettings, getSiteOrigin } from "../../utils/settings";
+import adminPostEditorScript from "../../scripts/adminPostEditor.ts?url";
+
+export const prerender = false;
+
+const settings = readSettings();
+const site = getSiteOrigin(settings) || "https://example.com";
+
+const isDev = import.meta.env.DEV;
+const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
+const url = new URL(Astro.request.url);
+const keyOk = ADMIN_KEY && url.searchParams.get('key') === ADMIN_KEY;
+const canUse = isDev || !!keyOk;
+
+const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+---
+<Base
+  title="WitchClick — Post Editor"
+  description="Edit, rename, or retire existing posts."
+  canon={`${site}/admin/posts`}
+  wide={true}
+  noindex={true}
+>
+  <Fragment slot="head">
+    <meta name="robots" content="noindex" />
+  </Fragment>
+
+  {canUse ? (
+    <div data-post-editor data-dev-api={DEV_API} class="space-y-6">
+      <header class="rounded-2xl border border-line-subtle bg-surface-muted px-4 py-3 text-sm text-primary">
+        <h1 class="text-lg font-semibold">Post Editor Dashboard</h1>
+        <p class="mt-1 text-body-muted">
+          Select an existing post to update frontmatter, tweak markdown, or remove it entirely. Changes save directly to the
+          Markdown files under <code>content/posts</code>.
+        </p>
+      </header>
+
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        <aside class="lg:col-span-4 space-y-4 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
+          <div class="flex items-center justify-between gap-3">
+            <label class="flex-1 text-xs font-medium" for="postSearch">Search posts</label>
+            <button
+              type="button"
+              data-refresh
+              class="rounded-lg border border-line-neutral px-3 py-1 text-xs font-medium hover:bg-surface-soft"
+            >
+              Refresh
+            </button>
+          </div>
+          <input
+            id="postSearch"
+            type="search"
+            placeholder="Start typing title or slug…"
+            data-search
+            class="w-full rounded-lg border border-line-subtle px-3 py-2 text-sm"
+          />
+          <p data-list-status class="text-xs text-body-muted">Loading…</p>
+          <select
+            data-post-list
+            size="14"
+            class="h-[28rem] w-full rounded-xl border border-line-subtle bg-surface-muted px-3 py-2 text-left text-sm font-medium text-primary focus:outline-none focus:ring-2 focus:ring-surface-accent"
+          ></select>
+        </aside>
+
+        <section class="lg:col-span-8 space-y-4 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 class="text-xl font-semibold">Editor</h2>
+              <p data-meta class="text-xs text-body-muted">Select a post to view its metadata.</p>
+            </div>
+            <button
+              type="button"
+              data-delete
+              class="rounded-lg border border-line-danger px-3 py-2 text-sm font-medium text-danger hover:bg-surface-danger"
+              disabled
+            >
+              Delete post
+            </button>
+          </div>
+
+          <div class="space-y-3">
+            <label class="block">
+              <span class="text-xs font-medium">Frontmatter (YAML)</span>
+              <textarea
+                data-frontmatter
+                class="mt-1 h-48 w-full rounded-lg border border-line-subtle px-3 py-2 font-mono text-xs"
+                spellcheck="false"
+                disabled
+              ></textarea>
+            </label>
+
+            <label class="block">
+              <span class="text-xs font-medium">Markdown</span>
+              <textarea
+                data-markdown
+                class="mt-1 h-[28rem] w-full rounded-lg border border-line-subtle px-3 py-2 font-mono text-sm"
+                spellcheck="false"
+                disabled
+              ></textarea>
+            </label>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              data-save
+              class="rounded-lg bg-surface-accent-bolder px-4 py-2 text-sm font-semibold text-inverse hover:bg-surface-accent-deep disabled:opacity-50"
+              disabled
+            >
+              Save changes
+            </button>
+            <div data-status class="text-sm text-body-muted"></div>
+          </div>
+
+          <ul data-warnings class="hidden list-disc space-y-1 rounded-lg border border-warning bg-warning/10 px-3 py-2 text-xs text-warning"></ul>
+        </section>
+      </div>
+    </div>
+  ) : (
+    <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
+      <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
+      <p class="text-body-muted">These tools only run in <strong>development</strong> (or with a temporary key on a server adapter).</p>
+      <p class="mt-3 text-sm text-body-muted">Use the ingestion CLI instead: <code>npm run ingest ./path/to/post.json</code></p>
+    </section>
+  )}
+
+  {canUse && <script type="module" src={adminPostEditorScript}></script>}
+</Base>

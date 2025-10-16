@@ -200,6 +200,151 @@ function findPostFileBySlug(slug) {
   return null;
 }
 
+async function loadPostForEditor(slug) {
+  if (!isValidSlug(slug)) {
+    throw new Error('Invalid slug');
+  }
+  const found = findPostFileBySlug(slug);
+  if (!found) {
+    const err = new Error('Post not found');
+    err.code = 'NOT_FOUND';
+    throw err;
+  }
+  const relativePath = path.relative(CWD, found.file).replace(/\\/g, '/');
+  const newline = /\r\n/.test(found.raw || '') ? '\r\n' : '\n';
+  const frontmatter = Array.isArray(found.lines) ? found.lines.join('\n') : '';
+  const markdown = typeof found.rest === 'string' ? found.rest.replace(/\r\n?/g, '\n') : '';
+  let stats = null;
+  try {
+    stats = await fsp.stat(found.file);
+  } catch {
+    stats = null;
+  }
+  return {
+    slug,
+    title: frontmatterString(found.data, 'title') || slug,
+    frontmatter,
+    markdown,
+    path: relativePath,
+    newline,
+    updatedAt: stats?.mtime ? stats.mtime.toISOString() : null,
+  };
+}
+
+async function updatePostFromEditor(payload) {
+  const originalSlug = slugify(String(payload?.originalSlug || ''));
+  if (!originalSlug) {
+    throw new Error('originalSlug is required');
+  }
+
+  const found = findPostFileBySlug(originalSlug);
+  if (!found) {
+    const err = new Error('Post not found');
+    err.code = 'NOT_FOUND';
+    throw err;
+  }
+
+  const newline = /\r\n/.test(found.raw || '') ? '\r\n' : '\n';
+  const frontmatterInput = typeof payload.frontmatter === 'string' ? payload.frontmatter : '';
+  const markdownInput = typeof payload.markdown === 'string' ? payload.markdown : '';
+
+  const frontmatterNormalized = frontmatterInput.replace(/\r\n?/g, '\n').trimEnd();
+  const markdownNormalized = markdownInput.replace(/\r\n?/g, '\n');
+
+  let parsed;
+  try {
+    parsed = parseFrontmatter(`---\n${frontmatterNormalized}\n---\n${markdownNormalized}`);
+  } catch (err) {
+    const error = new Error(`Frontmatter parse failed: ${err?.message || String(err)}`);
+    error.code = 'PARSE_ERROR';
+    throw error;
+  }
+
+  const rawSlug = frontmatterString(parsed.data, 'slug');
+  const normalizedSlug = slugify(rawSlug);
+  if (!normalizedSlug) {
+    throw new Error('Frontmatter slug is required');
+  }
+  if (!isValidSlug(normalizedSlug)) {
+    throw new Error(`Frontmatter slug is invalid: ${normalizedSlug}`);
+  }
+
+  const slugWarnings = [];
+  if (rawSlug !== normalizedSlug) {
+    slugWarnings.push(`Slug normalized to ${normalizedSlug}`);
+  }
+
+  const directories = listPostDirsForCollisions();
+  if (normalizedSlug !== originalSlug) {
+    for (const dir of directories) {
+      const candidate = path.join(dir, `${normalizedSlug}.md`);
+      if (fs.existsSync(candidate) && path.resolve(candidate) !== path.resolve(found.file)) {
+        const err = new Error(`Another post already uses the slug "${normalizedSlug}".`);
+        err.code = 'SLUG_CONFLICT';
+        throw err;
+      }
+    }
+  }
+
+  const fmLines = frontmatterNormalized.split('\n');
+  const slugLine = `slug: ${normalizedSlug}`;
+  const slugIndex = fmLines.findIndex((line) => line.trim().toLowerCase().startsWith('slug:'));
+  if (slugIndex === -1) {
+    const titleIndex = fmLines.findIndex((line) => line.trim().toLowerCase().startsWith('title:'));
+    const insertAt = titleIndex === -1 ? 0 : titleIndex + 1;
+    fmLines.splice(insertAt, 0, slugLine);
+  } else {
+    const indent = fmLines[slugIndex].match(/^\s*/)?.[0] || '';
+    fmLines[slugIndex] = `${indent}${slugLine}`;
+  }
+
+  const frontmatterForWrite = fmLines.join('\n').replace(/\s+$/, '');
+  let bodyForWrite = markdownNormalized;
+  if (bodyForWrite && !bodyForWrite.endsWith('\n')) {
+    bodyForWrite += '\n';
+  }
+  const fmBlock = frontmatterForWrite.replace(/\n/g, newline);
+  const bodyBlock = bodyForWrite.replace(/\n/g, newline);
+  const fileContents = `---${newline}${fmBlock ? `${fmBlock}${newline}` : ''}---${newline}${bodyBlock}`;
+
+  const nextSlug = normalizedSlug;
+  let targetFile = found.file;
+  if (nextSlug !== originalSlug) {
+    const nextFile = path.join(path.dirname(found.file), `${nextSlug}.md`);
+    await fsp.writeFile(nextFile, fileContents, 'utf8');
+    await fsp.unlink(found.file);
+    targetFile = nextFile;
+  } else {
+    await fsp.writeFile(found.file, fileContents, 'utf8');
+  }
+
+  const relativePath = path.relative(CWD, targetFile).replace(/\\/g, '/');
+  return {
+    slug: nextSlug,
+    title: frontmatterString(parsed.data, 'title') || nextSlug,
+    path: relativePath,
+    renamed: targetFile !== found.file,
+    warnings: slugWarnings,
+  };
+}
+
+async function deletePostBySlug(slug) {
+  if (!isValidSlug(slug)) {
+    throw new Error('Invalid slug');
+  }
+  const found = findPostFileBySlug(slug);
+  if (!found) {
+    const err = new Error('Post not found');
+    err.code = 'NOT_FOUND';
+    throw err;
+  }
+  await fsp.unlink(found.file);
+  return {
+    slug,
+    path: path.relative(CWD, found.file).replace(/\\/g, '/'),
+  };
+}
+
 function resolvePrimaryPostsDir() {
   const [first] = listPostDirsForCollisions();
   return first || path.join(CWD, 'content', 'posts');
@@ -941,6 +1086,47 @@ const server = http.createServer(async (req, res) => {
         return send(res, 200, { ok: true, items });
       } catch (e) {
         return send(res, 500, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/posts/load') {
+      try {
+        const body = await parseBody(req);
+        const slug = slugify(body?.slug ?? '');
+        if (!slug) {
+          return send(res, 400, { ok: false, error: 'Invalid slug' });
+        }
+        const data = await loadPostForEditor(slug);
+        return send(res, 200, { ok: true, ...data });
+      } catch (e) {
+        const status = e?.code === 'NOT_FOUND' ? 404 : e?.code === 'PARSE_ERROR' ? 400 : 500;
+        return send(res, status, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/posts/update') {
+      try {
+        const body = await parseBody(req);
+        const data = await updatePostFromEditor(body || {});
+        return send(res, 200, { ok: true, ...data });
+      } catch (e) {
+        const status = e?.code === 'NOT_FOUND' ? 404 : e?.code === 'SLUG_CONFLICT' ? 409 : 400;
+        return send(res, status, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/posts/delete') {
+      try {
+        const body = await parseBody(req);
+        const slug = slugify(body?.slug || '');
+        if (!slug) {
+          return send(res, 400, { ok: false, error: 'Invalid slug' });
+        }
+        const data = await deletePostBySlug(slug);
+        return send(res, 200, { ok: true, ...data });
+      } catch (e) {
+        const status = e?.code === 'NOT_FOUND' ? 404 : 400;
+        return send(res, status, { ok: false, error: e?.message || String(e) });
       }
     }
 
