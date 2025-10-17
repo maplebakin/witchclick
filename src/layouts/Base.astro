@@ -79,9 +79,9 @@ const formatFontStack = (value: string | null | undefined, fallback: string) => 
   const trimmed = typeof value === "string" ? value.trim() : "";
   if (!trimmed) return fallback;
   const sanitized = trimmed.replace(/[<>]/g, "");
-  const escaped = sanitized.replace(/["\\]/g, "\\$&");
-  const needsQuotes = /[\s,]/.test(escaped);
-  const primary = needsQuotes ? `"${escaped}"` : escaped;
+  const escaped = sanitized.replace(/["\\]/g, "\\$&").replace(/[\r\n]+/g, " ");
+  const isSimpleIdentifier = /^[A-Za-z0-9_-]+$/.test(escaped);
+  const primary = isSimpleIdentifier ? escaped : `"${escaped}"`;
   return `${primary}, ${fallback}`;
 };
 
