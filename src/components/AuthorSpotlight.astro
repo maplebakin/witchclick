@@ -13,7 +13,8 @@ const { author, class: className, compact = false, linkToProfile = true, postCou
 const authorUrl = `/author/${author.slug}/`;
 const hasLinks = Array.isArray(author.links) && author.links.length > 0;
 ---
-<article class:list={["author-spotlight", compact && "author-spotlight--compact", className]}
+<article
+  class:list={["card-panel", "card-tier-1", "card-panel-soft", "author-spotlight", compact && "author-spotlight--compact", className]}
   data-author-slug={author.slug}
 >
   <div class="author-spotlight__header">
@@ -59,16 +60,17 @@ const hasLinks = Array.isArray(author.links) && author.links.length > 0;
 
 <style>
   .author-spotlight {
-    border-radius: 1.75rem;
-    border: 1px solid color-mix(in srgb, var(--ambient-color, #a855f7) 28%, white 72%);
+    --card-hover-translate: -0.2rem;
+    --card-elevation-base: var(--elevation-tier-1);
+    --card-elevation-hover: var(--elevation-tier-2);
+    border: 1px solid color-mix(in srgb, var(--ambient-color, #a855f7) 32%, var(--card-panel-border, currentColor) 68%);
     background:
-      radial-gradient(circle at top left, color-mix(in srgb, var(--ambient-color, #a855f7) 16%, transparent 84%), transparent),
-      #fffdfc;
+      radial-gradient(circle at top left, color-mix(in srgb, var(--ambient-color, #a855f7) 18%, transparent 82%), transparent),
+      var(--card-panel-surface);
     padding: clamp(1.25rem, 3vw, 1.85rem);
     display: grid;
     gap: 0.75rem;
     color: color-mix(in srgb, var(--ink-body, #1f1a2b) 92%, white 8%);
-    box-shadow: 0 18px 40px rgba(76, 29, 149, 0.09);
   }
 
   .author-spotlight--compact {

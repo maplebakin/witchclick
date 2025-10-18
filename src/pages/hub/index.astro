@@ -117,7 +117,7 @@ const breadcrumbs = [
   <section class="hub-index-grid">
     <div class="hub-index-grid__inner">
       {hubCards.map((hub) => (
-        <article class="hub-card" style={`--hub-accent: ${hub.accent}`}> 
+        <article class="card-panel card-tier-2 card-panel-soft hub-card" style={`--hub-accent: ${hub.accent}`}>
           <div class="hub-card__header">
             <p class="hub-card__eyebrow">{hub.title} hub</p>
             <h2 class="hub-card__title">{hub.title}</h2>
@@ -241,16 +241,23 @@ const breadcrumbs = [
   }
 
   .hub-card {
+    --card-hover-translate: -0.35rem;
+    --card-elevation-base: var(--elevation-tier-2);
+    --card-elevation-hover: var(--elevation-tier-3);
     position: relative;
     display: grid;
     gap: clamp(1rem, 3vw, 1.5rem);
     padding: clamp(1.75rem, 4vw, 2.5rem);
-    border-radius: 2.25rem;
+    border: 1px solid color-mix(in srgb, var(--hub-accent, #a855f7) 28%, var(--card-panel-border, currentColor) 72%);
     background:
-      radial-gradient(circle at top left, color-mix(in srgb, var(--hub-accent, #a855f7) 22%, transparent 78%), transparent),
-      color-mix(in srgb, var(--color-night, #120725) 74%, var(--color-dusk, #271534) 26%);
-    border: 1px solid color-mix(in srgb, var(--hub-accent, #a855f7) 28%, var(--color-ink, #f4f1ff) 72%);
-    box-shadow: 0 24px 38px rgba(12, 5, 23, 0.5);
+      radial-gradient(circle at top left, color-mix(in srgb, var(--hub-accent, #a855f7) 18%, transparent 82%), transparent),
+      var(--card-panel-surface);
+    box-shadow: var(--card-elevation-base, var(--elevation-tier-2));
+  }
+
+  .hub-card:hover,
+  .hub-card:focus-visible {
+    border-color: color-mix(in srgb, var(--hub-accent, #a855f7) 45%, transparent 55%);
   }
 
   .hub-card__header {

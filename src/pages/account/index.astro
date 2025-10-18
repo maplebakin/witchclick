@@ -63,7 +63,7 @@ const shareGift = {
       </header>
       <div class="account-catalog__list" data-catalog-list>
         {ritualEntries.map((ritual) => (
-          <article class="catalog-card" data-slug={ritual.slug}>
+          <article class="card-panel card-tier-1 card-panel-soft catalog-card" data-slug={ritual.slug}>
             <header class="catalog-card__header">
               <h3>{ritual.name}</h3>
               <button type="button" class="catalog-card__save" data-action="save">Add to shelf</button>
@@ -234,7 +234,7 @@ const shareGift = {
 
       for (const ritual of entries) {
         const card = document.createElement("article");
-        card.className = "account-card";
+        card.className = "card-panel card-tier-2 card-panel-soft account-card";
         card.dataset.slug = ritual.slug;
 
         const header = document.createElement("header");
@@ -628,12 +628,16 @@ const shareGift = {
     }
 
     .account-card {
-      border-radius: 1.75rem;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      background: rgba(255, 255, 255, 0.94);
+      --card-hover-translate: -0.2rem;
+      --card-elevation-base: var(--elevation-tier-2);
+      --card-elevation-hover: var(--elevation-tier-3);
       padding: clamp(1.25rem, 3vw, 1.75rem);
       display: grid;
       gap: 1.1rem;
+      border: 1px solid color-mix(in srgb, rgba(148, 163, 184, 0.45) 60%, transparent 40%);
+      background:
+        radial-gradient(circle at top right, color-mix(in srgb, rgba(148, 163, 184, 0.35) 35%, transparent 65%), transparent),
+        var(--card-panel-surface);
     }
 
     .account-card__header {
@@ -667,8 +671,10 @@ const shareGift = {
     }
 
     .account-card__status {
-      border-radius: 1.25rem;
-      background: rgba(236, 233, 254, 0.7);
+      border-radius: calc(var(--card-radius, 1.5rem) - 0.5rem);
+      background:
+        radial-gradient(circle at top left, color-mix(in srgb, rgba(236, 233, 254, 0.7) 60%, transparent 40%), transparent),
+        color-mix(in srgb, rgba(236, 233, 254, 0.85) 70%, transparent 30%);
       padding: 1rem 1.25rem;
       display: grid;
       gap: 0.4rem;
@@ -777,13 +783,22 @@ const shareGift = {
     }
 
     .catalog-card {
-      border-radius: 1.5rem;
-      border: 1px solid rgba(226, 232, 240, 0.8);
-      background: rgba(255, 255, 255, 0.95);
+      --card-hover-translate: -0.25rem;
+      --card-elevation-base: var(--elevation-tier-1);
+      --card-elevation-hover: var(--elevation-tier-2);
+      border: 1px solid color-mix(in srgb, rgba(99, 102, 241, 0.55) 35%, var(--card-panel-border, currentColor) 65%);
+      background:
+        radial-gradient(circle at top right, color-mix(in srgb, rgba(99, 102, 241, 0.35) 25%, transparent 75%), transparent),
+        var(--card-panel-surface);
       padding: 1.2rem 1.4rem;
       display: grid;
       gap: 0.75rem;
-      transition: transform 0.18s ease;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .catalog-card:hover,
+    .catalog-card:focus-visible {
+      border-color: color-mix(in srgb, rgba(99, 102, 241, 0.78) 45%, transparent 55%);
     }
 
     .catalog-card__header {

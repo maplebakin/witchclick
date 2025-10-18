@@ -112,9 +112,13 @@ body {
 :root[data-comfort-theme="dawn"] body {
   color: var(--ink-body, #2c1b3d);
   background:
-    radial-gradient(120% 160% at 50% 0%, rgba(180, 156, 214, 0.16) 0%, transparent 60%),
-    radial-gradient(140% 200% at 10% 20%, rgba(214, 200, 236, 0.32) 0%, transparent 70%),
-    linear-gradient(180deg, var(--color-midnight) 0%, var(--color-night) 100%);
+    radial-gradient(120% 160% at 50% 0%, color-mix(in srgb, var(--card-panel-border-soft) 65%, transparent) 0%, transparent 60%),
+    radial-gradient(140% 200% at 10% 20%, color-mix(in srgb, var(--card-panel-border) 65%, transparent) 0%, transparent 70%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--card-panel-surface) 90%, white 10%) 0%,
+      color-mix(in srgb, var(--card-panel-surface-strong) 92%, white 8%) 100%
+    );
 }
 
 body::before {
@@ -128,7 +132,7 @@ body::before {
 }
 
 :root[data-comfort-theme="dawn"] body::before {
-  background: radial-gradient(80% 80% at 50% 0%, rgba(255, 255, 255, 0.25) 0%, transparent 70%);
+  background: radial-gradient(80% 80% at 50% 0%, color-mix(in srgb, var(--card-panel-border-soft) 55%, white 45%) 0%, transparent 70%);
   mix-blend-mode: normal;
 }
 
