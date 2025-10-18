@@ -193,6 +193,38 @@ a {
     z-index: 1;
   }
 
+  /* Dawn theme overrides for panel and soft-card */
+  :root[data-comfort-theme="dawn"] .panel,
+  :root[data-comfort-theme="dawn"] .soft-card {
+    border-color: rgba(122, 94, 154, 0.28);
+    background:
+      radial-gradient(
+        130% 120% at 18% -12%,
+        color-mix(in srgb, var(--surface-tint, hsl(270 55% 62%)) 12%, transparent) 0%,
+        transparent 72%
+      ),
+      linear-gradient(
+        160deg,
+        rgba(255, 252, 247, 0.92) 0%,
+        rgba(245, 238, 232, 0.95) 100%
+      );
+  }
+
+  :root[data-comfort-theme="dawn"] .soft-card {
+    border-color: rgba(166, 138, 198, 0.25);
+    background:
+      radial-gradient(
+        130% 120% at 18% -12%,
+        color-mix(in srgb, var(--surface-tint, hsl(270 55% 62%)) 8%, transparent) 0%,
+        transparent 72%
+      ),
+      linear-gradient(
+        160deg,
+        rgba(255, 252, 247, 0.88) 0%,
+        rgba(248, 242, 238, 0.92) 100%
+      );
+  }
+
   .wc-section-shell {
     position: relative;
     isolation: isolate;
