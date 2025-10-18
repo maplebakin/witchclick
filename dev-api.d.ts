@@ -43,3 +43,37 @@ export interface AdminPipelineHelpers {
 }
 
 export declare const adminPipelineHelpers: AdminPipelineHelpers;
+
+export interface AdminThemeSettings {
+  primary: string;
+  accent: string;
+  background: string;
+  fontSerif: string;
+  fontScript: string;
+}
+
+export type AdminThemeMode = "midnight" | "dawn";
+
+export interface AdminThemeRecord {
+  slug: string;
+  label: string;
+  mode: AdminThemeMode;
+  settings: AdminThemeSettings;
+}
+
+export interface AdminThemeListing {
+  items: {
+    midnight: AdminThemeRecord[];
+    dawn: AdminThemeRecord[];
+  };
+  active: {
+    midnight: string | null;
+    dawn: string | null;
+  };
+}
+
+export declare function listThemes(): Promise<AdminThemeListing>;
+export declare function saveThemeRecord(payload: Record<string, unknown>): Promise<AdminThemeRecord>;
+export declare function setActiveThemeRecord(
+  payload: Record<string, unknown>,
+): Promise<{ active: AdminThemeListing["active"]; theme: AdminThemeRecord }>;
