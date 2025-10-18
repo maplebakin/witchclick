@@ -63,7 +63,7 @@ const breadcrumbs = [
       {themedSections.map((section) => (
         <a
           href={section.href}
-          class="entity-hub-card group grid gap-6 rounded-2xl border p-6 shadow-sm transition-transform duration-300 ease-out hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--glass-pill-border-active)] focus-visible:ring-offset-2"
+          class="card-panel card-tier-2 card-panel-soft entity-hub-card"
           style={`--entity-card-border: ${section.border}; --entity-card-glow: ${section.glow}; --entity-card-highlight: ${section.highlight}; --entity-card-surface-top: ${section.surfaceTop}; --entity-card-surface-bottom: ${section.surfaceBottom}; --entity-card-heading: ${section.heading}; --entity-card-text: ${section.text}; --entity-card-label: ${section.ribbon}; --entity-card-cta: ${section.cta}; --entity-card-cta-hover: ${section.ctaHover}; --entity-card-icon: ${section.accent}; --entity-card-icon-shadow: ${section.iconShadow};`}
         >
           <div class="entity-card">
@@ -135,6 +135,9 @@ const breadcrumbs = [
   }
 
   .entity-hub-card {
+    --card-hover-translate: -0.4rem;
+    --card-elevation-base: var(--elevation-tier-2);
+    --card-elevation-hover: var(--elevation-tier-3);
     --entity-card-border: rgba(124, 58, 237, 0.28);
     --entity-card-glow: rgba(124, 58, 237, 0.16);
     --entity-card-highlight: #f7f0ff;
@@ -147,6 +150,9 @@ const breadcrumbs = [
     --entity-card-cta-hover: color-mix(in srgb, var(--ink-strong, currentColor) 85%, var(--ambient-color, var(--color-primary)) 15%);
     --entity-card-icon: var(--ambient-color, var(--color-primary));
     --entity-card-icon-shadow: rgba(79, 70, 229, 0.28);
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.25rem);
+    padding: clamp(1.85rem, 4vw, 2.5rem);
     border-color: color-mix(in srgb, var(--entity-card-border) 85%, transparent 15%);
     background:
       radial-gradient(120% 120% at 18% -15%, color-mix(in srgb, var(--entity-card-glow) 85%, transparent) 0%, transparent 70%),
@@ -154,20 +160,22 @@ const breadcrumbs = [
         180deg,
         color-mix(in srgb, var(--entity-card-surface-top) 92%, var(--entity-card-highlight) 8%) 0%,
         color-mix(in srgb, var(--entity-card-surface-bottom) 94%, white 6%) 100%
-      );
+      ),
+      var(--card-panel-surface);
     color: var(--entity-card-text);
-    box-shadow: var(--wc-shadow-soft, 0 20px 45px -25px rgba(15, 23, 42, 0.35));
+    box-shadow: var(--card-elevation-base, var(--elevation-tier-2));
     min-height: 100%;
+    transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
   }
 
   .entity-hub-card:hover,
   .entity-hub-card:focus-visible {
     border-color: color-mix(in srgb, var(--section-border, rgba(124, 58, 237, 0.18)) 92%, transparent 8%);
-    box-shadow: var(--wc-shadow-strong, 0 25px 60px -30px rgba(15, 23, 42, 0.45));
+    box-shadow: var(--card-elevation-hover, var(--elevation-tier-3));
   }
 
   .entity-hub-card:focus-visible {
-    box-shadow: var(--wc-shadow-strong, 0 25px 60px -30px rgba(15, 23, 42, 0.45)), 0 0 0 3px var(--glass-pill-border-active);
+    box-shadow: var(--card-focus-ring, 0 0 0 3px var(--glass-pill-border-active)), var(--card-elevation-hover, var(--elevation-tier-3));
   }
 
   .entity-card {

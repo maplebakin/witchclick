@@ -70,7 +70,7 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url);
     </header>
     <div class="salon-schedule__grid">
       {upcomingSalons.map((salon) => (
-        <article class="salon-card" data-zoom={salon.zoomLink}>
+        <article class="card-panel card-tier-2 card-panel-soft salon-card" data-zoom={salon.zoomLink}>
           <header class="salon-card__header">
             <h3>{salon.title}</h3>
             <p class="salon-card__time">{salon.date} · {salon.time}</p>
@@ -90,7 +90,7 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url);
   </section>
 
   <section class="salon-embeds">
-    <div class="salon-embed">
+    <div class="card-panel card-tier-1 card-panel-soft salon-embed">
       <h2>Zoom quick join</h2>
       <p>Use this embed during live sessions—keep your camera muted until the check-in round begins.</p>
       <div class="salon-embed__frame">
@@ -102,7 +102,7 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url);
         ></iframe>
       </div>
     </div>
-    <div class="salon-embed">
+    <div class="card-panel card-tier-1 card-panel-soft salon-embed">
       <h2>Shared Notion board</h2>
       <p>Live notes, prompts, and playlists land here. Feel free to drop gentle ideas between salons.</p>
       <div class="salon-embed__frame">
@@ -117,7 +117,7 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url);
   </section>
 
   <section class="salon-prep">
-    <div class="salon-prep__card">
+    <div class="card-panel card-tier-1 card-panel-soft salon-prep__card">
       <h2>How to prepare</h2>
       <ul>
         <li><strong>Bring a touchstone:</strong> a candle, crystal, or herb aligned with the salon theme.</li>
@@ -126,7 +126,7 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url);
         <li><strong>Invite a friend:</strong> every referral gifts them the printable sampler linked in your member account.</li>
       </ul>
     </div>
-    <div class="salon-prep__card">
+    <div class="card-panel card-tier-1 card-panel-soft salon-prep__card">
       <h2>Soft commitments</h2>
       <p>
         Salons are a co-created space. Arrive with curiosity, keep cameras optional, and honour consent—ask before coaching
@@ -250,19 +250,25 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url);
     }
 
     .salon-card {
-      border-radius: 1.75rem;
-      border: 1px solid rgba(191, 219, 254, 0.9);
-      background: rgba(255, 255, 255, 0.96);
+      --card-hover-translate: -0.3rem;
+      --card-elevation-base: var(--elevation-tier-1);
+      --card-elevation-hover: var(--elevation-tier-2);
       padding: 1.5rem;
       display: grid;
       gap: 0.9rem;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: 1px solid color-mix(in srgb, rgba(191, 219, 254, 0.9) 55%, transparent 45%);
+      background:
+        radial-gradient(circle at top right, color-mix(in srgb, rgba(191, 219, 254, 0.45) 35%, transparent 65%), transparent),
+        var(--card-panel-surface);
+    }
+
+    .salon-card:focus-within {
+      box-shadow: var(--card-focus-ring, 0 0 0 3px rgba(37, 99, 235, 0.35)), var(--card-elevation-hover, var(--elevation-tier-2));
     }
 
     .salon-card:hover,
-    .salon-card:focus-within {
-      transform: translateY(-3px);
-      box-shadow: 0 20px 40px -30px rgba(37, 99, 235, 0.55);
+    .salon-card:focus-visible {
+      border-color: color-mix(in srgb, rgba(37, 99, 235, 0.45) 65%, transparent 35%);
     }
 
     .salon-card__header h3 {
@@ -327,17 +333,18 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url);
     }
 
     .salon-embed {
-      border-radius: 2rem;
-      border: 1px solid rgba(191, 219, 254, 0.8);
-      background: rgba(255, 255, 255, 0.94);
       padding: clamp(1.5rem, 4vw, 2rem);
       display: grid;
       gap: 1rem;
+      border: 1px solid color-mix(in srgb, rgba(191, 219, 254, 0.8) 55%, transparent 45%);
+      background:
+        radial-gradient(circle at top left, color-mix(in srgb, rgba(191, 219, 254, 0.35) 30%, transparent 70%), transparent),
+        var(--card-panel-surface);
     }
 
     .salon-embed__frame {
       aspect-ratio: 16 / 9;
-      border-radius: 1.5rem;
+      border-radius: calc(var(--card-radius, 1.5rem) - 0.35rem);
       overflow: hidden;
       background: rgba(226, 232, 240, 0.6);
       position: relative;
@@ -362,12 +369,13 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url);
     }
 
     .salon-prep__card {
-      border-radius: 2rem;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      background: rgba(255, 255, 255, 0.95);
       padding: clamp(1.75rem, 4vw, 2.25rem);
       display: grid;
       gap: 0.9rem;
+      border: 1px solid color-mix(in srgb, rgba(148, 163, 184, 0.35) 65%, transparent 35%);
+      background:
+        radial-gradient(circle at top right, color-mix(in srgb, rgba(148, 163, 184, 0.3) 35%, transparent 65%), transparent),
+        var(--card-panel-surface);
     }
 
     .salon-prep__card h2 {

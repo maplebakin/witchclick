@@ -81,7 +81,7 @@ const breadcrumbs = [
     ) : (
       <ul class="grid gap-4 sm:grid-cols-2">
         {allProducts.map((product) => (
-          <li class="tools-card rounded-2xl border border-line-veil/70 bg-surface-base/80 p-4 shadow-sm backdrop-blur dark:border-line-veil-strong/70 dark:bg-surface-veil/70">
+          <li class="card-panel card-tier-1 card-panel-soft tools-card">
             {product.image && (
               <div class="tools-card__media">
                 <img src={product.image} alt={`Preview of ${product.name}`} loading="lazy" />
@@ -115,13 +115,20 @@ const breadcrumbs = [
 
 <style>
   .tools-card {
+    --card-hover-translate: -0.25rem;
+    --card-elevation-base: var(--elevation-tier-1);
+    --card-elevation-hover: var(--elevation-tier-2);
     display: grid;
     gap: 0.75rem;
     min-height: 100%;
+    padding: 1.5rem;
+    background:
+      radial-gradient(circle at top right, color-mix(in srgb, var(--card-panel-border-soft) 55%, transparent) 0%, transparent 75%),
+      var(--card-panel-surface);
   }
 
   .tools-card__media {
-    border-radius: 1.25rem;
+    border-radius: calc(var(--card-radius, 1.5rem) - 0.5rem);
     overflow: hidden;
     border: 1px solid color-mix(in srgb, var(--color-iris) 35%, transparent 65%);
     background: color-mix(in srgb, var(--color-night) 55%, var(--color-ink) 45%);
