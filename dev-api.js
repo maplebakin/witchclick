@@ -1674,4 +1674,7 @@ export {
   prepareSpecForPersistence,
   persistPreparedSpec,
   adminPipelineHelpers,
+  listThemes,
+  saveThemeRecord,
+  setActiveThemeRecord,
 };
