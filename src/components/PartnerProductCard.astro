@@ -30,7 +30,7 @@ const ctaLabel = product.ctaLabel?.trim() || "Visit partner";
     background:
       radial-gradient(circle at top right, rgba(147, 51, 234, 0.18), transparent 60%),
       linear-gradient(145deg, rgba(253, 244, 255, 0.95), rgba(236, 233, 252, 0.98));
-    color: color-mix(in srgb, var(--ink-body, #1f1a2b) 92%, white 8%);
+    color: var(--surface-text-secondary);
     border: 1px solid color-mix(in srgb, rgba(147, 51, 234, 0.35) 45%, white 55%);
     text-decoration: none;
     box-shadow: 0 24px 38px rgba(76, 29, 149, 0.12);
@@ -57,7 +57,7 @@ const ctaLabel = product.ctaLabel?.trim() || "Visit partner";
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.18em;
-    color: color-mix(in srgb, var(--ink-strong, #0f172a) 82%, white 18%);
+    color: var(--surface-text-strong);
     background: color-mix(in srgb, rgba(22, 163, 74, 0.12) 60%, white 40%);
     border: 1px solid rgba(22, 163, 74, 0.25);
   }
@@ -65,25 +65,25 @@ const ctaLabel = product.ctaLabel?.trim() || "Visit partner";
   .partner-product-card__title {
     margin: 0;
     font-size: clamp(1.15rem, 2.5vw, 1.4rem);
-    color: color-mix(in srgb, var(--ink-strong, #111827) 88%, white 12%);
+    color: var(--surface-text-strong);
   }
 
   .partner-product-card__description {
     margin: 0;
     font-size: 0.95rem;
     line-height: 1.6;
-    color: color-mix(in srgb, var(--ink-body, #1f1a2b) 80%, white 20%);
+    color: var(--surface-text-secondary);
   }
 
   .partner-product-card__note {
     margin: 0;
     font-size: 0.85rem;
-    color: color-mix(in srgb, var(--ink-muted, #475569) 82%, white 18%);
+    color: var(--surface-text-muted);
   }
 
   .partner-product-card__cta {
     font-weight: 600;
-    color: color-mix(in srgb, rgba(99, 102, 241, 0.9) 70%, var(--ink-strong, #111827) 30%);
+    color: color-mix(in srgb, var(--ambient-color, #7c3aed) 35%, var(--surface-text-strong) 65%);
     font-size: 0.95rem;
   }
 </style>
