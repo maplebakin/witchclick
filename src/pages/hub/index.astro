@@ -7,7 +7,7 @@ import { readEditorialCalendar } from "@/utils/editorialCalendar";
 import { createCollectionPageSchema } from "@/utils/structuredData";
 import { readSettings } from "@/utils/settings";
 import { getPostBySlug, extractHeroImage } from "@/utils/posts";
-import { Fragment } from "astro/jsx-runtime";
+import HeadSlot from "@/components/HeadSlot.astro";
 
 const HUBS = [
   {
@@ -99,9 +99,9 @@ const breadcrumbs = [
   ambientColor="#7c3aed"
 >
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
-  <Fragment slot="head">
+  <HeadSlot slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-  </Fragment>
+  </HeadSlot>
 
   <section class="hub-index-hero">
     <div class="hub-index-hero__inner">

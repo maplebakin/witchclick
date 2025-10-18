@@ -5,7 +5,7 @@ import Pagination from "../../components/Pagination.astro";
 import { loadAllPosts, paginatePosts, estimateReadingMinutes, firstParagraph, extractHeroImage } from "../../utils/posts";
 import { readSettings } from "../../utils/settings";
 import { createCollectionPageSchema } from "../../utils/structuredData";
-import { Fragment } from "astro/jsx-runtime";
+import HeadSlot from "@/components/HeadSlot.astro";
 
 export const prerender = true;
 
@@ -30,6 +30,8 @@ const { page, totalPages, pagePosts } = Astro.props as {
   pagePosts: ReturnType<typeof loadAllPosts>;
 };
 
+type LoadedPost = ReturnType<typeof loadAllPosts>[number];
+
 const settings = readSettings();
 const pageUrl = page > 1 ? `/page/${page}` : "/";
 const pageItemList = createCollectionPageSchema(
@@ -50,7 +52,7 @@ const pageItemList = createCollectionPageSchema(
   }),
 );
 
-function toCard(post) {
+function toCard(post: LoadedPost) {
   const fm = post.data ?? {};
   const hero = extractHeroImage(fm);
   const heroSrc = typeof hero.src === "string" && hero.src.trim() ? hero.src.trim() : undefined;
@@ -83,9 +85,9 @@ function toCard(post) {
 }
 ---
 <Base title={`WitchClick — Page ${page}`}>
-  <Fragment slot="head">
+  <HeadSlot slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(pageItemList)} />
-  </Fragment>
+  </HeadSlot>
 
   <section class="archive-section wc-section-shell">
     <h1 class="archive-title">Latest posts — page {page}</h1>

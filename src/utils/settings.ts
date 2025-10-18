@@ -19,6 +19,7 @@ export interface AdsSettings {
   slots?: Record<string, string>;
   sidebarSlotId?: string;
   endSlotId?: string;
+  leadSlotId?: string;
 }
 
 export type ObservabilityEnvironment = "production" | "staging" | "development";
@@ -382,6 +383,10 @@ function sanitizeAds(value: unknown, errors: string[]): AdsSettings | undefined 
   if ("endSlotId" in data) {
     const end = expectString(data.endSlotId, "ads.endSlotId", errors, { allowEmpty: true });
     if (end !== undefined) ads.endSlotId = end;
+  }
+  if ("leadSlotId" in data) {
+    const lead = expectString(data.leadSlotId, "ads.leadSlotId", errors, { allowEmpty: true });
+    if (lead !== undefined) ads.leadSlotId = lead;
   }
   if ("slots" in data) {
     const slotsValue = data.slots;

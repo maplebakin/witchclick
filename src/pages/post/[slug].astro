@@ -11,7 +11,7 @@ import CommentsSection from "../../components/CommentsSection.astro";
 import AuthorSpotlight from "../../components/AuthorSpotlight.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { readEntity } from "../../utils/entities";
-import { Fragment } from "astro/jsx-runtime";
+import HeadSlot from "@/components/HeadSlot.astro";
 import SpoonsBadge from "../../components/SpoonsBadge.astro";
 
 import fs from "node:fs";
@@ -37,40 +37,26 @@ const DOMPurify = createDOMPurify(dom.window);
 export const prerender = true;
 
 type PostData = Record<string, any>;
-type PrevNext = { slug: string; title: string } | null;
 
 export async function getStaticPaths() {
   const posts = loadAllPosts();
 
-  return posts.map((post, index) => {
-    const prev = posts[index - 1]
-      ? { slug: posts[index - 1].slug, title: posts[index - 1].title }
-      : null;
-    const next = posts[index + 1]
-      ? { slug: posts[index + 1].slug, title: posts[index + 1].title }
-      : null;
-
-    return {
-      params: { slug: post.slug },
-      props: {
-        data: post.data,
-        content: post.content,
-        effectiveSlug: post.slug,
-        prev,
-        next,
-        tldr: post.tldr,
-        spoons: post.spoons,
-      },
-    };
-  });
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: {
+      data: post.data,
+      content: post.content,
+      effectiveSlug: post.slug,
+      tldr: post.tldr,
+      spoons: post.spoons,
+    },
+  }));
 }
 
 const {
   data = {} as PostData,
   content = "",
   effectiveSlug = Astro.params.slug as string,
-  prev = null as PrevNext,
-  next = null as PrevNext,
   tldr: injectedTldr,
   spoons: injectedSpoons,
 } = Astro.props;
@@ -232,11 +218,34 @@ const pageAuthors: PageAuthor[] = authorSlugs
     return { slug, name: label, profile } satisfies PageAuthor;
   });
 
-const authorLinks = pageAuthors.map((author) => ({
+interface AuthorLinkEntry {
+  href: string | null;
+  label: string;
+  slug: string;
+}
+
+type AuthorSeparator = "ampersand" | "comma" | "commaAmpersand" | null;
+
+const authorLinks: AuthorLinkEntry[] = pageAuthors.map((author) => ({
   href: author.profile ? `/author/${author.profile.slug}/` : null,
   label: author.name,
   slug: author.slug,
 }));
+
+const authorSegments = authorLinks.map((author, index) => {
+  let separator: AuthorSeparator = null;
+  if (index > 0) {
+    const isLast = index === authorLinks.length - 1;
+    if (authorLinks.length === 2) {
+      separator = "ampersand";
+    } else if (isLast) {
+      separator = "commaAmpersand";
+    } else {
+      separator = "comma";
+    }
+  }
+  return { ...author, separator };
+});
 
 const authorsWithProfiles = pageAuthors
   .map((author) => author.profile)
@@ -320,7 +329,7 @@ const jsonLd = {
 ---
 
 <Base title={title} description={description} canon={canonical} wide={true} ogImage={ogImage}>
-  <Fragment slot="head">
+  <HeadSlot slot="head">
     <meta property="og:type" content="article" />
     {publishedAt && (
       <meta property="article:published_time" content={new Date(publishedAt).toISOString()} />
@@ -329,7 +338,7 @@ const jsonLd = {
       <meta property="article:modified_time" content={new Date(modifiedAt).toISOString()} />
     )}
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-  </Fragment>
+  </HeadSlot>
 
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
 
@@ -367,19 +376,16 @@ const jsonLd = {
                   {title}
                 </h1>
 
-                {authorLinks.length > 0 && (
+                {authorSegments.length > 0 && (
                   <p class="flex flex-wrap items-center gap-y-2 text-sm text-inverse-soft">
                     By
-                    {authorLinks.map((author, index) => (
-                      <Fragment key={author.slug || author.label}>
-                        {index > 0 &&
-                          (authorLinks.length === 2 ? (
-                            <span class="px-1 text-inverse-muted">&amp;</span>
-                          ) : index === authorLinks.length - 1 ? (
-                            <span class="px-1 text-inverse-muted">,&nbsp;&amp;&nbsp;</span>
-                          ) : (
-                            <span class="px-1 text-inverse-muted">,</span>
-                          ))}
+                    {authorSegments.map((author) => (
+                      <span class="inline-flex items-center">
+                        {author.separator === "comma" && <span class="px-1 text-inverse-muted">,</span>}
+                        {author.separator === "ampersand" && <span class="px-1 text-inverse-muted">&amp;</span>}
+                        {author.separator === "commaAmpersand" && (
+                          <span class="px-1 text-inverse-muted">,&nbsp;&amp;&nbsp;</span>
+                        )}
                         {author.href ? (
                           <a
                             class="font-semibold text-inverse transition-colors hover:text-accent-soft focus-visible:text-accent-soft"
@@ -390,7 +396,7 @@ const jsonLd = {
                         ) : (
                           <span class="font-semibold text-inverse">{author.label}</span>
                         )}
-                      </Fragment>
+                      </span>
                     ))}
                   </p>
                 )}
@@ -445,7 +451,7 @@ const jsonLd = {
                 </h2>
                 <div class="mt-4 grid gap-4 sm:grid-cols-2">
                   {authorsWithProfiles.map((author) => (
-                    <AuthorSpotlight author={author} compact={true} key={author.slug} />
+                    <AuthorSpotlight author={author} compact={true} />
                   ))}
                 </div>
               </section>
@@ -464,7 +470,7 @@ const jsonLd = {
                 <h2 class="text-xs font-semibold uppercase tracking-[0.32em] text-inverse">Referenced entities</h2>
                 <ul class="space-y-4 text-sm text-inverse-soft">
                   {resolvedEntities.map((entity: any) => (
-                    <li key={entity.href}>
+                      <li>
                       <a
                         class="font-semibold text-accent-soft transition-colors hover:text-accent focus-visible:text-accent"
                         href={entity.href}
@@ -484,7 +490,7 @@ const jsonLd = {
       </div>
 
       <div class="panel flex flex-col gap-6 p-6 text-inverse sm:p-8 lg:p-10">
-        <RelatedPosts currentSlug={effectiveSlug} tags={data.tags || []} prev={prev} next={next} />
+        <RelatedPosts currentSlug={effectiveSlug} tags={Array.isArray(data.tags) ? data.tags : []} />
       </div>
 
       <div class="panel flex flex-col gap-6 p-6 text-inverse sm:p-8 lg:p-10">

@@ -4,7 +4,7 @@ import PostCard from "../../components/PostCard.astro";
 import { loadAllPosts, estimateReadingMinutes, firstParagraph, extractHeroImage } from "../../utils/posts";
 import { readSettings } from "../../utils/settings";
 import { createCollectionPageSchema } from "../../utils/structuredData";
-import { Fragment } from "astro/jsx-runtime";
+import HeadSlot from "@/components/HeadSlot.astro";
 
 export const prerender = true;
 
@@ -89,9 +89,9 @@ const collectionSchema = createCollectionPageSchema(
 );
 ---
 <Base title={`Tag: ${tag} — WitchClick`}>
-  <Fragment slot="head">
+  <HeadSlot slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(collectionSchema)} />
-  </Fragment>
+  </HeadSlot>
 
   <h1 class="mb-6">Tag: {tag}</h1>
   {cards.length === 0 ? (

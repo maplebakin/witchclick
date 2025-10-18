@@ -1,6 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
+import HeadSlot from "@/components/HeadSlot.astro";
 
 export const prerender = false;
 
@@ -22,9 +23,9 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
   wide={true}
   noindex={true}
 >
-  <Fragment slot="head">
+  <HeadSlot slot="head">
     <meta name="robots" content="noindex" />
-  </Fragment>
+  </HeadSlot>
 
   {canUse ? (
     <section

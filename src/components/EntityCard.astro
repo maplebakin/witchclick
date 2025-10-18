@@ -84,7 +84,8 @@ const typeLabel =
   variant === "grimoire"
     ? type
         .split(/[-_\s]+/)
-        .map((part) => (part ? part[0].toUpperCase() + part.slice(1) : ""))
+        .filter((part): part is string => Boolean(part && part.trim()))
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
         .join(" ")
     : type;
 ---

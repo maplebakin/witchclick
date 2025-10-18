@@ -1,43 +1,67 @@
 ---
-import fs from 'node:fs';
-import path from 'node:path';
-import matter from 'gray-matter';
-import PostCard from './PostCard.astro';
-
+import fs from "node:fs";
+import path from "node:path";
+import matter from "gray-matter";
+import PostCard from "./PostCard.astro";
 
 interface Props {
-currentSlug: string; // e.g. 'tea-ritual-for-focus'
-tags?: string[]; // current post's tags
-limit?: number; // default 3
+  currentSlug: string;
+  tags?: string[];
+  limit?: number;
 }
+
+interface PostSummary {
+  slug: string;
+  data: Record<string, unknown>;
+  date: Date;
+  tagSet: Set<string>;
+}
+
 const { currentSlug, tags = [], limit = 3 } = Astro.props as Props;
 
+const postsDir = path.join(process.cwd(), "content", "posts");
+const files = fs.existsSync(postsDir)
+  ? fs.readdirSync(postsDir).filter((file) => file.endsWith(".md"))
+  : [];
 
-const postsDir = path.join(process.cwd(), 'content', 'posts');
-const files = fs.existsSync(postsDir) ? fs.readdirSync(postsDir).filter(f => f.endsWith('.md')) : [];
+const sanitizedTags = tags
+  .map((tag) => (typeof tag === "string" ? tag.trim().toLowerCase() : ""))
+  .filter((tag): tag is string => Boolean(tag));
 
+const all: PostSummary[] = files
+  .map((file) => {
+    const raw = fs.readFileSync(path.join(postsDir, file), "utf8");
+    const { data } = matter(raw);
+    const slugSource = typeof data?.slug === "string" ? data.slug : file.replace(/\.md$/, "");
+    const slug = slugSource.trim().toLowerCase();
+    const timestamp = data?.publishedAt || data?.pubDate || data?.date;
+    const date = new Date(typeof timestamp === "string" || typeof timestamp === "number" ? timestamp : 0);
+    const tagValues = Array.isArray(data?.tags) ? data.tags : [];
+    const tagSet = new Set(
+      tagValues
+        .map((value) => (typeof value === "string" ? value.trim().toLowerCase() : ""))
+        .filter((value): value is string => Boolean(value)),
+    );
 
-const all = files.map(file => {
-const raw = fs.readFileSync(path.join(postsDir, file), 'utf8');
-const { data } = matter(raw);
-const slug = (data?.slug ? String(data.slug) : file.replace(/\.md$/, '')).toLowerCase();
-const date = new Date(data?.publishedAt || data?.pubDate || data?.date || 0);
-const tagSet = new Set((Array.isArray(data?.tags) ? data.tags : []).map((t:any)=>String(t).toLowerCase()));
-return { slug, data, date, tagSet };
-}).filter(p => p.slug !== currentSlug);
+    return { slug, data, date, tagSet } satisfies PostSummary;
+  })
+  .filter((post) => post.slug !== currentSlug.toLowerCase());
 
+const score = (post: PostSummary) => {
+  let result = 0;
+  for (const tag of sanitizedTags) {
+    if (post.tagSet.has(tag)) {
+      result += 1;
+    }
+  }
+  return result;
+};
 
-// score by shared tags (desc), then by date (newest first)
-function score(post){
-let s = 0;
-for (const t of tags.map(x=>String(x).toLowerCase())) if (post.tagSet.has(t)) s++;
-return s;
-}
 const ranked = all
-.map(p => ({ ...p, _score: score(p) }))
-.filter(p => p._score > 0)
-.sort((a,b) => b._score - a._score || (+b.date - +a.date))
-.slice(0, limit);
+  .map((post) => ({ ...post, _score: score(post) }))
+  .filter((post) => post._score > 0)
+  .sort((a, b) => b._score - a._score || b.date.getTime() - a.date.getTime())
+  .slice(0, limit);
 ---
 {ranked.length > 0 ? (
 <section class="mt-12">

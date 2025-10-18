@@ -23,91 +23,121 @@ const resultsId = `${uid}-results`;
   ></div>
 </div>
 
-<script>
+<script type="module" is:inline>
 (() => {
   const root = document.currentScript?.previousElementSibling?.closest('[data-search]');
-  if (!root) return;
+  if (!(root instanceof HTMLElement)) return;
 
-  const input = root.querySelector('input');
+  const input = root.querySelector('input[type="search"]');
   const results = root.querySelector('[data-results]');
   if (!input || !results) return;
 
+  /** @type {HTMLInputElement} */
+  const searchInput = input;
+  /** @type {HTMLDivElement} */
+  const resultsList = results;
+
+  /** @type {Array<{ slug: string; title: string; excerpt?: string; tags?: string[] }>} */
   let data = [];
   let loaded = false;
 
-  async function ensure(){
+  const ensure = async () => {
     if (loaded) return;
     try {
-      const r = await fetch('/search.json', { cache: 'no-store' });
-      data = await r.json();
+      const response = await fetch('/search.json', { cache: 'no-store' });
+      const payload = await response.json();
+      data = Array.isArray(payload) ? payload : [];
       loaded = true;
     } catch (error) {
       if (typeof console !== 'undefined') {
         console.warn('[search] Failed to load search index', error);
       }
     }
-  }
+  };
 
-  function escapeHtml(value){
-    return String(value).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
+  /**
+   * @param {unknown} value
+   * @returns {string}
+   */
+  const escapeHtml = (value) =>
+    String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
 
-  function render(items){
-    if (!items.length){
-      results.classList.add('hidden');
-      results.innerHTML = '';
-      input.setAttribute('aria-expanded', 'false');
+  /**
+   * @param {Array<{ slug: string; title: string; excerpt?: string; tags?: string[] }>} items
+   */
+  const render = (items) => {
+    if (items.length === 0) {
+      resultsList.classList.add('hidden');
+      resultsList.innerHTML = '';
+      searchInput.setAttribute('aria-expanded', 'false');
       return;
     }
 
-    input.setAttribute('aria-expanded', 'true');
-    results.classList.remove('hidden');
-    results.innerHTML = items.slice(0,8).map(item => `
+    searchInput.setAttribute('aria-expanded', 'true');
+    resultsList.classList.remove('hidden');
+    resultsList.innerHTML = items
+      .slice(0, 8)
+      .map((item) => {
+        const excerpt = typeof item.excerpt === 'string' ? item.excerpt : '';
+        return `
       <a class="search-result" href="/post/${escapeHtml(item.slug)}" role="option">
         <div class="search-result__title">${escapeHtml(item.title)}</div>
-        ${item.excerpt ? `<div class=\"search-result__excerpt\">${escapeHtml(item.excerpt)}</div>` : ''}
-      </a>
-    `).join('');
-  }
+        ${excerpt ? `<div class=\"search-result__excerpt\">${escapeHtml(excerpt)}</div>` : ''}
+      </a>`;
+      })
+      .join('');
+  };
 
-  async function handleSearch(){
-    const query = input.value.trim().toLowerCase();
-    if (!query){
+  const handleSearch = async () => {
+    const query = searchInput.value.trim().toLowerCase();
+    if (!query) {
       render([]);
       return;
     }
 
-    input.setAttribute('aria-busy', 'true');
+    searchInput.setAttribute('aria-busy', 'true');
     await ensure();
-    input.removeAttribute('aria-busy');
+    searchInput.removeAttribute('aria-busy');
 
-    const items = data.filter(item => {
-      const hay = `${item.title} ${item.excerpt} ${(item.tags||[]).join(' ')}`.toLowerCase();
-      return hay.includes(query);
+    const items = data.filter((item) => {
+      const tags = Array.isArray(item.tags) ? item.tags : [];
+      const haystack = `${item.title} ${item.excerpt ?? ''} ${tags.join(' ')}`.toLowerCase();
+      return haystack.includes(query);
     });
 
     render(items);
-  }
+  };
 
+  /** @type {number | undefined} */
   let timerId;
 
-  input.addEventListener('input', () => {
-    if (timerId) {
+  searchInput.addEventListener('input', () => {
+    if (timerId !== undefined) {
       window.clearTimeout(timerId);
     }
     timerId = window.setTimeout(handleSearch, 120);
   });
 
-  input.addEventListener('focus', async () => {
-    if (input.value.trim()) {
+  searchInput.addEventListener('focus', async () => {
+    if (searchInput.value.trim()) {
       await handleSearch();
     }
   });
 
   document.addEventListener('click', (event) => {
-    if (!results.contains(event.target) && event.target !== input) {
-      results.classList.add('hidden');
-      input.setAttribute('aria-expanded', 'false');
+    const target = event.target;
+    if (!(target instanceof Node)) {
+      return;
+    }
+
+    if (!resultsList.contains(target) && target !== searchInput) {
+      resultsList.classList.add('hidden');
+      searchInput.setAttribute('aria-expanded', 'false');
     }
   });
 })();

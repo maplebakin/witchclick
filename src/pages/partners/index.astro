@@ -3,16 +3,29 @@ import Base from "@/layouts/Base.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import PrimaryButton from "@/components/buttons/PrimaryButton.astro";
 import PartnerProductCard from "@/components/PartnerProductCard.astro";
-import { readPartnerBlocks } from "@/utils/partners";
+import { readPartnerBlocks, type PartnerRecord } from "@/utils/partners";
 import { createItemListSchema } from "@/utils/structuredData";
 import { readSettings } from "@/utils/settings";
-import { Fragment } from "astro/jsx-runtime";
+import HeadSlot from "@/components/HeadSlot.astro";
 import { getLastUpdatedMeta } from "@/utils/lastUpdated";
 
 const partnerBlocks = readPartnerBlocks();
 const settings = readSettings();
 
-const communityItems = partnerBlocks.sections.flatMap((section) =>
+type PartnerWithExtras = PartnerRecord & { image?: string };
+
+const normalizePartner = (partner: PartnerRecord): PartnerWithExtras => {
+  const record = partner as PartnerRecord & Record<string, unknown>;
+  const imageValue = typeof record.image === "string" ? record.image : undefined;
+  return { ...partner, image: imageValue } satisfies PartnerWithExtras;
+};
+
+const partnerSections = partnerBlocks.sections.map((section) => ({
+  ...section,
+  partners: section.partners.map(normalizePartner),
+}));
+
+const communityItems = partnerSections.flatMap((section) =>
   section.partners.map((partner) => ({
     name: partner.name,
     url: partner.url,
@@ -44,9 +57,9 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
   ambientColor="#6366f1"
 >
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
-  <Fragment slot="head">
+  <HeadSlot slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-  </Fragment>
+  </HeadSlot>
 
   <section class="partners-hero">
     <div class="partners-hero__inner">
@@ -65,7 +78,7 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
     </div>
   </section>
 
-  {partnerBlocks.sections.map((section) => (
+  {partnerSections.map((section) => (
     <section class="partners-section" id={section.slug}>
       <header class="partners-section__header">
         <h2>{section.title}</h2>

@@ -5,6 +5,7 @@ import { readSettings, getSiteOrigin } from "../../utils/settings";
 import generatorStyles from "../../../server/lib/generatorStyles.js";
 import { generatorPresetOptions } from "../../../server/lib/generatorPresets.js";
 import normalizeDraftSpecScript from "../../scripts/normalizeDraftSpec.ts?url";
+import HeadSlot from "@/components/HeadSlot.astro";
 import {
   CURSE_TARGETS,
   CURSE_TONES,
@@ -67,9 +68,9 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
   wide={true}
   noindex={true}
 >
-  <Fragment slot="head">
+  <HeadSlot slot="head">
     <meta name="robots" content="noindex" />
-  </Fragment>
+  </HeadSlot>
 
   {canUse ? (
     <div class="space-y-6">

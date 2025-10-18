@@ -49,6 +49,14 @@
           },
           "additionalProperties": false
         },
+        "autoSummaries": {
+          "type": "boolean",
+          "default": true
+        },
+        "autoSpoons": {
+          "type": "boolean",
+          "default": true
+        },
         "ads": {
           "type": "object",
           "properties": {
@@ -56,6 +64,21 @@
               "type": "string"
             },
             "adsenseClientId": {
+              "type": "string"
+            },
+            "slots": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "sidebarSlotId": {
+              "type": "string"
+            },
+            "endSlotId": {
+              "type": "string"
+            },
+            "leadSlotId": {
               "type": "string"
             }
           },

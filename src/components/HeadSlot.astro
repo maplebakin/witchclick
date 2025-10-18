@@ -1,0 +1,7 @@
+---
+// src/components/HeadSlot.astro
+// Utility component that allows pages to pass head markup to Base layout
+// without introducing invalid wrapper elements.
+const rendered = await Astro.slots.render("default");
+---
+{rendered}
