@@ -94,6 +94,10 @@ const settings = defineCollection({
       .object({
         provider: z.string().optional(), // e.g., "adsense"
         adsenseClientId: z.string().optional(),
+        slots: z.record(z.string()).optional(),
+        sidebarSlotId: z.string().optional(),
+        endSlotId: z.string().optional(),
+        leadSlotId: z.string().optional(),
       })
       .optional(),
   }),

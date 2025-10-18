@@ -15,7 +15,6 @@ import {
 import { readSettings, getSiteOrigin, toAbsoluteUrl } from "@/utils/settings";
 import { buildAnalyticsInjection } from "@/utils/analytics";
 import { getActiveThemes } from "@/utils/theme";
-import { Fragment } from "astro/jsx-runtime";
 
 type LayoutProps = {
   title?: string;
@@ -200,8 +199,12 @@ const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content={themeMetaColor} />
 
-    {analytics?.head && <Fragment set:html={analytics.head} />}
-    {analytics?.config && <Fragment set:html={analytics.config} />}
+    {analytics?.head?.attributes && (
+      <script {...analytics.head.attributes}></script>
+    )}
+    {analytics?.config?.inline && (
+      <script is:inline>{analytics.config.inline}</script>
+    )}
 
     {themeStyle && <style is:inline set:html={themeStyle} />}
 
@@ -312,7 +315,9 @@ const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined
       adminLinks={adminLinks}
       disclosure={disclosure}
     />
-    {analytics?.runtime && <Fragment set:html={analytics.runtime} />}
+    {analytics?.runtime?.inline && (
+      <script is:inline>{analytics.runtime.inline}</script>
+    )}
     {observabilityConfig && (
       <script type="module" define:vars={{ observabilityConfig }}>
         import { initObservability } from "@/utils/observability";

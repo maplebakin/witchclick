@@ -3,6 +3,7 @@
 import Base from "../../layouts/Base.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
 import adminEntitiesScript from "../../scripts/adminEntities.ts?url";
+import HeadSlot from "@/components/HeadSlot.astro";
 
 export const prerender = false; // never emit in static builds
 
@@ -25,9 +26,9 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as 
   wide={true}
   noindex={true}
 >
-  <Fragment slot="head">
+  <HeadSlot slot="head">
     <meta name="robots" content="noindex" />
-  </Fragment>
+  </HeadSlot>
 
   {canUse ? (
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-12" data-dev-api={DEV_API}>

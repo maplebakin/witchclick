@@ -3,7 +3,7 @@ import Base from "../../layouts/Base.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import PrimaryButton from "../../components/buttons/PrimaryButton.astro";
 import fs from "node:fs";
-import { Fragment } from "astro/jsx-runtime";
+import HeadSlot from "@/components/HeadSlot.astro";
 import { readSettings } from "../../utils/settings";
 import { createItemListSchema } from "../../utils/structuredData";
 
@@ -13,29 +13,64 @@ const productsPath = "./content/products.json";
 const productsDoc = fs.existsSync(productsPath)
   ? JSON.parse(fs.readFileSync(productsPath, "utf8"))
   : { products: [] };
-const allProducts = Array.isArray(productsDoc) ? productsDoc : productsDoc.products || [];
+const rawProducts = Array.isArray(productsDoc) ? productsDoc : productsDoc.products || [];
 const settings = readSettings();
-const productItems: { name: string; url: string; description?: string; image?: string }[] = allProducts
-  .map((product: any) => {
-    const name = typeof product?.name === "string" ? product.name : "";
-    const url = typeof product?.url === "string" ? product.url : "";
-    if (!name || !url) return null;
 
-    const descriptionCandidate =
-      typeof product?.description === "string"
-        ? product.description
-        : typeof product?.summary === "string"
-          ? product.summary
-          : undefined;
+interface ProductEntry {
+  name: string;
+  url: string;
+  description?: string;
+  brand?: string;
+  tags: string[];
+  image?: string;
+  rel?: string;
+  utm?: string;
+}
 
-    return {
-      name,
-      url,
-      description: descriptionCandidate,
-      image: typeof product?.image === "string" ? product.image : undefined,
-    };
-  })
-  .filter(Boolean);
+const products: ProductEntry[] = Array.isArray(rawProducts)
+  ? rawProducts.reduce<ProductEntry[]>((acc, item) => {
+      const product = item as Record<string, unknown>;
+      const name = typeof product?.name === "string" ? product.name.trim() : "";
+      const url = typeof product?.url === "string" ? product.url.trim() : "";
+      if (!name || !url) {
+        return acc;
+      }
+
+      const descriptionCandidate =
+        typeof product?.description === "string"
+          ? product.description
+          : typeof product?.summary === "string"
+            ? product.summary
+            : undefined;
+
+      const tags = Array.isArray(product?.tags)
+        ? product.tags
+            .map((tag) => (typeof tag === "string" ? tag : String(tag)))
+            .filter((tag) => tag.trim().length > 0)
+        : [];
+
+      const entry: ProductEntry = {
+        name,
+        url,
+        description: descriptionCandidate,
+        brand: typeof product?.brand === "string" ? product.brand : undefined,
+        tags,
+        image: typeof product?.image === "string" ? product.image : undefined,
+        rel: typeof product?.rel === "string" ? product.rel : undefined,
+        utm: typeof product?.utm === "string" ? product.utm : undefined,
+      };
+
+      acc.push(entry);
+      return acc;
+    }, [])
+  : [];
+
+const productItems = products.map(({ name, url, description, image }) => ({
+  name,
+  url,
+  description,
+  image,
+}));
 
 const productListSchema =
   productItems.length > 0
@@ -58,9 +93,9 @@ const breadcrumbs = [
 ---
 <Base {title} {description}>
   {productListSchema && (
-    <Fragment slot="head">
+    <HeadSlot slot="head">
       <script type="application/ld+json" set:html={JSON.stringify(productListSchema)} />
-    </Fragment>
+    </HeadSlot>
   )}
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <section class="mx-auto max-w-5xl space-y-6">
@@ -72,7 +107,7 @@ const breadcrumbs = [
       </p>
     </header>
 
-    {allProducts.length === 0 ? (
+    {products.length === 0 ? (
       <p class="text-center text-base opacity-70">
         No tools to share just yet. Visit the
         <a class="ml-1 underline" href="/about/">About page</a>
@@ -80,7 +115,7 @@ const breadcrumbs = [
       </p>
     ) : (
       <ul class="grid gap-4 sm:grid-cols-2">
-        {allProducts.map((product) => (
+        {products.map((product) => (
           <li class="card-panel card-tier-1 card-panel-soft tools-card">
             {product.image && (
               <div class="tools-card__media">
@@ -90,7 +125,7 @@ const breadcrumbs = [
             <h2 class="text-xl font-semibold">{product.name}</h2>
             {product.brand && <p class="text-sm opacity-70">{product.brand}</p>}
             <div class="mt-3 flex flex-wrap gap-2">
-              {(product.tags || []).map((tag) => (
+              {product.tags.map((tag) => (
                 <span class="rounded-full bg-surface-soft px-3 py-1 text-xs font-medium text-primary dark:bg-surface-accent-night/30 dark:text-accent-faint">
                   {tag}
                 </span>

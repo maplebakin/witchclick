@@ -15,8 +15,12 @@ let text = '';
 let href = '';
 
 if (type === 'kofi') {
+  const fallback =
+    KOFI_CTA_VARIANTS[0] ??
+    "If this post brought a little light, you can tip the witch at Ko‑fi.";
   const idx = Math.floor(Math.random() * KOFI_CTA_VARIANTS.length);
-  text = KOFI_CTA_VARIANTS[idx];
+  const variant = KOFI_CTA_VARIANTS[idx] ?? fallback;
+  text = variant;
   href = KO_FI_URL;
 } else if (type === 'download') {
   text = 'Explore cozy tools and printable rituals.';
@@ -24,7 +28,7 @@ if (type === 'kofi') {
 }
 ---
 {type !== 'none' && text && href && (
-  <section class="cta-footer" aria-label="Support invitation">
+  <section class="cta-footer" aria-label="Support invitation" id={id}>
     <div class="cta-footer-content">
       <p class="cta-footer-copy">{text}</p>
       <a

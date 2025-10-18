@@ -3,7 +3,7 @@ import Base from "../../layouts/Base.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
 import { loadAllCurses, getCurseBySlug, resetCurseCache } from "../../utils/curses";
-import { Fragment } from "astro/jsx-runtime";
+import HeadSlot from "@/components/HeadSlot.astro";
 import SpoonsBadge from "../../components/SpoonsBadge.astro";
 import { normalizeSpoonLevel } from "../../utils/augment";
 
@@ -77,9 +77,9 @@ const breadcrumbs = [
 ---
 
 <Base title={title} description={description} canon={canonical} wide={true}>
-  <Fragment slot="head">
+  <HeadSlot slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(ritualJsonLd)} />
-  </Fragment>
+  </HeadSlot>
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <article class="mx-auto max-w-3xl space-y-6 py-10">
     <header class="space-y-3 text-center">

@@ -88,14 +88,14 @@ const isStub = summaryText ? /stub/i.test(summaryText) : false;
 
 const typeLabel = ent.type
   .split(/[-_\s]+/)
-  .map((part) => (part ? part[0].toUpperCase() + part.slice(1) : ""))
+  .map((part) => (part ? part.charAt(0).toUpperCase() + part.slice(1) : ""))
   .join(" ");
 
 function startCase(value: string): string {
   return value
     .split(/[-_\s]+/)
     .filter(Boolean)
-    .map((part) => part[0].toUpperCase() + part.slice(1))
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
 }
 
@@ -200,7 +200,7 @@ function pretty(v: unknown) {
             <h2 class="entity-section-title">Properties</h2>
             <dl>
               {propertyEntries.map(([key, value]) => (
-                <div class="entity-property" key={key}>
+                <div class="entity-property">
                   <dt>{key}</dt>
                   <dd>{typeof value === "string" || typeof value === "number" ? String(value) : <pre><code>{pretty(value)}</code></pre>}</dd>
                 </div>
@@ -271,7 +271,7 @@ function pretty(v: unknown) {
       {relatedPosts.length > 0 ? (
         <ul class="entity-related-list">
           {relatedPosts.map((post) => (
-            <li key={post.href ?? post.title}>
+            <li>
               <a href={post.href} class="card-panel card-tier-1 card-panel-soft entity-related-card">
                 <h3>{post.title}</h3>
                 {post.excerpt && <p>{post.excerpt}</p>}

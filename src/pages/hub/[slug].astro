@@ -8,7 +8,7 @@ import { readSettings } from "@/utils/settings";
 import { getPostBySlug, extractHeroImage } from "@/utils/posts";
 import { readPartnerBlocks } from "@/utils/partners";
 import { readEditorialCalendar } from "@/utils/editorialCalendar";
-import { Fragment } from "astro/jsx-runtime";
+import HeadSlot from "@/components/HeadSlot.astro";
 import { HUB_DEFINITIONS } from "@/data/hubs";
 
 export const prerender = true;
@@ -31,15 +31,17 @@ const partnerHighlight = hub.partnerHighlight
   ? partnerBlocks.affiliateHighlights.find((item) => item.slug === hub.partnerHighlight?.slug)
   : null;
 
+type HubPost = NonNullable<ReturnType<typeof getPostBySlug>>;
+
 const sections = hub.sections.map((section) => {
-  const posts = section.posts
+  const posts: HubPost[] = section.posts
     .map((postSlug) => getPostBySlug(postSlug))
-    .filter((post): post is NonNullable<ReturnType<typeof getPostBySlug>> => Boolean(post));
+    .filter((post): post is HubPost => Boolean(post));
 
   return { ...section, posts };
 });
 
-const uniquePosts = new Map<string, ReturnType<typeof getPostBySlug>>();
+const uniquePosts = new Map<string, HubPost>();
 for (const section of sections) {
   for (const post of section.posts) {
     if (!post) continue;
@@ -83,9 +85,9 @@ const breadcrumbs = [
   ambientColor={hub.ambient}
 >
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
-  <Fragment slot="head">
+  <HeadSlot slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-  </Fragment>
+  </HeadSlot>
 
   <section class="hub-hero">
     <div class="hub-hero__inner">
