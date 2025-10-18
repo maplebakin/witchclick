@@ -2,6 +2,7 @@
 // Featherweight client-side search (no deps). Fetches /search.json at runtime
 const uid = `search-${globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2)}`;
 const resultsId = `${uid}-results`;
+const rootSelector = `[data-search][data-search-id="${uid}"]`;
 ---
 <div class="search-control" data-search data-search-id={uid}>
   <label class="sr-only" for={uid}>Search posts</label>
@@ -23,9 +24,9 @@ const resultsId = `${uid}-results`;
   ></div>
 </div>
 
-<script type="module" is:inline>
+<script type="module" is:inline define:vars={{ rootSelector }}>
 (() => {
-  const root = document.querySelector('[data-search][data-search-id="${uid}"]');
+  const root = document.querySelector(rootSelector);
   if (!(root instanceof HTMLElement)) return;
 
   const input = root.querySelector('input[type="search"]');
