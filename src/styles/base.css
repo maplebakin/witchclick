@@ -125,14 +125,7 @@ body {
 
 :root[data-comfort-theme="dawn"] body {
   color: var(--ink-body, #2c1b3d);
-  background:
-    radial-gradient(120% 160% at 50% 0%, color-mix(in srgb, var(--card-panel-border-soft) 65%, transparent) 0%, transparent 60%),
-    radial-gradient(140% 200% at 10% 20%, color-mix(in srgb, var(--card-panel-border) 65%, transparent) 0%, transparent 70%),
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--card-panel-surface) 90%, white 10%) 0%,
-      color-mix(in srgb, var(--card-panel-surface-strong) 92%, white 8%) 100%
-    );
+  background: linear-gradient(180deg, hsl(270 60% 98%) 0%, hsl(270 40% 92%) 100%);
 }
 
 body::before {
@@ -146,7 +139,7 @@ body::before {
 }
 
 :root[data-comfort-theme="dawn"] body::before {
-  background: radial-gradient(80% 80% at 50% 0%, color-mix(in srgb, var(--card-panel-border-soft) 55%, white 45%) 0%, transparent 70%);
+  background: radial-gradient(80% 80% at 50% 0%, rgba(155, 134, 200, 0.12) 0%, transparent 70%);
   mix-blend-mode: normal;
 }
 

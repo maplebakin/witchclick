@@ -63,15 +63,7 @@
 
 body {
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background:
-    var(--wc-bg-layer-1, var(--body-overlay, var(--surface-parchment-overlay))),
-    var(--wc-bg-layer-2, transparent),
-    var(--body-texture, var(--surface-starfield)),
-    var(--body-surface, var(--surface-parchment)),
-    var(--color-background, transparent);
-  background-repeat: no-repeat, no-repeat, repeat, no-repeat, no-repeat;
-  background-size: cover, cover, auto, auto, auto;
-  background-attachment: fixed, fixed, fixed, fixed, fixed;
+  background: var(--card-panel-surface-strong);
 }
 
 .grimoire-bg {

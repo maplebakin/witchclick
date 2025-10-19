@@ -25,8 +25,8 @@
 }
 
 :root[data-comfort-theme="dawn"] {
-  --card-panel-surface: color-mix(in srgb, var(--color-night) 78%, white 22%);
-  --card-panel-surface-strong: color-mix(in srgb, var(--color-midnight) 68%, white 32%);
+  --card-panel-surface: rgba(255, 252, 247, 0.92);
+  --card-panel-surface-strong: rgba(248, 244, 240, 0.95);
   --card-panel-border: color-mix(in srgb, var(--color-iris) 32%, transparent 68%);
   --card-panel-border-strong: color-mix(in srgb, var(--color-iris) 48%, transparent 52%);
   --card-panel-border-soft: color-mix(in srgb, var(--color-iris) 28%, transparent 72%);

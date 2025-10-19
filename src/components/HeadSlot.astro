@@ -4,4 +4,4 @@
 // without introducing invalid wrapper elements.
 const rendered = await Astro.slots.render("default");
 ---
-{rendered}
+<Fragment set:html={rendered} />

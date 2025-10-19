@@ -112,4 +112,28 @@ const {
       justify-content: center;
     }
   }
+
+  /* Dawn theme overrides */
+  :root[data-comfort-theme="dawn"] .home-hero__backdrop {
+    background:
+      radial-gradient(75% 60% at 15% 10%, rgba(155, 134, 200, 0.18), transparent 70%),
+      radial-gradient(85% 65% at 85% 0%, rgba(180, 154, 217, 0.22), transparent 70%),
+      linear-gradient(160deg, rgba(252, 248, 242, 0.92), rgba(248, 242, 238, 0.95));
+  }
+
+  :root[data-comfort-theme="dawn"] .home-hero::after {
+    background: radial-gradient(circle at 50% 0%, rgba(155, 134, 200, 0.25), transparent 70%);
+  }
+
+  :root[data-comfort-theme="dawn"] .home-hero__eyebrow {
+    color: rgba(44, 27, 61, 0.75);
+  }
+
+  :root[data-comfort-theme="dawn"] .home-hero__title {
+    color: rgba(44, 27, 61, 0.94);
+  }
+
+  :root[data-comfort-theme="dawn"] .home-hero__blurb {
+    color: rgba(44, 27, 61, 0.78);
+  }
 </style>

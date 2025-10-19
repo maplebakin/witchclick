@@ -31,10 +31,10 @@ const customColors = {
 
   // Inverse palettes for dark surfaces
   inverse: colors.white, // Primary ink on night surfaces
-  'inverse-soft': colors.slate[100], // Sub-headings on dark backgrounds
-  'inverse-muted': colors.slate[200], // Metadata on dark backgrounds
-  'inverse-subtle': colors.slate[300], // Quiet hints on dark backgrounds
-  'inverse-faint': colors.slate[400], // Disabled states on dark backgrounds
+  'inverse-soft': colors.slate[50], // Sub-headings on dark backgrounds (lighter for better readability)
+  'inverse-muted': colors.slate[100], // Metadata on dark backgrounds (lighter for better readability)
+  'inverse-subtle': colors.slate[200], // Quiet hints on dark backgrounds
+  'inverse-faint': colors.slate[300], // Disabled states on dark backgrounds
 
   // Informational accents
   info: colors.indigo[700], // Info badges & headings
