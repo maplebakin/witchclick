@@ -99,6 +99,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
                 <p class="mt-2 text-xs" data-hero-prompt-hint>
                   Select a post to load the saved hero image prompt (or alt text fallback) for your LLM.
                 </p>
+                <div
+                  class="mt-3 flex flex-wrap items-center gap-2 text-xs text-body-muted"
+                  data-hero-theme
+                ></div>
                 <textarea
                   class="mt-3 hidden h-28 w-full resize-y rounded-md border border-line-muted bg-surface-base px-3 py-2 text-sm text-body focus:border-line-bold focus:outline-none"
                   readonly
@@ -252,6 +256,17 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
         const promptField = root.querySelector('[data-hero-prompt]');
         const promptHint = root.querySelector('[data-hero-prompt-hint]');
         const copyPromptButton = root.querySelector('[data-copy-prompt]');
+        const themeSummary = root.querySelector('[data-hero-theme]');
+
+        const FALLBACK_PALETTE = {
+          label: 'Default Midnight',
+          mode: 'midnight',
+          settings: {
+            primary: '#8b7e8f',
+            accent: '#d9b2c4',
+            background: '#120725',
+          },
+        };
 
         let posts = [];
         let selectedFile = null;
@@ -260,9 +275,14 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
         let lastPrefilledSlug = null;
         let isBusy = false;
         let dropEnabled = false;
+        let promptPalette = null;
 
         const MAX_SIZE = 5 * 1024 * 1024;
         const ACCEPTED_EXT = /\.(png|jpe?g|webp)$/i;
+
+        if (themeSummary) {
+          updateThemeSummary('Loading palette…');
+        }
 
         function showPreviewPlaceholder(show) {
           const shouldShow = !!show;
@@ -418,6 +438,161 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           else promptHint.classList.add('text-primary');
         }
 
+        function sanitizeHex(value) {
+          const text = typeof value === 'string' ? value.trim() : '';
+          if (!text) return '';
+          const match = /^#?([0-9a-fA-F]{6})$/.exec(text);
+          return match ? `#${match[1].toLowerCase()}` : '';
+        }
+
+        function getActivePalette() {
+          const source = promptPalette && typeof promptPalette === 'object' ? promptPalette : FALLBACK_PALETTE;
+          const settings = source && typeof source.settings === 'object' ? source.settings : {};
+          return {
+            label:
+              typeof source?.label === 'string' && source.label.trim() ? source.label.trim() : FALLBACK_PALETTE.label,
+            mode: source?.mode === 'dawn' ? 'dawn' : 'midnight',
+            settings: {
+              primary: sanitizeHex(settings.primary) || FALLBACK_PALETTE.settings.primary,
+              accent: sanitizeHex(settings.accent) || FALLBACK_PALETTE.settings.accent,
+              background: sanitizeHex(settings.background) || FALLBACK_PALETTE.settings.background,
+            },
+          };
+        }
+
+        function updateThemeSummary(message) {
+          if (!themeSummary) return;
+          if (!promptPalette) {
+            themeSummary.textContent = message || 'Loading palette…';
+            return;
+          }
+          const palette = getActivePalette();
+          themeSummary.innerHTML = '';
+          if (message) {
+            const status = document.createElement('span');
+            status.className = 'text-body-muted';
+            status.textContent = message;
+            themeSummary.appendChild(status);
+          }
+          if (!palette) return;
+          const label = document.createElement('span');
+          label.className = 'font-medium text-body';
+          label.textContent = `${palette.label} (${palette.mode === 'dawn' ? 'dawn' : 'midnight'}) palette`;
+          themeSummary.appendChild(label);
+          const swatches = document.createElement('div');
+          swatches.className = 'flex items-center gap-2';
+          ['primary', 'accent', 'background'].forEach((key) => {
+            const value = palette.settings?.[key];
+            if (!value) return;
+            const chip = document.createElement('span');
+            chip.className =
+              'flex items-center gap-1 rounded-full border border-line-subtle bg-surface-base/70 px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide';
+            chip.setAttribute('data-palette', key);
+            chip.title = `${key}: ${value}`;
+            const dot = document.createElement('span');
+            dot.className = 'h-3 w-3 rounded-full border border-white/60';
+            dot.style.backgroundColor = value;
+            const code = document.createElement('span');
+            code.textContent = value;
+            chip.appendChild(dot);
+            chip.appendChild(code);
+            swatches.appendChild(chip);
+          });
+          if (swatches.childElementCount) {
+            themeSummary.appendChild(swatches);
+          }
+        }
+
+        function truncateText(text, maxLength) {
+          const value = typeof text === 'string' ? text.trim() : '';
+          if (!value) return '';
+          if (!maxLength || value.length <= maxLength) return value;
+          const truncated = value.slice(0, maxLength).replace(/\s+\S*$/, '').trim();
+          return truncated ? `${truncated}…` : `${value.slice(0, maxLength)}…`;
+        }
+
+        function sameText(a, b) {
+          if (!a || !b) return false;
+          return a.trim().toLowerCase() === b.trim().toLowerCase();
+        }
+
+        function collectKeywords(post) {
+          const keywords = [];
+          if (Array.isArray(post?.tags)) {
+            post.tags.forEach((tag) => {
+              if (typeof tag === 'string' && tag.trim()) keywords.push(tag.trim());
+            });
+          }
+          if (typeof post?.mood === 'string' && post.mood.trim()) {
+            keywords.push(post.mood.trim());
+          }
+          const seen = new Set();
+          return keywords
+            .map((word) => word.replace(/\s+/g, ' '))
+            .filter((word) => {
+              const key = word.toLowerCase();
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            })
+            .slice(0, 8);
+        }
+
+        function summarizePost(post) {
+          if (!post || typeof post !== 'object') return '';
+          const fields = [post.excerpt, post.metaDescription];
+          for (const field of fields) {
+            if (typeof field === 'string' && field.trim()) {
+              return field.trim();
+            }
+          }
+          return '';
+        }
+
+        function buildHeroPrompt(post) {
+          if (!post || typeof post !== 'object') return '';
+          const palette = getActivePalette();
+          const title = typeof post.title === 'string' && post.title.trim() ? post.title.trim() : 'WitchClick feature';
+          const baseDescription = extractHeroDescription(post);
+          const summary = truncateText(summarizePost(post), 220);
+          const keywords = collectKeywords(post);
+          const lines = [`Hero image prompt for WitchClick article "${title}".`];
+
+          if (baseDescription) {
+            lines.push(`Scene focus: ${baseDescription}.`);
+            if (summary && !sameText(summary, baseDescription)) {
+              lines.push(`Story tone: ${summary}.`);
+            }
+          } else if (summary) {
+            lines.push(`Scene focus: ${summary}.`);
+          } else {
+            lines.push(
+              'Scene focus: cozy magical workspace with candles, celestial details, gentle textiles, and a welcoming witchy atmosphere.'
+            );
+          }
+
+          if (keywords.length) {
+            lines.push(`Keywords: ${keywords.join(', ')}.`);
+          }
+
+          if (palette && palette.settings) {
+            const tones = [];
+            if (palette.settings.primary) tones.push(`primary ${palette.settings.primary}`);
+            if (palette.settings.accent) tones.push(`accent ${palette.settings.accent}`);
+            if (palette.settings.background) tones.push(`background ${palette.settings.background}`);
+            if (tones.length) {
+              const paletteLabel = palette.label || (palette.mode === 'dawn' ? 'dawn palette' : 'midnight palette');
+              lines.push(`Colour palette — ${paletteLabel}: ${tones.join(', ')}.`);
+            }
+          }
+
+          lines.push(
+            'Style: cozy, inclusive, painterly digital illustration with soft light, tactile textures, and subtle magical realism details.'
+          );
+          lines.push('Constraints: no text or lettering, no watermarks or logos, 3:2 landscape hero composition, high resolution.');
+          return lines.join('\n');
+        }
+
         function cleanHeroAlt(value) {
           const text = typeof value === 'string' ? value.trim() : '';
           if (!text) return '';
@@ -510,6 +685,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           }
           const current = posts.find((post) => post.slug === select.value);
           const description = extractHeroDescription(current);
+          const promptText = buildHeroPrompt(current);
           updateExistingHeroNote(current || null);
           applyAltSuggestion(current || null);
           if (!selectedFile && !previewUrl) {
@@ -525,8 +701,8 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
               clearFileSelection();
             }
           }
-          if (description) {
-            promptField.value = description;
+          if (promptText) {
+            promptField.value = promptText;
             promptField.classList.remove('hidden');
             copyPromptButton.disabled = false;
             setPromptHint('Prompt ready. Copy it into your image model request.', 'success');
@@ -678,6 +854,59 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           return data;
         }
 
+        async function loadPromptPalette() {
+          if (!themeSummary) return;
+          try {
+            const data = await postJson('/themes/list', {});
+            const items = (data && data.items) || {};
+            const activeMidnight = typeof data?.active?.midnight === 'string' ? data.active.midnight.trim() : '';
+            const activeDawn = typeof data?.active?.dawn === 'string' ? data.active.dawn.trim() : '';
+
+            const findTheme = (mode, slug) => {
+              if (!slug) return null;
+              const list = Array.isArray(items?.[mode]) ? items[mode] : [];
+              return (
+                list.find((entry) => typeof entry?.slug === 'string' && entry.slug.trim() === slug) || null
+              );
+            };
+
+            let theme = findTheme('midnight', activeMidnight) || findTheme('dawn', activeDawn);
+            if (!theme) {
+              const candidateLists = [
+                ...(Array.isArray(items?.midnight) ? items.midnight : []),
+                ...(Array.isArray(items?.dawn) ? items.dawn : []),
+              ];
+              if (candidateLists.length) {
+                theme = candidateLists[0];
+              }
+            }
+
+            if (theme && typeof theme === 'object') {
+              promptPalette = {
+                label: typeof theme.label === 'string' && theme.label.trim() ? theme.label.trim() : FALLBACK_PALETTE.label,
+                mode: theme.mode === 'dawn' ? 'dawn' : 'midnight',
+                settings: {
+                  primary: sanitizeHex(theme.settings?.primary) || FALLBACK_PALETTE.settings.primary,
+                  accent: sanitizeHex(theme.settings?.accent) || FALLBACK_PALETTE.settings.accent,
+                  background: sanitizeHex(theme.settings?.background) || FALLBACK_PALETTE.settings.background,
+                },
+              };
+              updateThemeSummary();
+              updateHeroPromptUI();
+              return;
+            }
+
+            promptPalette = { ...FALLBACK_PALETTE, settings: { ...FALLBACK_PALETTE.settings } };
+            updateThemeSummary('Using default palette.');
+            updateHeroPromptUI();
+          } catch (error) {
+            console.warn('Could not load theme palette for hero prompts.', error);
+            promptPalette = { ...FALLBACK_PALETTE, settings: { ...FALLBACK_PALETTE.settings } };
+            updateThemeSummary('Using default palette.');
+            updateHeroPromptUI();
+          }
+        }
+
         async function loadPosts() {
           setStatus('Loading posts…', 'progress');
           try {
@@ -690,6 +919,14 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
                   heroAlt: typeof item?.heroAlt === 'string' ? item.heroAlt : '',
                   heroImageAlt: typeof item?.heroImageAlt === 'string' ? item.heroImageAlt : '',
                   heroImage: typeof item?.heroImage === 'string' ? item.heroImage : '',
+                  excerpt: typeof item?.excerpt === 'string' ? item.excerpt : '',
+                  metaDescription: typeof item?.metaDescription === 'string' ? item.metaDescription : '',
+                  mood: typeof item?.mood === 'string' ? item.mood : '',
+                  tags: Array.isArray(item?.tags)
+                    ? item.tags
+                        .map((tag) => (typeof tag === 'string' ? tag.trim() : String(tag ?? '').trim()))
+                        .filter(Boolean)
+                    : [],
                 }))
               : [];
             renderOptions();
@@ -828,6 +1065,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
 
         refreshFormAvailability();
         updateHeroPromptUI();
+        loadPromptPalette();
         loadPosts();
       })();
     </script>

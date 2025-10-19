@@ -191,6 +191,58 @@ const defaultDawn = {
           </label>
         </div>
 
+        <div
+          class="rounded-2xl border border-line-subtle bg-surface-neutral-soft/60 p-4 md:p-6"
+          data-theme-preview
+        >
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <p class="text-xs font-semibold uppercase tracking-wide text-body-muted">Live preview</p>
+            <span
+              class="rounded-full border border-line-neutral bg-surface-base px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-body"
+              data-preview-mode
+            >
+              Midnight
+            </span>
+          </div>
+          <div class="mt-4 grid gap-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+            <div class="space-y-4">
+              <article class="preview-card space-y-3 rounded-xl border p-4 shadow-sm" data-preview-card>
+                <p class="text-xs font-semibold uppercase tracking-wide text-body-muted" data-preview-eyebrow>
+                  Hero example
+                </p>
+                <h3 class="text-lg font-semibold" data-preview-title>Soft rituals for tired hearts</h3>
+                <p class="text-sm leading-relaxed" data-preview-body>
+                  Gentle copy shows how serif body text feels in paragraphs. Adjust colours and fonts above to see instant
+                  changes.
+                </p>
+                <div class="flex flex-wrap gap-2" data-preview-chips>
+                  <span class="preview-chip" data-preview-chip="primary">Primary</span>
+                  <span class="preview-chip" data-preview-chip="accent">Accent</span>
+                  <span class="preview-chip" data-preview-chip="background">Background</span>
+                </div>
+                <div class="flex flex-wrap gap-2 pt-1" data-preview-actions>
+                  <button type="button" class="preview-button preview-button--primary" data-preview-primary>
+                    Primary CTA
+                  </button>
+                  <button type="button" class="preview-button preview-button--ghost" data-preview-secondary>
+                    Secondary CTA
+                  </button>
+                </div>
+              </article>
+              <p class="text-sm" data-preview-copy>
+                Body text uses <span class="font-semibold" data-preview-serif>Literata</span>. Script flourishes render as
+                <span class="preview-script" data-preview-script>Moonlit Whispers</span>.
+              </p>
+            </div>
+            <div class="space-y-4">
+              <div class="rounded-xl border border-dashed border-line-muted/60 bg-surface-base/80 p-4" data-preview-surface>
+                <p class="text-xs font-semibold uppercase tracking-wide text-body-muted">Palette swatches</p>
+                <div class="mt-3 flex flex-col gap-2" data-preview-swatches></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="flex flex-wrap gap-2">
           <button
             type="button"
@@ -283,6 +335,12 @@ const defaultDawn = {
             return acc;
           }, {});
 
+          const previewRoot = root.querySelector('[data-theme-preview]');
+          const previewModeLabel = root.querySelector('[data-preview-mode]');
+          const previewSerif = root.querySelector('[data-preview-serif]');
+          const previewScript = root.querySelector('[data-preview-script]');
+          const previewSwatches = root.querySelector('[data-preview-swatches]');
+
           const saveBtn = root.querySelector('#saveThemeBtn');
           const setActiveBtn = root.querySelector('#setActiveThemeBtn');
           const resetBtn = root.querySelector('#resetThemeBtn');
@@ -335,6 +393,137 @@ const defaultDawn = {
             return match ? '#' + match[1].toLowerCase() : '';
           }
 
+          function hexToRgb(hex){
+            const match = /^#?([0-9a-fA-F]{6})$/.exec(String(hex || '').trim());
+            if (!match) return null;
+            const value = match[1];
+            return {
+              r: parseInt(value.slice(0, 2), 16),
+              g: parseInt(value.slice(2, 4), 16),
+              b: parseInt(value.slice(4, 6), 16)
+            };
+          }
+
+          function rgbToHex(r, g, b){
+            const clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
+            return '#' + [clamp(r), clamp(g), clamp(b)].map((v) => v.toString(16).padStart(2, '0')).join('');
+          }
+
+          function adjustHex(hex, amount){
+            const rgb = hexToRgb(hex);
+            if (!rgb) return hex;
+            const safeAmount = Math.max(-1, Math.min(1, amount || 0));
+            const towardWhite = safeAmount >= 0;
+            const ratio = Math.abs(safeAmount);
+            const target = towardWhite ? { r: 255, g: 255, b: 255 } : { r: 0, g: 0, b: 0 };
+            const r = rgb.r + (target.r - rgb.r) * ratio;
+            const g = rgb.g + (target.g - rgb.g) * ratio;
+            const b = rgb.b + (target.b - rgb.b) * ratio;
+            return rgbToHex(r, g, b);
+          }
+
+          function getLuminance(rgb){
+            if (!rgb) return 0;
+            const channel = (value) => {
+              const v = value / 255;
+              return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+            };
+            return 0.2126 * channel(rgb.r) + 0.7152 * channel(rgb.g) + 0.0722 * channel(rgb.b);
+          }
+
+          function pickContrastColor(hex){
+            const rgb = hexToRgb(hex);
+            if (!rgb) return '#1f1630';
+            const luminance = getLuminance(rgb);
+            return luminance > 0.5 ? '#1f1630' : '#fdfcfe';
+          }
+
+          function toFontStack(name, fallback){
+            const raw = String(name || '').trim();
+            if (!raw) return fallback;
+            const safe = raw.replace(/["']/g, '');
+            return `'${safe}'${fallback ? `, ${fallback}` : ''}`;
+          }
+
+          function refreshPreview(){
+            if (!previewRoot) return;
+            const mode = modeSelect && modeSelect.value === 'dawn' ? 'dawn' : 'midnight';
+            const defaultsForMode = defaults[mode] || defaults.midnight;
+            const primary =
+              normalizeHex(colorFields.primary?.input?.value) || normalizeHex(defaultsForMode.primary) || '#8b7e8f';
+            const accent =
+              normalizeHex(colorFields.accent?.input?.value) || normalizeHex(defaultsForMode.accent) || '#d9b2c4';
+            const background =
+              normalizeHex(colorFields.background?.input?.value) || normalizeHex(defaultsForMode.background) || '#120725';
+            const fontSerif =
+              fontSerifInput && fontSerifInput.value.trim() ? fontSerifInput.value.trim() : defaultsForMode.fontSerif;
+            const fontScript =
+              fontScriptInput && fontScriptInput.value.trim() ? fontScriptInput.value.trim() : defaultsForMode.fontScript;
+
+            const bgRgb = hexToRgb(background);
+            const luminance = getLuminance(bgRgb);
+            const textColor = pickContrastColor(background);
+            const muted = adjustHex(background, luminance > 0.5 ? -0.25 : 0.35);
+            const surface = adjustHex(background, luminance > 0.5 ? -0.08 : 0.22);
+            const border = adjustHex(background, luminance > 0.5 ? -0.3 : 0.28);
+
+            previewRoot.style.setProperty('--preview-primary', primary);
+            previewRoot.style.setProperty('--preview-accent', accent);
+            previewRoot.style.setProperty('--preview-background', background);
+            previewRoot.style.setProperty('--preview-surface', surface);
+            previewRoot.style.setProperty('--preview-border', border);
+            previewRoot.style.setProperty('--preview-text', textColor);
+            previewRoot.style.setProperty('--preview-muted', muted);
+            previewRoot.style.setProperty('--preview-primary-contrast', pickContrastColor(primary));
+            previewRoot.style.setProperty('--preview-accent-contrast', pickContrastColor(accent));
+            previewRoot.style.setProperty('--preview-font-serif', toFontStack(fontSerif, 'serif'));
+            previewRoot.style.setProperty('--preview-font-script', toFontStack(fontScript, 'cursive'));
+            previewRoot.setAttribute('data-mode', mode);
+
+            if (previewModeLabel) {
+              previewModeLabel.textContent = mode === 'dawn' ? 'Dawn' : 'Midnight';
+            }
+            if (previewSerif) {
+              const serifLabel = fontSerif || defaultsForMode.fontSerif;
+              previewSerif.textContent = serifLabel;
+              previewSerif.style.fontFamily = toFontStack(serifLabel, 'serif');
+            }
+            if (previewScript) {
+              const scriptLabel = fontScript || defaultsForMode.fontScript;
+              previewScript.textContent = scriptLabel;
+              previewScript.style.fontFamily = toFontStack(scriptLabel, 'cursive');
+            }
+
+            if (previewSwatches) {
+              previewSwatches.innerHTML = '';
+              const swatchData = [
+                { label: 'Primary', value: primary },
+                { label: 'Accent', value: accent },
+                { label: 'Background', value: background },
+                { label: 'Surface', value: surface },
+              ];
+              swatchData.forEach((item) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between gap-3 text-sm';
+                const left = document.createElement('div');
+                left.className = 'flex items-center gap-2';
+                const circle = document.createElement('span');
+                circle.className = 'h-6 w-6 rounded-full border border-white/60 shadow-sm';
+                circle.style.backgroundColor = item.value;
+                const label = document.createElement('span');
+                label.textContent = item.label;
+                left.appendChild(circle);
+                left.appendChild(label);
+                const code = document.createElement('code');
+                code.className = 'text-xs text-body-muted';
+                code.textContent = item.value;
+                row.appendChild(left);
+                row.appendChild(code);
+                previewSwatches.appendChild(row);
+              });
+            }
+          }
+
           function setColorField(key, value){
             const field = colorFields[key];
             if (!field) return;
@@ -382,6 +571,7 @@ const defaultDawn = {
             setColorField('accent', theme?.settings?.accent ?? defaults[mode].accent);
             setColorField('background', theme?.settings?.background ?? defaults[mode].background);
             updateSetActiveLabel();
+            refreshPreview();
           }
 
           function updateSetActiveLabel(){
@@ -422,41 +612,93 @@ const defaultDawn = {
                 return;
               }
               themes.forEach((theme) => {
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.className = 'w-full rounded-lg border px-3 py-2 text-left text-sm transition hover:bg-surface-soft';
-                button.setAttribute('data-theme-item', theme.slug);
-                button.addEventListener('click', () => {
-                  populateForm(theme);
-                  setStatus('Loaded "' + theme.label + '".', 'success');
-                });
+                const card = document.createElement('div');
+                card.className =
+                  'group rounded-xl border border-line-neutral bg-surface-base px-3 py-3 text-sm transition hover:border-line-bold hover:bg-surface-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-line-bold focus-visible:ring-offset-2';
+                card.setAttribute('role', 'button');
+                card.tabIndex = 0;
+                card.dataset.themeItem = theme.slug;
 
+                const activateClassList = ['border-line-emerald', 'bg-surface-emerald-soft'];
                 if (state.active[mode] === theme.slug) {
-                  button.classList.add('border-line-emerald', 'bg-surface-emerald-soft');
-                } else {
-                  button.classList.add('border-line-neutral');
+                  activateClassList.forEach((cls) => card.classList.add(cls));
                 }
 
-                const title = document.createElement('div');
-                title.className = 'flex items-center justify-between gap-3';
+                const handleLoad = () => {
+                  populateForm(theme);
+                  setStatus('Loaded "' + theme.label + '".', 'success');
+                };
+
+                card.addEventListener('click', handleLoad);
+                card.addEventListener('keydown', (event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    handleLoad();
+                  }
+                });
+
+                const header = document.createElement('div');
+                header.className = 'flex items-center justify-between gap-3';
                 const labelSpan = document.createElement('span');
                 labelSpan.className = 'font-medium text-primary';
                 labelSpan.textContent = theme.label;
-                title.appendChild(labelSpan);
+                header.appendChild(labelSpan);
+
+                const headerMeta = document.createElement('div');
+                headerMeta.className = 'flex items-center gap-2';
+                const modeBadge = document.createElement('span');
+                modeBadge.className = 'rounded-full bg-surface-neutral-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-body-muted';
+                modeBadge.textContent = theme.mode === 'dawn' ? 'Dawn' : 'Midnight';
+                headerMeta.appendChild(modeBadge);
                 if (state.active[mode] === theme.slug) {
                   const badge = document.createElement('span');
                   badge.className = 'rounded bg-surface-success px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-inverse';
                   badge.textContent = 'Active';
-                  title.appendChild(badge);
+                  headerMeta.appendChild(badge);
                 }
+                header.appendChild(headerMeta);
 
                 const slugLine = document.createElement('p');
                 slugLine.className = 'mt-1 text-[11px] text-body-muted';
                 slugLine.textContent = theme.slug;
 
-                button.appendChild(title);
-                button.appendChild(slugLine);
-                listEl.appendChild(button);
+                const paletteRow = document.createElement('div');
+                paletteRow.className = 'mt-3 flex flex-wrap items-center gap-2';
+                ['primary', 'accent', 'background'].forEach((key) => {
+                  const tone = typeof theme.settings?.[key] === 'string' ? theme.settings[key] : '';
+                  if (!tone) return;
+                  const chip = document.createElement('span');
+                  chip.className =
+                    'flex items-center gap-1 rounded-full border border-line-subtle bg-surface-base/70 px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide';
+                  const dot = document.createElement('span');
+                  dot.className = 'h-3 w-3 rounded-full border border-white/60 shadow-sm';
+                  dot.style.backgroundColor = tone;
+                  const code = document.createElement('span');
+                  code.textContent = tone;
+                  chip.appendChild(dot);
+                  chip.appendChild(code);
+                  paletteRow.appendChild(chip);
+                });
+
+                const actions = document.createElement('div');
+                actions.className = 'mt-3 flex flex-wrap gap-2';
+                const activateBtn = document.createElement('button');
+                activateBtn.type = 'button';
+                activateBtn.className = 'rounded-md border border-line-neutral px-2 py-1 text-[11px] font-semibold uppercase tracking-wide transition hover:bg-surface-soft';
+                activateBtn.textContent = 'Activate';
+                activateBtn.addEventListener('click', (event) => {
+                  event.stopPropagation();
+                  quickActivateTheme(theme);
+                });
+                actions.appendChild(activateBtn);
+
+                card.appendChild(header);
+                card.appendChild(slugLine);
+                if (paletteRow.childElementCount) {
+                  card.appendChild(paletteRow);
+                }
+                card.appendChild(actions);
+                listEl.appendChild(card);
               });
             });
           }
@@ -546,9 +788,10 @@ const defaultDawn = {
             }
           }
 
-          async function activateTheme(){
-            const payload = collectForm();
-            if (!payload.slug) {
+          async function setThemeActive(mode, slug, label){
+            const safeMode = mode === 'dawn' ? 'dawn' : 'midnight';
+            const safeSlug = typeof slug === 'string' ? slug.trim() : '';
+            if (!safeSlug) {
               setStatus('Save the theme before activating it.', 'error');
               return;
             }
@@ -557,17 +800,28 @@ const defaultDawn = {
               const res = await fetch(devApi + '/themes/set-active', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ mode: payload.mode, slug: payload.slug })
+                body: JSON.stringify({ mode: safeMode, slug: safeSlug })
               });
               const json = await toJSON(res);
               if (!json || json.ok !== true) {
                 throw new Error(json?.error || 'Unable to set active theme');
               }
-              setStatus('Activated "' + (json?.theme?.label || payload.slug) + '" for ' + payload.mode + '.', 'success');
-              await refresh(payload.mode, payload.slug);
+              const labelText = json?.theme?.label || label || safeSlug;
+              setStatus('Activated "' + labelText + '" for ' + safeMode + '.', 'success');
+              await refresh(safeMode, safeSlug);
             } catch (error) {
               setStatus(error?.message || 'Failed to activate theme.', 'error');
             }
+          }
+
+          async function activateTheme(){
+            const payload = collectForm();
+            await setThemeActive(payload.mode, payload.slug, payload.label || payload.slug);
+          }
+
+          async function quickActivateTheme(theme){
+            if (!theme || typeof theme.slug !== 'string') return;
+            await setThemeActive(theme.mode, theme.slug, theme.label);
           }
 
           function loadActiveTheme(){
@@ -591,6 +845,7 @@ const defaultDawn = {
           if (modeSelect) {
             modeSelect.addEventListener('change', () => {
               updateSetActiveLabel();
+              refreshPreview();
             });
           }
 
@@ -601,17 +856,29 @@ const defaultDawn = {
                 if (field.input) {
                   field.input.value = field.picker.value;
                 }
+                refreshPreview();
               });
             }
             if (field.input) {
+              field.input.addEventListener('input', () => {
+                refreshPreview();
+              });
               field.input.addEventListener('blur', () => {
                 const hex = normalizeHex(field.input.value);
                 if (hex && field.picker) {
                   field.picker.value = hex;
                 }
+                refreshPreview();
               });
             }
           });
+
+          if (fontSerifInput) {
+            fontSerifInput.addEventListener('input', () => refreshPreview());
+          }
+          if (fontScriptInput) {
+            fontScriptInput.addEventListener('input', () => refreshPreview());
+          }
 
           if (saveBtn) saveBtn.addEventListener('click', saveTheme);
           if (setActiveBtn) setActiveBtn.addEventListener('click', activateTheme);
@@ -628,9 +895,112 @@ const defaultDawn = {
             });
           });
 
+          refreshPreview();
           refresh(undefined, undefined, { showStatus: true });
         })();
       `}
     </script>
   )}
+
+  <style>
+    [data-theme-preview] {
+      --preview-primary: #8b7e8f;
+      --preview-accent: #d9b2c4;
+      --preview-background: #120725;
+      --preview-surface: #1d1033;
+      --preview-border: #2e1b4a;
+      --preview-text: #fdfcfe;
+      --preview-muted: #d9b2c4;
+      --preview-primary-contrast: #fdfcfe;
+      --preview-accent-contrast: #1f1630;
+      --preview-font-serif: 'Literata', serif;
+      --preview-font-script: 'Parisienne', cursive;
+      background: var(--preview-background);
+      color: var(--preview-text);
+      border-color: var(--preview-border);
+      font-family: var(--preview-font-serif, 'Literata', serif);
+      transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    }
+
+    [data-theme-preview] .preview-card {
+      background: var(--preview-surface);
+      border-color: var(--preview-border);
+      color: var(--preview-text);
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+      font-family: var(--preview-font-serif, 'Literata', serif);
+    }
+
+    [data-theme-preview] .preview-card h3 {
+      font-family: var(--preview-font-serif, 'Literata', serif);
+    }
+
+    [data-theme-preview] .preview-card p[data-preview-eyebrow] {
+      color: var(--preview-muted);
+      letter-spacing: 0.1em;
+    }
+
+    [data-theme-preview] .preview-chip {
+      background: var(--preview-surface);
+      border: 1px solid var(--preview-border);
+      border-radius: 9999px;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--preview-text);
+    }
+
+    [data-theme-preview] .preview-button {
+      border-radius: 9999px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: 0.4rem 1.05rem;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+    }
+
+    [data-theme-preview] .preview-button--primary {
+      background: var(--preview-primary);
+      color: var(--preview-primary-contrast);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    [data-theme-preview] .preview-button--primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.22);
+    }
+
+    [data-theme-preview] .preview-button--ghost {
+      border: 1px solid var(--preview-border);
+      background: transparent;
+      color: var(--preview-text);
+    }
+
+    [data-theme-preview] .preview-button--ghost:hover {
+      background: var(--preview-surface);
+    }
+
+    [data-theme-preview] .preview-script {
+      font-family: var(--preview-font-script, 'Parisienne', cursive);
+      font-size: 1.125rem;
+      color: var(--preview-text);
+    }
+
+    [data-theme-preview] [data-preview-copy] {
+      color: var(--preview-text);
+    }
+
+    [data-theme-preview] [data-preview-surface] {
+      border-color: var(--preview-border);
+      color: var(--preview-text);
+      background: var(--preview-surface);
+    }
+
+    [data-theme-preview] code {
+      background: rgba(0, 0, 0, 0.18);
+      color: var(--preview-text);
+      border-radius: 0.375rem;
+      padding: 0.125rem 0.375rem;
+    }
+  </style>
 </Base>
