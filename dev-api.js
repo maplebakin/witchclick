@@ -91,6 +91,19 @@ const MIME_EXTENSION_MAP = {
   'application/pdf': '.pdf',
 };
 
+function toStringArray(value) {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => (typeof item === 'string' ? item.trim() : String(item ?? '').trim()))
+      .filter(Boolean);
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed ? [trimmed] : [];
+  }
+  return [];
+}
+
 function normalizeExtension(ext, fallback) {
   if (!ext) return fallback;
   const lower = ext.toLowerCase();
@@ -171,6 +184,10 @@ async function listPostsForHero() {
       const fmLegacyAlt = frontmatterString(parsed.data, 'heroImageAlt');
       const fmHeroImage = frontmatterString(parsed.data, 'heroImage');
       const fmLegacyImage = frontmatterString(parsed.data, 'heroImageSrc');
+      const fmExcerpt = frontmatterString(parsed.data, 'excerpt');
+      const fmMetaDescription = frontmatterString(parsed.data, 'metaDescription');
+      const fmMood = frontmatterString(parsed.data, 'mood');
+      const fmTags = toStringArray(parsed.data?.tags);
       if (!isValidSlug(slug)) continue;
       items.push({
         slug,
@@ -179,13 +196,28 @@ async function listPostsForHero() {
         heroAlt: fmHeroAlt || null,
         heroImageAlt: fmLegacyAlt || null,
         heroImage: fmHeroImage || fmLegacyImage || null,
+        excerpt: fmExcerpt || fmMetaDescription || '',
+        metaDescription: fmMetaDescription || '',
+        mood: fmMood || '',
+        tags: fmTags,
       });
       continue;
     } catch {
       /* ignore unreadable file */
     }
     if (!isValidSlug(slug)) continue;
-    items.push({ slug, title, heroImagePrompt: null, heroAlt: null, heroImageAlt: null, heroImage: null });
+    items.push({
+      slug,
+      title,
+      heroImagePrompt: null,
+      heroAlt: null,
+      heroImageAlt: null,
+      heroImage: null,
+      excerpt: '',
+      metaDescription: '',
+      mood: '',
+      tags: [],
+    });
   }
   items.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }));
   return items;
