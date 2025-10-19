@@ -634,7 +634,7 @@ blockquote {
   font-size: 0.65rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(244, 241, 255, 0.55);
+  color: var(--text-hint);
   margin-top: 0.15rem;
 }
 

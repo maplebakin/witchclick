@@ -261,7 +261,7 @@
   font-size: 0.625rem;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: rgba(244, 241, 255, 0.6);
+  color: var(--text-hint);
 }
 
 /* --- New Styles for the Unified Post Container --- */
