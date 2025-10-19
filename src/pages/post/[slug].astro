@@ -441,8 +441,6 @@ const jsonLd = {
               <DownloadCard id={String(data.downloadId)} />
             ) : null}
 
-            <AdSlot slot="end" class="mt-4" />
-
             {authorsWithProfiles.length > 0 && (
               <section class="border-t border-line-inverse/30 pt-6 sm:pt-8">
                 <h2 class="text-sm font-semibold uppercase tracking-[0.26em] text-inverse-muted">
@@ -490,6 +488,7 @@ const jsonLd = {
 
       <div class="card-panel card-panel-strong card-panel-static flex flex-col gap-6 p-6 text-inverse sm:p-8 lg:p-10">
         <RelatedPosts currentSlug={effectiveSlug} tags={Array.isArray(data.tags) ? data.tags : []} />
+        <AdSlot class="mt-6" />
       </div>
 
       <div class="card-panel card-panel-strong card-panel-static flex flex-col gap-6 p-6 text-inverse sm:p-8 lg:p-10">
