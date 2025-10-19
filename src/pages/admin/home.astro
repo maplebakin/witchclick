@@ -1,0 +1,250 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readSettings, getSiteOrigin } from "../../utils/settings";
+import HeadSlot from "@/components/HeadSlot.astro";
+
+export const prerender = false;
+
+const settings = readSettings();
+const site = getSiteOrigin(settings) || "https://example.com";
+
+const isDev = import.meta.env.DEV;
+const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
+const url = new URL(Astro.request.url);
+const keyOk = ADMIN_KEY && url.searchParams.get('key') === ADMIN_KEY;
+const canUse = isDev || !!keyOk;
+
+const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+---
+<Base
+  title="WitchClick — Home Page Dashboard"
+  description="Manage homepage content including CTA and testimonials."
+  canon={`${site}/admin/home`}
+  wide={true}
+  noindex={true}
+>
+  <HeadSlot slot="head">
+    <meta name="robots" content="noindex" />
+  </HeadSlot>
+
+  {canUse ? (
+    <div class="mx-auto max-w-6xl space-y-6" data-home-admin data-dev-api={DEV_API}>
+      <header>
+        <h1 class="text-2xl font-semibold text-primary">Homepage Content</h1>
+        <p class="mt-2 text-sm text-body-muted">
+          Manage your homepage CTA and testimonials.
+        </p>
+      </header>
+
+      <div class="grid gap-6 lg:grid-cols-2">
+        {/* CTA Section */}
+        <section class="rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm">
+          <h2 class="mb-4 text-lg font-semibold text-primary">Call to Action</h2>
+          <form id="ctaForm" class="space-y-4">
+            <label class="block">
+              <span class="text-sm font-medium text-body">Eyebrow</span>
+              <input type="text" name="eyebrow" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm" placeholder="Stay in the circle" />
+            </label>
+            <label class="block">
+              <span class="text-sm font-medium text-body">Title</span>
+              <input type="text" name="title" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm" placeholder="Sign up for the dispatch" />
+            </label>
+            <label class="block">
+              <span class="text-sm font-medium text-body">Description</span>
+              <textarea name="description" rows="3" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm" placeholder="Two gentle emails a month..."></textarea>
+            </label>
+            <details class="rounded-lg border border-line-subtle p-3">
+              <summary class="cursor-pointer text-sm font-medium text-body">Form Settings</summary>
+              <div class="mt-3 space-y-3">
+                <label class="block">
+                  <span class="text-xs font-medium text-body">Form Action URL</span>
+                  <input type="url" name="formAction" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-1.5 text-xs" />
+                </label>
+                <label class="block">
+                  <span class="text-xs font-medium text-body">Email Placeholder</span>
+                  <input type="text" name="emailPlaceholder" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-1.5 text-xs" />
+                </label>
+                <label class="block">
+                  <span class="text-xs font-medium text-body">Submit Label</span>
+                  <input type="text" name="submitLabel" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-1.5 text-xs" />
+                </label>
+                <label class="block">
+                  <span class="text-xs font-medium text-body">Disclaimer</span>
+                  <input type="text" name="disclaimer" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-1.5 text-xs" />
+                </label>
+              </div>
+            </details>
+          </form>
+        </section>
+
+        {/* Testimonials Section */}
+        <section class="rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm">
+          <div class="mb-4 flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-primary">Testimonials</h2>
+            <button type="button" id="addTestimonialBtn" class="rounded-lg border border-line-neutral px-3 py-1 text-xs font-medium hover:bg-surface-soft">
+              Add Testimonial
+            </button>
+          </div>
+          <div id="testimonialsList" class="space-y-3"></div>
+        </section>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button type="button" id="saveBtn" class="rounded-lg bg-surface-success px-5 py-2.5 text-sm font-medium text-inverse hover:bg-surface-success-strong">
+          Save Homepage
+        </button>
+        <button type="button" id="resetBtn" class="rounded-lg border border-line-neutral px-5 py-2.5 text-sm font-medium hover:bg-surface-soft">
+          Reset
+        </button>
+        <p class="ml-auto text-sm" data-status></p>
+      </div>
+    </div>
+  ) : (
+    <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
+      <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
+      <p class="text-body-muted">This dashboard is only available in <strong>development</strong>.</p>
+    </section>
+  )}
+
+  {canUse && (
+    <script is:inline>
+      {`(function(){
+        const root = document.querySelector('[data-home-admin]');
+        if (!root) return;
+        const devApi = root.getAttribute('data-dev-api');
+        const ctaForm = root.querySelector('#ctaForm');
+        const testimonialsList = root.querySelector('#testimonialsList');
+        const statusEl = root.querySelector('[data-status]');
+        const saveBtn = root.querySelector('#saveBtn');
+        const resetBtn = root.querySelector('#resetBtn');
+        const addTestimonialBtn = root.querySelector('#addTestimonialBtn');
+        let data = { cta: {}, testimonials: [] };
+
+        function setStatus(msg, tone) {
+          if (!statusEl) return;
+          statusEl.textContent = msg || '';
+          statusEl.className = 'ml-auto text-sm ' + (tone === 'error' ? 'text-danger' : tone === 'success' ? 'text-success' : 'text-body-muted');
+        }
+
+        function populateCTA(cta) {
+          if (!ctaForm || !cta) return;
+          const fields = { eyebrow: '', title: '', description: '', formAction: '', emailPlaceholder: '', submitLabel: '', disclaimer: '' };
+          Object.keys(fields).forEach(key => {
+            const input = ctaForm.querySelector('[name="' + key + '"]');
+            if (input) {
+              if (key.startsWith('form')) {
+                const formKey = key.replace('form', '').replace(/^./, c => c.toLowerCase());
+                input.value = cta.form?.[formKey] || cta.form?.[key] || '';
+              } else {
+                input.value = cta[key] || '';
+              }
+            }
+          });
+        }
+
+        function collectCTA() {
+          const form = {};
+          ['action', 'emailPlaceholder', 'submitLabel', 'disclaimer'].forEach(key => {
+            const input = ctaForm.querySelector('[name="form' + key.charAt(0).toUpperCase() + key.slice(1) + '"]');
+            if (input) form[key] = input.value;
+          });
+          return {
+            eyebrow: ctaForm.querySelector('[name="eyebrow"]')?.value || '',
+            title: ctaForm.querySelector('[name="title"]')?.value || '',
+            description: ctaForm.querySelector('[name="description"]')?.value || '',
+            form: { ...form, method: 'post', emailFieldName: 'email' }
+          };
+        }
+
+        function renderTestimonials() {
+          if (!testimonialsList) return;
+          testimonialsList.innerHTML = '';
+          if (!data.testimonials.length) {
+            testimonialsList.innerHTML = '<p class="text-xs text-body-muted">No testimonials yet.</p>';
+            return;
+          }
+          data.testimonials.forEach((t, i) => {
+            const card = document.createElement('div');
+            card.className = 'rounded-lg border border-line-neutral bg-surface-soft p-3 space-y-2';
+            const header = document.createElement('div');
+            header.className = 'flex items-center justify-between';
+            const title = document.createElement('span');
+            title.className = 'text-xs font-semibold text-primary';
+            title.textContent = t.author || 'Testimonial ' + (i + 1);
+            const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'text-xs text-danger hover:underline';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.addEventListener('click', () => { data.testimonials.splice(i, 1); renderTestimonials(); });
+            header.appendChild(title);
+            header.appendChild(deleteBtn);
+            card.appendChild(header);
+
+            const quoteLabel = document.createElement('label');
+            quoteLabel.className = 'block';
+            quoteLabel.innerHTML = '<span class="text-xs font-medium text-body">Quote</span>';
+            const quoteInput = document.createElement('textarea');
+            quoteInput.rows = 2;
+            quoteInput.className = 'mt-1 w-full rounded border border-line-neutral px-2 py-1 text-xs';
+            quoteInput.value = t.quote || '';
+            quoteInput.addEventListener('input', e => { data.testimonials[i].quote = e.target.value; });
+            quoteLabel.appendChild(quoteInput);
+            card.appendChild(quoteLabel);
+
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-2 gap-2';
+            ['author', 'role'].forEach(field => {
+              const label = document.createElement('label');
+              label.className = 'block';
+              label.innerHTML = '<span class="text-xs font-medium text-body capitalize">' + field + '</span>';
+              const input = document.createElement('input');
+              input.type = 'text';
+              input.className = 'mt-1 w-full rounded border border-line-neutral px-2 py-1 text-xs';
+              input.value = t[field] || '';
+              input.addEventListener('input', e => { data.testimonials[i][field] = e.target.value; renderTestimonials(); });
+              label.appendChild(input);
+              grid.appendChild(label);
+            });
+            card.appendChild(grid);
+            testimonialsList.appendChild(card);
+          });
+        }
+
+        async function loadData() {
+          try {
+            setStatus('Loading…');
+            const res = await fetch(devApi + '/home/get', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+            const json = await res.json();
+            if (!json?.ok) throw new Error(json?.error || 'Failed to load');
+            data = json.data || { cta: {}, testimonials: [] };
+            populateCTA(data.cta);
+            renderTestimonials();
+            setStatus('Loaded.', 'success');
+            setTimeout(() => setStatus(''), 2000);
+          } catch (e) {
+            setStatus(e?.message || 'Failed to load.', 'error');
+          }
+        }
+
+        async function saveData() {
+          try {
+            setStatus('Saving…');
+            data.cta = collectCTA();
+            const res = await fetch(devApi + '/home/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            const json = await res.json();
+            if (!json?.ok) throw new Error(json?.error || 'Failed to save');
+            setStatus('Saved!', 'success');
+            setTimeout(() => setStatus(''), 3000);
+          } catch (e) {
+            setStatus(e?.message || 'Failed to save.', 'error');
+          }
+        }
+
+        if (addTestimonialBtn) addTestimonialBtn.addEventListener('click', () => { data.testimonials.push({ quote: '', author: '', role: '' }); renderTestimonials(); });
+        if (saveBtn) saveBtn.addEventListener('click', saveData);
+        if (resetBtn) resetBtn.addEventListener('click', loadData);
+        loadData();
+      })();`}
+    </script>
+  )}
+</Base>

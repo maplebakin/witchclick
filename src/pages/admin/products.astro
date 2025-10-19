@@ -1,0 +1,281 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readSettings, getSiteOrigin } from "../../utils/settings";
+import HeadSlot from "@/components/HeadSlot.astro";
+
+export const prerender = false;
+
+const settings = readSettings();
+const site = getSiteOrigin(settings) || "https://example.com";
+
+const isDev = import.meta.env.DEV;
+const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
+const url = new URL(Astro.request.url);
+const keyOk = ADMIN_KEY && url.searchParams.get('key') === ADMIN_KEY;
+const canUse = isDev || !!keyOk;
+
+const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+---
+<Base
+  title="WitchClick — Products Dashboard"
+  description="Manage affiliate products and product catalog."
+  canon={`${site}/admin/products`}
+  wide={true}
+  noindex={true}
+>
+  <HeadSlot slot="head">
+    <meta name="robots" content="noindex" />
+  </HeadSlot>
+
+  {canUse ? (
+    <div class="mx-auto max-w-6xl space-y-6" data-products-admin data-dev-api={DEV_API}>
+      <section class="rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm">
+        <header class="mb-6 flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-semibold text-primary">Affiliate Products</h1>
+            <p class="mt-2 text-sm text-body-muted">
+              Manage your affiliate product catalog and links.
+            </p>
+          </div>
+          <button
+            type="button"
+            id="addProductBtn"
+            class="rounded-lg bg-surface-success px-4 py-2 text-sm font-medium text-inverse hover:bg-surface-success-strong"
+          >
+            Add Product
+          </button>
+        </header>
+
+        <div id="productsList" class="space-y-4"></div>
+
+        <div class="mt-6 flex items-center gap-3 border-t border-line-subtle pt-6">
+          <button
+            type="button"
+            id="saveBtn"
+            class="rounded-lg bg-surface-success px-5 py-2.5 text-sm font-medium text-inverse hover:bg-surface-success-strong"
+          >
+            Save All Products
+          </button>
+          <button
+            type="button"
+            id="resetBtn"
+            class="rounded-lg border border-line-neutral px-5 py-2.5 text-sm font-medium hover:bg-surface-soft"
+          >
+            Reset
+          </button>
+          <p class="ml-auto text-sm" data-status></p>
+        </div>
+      </section>
+    </div>
+  ) : (
+    <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
+      <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
+      <p class="text-body-muted">This dashboard is only available in <strong>development</strong> (or with a temporary key).</p>
+    </section>
+  )}
+
+  {canUse && (
+    <script is:inline>
+      {`
+        (function(){
+          const root = document.querySelector('[data-products-admin]');
+          if (!root) return;
+
+          const devApi = root.getAttribute('data-dev-api') || 'http://localhost:8787';
+          const productsList = root.querySelector('#productsList');
+          const statusEl = root.querySelector('[data-status]');
+          const saveBtn = root.querySelector('#saveBtn');
+          const resetBtn = root.querySelector('#resetBtn');
+          const addProductBtn = root.querySelector('#addProductBtn');
+
+          let products = [];
+
+          function setStatus(message, tone) {
+            if (!statusEl) return;
+            const base = 'text-sm ml-auto';
+            if (!message) {
+              statusEl.textContent = '';
+              statusEl.className = base + ' text-body-muted';
+              return;
+            }
+            if (tone === 'error') {
+              statusEl.className = base + ' text-danger';
+            } else if (tone === 'success') {
+              statusEl.className = base + ' text-success';
+            } else {
+              statusEl.className = base + ' text-body-muted';
+            }
+            statusEl.textContent = message;
+          }
+
+          function createProductCard(product, index) {
+            const card = document.createElement('div');
+            card.className = 'rounded-xl border border-line-neutral bg-surface-soft p-4 space-y-3';
+            card.dataset.productIndex = index;
+
+            const header = document.createElement('div');
+            header.className = 'flex items-center justify-between gap-3';
+
+            const title = document.createElement('h3');
+            title.className = 'text-sm font-semibold text-primary';
+            title.textContent = product.name || 'New Product';
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'text-xs text-danger hover:underline';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.addEventListener('click', () => {
+              products.splice(index, 1);
+              renderProducts();
+            });
+
+            header.appendChild(title);
+            header.appendChild(deleteBtn);
+
+            const grid = document.createElement('div');
+            grid.className = 'grid gap-3 md:grid-cols-2';
+
+            const fields = [
+              { name: 'key', label: 'Product Key', type: 'text', placeholder: 'sustainable-incense', required: true },
+              { name: 'name', label: 'Product Name', type: 'text', placeholder: 'Sustainable Incense Stick Set', required: true },
+              { name: 'brand', label: 'Brand', type: 'text', placeholder: 'Various Makers' },
+              { name: 'url', label: 'Affiliate URL', type: 'url', placeholder: 'https://...', required: true, fullWidth: true },
+              { name: 'utm', label: 'UTM Parameters', type: 'text', placeholder: 'utm_source=witchclick&utm_medium=affiliate', fullWidth: true },
+              { name: 'rel', label: 'Link Rel', type: 'text', placeholder: 'sponsored nofollow' },
+              { name: 'tags', label: 'Tags (comma-separated)', type: 'text', placeholder: 'incense, cleansing, aromatherapy', fullWidth: true },
+            ];
+
+            fields.forEach(field => {
+              const label = document.createElement('label');
+              label.className = 'block' + (field.fullWidth ? ' md:col-span-2' : '');
+
+              const labelSpan = document.createElement('span');
+              labelSpan.className = 'text-xs font-medium text-body';
+              labelSpan.textContent = field.label;
+              if (field.required) {
+                const req = document.createElement('span');
+                req.className = 'text-danger';
+                req.textContent = ' *';
+                labelSpan.appendChild(req);
+              }
+
+              const input = document.createElement('input');
+              input.type = field.type;
+              input.name = field.name;
+              input.placeholder = field.placeholder || '';
+              input.className = 'mt-1 w-full rounded-lg border border-line-neutral px-3 py-1.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20';
+
+              if (field.name === 'tags' && Array.isArray(product[field.name])) {
+                input.value = product[field.name].join(', ');
+              } else {
+                input.value = product[field.name] || '';
+              }
+
+              input.addEventListener('input', (e) => {
+                if (field.name === 'tags') {
+                  products[index][field.name] = e.target.value.split(',').map(t => t.trim()).filter(Boolean);
+                } else {
+                  products[index][field.name] = e.target.value;
+                }
+                renderProducts();
+              });
+
+              label.appendChild(labelSpan);
+              label.appendChild(input);
+              grid.appendChild(label);
+            });
+
+            card.appendChild(header);
+            card.appendChild(grid);
+            return card;
+          }
+
+          function renderProducts() {
+            if (!productsList) return;
+            productsList.innerHTML = '';
+
+            if (!products.length) {
+              const empty = document.createElement('p');
+              empty.className = 'text-sm text-body-muted text-center py-8';
+              empty.textContent = 'No products yet. Click "Add Product" to get started.';
+              productsList.appendChild(empty);
+              return;
+            }
+
+            products.forEach((product, index) => {
+              productsList.appendChild(createProductCard(product, index));
+            });
+          }
+
+          async function loadProducts() {
+            try {
+              setStatus('Loading products…');
+              const res = await fetch(devApi + '/products/list', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: '{}'
+              });
+              const json = await res.json();
+              if (!json || json.ok !== true) {
+                throw new Error(json?.error || 'Failed to load products');
+              }
+              products = json.products || [];
+              renderProducts();
+              setStatus('Products loaded.', 'success');
+              setTimeout(() => setStatus(''), 2000);
+            } catch (error) {
+              setStatus(error?.message || 'Failed to load products.', 'error');
+            }
+          }
+
+          async function saveProducts() {
+            try {
+              setStatus('Saving products…');
+              const res = await fetch(devApi + '/products/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ products })
+              });
+              const json = await res.json();
+              if (!json || json.ok !== true) {
+                throw new Error(json?.error || 'Failed to save products');
+              }
+              products = json.products || [];
+              renderProducts();
+              setStatus('Products saved successfully!', 'success');
+              setTimeout(() => setStatus(''), 3000);
+            } catch (error) {
+              setStatus(error?.message || 'Failed to save products.', 'error');
+            }
+          }
+
+          if (addProductBtn) {
+            addProductBtn.addEventListener('click', () => {
+              products.push({
+                key: '',
+                name: '',
+                brand: '',
+                url: '',
+                utm: '',
+                rel: 'sponsored nofollow',
+                tags: []
+              });
+              renderProducts();
+            });
+          }
+
+          if (saveBtn) {
+            saveBtn.addEventListener('click', saveProducts);
+          }
+
+          if (resetBtn) {
+            resetBtn.addEventListener('click', loadProducts);
+          }
+
+          // Load products on page load
+          loadProducts();
+        })();
+      `}
+    </script>
+  )}
+</Base>

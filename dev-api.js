@@ -9,6 +9,20 @@
 //   POST /entities/get {type, slug}
 //   POST /entities/save {type, slug, name, summary, properties, related[]}
 //   POST /posts/save   {title, slug?, excerpt, metaDescription, tags, includeAds, includeKofi, entities, markdown}
+//   POST /settings/get
+//   POST /settings/save {siteUrl, brandName, disclosure, kofiUsername, showAccountLink, analytics*, ads*, observability*, clientErrorEndpoint}
+//   POST /products/list
+//   POST /products/save {products[]}
+//   POST /home/get
+//   POST /home/save {cta, testimonials[]}
+//   POST /partners/get
+//   POST /partners/save {sections[], affiliateHighlights[]}
+//   POST /calendar/get
+//   POST /calendar/save {seasons[]}
+//   POST /authors/list
+//   POST /authors/get {slug}
+//   POST /authors/save {slug, name, title, pronouns, bio, focus, specialties[], links[]}
+//   POST /authors/delete {slug}
 
 import http from 'node:http';
 import fs from 'node:fs';
@@ -1631,6 +1645,63 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
+    // ---- Settings
+    if (req.method === 'POST' && req.url === '/settings/get') {
+      try {
+        const settingsPath = path.join(CWD, 'content', 'settings.json');
+        const settings = readJSON(settingsPath) || {};
+        return send(res, 200, { ok: true, settings });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/settings/save') {
+      try {
+        const body = await parseBody(req);
+        if (!body || typeof body !== 'object') {
+          return send(res, 400, { ok: false, error: 'Invalid request body' });
+        }
+
+        const settingsPath = path.join(CWD, 'content', 'settings.json');
+        const currentSettings = readJSON(settingsPath) || {};
+
+        // Merge the updates with current settings
+        const updatedSettings = {
+          siteUrl: typeof body.siteUrl === 'string' ? body.siteUrl.trim() : currentSettings.siteUrl || 'https://witchclick.space',
+          brandName: typeof body.brandName === 'string' ? body.brandName.trim() : currentSettings.brandName || 'WitchClick',
+          disclosure: typeof body.disclosure === 'string' ? body.disclosure.trim() : currentSettings.disclosure || '',
+          kofiUsername: typeof body.kofiUsername === 'string' ? body.kofiUsername.trim() : currentSettings.kofiUsername || '',
+          showAccountLink: body.showAccountLink === true || body.showAccountLink === 'true',
+          analytics: {
+            enabled: body.analyticsEnabled === true || body.analyticsEnabled === 'true',
+            provider: typeof body.analyticsProvider === 'string' ? body.analyticsProvider.trim() : (currentSettings.analytics?.provider || 'plausible'),
+            domain: typeof body.analyticsDomain === 'string' ? body.analyticsDomain.trim() : (currentSettings.analytics?.domain || ''),
+            apiHost: typeof body.analyticsApiHost === 'string' ? body.analyticsApiHost.trim() : (currentSettings.analytics?.apiHost || ''),
+          },
+          ads: {
+            provider: typeof body.adsProvider === 'string' ? body.adsProvider.trim() : (currentSettings.ads?.provider || 'adsense'),
+            adsenseClientId: typeof body.adsenseClientId === 'string' ? body.adsenseClientId.trim() : (currentSettings.ads?.adsenseClientId || ''),
+            sidebarSlotId: typeof body.sidebarSlotId === 'string' ? body.sidebarSlotId.trim() : (currentSettings.ads?.sidebarSlotId || ''),
+            endSlotId: typeof body.endSlotId === 'string' ? body.endSlotId.trim() : (currentSettings.ads?.endSlotId || ''),
+          },
+          observability: {
+            enabled: body.observabilityEnabled === true || body.observabilityEnabled === 'true',
+            dsn: body.observabilityDsn || currentSettings.observability?.dsn || null,
+            environment: typeof body.observabilityEnvironment === 'string' ? body.observabilityEnvironment.trim() : (currentSettings.observability?.environment || 'production'),
+          },
+          clientErrorEndpoint: body.clientErrorEndpoint || currentSettings.clientErrorEndpoint || null,
+        };
+
+        ensureDir(path.dirname(settingsPath));
+        await fsp.writeFile(settingsPath, JSON.stringify(updatedSettings, null, 2), 'utf8');
+
+        return send(res, 200, { ok: true, settings: updatedSettings });
+      } catch (e) {
+        return send(res, 400, { ok: false, error: e.message || String(e) });
+      }
+    }
+
     // ---- Entities
     if (req.method === 'POST' && req.url === '/entities/list') {
       try {
@@ -1656,6 +1727,211 @@ const server = http.createServer(async (req, res) => {
         const body = await parseBody(req);
         const data = await saveEntity(body || {});
         return send(res, 200, { ok: true, ...data });
+      } catch (e) {
+        return send(res, 400, { ok: false, error: e.message || String(e) });
+      }
+    }
+
+    // ---- Products
+    if (req.method === 'POST' && req.url === '/products/list') {
+      try {
+        const productsPath = path.join(CWD, 'content', 'products.json');
+        const data = readJSON(productsPath) || { products: [] };
+        return send(res, 200, { ok: true, products: data.products || [] });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/products/save') {
+      try {
+        const body = await parseBody(req);
+        if (!body || !Array.isArray(body.products)) {
+          return send(res, 400, { ok: false, error: 'products array required' });
+        }
+        const productsPath = path.join(CWD, 'content', 'products.json');
+        const data = { products: body.products };
+        ensureDir(path.dirname(productsPath));
+        await fsp.writeFile(productsPath, JSON.stringify(data, null, 2), 'utf8');
+        return send(res, 200, { ok: true, products: data.products });
+      } catch (e) {
+        return send(res, 400, { ok: false, error: e.message || String(e) });
+      }
+    }
+
+    // ---- Home (Testimonials & CTA)
+    if (req.method === 'POST' && req.url === '/home/get') {
+      try {
+        const homePath = path.join(CWD, 'content', 'blocks', 'home.json');
+        const data = readJSON(homePath) || { cta: {}, testimonials: [] };
+        return send(res, 200, { ok: true, data });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/home/save') {
+      try {
+        const body = await parseBody(req);
+        if (!body || typeof body !== 'object') {
+          return send(res, 400, { ok: false, error: 'Invalid request body' });
+        }
+        const homePath = path.join(CWD, 'content', 'blocks', 'home.json');
+        ensureDir(path.dirname(homePath));
+        await fsp.writeFile(homePath, JSON.stringify(body, null, 2), 'utf8');
+        return send(res, 200, { ok: true, data: body });
+      } catch (e) {
+        return send(res, 400, { ok: false, error: e.message || String(e) });
+      }
+    }
+
+    // ---- Partners
+    if (req.method === 'POST' && req.url === '/partners/get') {
+      try {
+        const partnersPath = path.join(CWD, 'content', 'blocks', 'partners.json');
+        const data = readJSON(partnersPath) || { updatedAt: '', sections: [], affiliateHighlights: [] };
+        return send(res, 200, { ok: true, data });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/partners/save') {
+      try {
+        const body = await parseBody(req);
+        if (!body || typeof body !== 'object') {
+          return send(res, 400, { ok: false, error: 'Invalid request body' });
+        }
+        const partnersPath = path.join(CWD, 'content', 'blocks', 'partners.json');
+        const data = {
+          updatedAt: new Date().toISOString().split('T')[0],
+          sections: Array.isArray(body.sections) ? body.sections : [],
+          affiliateHighlights: Array.isArray(body.affiliateHighlights) ? body.affiliateHighlights : [],
+        };
+        ensureDir(path.dirname(partnersPath));
+        await fsp.writeFile(partnersPath, JSON.stringify(data, null, 2), 'utf8');
+        return send(res, 200, { ok: true, data });
+      } catch (e) {
+        return send(res, 400, { ok: false, error: e.message || String(e) });
+      }
+    }
+
+    // ---- Editorial Calendar
+    if (req.method === 'POST' && req.url === '/calendar/get') {
+      try {
+        const calendarPath = path.join(CWD, 'content', 'blocks', 'editorial-calendar.json');
+        const data = readJSON(calendarPath) || { updatedAt: '', seasons: [] };
+        return send(res, 200, { ok: true, data });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/calendar/save') {
+      try {
+        const body = await parseBody(req);
+        if (!body || typeof body !== 'object') {
+          return send(res, 400, { ok: false, error: 'Invalid request body' });
+        }
+        const calendarPath = path.join(CWD, 'content', 'blocks', 'editorial-calendar.json');
+        const data = {
+          updatedAt: new Date().toISOString().split('T')[0],
+          seasons: Array.isArray(body.seasons) ? body.seasons : [],
+        };
+        ensureDir(path.dirname(calendarPath));
+        await fsp.writeFile(calendarPath, JSON.stringify(data, null, 2), 'utf8');
+        return send(res, 200, { ok: true, data });
+      } catch (e) {
+        return send(res, 400, { ok: false, error: e.message || String(e) });
+      }
+    }
+
+    // ---- Authors
+    if (req.method === 'POST' && req.url === '/authors/list') {
+      try {
+        const authorsDir = path.join(CWD, 'content', 'authors');
+        const authors = [];
+        if (fs.existsSync(authorsDir)) {
+          const files = fs.readdirSync(authorsDir).filter(f => f.endsWith('.json'));
+          for (const file of files) {
+            try {
+              const data = JSON.parse(fs.readFileSync(path.join(authorsDir, file), 'utf8'));
+              authors.push({
+                slug: data.slug || file.replace(/\.json$/, ''),
+                name: data.name || '',
+                title: data.title || '',
+                pronouns: data.pronouns || '',
+              });
+            } catch { /* ignore malformed file */ }
+          }
+        }
+        authors.sort((a, b) => a.name.localeCompare(b.name));
+        return send(res, 200, { ok: true, authors });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/authors/get') {
+      try {
+        const body = await parseBody(req);
+        const slug = slugify(body?.slug || '');
+        if (!slug) {
+          return send(res, 400, { ok: false, error: 'slug required' });
+        }
+        const authorPath = path.join(CWD, 'content', 'authors', `${slug}.json`);
+        if (!fs.existsSync(authorPath)) {
+          return send(res, 404, { ok: false, error: 'Author not found' });
+        }
+        const data = JSON.parse(fs.readFileSync(authorPath, 'utf8'));
+        return send(res, 200, { ok: true, data });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/authors/save') {
+      try {
+        const body = await parseBody(req);
+        if (!body || typeof body !== 'object') {
+          return send(res, 400, { ok: false, error: 'Invalid request body' });
+        }
+        const slug = slugify(body.slug || body.name || '');
+        if (!slug) {
+          return send(res, 400, { ok: false, error: 'slug or name required' });
+        }
+        const authorPath = path.join(CWD, 'content', 'authors', `${slug}.json`);
+        const data = {
+          slug,
+          name: String(body.name || '').trim() || slug,
+          title: String(body.title || '').trim(),
+          pronouns: String(body.pronouns || '').trim(),
+          bio: String(body.bio || '').trim(),
+          focus: String(body.focus || '').trim(),
+          specialties: Array.isArray(body.specialties) ? body.specialties : [],
+          links: Array.isArray(body.links) ? body.links : [],
+        };
+        ensureDir(path.dirname(authorPath));
+        await fsp.writeFile(authorPath, JSON.stringify(data, null, 2), 'utf8');
+        return send(res, 200, { ok: true, data, path: `content/authors/${slug}.json` });
+      } catch (e) {
+        return send(res, 400, { ok: false, error: e.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/authors/delete') {
+      try {
+        const body = await parseBody(req);
+        const slug = slugify(body?.slug || '');
+        if (!slug) {
+          return send(res, 400, { ok: false, error: 'slug required' });
+        }
+        const authorPath = path.join(CWD, 'content', 'authors', `${slug}.json`);
+        if (!fs.existsSync(authorPath)) {
+          return send(res, 404, { ok: false, error: 'Author not found' });
+        }
+        await fsp.unlink(authorPath);
+        return send(res, 200, { ok: true, slug });
       } catch (e) {
         return send(res, 400, { ok: false, error: e.message || String(e) });
       }

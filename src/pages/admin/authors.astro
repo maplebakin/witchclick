@@ -1,0 +1,311 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readSettings, getSiteOrigin } from "../../utils/settings";
+import HeadSlot from "@/components/HeadSlot.astro";
+
+export const prerender = false;
+
+const settings = readSettings();
+const site = getSiteOrigin(settings) || "https://example.com";
+
+const isDev = import.meta.env.DEV;
+const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
+const url = new URL(Astro.request.url);
+const keyOk = ADMIN_KEY && url.searchParams.get('key') === ADMIN_KEY;
+const canUse = isDev || !!keyOk;
+
+const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+---
+<Base
+  title="WitchClick — Authors Dashboard"
+  description="Manage author profiles and contributors."
+  canon={`${site}/admin/authors`}
+  wide={true}
+  noindex={true}
+>
+  <HeadSlot slot="head">
+    <meta name="robots" content="noindex" />
+  </HeadSlot>
+
+  {canUse ? (
+    <div class="mx-auto max-w-4xl space-y-6" data-authors-admin data-dev-api={DEV_API}>
+      <section class="rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm">
+        <header class="mb-6 flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-semibold text-primary">Authors</h1>
+            <p class="mt-2 text-sm text-body-muted">Manage author profiles and contributor information.</p>
+          </div>
+        </header>
+
+        <div class="mb-6 flex items-center gap-3">
+          <select id="authorSelect" class="flex-1 rounded-lg border border-line-neutral px-3 py-2 text-sm">
+            <option value="">Select an author...</option>
+          </select>
+          <button type="button" id="newAuthorBtn" class="rounded-lg bg-surface-success px-4 py-2 text-sm font-medium text-inverse hover:bg-surface-success-strong">
+            New Author
+          </button>
+        </div>
+
+        <form id="authorForm" class="hidden space-y-4">
+          <label class="block">
+            <span class="text-sm font-medium text-body">Name <span class="text-danger">*</span></span>
+            <input type="text" name="name" required class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm" placeholder="Sol Rivera" />
+          </label>
+
+          <div class="grid gap-4 md:grid-cols-2">
+            <label class="block">
+              <span class="text-sm font-medium text-body">Slug</span>
+              <input type="text" name="slug" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm" placeholder="sol-rivera" />
+              <p class="mt-1 text-xs text-body-muted">Auto-generated from name if blank</p>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-body">Pronouns</span>
+              <input type="text" name="pronouns" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm" placeholder="they/them" />
+            </label>
+          </div>
+
+          <label class="block">
+            <span class="text-sm font-medium text-body">Title</span>
+            <input type="text" name="title" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm" placeholder="Community Care Cartographer" />
+          </label>
+
+          <label class="block">
+            <span class="text-sm font-medium text-body">Focus</span>
+            <input type="text" name="focus" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm" placeholder="Collective nervous system care" />
+          </label>
+
+          <label class="block">
+            <span class="text-sm font-medium text-body">Bio</span>
+            <textarea name="bio" rows="3" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm" placeholder="A brief bio..."></textarea>
+          </label>
+
+          <label class="block">
+            <span class="text-sm font-medium text-body">Specialties (comma-separated)</span>
+            <input type="text" name="specialties" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm" placeholder="calm rituals, mutual aid weaving, repair scripts" />
+          </label>
+
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium text-body">Links</span>
+              <button type="button" id="addLinkBtn" class="text-xs text-primary hover:underline">Add Link</button>
+            </div>
+            <div id="linksContainer" class="space-y-2"></div>
+          </div>
+
+          <div class="flex items-center gap-3 border-t border-line-subtle pt-4">
+            <button type="submit" class="rounded-lg bg-surface-success px-5 py-2.5 text-sm font-medium text-inverse hover:bg-surface-success-strong">
+              Save Author
+            </button>
+            <button type="button" id="deleteBtn" class="hidden rounded-lg border border-danger px-5 py-2.5 text-sm font-medium text-danger hover:bg-surface-danger hover:text-inverse">
+              Delete Author
+            </button>
+            <p class="ml-auto text-sm" data-status></p>
+          </div>
+        </form>
+      </section>
+    </div>
+  ) : (
+    <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
+      <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
+      <p class="text-body-muted">This dashboard is only available in <strong>development</strong>.</p>
+    </section>
+  )}
+
+  {canUse && (
+    <script is:inline>
+      {`(function(){
+        const root = document.querySelector('[data-authors-admin]');
+        if (!root) return;
+        const devApi = root.getAttribute('data-dev-api');
+        const authorSelect = root.querySelector('#authorSelect');
+        const authorForm = root.querySelector('#authorForm');
+        const newAuthorBtn = root.querySelector('#newAuthorBtn');
+        const deleteBtn = root.querySelector('#deleteBtn');
+        const addLinkBtn = root.querySelector('#addLinkBtn');
+        const linksContainer = root.querySelector('#linksContainer');
+        const statusEl = root.querySelector('[data-status]');
+
+        let currentAuthor = null;
+        let authors = [];
+        let links = [];
+
+        function setStatus(msg, tone) {
+          if (!statusEl) return;
+          statusEl.textContent = msg || '';
+          statusEl.className = 'ml-auto text-sm ' + (tone === 'error' ? 'text-danger' : tone === 'success' ? 'text-success' : 'text-body-muted');
+        }
+
+        function renderLinks() {
+          if (!linksContainer) return;
+          linksContainer.innerHTML = '';
+          links.forEach((link, i) => {
+            const div = document.createElement('div');
+            div.className = 'flex gap-2';
+            const titleInput = document.createElement('input');
+            titleInput.type = 'text';
+            titleInput.placeholder = 'Link title';
+            titleInput.value = link.title || '';
+            titleInput.className = 'flex-1 rounded border border-line-neutral px-2 py-1 text-sm';
+            titleInput.addEventListener('input', e => { links[i].title = e.target.value; });
+            const urlInput = document.createElement('input');
+            urlInput.type = 'url';
+            urlInput.placeholder = 'https://...';
+            urlInput.value = link.url || '';
+            urlInput.className = 'flex-1 rounded border border-line-neutral px-2 py-1 text-sm';
+            urlInput.addEventListener('input', e => { links[i].url = e.target.value; });
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.textContent = 'Remove';
+            removeBtn.className = 'text-xs text-danger hover:underline';
+            removeBtn.addEventListener('click', () => { links.splice(i, 1); renderLinks(); });
+            div.appendChild(titleInput);
+            div.appendChild(urlInput);
+            div.appendChild(removeBtn);
+            linksContainer.appendChild(div);
+          });
+        }
+
+        function populateForm(data) {
+          if (!authorForm || !data) return;
+          currentAuthor = data.slug;
+          authorForm.classList.remove('hidden');
+          authorForm.querySelector('[name="name"]').value = data.name || '';
+          authorForm.querySelector('[name="slug"]').value = data.slug || '';
+          authorForm.querySelector('[name="pronouns"]').value = data.pronouns || '';
+          authorForm.querySelector('[name="title"]').value = data.title || '';
+          authorForm.querySelector('[name="focus"]').value = data.focus || '';
+          authorForm.querySelector('[name="bio"]').value = data.bio || '';
+          authorForm.querySelector('[name="specialties"]').value = Array.isArray(data.specialties) ? data.specialties.join(', ') : '';
+          links = Array.isArray(data.links) ? data.links : [];
+          renderLinks();
+          if (deleteBtn) deleteBtn.classList.remove('hidden');
+        }
+
+        function clearForm() {
+          currentAuthor = null;
+          if (!authorForm) return;
+          authorForm.reset();
+          links = [];
+          renderLinks();
+          if (deleteBtn) deleteBtn.classList.add('hidden');
+        }
+
+        async function loadAuthors() {
+          try {
+            const res = await fetch(devApi + '/authors/list', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+            const json = await res.json();
+            if (!json?.ok) throw new Error(json?.error || 'Failed to load authors');
+            authors = json.authors || [];
+            if (authorSelect) {
+              authorSelect.innerHTML = '<option value="">Select an author...</option>';
+              authors.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a.slug;
+                opt.textContent = a.name + (a.pronouns ? ' (' + a.pronouns + ')' : '');
+                authorSelect.appendChild(opt);
+              });
+            }
+          } catch (e) {
+            setStatus(e?.message || 'Failed to load authors.', 'error');
+          }
+        }
+
+        async function loadAuthor(slug) {
+          try {
+            setStatus('Loading…');
+            const res = await fetch(devApi + '/authors/get', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug }) });
+            const json = await res.json();
+            if (!json?.ok) throw new Error(json?.error || 'Failed to load author');
+            populateForm(json.data);
+            setStatus('Loaded.', 'success');
+            setTimeout(() => setStatus(''), 2000);
+          } catch (e) {
+            setStatus(e?.message || 'Failed to load author.', 'error');
+          }
+        }
+
+        async function saveAuthor(data) {
+          try {
+            setStatus('Saving…');
+            const res = await fetch(devApi + '/authors/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            const json = await res.json();
+            if (!json?.ok) throw new Error(json?.error || 'Failed to save');
+            setStatus('Saved!', 'success');
+            await loadAuthors();
+            if (authorSelect) authorSelect.value = json.data.slug;
+            setTimeout(() => setStatus(''), 3000);
+          } catch (e) {
+            setStatus(e?.message || 'Failed to save.', 'error');
+          }
+        }
+
+        async function deleteAuthor(slug) {
+          if (!confirm('Delete this author? This cannot be undone.')) return;
+          try {
+            setStatus('Deleting…');
+            const res = await fetch(devApi + '/authors/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug }) });
+            const json = await res.json();
+            if (!json?.ok) throw new Error(json?.error || 'Failed to delete');
+            setStatus('Deleted.', 'success');
+            clearForm();
+            authorForm.classList.add('hidden');
+            await loadAuthors();
+            setTimeout(() => setStatus(''), 3000);
+          } catch (e) {
+            setStatus(e?.message || 'Failed to delete.', 'error');
+          }
+        }
+
+        if (authorSelect) {
+          authorSelect.addEventListener('change', e => {
+            if (e.target.value) loadAuthor(e.target.value);
+            else { clearForm(); authorForm.classList.add('hidden'); }
+          });
+        }
+
+        if (newAuthorBtn) {
+          newAuthorBtn.addEventListener('click', () => {
+            clearForm();
+            authorForm.classList.remove('hidden');
+            if (authorSelect) authorSelect.value = '';
+          });
+        }
+
+        if (addLinkBtn) {
+          addLinkBtn.addEventListener('click', () => {
+            links.push({ title: '', url: '' });
+            renderLinks();
+          });
+        }
+
+        if (authorForm) {
+          authorForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const specialtiesRaw = formData.get('specialties');
+            const data = {
+              name: formData.get('name'),
+              slug: formData.get('slug') || undefined,
+              pronouns: formData.get('pronouns'),
+              title: formData.get('title'),
+              focus: formData.get('focus'),
+              bio: formData.get('bio'),
+              specialties: specialtiesRaw ? specialtiesRaw.split(',').map(s => s.trim()).filter(Boolean) : [],
+              links: links.filter(l => l.title && l.url)
+            };
+            await saveAuthor(data);
+          });
+        }
+
+        if (deleteBtn) {
+          deleteBtn.addEventListener('click', () => {
+            if (currentAuthor) deleteAuthor(currentAuthor);
+          });
+        }
+
+        loadAuthors();
+      })();`}
+    </script>
+  )}
+</Base>

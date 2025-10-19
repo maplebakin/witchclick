@@ -1,0 +1,452 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readSettings, getSiteOrigin } from "../../utils/settings";
+import HeadSlot from "@/components/HeadSlot.astro";
+
+export const prerender = false;
+
+const settings = readSettings();
+const site = getSiteOrigin(settings) || "https://example.com";
+
+const isDev = import.meta.env.DEV;
+const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
+const url = new URL(Astro.request.url);
+const keyOk = ADMIN_KEY && url.searchParams.get('key') === ADMIN_KEY;
+const canUse = isDev || !!keyOk;
+
+const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+---
+<Base
+  title="WitchClick — Settings Dashboard"
+  description="Configure site settings, analytics, ads, and more."
+  canon={`${site}/admin/settings`}
+  wide={true}
+  noindex={true}
+>
+  <HeadSlot slot="head">
+    <meta name="robots" content="noindex" />
+  </HeadSlot>
+
+  {canUse ? (
+    <div class="mx-auto max-w-4xl space-y-6" data-settings-admin data-dev-api={DEV_API}>
+      <section class="rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm">
+        <header class="mb-6">
+          <h1 class="text-2xl font-semibold text-primary">Site Settings</h1>
+          <p class="mt-2 text-sm text-body-muted">
+            Configure your site's brand, analytics, advertisements, and observability.
+          </p>
+        </header>
+
+        <form id="settingsForm" class="space-y-8">
+          {/* Basic Settings */}
+          <div class="space-y-4">
+            <h2 class="text-lg font-semibold text-primary border-b border-line-subtle pb-2">Basic Settings</h2>
+
+            <label class="block">
+              <span class="text-sm font-medium text-body">Site URL</span>
+              <input
+                type="url"
+                name="siteUrl"
+                id="siteUrl"
+                class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                placeholder="https://witchclick.space"
+              />
+              <p class="mt-1 text-xs text-body-muted">The canonical URL of your site</p>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-body">Brand Name</span>
+              <input
+                type="text"
+                name="brandName"
+                id="brandName"
+                class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                placeholder="WitchClick"
+              />
+              <p class="mt-1 text-xs text-body-muted">Your site's brand name</p>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-body">Affiliate Disclosure</span>
+              <textarea
+                name="disclosure"
+                id="disclosure"
+                rows="3"
+                class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                placeholder="This grimoire shares affiliate links for cozy tools..."
+              ></textarea>
+              <p class="mt-1 text-xs text-body-muted">Disclosure text shown for affiliate links</p>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-body">Ko-fi Username</span>
+              <input
+                type="text"
+                name="kofiUsername"
+                id="kofiUsername"
+                class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                placeholder="yourusername"
+              />
+              <p class="mt-1 text-xs text-body-muted">Your Ko-fi username (without @)</p>
+            </label>
+
+            <label class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="showAccountLink"
+                id="showAccountLink"
+                class="h-4 w-4 rounded border-line-neutral text-primary focus:ring-2 focus:ring-primary/20"
+              />
+              <span class="text-sm font-medium text-body">Show Account Link</span>
+            </label>
+          </div>
+
+          {/* Analytics Settings */}
+          <div class="space-y-4">
+            <h2 class="text-lg font-semibold text-primary border-b border-line-subtle pb-2">Analytics</h2>
+
+            <label class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="analyticsEnabled"
+                id="analyticsEnabled"
+                class="h-4 w-4 rounded border-line-neutral text-primary focus:ring-2 focus:ring-primary/20"
+              />
+              <span class="text-sm font-medium text-body">Enable Analytics</span>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-body">Provider</span>
+              <select
+                name="analyticsProvider"
+                id="analyticsProvider"
+                class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
+                <option value="plausible">Plausible</option>
+                <option value="googleanalytics">Google Analytics</option>
+                <option value="matomo">Matomo</option>
+              </select>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-body">Domain</span>
+              <input
+                type="text"
+                name="analyticsDomain"
+                id="analyticsDomain"
+                class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                placeholder="witchclick.space"
+              />
+              <p class="mt-1 text-xs text-body-muted">Domain to track</p>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-body">API Host</span>
+              <input
+                type="url"
+                name="analyticsApiHost"
+                id="analyticsApiHost"
+                class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                placeholder="https://plausible.witchclick.space"
+              />
+              <p class="mt-1 text-xs text-body-muted">Analytics API host URL</p>
+            </label>
+          </div>
+
+          {/* Ads Settings */}
+          <div class="space-y-4">
+            <h2 class="text-lg font-semibold text-primary border-b border-line-subtle pb-2">Advertisements</h2>
+
+            <label class="block">
+              <span class="text-sm font-medium text-body">Provider</span>
+              <select
+                name="adsProvider"
+                id="adsProvider"
+                class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
+                <option value="adsense">Google AdSense</option>
+                <option value="none">None</option>
+              </select>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-body">AdSense Client ID</span>
+              <input
+                type="text"
+                name="adsenseClientId"
+                id="adsenseClientId"
+                class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                placeholder="ca-pub-XXXXXXXXXXXXXXXX"
+              />
+              <p class="mt-1 text-xs text-body-muted">Your Google AdSense publisher ID</p>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-body">Sidebar Slot ID</span>
+              <input
+                type="text"
+                name="sidebarSlotId"
+                id="sidebarSlotId"
+                class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                placeholder=""
+              />
+              <p class="mt-1 text-xs text-body-muted">Ad slot ID for sidebar placement</p>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-body">End Slot ID</span>
+              <input
+                type="text"
+                name="endSlotId"
+                id="endSlotId"
+                class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                placeholder=""
+              />
+              <p class="mt-1 text-xs text-body-muted">Ad slot ID for end-of-content placement</p>
+            </label>
+          </div>
+
+          {/* Observability Settings */}
+          <div class="space-y-4">
+            <h2 class="text-lg font-semibold text-primary border-b border-line-subtle pb-2">Observability</h2>
+
+            <label class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="observabilityEnabled"
+                id="observabilityEnabled"
+                class="h-4 w-4 rounded border-line-neutral text-primary focus:ring-2 focus:ring-primary/20"
+              />
+              <span class="text-sm font-medium text-body">Enable Observability</span>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-body">Sentry DSN</span>
+              <input
+                type="text"
+                name="observabilityDsn"
+                id="observabilityDsn"
+                class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                placeholder="https://..."
+              />
+              <p class="mt-1 text-xs text-body-muted">Sentry DSN for error tracking</p>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-body">Environment</span>
+              <select
+                name="observabilityEnvironment"
+                id="observabilityEnvironment"
+                class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
+                <option value="production">Production</option>
+                <option value="development">Development</option>
+                <option value="staging">Staging</option>
+              </select>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-body">Client Error Endpoint</span>
+              <input
+                type="url"
+                name="clientErrorEndpoint"
+                id="clientErrorEndpoint"
+                class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                placeholder="https://..."
+              />
+              <p class="mt-1 text-xs text-body-muted">Custom endpoint for client-side error reporting</p>
+            </label>
+          </div>
+
+          {/* Actions */}
+          <div class="flex items-center gap-3 border-t border-line-subtle pt-6">
+            <button
+              type="submit"
+              class="rounded-lg bg-surface-success px-5 py-2.5 text-sm font-medium text-inverse hover:bg-surface-success-strong focus:outline-none focus:ring-2 focus:ring-success/20"
+            >
+              Save Settings
+            </button>
+            <button
+              type="button"
+              id="resetBtn"
+              class="rounded-lg border border-line-neutral px-5 py-2.5 text-sm font-medium hover:bg-surface-soft focus:outline-none focus:ring-2 focus:ring-primary/20"
+            >
+              Reset
+            </button>
+            <p class="ml-auto text-sm" data-status></p>
+          </div>
+        </form>
+      </section>
+    </div>
+  ) : (
+    <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
+      <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
+      <p class="text-body-muted">This dashboard is only available in <strong>development</strong> (or with a temporary key).</p>
+      <p class="mt-3 text-sm text-body-muted">Update <code>content/settings.json</code> manually when the panel is unavailable.</p>
+    </section>
+  )}
+
+  {canUse && (
+    <script is:inline>
+      {`
+        (function(){
+          const root = document.querySelector('[data-settings-admin]');
+          if (!root) return;
+
+          const devApi = root.getAttribute('data-dev-api') || 'http://localhost:8787';
+          const form = root.querySelector('#settingsForm');
+          const statusEl = root.querySelector('[data-status]');
+          const resetBtn = root.querySelector('#resetBtn');
+
+          function setStatus(message, tone) {
+            if (!statusEl) return;
+            const base = 'text-sm';
+            if (!message) {
+              statusEl.textContent = '';
+              statusEl.className = base + ' text-body-muted';
+              return;
+            }
+            if (tone === 'error') {
+              statusEl.className = base + ' text-danger';
+            } else if (tone === 'success') {
+              statusEl.className = base + ' text-success';
+            } else {
+              statusEl.className = base + ' text-body-muted';
+            }
+            statusEl.textContent = message;
+          }
+
+          function populateForm(settings) {
+            if (!settings || typeof settings !== 'object') return;
+
+            const setValue = (id, value) => {
+              const el = document.getElementById(id);
+              if (!el) return;
+              if (el.type === 'checkbox') {
+                el.checked = !!value;
+              } else {
+                el.value = value ?? '';
+              }
+            };
+
+            setValue('siteUrl', settings.siteUrl);
+            setValue('brandName', settings.brandName);
+            setValue('disclosure', settings.disclosure);
+            setValue('kofiUsername', settings.kofiUsername);
+            setValue('showAccountLink', settings.showAccountLink);
+
+            if (settings.analytics) {
+              setValue('analyticsEnabled', settings.analytics.enabled);
+              setValue('analyticsProvider', settings.analytics.provider);
+              setValue('analyticsDomain', settings.analytics.domain);
+              setValue('analyticsApiHost', settings.analytics.apiHost);
+            }
+
+            if (settings.ads) {
+              setValue('adsProvider', settings.ads.provider);
+              setValue('adsenseClientId', settings.ads.adsenseClientId);
+              setValue('sidebarSlotId', settings.ads.sidebarSlotId);
+              setValue('endSlotId', settings.ads.endSlotId);
+            }
+
+            if (settings.observability) {
+              setValue('observabilityEnabled', settings.observability.enabled);
+              setValue('observabilityDsn', settings.observability.dsn);
+              setValue('observabilityEnvironment', settings.observability.environment);
+            }
+
+            setValue('clientErrorEndpoint', settings.clientErrorEndpoint);
+          }
+
+          function collectForm() {
+            const getValue = (id) => {
+              const el = document.getElementById(id);
+              if (!el) return null;
+              if (el.type === 'checkbox') {
+                return el.checked;
+              }
+              return el.value;
+            };
+
+            return {
+              siteUrl: getValue('siteUrl'),
+              brandName: getValue('brandName'),
+              disclosure: getValue('disclosure'),
+              kofiUsername: getValue('kofiUsername'),
+              showAccountLink: getValue('showAccountLink'),
+              analyticsEnabled: getValue('analyticsEnabled'),
+              analyticsProvider: getValue('analyticsProvider'),
+              analyticsDomain: getValue('analyticsDomain'),
+              analyticsApiHost: getValue('analyticsApiHost'),
+              adsProvider: getValue('adsProvider'),
+              adsenseClientId: getValue('adsenseClientId'),
+              sidebarSlotId: getValue('sidebarSlotId'),
+              endSlotId: getValue('endSlotId'),
+              observabilityEnabled: getValue('observabilityEnabled'),
+              observabilityDsn: getValue('observabilityDsn'),
+              observabilityEnvironment: getValue('observabilityEnvironment'),
+              clientErrorEndpoint: getValue('clientErrorEndpoint'),
+            };
+          }
+
+          async function loadSettings() {
+            try {
+              setStatus('Loading settings…');
+              const res = await fetch(devApi + '/settings/get', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: '{}'
+              });
+              const json = await res.json();
+              if (!json || json.ok !== true) {
+                throw new Error(json?.error || 'Failed to load settings');
+              }
+              populateForm(json.settings);
+              setStatus('Settings loaded.', 'success');
+              setTimeout(() => setStatus(''), 2000);
+            } catch (error) {
+              setStatus(error?.message || 'Failed to load settings.', 'error');
+            }
+          }
+
+          async function saveSettings(data) {
+            try {
+              setStatus('Saving settings…');
+              const res = await fetch(devApi + '/settings/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+              });
+              const json = await res.json();
+              if (!json || json.ok !== true) {
+                throw new Error(json?.error || 'Failed to save settings');
+              }
+              populateForm(json.settings);
+              setStatus('Settings saved successfully!', 'success');
+              setTimeout(() => setStatus(''), 3000);
+            } catch (error) {
+              setStatus(error?.message || 'Failed to save settings.', 'error');
+            }
+          }
+
+          if (form) {
+            form.addEventListener('submit', async (event) => {
+              event.preventDefault();
+              const data = collectForm();
+              await saveSettings(data);
+            });
+          }
+
+          if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+              loadSettings();
+            });
+          }
+
+          // Load settings on page load
+          loadSettings();
+        })();
+      `}
+    </script>
+  )}
+</Base>

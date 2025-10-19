@@ -1,0 +1,155 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readSettings, getSiteOrigin } from "../../utils/settings";
+import HeadSlot from "@/components/HeadSlot.astro";
+
+export const prerender = false;
+
+const settings = readSettings();
+const site = getSiteOrigin(settings) || "https://example.com";
+
+const isDev = import.meta.env.DEV;
+const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
+const url = new URL(Astro.request.url);
+const keyOk = ADMIN_KEY && url.searchParams.get('key') === ADMIN_KEY;
+const canUse = isDev || !!keyOk;
+
+const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+---
+<Base
+  title="WitchClick — Partners Dashboard"
+  description="Manage partners, mutual aid funds, and affiliate highlights."
+  canon={`${site}/admin/partners`}
+  wide={true}
+  noindex={true}
+>
+  <HeadSlot slot="head">
+    <meta name="robots" content="noindex" />
+  </HeadSlot>
+
+  {canUse ? (
+    <div class="mx-auto max-w-6xl space-y-6" data-partners-admin data-dev-api={DEV_API}>
+      <header>
+        <h1 class="text-2xl font-semibold text-primary">Partners & Community</h1>
+        <p class="mt-2 text-sm text-body-muted">
+          Manage partner sections and affiliate highlights. Use JSON editor for detailed control.
+        </p>
+      </header>
+
+      <section class="rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm">
+        <div class="mb-4">
+          <p class="text-xs text-body-muted mb-2">Last updated: <span data-updated-at>—</span></p>
+        </div>
+
+        <div class="space-y-4">
+          <label class="block">
+            <span class="text-sm font-medium text-body">Partner Sections (JSON)</span>
+            <p class="mt-1 text-xs text-body-muted">Format: Array of objects with slug, title, summary, partners (array of partner objects)</p>
+            <textarea id="sectionsEditor" rows="12" class="mt-2 w-full rounded-lg border border-line-neutral bg-surface-soft px-3 py-2 font-mono text-xs" placeholder='[]'></textarea>
+          </label>
+
+          <label class="block">
+            <span class="text-sm font-medium text-body">Affiliate Highlights (JSON)</span>
+            <p class="mt-1 text-xs text-body-muted">Format: Array of objects with slug, name, description, url, impactTag, ethicalNote, ctaLabel</p>
+            <textarea id="highlightsEditor" rows="8" class="mt-2 w-full rounded-lg border border-line-neutral bg-surface-soft px-3 py-2 font-mono text-xs" placeholder='[]'></textarea>
+          </label>
+        </div>
+
+        <div class="mt-6 flex items-center gap-3 border-t border-line-subtle pt-4">
+          <button type="button" id="saveBtn" class="rounded-lg bg-surface-success px-5 py-2.5 text-sm font-medium text-inverse hover:bg-surface-success-strong">
+            Save Partners
+          </button>
+          <button type="button" id="resetBtn" class="rounded-lg border border-line-neutral px-5 py-2.5 text-sm font-medium hover:bg-surface-soft">
+            Reset
+          </button>
+          <button type="button" id="validateBtn" class="rounded-lg border border-line-neutral px-5 py-2.5 text-sm font-medium hover:bg-surface-soft">
+            Validate JSON
+          </button>
+          <p class="ml-auto text-sm" data-status></p>
+        </div>
+      </section>
+    </div>
+  ) : (
+    <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
+      <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
+      <p class="text-body-muted">This dashboard is only available in <strong>development</strong>.</p>
+    </section>
+  )}
+
+  {canUse && (
+    <script is:inline>
+      {`(function(){
+        const root = document.querySelector('[data-partners-admin]');
+        if (!root) return;
+        const devApi = root.getAttribute('data-dev-api');
+        const sectionsEditor = root.querySelector('#sectionsEditor');
+        const highlightsEditor = root.querySelector('#highlightsEditor');
+        const updatedAtEl = root.querySelector('[data-updated-at]');
+        const statusEl = root.querySelector('[data-status]');
+        const saveBtn = root.querySelector('#saveBtn');
+        const resetBtn = root.querySelector('#resetBtn');
+        const validateBtn = root.querySelector('#validateBtn');
+
+        function setStatus(msg, tone) {
+          if (!statusEl) return;
+          statusEl.textContent = msg || '';
+          statusEl.className = 'ml-auto text-sm ' + (tone === 'error' ? 'text-danger' : tone === 'success' ? 'text-success' : 'text-body-muted');
+        }
+
+        function validateJSON() {
+          try {
+            JSON.parse(sectionsEditor.value || '[]');
+            JSON.parse(highlightsEditor.value || '[]');
+            setStatus('JSON is valid!', 'success');
+            setTimeout(() => setStatus(''), 3000);
+            return true;
+          } catch (e) {
+            setStatus('Invalid JSON: ' + e.message, 'error');
+            return false;
+          }
+        }
+
+        async function loadData() {
+          try {
+            setStatus('Loading…');
+            const res = await fetch(devApi + '/partners/get', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+            const json = await res.json();
+            if (!json?.ok) throw new Error(json?.error || 'Failed to load');
+            const data = json.data || {};
+            sectionsEditor.value = JSON.stringify(data.sections || [], null, 2);
+            highlightsEditor.value = JSON.stringify(data.affiliateHighlights || [], null, 2);
+            if (updatedAtEl) updatedAtEl.textContent = data.updatedAt || '—';
+            setStatus('Loaded.', 'success');
+            setTimeout(() => setStatus(''), 2000);
+          } catch (e) {
+            setStatus(e?.message || 'Failed to load.', 'error');
+          }
+        }
+
+        async function saveData() {
+          if (!validateJSON()) return;
+          try {
+            setStatus('Saving…');
+            const data = {
+              sections: JSON.parse(sectionsEditor.value || '[]'),
+              affiliateHighlights: JSON.parse(highlightsEditor.value || '[]')
+            };
+            const res = await fetch(devApi + '/partners/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            const json = await res.json();
+            if (!json?.ok) throw new Error(json?.error || 'Failed to save');
+            if (updatedAtEl && json.data?.updatedAt) updatedAtEl.textContent = json.data.updatedAt;
+            setStatus('Saved!', 'success');
+            setTimeout(() => setStatus(''), 3000);
+          } catch (e) {
+            setStatus(e?.message || 'Failed to save.', 'error');
+          }
+        }
+
+        if (saveBtn) saveBtn.addEventListener('click', saveData);
+        if (resetBtn) resetBtn.addEventListener('click', loadData);
+        if (validateBtn) validateBtn.addEventListener('click', validateJSON);
+        loadData();
+      })();`}
+    </script>
+  )}
+</Base>
