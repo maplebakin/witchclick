@@ -237,6 +237,100 @@ async function listPostsForHero() {
   return items;
 }
 
+async function attachHeroToPost({ slug, heroImage, heroAlt }) {
+  const normalizedSlug = String(slug || '').trim();
+  if (!isValidSlug(normalizedSlug)) {
+    const err = new Error('Invalid slug');
+    err.code = 'INVALID_SLUG';
+    throw err;
+  }
+
+  const heroPath = String(heroImage || '').trim();
+  if (!heroPath || !heroPath.startsWith(`/images/hero/${normalizedSlug}/`)) {
+    const err = new Error('heroImage must point to the hero directory for this slug');
+    err.code = 'INVALID_IMAGE';
+    throw err;
+  }
+
+  const heroAltText = heroAlt == null ? '' : String(heroAlt).trim();
+  const heroDiskPath = path.join(CWD, 'public', heroPath.replace(/^\//, ''));
+  if (!fs.existsSync(heroDiskPath)) {
+    const err = new Error('Hero image file was not found on disk');
+    err.code = 'MISSING_FILE';
+    throw err;
+  }
+
+  const found = findPostFileBySlug(normalizedSlug);
+  if (!found) {
+    const err = new Error('Post not found');
+    err.code = 'NOT_FOUND';
+    throw err;
+  }
+
+  const raw = typeof found.raw === 'string' ? found.raw : await fsp.readFile(found.file, 'utf8');
+  const fmMatch = /^---\r?\n([\s\S]*?)\r?\n---/.exec(raw);
+  if (!fmMatch) {
+    const err = new Error('Frontmatter missing from post');
+    err.code = 'MISSING_FRONTMATTER';
+    throw err;
+  }
+
+  const block = fmMatch[0];
+  const newline = block.includes('\r\n') ? '\r\n' : '\n';
+  const remainder = raw.slice(block.length);
+  const lines = Array.isArray(found.lines) ? [...found.lines] : fmMatch[1].split(/\r?\n/);
+
+  const specIndex = lines.findIndex((line) => typeof line === 'string' && line.trim().startsWith('specVersion:'));
+  const heroImageLine = `heroImage: ${yq(heroPath)}`;
+  const heroImageSrcLine = `heroImageSrc: ${yq(heroPath)}`;
+  const heroAltLine = `heroAlt: ${yq(heroAltText)}`;
+
+  function indentOf(line) {
+    const match = typeof line === 'string' ? /^\s*/.exec(line) : null;
+    return match ? match[0] : '';
+  }
+
+  let heroImageIndex = lines.findIndex((line) => typeof line === 'string' && line.trim().startsWith('heroImage:'));
+  const heroImageIndent = heroImageIndex !== -1 ? indentOf(lines[heroImageIndex]) : '';
+  if (heroImageIndex !== -1) {
+    lines[heroImageIndex] = `${heroImageIndent}${heroImageLine}`;
+  } else {
+    const insertIndex = specIndex === -1 ? lines.length : specIndex;
+    lines.splice(insertIndex, 0, `${heroImageIndent}${heroImageLine}`);
+    heroImageIndex = insertIndex;
+  }
+
+  let heroImageSrcIndex = lines.findIndex((line) => typeof line === 'string' && line.trim().startsWith('heroImageSrc:'));
+  const heroImageSrcIndent = heroImageSrcIndex !== -1 ? indentOf(lines[heroImageSrcIndex]) : heroImageIndent;
+  if (heroImageSrcIndex !== -1) {
+    lines[heroImageSrcIndex] = `${heroImageSrcIndent}${heroImageSrcLine}`;
+  } else {
+    const baseIndex = heroImageIndex >= 0 ? heroImageIndex + 1 : (specIndex === -1 ? lines.length : specIndex);
+    lines.splice(baseIndex, 0, `${heroImageSrcIndent}${heroImageSrcLine}`);
+    heroImageSrcIndex = baseIndex;
+  }
+
+  let heroAltIndex = lines.findIndex((line) => typeof line === 'string' && line.trim().startsWith('heroAlt:'));
+  const heroAltIndent = heroAltIndex !== -1 ? indentOf(lines[heroAltIndex]) : heroImageIndent;
+  if (heroAltIndex !== -1) {
+    lines[heroAltIndex] = `${heroAltIndent}${heroAltLine}`;
+  } else {
+    const insertIndex = heroImageSrcIndex >= 0 ? heroImageSrcIndex + 1 : (specIndex === -1 ? lines.length : specIndex);
+    lines.splice(insertIndex, 0, `${heroAltIndent}${heroAltLine}`);
+    heroAltIndex = insertIndex;
+  }
+
+  const updatedFrontmatter = lines.join(newline);
+  const nextBlock = `---${newline}${updatedFrontmatter}${newline}---`;
+  const next = `${nextBlock}${remainder}`;
+
+  if (next !== raw) {
+    await fsp.writeFile(found.file, next, 'utf8');
+  }
+
+  return { path: path.relative(CWD, found.file).replace(/\\/g, '/') };
+}
+
 function findPostFileBySlug(slug) {
   const dirs = listPostDirsForCollisions();
   for (const dir of dirs) {
@@ -1444,76 +1538,21 @@ const server = http.createServer(async (req, res) => {
         if (!body || typeof body !== 'object') {
           return send(res, 400, { ok: false, error: 'Invalid JSON body' });
         }
-        const slug = String(body.slug || '').trim();
-        if (!isValidSlug(slug)) {
-          return send(res, 400, { ok: false, error: 'Invalid slug' });
-        }
-        const heroImage = String(body.heroImage || '').trim();
-        if (!heroImage || !heroImage.startsWith(`/images/hero/${slug}/`)) {
-          return send(res, 400, { ok: false, error: 'heroImage must point to the hero directory for this slug' });
-        }
-        const heroAlt = body.heroAlt == null ? '' : String(body.heroAlt).trim();
-        const heroDiskPath = path.join(CWD, 'public', heroImage.replace(/^\//, ''));
-        if (!fs.existsSync(heroDiskPath)) {
-          return send(res, 400, { ok: false, error: 'Hero image file was not found on disk' });
-        }
-
-        const found = findPostFileBySlug(slug);
-        if (!found) {
-          return send(res, 404, { ok: false, error: 'Post not found' });
-        }
-
-        const raw = typeof found.raw === 'string' ? found.raw : await fsp.readFile(found.file, 'utf8');
-        const fmMatch = /^---\r?\n([\s\S]*?)\r?\n---/.exec(raw);
-        if (!fmMatch) {
-          return send(res, 500, { ok: false, error: 'Frontmatter missing from post' });
-        }
-        const block = fmMatch[0];
-        const newline = block.includes('\r\n') ? '\r\n' : '\n';
-        const remainder = raw.slice(block.length);
-        const lines = Array.isArray(found.lines) ? [...found.lines] : fmMatch[1].split(/\r?\n/);
-
-        const specIndex = lines.findIndex((line) => typeof line === 'string' && line.trim().startsWith('specVersion:'));
-        const heroImageLine = `heroImage: ${yq(heroImage)}`;
-        const heroAltLine = `heroAlt: ${yq(heroAlt)}`;
-
-        function indentOf(line) {
-          const match = typeof line === 'string' ? /^\s*/.exec(line) : null;
-          return match ? match[0] : '';
-        }
-
-        let heroImageIndex = lines.findIndex((line) => typeof line === 'string' && line.trim().startsWith('heroImage:'));
-        const heroImageIndent = heroImageIndex !== -1 ? indentOf(lines[heroImageIndex]) : '';
-        if (heroImageIndex !== -1) {
-          lines[heroImageIndex] = `${heroImageIndent}${heroImageLine}`;
-        } else {
-          const insertIndex = specIndex === -1 ? lines.length : specIndex;
-          lines.splice(insertIndex, 0, `${heroImageIndent}${heroImageLine}`);
-          heroImageIndex = insertIndex;
-        }
-
-        let heroAltIndex = lines.findIndex((line) => typeof line === 'string' && line.trim().startsWith('heroAlt:'));
-        const heroAltIndent = heroAltIndex !== -1 ? indentOf(lines[heroAltIndex]) : heroImageIndent;
-        if (heroAltIndex !== -1) {
-          lines[heroAltIndex] = `${heroAltIndent}${heroAltLine}`;
-        } else {
-          const insertIndex = heroImageIndex >= 0 ? heroImageIndex + 1 : (specIndex === -1 ? lines.length : specIndex);
-          lines.splice(insertIndex, 0, `${heroAltIndent}${heroAltLine}`);
-          heroAltIndex = insertIndex;
-        }
-
-        const updatedFrontmatter = lines.join(newline);
-        const nextBlock = `---${newline}${updatedFrontmatter}${newline}---`;
-        const next = `${nextBlock}${remainder}`;
-
-        if (next === raw) {
-          return send(res, 200, { ok: true, path: path.relative(CWD, found.file) });
-        }
-
-        await fsp.writeFile(found.file, next, 'utf8');
-        return send(res, 200, { ok: true, path: path.relative(CWD, found.file) });
+        const result = await attachHeroToPost({
+          slug: body.slug,
+          heroImage: body.heroImage,
+          heroAlt: body.heroAlt,
+        });
+        return send(res, 200, { ok: true, path: result.path });
       } catch (e) {
-        return send(res, 500, { ok: false, error: e?.message || String(e) });
+        const code = e?.code;
+        const status =
+          code === 'NOT_FOUND'
+            ? 404
+            : code === 'INVALID_SLUG' || code === 'INVALID_IMAGE' || code === 'MISSING_FILE'
+              ? 400
+              : 500;
+        return send(res, status, { ok: false, error: e?.message || String(e) });
       }
     }
 
@@ -2006,4 +2045,5 @@ export {
   listThemes,
   saveThemeRecord,
   setActiveThemeRecord,
+  attachHeroToPost,
 };
