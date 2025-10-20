@@ -59,9 +59,15 @@ async function cmdGenprompt(flags: Flags) {
   const words = Number(flags.words ?? flags.w ?? 1200);
   const ads = String(flags.ads ?? 'off') === 'on' ? 'on' : 'off';
   const kofi = String(flags.kofi ?? 'on') === 'on' ? 'on' : 'off';
+  const mode = typeof flags.mode === 'string' ? flags.mode : undefined;
+  const style = typeof flags.style === 'string' ? flags.style : undefined;
+  const strictFlag = flags.strict ?? flags.s;
+  const strict = typeof strictFlag === 'string'
+    ? strictFlag === 'true' || strictFlag === '1'
+    : Boolean(strictFlag);
 
   const mod = await import('./genprompt.js'); // compiled neighbor
-  const { prompt } = (mod as any).genprompt({ topic, words, ads, kofi });
+  const { prompt } = (mod as any).genprompt({ topic, words, ads, kofi, mode, style, strict });
 
   const outDir = path.join(process.cwd(), 'tmp');
   ensureDir(outDir);

@@ -3,6 +3,7 @@ export const prerender = false;
 
 // 👇 pin to the source file with extension
 import { genprompt } from '../../../tools/src/genprompt';;
+import { resolveGeneratorPresetKey } from '../../../server/lib/generatorPresets.js';
 
 export async function POST({ request }: { request: Request }) {
   try {
@@ -17,10 +18,17 @@ export async function POST({ request }: { request: Request }) {
     const ads: 'on' | 'off' = String(body.ads ?? 'off') === 'on' ? 'on' : 'off';
     const kofi: 'on' | 'off' = String(body.kofi ?? 'on') === 'on' ? 'on' : 'off';
 
-    const { prompt } = genprompt({ topic, words, ads, kofi });
+    const mode = typeof body.mode === 'string' ? body.mode : undefined;
+    const style = typeof body.style === 'string' ? body.style : undefined;
+    const strict = body.strict === true || body.strict === 'true';
+
+    const { prompt } = genprompt({ topic, words, ads, kofi, mode, style, strict });
 
     // tiny runtime sanity check so this never silently regresses
-    if (!prompt.includes('opening-reflection') || !prompt.includes('REQUIRED: The first outline item')) {
+    const resolvedModeKey = resolveGeneratorPresetKey(typeof mode === 'string' ? mode : '');
+    const hasPreset = Boolean(resolvedModeKey);
+
+    if (!hasPreset && (!prompt.includes('opening-reflection') || !prompt.includes('REQUIRED: The first outline item'))) {
       throw new Error('Stale prompt detected (missing Opening Reflection guards). Check imports/caches.');
     }
 
