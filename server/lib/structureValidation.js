@@ -83,23 +83,41 @@ export function validateStructure(spec, contentWords) {
     headings.some((heading) => /^opening/.test(heading) && /(reflection|scene|note)/.test(heading));
   if (!hasOpening) errors.push('Missing section: Opening Reflection');
 
+  // Content-type specific validations
   const hasQuick =
     headings.some((heading) => /quick|low[- ]?energy|5[- ]?minute/.test(heading)) ||
     /quick|low[- ]?energy/.test(body);
   const hasDeep =
     headings.some((heading) => /deep( dive)?|long(er)?/.test(heading)) || /deep( dive)?/.test(body);
-  const variantsRequired = contentType === 'ritual';
-  if (variantsRequired && !(hasQuick && hasDeep)) {
-    errors.push('Ritual posts require both Quick/Low-Energy and Deep variants.');
+
+  // Ritual and spellwork require Quick/Deep variants
+  if ((contentType === 'ritual' || contentType === 'spellwork') && !(hasQuick && hasDeep)) {
+    errors.push(`${contentType === 'ritual' ? 'Ritual' : 'Spellwork'} posts require both Quick/Low-Energy and Deep variants.`);
   }
 
   const hasChecklist = headings.some((heading) => /checklist|summary|at a glance/.test(heading));
-  if (!hasChecklist) errors.push('Missing section: Checklist/Summary');
+  // Only ritual, guide, and spellwork require checklists
+  if ((contentType === 'ritual' || contentType === 'guide' || contentType === 'spellwork') && !hasChecklist) {
+    errors.push('Missing section: Checklist/Summary');
+  }
 
   const hasReflection =
     headings.some((heading) => /reflection prompt|journal|reflection/.test(heading)) ||
     /prompt|question/.test(body);
-  if (!hasReflection) errors.push('Missing section: Reflection Prompt');
+  // Reflection essays and rituals benefit from reflection prompts, but stories/crystals don't need them
+  if ((contentType === 'ritual' || contentType === 'reflection' || contentType === 'guide') && !hasReflection) {
+    warnings.push('Consider adding a Reflection Prompt section for deeper engagement.');
+  }
+
+  // Tarot spreads should have position descriptions
+  if ((contentType === 'tarotSpread' || contentType === 'spread') && !headings.some((heading) => /position|layout|spread/.test(heading))) {
+    warnings.push('Tarot spreads should include a section describing card positions or spread layout.');
+  }
+
+  // Crystal profiles should have geological/care info
+  if (contentType === 'crystals' && !headings.some((heading) => /geolog|properties|care|cleansing/.test(heading))) {
+    warnings.push('Crystal profiles should include geological properties and care instructions.');
+  }
 
   if (!(typeof spec.heroImagePrompt === 'string' || spec.heroImagePrompt === null)) {
     errors.push('heroImagePrompt must be string or null');

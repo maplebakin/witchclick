@@ -45,6 +45,9 @@ export function validatePostSpec(spec, options = {}) {
     ? options.allowedAffiliateKeys.map((key) => String(key || '').trim()).filter(Boolean)
     : [];
 
+  // Determine content type, defaulting to 'ritual' for backward compatibility
+  const contentType = spec.contentType || 'ritual';
+
   const errors = [];
   const warnings = [];
 
@@ -141,18 +144,45 @@ export function validatePostSpec(spec, options = {}) {
     }
   }
 
+  // Content-type specific section validations
   const lowerHeadings = sectionHeadings.map((heading) => heading.toLowerCase());
-  if (!lowerHeadings.some((heading) => heading.includes('quick') || heading.includes('low-energy'))) {
-    warnings.push('No section heading includes "Quick" or "Low-Energy".');
+
+  // Ritual and spellwork posts need Quick/Deep variants
+  if (contentType === 'ritual' || contentType === 'spellwork') {
+    if (!lowerHeadings.some((heading) => heading.includes('quick') || heading.includes('low-energy'))) {
+      warnings.push('No section heading includes "Quick" or "Low-Energy".');
+    }
+    if (!lowerHeadings.some((heading) => heading.includes('deep'))) {
+      warnings.push('No section heading includes "Deep".');
+    }
   }
-  if (!lowerHeadings.some((heading) => heading.includes('deep'))) {
-    warnings.push('No section heading includes "Deep".');
+
+  // Reflection prompts recommended for certain types
+  if (contentType === 'ritual' || contentType === 'reflection' || contentType === 'guide') {
+    if (!lowerHeadings.some((heading) => heading.includes('reflection prompt') || heading.includes('journaling prompt'))) {
+      warnings.push('Consider adding a "Reflection Prompt" or "Journaling Prompts" section.');
+    }
   }
-  if (!lowerHeadings.some((heading) => heading.includes('reflection prompt'))) {
-    warnings.push('No section heading includes "Reflection Prompt".');
+
+  // Checklists only for ritual, guide, spellwork
+  if (contentType === 'ritual' || contentType === 'guide' || contentType === 'spellwork') {
+    if (!lowerHeadings.some((heading) => heading.includes('checklist') || heading.includes('summary'))) {
+      warnings.push('No section heading includes "Checklist" or "Summary".');
+    }
   }
-  if (!lowerHeadings.some((heading) => heading.includes('checklist') || heading.includes('summary'))) {
-    warnings.push('No section heading includes "Checklist" or "Summary".');
+
+  // Tarot spreads should have position info
+  if (contentType === 'tarotSpread' || contentType === 'spread') {
+    if (!lowerHeadings.some((heading) => heading.includes('position') || heading.includes('layout') || heading.includes('spread'))) {
+      warnings.push('Tarot spreads should include a section describing card positions or spread layout.');
+    }
+  }
+
+  // Crystal profiles should have care/geological info
+  if (contentType === 'crystals') {
+    if (!lowerHeadings.some((heading) => heading.includes('geolog') || heading.includes('properties') || heading.includes('care'))) {
+      warnings.push('Crystal profiles should include geological properties and care instructions.');
+    }
   }
 
   return {

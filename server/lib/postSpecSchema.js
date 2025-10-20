@@ -4,7 +4,7 @@
 import { z } from 'zod';
 
 export const ENTITY_TYPES = ['crystal', 'herb', 'moonPhase', 'tarot', 'planetaryDay', 'ritual'];
-export const CONTENT_TYPES = ['ritual', 'guide', 'spread'];
+export const CONTENT_TYPES = ['ritual', 'guide', 'spread', 'reflection', 'story', 'tarotSpread', 'spellwork', 'crystals'];
 
 export const EntityTypeSchema = z.enum(ENTITY_TYPES);
 export const PostContentTypeSchema = z.enum(CONTENT_TYPES);
