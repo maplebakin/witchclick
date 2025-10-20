@@ -33,45 +33,64 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
       <AdminNav currentPath="/admin/partners" />
 
       <div class="mx-auto max-w-6xl space-y-6" data-partners-admin data-dev-api={DEV_API}>
-      <header>
-        <h1 class="text-2xl font-semibold text-primary">Partners & Community</h1>
-        <p class="mt-2 text-sm text-body-muted">
-          Manage partner sections and affiliate highlights. Use JSON editor for detailed control.
-        </p>
-      </header>
+        <header>
+          <h1 class="text-2xl font-semibold text-primary">Partners & Community</h1>
+          <p class="mt-2 text-sm text-body-muted">
+            Manage partner sections and affiliate highlights. Add, reorder, and edit entries without touching JSON.
+          </p>
+        </header>
 
-      <section class="rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm">
-        <div class="mb-4">
-          <p class="text-xs text-body-muted mb-2">Last updated: <span data-updated-at>—</span></p>
-        </div>
+        <section class="rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm space-y-6">
+          <div class="flex flex-wrap items-center gap-3">
+            <p class="text-xs text-body-muted">Last updated: <span data-updated-at>—</span></p>
+            <p class="text-xs text-body-muted" data-validation-summary aria-live="polite"></p>
+          </div>
 
-        <div class="space-y-4">
-          <label class="block">
-            <span class="text-sm font-medium text-body">Partner Sections (JSON)</span>
-            <p class="mt-1 text-xs text-body-muted">Format: Array of objects with slug, title, summary, partners (array of partner objects)</p>
-            <textarea id="sectionsEditor" rows="12" class="mt-2 w-full rounded-lg border border-line-neutral bg-surface-soft px-3 py-2 font-mono text-xs" placeholder='[]'></textarea>
-          </label>
+          <div class="space-y-5">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h2 class="text-lg font-semibold text-body">Partner Sections</h2>
+                <p class="text-xs text-body-muted mt-1">
+                  Create thematic groupings of partners. Each section can hold multiple partner cards.
+                </p>
+              </div>
+              <button type="button" data-action="add-section" class="rounded-lg bg-surface-primary px-4 py-2 text-sm font-medium text-inverse hover:bg-surface-primary-strong">
+                Add section
+              </button>
+            </div>
 
-          <label class="block">
-            <span class="text-sm font-medium text-body">Affiliate Highlights (JSON)</span>
-            <p class="mt-1 text-xs text-body-muted">Format: Array of objects with slug, name, description, url, impactTag, ethicalNote, ctaLabel</p>
-            <textarea id="highlightsEditor" rows="8" class="mt-2 w-full rounded-lg border border-line-neutral bg-surface-soft px-3 py-2 font-mono text-xs" placeholder='[]'></textarea>
-          </label>
-        </div>
+            <div class="space-y-4" data-sections-list></div>
+          </div>
 
-        <div class="mt-6 flex items-center gap-3 border-t border-line-subtle pt-4">
-          <button type="button" id="saveBtn" class="rounded-lg bg-surface-success px-5 py-2.5 text-sm font-medium text-inverse hover:bg-surface-success-strong">
-            Save Partners
-          </button>
-          <button type="button" id="resetBtn" class="rounded-lg border border-line-neutral px-5 py-2.5 text-sm font-medium hover:bg-surface-soft">
-            Reset
-          </button>
-          <button type="button" id="validateBtn" class="rounded-lg border border-line-neutral px-5 py-2.5 text-sm font-medium hover:bg-surface-soft">
-            Validate JSON
-          </button>
-          <p class="ml-auto text-sm" data-status></p>
-        </div>
-      </section>
+          <div class="space-y-5 border-t border-line-subtle pt-5">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h2 class="text-lg font-semibold text-body">Affiliate Highlights</h2>
+                <p class="text-xs text-body-muted mt-1">
+                  Spotlight products or collaborations. Each highlight needs a slug, URL, and CTA label.
+                </p>
+              </div>
+              <button type="button" data-action="add-highlight" class="rounded-lg bg-surface-primary px-4 py-2 text-sm font-medium text-inverse hover:bg-surface-primary-strong">
+                Add highlight
+              </button>
+            </div>
+
+            <div class="space-y-4" data-highlights-list></div>
+          </div>
+
+          <div class="flex items-center gap-3 border-t border-line-subtle pt-4">
+            <button type="button" id="saveBtn" class="rounded-lg bg-surface-success px-5 py-2.5 text-sm font-medium text-inverse hover:bg-surface-success-strong">
+              Save Partners
+            </button>
+            <button type="button" id="resetBtn" class="rounded-lg border border-line-neutral px-5 py-2.5 text-sm font-medium hover:bg-surface-soft">
+              Reset
+            </button>
+            <button type="button" id="validateBtn" class="rounded-lg border border-line-neutral px-5 py-2.5 text-sm font-medium hover:bg-surface-soft">
+              Check for issues
+            </button>
+            <p class="ml-auto text-sm" data-status></p>
+          </div>
+        </section>
       </div>
     </div>
   ) : (
@@ -87,31 +106,775 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         const root = document.querySelector('[data-partners-admin]');
         if (!root) return;
         const devApi = root.getAttribute('data-dev-api');
-        const sectionsEditor = root.querySelector('#sectionsEditor');
-        const highlightsEditor = root.querySelector('#highlightsEditor');
+        const sectionsList = root.querySelector('[data-sections-list]');
+        const highlightsList = root.querySelector('[data-highlights-list]');
         const updatedAtEl = root.querySelector('[data-updated-at]');
         const statusEl = root.querySelector('[data-status]');
+        const validationSummaryEl = root.querySelector('[data-validation-summary]');
         const saveBtn = root.querySelector('#saveBtn');
         const resetBtn = root.querySelector('#resetBtn');
         const validateBtn = root.querySelector('#validateBtn');
 
+        const state = { sections: [], affiliateHighlights: [] };
+
         function setStatus(msg, tone) {
           if (!statusEl) return;
           statusEl.textContent = msg || '';
-          statusEl.className = 'ml-auto text-sm ' + (tone === 'error' ? 'text-danger' : tone === 'success' ? 'text-success' : 'text-body-muted');
+          let toneClass = 'text-body-muted';
+          if (tone === 'error') toneClass = 'text-danger';
+          if (tone === 'success') toneClass = 'text-success';
+          statusEl.className = 'ml-auto text-sm ' + toneClass;
         }
 
-        function validateJSON() {
-          try {
-            JSON.parse(sectionsEditor.value || '[]');
-            JSON.parse(highlightsEditor.value || '[]');
-            setStatus('JSON is valid!', 'success');
-            setTimeout(() => setStatus(''), 3000);
-            return true;
-          } catch (e) {
-            setStatus('Invalid JSON: ' + e.message, 'error');
-            return false;
+        function countErrors(errors) {
+          if (!errors) return 0;
+          if (typeof errors === 'string') return errors ? 1 : 0;
+          if (Array.isArray(errors)) return errors.reduce((sum, item) => sum + countErrors(item), 0);
+          if (typeof errors === 'object') return Object.values(errors).reduce((sum, value) => sum + countErrors(value), 0);
+          return 0;
+        }
+
+        function getErrorByPath(errors, path) {
+          if (!path) return '';
+          const segments = path.split('.');
+          let node = errors;
+          for (let i = 0; i < segments.length; i++) {
+            if (node == null) return '';
+            const segment = segments[i];
+            const numeric = Number(segment);
+            if (Array.isArray(node) && !Number.isNaN(numeric)) {
+              node = node[numeric];
+            } else {
+              node = node[segment];
+            }
           }
+          return typeof node === 'string' ? node : '';
+        }
+
+        function applyErrors(errors) {
+          const errorElements = root.querySelectorAll('[data-error-for]');
+          errorElements.forEach(function(el){
+            const path = el.getAttribute('data-error-for');
+            const message = getErrorByPath(errors, path);
+            if (message) {
+              el.textContent = message;
+              el.classList.remove('hidden');
+            } else {
+              el.textContent = '';
+              el.classList.add('hidden');
+            }
+          });
+          const inputs = root.querySelectorAll('[data-path]');
+          inputs.forEach(function(input){
+            const message = getErrorByPath(errors, input.getAttribute('data-path'));
+            if (message) {
+              input.classList.add('border-danger');
+              input.classList.add('focus-visible:ring-danger');
+              input.setAttribute('aria-invalid', 'true');
+            } else {
+              input.classList.remove('border-danger');
+              input.classList.remove('focus-visible:ring-danger');
+              input.removeAttribute('aria-invalid');
+            }
+          });
+          if (validationSummaryEl) {
+            const total = countErrors(errors);
+            validationSummaryEl.textContent = total > 0 ? (total === 1 ? '1 required field missing' : total + ' required fields missing') : '';
+          }
+        }
+
+        function validateState() {
+          const result = { sections: [], affiliateHighlights: [] };
+          state.sections.forEach(function(section, sectionIndex){
+            const sectionErrors = {};
+            if (!section.slug || !section.slug.trim()) sectionErrors.slug = 'Slug is required.';
+            if (!section.title || !section.title.trim()) sectionErrors.title = 'Title is required.';
+            const partnerErrors = [];
+            section.partners.forEach(function(partner){
+              const errors = {};
+              if (!partner.slug || !partner.slug.trim()) errors.slug = 'Slug is required.';
+              if (!partner.name || !partner.name.trim()) errors.name = 'Name is required.';
+              if (!partner.description || !partner.description.trim()) errors.description = 'Description is required.';
+              if (!partner.url || !partner.url.trim()) errors.url = 'URL is required.';
+              partnerErrors.push(errors);
+            });
+            sectionErrors.partners = partnerErrors;
+            result.sections[sectionIndex] = sectionErrors;
+          });
+          state.affiliateHighlights.forEach(function(highlight, highlightIndex){
+            const highlightErrors = {};
+            if (!highlight.slug || !highlight.slug.trim()) highlightErrors.slug = 'Slug is required.';
+            if (!highlight.name || !highlight.name.trim()) highlightErrors.name = 'Name is required.';
+            if (!highlight.description || !highlight.description.trim()) highlightErrors.description = 'Description is required.';
+            if (!highlight.url || !highlight.url.trim()) highlightErrors.url = 'URL is required.';
+            if (!highlight.ctaLabel || !highlight.ctaLabel.trim()) highlightErrors.ctaLabel = 'CTA label is required.';
+            result.affiliateHighlights[highlightIndex] = highlightErrors;
+          });
+          return result;
+        }
+
+        function hasAnyErrors(errors) {
+          return countErrors(errors) > 0;
+        }
+
+        function asString(value) {
+          if (typeof value === 'string') return value;
+          if (value == null) return '';
+          return String(value);
+        }
+
+        function toTrimmedString(value) {
+          return asString(value).trim();
+        }
+
+        function normalizePartner(partner) {
+          const offerings = Array.isArray(partner && partner.offerings) ? partner.offerings : [];
+          const categories = Array.isArray(partner && partner.categories) ? partner.categories : [];
+          return {
+            slug: asString(partner && partner.slug),
+            name: asString(partner && partner.name),
+            description: asString(partner && partner.description),
+            url: asString(partner && partner.url),
+            location: asString(partner && partner.location),
+            impactTag: asString(partner && partner.impactTag),
+            ethicalNote: asString(partner && partner.ethicalNote),
+            contact: asString(partner && partner.contact),
+            notes: asString(partner && partner.notes),
+            offerings: offerings.map(asString).filter(function(item){ return item.trim().length > 0; }),
+            categories: categories.map(asString).filter(function(item){ return item.trim().length > 0; })
+          };
+        }
+
+        function normalizeSection(section) {
+          const partners = Array.isArray(section && section.partners) ? section.partners.map(normalizePartner) : [];
+          return {
+            slug: asString(section && section.slug),
+            title: asString(section && section.title),
+            summary: asString(section && section.summary),
+            partners: partners
+          };
+        }
+
+        function normalizeHighlight(highlight) {
+          return {
+            slug: asString(highlight && highlight.slug),
+            name: asString(highlight && highlight.name),
+            description: asString(highlight && highlight.description),
+            url: asString(highlight && highlight.url),
+            impactTag: asString(highlight && highlight.impactTag),
+            ethicalNote: asString(highlight && highlight.ethicalNote),
+            ctaLabel: asString(highlight && highlight.ctaLabel),
+            image: asString(highlight && highlight.image)
+          };
+        }
+
+        function createEmptySection() {
+          return { slug: '', title: '', summary: '', partners: [] };
+        }
+
+        function createEmptyPartner() {
+          return { slug: '', name: '', description: '', url: '', location: '', impactTag: '', ethicalNote: '', contact: '', notes: '', offerings: [], categories: [] };
+        }
+
+        function createEmptyHighlight() {
+          return { slug: '', name: '', description: '', url: '', impactTag: '', ethicalNote: '', ctaLabel: '', image: '' };
+        }
+
+        function moveItem(list, from, to) {
+          if (!Array.isArray(list) || from === to || to < 0 || to >= list.length) return;
+          const item = list.splice(from, 1)[0];
+          list.splice(to, 0, item);
+        }
+
+        function createActionButton(label, action, dataset, options) {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'rounded-md border border-line-neutral px-2 py-1 text-xs font-medium text-body hover:bg-surface-soft';
+          if (options && options.destructive) {
+            button.classList.add('text-danger');
+          }
+          if (options && options.disabled) {
+            button.disabled = true;
+            button.classList.add('opacity-50', 'cursor-not-allowed');
+          }
+          button.dataset.action = action;
+          if (dataset) {
+            Object.keys(dataset).forEach(function(key){
+              button.dataset[key] = String(dataset[key]);
+            });
+          }
+          button.textContent = label;
+          return button;
+        }
+
+        function createField(config) {
+          const label = document.createElement('label');
+          label.className = 'block space-y-1';
+
+          const header = document.createElement('div');
+          header.className = 'flex items-baseline justify-between gap-2';
+          const title = document.createElement('span');
+          title.className = 'text-sm font-medium text-body';
+          title.textContent = config.label;
+          header.appendChild(title);
+
+          const badge = document.createElement('span');
+          badge.className = 'text-xs ' + (config.required ? 'text-danger' : 'text-body-muted');
+          badge.textContent = config.required ? 'Required' : 'Optional';
+          header.appendChild(badge);
+          label.appendChild(header);
+
+          const input = config.multiline ? document.createElement('textarea') : document.createElement('input');
+          if (!config.multiline) input.type = 'text';
+          input.className = 'mt-1 w-full rounded-lg border border-line-neutral bg-surface-soft px-3 py-2 text-sm text-body';
+          input.value = config.value || '';
+          if (config.placeholder) input.placeholder = config.placeholder;
+          if (config.multiline && config.rows) input.rows = config.rows;
+          input.dataset.path = config.path;
+          if (config.dataset) {
+            Object.keys(config.dataset).forEach(function(key){
+              input.dataset[key] = String(config.dataset[key]);
+            });
+          }
+          label.appendChild(input);
+
+          if (config.description) {
+            const helper = document.createElement('p');
+            helper.className = 'text-xs text-body-muted';
+            helper.textContent = config.description;
+            label.appendChild(helper);
+          }
+
+          const errorId = 'error-' + config.path.replace(/[^a-z0-9]/gi, '-');
+          const error = document.createElement('p');
+          error.className = 'text-xs text-danger hidden';
+          error.dataset.errorFor = config.path;
+          error.id = errorId;
+          label.appendChild(error);
+          input.setAttribute('aria-describedby', errorId);
+
+          return label;
+        }
+
+        function renderSections() {
+          if (!sectionsList) return;
+          sectionsList.innerHTML = '';
+          if (!state.sections.length) {
+            const empty = document.createElement('p');
+            empty.className = 'rounded-lg border border-dashed border-line-subtle bg-surface-soft p-4 text-sm text-body-muted';
+            empty.textContent = 'No sections yet. Add your first section to begin.';
+            sectionsList.appendChild(empty);
+            return;
+          }
+
+          state.sections.forEach(function(section, sectionIndex){
+            const card = document.createElement('div');
+            card.className = 'space-y-4 rounded-xl border border-line-subtle bg-surface-soft p-4';
+            card.setAttribute('data-section-card', sectionIndex);
+
+            const header = document.createElement('div');
+            header.className = 'flex flex-wrap items-center justify-between gap-3';
+            const heading = document.createElement('h3');
+            heading.className = 'text-base font-semibold text-body';
+            heading.textContent = section.title && section.title.trim() ? section.title : 'Section ' + (sectionIndex + 1);
+            heading.setAttribute('data-section-heading', '');
+            header.appendChild(heading);
+
+            const controls = document.createElement('div');
+            controls.className = 'flex items-center gap-2';
+            controls.appendChild(createActionButton('Move up', 'move-section', { sectionIndex: sectionIndex, direction: 'up' }, { disabled: sectionIndex === 0 }));
+            controls.appendChild(createActionButton('Move down', 'move-section', { sectionIndex: sectionIndex, direction: 'down' }, { disabled: sectionIndex === state.sections.length - 1 }));
+            controls.appendChild(createActionButton('Remove', 'remove-section', { sectionIndex: sectionIndex }, { destructive: true }));
+            header.appendChild(controls);
+            card.appendChild(header);
+
+            const fieldsGrid = document.createElement('div');
+            fieldsGrid.className = 'grid gap-3 md:grid-cols-2';
+            const slugField = createField({
+              label: 'Section slug',
+              value: section.slug,
+              path: 'sections.' + sectionIndex + '.slug',
+              dataset: { type: 'section', sectionIndex: sectionIndex, field: 'slug' },
+              required: true
+            });
+            const titleField = createField({
+              label: 'Section title',
+              value: section.title,
+              path: 'sections.' + sectionIndex + '.title',
+              dataset: { type: 'section', sectionIndex: sectionIndex, field: 'title' },
+              required: true
+            });
+            const summaryField = createField({
+              label: 'Section summary',
+              value: section.summary,
+              path: 'sections.' + sectionIndex + '.summary',
+              dataset: { type: 'section', sectionIndex: sectionIndex, field: 'summary' },
+              required: false,
+              multiline: true,
+              rows: 3
+            });
+            summaryField.classList.add('md:col-span-2');
+            fieldsGrid.appendChild(slugField);
+            fieldsGrid.appendChild(titleField);
+            fieldsGrid.appendChild(summaryField);
+            card.appendChild(fieldsGrid);
+
+            const partnersHeader = document.createElement('div');
+            partnersHeader.className = 'flex flex-wrap items-center justify-between gap-3';
+            const partnersTitle = document.createElement('h4');
+            partnersTitle.className = 'text-sm font-semibold text-body';
+            partnersTitle.textContent = 'Partners';
+            partnersHeader.appendChild(partnersTitle);
+            partnersHeader.appendChild(createActionButton('Add partner', 'add-partner', { sectionIndex: sectionIndex }));
+            card.appendChild(partnersHeader);
+
+            const partnersList = document.createElement('div');
+            partnersList.className = 'space-y-3';
+            if (!section.partners.length) {
+              const emptyPartners = document.createElement('p');
+              emptyPartners.className = 'rounded-lg border border-dashed border-line-subtle bg-surface-base p-3 text-xs text-body-muted';
+              emptyPartners.textContent = 'No partners in this section yet.';
+              partnersList.appendChild(emptyPartners);
+            } else {
+              section.partners.forEach(function(partner, partnerIndex){
+                const partnerCard = document.createElement('div');
+                partnerCard.className = 'space-y-3 rounded-lg border border-line-neutral bg-surface-base p-4';
+                partnerCard.setAttribute('data-partner-card', '');
+
+                const partnerHeader = document.createElement('div');
+                partnerHeader.className = 'flex flex-wrap items-center justify-between gap-3';
+                const partnerHeading = document.createElement('h5');
+                partnerHeading.className = 'text-sm font-semibold text-body';
+                partnerHeading.textContent = partner.name && partner.name.trim() ? partner.name : 'Partner ' + (partnerIndex + 1);
+                partnerHeading.setAttribute('data-partner-heading', '');
+                partnerHeader.appendChild(partnerHeading);
+
+                const partnerControls = document.createElement('div');
+                partnerControls.className = 'flex items-center gap-2';
+                partnerControls.appendChild(createActionButton('Move up', 'move-partner', { sectionIndex: sectionIndex, partnerIndex: partnerIndex, direction: 'up' }, { disabled: partnerIndex === 0 }));
+                partnerControls.appendChild(createActionButton('Move down', 'move-partner', { sectionIndex: sectionIndex, partnerIndex: partnerIndex, direction: 'down' }, { disabled: partnerIndex === section.partners.length - 1 }));
+                partnerControls.appendChild(createActionButton('Remove', 'remove-partner', { sectionIndex: sectionIndex, partnerIndex: partnerIndex }, { destructive: true }));
+                partnerHeader.appendChild(partnerControls);
+                partnerCard.appendChild(partnerHeader);
+
+                const partnerFields = document.createElement('div');
+                partnerFields.className = 'grid gap-3 md:grid-cols-2';
+                const partnerSlug = createField({
+                  label: 'Partner slug',
+                  value: partner.slug,
+                  path: 'sections.' + sectionIndex + '.partners.' + partnerIndex + '.slug',
+                  dataset: { type: 'partner', sectionIndex: sectionIndex, partnerIndex: partnerIndex, field: 'slug' },
+                  required: true
+                });
+                const partnerName = createField({
+                  label: 'Partner name',
+                  value: partner.name,
+                  path: 'sections.' + sectionIndex + '.partners.' + partnerIndex + '.name',
+                  dataset: { type: 'partner', sectionIndex: sectionIndex, partnerIndex: partnerIndex, field: 'name' },
+                  required: true
+                });
+                const partnerUrl = createField({
+                  label: 'Website URL',
+                  value: partner.url,
+                  path: 'sections.' + sectionIndex + '.partners.' + partnerIndex + '.url',
+                  dataset: { type: 'partner', sectionIndex: sectionIndex, partnerIndex: partnerIndex, field: 'url' },
+                  required: true,
+                  placeholder: 'https://example.com'
+                });
+                const partnerLocation = createField({
+                  label: 'Location',
+                  value: partner.location,
+                  path: 'sections.' + sectionIndex + '.partners.' + partnerIndex + '.location',
+                  dataset: { type: 'partner', sectionIndex: sectionIndex, partnerIndex: partnerIndex, field: 'location' },
+                  required: false
+                });
+                const partnerDescription = createField({
+                  label: 'Description',
+                  value: partner.description,
+                  path: 'sections.' + sectionIndex + '.partners.' + partnerIndex + '.description',
+                  dataset: { type: 'partner', sectionIndex: sectionIndex, partnerIndex: partnerIndex, field: 'description' },
+                  required: true,
+                  multiline: true,
+                  rows: 3
+                });
+                partnerDescription.classList.add('md:col-span-2');
+                const partnerImpact = createField({
+                  label: 'Impact tag',
+                  value: partner.impactTag,
+                  path: 'sections.' + sectionIndex + '.partners.' + partnerIndex + '.impactTag',
+                  dataset: { type: 'partner', sectionIndex: sectionIndex, partnerIndex: partnerIndex, field: 'impactTag' },
+                  required: false
+                });
+                const partnerEthics = createField({
+                  label: 'Ethical note',
+                  value: partner.ethicalNote,
+                  path: 'sections.' + sectionIndex + '.partners.' + partnerIndex + '.ethicalNote',
+                  dataset: { type: 'partner', sectionIndex: sectionIndex, partnerIndex: partnerIndex, field: 'ethicalNote' },
+                  required: false,
+                  multiline: true,
+                  rows: 3
+                });
+                partnerEthics.classList.add('md:col-span-2');
+                const partnerContact = createField({
+                  label: 'Contact info',
+                  value: partner.contact,
+                  path: 'sections.' + sectionIndex + '.partners.' + partnerIndex + '.contact',
+                  dataset: { type: 'partner', sectionIndex: sectionIndex, partnerIndex: partnerIndex, field: 'contact' },
+                  required: false
+                });
+                const partnerOfferings = createField({
+                  label: 'Offerings',
+                  value: partner.offerings.join('\n'),
+                  path: 'sections.' + sectionIndex + '.partners.' + partnerIndex + '.offerings',
+                  dataset: { type: 'partner', sectionIndex: sectionIndex, partnerIndex: partnerIndex, field: 'offerings', array: 'true' },
+                  required: false,
+                  multiline: true,
+                  rows: 3,
+                  description: 'One per line.'
+                });
+                partnerOfferings.classList.add('md:col-span-2');
+                const partnerCategories = createField({
+                  label: 'Categories',
+                  value: partner.categories.join('\n'),
+                  path: 'sections.' + sectionIndex + '.partners.' + partnerIndex + '.categories',
+                  dataset: { type: 'partner', sectionIndex: sectionIndex, partnerIndex: partnerIndex, field: 'categories', array: 'true' },
+                  required: false,
+                  multiline: true,
+                  rows: 2,
+                  description: 'Use new lines to separate categories.'
+                });
+                partnerCategories.classList.add('md:col-span-2');
+                const partnerNotes = createField({
+                  label: 'Notes',
+                  value: partner.notes,
+                  path: 'sections.' + sectionIndex + '.partners.' + partnerIndex + '.notes',
+                  dataset: { type: 'partner', sectionIndex: sectionIndex, partnerIndex: partnerIndex, field: 'notes' },
+                  required: false,
+                  multiline: true,
+                  rows: 3
+                });
+                partnerNotes.classList.add('md:col-span-2');
+
+                partnerFields.appendChild(partnerSlug);
+                partnerFields.appendChild(partnerName);
+                partnerFields.appendChild(partnerUrl);
+                partnerFields.appendChild(partnerLocation);
+                partnerFields.appendChild(partnerDescription);
+                partnerFields.appendChild(partnerImpact);
+                partnerFields.appendChild(partnerEthics);
+                partnerFields.appendChild(partnerContact);
+                partnerFields.appendChild(partnerOfferings);
+                partnerFields.appendChild(partnerCategories);
+                partnerFields.appendChild(partnerNotes);
+                partnerCard.appendChild(partnerFields);
+                partnersList.appendChild(partnerCard);
+              });
+            }
+            card.appendChild(partnersList);
+
+            sectionsList.appendChild(card);
+          });
+        }
+
+        function renderHighlights() {
+          if (!highlightsList) return;
+          highlightsList.innerHTML = '';
+          if (!state.affiliateHighlights.length) {
+            const empty = document.createElement('p');
+            empty.className = 'rounded-lg border border-dashed border-line-subtle bg-surface-soft p-4 text-sm text-body-muted';
+            empty.textContent = 'No affiliate highlights yet.';
+            highlightsList.appendChild(empty);
+            return;
+          }
+
+          state.affiliateHighlights.forEach(function(highlight, highlightIndex){
+            const card = document.createElement('div');
+            card.className = 'space-y-4 rounded-xl border border-line-subtle bg-surface-soft p-4';
+            card.setAttribute('data-highlight-card', '');
+
+            const header = document.createElement('div');
+            header.className = 'flex flex-wrap items-center justify-between gap-3';
+            const heading = document.createElement('h3');
+            heading.className = 'text-base font-semibold text-body';
+            heading.textContent = highlight.name && highlight.name.trim() ? highlight.name : 'Highlight ' + (highlightIndex + 1);
+            heading.setAttribute('data-highlight-heading', '');
+            header.appendChild(heading);
+
+            const controls = document.createElement('div');
+            controls.className = 'flex items-center gap-2';
+            controls.appendChild(createActionButton('Move up', 'move-highlight', { highlightIndex: highlightIndex, direction: 'up' }, { disabled: highlightIndex === 0 }));
+            controls.appendChild(createActionButton('Move down', 'move-highlight', { highlightIndex: highlightIndex, direction: 'down' }, { disabled: highlightIndex === state.affiliateHighlights.length - 1 }));
+            controls.appendChild(createActionButton('Remove', 'remove-highlight', { highlightIndex: highlightIndex }, { destructive: true }));
+            header.appendChild(controls);
+            card.appendChild(header);
+
+            const fieldsGrid = document.createElement('div');
+            fieldsGrid.className = 'grid gap-3 md:grid-cols-2';
+            const slugField = createField({
+              label: 'Highlight slug',
+              value: highlight.slug,
+              path: 'affiliateHighlights.' + highlightIndex + '.slug',
+              dataset: { type: 'highlight', highlightIndex: highlightIndex, field: 'slug' },
+              required: true
+            });
+            const nameField = createField({
+              label: 'Name',
+              value: highlight.name,
+              path: 'affiliateHighlights.' + highlightIndex + '.name',
+              dataset: { type: 'highlight', highlightIndex: highlightIndex, field: 'name' },
+              required: true
+            });
+            const urlField = createField({
+              label: 'URL',
+              value: highlight.url,
+              path: 'affiliateHighlights.' + highlightIndex + '.url',
+              dataset: { type: 'highlight', highlightIndex: highlightIndex, field: 'url' },
+              required: true,
+              placeholder: 'https://example.com'
+            });
+            const ctaField = createField({
+              label: 'CTA label',
+              value: highlight.ctaLabel,
+              path: 'affiliateHighlights.' + highlightIndex + '.ctaLabel',
+              dataset: { type: 'highlight', highlightIndex: highlightIndex, field: 'ctaLabel' },
+              required: true
+            });
+            const descriptionField = createField({
+              label: 'Description',
+              value: highlight.description,
+              path: 'affiliateHighlights.' + highlightIndex + '.description',
+              dataset: { type: 'highlight', highlightIndex: highlightIndex, field: 'description' },
+              required: true,
+              multiline: true,
+              rows: 3
+            });
+            descriptionField.classList.add('md:col-span-2');
+            const impactField = createField({
+              label: 'Impact tag',
+              value: highlight.impactTag,
+              path: 'affiliateHighlights.' + highlightIndex + '.impactTag',
+              dataset: { type: 'highlight', highlightIndex: highlightIndex, field: 'impactTag' },
+              required: false
+            });
+            const ethicsField = createField({
+              label: 'Ethical note',
+              value: highlight.ethicalNote,
+              path: 'affiliateHighlights.' + highlightIndex + '.ethicalNote',
+              dataset: { type: 'highlight', highlightIndex: highlightIndex, field: 'ethicalNote' },
+              required: false,
+              multiline: true,
+              rows: 3
+            });
+            ethicsField.classList.add('md:col-span-2');
+            const imageField = createField({
+              label: 'Image URL',
+              value: highlight.image,
+              path: 'affiliateHighlights.' + highlightIndex + '.image',
+              dataset: { type: 'highlight', highlightIndex: highlightIndex, field: 'image' },
+              required: false,
+              placeholder: 'Optional image path or URL'
+            });
+
+            fieldsGrid.appendChild(slugField);
+            fieldsGrid.appendChild(nameField);
+            fieldsGrid.appendChild(urlField);
+            fieldsGrid.appendChild(ctaField);
+            fieldsGrid.appendChild(descriptionField);
+            fieldsGrid.appendChild(impactField);
+            fieldsGrid.appendChild(ethicsField);
+            fieldsGrid.appendChild(imageField);
+
+            card.appendChild(fieldsGrid);
+            highlightsList.appendChild(card);
+          });
+        }
+
+        function renderAll() {
+          renderSections();
+          renderHighlights();
+          applyErrors(validateState());
+        }
+
+        function handleInput(event) {
+          const target = event.target;
+          if (!(target instanceof HTMLInputElement) && !(target instanceof HTMLTextAreaElement)) return;
+          const type = target.dataset.type;
+          if (!type) return;
+          if (type === 'section') {
+            const sectionIndex = Number(target.dataset.sectionIndex);
+            const field = target.dataset.field;
+            if (!state.sections[sectionIndex]) return;
+            state.sections[sectionIndex][field] = target.value;
+            if (field === 'title') {
+              const card = target.closest('[data-section-card]');
+              if (card) {
+                const heading = card.querySelector('[data-section-heading]');
+                if (heading) heading.textContent = target.value.trim() ? target.value : 'Section ' + (sectionIndex + 1);
+              }
+            }
+          } else if (type === 'partner') {
+            const sectionIndex = Number(target.dataset.sectionIndex);
+            const partnerIndex = Number(target.dataset.partnerIndex);
+            const field = target.dataset.field;
+            if (!state.sections[sectionIndex] || !state.sections[sectionIndex].partners[partnerIndex]) return;
+            if (target.dataset.array === 'true') {
+              const lines = target.value.split(/\r?\n/).map(function(line){ return line.trim(); }).filter(function(line){ return line.length > 0; });
+              state.sections[sectionIndex].partners[partnerIndex][field] = lines;
+            } else {
+              state.sections[sectionIndex].partners[partnerIndex][field] = target.value;
+              if (field === 'name') {
+                const card = target.closest('[data-partner-card]');
+                if (card) {
+                  const heading = card.querySelector('[data-partner-heading]');
+                  if (heading) heading.textContent = target.value.trim() ? target.value : 'Partner ' + (partnerIndex + 1);
+                }
+              }
+            }
+          } else if (type === 'highlight') {
+            const highlightIndex = Number(target.dataset.highlightIndex);
+            const field = target.dataset.field;
+            if (!state.affiliateHighlights[highlightIndex]) return;
+            state.affiliateHighlights[highlightIndex][field] = target.value;
+            if (field === 'name') {
+              const card = target.closest('[data-highlight-card]');
+              if (card) {
+                const heading = card.querySelector('[data-highlight-heading]');
+                if (heading) heading.textContent = target.value.trim() ? target.value : 'Highlight ' + (highlightIndex + 1);
+              }
+            }
+          }
+          applyErrors(validateState());
+        }
+
+        function handleAction(event) {
+          const button = event.target.closest('[data-action]');
+          if (!button) return;
+          event.preventDefault();
+          const action = button.dataset.action;
+          if (action === 'add-section') {
+            state.sections.push(createEmptySection());
+            renderAll();
+            return;
+          }
+          if (action === 'add-highlight') {
+            state.affiliateHighlights.push(createEmptyHighlight());
+            renderAll();
+            return;
+          }
+          const sectionIndex = Number(button.dataset.sectionIndex);
+          const partnerIndex = Number(button.dataset.partnerIndex);
+          const highlightIndex = Number(button.dataset.highlightIndex);
+          if (action === 'remove-section') {
+            if (!Number.isNaN(sectionIndex)) {
+              state.sections.splice(sectionIndex, 1);
+              renderAll();
+            }
+            return;
+          }
+          if (action === 'move-section') {
+            const direction = button.dataset.direction === 'up' ? -1 : 1;
+            if (!Number.isNaN(sectionIndex)) {
+              moveItem(state.sections, sectionIndex, sectionIndex + direction);
+              renderAll();
+            }
+            return;
+          }
+          if (action === 'add-partner') {
+            if (!Number.isNaN(sectionIndex) && state.sections[sectionIndex]) {
+              state.sections[sectionIndex].partners.push(createEmptyPartner());
+              renderAll();
+            }
+            return;
+          }
+          if (action === 'remove-partner') {
+            if (!Number.isNaN(sectionIndex) && !Number.isNaN(partnerIndex) && state.sections[sectionIndex]) {
+              state.sections[sectionIndex].partners.splice(partnerIndex, 1);
+              renderAll();
+            }
+            return;
+          }
+          if (action === 'move-partner') {
+            if (!Number.isNaN(sectionIndex) && !Number.isNaN(partnerIndex) && state.sections[sectionIndex]) {
+              const direction = button.dataset.direction === 'up' ? -1 : 1;
+              moveItem(state.sections[sectionIndex].partners, partnerIndex, partnerIndex + direction);
+              renderAll();
+            }
+            return;
+          }
+          if (action === 'remove-highlight') {
+            if (!Number.isNaN(highlightIndex)) {
+              state.affiliateHighlights.splice(highlightIndex, 1);
+              renderAll();
+            }
+            return;
+          }
+          if (action === 'move-highlight') {
+            if (!Number.isNaN(highlightIndex)) {
+              const direction = button.dataset.direction === 'up' ? -1 : 1;
+              moveItem(state.affiliateHighlights, highlightIndex, highlightIndex + direction);
+              renderAll();
+            }
+            return;
+          }
+        }
+
+        function cleanPartner(partner) {
+          const cleaned = {
+            slug: toTrimmedString(partner.slug),
+            name: toTrimmedString(partner.name),
+            description: toTrimmedString(partner.description),
+            url: toTrimmedString(partner.url)
+          };
+          const location = toTrimmedString(partner.location);
+          if (location) cleaned.location = location;
+          const impactTag = toTrimmedString(partner.impactTag);
+          if (impactTag) cleaned.impactTag = impactTag;
+          const ethicalNote = toTrimmedString(partner.ethicalNote);
+          if (ethicalNote) cleaned.ethicalNote = ethicalNote;
+          const contact = toTrimmedString(partner.contact);
+          if (contact) cleaned.contact = contact;
+          const notes = toTrimmedString(partner.notes);
+          if (notes) cleaned.notes = notes;
+          const offerings = Array.isArray(partner.offerings) ? partner.offerings.map(toTrimmedString).filter(function(item){ return item.length > 0; }) : [];
+          if (offerings.length) cleaned.offerings = offerings;
+          const categories = Array.isArray(partner.categories) ? partner.categories.map(toTrimmedString).filter(function(item){ return item.length > 0; }) : [];
+          if (categories.length) cleaned.categories = categories;
+          return cleaned;
+        }
+
+        function cleanSection(section) {
+          const cleaned = {
+            slug: toTrimmedString(section.slug),
+            title: toTrimmedString(section.title),
+            partners: Array.isArray(section.partners) ? section.partners.map(cleanPartner) : []
+          };
+          const summary = toTrimmedString(section.summary);
+          if (summary) cleaned.summary = summary;
+          return cleaned;
+        }
+
+        function cleanHighlight(highlight) {
+          const cleaned = {
+            slug: toTrimmedString(highlight.slug),
+            name: toTrimmedString(highlight.name),
+            description: toTrimmedString(highlight.description),
+            url: toTrimmedString(highlight.url),
+            ctaLabel: toTrimmedString(highlight.ctaLabel)
+          };
+          const impactTag = toTrimmedString(highlight.impactTag);
+          if (impactTag) cleaned.impactTag = impactTag;
+          const ethicalNote = toTrimmedString(highlight.ethicalNote);
+          if (ethicalNote) cleaned.ethicalNote = ethicalNote;
+          const image = toTrimmedString(highlight.image);
+          if (image) cleaned.image = image;
+          return cleaned;
+        }
+
+        function buildPayload() {
+          return {
+            sections: state.sections.map(cleanSection),
+            affiliateHighlights: state.affiliateHighlights.map(cleanHighlight)
+          };
         }
 
         async function loadData() {
@@ -119,40 +882,60 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             setStatus('Loading…');
             const res = await fetch(devApi + '/partners/get', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
             const json = await res.json();
-            if (!json?.ok) throw new Error(json?.error || 'Failed to load');
+            if (!json || !json.ok) throw new Error((json && json.error) || 'Failed to load');
             const data = json.data || {};
-            sectionsEditor.value = JSON.stringify(data.sections || [], null, 2);
-            highlightsEditor.value = JSON.stringify(data.affiliateHighlights || [], null, 2);
+            state.sections = Array.isArray(data.sections) ? data.sections.map(normalizeSection) : [];
+            state.affiliateHighlights = Array.isArray(data.affiliateHighlights) ? data.affiliateHighlights.map(normalizeHighlight) : [];
             if (updatedAtEl) updatedAtEl.textContent = data.updatedAt || '—';
+            renderAll();
             setStatus('Loaded.', 'success');
-            setTimeout(() => setStatus(''), 2000);
-          } catch (e) {
-            setStatus(e?.message || 'Failed to load.', 'error');
+            setTimeout(function(){ setStatus(''); }, 2000);
+          } catch (error) {
+            setStatus(error && error.message ? error.message : 'Failed to load.', 'error');
           }
         }
 
         async function saveData() {
-          if (!validateJSON()) return;
+          const errors = validateState();
+          applyErrors(errors);
+          if (hasAnyErrors(errors)) {
+            setStatus('Fix the highlighted fields before saving.', 'error');
+            return;
+          }
           try {
             setStatus('Saving…');
-            const data = {
-              sections: JSON.parse(sectionsEditor.value || '[]'),
-              affiliateHighlights: JSON.parse(highlightsEditor.value || '[]')
-            };
-            const res = await fetch(devApi + '/partners/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            const payload = buildPayload();
+            const res = await fetch(devApi + '/partners/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             const json = await res.json();
-            if (!json?.ok) throw new Error(json?.error || 'Failed to save');
-            if (updatedAtEl && json.data?.updatedAt) updatedAtEl.textContent = json.data.updatedAt;
+            if (!json || !json.ok) throw new Error((json && json.error) || 'Failed to save');
+            const data = json.data || {};
+            state.sections = Array.isArray(data.sections) ? data.sections.map(normalizeSection) : state.sections;
+            state.affiliateHighlights = Array.isArray(data.affiliateHighlights) ? data.affiliateHighlights.map(normalizeHighlight) : state.affiliateHighlights;
+            if (updatedAtEl && data.updatedAt) updatedAtEl.textContent = data.updatedAt;
+            renderAll();
             setStatus('Saved!', 'success');
-            setTimeout(() => setStatus(''), 3000);
-          } catch (e) {
-            setStatus(e?.message || 'Failed to save.', 'error');
+            setTimeout(function(){ setStatus(''); }, 3000);
+          } catch (error) {
+            setStatus(error && error.message ? error.message : 'Failed to save.', 'error');
           }
         }
 
         if (saveBtn) saveBtn.addEventListener('click', saveData);
         if (resetBtn) resetBtn.addEventListener('click', loadData);
-        if (validateBtn) validateBtn.addEventListener('click', validateJSON);
+        if (validateBtn) {
+          validateBtn.addEventListener('click', function(){
+            const errors = validateState();
+            applyErrors(errors);
+            if (hasAnyErrors(errors)) {
+              setStatus('Please fix the highlighted fields.', 'error');
+            } else {
+              setStatus('All required fields look good!', 'success');
+              setTimeout(function(){ setStatus(''); }, 3000);
+            }
+          });
+        }
+        root.addEventListener('input', handleInput);
+        root.addEventListener('click', handleAction);
         loadData();
       })();`}
     </script>
