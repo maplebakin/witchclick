@@ -49,6 +49,17 @@
   --card-pill-shadow: 0 2px 6px rgba(74, 58, 104, 0.14);
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .card-panel[data-animate="pending"] {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+
+  .card-panel[data-animate="animating"] {
+    will-change: opacity, transform, filter;
+  }
+}
+
 .card-panel {
   position: relative;
   display: block;
