@@ -23,7 +23,10 @@ describe('prompt consistency', () => {
     const cliPrompt = genprompt(options).prompt;
 
     const resolvedKey = resolveGeneratorPresetKey(mode);
-    const preset = resolvedKey ? (generatorPresets as Record<string, any>)[resolvedKey] : undefined;
+    if (!resolvedKey) {
+      throw new Error(`Preset key not found for mode "${mode}"`);
+    }
+    const preset = (generatorPresets as Record<string, any>)[resolvedKey];
     expect(preset).toBeTruthy();
     if (!preset) throw new Error('Preset not found for mode');
     const styleDirective = (generatorStyles as Record<string, string | undefined>)[style.toLowerCase()] ??
