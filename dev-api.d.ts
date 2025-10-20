@@ -23,6 +23,19 @@ export declare function generateMetaDescription(
 ): string;
 export declare function normalizeTags(tags: unknown): string[];
 export declare function buildGenprompt(options: Record<string, unknown>): { prompt: string };
+export declare function buildPresetPrompt(options: {
+  preset: {
+    system: string;
+    goal: string;
+    strictOutputContract: string[];
+    looseOutputContract: string[];
+    [extra: string]: unknown;
+  };
+  topic: string;
+  strict?: boolean;
+  styleDirective?: string;
+  contentType?: string;
+}): string;
 
 export declare function prepareSpecForPersistence(
   rawSpec: unknown,
@@ -38,6 +51,7 @@ export interface AdminPipelineHelpers {
   generateMetaDescription: typeof generateMetaDescription;
   normalizeTags: typeof normalizeTags;
   buildGenprompt: typeof buildGenprompt;
+  buildPresetPrompt: typeof buildPresetPrompt;
   prepareSpecForPersistence: typeof prepareSpecForPersistence;
   persistPreparedSpec: typeof persistPreparedSpec;
 }
@@ -77,3 +91,8 @@ export declare function saveThemeRecord(payload: Record<string, unknown>): Promi
 export declare function setActiveThemeRecord(
   payload: Record<string, unknown>,
 ): Promise<{ active: AdminThemeListing["active"]; theme: AdminThemeRecord }>;
+export declare function attachHeroToPost(options: {
+  slug: string;
+  heroImage: string;
+  heroAlt?: string | null;
+}): Promise<{ path: string }>;
