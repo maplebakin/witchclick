@@ -36,10 +36,9 @@ import { STRICT_JSON_RULES } from './server/lib/strictJsonRules.js';
 import { buildMasterPrompt } from './server/lib/promptBuilder.js';
 import { buildCursePrompt } from './server/lib/cursePromptBuilder.js';
 import { CURSE_TARGETS, CURSE_TONES, CURSE_TYPES } from './server/lib/curseSpecSchema.js';
+import { loadPromptContext } from './server/lib/promptContext.js';
 import { resolvePostsDirectories } from './scripts/lib/contentPaths.js';
 import { frontmatterString, parseFrontmatter, readFrontmatter } from './scripts/lib/frontmatter.js';
-import { collectPostMetadata } from './scripts/lib/postInventory.js';
-import { readSlugHistory, writeSlugHistory } from './scripts/lib/slugHistory.js';
 import { isValidSlug, slugify } from './shared/slugify.js';
 import {
   prepareSpecForPersistence,
@@ -673,34 +672,28 @@ function normalizeTags(input) {
 
 // ---------- GENPROMPT (shared with CLI) ----------
 function buildGenprompt({ topic, words, ads, kofi }) {
-  const settings =
-    readJSON(path.join(CWD, 'content', 'settings.json')) ||
-    { brandName: 'WitchClick', siteUrl: 'https://example.com' };
-  const products = readJSON(path.join(CWD, 'content', 'products.json')) || { products: [] };
-  const allowed = Array.isArray(products.products)
-    ? products.products
-        .map((p) => String(p?.key || '').trim())
-        .filter(Boolean)
+  const context = loadPromptContext({ cwd: CWD });
+  const allowed = Array.isArray(context.allowedAffiliateKeys)
+    ? context.allowedAffiliateKeys
     : [];
-
-  const metadata = collectPostMetadata(CWD);
-  const existingTitles = metadata.map((item) => item.title).filter(Boolean);
-  const currentSlugs = metadata.map((item) => item.slug).filter(Boolean);
-  const historicSlugs = readSlugHistory(CWD);
-  const mergedSlugSet = new Set([...historicSlugs, ...currentSlugs]);
-  const mergedSlugs = Array.from(mergedSlugSet);
-  writeSlugHistory(CWD, mergedSlugs);
+  const existingTitles = Array.isArray(context.existingPostTitles)
+    ? context.existingPostTitles
+    : [];
+  const mergedSlugs = Array.isArray(context.existingPostSlugs)
+    ? context.existingPostSlugs
+    : [];
 
   return buildMasterPrompt({
     topic,
     words,
     ads,
     kofi,
-    brandName: settings.brandName ?? 'WitchClick',
-    siteUrl: settings.siteUrl ?? 'https://example.com',
+    brandName: context.brandName ?? 'WitchClick',
+    siteUrl: context.siteUrl ?? 'https://example.com',
     existingPostTitles: existingTitles,
     existingPostSlugs: mergedSlugs,
     allowedAffiliateKeys: allowed,
+    engagementSignals: context.engagementSignals,
   });
 }
 

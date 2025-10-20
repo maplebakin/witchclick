@@ -9,6 +9,22 @@ export interface MasterPromptOptions {
   existingPostSlugs?: string[];
   allowedAffiliateKeys?: string[];
   strictJsonRules?: string[];
+  engagementSignals?: {
+    tags?: Array<{
+      tag: string;
+      reason?: string;
+      score?: number;
+      recencyDays?: number;
+    }>;
+    entities?: Array<{
+      slug: string;
+      type?: string;
+      name?: string;
+      reason?: string;
+      score?: number;
+      recencyDays?: number;
+    }>;
+  } | null;
 }
 
 export function buildMasterPrompt(options: MasterPromptOptions): string;

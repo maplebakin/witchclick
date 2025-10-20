@@ -75,6 +75,86 @@ async function cmdGenprompt(flags: Flags) {
   console.log(prompt);
 }
 
+async function cmdLint(positional: string[], flags: Flags) {
+  const fileArg = positional[0] || String(flags.file ?? flags.f ?? '');
+  if (!fileArg) {
+    console.error('Usage: lint <spec.json> [--target 1200]');
+    process.exitCode = 1;
+    return;
+  }
+
+  const targetValue = flags.target ?? flags.words ?? flags.wordCount;
+  const targetWordCount = typeof targetValue === 'string'
+    ? Number(targetValue)
+    : typeof targetValue === 'number'
+      ? targetValue
+      : undefined;
+  const resolvedTarget = Number.isFinite(targetWordCount) && targetWordCount > 0
+    ? Number(targetWordCount)
+    : undefined;
+
+  const mod = await import('./lintSpec.js');
+
+  try {
+    const result = await (mod as any).lintSpec(fileArg, {
+      targetWordCount: resolvedTarget,
+      cwd: process.cwd(),
+    });
+
+    if (!result?.ok) {
+      console.error(`✖ Spec validation failed for ${fileArg}`);
+      const errors: string[] = Array.isArray(result?.errors) ? result.errors : [];
+      for (const err of errors) {
+        console.error(`  • ${err}`);
+      }
+      const warnings: string[] = Array.isArray(result?.warnings) ? result.warnings : [];
+      if (warnings.length) {
+        console.warn('Warnings:');
+        for (const warning of warnings) {
+          console.warn(`  • ${warning}`);
+        }
+      }
+      const normalizations: string[] = Array.isArray(result?.normalizations) ? result.normalizations : [];
+      if (normalizations.length) {
+        console.warn('Normalizations applied:');
+        for (const note of normalizations) {
+          console.warn(`  • ${note}`);
+        }
+      }
+      process.exitCode = 1;
+      return;
+    }
+
+    const wordCount = typeof result.wordCount === 'number' ? result.wordCount : 'unknown';
+    console.log(`✓ Spec valid (${wordCount} words).`);
+
+    const normalizations: string[] = Array.isArray(result.normalizations) ? result.normalizations : [];
+    if (normalizations.length) {
+      console.log('Normalizations:');
+      for (const note of normalizations) {
+        console.log(`  • ${note}`);
+      }
+    }
+
+    const warnings: string[] = Array.isArray(result.warnings) ? result.warnings : [];
+    if (warnings.length) {
+      console.log('Warnings:');
+      for (const warning of warnings) {
+        console.log(`  • ${warning}`);
+      }
+    }
+
+    if (result.promptMetadata) {
+      console.log('Prompt metadata:');
+      console.log(JSON.stringify(result.promptMetadata, null, 2));
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`✖ ${message}`);
+    process.exitCode = 1;
+  }
+}
+
 async function cmdCurses(flags: Flags) {
   const type = String(flags.type ?? flags.t ?? 'mirror');
   const target = String(flags.target ?? flags.g ?? 'person');
@@ -204,10 +284,13 @@ async function cmdHealth() {
 export async function main(argv: string[] = process.argv.slice(2)) {
   const { positional, flags } = parseArgv(argv);
   const cmd = positional[0] || 'help';
+  const args = positional.slice(1);
 
   switch (cmd) {
     case 'genprompt':
       return cmdGenprompt(flags);
+    case 'lint':
+      return cmdLint(args, flags);
     case 'curses':
       return cmdCurses(flags);
     case 'ingest':
@@ -234,6 +317,7 @@ export async function main(argv: string[] = process.argv.slice(2)) {
           '',
           'Usage:',
           '  node tools/wc.js genprompt --topic "..." --words 1200 --ads on|off --kofi on|off',
+          '  node tools/wc.js lint spec.json [--target 1200]',
           '  node tools/wc.js curses --type mirror --target person --tone poetic [--sigil "Sigil"] [--altar "Item"] [--journal "Question"]',
           '  node tools/wc.js curses:ingest --from-file curse.json [--dry-run]',
           '  node tools/wc.js curses:export [--slug curse-slug]',

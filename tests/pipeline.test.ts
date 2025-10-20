@@ -82,6 +82,7 @@ describe('content pipeline integration', () => {
 
     const saved = await readFile(path.join(tempDir, payload.path), 'utf8');
     expect(saved).toContain('title: "Example Focus Ritual"');
+    expect(saved).toMatch(/promptMetadata:/);
 
     const files = await readdir(path.join(tempDir, 'content', 'posts'));
     expect(files).toContain('example-focus-ritual.md');

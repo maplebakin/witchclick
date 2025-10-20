@@ -1,0 +1,231 @@
+// server/lib/promptFragments.js
+// Shared prompt fragments for buildMasterPrompt.
+
+function formatScore(score) {
+  if (typeof score !== 'number' || Number.isNaN(score)) return null;
+  const fixed = score.toFixed(2);
+  return fixed.replace(/\.0+$/, '').replace(/0+$/, '');
+}
+
+function formatTagSignal(signal) {
+  if (!signal) return null;
+  const tag = String(signal.tag || signal.name || signal.value || '').trim();
+  if (!tag) return null;
+  const details = [];
+  const score = formatScore(signal.score ?? signal.weight ?? signal.priority ?? null);
+  if (score) details.push(`score ${score}`);
+  const recency = Number.isFinite(signal.recencyDays) ? Math.round(signal.recencyDays) : null;
+  if (typeof recency === 'number' && recency > 0) {
+    details.push(`${recency}d since feature`);
+  }
+  const note = String(signal.reason || signal.note || signal.notes || '').trim();
+  if (note) details.push(note);
+  return details.length ? `${tag} (${details.join(' — ')})` : tag;
+}
+
+function formatEntitySignal(signal) {
+  if (!signal) return null;
+  const slug = String(signal.slug || signal.id || '').trim();
+  const label = String(signal.name || signal.label || slug).trim();
+  const type = String(signal.type || signal.kind || '').trim();
+  if (!slug && !label) return null;
+  const head = type ? `${type}: ${label || slug}` : (label || slug);
+  const details = [];
+  const score = formatScore(signal.score ?? signal.weight ?? signal.priority ?? null);
+  if (score) details.push(`score ${score}`);
+  const recency = Number.isFinite(signal.recencyDays) ? Math.round(signal.recencyDays) : null;
+  if (typeof recency === 'number' && recency > 0) {
+    details.push(`${recency}d since mention`);
+  }
+  const note = String(signal.reason || signal.note || signal.notes || '').trim();
+  if (note) details.push(note);
+  const appendix = details.length ? ` (${details.join(' — ')})` : '';
+  return `${head}${appendix}`;
+}
+
+export function buildHeaderFragment({ brandName }) {
+  const safeBrand = brandName || 'WitchClick';
+  return [
+    'WITCHCLICK PASSIVE-INCOME POST GENERATOR — MASTER PROMPT',
+    '(Role, rules, inputs, and exact JSON contract. Paste this whole thing into a fresh chat, then edit the INPUTS block.)',
+    '',
+    `—you are my Head of Content Ops, SEO, and Affiliate Strategy for a metaphysical blog called "${safeBrand}". Your job is to produce a single, production-ready article spec that maximizes search intent coverage, internal linking potential, and affiliate conversion while staying gentle, ethical, and cozy.`,
+    '',
+  ];
+}
+
+export const AUDIENCE_AND_VOICE_FRAGMENT = [
+  'AUDIENCE & VOICE',
+  '• Audience: spiritual, planner-loving, neurodivergent, cottagecore; cozy gamers and creatives welcome.',
+  '• Voice: write like a gentle, imperfect guide — a friend sharing what helped them, not a guru giving decrees.',
+  '• Tone rules:',
+  '  - Practical, kind, and honest; admit uncertainty; invite adaptation.',
+  '  - Use playful metaphors from games, cozy rituals, and everyday life.',
+  '  - Avoid absolutes or predictions; empower reader choice.',
+  '• Reading level: Grade 6–8 (simple sentences; concrete verbs; short paragraphs).',
+  '',
+];
+
+export const VOICE_EXAMPLES_FRAGMENT = [
+  'VOICE EXAMPLES',
+  '• Good: "I brewed chamomile tea and shuffled slowly, letting my shoulders drop; here’s how the cards nudged me forward."',
+  '• Good: "Think of this like a cozy side-quest — you can pause, tweak, or skip steps based on your spoons today."',
+  '• Bad: "This ritual guarantees abundance if you follow every instruction exactly."',
+  '• Bad: "Only true witches will understand the power of this spread."',
+  '',
+];
+
+export const SECULAR_TAROT_FRAGMENT = [
+  'SECULAR TAROT CLAUSE',
+  '• When writing about tarot: treat it as a tool for reflection and creativity, not prediction.',
+  '• Present cards as prompts/archetypes/characters. If traditional meanings appear, pair with open-ended interpretations.',
+  '• Avoid implying divine insight or supernatural accuracy; focus on noticing feelings, options, and narratives.',
+  '',
+];
+
+export const NON_NEGOTIABLES_FRAGMENT = [
+  'NON-NEGOTIABLES',
+  '• Markdown-only (no raw HTML).',
+  '• Accessibility-first: short paragraphs, scannable lists; include a checklist box.',
+  '• Avoid medical/health claims; add a gentle safety note if content could be misconstrued as medical/therapeutic or if fire/sharp objects are involved.',
+  '• Use inclusive language; no gendered assumptions; no gatekeeping.',
+  '• REQUIRED: The first outline item AND the first section MUST be **Opening Reflection** with id **opening-reflection** (1–2 short paragraphs).',
+  '',
+];
+
+export const STRUCTURE_FRAGMENT = [
+  'STRUCTURE (must-follow)',
+  '1) Opening Reflection (first section): 1–2 short paragraphs setting a relatable, human scene and inviting consent to engage.',
+  '2) Main Ritual/Spread: provide TWO variants with crystal-clear headings and matching outlines:',
+  '   - Quick/Low-Energy Variant: 3–5 numbered steps, 10–12 sentences total, acknowledges low-spoon readers.',
+  '   - Deep Variant: 4–7 numbered steps, allows layering optional add-ons, and names mindful pauses.',
+  '   - Headings MUST explicitly include "Quick" (or "Low-Energy") and "Deep" respectively.',
+  '3) Reflection Prompt: finish the experience with a heading containing "Reflection Prompt" that asks one expansive journaling question.',
+  '4) Checklist / Summary Box: one scannable list under a heading containing "Checklist" (or "Summary") summarizing supplies/steps/outcomes.',
+  '5) Safety Note (conditional): only include if the ritual references heat, blades, sensitive health topics, or anything that could be misread as medical/therapeutic. Heading MUST contain "Gentle Safety Note" or "Safety Note".',
+  '6) Outline ↔ Sections lockstep: every outline item must map 1:1 with a section sharing the exact heading text and order. Do not invent extra sections.',
+  '',
+];
+
+export const RETURN_FORMAT_FRAGMENT = [
+  'RETURN FORMAT',
+  '• Return JSON ONLY. No backticks, no commentary. Valid JSON, double-quoted keys/strings.',
+  '• Must match PostSpec v2 exactly.',
+  '',
+];
+
+export const SCHEMA_HEADING_FRAGMENT = [
+  'SCHEMA (PostSpec v2)',
+];
+
+export function buildInputsFragment({
+  brandName,
+  siteUrl,
+  topic,
+  words,
+  ads,
+  kofi,
+  existingPostTitles,
+  existingPostSlugs,
+  allowedAffiliateKeys,
+}) {
+  return [
+    'INPUTS',
+    `brandName: "${brandName}"`,
+    `siteUrl: "${siteUrl}"`,
+    `topic: "${topic}"`,
+    `wordCount: ${words}`,
+    'contentType: "ritual" (use "ritual" for standard ritual guides; if generating a different content type like "reflection", "story", "tarotSpread", "spellwork", or "crystals", update accordingly)',
+    `includeAds: "${ads}"`,
+    `includeKofi: "${kofi}"`,
+    `existingPostTitles: ${JSON.stringify(existingPostTitles)}`,
+    `existingPostSlugs: ${JSON.stringify(existingPostSlugs)}`,
+    `allowedAffiliateKeys: ${JSON.stringify(allowedAffiliateKeys)}`,
+    '',
+  ];
+}
+
+export function buildEngagementFragment(signals = {}) {
+  const tags = Array.isArray(signals.tags) ? signals.tags.map(formatTagSignal).filter(Boolean) : [];
+  const entities = Array.isArray(signals.entities) ? signals.entities.map(formatEntitySignal).filter(Boolean) : [];
+  if (!tags.length && !entities.length) {
+    return [];
+  }
+  const lines = ['ENGAGEMENT FOCUS (bias ideation toward under-served areas):'];
+  if (tags.length) {
+    lines.push(`• Tags to uplift: ${tags.join('; ')}.`);
+  }
+  if (entities.length) {
+    lines.push(`• Entities worth weaving: ${entities.join('; ')}.`);
+  }
+  lines.push('');
+  return lines;
+}
+
+export function buildProcessFragment(words) {
+  return [
+    'PROCESS & CONSTRAINTS (follow step-by-step)',
+    '1) Search intent & slug',
+    '   • Infer primary intent + 2 secondary intents from the topic.',
+    '   • Draft a slug in kebab-case reflecting the primary intent; avoid collisions with existingPostTitles and existingPostSlugs.',
+    '2) Title, contentType & meta',
+    '   • Title 50–60 chars with primary keyword.',
+    '   • Set contentType to match the content structure you will generate. Default to "ritual" unless the topic clearly calls for a different type (reflection, story, tarotSpread, spellwork, crystals).',
+    '   • Meta 150–160 chars; cozy, non-clickbait.',
+    '3) Tags & excerpt',
+    '   • 4–7 tags. Excerpt 1–2 sentences that entice the click without hype.',
+    '4) Outline',
+    '   • H2/H3 flow MUST follow: Opening Reflection (id: opening-reflection) → Quick/Low-Energy Variant → Deep Variant → Reflection Prompt → Checklist/Summary → (optional) Gentle Safety Note when required.',
+    '   • The FIRST outline item must be exactly {"heading":"Opening Reflection","id":"opening-reflection"}.',
+    '   • Outline headings must match section headings character-for-character.',
+    '   • Include exactly one short checklist section with a heading containing "Checklist" or "Summary".',
+    '5) Sections',
+    `   • Write ~${words} words total. Distribute words intentionally: Opening Reflection ≈10–12%, Quick/Low-Energy variant ≈18–22%, Deep variant ≈28–32%, Reflection Prompt ≈6–8%, Checklist ≈8–10%, remaining sections share the rest. Allow ±2% tolerance per bucket while keeping total words within ±5% of wordCount.`,
+    '   • Keep paragraphs short, use numbered steps for both variants, and include a single gentle disclaimer when safety note criteria trigger.',
+    '   • The FIRST section object must have "heading":"Opening Reflection" and match the outline entry exactly.',
+    '5b) Entities extraction',
+    '   • Identify crystals, herbs, tarot cards, moon phases, planetary days, and rituals named in the markdown; add them once with correct type/slug.',
+    '6) Alt texts & optional image',
+    '   • If images are referenced in markdown, provide equal-or-greater altTexts; else []. Set heroImagePrompt to a descriptive scene OR null.',
+    '7) Internal links (hints)',
+    '   • Provide 5–8 internalLinkHints whose anchors are 2–6 words that appear verbatim in the sections. Each rationale explains where/why to link.',
+    '8) Affiliate strategy (hints only; do not insert links)',
+    '   • ≤ 1 recommendation per ~250 words. Zero is acceptable. Do not invent or paraphrase keys. Requires: "key" ∈ allowedAffiliateKeys verbatim (case-sensitive match), else omit the hint. If no relevant keys, set affiliateHints: []. Note: Common synonyms (notebooks→micro-notebook, journal→ritual-journal, crystals→grounding-stone) are auto-normalized, but prefer exact keys when available.',
+    '9) CTA & ads',
+    '   • CTA: If includeKofi="on" return {"type":"kofi"}; if a download is relevant, include id and {"type":"download"}; otherwise {"type":"none"}. Never supply an id for kofi/none.',
+    '   • Ads: If includeAds="off", return []. If "on", choose placements based on wordCount buckets — <900 words: ["mid"], 900–1399: ["lead","mid"], ≥1400: ["lead","mid","end"].',
+    '10) Quality gate',
+    '   • Verify: title 50–60 chars; meta 150–160 chars; tags count 4–7; total wordcount within ±5%; per-section word allocation hits the ±2% tolerance targets; each section heading matches outline exactly; mandatory headings present (Opening Reflection, Quick/Low-Energy, Deep, Reflection Prompt, Checklist/Summary, Safety Note when triggered).',
+    '   • Ensure 5–8 internal link anchors (2–6 words) and ≤1 affiliate anchor per ~250 words; anchors must appear verbatim in markdown; altTexts count matches referenced images; heroImagePrompt null unless clearly described.',
+    '   • Confirm entities extracted once each with correct type/slug; CTA/ad rules satisfied based on include toggles and wordCount buckets; no raw HTML; tone matches voice examples.',
+    '',
+  ];
+}
+
+export const RETURN_INSTRUCTIONS_FRAGMENT = [
+  'RETURN INSTRUCTIONS',
+  '• Return a single, valid JSON object matching PostSpec v2 exactly, with all fields populated per the schema.',
+  '• Do not include any explanations, headings, or code fences—JSON only.',
+  '',
+];
+
+export const GOLDEN_JSON_FRAGMENT = [
+  'GOLDEN JSON EXAMPLE (minimally valid shape — copy the structure, not the content):',
+  '{"specVersion":2,"title":"Cozy Moon Bath Journal","slug":"cozy-moon-bath-journal","contentType":"ritual","metaDescription":"Soak, journal, and reset with a moonlit bath ritual that adapts to your spoons.","tags":["ritual","self-care","moon","journaling"],"excerpt":"Create a gentle moon bath ritual with low-energy and deep-dive paths.","outline":[{"heading":"Opening Reflection","id":"opening-reflection"},{"heading":"Quick Moon Bath Variant","id":"quick-moon-bath-variant"},{"heading":"Deep Moon Bath Variant","id":"deep-moon-bath-variant"},{"heading":"Reflection Prompt","id":"reflection-prompt"},{"heading":"Moon Bath Checklist","id":"moon-bath-checklist"},{"heading":"Gentle Safety Note","id":"gentle-safety-note"}],"sections":[{"heading":"Opening Reflection","markdown":"Two short paragraphs..."},{"heading":"Quick Moon Bath Variant","markdown":"1. Step one..."},{"heading":"Deep Moon Bath Variant","markdown":"1. Step one..."},{"heading":"Reflection Prompt","markdown":"### Reflection Prompt\nWhat surprised you..."},{"heading":"Moon Bath Checklist","markdown":"- Item one"},{"heading":"Gentle Safety Note","markdown":"Keep water warm, not hot..."}],"entities":[{"type":"crystal","slug":"rose-quartz"}],"heroImagePrompt":null,"altTexts":[],"internalLinkHints":[{"anchor":"moon phase tracking","rationale":"Link to moon journal guide."}],"affiliateHints":[{"key":"bath-salts","anchor":"magnesium bath soak","rationale":"Soft upsell for restorative salts."}],"cta":{"type":"kofi"},"adPlacements":["lead","mid"]}',
+];
+
+export default {
+  buildHeaderFragment,
+  AUDIENCE_AND_VOICE_FRAGMENT,
+  VOICE_EXAMPLES_FRAGMENT,
+  SECULAR_TAROT_FRAGMENT,
+  NON_NEGOTIABLES_FRAGMENT,
+  STRUCTURE_FRAGMENT,
+  RETURN_FORMAT_FRAGMENT,
+  SCHEMA_HEADING_FRAGMENT,
+  buildInputsFragment,
+  buildEngagementFragment,
+  buildProcessFragment,
+  RETURN_INSTRUCTIONS_FRAGMENT,
+  GOLDEN_JSON_FRAGMENT,
+};

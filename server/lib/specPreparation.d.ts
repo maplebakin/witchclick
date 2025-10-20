@@ -11,6 +11,7 @@ export interface PreparedSpec {
   };
   frontmatter: Record<string, unknown>;
   entityStubs: { file: string; payload: Record<string, unknown> }[];
+  promptMetadata?: Record<string, unknown> | null;
 }
 
 export interface PrepareSpecOptions {
@@ -18,6 +19,24 @@ export interface PrepareSpecOptions {
   postsDirectories?: string[];
   targetWordCount?: number;
   allowedAffiliateKeys?: string[];
+  sourcePath?: string;
+  generatedAt?: string;
+  engagementSignals?: {
+    tags?: Array<{
+      tag: string;
+      reason?: string;
+      score?: number;
+      recencyDays?: number;
+    }>;
+    entities?: Array<{
+      slug: string;
+      type?: string;
+      name?: string;
+      reason?: string;
+      score?: number;
+      recencyDays?: number;
+    }>;
+  } | null;
 }
 
 export interface PersistResult {

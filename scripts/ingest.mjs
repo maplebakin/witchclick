@@ -62,6 +62,8 @@ export async function ingestFromSpec(input, options = {}) {
     prepared = prepareSpecForPersistence(input || {}, {
       cwd: PROJECT_ROOT,
       postsDirectories,
+      sourcePath: inputPath || null,
+      generatedAt: new Date().toISOString(),
     });
   } catch (err) {
     const errors = Array.isArray(err?.errors) && err.errors.length ? err.errors : [err?.message || "Spec validation failed"];
@@ -83,7 +85,7 @@ export async function ingestFromSpec(input, options = {}) {
     throw new IngestValidationError({ message: err?.message, errors, warnings, normalizations });
   }
 
-  const { post, spec, normalizationReport, warnings, entityStubs, postStubs } = prepared;
+  const { post, spec, normalizationReport, warnings, entityStubs, postStubs, promptMetadata } = prepared;
   const slug = spec.slug;
   const bytesWritten = Buffer.byteLength(post.contents, "utf8");
 
@@ -106,6 +108,7 @@ export async function ingestFromSpec(input, options = {}) {
     createdEntities: persistence?.createdEntities ?? [],
     createdPosts: persistence?.createdPosts ?? [],
     source: inputPath || null,
+    promptMetadata: promptMetadata ?? null,
   };
 
   emitLog?.({
