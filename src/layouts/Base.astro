@@ -16,6 +16,7 @@ import {
 import { readSettings, buildCanonicalUrl, toAbsoluteUrl } from "@/utils/settings";
 import { buildAnalyticsInjection } from "@/utils/analytics";
 import { getActiveThemes } from "@/utils/theme";
+import { mixColors } from "@/utils/color";
 
 type LayoutProps = {
   title?: string;
@@ -136,6 +137,20 @@ const dawnCss = buildThemeCss(dawnTheme, ':root[data-comfort-theme="dawn"]', FAL
 const themeStyle = `${midnightCss}\n\n${dawnCss}`;
 const themeMetaColor = sanitizeColor(midnightTheme?.primary, FALLBACK_COLORS.midnight.primary);
 
+const fallbackPrimary = sanitizeColor(midnightTheme?.primary, FALLBACK_COLORS.midnight.primary);
+const fallbackAccent = sanitizeColor(midnightTheme?.accent, FALLBACK_COLORS.midnight.accent);
+const fallbackBackground = sanitizeColor(
+  midnightTheme?.background,
+  FALLBACK_COLORS.midnight.background,
+);
+
+const ambientBase = sanitizeColor(ambientColor, fallbackPrimary);
+const ambientHighlight = mixColors(ambientBase, "#ffffff", 0.24);
+const ambientAurora = mixColors(ambientBase, fallbackAccent, 0.45);
+const ambientDepth = mixColors(ambientBase, fallbackBackground, 0.52);
+const ambientShadow = mixColors(fallbackBackground, "#000000", 0.32);
+const ambientOverlay = mixColors(ambientBase, "#000000", 0.18);
+
 const showAccountLink = settings.showAccountLink ?? false;
 
 const observabilitySettings = settings.observability ?? { enabled: false };
@@ -192,7 +207,16 @@ const footerUtilities = footerUtilityLinks
 const isDev = import.meta.env.DEV;
 const adminSections = isDev ? adminNavSections : [];
 
-const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined;
+const bodyStyleEntries = [
+  ["--ambient-color", ambientBase],
+  ["--ambient-highlight", ambientHighlight],
+  ["--ambient-aurora", ambientAurora],
+  ["--ambient-depth", ambientDepth],
+  ["--ambient-shadow", ambientShadow],
+  ["--ambient-overlay", ambientOverlay],
+] as const;
+
+const bodyStyle = bodyStyleEntries.map(([key, value]) => `${key}: ${value}`).join("; ");
 ---
 <html lang="en" class="h-full">
   <head>
@@ -344,6 +368,9 @@ const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined
         initObservability(observabilityConfig);
       </script>
     )}
+    <script type="module" is:inline>
+      import "@/scripts/card-animations";
+    </script>
   </body>
 </html>
 
@@ -374,10 +401,52 @@ const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined
     display: flex;
     flex-direction: column;
     background:
-      radial-gradient(120% 160% at 50% 0%, rgba(212, 175, 55, 0.16) 0%, transparent 60%),
-      radial-gradient(140% 200% at 10% 20%, rgba(124, 78, 176, 0.22) 0%, transparent 70%),
-      linear-gradient(180deg, var(--color-midnight, #07020f) 0%, var(--color-night, #120725) 100%);
-    color: var(--color-ink, #f4f1ff);
+      radial-gradient(
+        120% 160% at 50% -10%,
+        color-mix(
+            in srgb,
+            var(--ambient-highlight, var(--color-gold, #d4af37)) 38%,
+            transparent 62%
+          )
+          0%,
+        transparent 62%
+      ),
+      radial-gradient(
+        140% 200% at 12% 18%,
+        color-mix(
+            in srgb,
+            var(--ambient-aurora, var(--color-iris, #7c3aed)) 32%,
+            transparent 68%
+          )
+          0%,
+        transparent 72%
+      ),
+      radial-gradient(
+        160% 200% at 82% 12%,
+        color-mix(
+            in srgb,
+            var(--ambient-overlay, rgba(20, 10, 35, 0.3)) 42%,
+            transparent 58%
+          )
+          0%,
+        transparent 75%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(
+            in srgb,
+            var(--ambient-depth, var(--color-midnight, #07020f)) 72%,
+            var(--color-midnight, #07020f) 28%
+          )
+          0%,
+        color-mix(
+            in srgb,
+            var(--ambient-shadow, var(--color-night, #120725)) 82%,
+            var(--color-night, #120725) 18%
+          )
+          100%
+      );
+    color: color-mix(in srgb, var(--ink-strong, #f4f1ff) 92%, var(--ambient-highlight, #e9d4ff) 8%);
   }
 
   .site-shell--plain {
