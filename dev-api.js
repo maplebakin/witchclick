@@ -1106,6 +1106,27 @@ async function saveDownload({ slug, name, price, currency, summary, cover, file,
   return { path: `content/downloads/${s}.json`, slug: s };
 }
 
+async function deleteDownload({ slug, archive }) {
+  if (!slug) throw new Error('slug is required');
+  const s = slugify(slug);
+  if (!s) throw new Error('invalid slug');
+  const filePath = path.join(CWD, 'content', 'downloads', `${s}.json`);
+  if (!fs.existsSync(filePath)) throw new Error('not found');
+
+  if (archive) {
+    const archiveDir = path.join(CWD, 'content', 'downloads', '_archive');
+    ensureDir(archiveDir);
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const targetName = `${s}-${stamp}.json`;
+    const archivePath = path.join(archiveDir, targetName);
+    await fsp.rename(filePath, archivePath);
+    return { slug: s, archivePath: `content/downloads/_archive/${targetName}` };
+  }
+
+  await fsp.unlink(filePath);
+  return { slug: s, deletedPath: `content/downloads/${s}.json` };
+}
+
 // ---------- ENTITIES ----------
 async function listEntities() {
   const base = path.join(CWD, 'content', 'entities');
@@ -1699,6 +1720,16 @@ const server = http.createServer(async (req, res) => {
       try {
         const body = await parseBody(req);
         const data = await saveDownload(body || {});
+        return send(res, 200, { ok: true, ...data });
+      } catch (e) {
+        return send(res, 400, { ok: false, error: e.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/downloads/delete') {
+      try {
+        const body = await parseBody(req);
+        const data = await deleteDownload(body || {});
         return send(res, 200, { ok: true, ...data });
       } catch (e) {
         return send(res, 400, { ok: false, error: e.message || String(e) });

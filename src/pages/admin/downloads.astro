@@ -44,7 +44,13 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
       </section>
 
       <section class="lg:col-span-8 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
-        <h2 class="mb-3 text-lg font-semibold">Editor</h2>
+        <div class="mb-3 flex items-center justify-between gap-3">
+          <h2 class="text-lg font-semibold">Editor</h2>
+          <span
+            id="loadedIndicator"
+            class="rounded-full bg-surface-muted px-3 py-1 text-xs font-medium text-body"
+          >No download loaded</span>
+        </div>
         <div class="grid gap-3 md:grid-cols-2">
           <label class="block"><span class="text-xs font-medium">Name</span><input id="name" class="mt-1 w-full rounded-lg border px-3 py-2" /></label>
           <label class="block"><span class="text-xs font-medium">Slug</span><input id="slug" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="tarot-study-planner" /></label>
@@ -57,9 +63,19 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           <label class="block md:col-span-2"><span class="text-xs font-medium">Features (one per line)</span><textarea id="features" class="mt-1 h-24 w-full rounded-lg border px-3 py-2"></textarea></label>
           <label class="block md:col-span-2"><span class="text-xs font-medium">Tags (comma-separated)</span><input id="tags" class="mt-1 w-full rounded-lg border px-3 py-2" /></label>
         </div>
-        <div class="mt-4 flex gap-3">
+        <div class="mt-4 flex flex-wrap items-center gap-3">
           <button id="save" class="rounded-lg bg-surface-success px-4 py-2 text-inverse hover:bg-surface-success-strong">Save</button>
-          <span id="status" class="self-center text-sm text-body-muted"></span>
+          <button
+            id="delete"
+            class="rounded-lg border border-danger px-4 py-2 text-danger hover:bg-surface-danger hover:text-inverse disabled:cursor-not-allowed disabled:opacity-60"
+            type="button"
+            disabled
+          >Delete</button>
+          <label class="flex items-center gap-2 text-sm text-body-muted">
+            <input id="archive" type="checkbox" class="rounded border-line-subtle" disabled />
+            <span>Move to archive folder when deleting</span>
+          </label>
+          <span id="status" class="flex-1 text-sm text-body-muted"></span>
         </div>
       </section>
       </div>
@@ -83,7 +99,50 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
         var API = root?.getAttribute('data-dev-api') || 'http://localhost:8787';
         var $ = function(id){ return document.getElementById(id); };
 
-        function setStatus(msg, ok){ var el=$('status'); el.textContent=msg; el.style.color = ok===false ? '#7f1d1d' : '#065f46'; }
+        var currentSlug = null;
+
+        function setStatus(msg, ok){
+          var el=$('status');
+          el.textContent=msg;
+          el.style.color = ok===false ? '#7f1d1d' : '#065f46';
+        }
+
+        function updateSelectionDisplay(){
+          var badge = $('loadedIndicator');
+          if (badge){
+            if (currentSlug){
+              badge.textContent = 'Loaded: '+currentSlug;
+              badge.classList.remove('bg-surface-base');
+            } else {
+              badge.textContent = 'New download draft';
+            }
+          }
+          var items = $('list')?.querySelectorAll('[data-slug]') || [];
+          items.forEach(function(node){
+            if (node.getAttribute('data-slug') === currentSlug){
+              node.classList.add('border-line-strong','bg-surface-muted');
+              node.classList.remove('border-transparent');
+            } else {
+              node.classList.remove('border-line-strong','bg-surface-muted');
+              node.classList.add('border-transparent');
+            }
+          });
+          var del = $('delete');
+          var arch = $('archive');
+          if (del) del.disabled = !currentSlug;
+          if (arch) arch.disabled = !currentSlug;
+          if (!currentSlug && arch) arch.checked = false;
+        }
+
+        function clearForm(){
+          ['name','slug','price','currency','summary','cover','file','url','features','tags'].forEach(function(id){
+            var field = $(id);
+            if (field) field.value='';
+          });
+          $('currency').value='USD';
+          currentSlug = null;
+          updateSelectionDisplay();
+        }
 
         function toLines(arr){ return (Array.isArray(arr)?arr:[]).join('\n'); }
         function fromLines(txt){ return String(txt||'').split('\n').map(function(s){return s.trim();}).filter(Boolean); }
@@ -100,11 +159,13 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
             if (q && name.indexOf(q)===-1 && slug.indexOf(q)===-1) return;
             var a = document.createElement('a');
             a.href='#';
-            a.className='block rounded px-2 py-1 hover:bg-surface-muted';
+            a.className='download-item block rounded border border-transparent px-2 py-1 transition hover:bg-surface-muted';
+            a.setAttribute('data-slug', it.slug || '');
             a.textContent = (it.name||'') + ' ('+(it.slug||'')+')';
             a.addEventListener('click', function(ev){ ev.preventDefault(); load(it.slug); });
             list.appendChild(a);
           });
+          updateSelectionDisplay();
         }
 
         async function load(slug){
@@ -122,12 +183,14 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           $('url').value = d.url || '';
           $('features').value = toLines(d.features);
           $('tags').value = (d.tags||[]).join(', ');
+          if ($('archive')) $('archive').checked = false;
+          currentSlug = d.slug || slug || '';
+          updateSelectionDisplay();
           setStatus('Loaded '+d.slug);
         }
 
         $('newBtn').addEventListener('click', function(){
-          ['name','slug','price','currency','summary','cover','file','url','features','tags'].forEach(function(id){ $(id).value=''; });
-          $('currency').value='USD';
+          clearForm();
           setStatus('New download draft');
         });
 
@@ -149,8 +212,30 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
             var data = await res.json();
             if (!data.ok) throw new Error(data.error||'save failed');
             setStatus('Saved → '+data.path);
+            currentSlug = data.slug || payload.slug;
+            updateSelectionDisplay();
             refresh();
           } catch (e) { setStatus('Save error: '+(e.message||String(e)), false); }
+        });
+
+        $('delete').addEventListener('click', async function(){
+          var slug = currentSlug || $('slug').value;
+          slug = String(slug||'').trim();
+          if (!slug) return setStatus('Load a download before deleting', false);
+          var archive = $('archive').checked;
+          var promptMsg = archive ? ('Archive '+slug+'? The file will move to content/downloads/_archive.') : ('Delete '+slug+'? This removes the JSON file.');
+          if (!confirm(promptMsg)) return setStatus('Deletion cancelled');
+          try {
+            var res = await fetch(API+'/downloads/delete',{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({slug, archive})});
+            var data = await res.json();
+            if (!data.ok) throw new Error(data.error||'delete failed');
+            var msg = archive && data.archivePath ? ('Archived '+slug+' → '+data.archivePath) : ('Deleted '+slug+'. Restore from version control if needed.');
+            setStatus(msg);
+            clearForm();
+            refresh();
+          } catch (e) {
+            setStatus('Delete error: '+(e.message||String(e)), false);
+          }
         });
 
         $('search').addEventListener('input', refresh);
