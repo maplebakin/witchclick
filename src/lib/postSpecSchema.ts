@@ -5,12 +5,12 @@ export {
   EntityTypeSchema,
   PostContentTypeSchema,
   PostSpecV2Schema,
-  generateSchemaDocumentation,
+  generatePostSpecDocumentation as generateSchemaDocumentation,
   stripMarkdownToPlainText,
-} from '../../server/lib/postSpecSchema.js';
+} from '../../shared/schema/index.js';
 
 export type {
   EntityType,
   PostContentType,
   PostSpecV2,
-} from '../../server/lib/postSpecSchema.js';
+} from '../../shared/schema/index.js';

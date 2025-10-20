@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { buildCursePrompt } from '../../server/lib/cursePromptBuilder.js';
-import { CURSE_TARGETS, CURSE_TONES, CURSE_TYPES } from '../../server/lib/curseSpecSchema.js';
+import { CURSE_TARGETS, CURSE_TONES, CURSE_TYPES } from '../../shared/schema/index.js';
 
 const CWD = process.cwd();
 const TMP_DIR = path.join(CWD, 'tmp');

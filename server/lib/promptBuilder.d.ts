@@ -8,6 +8,7 @@ export interface MasterPromptOptions {
   existingPostTitles?: string[];
   existingPostSlugs?: string[];
   allowedAffiliateKeys?: string[];
+  priorityInsights?: string[];
   strictJsonRules?: string[];
 }
 

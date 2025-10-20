@@ -8,6 +8,8 @@ import generatorPresets, { resolveGeneratorPresetKey } from '../../server/lib/ge
 import { STRICT_JSON_RULES } from '../../server/lib/strictJsonRules.js';
 import { collectPostMetadata } from '../../scripts/lib/postInventory.js';
 import { readSlugHistory, writeSlugHistory } from '../../scripts/lib/slugHistory.js';
+import { recordPromptEvent } from '../../shared/telemetry/index.js';
+import { resolvePriorityFocus } from '../../shared/insights/prioritizer.js';
 
 function readJSON<T = any>(p: string): T | null {
   try {
@@ -44,12 +46,14 @@ function buildPresetPrompt({
   strict,
   styleDirective,
   contentType,
+  priorityNotes,
 }: {
   preset: PresetDefinition;
   topic: string;
   strict: boolean;
   styleDirective?: string;
   contentType?: string;
+  priorityNotes?: string[];
 }) {
   const lines: string[] = [`SYSTEM ROLE: ${preset.system}`];
 
@@ -61,6 +65,14 @@ function buildPresetPrompt({
 
   if (contentType) {
     lines.push(`IMPORTANT: Set "contentType" field to "${contentType}" in your JSON output.`, '');
+  }
+
+  if (priorityNotes && priorityNotes.length) {
+    lines.push('PRIORITY FOCUS AREAS (blend these insights into ideation):');
+    for (const note of priorityNotes) {
+      lines.push(`• ${note}`);
+    }
+    lines.push('');
   }
 
   const contractLines = strict ? preset.strictOutputContract : preset.looseOutputContract;
@@ -116,6 +128,9 @@ export function genprompt({
   const styleDirective = styleKey && STYLES[styleKey] ? STYLES[styleKey] : DEFAULT_STYLE_DIRECTIVE;
   const useStrict = strict === true || strict === 'true' || strict === '1';
 
+  const priorities = resolvePriorityFocus({ cwd: CWD });
+  const priorityNotes = priorities.notes;
+
   const prompt = preset
     ? buildPresetPrompt({
         preset,
@@ -123,6 +138,7 @@ export function genprompt({
         strict: useStrict,
         styleDirective,
         contentType: resolvedModeKey || undefined,
+        priorityNotes,
       })
     : buildMasterPrompt({
         topic,
@@ -134,7 +150,23 @@ export function genprompt({
         existingPostTitles,
         existingPostSlugs: mergedSlugs,
         allowedAffiliateKeys: allowedKeys,
+        priorityInsights: priorityNotes,
       });
+
+  recordPromptEvent({
+    topic,
+    words,
+    ads,
+    kofi,
+    mode: resolvedModeKey || null,
+    style: styleKey || null,
+    strict: useStrict,
+    metadata: {
+      focus: priorities.focus,
+      notes: priorityNotes,
+      analyticsUpdatedAt: priorities.analytics.updatedAt,
+    },
+  });
 
   return { prompt };
 }

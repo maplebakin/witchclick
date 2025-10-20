@@ -16,6 +16,13 @@
     "strict": true,
     "noUncheckedIndexedAccess": true
   },
-  "include": ["src/**/*", "tests/**/*.ts", "tests/**/*.d.ts", "scripts/**/*.d.ts", "playwright.config.ts"],
+  "include": [
+    "src/**/*",
+    "tests/**/*.ts",
+    "tests/**/*.d.ts",
+    "scripts/**/*.d.ts",
+    "shared/**/*.d.ts",
+    "playwright.config.ts"
+  ],
   "exclude": ["node_modules","tools/_compiled","dist"]
 }

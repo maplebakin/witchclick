@@ -1,11 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { performance } from 'node:perf_hooks';
 
 import {
   persistPreparedCurse,
   prepareCurseForPersistence,
 } from '../../server/lib/cursePreparation.js';
-import type { CurseSpec } from '../../server/lib/curseSpecSchema.js';
+import { recordIngestEvent, recordPerformanceMetric } from '../../shared/telemetry/index.js';
+import type { CurseSpec } from '../../shared/schema/index.js';
 
 export async function ingestCurse(args: string[]) {
   const CWD = process.cwd();
@@ -13,9 +15,11 @@ export async function ingestCurse(args: string[]) {
   const CURSE_DIR = path.join(CONTENT_DIR, 'white-magic-curses');
   const fromIdx = args.indexOf('--from-file');
   const dryRun = args.includes('--dry-run');
+  const started = performance.now();
 
   try {
     let json: CurseSpec;
+    let slug = '';
 
     if (fromIdx >= 0) {
       const sourcePath = args[fromIdx + 1];
@@ -39,6 +43,8 @@ export async function ingestCurse(args: string[]) {
       directory: CURSE_DIR,
     });
 
+    slug = prepared.spec.slug;
+
     if (!dryRun) {
       await persistPreparedCurse(prepared);
     }
@@ -54,6 +60,21 @@ export async function ingestCurse(args: string[]) {
     };
 
     process.stdout.write(`${JSON.stringify(response, null, 2)}\n`);
+
+    const durationMs = performance.now() - started;
+    recordIngestEvent({
+      slug,
+      ok: true,
+      warnings: prepared.warnings,
+      durationMs,
+      path: relativePath,
+    });
+    recordPerformanceMetric({
+      name: 'ingest:curse',
+      durationMs,
+      success: true,
+      meta: { slug, saved: !dryRun },
+    });
   } catch (error: any) {
     const response: Record<string, unknown> = {
       ok: false,
@@ -64,5 +85,18 @@ export async function ingestCurse(args: string[]) {
     }
     process.stdout.write(`${JSON.stringify(response, null, 2)}\n`);
     process.exitCode = 1;
+
+    const durationMs = performance.now() - started;
+    recordIngestEvent({
+      ok: false,
+      warnings: Array.isArray(error?.warnings) ? error.warnings : [],
+      durationMs,
+    });
+    recordPerformanceMetric({
+      name: 'ingest:curse',
+      durationMs,
+      success: false,
+      meta: { error: error?.message || String(error) },
+    });
   }
 }

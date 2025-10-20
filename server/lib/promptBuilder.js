@@ -25,6 +25,7 @@ export function buildMasterPrompt(options) {
     existingPostTitles = [],
     existingPostSlugs = [],
     allowedAffiliateKeys = [],
+    priorityInsights = [],
     strictJsonRules = DEFAULT_STRICT_RULES,
   } = options;
 
@@ -93,6 +94,17 @@ export function buildMasterPrompt(options) {
     `existingPostSlugs: ${JSON.stringify(existingPostSlugs)}`,
     `allowedAffiliateKeys: ${JSON.stringify(allowedAffiliateKeys)}`,
     '',
+  ];
+
+  if (Array.isArray(priorityInsights) && priorityInsights.length) {
+    promptLines.push('PRIORITY FOCUS AREAS (lean on these analytics signals):');
+    for (const insight of priorityInsights) {
+      promptLines.push(`• ${insight}`);
+    }
+    promptLines.push('');
+  }
+
+  promptLines.push(
     'PROCESS & CONSTRAINTS (follow step-by-step)',
     '1) Search intent & slug',
     '   • Infer primary intent + 2 secondary intents from the topic.',
@@ -136,7 +148,7 @@ export function buildMasterPrompt(options) {
     '',
     'GOLDEN JSON EXAMPLE (minimally valid shape — copy the structure, not the content):',
     '{"specVersion":2,"title":"Cozy Moon Bath Journal","slug":"cozy-moon-bath-journal","contentType":"ritual","metaDescription":"Soak, journal, and reset with a moonlit bath ritual that adapts to your spoons.","tags":["ritual","self-care","moon","journaling"],"excerpt":"Create a gentle moon bath ritual with low-energy and deep-dive paths.","outline":[{"heading":"Opening Reflection","id":"opening-reflection"},{"heading":"Quick Moon Bath Variant","id":"quick-moon-bath-variant"},{"heading":"Deep Moon Bath Variant","id":"deep-moon-bath-variant"},{"heading":"Reflection Prompt","id":"reflection-prompt"},{"heading":"Moon Bath Checklist","id":"moon-bath-checklist"},{"heading":"Gentle Safety Note","id":"gentle-safety-note"}],"sections":[{"heading":"Opening Reflection","markdown":"Two short paragraphs..."},{"heading":"Quick Moon Bath Variant","markdown":"1. Step one..."},{"heading":"Deep Moon Bath Variant","markdown":"1. Step one..."},{"heading":"Reflection Prompt","markdown":"### Reflection Prompt\nWhat surprised you..."},{"heading":"Moon Bath Checklist","markdown":"- Item one"},{"heading":"Gentle Safety Note","markdown":"Keep water warm, not hot..."}],"entities":[{"type":"crystal","slug":"rose-quartz"}],"heroImagePrompt":null,"altTexts":[],"internalLinkHints":[{"anchor":"moon phase tracking","rationale":"Link to moon journal guide."}],"affiliateHints":[{"key":"bath-salts","anchor":"magnesium bath soak","rationale":"Soft upsell for restorative salts."}],"cta":{"type":"kofi"},"adPlacements":["lead","mid"]}',
-  ];
+  );
 
   return promptLines.join('\n');
 }

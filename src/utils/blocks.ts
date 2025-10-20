@@ -1,35 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
-import { z } from "zod";
 
-const CtaFormSchema = z.object({
-  action: z.string().min(1, "Form action required"),
-  method: z.string().default("post"),
-  emailFieldName: z.string().min(1, "Email field name required").default("email"),
-  emailPlaceholder: z.string().default("you@example.com"),
-  submitLabel: z.string().default("Sign up"),
-  disclaimer: z.string().optional(),
-});
+import {
+  EvergreenBlocksSchema as HomeBlocksSchema,
+  type EvergreenBlocks,
+} from "../../shared/schema/index.js";
 
-const EvergreenCtaSchema = z.object({
-  eyebrow: z.string().optional(),
-  title: z.string(),
-  description: z.string(),
-  form: CtaFormSchema,
-});
-
-const TestimonialSchema = z.object({
-  quote: z.string(),
-  author: z.string(),
-  role: z.string().optional(),
-});
-
-const HomeBlocksSchema = z.object({
-  cta: EvergreenCtaSchema.optional(),
-  testimonials: z.array(TestimonialSchema).default([]),
-});
-
-export type EvergreenBlocks = z.infer<typeof HomeBlocksSchema>;
+export type { EvergreenBlocks } from "../../shared/schema/index.js";
 
 let cachedBlocks: EvergreenBlocks | null = null;
 let cachedMtimeMs = 0;

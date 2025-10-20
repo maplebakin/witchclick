@@ -1,0 +1,52 @@
+{
+  "updatedAt": "2025-01-05T12:00:00.000Z",
+  "tags": [
+    {
+      "tag": "moon-magic",
+      "views": 4280,
+      "conversions": 34,
+      "lastContentAt": "2024-09-18",
+      "trend": "declining"
+    },
+    {
+      "tag": "kitchen-witchcraft",
+      "views": 3895,
+      "conversions": 22,
+      "lastContentAt": "2024-07-02",
+      "trend": "flat"
+    },
+    {
+      "tag": "cozy-protection",
+      "views": 2510,
+      "conversions": 18,
+      "lastContentAt": "2024-05-21",
+      "trend": "rising"
+    }
+  ],
+  "entities": [
+    {
+      "type": "crystal",
+      "slug": "labradorite",
+      "views": 980,
+      "conversions": 12,
+      "lastMentioned": "2024-06-15",
+      "tags": ["intuition", "protection"]
+    },
+    {
+      "type": "herb",
+      "slug": "mugwort",
+      "views": 1420,
+      "conversions": 9,
+      "lastMentioned": "2024-04-09",
+      "tags": ["dreamwork", "lucid-dreaming"]
+    },
+    {
+      "type": "moonPhase",
+      "slug": "waning-gibbous",
+      "views": 1630,
+      "conversions": 7,
+      "lastMentioned": "2024-03-28",
+      "tags": ["release", "reflection"]
+    }
+  ]
+}
