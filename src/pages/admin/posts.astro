@@ -3,6 +3,7 @@ import Base from "../../layouts/Base.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
 import adminPostEditorScript from "../../scripts/adminPostEditor.ts?url";
 import HeadSlot from "@/components/HeadSlot.astro";
+import AdminNav from "@/components/AdminNav.astro";
 
 export const prerender = false;
 
@@ -29,7 +30,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
   </HeadSlot>
 
   {canUse ? (
-    <div data-post-editor data-dev-api={DEV_API} class="space-y-6">
+    <div class="space-y-6">
+      <AdminNav currentPath="/admin/posts" />
+
+      <div data-post-editor data-dev-api={DEV_API} class="space-y-6">
       <header class="rounded-2xl border border-line-subtle bg-surface-muted px-4 py-3 text-sm text-primary">
         <h1 class="text-lg font-semibold">Post Editor Dashboard</h1>
         <p class="mt-1 text-body-muted">
@@ -117,6 +121,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
           <ul data-warnings class="hidden list-disc space-y-1 rounded-lg border border-warning bg-warning/10 px-3 py-2 text-xs text-warning"></ul>
         </section>
+      </div>
       </div>
     </div>
   ) : (

@@ -6,6 +6,7 @@ import generatorStyles from "../../../server/lib/generatorStyles.js";
 import { generatorPresetOptions } from "../../../server/lib/generatorPresets.js";
 import normalizeDraftSpecScript from "../../scripts/normalizeDraftSpec.ts?url";
 import HeadSlot from "@/components/HeadSlot.astro";
+import AdminNav from "@/components/AdminNav.astro";
 import {
   CURSE_TARGETS,
   CURSE_TONES,
@@ -74,18 +75,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
   {canUse ? (
     <div class="space-y-6">
-      <nav aria-label="Admin shortcuts" class="rounded-2xl border border-line-subtle bg-surface-muted px-4 py-3 text-sm text-primary">
-        <span class="font-medium">Quick tools:</span>
-        <a class="ml-3 underline underline-offset-4 hover:no-underline" href="/admin/entities">Entities Admin</a>
-        <span aria-hidden="true" class="mx-2">•</span>
-        <a class="underline underline-offset-4 hover:no-underline" href="/admin/downloads">Downloads Admin</a>
-        <span aria-hidden="true" class="mx-2">•</span>
-        <a class="underline underline-offset-4 hover:no-underline" href="/admin/posts">Post Editor</a>
-        <span aria-hidden="true" class="mx-2">•</span>
-        <a class="underline underline-offset-4 hover:no-underline" href="/admin/hero">Hero Image Uploader</a>
-        <span aria-hidden="true" class="mx-2">•</span>
-        <a class="underline underline-offset-4 hover:no-underline" href="/admin/theme">Theme Dashboard</a>
-      </nav>
+      <AdminNav currentPath="/admin" />
 
       <div class="rounded-2xl border border-line-subtle bg-surface-base/40 p-1 text-sm text-primary">
         <span class="mr-3 font-medium">Panel:</span>

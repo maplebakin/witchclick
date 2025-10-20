@@ -3,6 +3,7 @@ import Base from "../../layouts/Base.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
 import adminWriteScript from "../../scripts/adminWrite.ts?url";
 import HeadSlot from "@/components/HeadSlot.astro";
+import AdminNav from "@/components/AdminNav.astro";
 
 export const prerender = false; // never emit in static builds
 
@@ -29,11 +30,14 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
   </HeadSlot>
 
   {canUse ? (
-    <div
-      class="grid grid-cols-1 gap-6 lg:grid-cols-12"
-      data-dev-api={DEV_API}
-      data-site-origin={site}
-    >
+    <div class="space-y-6">
+      <AdminNav currentPath="/admin/write" />
+
+      <div
+        class="grid grid-cols-1 gap-6 lg:grid-cols-12"
+        data-dev-api={DEV_API}
+        data-site-origin={site}
+      >
       <section class="lg:col-span-8 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
         <h1 class="mb-3 text-xl font-semibold">Write a Post</h1>
 
@@ -145,6 +149,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           <li>Opinionated pieces benefit from a 1-sentence TL;DR. If you skip it here, the build step will draft one for you.</li>
         </ul>
       </aside>
+      </div>
     </div>
   ) : (
     <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">

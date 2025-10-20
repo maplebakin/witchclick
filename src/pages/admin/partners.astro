@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
 import HeadSlot from "@/components/HeadSlot.astro";
+import AdminNav from "@/components/AdminNav.astro";
 
 export const prerender = false;
 
@@ -28,7 +29,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
   </HeadSlot>
 
   {canUse ? (
-    <div class="mx-auto max-w-6xl space-y-6" data-partners-admin data-dev-api={DEV_API}>
+    <div class="space-y-6">
+      <AdminNav currentPath="/admin/partners" />
+
+      <div class="mx-auto max-w-6xl space-y-6" data-partners-admin data-dev-api={DEV_API}>
       <header>
         <h1 class="text-2xl font-semibold text-primary">Partners & Community</h1>
         <p class="mt-2 text-sm text-body-muted">
@@ -68,6 +72,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           <p class="ml-auto text-sm" data-status></p>
         </div>
       </section>
+      </div>
     </div>
   ) : (
     <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">

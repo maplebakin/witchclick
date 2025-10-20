@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
 import HeadSlot from "@/components/HeadSlot.astro";
+import AdminNav from "@/components/AdminNav.astro";
 
 export const prerender = false; // never emit in static builds
 
@@ -29,7 +30,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
   </HeadSlot>
 
   {canUse ? (
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-12" data-dev-api={DEV_API}>
+    <div class="space-y-6">
+      <AdminNav currentPath="/admin/downloads" />
+
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-12" data-dev-api={DEV_API}>
       <section class="lg:col-span-4 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
         <div class="mb-3 flex items-center justify-between gap-2">
           <h1 class="text-xl font-semibold">Downloads</h1>
@@ -58,6 +62,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           <span id="status" class="self-center text-sm text-body-muted"></span>
         </div>
       </section>
+      </div>
     </div>
   ) : (
     <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">

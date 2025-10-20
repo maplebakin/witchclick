@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
 import HeadSlot from "@/components/HeadSlot.astro";
+import AdminNav from "@/components/AdminNav.astro";
 
 export const prerender = false;
 
@@ -28,12 +29,15 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
   </HeadSlot>
 
   {canUse ? (
-    <section
-      id="heroUploader"
-      class="mx-auto max-w-4xl space-y-6 rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm"
-      data-dev-api={DEV_API}
-      data-site-origin={site}
-    >
+    <div class="space-y-6">
+      <AdminNav currentPath="/admin/hero" />
+
+      <section
+        id="heroUploader"
+        class="mx-auto max-w-4xl space-y-6 rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm"
+        data-dev-api={DEV_API}
+        data-site-origin={site}
+      >
       <header class="space-y-2">
         <h1 class="text-2xl font-semibold text-body-strong">Admin → Hero Image Uploader</h1>
         <p class="text-sm text-body-muted">
@@ -221,6 +225,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
         </li>
       </ol>
     </section>
+    </div>
   ) : (
     <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
       <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>

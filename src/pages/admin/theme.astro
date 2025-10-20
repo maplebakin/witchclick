@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
 import HeadSlot from "@/components/HeadSlot.astro";
+import AdminNav from "@/components/AdminNav.astro";
 
 export const prerender = false;
 
@@ -44,13 +45,16 @@ const defaultDawn = {
   </HeadSlot>
 
   {canUse ? (
-    <div
-      class="grid grid-cols-1 gap-6 lg:grid-cols-12"
-      data-theme-admin
-      data-dev-api={DEV_API}
-      data-default-midnight={JSON.stringify(defaultMidnight)}
-      data-default-dawn={JSON.stringify(defaultDawn)}
-    >
+    <div class="space-y-6">
+      <AdminNav currentPath="/admin/theme" />
+
+      <div
+        class="grid grid-cols-1 gap-6 lg:grid-cols-12"
+        data-theme-admin
+        data-dev-api={DEV_API}
+        data-default-midnight={JSON.stringify(defaultMidnight)}
+        data-default-dawn={JSON.stringify(defaultDawn)}
+      >
       <section class="lg:col-span-4 space-y-6 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
         <header>
           <h1 class="text-xl font-semibold text-primary">Theme Dashboard</h1>
@@ -276,6 +280,7 @@ const defaultDawn = {
 
         <p class="mt-2 text-sm text-body-muted" data-status></p>
       </section>
+      </div>
     </div>
   ) : (
     <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
@@ -442,7 +447,7 @@ const defaultDawn = {
             const raw = String(name || '').trim();
             if (!raw) return fallback;
             const safe = raw.replace(/["']/g, '');
-            return `'${safe}'${fallback ? `, ${fallback}` : ''}`;
+            return "'" + safe + "'" + (fallback ? ", " + fallback : "");
           }
 
           function refreshPreview(){

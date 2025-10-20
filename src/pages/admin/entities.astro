@@ -4,6 +4,7 @@ import Base from "../../layouts/Base.astro";
 import { readSettings, getSiteOrigin } from "../../utils/settings";
 import adminEntitiesScript from "../../scripts/adminEntities.ts?url";
 import HeadSlot from "@/components/HeadSlot.astro";
+import AdminNav from "@/components/AdminNav.astro";
 
 export const prerender = false; // never emit in static builds
 
@@ -31,7 +32,10 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as 
   </HeadSlot>
 
   {canUse ? (
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-12" data-dev-api={DEV_API}>
+    <div class="space-y-6">
+      <AdminNav currentPath="/admin/entities" />
+
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-12" data-dev-api={DEV_API}>
       <!-- Left: list -->
       <section class="lg:col-span-4 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
         <div class="mb-3 flex items-center justify-between gap-2">
@@ -85,6 +89,7 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as 
           <span id="status" class="self-center text-sm text-body-muted"></span>
         </div>
       </section>
+      </div>
     </div>
   ) : (
     <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">

@@ -1,0 +1,225 @@
+---
+/**
+ * AdminNav - Consistent navigation for all admin pages
+ *
+ * Props:
+ * - currentPath: string - The current page path (e.g., "/admin/write")
+ */
+
+interface Props {
+  currentPath?: string;
+}
+
+const { currentPath = "" } = Astro.props;
+
+const navSections = [
+  {
+    label: "Content Creation",
+    items: [
+      { href: "/admin", label: "Generator", description: "Generate posts from prompts" },
+      { href: "/admin/write", label: "Write", description: "Compose posts in markdown" },
+      { href: "/admin/posts", label: "Posts", description: "Edit existing posts" },
+    ]
+  },
+  {
+    label: "Content Management",
+    items: [
+      { href: "/admin/entities", label: "Entities", description: "Manage crystals, herbs, tarot" },
+      { href: "/admin/authors", label: "Authors", description: "Manage author profiles" },
+      { href: "/admin/partners", label: "Partners", description: "Partner relationships" },
+      { href: "/admin/calendar", label: "Calendar", description: "Editorial calendar" },
+      { href: "/admin/downloads", label: "Downloads", description: "Digital downloads" },
+    ]
+  },
+  {
+    label: "Customization",
+    items: [
+      { href: "/admin/theme", label: "Theme", description: "Colors and typography" },
+      { href: "/admin/hero", label: "Hero Images", description: "Upload hero images" },
+      { href: "/admin/home", label: "Homepage", description: "Configure homepage" },
+    ]
+  },
+  {
+    label: "System",
+    items: [
+      { href: "/admin/products", label: "Products", description: "Affiliate products" },
+      { href: "/admin/settings", label: "Settings", description: "Site configuration" },
+    ]
+  }
+];
+
+function isActive(itemPath: string, current: string): boolean {
+  if (!current) return false;
+  // Exact match for index
+  if (itemPath === "/admin" && current === "/admin") return true;
+  // Prefix match for other pages
+  if (itemPath !== "/admin" && current.startsWith(itemPath)) return true;
+  return false;
+}
+---
+
+<nav aria-label="Admin navigation" class="admin-nav">
+  <div class="admin-nav-header">
+    <h2 class="admin-nav-title">Admin Panel</h2>
+    <a href="/" class="admin-nav-home-link">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span>View Site</span>
+    </a>
+  </div>
+
+  <div class="admin-nav-sections">
+    {navSections.map((section) => (
+      <div class="admin-nav-section">
+        <h3 class="admin-nav-section-label">{section.label}</h3>
+        <ul class="admin-nav-list">
+          {section.items.map((item) => {
+            const active = isActive(item.href, currentPath);
+            return (
+              <li>
+                <a
+                  href={item.href}
+                  class:list={["admin-nav-link", { "admin-nav-link--active": active }]}
+                  aria-current={active ? "page" : undefined}
+                >
+                  <span class="admin-nav-link-label">{item.label}</span>
+                  <span class="admin-nav-link-description">{item.description}</span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    ))}
+  </div>
+</nav>
+
+<style>
+  .admin-nav {
+    background: var(--color-surface-base, #ffffff);
+    border: 1px solid var(--color-line-subtle, #e5e7eb);
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  }
+
+  .admin-nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-line-subtle, #e5e7eb);
+    margin-bottom: 1rem;
+  }
+
+  .admin-nav-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-primary, #1f2937);
+    margin: 0;
+  }
+
+  .admin-nav-home-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-body-muted, #6b7280);
+    border: 1px solid var(--color-line-neutral, #d1d5db);
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .admin-nav-home-link:hover {
+    background: var(--color-surface-soft, #f9fafb);
+    color: var(--color-primary, #1f2937);
+  }
+
+  .admin-nav-sections {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .admin-nav-section {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .admin-nav-section-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-body-faint, #9ca3af);
+    margin: 0;
+  }
+
+  .admin-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .admin-nav-link {
+    display: grid;
+    gap: 0.125rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    border: 1px solid transparent;
+  }
+
+  .admin-nav-link:hover {
+    background: var(--color-surface-soft, #f9fafb);
+    border-color: var(--color-line-neutral, #d1d5db);
+  }
+
+  .admin-nav-link--active {
+    background: var(--color-surface-accent-soft, #ede9fe);
+    border-color: var(--color-line-accent, #c4b5fd);
+  }
+
+  .admin-nav-link--active:hover {
+    background: var(--color-surface-accent-soft, #ede9fe);
+    border-color: var(--color-line-accent, #c4b5fd);
+  }
+
+  .admin-nav-link-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-primary, #1f2937);
+  }
+
+  .admin-nav-link-description {
+    font-size: 0.75rem;
+    color: var(--color-body-muted, #6b7280);
+    line-height: 1.2;
+  }
+
+  .admin-nav-link--active .admin-nav-link-label {
+    color: var(--color-accent-deep, #7c3aed);
+  }
+
+  /* Responsive: horizontal on larger screens */
+  @media (min-width: 1024px) {
+    .admin-nav-sections {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem 1.5rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .admin-nav-sections {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>
