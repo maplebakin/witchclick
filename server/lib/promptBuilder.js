@@ -86,6 +86,7 @@ export function buildMasterPrompt(options) {
     `siteUrl: "${siteUrl}"`,
     `topic: "${topic}"`,
     `wordCount: ${words}`,
+    `contentType: "ritual" (use "ritual" for standard ritual guides; if generating a different content type like "reflection", "story", "tarotSpread", "spellwork", or "crystals", update accordingly)`,
     `includeAds: "${ads}"`,
     `includeKofi: "${kofi}"`,
     `existingPostTitles: ${JSON.stringify(existingPostTitles)}`,
@@ -96,8 +97,10 @@ export function buildMasterPrompt(options) {
     '1) Search intent & slug',
     '   • Infer primary intent + 2 secondary intents from the topic.',
     '   • Draft a slug in kebab-case reflecting the primary intent; avoid collisions with existingPostTitles and existingPostSlugs.',
-    '2) Title & meta',
-    '   • Title 50–60 chars with primary keyword. Meta 150–160 chars; cozy, non-clickbait.',
+    '2) Title, contentType & meta',
+    '   • Title 50–60 chars with primary keyword.',
+    '   • Set contentType to match the content structure you will generate. Default to "ritual" unless the topic clearly calls for a different type (reflection, story, tarotSpread, spellwork, crystals).',
+    '   • Meta 150–160 chars; cozy, non-clickbait.',
     '3) Tags & excerpt',
     '   • 4–7 tags. Excerpt 1–2 sentences that entice the click without hype.',
     '4) Outline',
@@ -116,7 +119,7 @@ export function buildMasterPrompt(options) {
     '7) Internal links (hints)',
     '   • Provide 5–8 internalLinkHints whose anchors are 2–6 words that appear verbatim in the sections. Each rationale explains where/why to link.',
     '8) Affiliate strategy (hints only; do not insert links)',
-    '   • ≤ 1 recommendation per ~250 words. Zero is acceptable. Do not invent or paraphrase keys. Requires: "key" ∈ allowedAffiliateKeys verbatim (case-sensitive match), else omit the hint. If no relevant keys, set affiliateHints: []. Never use plurals/synonyms like notebooks, journal, crystals, cozy-games unless they are exact matches in allowedAffiliateKeys.',
+    '   • ≤ 1 recommendation per ~250 words. Zero is acceptable. Do not invent or paraphrase keys. Requires: "key" ∈ allowedAffiliateKeys verbatim (case-sensitive match), else omit the hint. If no relevant keys, set affiliateHints: []. Note: Common synonyms (notebooks→micro-notebook, journal→ritual-journal, crystals→grounding-stone) are auto-normalized, but prefer exact keys when available.',
     '9) CTA & ads',
     '   • CTA: If includeKofi="on" return {"type":"kofi"}; if a download is relevant, include id and {"type":"download"}; otherwise {"type":"none"}. Never supply an id for kofi/none.',
     '   • Ads: If includeAds="off", return []. If "on", choose placements based on wordCount buckets — <900 words: ["mid"], 900–1399: ["lead","mid"], ≥1400: ["lead","mid","end"].',
@@ -132,7 +135,7 @@ export function buildMasterPrompt(options) {
     ...strictJsonRules,
     '',
     'GOLDEN JSON EXAMPLE (minimally valid shape — copy the structure, not the content):',
-    '{"specVersion":2,"title":"Cozy Moon Bath Journal","slug":"cozy-moon-bath-journal","metaDescription":"Soak, journal, and reset with a moonlit bath ritual that adapts to your spoons.","tags":["ritual","self-care","moon","journaling"],"excerpt":"Create a gentle moon bath ritual with low-energy and deep-dive paths.","outline":[{"heading":"Opening Reflection","id":"opening-reflection"},{"heading":"Quick Moon Bath Variant","id":"quick-moon-bath-variant"},{"heading":"Deep Moon Bath Variant","id":"deep-moon-bath-variant"},{"heading":"Reflection Prompt","id":"reflection-prompt"},{"heading":"Moon Bath Checklist","id":"moon-bath-checklist"},{"heading":"Gentle Safety Note","id":"gentle-safety-note"}],"sections":[{"heading":"Opening Reflection","markdown":"Two short paragraphs..."},{"heading":"Quick Moon Bath Variant","markdown":"1. Step one..."},{"heading":"Deep Moon Bath Variant","markdown":"1. Step one..."},{"heading":"Reflection Prompt","markdown":"### Reflection Prompt\nWhat surprised you..."},{"heading":"Moon Bath Checklist","markdown":"- Item one"},{"heading":"Gentle Safety Note","markdown":"Keep water warm, not hot..."}],"entities":[{"type":"crystal","slug":"rose-quartz"}],"heroImagePrompt":null,"altTexts":[],"internalLinkHints":[{"anchor":"moon phase tracking","rationale":"Link to moon journal guide."}],"affiliateHints":[{"key":"bath-salts","anchor":"magnesium bath soak","rationale":"Soft upsell for restorative salts."}],"cta":{"type":"kofi"},"adPlacements":["lead","mid"]}',
+    '{"specVersion":2,"title":"Cozy Moon Bath Journal","slug":"cozy-moon-bath-journal","contentType":"ritual","metaDescription":"Soak, journal, and reset with a moonlit bath ritual that adapts to your spoons.","tags":["ritual","self-care","moon","journaling"],"excerpt":"Create a gentle moon bath ritual with low-energy and deep-dive paths.","outline":[{"heading":"Opening Reflection","id":"opening-reflection"},{"heading":"Quick Moon Bath Variant","id":"quick-moon-bath-variant"},{"heading":"Deep Moon Bath Variant","id":"deep-moon-bath-variant"},{"heading":"Reflection Prompt","id":"reflection-prompt"},{"heading":"Moon Bath Checklist","id":"moon-bath-checklist"},{"heading":"Gentle Safety Note","id":"gentle-safety-note"}],"sections":[{"heading":"Opening Reflection","markdown":"Two short paragraphs..."},{"heading":"Quick Moon Bath Variant","markdown":"1. Step one..."},{"heading":"Deep Moon Bath Variant","markdown":"1. Step one..."},{"heading":"Reflection Prompt","markdown":"### Reflection Prompt\nWhat surprised you..."},{"heading":"Moon Bath Checklist","markdown":"- Item one"},{"heading":"Gentle Safety Note","markdown":"Keep water warm, not hot..."}],"entities":[{"type":"crystal","slug":"rose-quartz"}],"heroImagePrompt":null,"altTexts":[],"internalLinkHints":[{"anchor":"moon phase tracking","rationale":"Link to moon journal guide."}],"affiliateHints":[{"key":"bath-salts","anchor":"magnesium bath soak","rationale":"Soft upsell for restorative salts."}],"cta":{"type":"kofi"},"adPlacements":["lead","mid"]}',
   ];
 
   return promptLines.join('\n');

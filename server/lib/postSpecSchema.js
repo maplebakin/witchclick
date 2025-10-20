@@ -66,6 +66,7 @@ const DOC_LINES = [
   '  "specVersion": 2,',
   '  "title": string (50-60 chars),',
   '  "slug": string (kebab-case),',
+  '  "contentType": "ritual"|"guide"|"spread"|"reflection"|"story"|"tarotSpread"|"spellwork"|"crystals" (optional, defaults to "ritual"),',
   '  "metaDescription": string (150-160 chars),',
   '  "tags": string[4-7],',
   '  "excerpt": string (1-2 sentences),',

@@ -7,6 +7,7 @@ const BASE_FIELDS = [
   'Required fields (aliases allowed):',
   '- title (name, headline) — 50–60 characters with the primary keyword.',
   '- slug (permalink, urlSlug) — kebab-case, ≤70 characters, no spaces.',
+  '- contentType — one of: "ritual", "guide", "spread", "reflection", "story", "tarotSpread", "spellwork", "crystals". MUST match the preset mode you are using.',
   '- metaDescription (meta, description, seoDescription) — 150–160 characters; cozy and non-clickbait.',
   '- tags (keywords, labels) — array of 4–7 short strings.',
   '- excerpt — 35–55 words across 1–2 sentences.',
@@ -34,6 +35,7 @@ const STRUCTURE_REQUIREMENTS = {
   reflection: [
     '',
     'Content Structure for Reflection Essays:',
+    '- contentType: Set to "reflection"',
     '1. Opening Reflection (required first section): 1–2 paragraphs setting a relatable scene',
     '2. Main reflection sections: 2–4 sections exploring different angles of the topic',
     '3. Journaling Prompts: A section with 3–5 open-ended questions for self-inquiry',
@@ -44,6 +46,7 @@ const STRUCTURE_REQUIREMENTS = {
   ritual: [
     '',
     'Content Structure for Ritual Guides:',
+    '- contentType: Set to "ritual"',
     '1. Opening Reflection (required first section): 1–2 paragraphs inviting consent to engage',
     '2. Quick/Low-Energy Variant: 3–5 numbered steps, acknowledges low-spoon readers',
     '3. Deep Variant: 4–7 numbered steps with optional add-ons and mindful pauses',
@@ -55,6 +58,7 @@ const STRUCTURE_REQUIREMENTS = {
   story: [
     '',
     'Content Structure for Story/Vignettes:',
+    '- contentType: Set to "story"',
     '1. Opening Reflection (required first section): Set the narrative scene',
     '2. Story sections: 3–5 narrative sections with sensory details and emotional arc',
     '3. Gentle Takeaway: A brief closing reflection on what the story offers',
@@ -65,6 +69,7 @@ const STRUCTURE_REQUIREMENTS = {
   tarotSpread: [
     '',
     'Content Structure for Tarot Spreads:',
+    '- contentType: Set to "tarotSpread"',
     '1. Opening Reflection (required first section): Context for when/why to use this spread',
     '2. Spread Layout: Visual description of card positions',
     '3. Position Meanings: Detailed explanation of each position (3–7 positions typical)',
@@ -77,6 +82,7 @@ const STRUCTURE_REQUIREMENTS = {
   spellwork: [
     '',
     'Content Structure for Spellwork:',
+    '- contentType: Set to "spellwork"',
     '1. Opening Reflection (required first section): Intent and consent-first approach',
     '2. Ingredients & Correspondences: What you\'ll need and why',
     '3. Step-by-Step Instructions: Numbered steps for the working',
@@ -89,6 +95,7 @@ const STRUCTURE_REQUIREMENTS = {
   crystals: [
     '',
     'Content Structure for Crystal Profiles:',
+    '- contentType: Set to "crystals"',
     '1. Opening Reflection (required first section): Introduction to the crystal',
     '2. Geological Properties: Scientific facts about formation, composition, appearance',
     '3. Mindful Uses: Secular, grounded applications in daily life',
@@ -113,6 +120,7 @@ const STRICT_OUTPUT_CONTRACT = [
   '  "specVersion": 2,',
   '  "title": "",',
   '  "slug": "",',
+  '  "contentType": "",',
   '  "metaDescription": "",',
   '  "tags": [""],',
   '  "excerpt": "",',

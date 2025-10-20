@@ -610,7 +610,7 @@ function buildGenprompt({ topic, words, ads, kofi }) {
   });
 }
 
-function buildPresetPrompt({ preset, topic, strict, styleDirective }) {
+function buildPresetPrompt({ preset, topic, strict, styleDirective, contentType }) {
   const lines = [`SYSTEM ROLE: ${preset.system}`];
 
   if (styleDirective) {
@@ -618,6 +618,10 @@ function buildPresetPrompt({ preset, topic, strict, styleDirective }) {
   }
 
   lines.push(`Goal: ${preset.goal}`, '', `Topic: ${topic}`, '');
+
+  if (contentType) {
+    lines.push(`IMPORTANT: Set "contentType" field to "${contentType}" in your JSON output.`, '');
+  }
 
   const contractLines = strict
     ? preset.strictOutputContract
@@ -1149,7 +1153,7 @@ const server = http.createServer(async (req, res) => {
       const strict = body.strict === true || body.strict === 'true';
       const preset = modeKey ? generatorPresets[modeKey] : undefined;
       const prompt = preset
-        ? buildPresetPrompt({ preset, topic, strict, styleDirective })
+        ? buildPresetPrompt({ preset, topic, strict, styleDirective, contentType: modeKey })
         : buildGenprompt({ topic, words, ads, kofi });
 
       // loud guard so stale prompts never slip through
@@ -1159,7 +1163,7 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, {
         ok: true,
         prompt,
-        options: { topic, mode: rawMode || null, style: resolvedStyleKey, strict }
+        options: { topic, mode: rawMode || null, style: resolvedStyleKey, strict, contentType: modeKey || null }
       });
     }
 
