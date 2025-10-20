@@ -17,44 +17,52 @@ const slotMap = {
 const slotId = slotMap?.[slot] || '';
 const isAdsense = provider === 'adsense' && ads.adsenseClientId && slotId;
 const isHouse = provider === 'house';
-const baseClass = `ad ad--${slot} ${className}`;
+const baseClass = `ad ad--${slot} ${className}`.trim();
+const ariaLabel = slot === 'side' ? 'Sponsored sidebar' : 'Sponsored message';
 ---
 {isAdsense && (
-  <div class={baseClass} data-slot={slot} aria-label={`Advertisement ${slot}`}>
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client={ads.adsenseClientId}
-         data-ad-slot={slotId}
-         data-ad-format="auto"
-         data-full-width-responsive="true" />
+  <aside class={baseClass} data-slot={slot} aria-label={ariaLabel} role="complementary">
+    <p class="ad__label">Sponsored</p>
+    <div class="ad__frame">
+      <ins
+        class="adsbygoogle"
+        style="display:block"
+        data-ad-client={ads.adsenseClientId}
+        data-ad-slot={slotId}
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      />
+    </div>
     <script is:inline>
       try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch {}
     </script>
-  </div>
+  </aside>
 )}
 
 {isHouse && slot === 'side' && (
-  <aside class={`${baseClass} my-6 rounded-xl border border-line-muted bg-surface-muted p-4`} role="complementary" aria-label="Sponsored sidebar">
-    <p class="m-0 text-sm text-primary">Cozy tools that support this guide:</p>
-    <ul class="mt-2 space-y-1 text-sm">
-      <li>• <a class="underline" href="/go/journal" rel="sponsored nofollow">linen journal</a></li>
-      <li>• <a class="underline" href="/go/notebooks" rel="sponsored nofollow">dotted notebook</a></li>
-      <li>• <a class="underline" href="/go/crystals" rel="sponsored nofollow">starter crystals</a></li>
+  <aside class={baseClass} role="complementary" aria-label={ariaLabel}>
+    <p class="ad__label">Sponsored</p>
+    <p class="ad__copy">Cozy tools that support this guide:</p>
+    <ul class="ad__list">
+      <li><a class="ad__link" href="/go/journal" rel="sponsored nofollow">linen journal</a></li>
+      <li><a class="ad__link" href="/go/notebooks" rel="sponsored nofollow">dotted notebook</a></li>
+      <li><a class="ad__link" href="/go/crystals" rel="sponsored nofollow">starter crystals</a></li>
     </ul>
   </aside>
 )}
 
 {isHouse && slot !== 'side' && (
-  <aside class={`${baseClass} my-6 rounded-xl border border-line-muted bg-surface-muted p-4`} role="complementary" aria-label="Sponsored">
-    <p class="m-0 text-sm text-primary">
+  <aside class={baseClass} role="complementary" aria-label={ariaLabel}>
+    <p class="ad__label">Sponsored</p>
+    <p class="ad__copy">
       Thanks for reading. Support WitchClick with a
-      <a class="ml-1 underline" href="/go/notebooks" rel="sponsored nofollow">dotted notebook</a>
+      <a class="ad__link" href="/go/notebooks" rel="sponsored nofollow">dotted notebook</a>
       or a
-      <a class="ml-1 underline" href="/go/journal" rel="sponsored nofollow">linen journal</a>.
+      <a class="ad__link" href="/go/journal" rel="sponsored nofollow">linen journal</a>.
     </p>
   </aside>
 )}
 
 {provider === 'adsense' && !isAdsense && (
-  <div class={`${baseClass} ad--placeholder`} aria-hidden="true" style="display: none;"></div>
+  <aside class={`${baseClass} ad--placeholder`} aria-hidden="true" style="display: none;"></aside>
 )}
