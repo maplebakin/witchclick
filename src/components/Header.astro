@@ -8,12 +8,17 @@ interface NavLink {
   rel?: string;
 }
 
+interface AdminNavSection {
+  label: string;
+  items: NavLink[];
+}
+
 interface Props {
   brandName: string;
   navLinks: NavLink[];
   secondaryLinks?: NavLink[];
   utilityLinks?: NavLink[];
-  adminLinks?: NavLink[];
+  adminSections?: AdminNavSection[];
   currentPath?: string;
 }
 
@@ -22,7 +27,7 @@ const {
   navLinks = [],
   secondaryLinks = [],
   utilityLinks = [],
-  adminLinks = [],
+  adminSections = [],
   currentPath = "/",
 } = Astro.props as Props;
 
@@ -30,7 +35,10 @@ const normalizedPath = currentPath.endsWith("/") && currentPath.length > 1
   ? currentPath
   : `${currentPath.replace(/\/$/, "")}/`;
 
-const visibleAdmin = adminLinks.filter((link) => link && typeof link.href === "string");
+const visibleAdminSections = adminSections.filter((section) =>
+  section && Array.isArray(section.items) && section.items.length > 0
+);
+const hasAdminLinks = visibleAdminSections.length > 0;
 const visibleSecondary = secondaryLinks.filter((link) => link && typeof link.href === "string");
 const visibleUtility = utilityLinks.filter((link) => link && typeof link.href === "string");
 
@@ -123,28 +131,34 @@ function isActive(href: string): boolean {
           </div>
         )}
         <ComfortSettings />
-        {visibleAdmin.length > 0 && (
-          <details class="site-nav__dev" data-dev-menu>
-            <summary class="site-nav__button site-nav__button--dev focus-ring">
-              Dev shortcuts
-              <svg class="site-nav__dev-caret" viewBox="0 0 12 8" aria-hidden="true">
+        {hasAdminLinks && (
+          <details class="site-nav__admin" data-admin-menu>
+            <summary class="site-nav__button site-nav__button--admin focus-ring">
+              Admin
+              <svg class="site-nav__admin-caret" viewBox="0 0 12 8" aria-hidden="true">
                 <path
                   fill="currentColor"
                   d="M10.59.59a2 2 0 0 1 0 2.82l-3.3 3.29a2 2 0 0 1-2.82 0L1.17 3.41A2 2 0 0 1 4 1.59l2 2 2-2a2 2 0 0 1 2.59 0Z"
                 />
               </svg>
             </summary>
-            <div class="site-nav__dev-dropdown" aria-label="Developer links">
-              <ul class="site-nav__dev-list">
-                {visibleAdmin.map((item) => (
-                  <li>
-                    <a class="site-nav__dev-link" href={item.href} rel={item.rel}>
-                      {item.label}
-                      <span aria-hidden="true">↗</span>
-                    </a>
-                  </li>
+            <div class="site-nav__admin-dropdown" aria-label="Admin panel links">
+              <div class="site-nav__admin-grid">
+                {visibleAdminSections.map((section) => (
+                  <div class="site-nav__admin-section">
+                    <h3 class="site-nav__admin-section-label">{section.label}</h3>
+                    <ul class="site-nav__admin-list">
+                      {section.items.map((item) => (
+                        <li>
+                          <a class="site-nav__admin-link" href={item.href} rel={item.rel}>
+                            {item.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           </details>
         )}
@@ -212,18 +226,23 @@ function isActive(href: string): boolean {
         </ul>
       </div>
     )}
-    {visibleAdmin.length > 0 && (
+    {hasAdminLinks && (
       <div class="site-nav__mobile-admin">
-        <p class="site-footer__title">Dev shortcuts</p>
-        <ul class="site-nav__nav--stacked">
-          {visibleAdmin.map((item) => (
-            <li>
-              <a class="site-nav__mobile-link focus-ring" href={item.href} rel={item.rel}>
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
+        <p class="site-footer__title">Admin Panel</p>
+        {visibleAdminSections.map((section) => (
+          <div class="site-nav__mobile-admin-section">
+            <h4 class="site-nav__mobile-admin-label">{section.label}</h4>
+            <ul class="site-nav__nav--stacked">
+              {section.items.map((item) => (
+                <li>
+                  <a class="site-nav__mobile-link focus-ring" href={item.href} rel={item.rel} data-mobile-link>
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
     )}
     {visibleUtility.length > 0 && (
@@ -463,9 +482,15 @@ function isActive(href: string): boolean {
     background: rgba(124, 78, 176, 0.32);
   }
 
-  .site-nav__button--dev {
-    border-style: dashed;
-    color: rgba(244, 241, 255, 0.8);
+  .site-nav__button--admin {
+    background: rgba(212, 175, 55, 0.18);
+    border-color: rgba(212, 175, 55, 0.25);
+  }
+
+  .site-nav__button--admin:hover,
+  .site-nav__button--admin:focus-visible {
+    background: rgba(212, 175, 55, 0.28);
+    border-color: rgba(212, 175, 55, 0.45);
   }
 
   .site-nav__item--submenu {
@@ -486,41 +511,40 @@ function isActive(href: string): boolean {
     transform: rotate(180deg);
   }
 
-  .site-nav__dev {
+  .site-nav__admin {
     position: relative;
   }
 
-  .site-nav__dev > summary {
+  .site-nav__admin > summary {
     list-style: none;
     cursor: pointer;
   }
 
-  .site-nav__dev > summary::-webkit-details-marker {
+  .site-nav__admin > summary::-webkit-details-marker {
     display: none;
   }
 
-  .site-nav__dev-caret {
+  .site-nav__admin-caret {
     width: 0.75rem;
     height: 0.75rem;
     transition: transform 160ms ease;
   }
 
-  .site-nav__dev[open] .site-nav__dev-caret {
+  .site-nav__admin[open] .site-nav__admin-caret {
     transform: rotate(180deg);
   }
 
-  .site-nav__dev-dropdown {
+  .site-nav__admin-dropdown {
     position: absolute;
     right: 0;
     margin-top: var(--space-2, 0.5rem);
-    padding: var(--space-4, 1rem);
+    padding: var(--space-5, 1.25rem);
     border-radius: 1rem;
     border: 1px solid rgba(212, 175, 55, 0.25);
-    background: rgba(18, 7, 37, 0.95);
+    background: rgba(18, 7, 37, 0.97);
+    backdrop-filter: blur(12px);
     box-shadow: var(--shadow-2, 0 28px 75px -24px rgba(3, 2, 12, 0.72));
-    display: grid;
-    gap: var(--space-2, 0.5rem);
-    min-width: 16rem;
+    min-width: 36rem;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-0.35rem);
@@ -528,42 +552,62 @@ function isActive(href: string): boolean {
     z-index: 40;
   }
 
-  .site-nav__dev[open] .site-nav__dev-dropdown {
+  .site-nav__admin[open] .site-nav__admin-dropdown {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
   }
 
-  .site-nav__dev-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  .site-nav__admin-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-5, 1.25rem);
+  }
+
+  .site-nav__admin-section {
     display: grid;
     gap: var(--space-2, 0.5rem);
   }
 
-  .site-nav__dev-link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-2, 0.5rem);
-    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
-    border-radius: 0.75rem;
-    border: 1px solid transparent;
-    background: rgba(124, 78, 176, 0.12);
-    color: rgba(244, 241, 255, 0.85);
+  .site-nav__admin-section-label {
     font-family: var(--font-accent);
-    font-size: 0.72rem;
-    letter-spacing: 0.2em;
+    font-size: 0.6875rem;
+    font-weight: 700;
     text-transform: uppercase;
-    text-decoration: none;
+    letter-spacing: 0.1em;
+    color: rgba(212, 175, 55, 0.85);
+    margin: 0;
+    padding-bottom: var(--space-1, 0.25rem);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.18);
   }
 
-  .site-nav__dev-link:hover,
-  .site-nav__dev-link:focus-visible {
-    border-color: rgba(212, 175, 55, 0.45);
-    background: rgba(124, 78, 176, 0.25);
+  .site-nav__admin-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.125rem;
+  }
+
+  .site-nav__admin-link {
+    display: block;
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    border-radius: 0.5rem;
+    border: 1px solid transparent;
+    background: rgba(124, 78, 176, 0.08);
+    color: rgba(244, 241, 255, 0.85);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 120ms ease;
+  }
+
+  .site-nav__admin-link:hover,
+  .site-nav__admin-link:focus-visible {
+    border-color: rgba(212, 175, 55, 0.35);
+    background: rgba(124, 78, 176, 0.18);
     color: var(--color-gold, #d4af37);
+    transform: translateX(0.125rem);
   }
 
   .site-nav__mobile-admin {
@@ -571,7 +615,23 @@ function isActive(href: string): boolean {
     padding-top: var(--space-4, 1rem);
     border-top: 1px solid rgba(212, 175, 55, 0.18);
     display: grid;
-    gap: var(--space-3, 0.75rem);
+    gap: var(--space-4, 1rem);
+  }
+
+  .site-nav__mobile-admin-section {
+    display: grid;
+    gap: var(--space-2, 0.5rem);
+  }
+
+  .site-nav__mobile-admin-label {
+    font-family: var(--font-accent);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(212, 175, 55, 0.75);
+    margin: 0;
+    padding-left: var(--space-2, 0.5rem);
   }
 
   .site-nav__nav--stacked {

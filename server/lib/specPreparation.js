@@ -115,6 +115,60 @@ function createEntityStubRecords(cwd, entities) {
   });
 }
 
+function createPostStubRecords(cwd, postsDirectories, internalLinkHints, siteUrl) {
+  if (!Array.isArray(internalLinkHints) || !internalLinkHints.length) return [];
+  const stubs = [];
+
+  for (const hint of internalLinkHints) {
+    const anchor = String(hint?.anchor || '').trim();
+    if (!anchor) continue;
+
+    // Convert anchor text to slug
+    const candidateSlug = slugify(anchor);
+    if (!candidateSlug) continue;
+
+    // Check if a post with this slug already exists
+    const exists = postsDirectories.some((dir) =>
+      fs.existsSync(path.join(dir, `${candidateSlug}.md`))
+    );
+
+    if (exists) continue;
+
+    // Create stub post
+    const primaryPostsDir = postsDirectories[0];
+    const file = path.join(primaryPostsDir, `${candidateSlug}.md`);
+    const title = anchor.replace(/\b\w/g, (m) => m.toUpperCase());
+
+    const frontmatter = {
+      title,
+      slug: candidateSlug,
+      excerpt: `Placeholder post for "${title}".`,
+      metaTitle: title,
+      metaDescription: `This is a placeholder post that was auto-generated from an internal link reference. Content coming soon.`,
+      tags: ['placeholder', 'stub'],
+      outline: ['Placeholder'],
+      wordCount: 50,
+      readingMinutes: 1,
+      entities: [],
+      includeAds: false,
+      includeKofi: false,
+      affiliateAnchors: [],
+      internalLinkHints: [],
+      internalLinks: [],
+      publishedAt: new Date().toISOString(),
+      canonicalUrl: `${siteUrl}/post/${candidateSlug}`,
+      specVersion: 2,
+      draft: true,
+    };
+
+    const contents = `---\n${toFrontmatterYAML(frontmatter)}\n---\n\n## Placeholder\n\nThis post was automatically created as a stub from an internal link reference. Please replace this content.\n`;
+
+    stubs.push({ file, contents, slug: candidateSlug, title });
+  }
+
+  return stubs;
+}
+
 export function prepareSpecForPersistence(rawSpec, options = {}) {
   const cwd = options.cwd || process.cwd();
   const postsDirectories = Array.isArray(options.postsDirectories) && options.postsDirectories.length
@@ -212,6 +266,7 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
   const postFilePath = path.join(primaryPostsDir, `${spec.slug}.md`);
 
   const entityStubs = createEntityStubRecords(cwd, spec.entities);
+  const postStubs = createPostStubRecords(cwd, postsDirectories, spec.internalLinkHints, siteUrl);
 
   return {
     spec,
@@ -224,6 +279,7 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
     },
     frontmatter,
     entityStubs,
+    postStubs,
   };
 }
 
@@ -240,9 +296,19 @@ export async function persistPreparedSpec(prepared) {
     }
   }
 
+  const createdPosts = [];
+  for (const stub of prepared.postStubs || []) {
+    ensureDirSync(path.dirname(stub.file));
+    if (!fs.existsSync(stub.file)) {
+      await fsp.writeFile(stub.file, stub.contents, 'utf8');
+      createdPosts.push(stub.file);
+    }
+  }
+
   return {
     postPath: prepared.post.filePath,
     createdEntities,
+    createdPosts,
   };
 }
 

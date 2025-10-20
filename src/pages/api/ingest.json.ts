@@ -53,6 +53,50 @@ function ensureEntityStubs(entities: {type:EntityType; slug:string}[]){
   }
 }
 
+function ensurePostStubs(internalLinkHints: string[], postsDir: string, siteUrl: string): string[] {
+  const createdStubs: string[] = [];
+
+  for (const anchor of internalLinkHints || []) {
+    if (!anchor) continue;
+
+    const candidateSlug = slugify(anchor);
+    if (!candidateSlug) continue;
+
+    const postPath = path.join(postsDir, `${candidateSlug}.md`);
+    if (fs.existsSync(postPath)) continue; // Post already exists
+
+    const title = anchor.replace(/\b\w/g, (m) => m.toUpperCase());
+    const frontmatter = {
+      title,
+      slug: candidateSlug,
+      excerpt: `Placeholder post for "${title}".`,
+      metaTitle: title,
+      metaDescription: `This is a placeholder post that was auto-generated from an internal link reference. Content coming soon.`,
+      tags: ['placeholder', 'stub'],
+      outline: ['Placeholder'],
+      wordCount: 50,
+      readingMinutes: 1,
+      entities: [],
+      includeAds: false,
+      includeKofi: false,
+      affiliateAnchors: [],
+      internalLinkHints: [],
+      internalLinks: [],
+      publishedAt: new Date().toISOString(),
+      canonicalUrl: `${siteUrl}/post/${candidateSlug}`,
+      specVersion: 2 as const,
+      draft: true,
+    };
+
+    const contents = `---\n${toFrontmatterYAML(frontmatter)}\n---\n\n## Placeholder\n\nThis post was automatically created as a stub from an internal link reference. Please replace this content.\n`;
+
+    fs.writeFileSync(postPath, contents, 'utf8');
+    createdStubs.push(`content/posts/${candidateSlug}.md`);
+  }
+
+  return createdStubs;
+}
+
 function toFrontmatterYAML(obj: Record<string, any>) {
   const lines: string[] = [];
   for (const [k, v] of Object.entries(obj)) {
@@ -204,6 +248,9 @@ export async function POST({ request }: { request: Request }) {
 
     ensureEntityStubs(fm.entities);
 
+    const siteUrl = String(settings.siteUrl||'').replace(/\/$/,'');
+    const createdPostStubs = ensurePostStubs(internalLinkHints, POSTS_DIR, siteUrl);
+
     const body = (spec.sections || [])
       .map((section: PostSpecV2["sections"][number]) =>
         `## ${section.heading}\n\n${String(section.markdown || '').trim()}\n`,
@@ -224,6 +271,7 @@ export async function POST({ request }: { request: Request }) {
       words: contentWords,
       warnings: combinedWarnings,
       normalizations: normalizationReport,
+      createdPostStubs,
     });
   } catch (e: any) {
     return json({ ok:false, error: e?.message || String(e) }, 500);

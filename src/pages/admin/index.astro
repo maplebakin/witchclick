@@ -332,7 +332,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         });
 
         showPanel('posts');
-        function setStatus(msg, ok, warnings, notes, errors){
+        function setStatus(msg, ok, warnings, notes, errors, postStubs){
           var el=$('status');
           if (!el) return;
           var base='rounded-lg border px-3 py-2 text-sm';
@@ -371,6 +371,21 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           appendList('Errors', errors, 'text-danger');
           appendList('Warnings', warnings, 'text-warning');
           appendList('Notes', notes, 'text-muted');
+
+          if (Array.isArray(postStubs) && postStubs.length) {
+            var stubsHeading=document.createElement('p');
+            stubsHeading.className='mt-2 text-[11px] font-semibold text-info';
+            stubsHeading.textContent='Post stubs that will be created:';
+            el.appendChild(stubsHeading);
+            var stubsList=document.createElement('ul');
+            stubsList.className='mt-1 list-disc pl-5 text-[11px] text-info';
+            postStubs.forEach(function(stub){
+              var li=document.createElement('li');
+              li.textContent=(stub.title || stub.slug) + ' (' + (stub.path || stub.slug) + ')';
+              stubsList.appendChild(li);
+            });
+            el.appendChild(stubsList);
+          }
 
           if (!msg && !(Array.isArray(warnings) && warnings.length) && !(Array.isArray(notes) && notes.length)) {
             el.textContent='Ready for PostSpec JSON.';
@@ -922,15 +937,16 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           var warnings = err && err.data ? extractArray(err.data.warnings) : [];
           var notes = err && err.data ? extractArray(err.data.normalizationReport) : [];
           var errors = err && err.data ? extractArray(err.data.errors) : [];
+          var postStubs = err && err.data ? extractArray(err.data.postStubs) : [];
           if (err && err.type === 'network') {
-            setStatus(err.message, false, warnings, notes, errors);
+            setStatus(err.message, false, warnings, notes, errors, postStubs);
             return;
           }
           if (err && err.type === 'http') {
-            setStatus(err.message, false, warnings, notes, errors);
+            setStatus(err.message, false, warnings, notes, errors, postStubs);
             return;
           }
-          setStatus((err && err.message) || 'Unexpected error', false, warnings, notes, errors);
+          setStatus((err && err.message) || 'Unexpected error', false, warnings, notes, errors, postStubs);
         }
 
         function handleCurseError(err){
@@ -960,11 +976,12 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             var warnings = extractArray(data.warnings);
             var notes = extractArray(data.normalizationReport);
             var errors = extractArray(data.errors);
+            var postStubs = extractArray(data.postStubs);
             if (data.ok === false) {
-              setStatus(data.error || 'Validation errors found.', false, warnings, notes, errors);
+              setStatus(data.error || 'Validation errors found.', false, warnings, notes, errors, postStubs);
               return;
             }
-            setStatus('Valid ✓', true, warnings, notes, errors);
+            setStatus('Valid ✓', true, warnings, notes, errors, postStubs);
           }catch(e){ handleSpecError(e); }
           finally{ busy(false); }
         });
@@ -1043,12 +1060,13 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             var warnings = extractArray(data.warnings);
             var notes = extractArray(data.normalizationReport);
             var errors = extractArray(data.errors);
+            var postStubs = extractArray(data.postStubs);
             if (data.ok === false) {
-              setStatus(data.error || 'Validation errors found.', false, warnings, notes, errors);
+              setStatus(data.error || 'Validation errors found.', false, warnings, notes, errors, postStubs);
               return;
             }
             renderPreview(finalSpec);
-            setStatus('Preview ✓', true, warnings, notes, errors);
+            setStatus('Preview ✓', true, warnings, notes, errors, postStubs);
           }catch(e){ handleSpecError(e); }
           finally{ busy(false); }
         });
@@ -1063,24 +1081,29 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             var warnings = extractArray(dryRun.warnings);
             var notes = extractArray(dryRun.normalizationReport);
             var errors = extractArray(dryRun.errors);
+            var postStubs = extractArray(dryRun.postStubs);
             if (dryRun.ok === false) {
-              setStatus(dryRun.error || 'Validation errors found.', false, warnings, notes, errors);
+              setStatus(dryRun.error || 'Validation errors found.', false, warnings, notes, errors, postStubs);
               return;
             }
-            setStatus('Validation passed. Ingesting…', null, warnings, notes, errors);
+            setStatus('Validation passed. Ingesting…', null, warnings, notes, errors, postStubs);
             var data = await postSpec(finalSpec, { dryRun: false });
             if (data.ok === false) {
-              setStatus(data.error || 'Ingest failed.', false, extractArray(data.warnings), extractArray(data.normalizationReport), extractArray(data.errors));
+              setStatus(data.error || 'Ingest failed.', false, extractArray(data.warnings), extractArray(data.normalizationReport), extractArray(data.errors), extractArray(data.postStubs));
               return;
             }
             var ingestWarnings = extractArray(data.warnings);
             var ingestNotes = extractArray(data.normalizationReport);
             var mergedWarnings = ingestWarnings.length ? ingestWarnings : warnings;
             var mergedNotes = ingestNotes.length ? ingestNotes : notes;
+            var createdPosts = extractArray(data.createdPosts);
             var location = data.path || ('content/posts/' + (data.slug || finalSpec.slug || 'post') + '.md');
             var slug = data.slug || (finalSpec && finalSpec.slug) || '';
             var msg = (data.saved === false ? 'Ingested (dry run)' : 'Ingested ✓') + ' → ' + location + (slug ? ' • Preview: /post/' + slug : '');
-            setStatus(msg, true, mergedWarnings, mergedNotes, extractArray(data.errors));
+            if (createdPosts.length) {
+              msg += ' • Created ' + createdPosts.length + ' stub post' + (createdPosts.length === 1 ? '' : 's');
+            }
+            setStatus(msg, true, mergedWarnings, mergedNotes, extractArray(data.errors), createdPosts.map(function(p){ return {path: p}; }));
           }catch(e){ handleSpecError(e); }
           finally{ busy(false); }
         });
@@ -1095,26 +1118,31 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             var warnings = extractArray(dryRun.warnings);
             var notes = extractArray(dryRun.normalizationReport);
             var errors = extractArray(dryRun.errors);
+            var postStubs = extractArray(dryRun.postStubs);
             if (dryRun.ok === false) {
-              setStatus(dryRun.error || 'Validation errors found.', false, warnings, notes, errors);
+              setStatus(dryRun.error || 'Validation errors found.', false, warnings, notes, errors, postStubs);
               return;
             }
-            setStatus('Validation passed. Ingesting…', null, warnings, notes, errors);
+            setStatus('Validation passed. Ingesting…', null, warnings, notes, errors, postStubs);
             var data = await postSpec(finalSpec, { dryRun: false });
             if (data.ok === false) {
-              setStatus(data.error || 'Ingest failed.', false, extractArray(data.warnings), extractArray(data.normalizationReport), extractArray(data.errors));
+              setStatus(data.error || 'Ingest failed.', false, extractArray(data.warnings), extractArray(data.normalizationReport), extractArray(data.errors), extractArray(data.postStubs));
               return;
             }
             var ingestWarnings = extractArray(data.warnings);
             var ingestNotes = extractArray(data.normalizationReport);
+            var createdPosts = extractArray(data.createdPosts);
             var slug = data.slug || (finalSpec && finalSpec.slug) || '';
-            setStatus('Ingested. Publishing…', true, ingestWarnings.length ? ingestWarnings : warnings, ingestNotes.length ? ingestNotes : notes, extractArray(data.errors));
+            setStatus('Ingested. Publishing…', true, ingestWarnings.length ? ingestWarnings : warnings, ingestNotes.length ? ingestNotes : notes, extractArray(data.errors), createdPosts.map(function(p){ return {path: p}; }));
             var r = await fetch(DEV_API + '/bundle', { method:'POST' });
             var b = await r.json();
             if (!b.ok) throw new Error((b.steps && b.steps.map(function(s){return s.err;}).filter(Boolean).join('\n')) || b.error || 'bundle failed');
             var slug = data.slug || (finalSpec && finalSpec.slug) || '';
             var publishMsg = 'Published ✓' + (slug ? ' • Open post: /post/' + slug : '');
-            setStatus(publishMsg, true, ingestWarnings.length ? ingestWarnings : warnings, ingestNotes.length ? ingestNotes : notes, extractArray(data.errors));
+            if (createdPosts.length) {
+              publishMsg += ' • Created ' + createdPosts.length + ' stub post' + (createdPosts.length === 1 ? '' : 's');
+            }
+            setStatus(publishMsg, true, ingestWarnings.length ? ingestWarnings : warnings, ingestNotes.length ? ingestNotes : notes, extractArray(data.errors), createdPosts.map(function(p){ return {path: p}; }));
           }catch(e){ handleSpecError(e); }
           finally{ busy(false); }
         });

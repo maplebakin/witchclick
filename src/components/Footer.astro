@@ -12,7 +12,6 @@ interface Props {
   navLinks?: NavLink[];
   secondaryNavLinks?: NavLink[];
   utilityLinks?: NavLink[];
-  adminLinks?: NavLink[];
   disclosure?: string;
 }
 
@@ -21,7 +20,6 @@ const {
   navLinks = [],
   secondaryNavLinks = [],
   utilityLinks = [],
-  adminLinks = [],
   disclosure = "",
 } = Astro.props as Props;
 
@@ -32,7 +30,6 @@ const isNavLink = (link: NavLink | undefined | null): link is NavLink =>
 const primaryNav = navLinks.filter(isNavLink);
 const secondaryNav = secondaryNavLinks.filter(isNavLink);
 const utilityNav = utilityLinks.filter(isNavLink);
-const adminNav = adminLinks.filter(isNavLink);
 ---
 <footer class="site-footer" aria-label="Site footer">
   <div class="wc-container site-footer__inner">
@@ -85,18 +82,11 @@ const adminNav = adminLinks.filter(isNavLink);
       </div>
     </div>
     <div class="site-footer__meta">
-      {(utilityNav.length > 0 || adminNav.length > 0) && (
+      {utilityNav.length > 0 && (
         <ul class="site-footer__nav site-footer__nav--inline">
           {utilityNav.map((link) => (
             <li>
               <a class="site-footer__link focus-ring" href={link.href} rel={link.rel}>
-                {link.label}
-              </a>
-            </li>
-          ))}
-          {adminNav.map((link) => (
-            <li class="site-footer__link--dev">
-              <a class="focus-ring" href={link.href} rel={link.rel}>
                 {link.label}
               </a>
             </li>

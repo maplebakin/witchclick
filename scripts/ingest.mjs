@@ -83,7 +83,7 @@ export async function ingestFromSpec(input, options = {}) {
     throw new IngestValidationError({ message: err?.message, errors, warnings, normalizations });
   }
 
-  const { post, spec, normalizationReport, warnings, entityStubs } = prepared;
+  const { post, spec, normalizationReport, warnings, entityStubs, postStubs } = prepared;
   const slug = spec.slug;
   const bytesWritten = Buffer.byteLength(post.contents, "utf8");
 
@@ -101,8 +101,10 @@ export async function ingestFromSpec(input, options = {}) {
     warnings,
     normalizationReport,
     entityStubs,
+    postStubs,
     markdown: post.contents,
     createdEntities: persistence?.createdEntities ?? [],
+    createdPosts: persistence?.createdPosts ?? [],
     source: inputPath || null,
   };
 
@@ -383,6 +385,12 @@ function printDryRun(result) {
       console.log(` • ${w}`);
     }
   }
+  if (Array.isArray(result.postStubs) && result.postStubs.length) {
+    console.log("Would create post stubs:");
+    for (const stub of result.postStubs) {
+      console.log(` • ${rel(stub.file)} (${stub.title})`);
+    }
+  }
 }
 
 function printSuccess(result) {
@@ -402,6 +410,12 @@ function printSuccess(result) {
   if (Array.isArray(result.createdEntities) && result.createdEntities.length) {
     console.log("Created entity stubs:");
     for (const file of result.createdEntities) {
+      console.log(` • ${rel(file)}`);
+    }
+  }
+  if (Array.isArray(result.createdPosts) && result.createdPosts.length) {
+    console.log("Created post stubs:");
+    for (const file of result.createdPosts) {
       console.log(` • ${rel(file)}`);
     }
   }

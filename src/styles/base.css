@@ -1114,7 +1114,7 @@ blockquote {
   }
 }
 
-/* --- Fix Conflicting Backgrounds (Add to the end of base.css) --- */
+/* --- Fix Conflicting Backgrounds --- */
 
 .site-main__container,
 .site-main__content {
@@ -1123,4 +1123,256 @@ blockquote {
   background-color: transparent !important;
 }
 
-/* --- End Base CSS Fix --- */
+/* --- Page-Specific Background Treatments --- */
+
+/* 1. Homepage: Welcoming & Grounding */
+.bg-home {
+  background-color: #faf7f5; /* Fallback: warm cream */
+  background-image: linear-gradient(135deg, #faf7f5 0%, #f5ebe0 50%, #fce4ec 100%);
+  position: relative;
+}
+
+:root[data-comfort-theme="dawn"] .bg-home {
+  background-color: #f6f0e8;
+  background-image: linear-gradient(135deg, #f6f0e8 0%, #ede5dc 50%, #f2ecfa 100%);
+}
+
+/* Subtle noise texture (CSS-only) */
+.bg-noise {
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px);
+}
+
+:root[data-comfort-theme="dawn"] .bg-noise {
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.015) 2px, rgba(0,0,0,.015) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,.015) 2px, rgba(0,0,0,.015) 4px);
+}
+
+/* 2. Curses: Darker Symbolic Energy */
+.bg-curses {
+  background-color: #581c87; /* Fallback: purple-900 */
+  background-image: linear-gradient(180deg, #4c1d95 0%, #581c87 50%, #0f172a 100%);
+  position: relative;
+}
+
+/* Repeating symbolic cross/sigil pattern */
+.bg-sigil-pattern {
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(217, 178, 196, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(217, 178, 196, 0.08) 0%, transparent 50%),
+    repeating-conic-gradient(
+      from 45deg at 50% 50%,
+      transparent 0deg,
+      transparent 85deg,
+      rgba(139, 92, 246, 0.02) 85deg,
+      rgba(139, 92, 246, 0.02) 95deg
+    );
+  background-size: 100% 100%, 100% 100%, 200px 200px;
+}
+
+/* Soft vignette for depth */
+.bg-radial-vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 60%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+}
+
+:root[data-comfort-theme="dawn"] .bg-curses {
+  background-color: #9b86c8; /* Dawn variant fallback */
+  background-image: linear-gradient(180deg, #b49ad9 0%, #9b86c8 50%, #6b5b95 100%);
+}
+
+:root[data-comfort-theme="dawn"] .bg-sigil-pattern {
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(155, 134, 200, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(202, 160, 67, 0.06) 0%, transparent 50%),
+    repeating-conic-gradient(
+      from 45deg at 50% 50%,
+      transparent 0deg,
+      transparent 85deg,
+      rgba(122, 94, 154, 0.015) 85deg,
+      rgba(122, 94, 154, 0.015) 95deg
+    );
+  background-size: 100% 100%, 100% 100%, 200px 200px;
+}
+
+/* 3. Entities: Moonlight & Mist */
+.bg-entities {
+  background-color: #1e293b; /* Fallback: slate-800 */
+  background-image: linear-gradient(180deg, #0f172a 0%, rgba(30, 27, 75, 0.8) 50%, #1e293b 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+:root[data-comfort-theme="dawn"] .bg-entities {
+  background-color: #e5daf5; /* Dawn variant fallback */
+  background-image: linear-gradient(180deg, #f2ecfa 0%, #e5daf5 50%, #d7c8f3 100%);
+}
+
+/* Moonlight glow */
+.bg-moon-glow {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(224, 231, 255, 0.4) 0%,
+    rgba(165, 180, 252, 0.2) 40%,
+    transparent 70%
+  );
+}
+
+:root[data-comfort-theme="dawn"] .bg-moon-glow {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(155, 134, 200, 0.25) 0%,
+    rgba(202, 160, 67, 0.12) 40%,
+    transparent 70%
+  );
+}
+
+/* Tiny star field (CSS-only) */
+.bg-stars {
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, white, transparent),
+    radial-gradient(1px 1px at 60% 70%, white, transparent),
+    radial-gradient(1px 1px at 50% 50%, white, transparent),
+    radial-gradient(1px 1px at 80% 10%, white, transparent),
+    radial-gradient(1px 1px at 90% 60%, white, transparent),
+    radial-gradient(0.5px 0.5px at 33% 80%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(0.5px 0.5px at 15% 90%, rgba(255,255,255,0.5), transparent);
+  background-size: 200% 200%;
+  background-position: 0% 0%, 40% 60%, 130% 270%, 70% 100%, 200% 50%, 110% 180%, 90% 240%;
+}
+
+:root[data-comfort-theme="dawn"] .bg-stars {
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(155, 134, 200, 0.4), transparent),
+    radial-gradient(1px 1px at 60% 70%, rgba(202, 160, 67, 0.3), transparent),
+    radial-gradient(1px 1px at 50% 50%, rgba(155, 134, 200, 0.35), transparent),
+    radial-gradient(1px 1px at 80% 10%, rgba(202, 160, 67, 0.4), transparent),
+    radial-gradient(1px 1px at 90% 60%, rgba(155, 134, 200, 0.3), transparent),
+    radial-gradient(0.5px 0.5px at 33% 80%, rgba(122, 94, 154, 0.25), transparent),
+    radial-gradient(0.5px 0.5px at 15% 90%, rgba(122, 94, 154, 0.2), transparent);
+  background-size: 200% 200%;
+  background-position: 0% 0%, 40% 60%, 130% 270%, 70% 100%, 200% 50%, 110% 180%, 90% 240%;
+}
+
+/* 4. Tools & Prints: Altar Meets Shop */
+.bg-tools {
+  background-color: #fefce8; /* Fallback: amber-50 */
+  position: relative;
+}
+
+:root[data-comfort-theme="dawn"] .bg-tools {
+  background-color: #fffdf6;
+}
+
+/* Woven linen texture */
+.bg-linen {
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(139, 92, 46, 0.02) 2px,
+      rgba(139, 92, 46, 0.02) 4px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(139, 92, 46, 0.015) 2px,
+      rgba(139, 92, 46, 0.015) 4px
+    );
+}
+
+:root[data-comfort-theme="dawn"] .bg-linen {
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(122, 94, 154, 0.015) 2px,
+      rgba(122, 94, 154, 0.015) 4px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(122, 94, 154, 0.01) 2px,
+      rgba(122, 94, 154, 0.01) 4px
+    );
+}
+
+/* Radial gradient helper */
+.bg-gradient-radial {
+  background: radial-gradient(circle, currentColor 0%, transparent 70%);
+}
+
+/* 5. Salon: Tea & Ink Study */
+.bg-salon {
+  background-color: #f5f5f4; /* Fallback: stone-100 */
+  background-image: linear-gradient(135deg, #f5f5f4 0%, #fafaf9 40%, #f1f5f9 100%);
+  position: relative;
+}
+
+:root[data-comfort-theme="dawn"] .bg-salon {
+  background-color: #fafaf9;
+  background-image: linear-gradient(135deg, #fafaf9 0%, #f5f5f4 40%, #f2ecfa 100%);
+}
+
+/* Ink wash (soft bleed effect) */
+.bg-ink-wash {
+  background: radial-gradient(
+    ellipse at top,
+    rgba(71, 85, 105, 0.15) 0%,
+    rgba(100, 116, 139, 0.08) 40%,
+    transparent 70%
+  );
+}
+
+:root[data-comfort-theme="dawn"] .bg-ink-wash {
+  background: radial-gradient(
+    ellipse at top,
+    rgba(155, 134, 200, 0.08) 0%,
+    rgba(122, 94, 154, 0.04) 40%,
+    transparent 70%
+  );
+}
+
+/* Fine grain texture */
+.bg-grain {
+  background-image:
+    repeating-radial-gradient(
+      circle at 0 0,
+      transparent 0,
+      rgba(0, 0, 0, 0.1) 1px,
+      transparent 2px
+    );
+  background-size: 4px 4px;
+}
+
+:root[data-comfort-theme="dawn"] .bg-grain {
+  background-image:
+    repeating-radial-gradient(
+      circle at 0 0,
+      transparent 0,
+      rgba(122, 94, 154, 0.05) 1px,
+      transparent 2px
+    );
+  background-size: 4px 4px;
+}
+
+/* --- Accessibility: Reduce Motion --- */
+@media (prefers-reduced-motion: reduce) {
+  .blur-3xl,
+  .blur-2xl,
+  .blur-xl {
+    filter: none !important;
+  }
+}
+
+/* --- End Page-Specific Backgrounds --- */

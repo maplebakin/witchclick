@@ -1247,10 +1247,25 @@ const server = http.createServer(async (req, res) => {
             cwd: CWD,
             postsDirectories: listPostDirsForCollisions(),
           });
+          let persistence = null;
           if (!dryRun) {
-            await persistPreparedSpec(prepared);
+            persistence = await persistPreparedSpec(prepared);
           }
           const relativePath = path.relative(CWD, prepared.post.filePath).replace(/\\/g, '/');
+
+          // Format post stubs for response
+          const postStubs = Array.isArray(prepared.postStubs) && prepared.postStubs.length
+            ? prepared.postStubs.map(stub => ({
+                slug: stub.slug,
+                title: stub.title,
+                path: path.relative(CWD, stub.file).replace(/\\/g, '/')
+              }))
+            : [];
+
+          const createdPosts = persistence && Array.isArray(persistence.createdPosts) && persistence.createdPosts.length
+            ? persistence.createdPosts.map(file => path.relative(CWD, file).replace(/\\/g, '/'))
+            : [];
+
           return send(res, 200, {
             ok: true,
             spec: prepared.spec,
@@ -1262,6 +1277,8 @@ const server = http.createServer(async (req, res) => {
             saved: !dryRun,
             slug: prepared.spec.slug,
             path: relativePath,
+            postStubs,
+            createdPosts,
           });
         } catch (e) {
           const status = Array.isArray(e?.errors) ? 400 : 500;

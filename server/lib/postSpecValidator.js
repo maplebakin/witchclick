@@ -108,8 +108,10 @@ export function validatePostSpec(spec, options = {}) {
         errors.push(`internalLinkHints[${i}] is missing an anchor.`);
         continue;
       }
+      // Note: We no longer error on missing anchors since stub posts are auto-created
+      // This allows referencing future posts that don't exist yet
       if (!markdownContainsAnchor(combinedMarkdown, anchor)) {
-        errors.push(`Internal link anchor "${anchor}" does not appear verbatim in sections markdown.`);
+        warnings.push(`Internal link anchor "${anchor}" does not appear in sections markdown (stub post will be created).`);
       }
       const words = anchorWordCount(anchor);
       if (words < 2 || words > 6) {

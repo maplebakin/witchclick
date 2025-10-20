@@ -11,6 +11,7 @@ import {
   secondaryNavLinks,
   headerUtilityLinks,
   footerUtilityLinks,
+  adminNavSections,
 } from "@/data/navigation";
 import { readSettings, getSiteOrigin, toAbsoluteUrl } from "@/utils/settings";
 import { buildAnalyticsInjection } from "@/utils/analytics";
@@ -171,15 +172,7 @@ const footerUtilities = footerUtilityLinks
   .filter((link): link is typeof footerUtilityLinks[number] => Boolean(link));
 
 const isDev = import.meta.env.DEV;
-const adminLinks = isDev
-  ? [
-      { href: "/admin/", label: "Admin" },
-      { href: "/admin/write", label: "Write" },
-      { href: "/admin/entities", label: "Entities" },
-      { href: "/admin/downloads", label: "Downloads" },
-      { href: "/admin/hero", label: "Hero Uploads" },
-    ]
-  : [];
+const adminSections = isDev ? adminNavSections : [];
 
 const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined;
 ---
@@ -287,7 +280,7 @@ const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined
       navLinks={navLinks}
       secondaryLinks={secondaryLinks}
       utilityLinks={headerUtility}
-      adminLinks={adminLinks}
+      adminSections={adminSections}
       currentPath={currentPath}
     />
     <main id="main" class="site-main">
@@ -312,7 +305,6 @@ const bodyStyle = ambientColor ? `--ambient-color: ${ambientColor};` : undefined
       navLinks={navLinks}
       secondaryNavLinks={secondaryLinks}
       utilityLinks={footerUtilities}
-      adminLinks={adminLinks}
       disclosure={disclosure}
     />
     {analytics?.runtime?.inline && (
