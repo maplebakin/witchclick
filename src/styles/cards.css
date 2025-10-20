@@ -7,8 +7,16 @@
   --card-panel-border-soft: color-mix(in srgb, var(--color-iris) 28%, transparent 72%);
   --card-hover-translate: -0.35rem;
   --card-transition: 220ms ease;
-  --card-focus-ring: 0 0 0 3px color-mix(in srgb, var(--color-gold) 55%, transparent 45%);
-  --card-focus-ring-strong: 0 0 0 3px color-mix(in srgb, var(--color-gold) 70%, transparent 30%);
+  --card-focus-ring:
+    0 0 0 2px color-mix(in srgb, var(--color-night) 72%, transparent 28%),
+    0 0 0 calc(var(--card-focus-offset, 5px) + 2px)
+      color-mix(in srgb, var(--card-focus-outline, color-mix(in srgb, var(--color-gold) 82%, white 18%)) 35%, transparent 65%);
+  --card-focus-ring-strong:
+    0 0 0 2px color-mix(in srgb, var(--color-iris) 42%, transparent 58%),
+    0 0 0 calc(var(--card-focus-offset, 5px) + 2px)
+      color-mix(in srgb, var(--card-focus-outline, color-mix(in srgb, var(--color-gold) 82%, white 18%)) 40%, transparent 60%);
+  --card-focus-outline: color-mix(in srgb, var(--color-gold) 82%, white 18%);
+  --card-focus-offset: 5px;
   --card-highlight: radial-gradient(circle at 15% -25%, color-mix(in srgb, var(--color-gold) 32%, transparent 68%), transparent 60%);
   --card-highlight-alt: radial-gradient(circle at 85% -10%, color-mix(in srgb, var(--color-iris) 36%, transparent 64%), transparent 70%);
   --card-highlight-soft: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--color-iris) 26%, transparent 74%), transparent 70%);
@@ -31,8 +39,16 @@
   --card-panel-border-strong: color-mix(in srgb, var(--color-iris) 48%, transparent 52%);
   --card-panel-border-soft: color-mix(in srgb, var(--color-iris) 28%, transparent 72%);
   --card-hover-translate: -0.3rem;
-  --card-focus-ring: 0 0 0 3px color-mix(in srgb, var(--color-iris) 45%, transparent 55%);
-  --card-focus-ring-strong: 0 0 0 3px color-mix(in srgb, var(--color-iris) 60%, transparent 40%);
+  --card-focus-ring:
+    0 0 0 2px color-mix(in srgb, var(--color-iris) 32%, transparent 68%),
+    0 0 0 calc(var(--card-focus-offset, 5px) + 2px)
+      color-mix(in srgb, var(--card-focus-outline, color-mix(in srgb, var(--color-iris) 68%, white 32%)) 38%, transparent 62%);
+  --card-focus-ring-strong:
+    0 0 0 2px color-mix(in srgb, var(--color-iris) 46%, transparent 54%),
+    0 0 0 calc(var(--card-focus-offset, 5px) + 2px)
+      color-mix(in srgb, var(--card-focus-outline, color-mix(in srgb, var(--color-iris) 68%, white 32%)) 44%, transparent 56%);
+  --card-focus-outline: color-mix(in srgb, var(--color-iris) 68%, white 32%);
+  --card-focus-offset: 5px;
   --card-highlight: radial-gradient(circle at 15% -25%, color-mix(in srgb, var(--color-iris) 40%, transparent 60%), transparent 60%);
   --card-highlight-alt: radial-gradient(circle at 85% -10%, color-mix(in srgb, var(--color-iris) 28%, transparent 72%), transparent 70%);
   --card-highlight-soft: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--color-iris) 32%, transparent 68%), transparent 70%);
@@ -76,7 +92,8 @@
 }
 
 .card-panel:focus-visible {
-  outline: none;
+  outline: 2px solid var(--card-focus-outline, color-mix(in srgb, var(--color-gold) 78%, white 22%));
+  outline-offset: var(--card-focus-offset, 5px);
   box-shadow: var(--card-focus-ring), var(--card-elevation-hover, var(--elevation-tier-2));
 }
 
@@ -165,14 +182,14 @@
 .card-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.3rem;
   border-radius: 9999px;
-  padding: 0.35rem 0.85rem;
-  font-size: 0.625rem;
-  line-height: 1;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.75rem;
+  line-height: 1.2;
   font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-transform: none;
   background: var(--card-pill-bg, var(--card-tag-bg));
   border: 1px solid var(--card-pill-border, var(--card-tag-border));
   color: var(--card-pill-text, var(--card-tag-text));
@@ -183,12 +200,17 @@
   --card-pill-bg: var(--card-badge-bg);
   --card-pill-border: var(--card-badge-border);
   --card-pill-text: var(--card-badge-text);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.6875rem;
 }
 
 .card-tag {
   --card-pill-bg: var(--card-tag-bg);
   --card-pill-border: var(--card-tag-border);
   --card-pill-text: var(--card-tag-text);
+  letter-spacing: 0.06em;
+  text-transform: none;
 }
 
 .card-spoon {

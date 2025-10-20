@@ -6,23 +6,84 @@ const {
   primaryHref = '/posts/cozy-cursing-ritual',
   primaryLabel = 'Read the latest guide →',
   secondaryHref = '/tools',
-  secondaryLabel = 'Explore printable tools'
+  secondaryLabel = 'Explore printable tools',
+  actionNote = 'Choose the featured ritual or explore printable tools to keep your practice grounded.',
+  heroImageSrc = '',
+  heroImageSrcset = '',
+  heroImageSizes = '',
+  heroImageAlt = ''
 } = Astro.props;
+
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '') || 'hero';
+
+const noteText = typeof actionNote === 'string' ? actionNote.trim() : '';
+const ctaDescriptionId = noteText ? `hero-cta-note-${slugify(title)}` : undefined;
+
+const heroSrc = typeof heroImageSrc === 'string' ? heroImageSrc.trim() : '';
+const hasHeroImage = heroSrc.length > 0;
+const heroAlt = hasHeroImage
+  ? (typeof heroImageAlt === 'string' && heroImageAlt.trim().length ? heroImageAlt.trim() : title)
+  : '';
+const providedSrcset = typeof heroImageSrcset === 'string' ? heroImageSrcset.trim() : '';
+const autoSrcset = hasHeroImage
+  ? [480, 768, 1080]
+      .map((width) => `${heroSrc}${heroSrc.includes('?') ? '&' : '?'}w=${width} ${width}w`)
+      .join(', ')
+  : '';
+const resolvedSrcset = providedSrcset || autoSrcset;
+const resolvedSizes =
+  typeof heroImageSizes === 'string' && heroImageSizes.trim().length
+    ? heroImageSizes.trim()
+    : '(max-width: 768px) 88vw, (max-width: 1200px) 360px, 420px';
 ---
 <section role="banner" class="home-hero" aria-labelledby="home-hero-title">
   <div class="home-hero__backdrop" aria-hidden="true"></div>
   <div class="wc-container home-hero__inner">
-    <p class="home-hero__eyebrow">{kicker}</p>
-    <h1 id="home-hero-title" class="home-hero__title">{title}</h1>
-    <p class="home-hero__blurb">{blurb}</p>
-    <div class="home-hero__actions">
-      <a class="hero-cta hero-cta--primary" href={primaryHref} data-analytics="hero_primary">
-        {primaryLabel}
-      </a>
-      <a class="hero-cta hero-cta--secondary" href={secondaryHref} data-analytics="hero_secondary">
-        {secondaryLabel}
-      </a>
+    <div class="home-hero__copy">
+      <p class="home-hero__eyebrow">{kicker}</p>
+      <h1 id="home-hero-title" class="home-hero__title">{title}</h1>
+      <p class="home-hero__blurb">{blurb}</p>
+      <div class="home-hero__actions">
+        <a
+          class="hero-cta hero-cta--primary"
+          href={primaryHref}
+          data-analytics="hero_primary"
+          aria-describedby={ctaDescriptionId}
+        >
+          {primaryLabel}
+        </a>
+        <a
+          class="hero-cta hero-cta--secondary"
+          href={secondaryHref}
+          data-analytics="hero_secondary"
+          aria-describedby={ctaDescriptionId}
+        >
+          {secondaryLabel}
+        </a>
+      </div>
+      {noteText && (
+        <p id={ctaDescriptionId} class="home-hero__note">
+          {noteText}
+        </p>
+      )}
     </div>
+    {hasHeroImage && (
+      <figure class="home-hero__media" aria-hidden={heroAlt ? undefined : 'true'}>
+        <img
+          class="home-hero__image"
+          src={heroSrc}
+          alt={heroAlt}
+          loading="lazy"
+          decoding="async"
+          srcset={resolvedSrcset || undefined}
+          sizes={resolvedSrcset ? resolvedSizes : undefined}
+        />
+      </figure>
+    )}
   </div>
 </section>
 
@@ -61,8 +122,15 @@ const {
     position: relative;
     z-index: 1;
     display: grid;
-    gap: clamp(1.2rem, 4vw, 2rem);
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(1.4rem, 4vw, 2.5rem);
     max-width: 72rem;
+  }
+
+  .home-hero__copy {
+    display: grid;
+    gap: clamp(1.2rem, 3vw, 2rem);
   }
 
   .home-hero__eyebrow {
@@ -94,7 +162,30 @@ const {
   .home-hero__actions {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-3, 0.75rem);
+    gap: clamp(0.75rem, 2vw, 1.25rem);
+  }
+
+  .home-hero__note {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-tertiary, rgba(244, 241, 255, 0.75));
+    max-width: 52ch;
+  }
+
+  .home-hero__media {
+    display: flex;
+    justify-content: center;
+  }
+
+  .home-hero__image {
+    width: min(100%, 21rem);
+    border-radius: 1.5rem;
+    border: 1px solid color-mix(in srgb, var(--color-border, rgba(212, 175, 55, 0.35)) 70%, transparent 30%);
+    background: color-mix(in srgb, var(--color-overlay, rgba(18, 7, 37, 0.45)) 55%, transparent 45%);
+    box-shadow: var(--shadow-soft, 0 18px 45px -28px rgba(11, 6, 20, 0.55));
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
   }
 
   .hero-cta {
@@ -113,6 +204,44 @@ const {
     }
   }
 
+  @media (max-width: 720px) {
+    .home-hero__media {
+      margin-inline: auto;
+      max-width: min(85vw, 20rem);
+    }
+
+    .home-hero__note {
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .home-hero__image {
+      width: min(100%, 18rem);
+    }
+  }
+
+  @media (max-width: 400px) {
+    .home-hero {
+      padding-block: 2.25rem;
+    }
+
+    .home-hero__actions {
+      gap: var(--space-2, 0.5rem);
+    }
+  }
+
+  @media (min-width: 960px) {
+    .home-hero__inner {
+      grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
+      gap: clamp(2rem, 5vw, 3.5rem);
+    }
+
+    .home-hero__media {
+      justify-content: flex-end;
+    }
+  }
+
   /* Dawn theme overrides */
   :root[data-comfort-theme="dawn"] .home-hero__backdrop {
     background:
@@ -125,6 +254,11 @@ const {
     background: radial-gradient(circle at 50% 0%, rgba(155, 134, 200, 0.25), transparent 70%);
   }
 
+  :root[data-comfort-theme="dawn"] .home-hero__image {
+    border-color: color-mix(in srgb, var(--color-border, rgba(122, 94, 154, 0.35)) 75%, transparent 25%);
+    background: color-mix(in srgb, var(--color-overlay, rgba(242, 236, 229, 0.48)) 60%, transparent 40%);
+  }
+
   :root[data-comfort-theme="dawn"] .home-hero__eyebrow {
     color: rgba(44, 27, 61, 0.75);
   }
@@ -135,5 +269,9 @@ const {
 
   :root[data-comfort-theme="dawn"] .home-hero__blurb {
     color: rgba(44, 27, 61, 0.78);
+  }
+
+  :root[data-comfort-theme="dawn"] .home-hero__note {
+    color: rgba(44, 27, 61, 0.7);
   }
 </style>
