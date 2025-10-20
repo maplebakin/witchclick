@@ -32,6 +32,19 @@ const defaultDawn = {
   fontSerif: "Literata",
   fontScript: "Parisienne",
 };
+
+const fontOptions = [
+  "Literata",
+  "Litera",
+  "EB Garamond",
+  "Playfair Display",
+  "Fraunces",
+  "Cormorant Garamond",
+  "Parisienne",
+  "Dancing Script",
+  "Great Vibes",
+  "Sacramento",
+];
 ---
 <Base
   title="WitchClick — Theme Dashboard"
@@ -54,6 +67,7 @@ const defaultDawn = {
         data-dev-api={DEV_API}
         data-default-midnight={JSON.stringify(defaultMidnight)}
         data-default-dawn={JSON.stringify(defaultDawn)}
+        data-font-options={JSON.stringify(fontOptions)}
       >
       <section class="lg:col-span-4 space-y-6 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
         <header>
@@ -179,19 +193,29 @@ const defaultDawn = {
         <div class="grid gap-3 md:grid-cols-2">
           <label class="block text-sm">
             <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Serif body font</span>
-            <input
+            <select
               id="themeFontSerif"
               class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2"
-              placeholder="Literata"
-            />
+            >
+              {fontOptions.map((font) => (
+                <option value={font} selected={font === defaultMidnight.fontSerif}>
+                  {font}
+                </option>
+              ))}
+            </select>
           </label>
           <label class="block text-sm">
             <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Script accent font</span>
-            <input
+            <select
               id="themeFontScript"
               class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2"
-              placeholder="Parisienne"
-            />
+            >
+              {fontOptions.map((font) => (
+                <option value={font} selected={font === defaultMidnight.fontScript}>
+                  {font}
+                </option>
+              ))}
+            </select>
           </label>
         </div>
 
@@ -328,9 +352,10 @@ const defaultDawn = {
           const modeSelect = root.querySelector('#themeMode');
           const labelInput = root.querySelector('#themeLabel');
           const slugInput = root.querySelector('#themeSlug');
-          const fontSerifInput = root.querySelector('#themeFontSerif');
-          const fontScriptInput = root.querySelector('#themeFontScript');
+          const fontSerifSelect = root.querySelector('#themeFontSerif');
+          const fontScriptSelect = root.querySelector('#themeFontScript');
           const statusEl = root.querySelector('[data-status]');
+          const fontChoices = parseFontOptions(root.getAttribute('data-font-options'));
 
           const colorFields = ['primary','accent','background'].reduce((acc, key) => {
             acc[key] = {
@@ -372,6 +397,54 @@ const defaultDawn = {
               }
             } catch {}
             return { ...fallback };
+          }
+
+          function parseFontOptions(raw){
+            try {
+              const parsed = JSON.parse(raw || '[]');
+              if (Array.isArray(parsed)) {
+                const values = parsed
+                  .map((item) => (typeof item === 'string' ? item.trim() : ''))
+                  .filter(Boolean);
+                return Array.from(new Set(values));
+              }
+            } catch {}
+            return [];
+          }
+
+          function ensureFontOption(select, value){
+            if (!select) return;
+            const trimmed = typeof value === 'string' ? value.trim() : '';
+            if (!trimmed) return;
+            const options = Array.from(select.options || []);
+            if (!options.some((option) => option.value === trimmed)) {
+              const option = document.createElement('option');
+              option.value = trimmed;
+              option.textContent = trimmed;
+              select.appendChild(option);
+            }
+            if (!fontChoices.includes(trimmed)) {
+              fontChoices.push(trimmed);
+            }
+          }
+
+          function setFontSelectValue(select, value, fallback){
+            if (!select) return;
+            const trimmed = typeof value === 'string' ? value.trim() : '';
+            const fallbackValue = typeof fallback === 'string' ? fallback.trim() : '';
+            const toUse = trimmed || fallbackValue;
+            if (toUse) {
+              ensureFontOption(select, toUse);
+              select.value = toUse;
+            } else {
+              select.value = '';
+            }
+          }
+
+          function getFontValue(select){
+            if (!select) return '';
+            const value = typeof select.value === 'string' ? select.value.trim() : '';
+            return value;
           }
 
           function setStatus(message, tone){
@@ -460,10 +533,8 @@ const defaultDawn = {
               normalizeHex(colorFields.accent?.input?.value) || normalizeHex(defaultsForMode.accent) || '#d9b2c4';
             const background =
               normalizeHex(colorFields.background?.input?.value) || normalizeHex(defaultsForMode.background) || '#120725';
-            const fontSerif =
-              fontSerifInput && fontSerifInput.value.trim() ? fontSerifInput.value.trim() : defaultsForMode.fontSerif;
-            const fontScript =
-              fontScriptInput && fontScriptInput.value.trim() ? fontScriptInput.value.trim() : defaultsForMode.fontScript;
+            const fontSerif = getFontValue(fontSerifSelect) || defaultsForMode.fontSerif;
+            const fontScript = getFontValue(fontScriptSelect) || defaultsForMode.fontScript;
 
             const bgRgb = hexToRgb(background);
             const luminance = getLuminance(bgRgb);
@@ -557,8 +628,8 @@ const defaultDawn = {
                 primary: colorFields.primary?.input?.value.trim() || '',
                 accent: colorFields.accent?.input?.value.trim() || '',
                 background: colorFields.background?.input?.value.trim() || '',
-                fontSerif: fontSerifInput ? fontSerifInput.value.trim() : '',
-                fontScript: fontScriptInput ? fontScriptInput.value.trim() : ''
+                fontSerif: getFontValue(fontSerifSelect),
+                fontScript: getFontValue(fontScriptSelect)
               }
             };
             return payload;
@@ -567,14 +638,19 @@ const defaultDawn = {
           function populateForm(theme){
             current = theme ? { ...theme, settings: { ...theme.settings } } : null;
             const mode = theme?.mode || 'midnight';
+            const defaultsForMode = defaults[mode] || defaults.midnight;
             if (modeSelect) modeSelect.value = mode;
             if (labelInput) labelInput.value = theme?.label || '';
             if (slugInput) slugInput.value = theme?.slug || '';
-            if (fontSerifInput) fontSerifInput.value = theme?.settings?.fontSerif || defaults[mode].fontSerif;
-            if (fontScriptInput) fontScriptInput.value = theme?.settings?.fontScript || defaults[mode].fontScript;
-            setColorField('primary', theme?.settings?.primary ?? defaults[mode].primary);
-            setColorField('accent', theme?.settings?.accent ?? defaults[mode].accent);
-            setColorField('background', theme?.settings?.background ?? defaults[mode].background);
+            if (fontSerifSelect) {
+              setFontSelectValue(fontSerifSelect, theme?.settings?.fontSerif, defaultsForMode.fontSerif);
+            }
+            if (fontScriptSelect) {
+              setFontSelectValue(fontScriptSelect, theme?.settings?.fontScript, defaultsForMode.fontScript);
+            }
+            setColorField('primary', theme?.settings?.primary ?? defaultsForMode.primary);
+            setColorField('accent', theme?.settings?.accent ?? defaultsForMode.accent);
+            setColorField('background', theme?.settings?.background ?? defaultsForMode.background);
             updateSetActiveLabel();
             refreshPreview();
           }
@@ -878,11 +954,11 @@ const defaultDawn = {
             }
           });
 
-          if (fontSerifInput) {
-            fontSerifInput.addEventListener('input', () => refreshPreview());
+          if (fontSerifSelect) {
+            fontSerifSelect.addEventListener('change', () => refreshPreview());
           }
-          if (fontScriptInput) {
-            fontScriptInput.addEventListener('input', () => refreshPreview());
+          if (fontScriptSelect) {
+            fontScriptSelect.addEventListener('change', () => refreshPreview());
           }
 
           if (saveBtn) saveBtn.addEventListener('click', saveTheme);
