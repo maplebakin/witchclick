@@ -24,8 +24,15 @@ const TestimonialSchema = z.object({
   role: z.string().optional(),
 });
 
+const TestimonialSectionSchema = z.object({
+  eyebrow: z.string().optional(),
+  title: z.string().optional(),
+  description: z.string().optional(),
+});
+
 const HomeBlocksSchema = z.object({
   cta: EvergreenCtaSchema.optional(),
+  testimonialSection: TestimonialSectionSchema.optional(),
   testimonials: z.array(TestimonialSchema).default([]),
 });
 
@@ -42,7 +49,7 @@ export function readEvergreenBlocks(filePath = path.join(process.cwd(), "content
     }
 
     if (!stat) {
-      cachedBlocks = { testimonials: [] };
+      cachedBlocks = { testimonials: [], testimonialSection: undefined };
       cachedMtimeMs = 0;
       return cachedBlocks;
     }
@@ -62,7 +69,7 @@ export function readEvergreenBlocks(filePath = path.join(process.cwd(), "content
     }
     cachedBlocks = null;
     cachedMtimeMs = 0;
-    return { testimonials: [] };
+    return { testimonials: [], testimonialSection: undefined };
   }
 }
 

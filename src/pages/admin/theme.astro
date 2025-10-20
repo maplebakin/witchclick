@@ -1,13 +1,13 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { readSettings, getSiteOrigin } from "../../utils/settings";
+import { readSettings, buildCanonicalUrl } from "../../utils/settings";
 import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
 
 export const prerender = false;
 
 const settings = readSettings();
-const site = getSiteOrigin(settings) || "https://example.com";
+const canonical = buildCanonicalUrl(settings, { path: "/admin/theme" });
 
 const isDev = import.meta.env.DEV;
 const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
@@ -49,7 +49,7 @@ const fontOptions = [
 <Base
   title="WitchClick — Theme Dashboard"
   description="Craft, save, and activate WitchClick theme palettes."
-  canon={`${site}/admin/theme`}
+  canon={canonical}
   wide={true}
   noindex={true}
 >

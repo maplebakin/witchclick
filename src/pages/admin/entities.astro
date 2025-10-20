@@ -1,7 +1,7 @@
 ---
 /* Admin: Entities CRUD */
 import Base from "../../layouts/Base.astro";
-import { readSettings, getSiteOrigin } from "../../utils/settings";
+import { readSettings, buildCanonicalUrl } from "../../utils/settings";
 import adminEntitiesScript from "../../scripts/adminEntities.ts?url";
 import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
@@ -9,7 +9,7 @@ import AdminNav from "@/components/AdminNav.astro";
 export const prerender = false; // never emit in static builds
 
 const settings = readSettings();
-const site = getSiteOrigin(settings) || "https://example.com";
+const canonical = buildCanonicalUrl(settings, { path: "/admin/entities" });
 
 const isDev = import.meta.env.DEV;
 const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
@@ -23,7 +23,7 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as 
 <Base
   title="WitchClick — Entities Admin"
   description="Create and edit entity JSON files."
-  canon={`${site}/admin/entities`}
+  canon={canonical}
   wide={true}
   noindex={true}
 >

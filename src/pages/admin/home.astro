@@ -1,13 +1,13 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { readSettings, getSiteOrigin } from "../../utils/settings";
+import { readSettings, buildCanonicalUrl } from "../../utils/settings";
 import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
 
 export const prerender = false;
 
 const settings = readSettings();
-const site = getSiteOrigin(settings) || "https://example.com";
+const canonical = buildCanonicalUrl(settings, { path: "/admin/home" });
 
 const isDev = import.meta.env.DEV;
 const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
@@ -20,7 +20,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 <Base
   title="WitchClick — Home Page Dashboard"
   description="Manage homepage content including CTA and testimonials."
-  canon={`${site}/admin/home`}
+  canon={canonical}
   wide={true}
   noindex={true}
 >
@@ -97,6 +97,20 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               Add Testimonial
             </button>
           </div>
+          <div class="mb-4 grid gap-3 md:grid-cols-2">
+            <label class="block">
+              <span class="text-xs font-medium text-body">Eyebrow</span>
+              <input type="text" name="testimonialEyebrow" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-1.5 text-xs" />
+            </label>
+            <label class="block">
+              <span class="text-xs font-medium text-body">Headline</span>
+              <input type="text" name="testimonialTitle" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-1.5 text-xs" />
+            </label>
+          </div>
+          <label class="mb-4 block">
+            <span class="text-xs font-medium text-body">Description</span>
+            <textarea name="testimonialDescription" rows="2" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-1.5 text-xs"></textarea>
+          </label>
           <div id="testimonialsList" class="space-y-3"></div>
         </section>
       </div>
@@ -131,7 +145,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         const saveBtn = root.querySelector('#saveBtn');
         const resetBtn = root.querySelector('#resetBtn');
         const addTestimonialBtn = root.querySelector('#addTestimonialBtn');
-        let data = { cta: {}, testimonials: [] };
+        const testimonialEyebrowInput = root.querySelector('[name="testimonialEyebrow"]');
+        const testimonialTitleInput = root.querySelector('[name="testimonialTitle"]');
+        const testimonialDescriptionInput = root.querySelector('[name="testimonialDescription"]');
+        let data = { cta: {}, testimonialSection: {}, testimonials: [] };
 
         function setStatus(msg, tone) {
           if (!statusEl) return;
@@ -182,6 +199,23 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               emailFieldName: form.emailFieldName || 'email'
             }
           };
+        }
+
+        function populateTestimonialSection(section) {
+          if (testimonialEyebrowInput) testimonialEyebrowInput.value = section?.eyebrow || '';
+          if (testimonialTitleInput) testimonialTitleInput.value = section?.title || '';
+          if (testimonialDescriptionInput) testimonialDescriptionInput.value = section?.description || '';
+        }
+
+        function collectTestimonialSection() {
+          const eyebrow = testimonialEyebrowInput ? testimonialEyebrowInput.value.trim() : '';
+          const title = testimonialTitleInput ? testimonialTitleInput.value.trim() : '';
+          const description = testimonialDescriptionInput ? testimonialDescriptionInput.value.trim() : '';
+          const section = {};
+          if (eyebrow) section.eyebrow = eyebrow;
+          if (title) section.title = title;
+          if (description) section.description = description;
+          return section;
         }
 
         function renderTestimonials() {
@@ -244,8 +278,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             const res = await fetch(devApi + '/home/get', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
             const json = await res.json();
             if (!json?.ok) throw new Error(json?.error || 'Failed to load');
-            data = json.data || { cta: {}, testimonials: [] };
+            data = json.data || { cta: {}, testimonialSection: {}, testimonials: [] };
+            if (!Array.isArray(data.testimonials)) data.testimonials = [];
+            if (!data.testimonialSection) data.testimonialSection = {};
             populateCTA(data.cta);
+            populateTestimonialSection(data.testimonialSection);
             renderTestimonials();
             setStatus('Loaded.', 'success');
             setTimeout(() => setStatus(''), 2000);
@@ -258,6 +295,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           try {
             setStatus('Saving…');
             data.cta = collectCTA();
+            data.testimonialSection = collectTestimonialSection();
             const res = await fetch(devApi + '/home/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
             const json = await res.json();
             if (!json?.ok) throw new Error(json?.error || 'Failed to save');

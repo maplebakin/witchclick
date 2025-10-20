@@ -21,7 +21,7 @@ import createDOMPurify from "dompurify";
 import { JSDOM } from "jsdom";
 
 import { autoLinkAffiliates } from "../../../tools/src/auto-affiliate";
-import { readSettings, getSiteOrigin, toAbsoluteUrl } from "../../utils/settings";
+import { readSettings, getSiteOrigin, buildCanonicalUrl, toAbsoluteUrl } from "../../utils/settings";
 import { normalizeSpoonLevel } from "../../utils/augment";
 import {
   loadAllPosts,
@@ -63,14 +63,14 @@ const {
 
 const settings = readSettings();
 const showEndAd = Boolean(settings.ads?.provider);
-const siteOrigin = getSiteOrigin(settings) || "https://example.com";
+const siteOrigin = getSiteOrigin(settings);
 const title = data.title ?? "Untitled";
 const description =
   data.metaDescription ?? data.description ?? data.excerpt ?? firstParagraph(content);
 
 const publishedAt = data.publishedAt ?? data.pubDate ?? data.date ?? undefined;
 const modifiedAt = data.updatedAt ?? publishedAt ?? undefined;
-const canonical = `${siteOrigin}/post/${effectiveSlug}`;
+const canonical = buildCanonicalUrl(settings, { path: `/post/${effectiveSlug}` });
 
 const breadcrumbs = [
   { label: "Home", href: "/" },

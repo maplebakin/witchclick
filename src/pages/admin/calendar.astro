@@ -1,13 +1,13 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { readSettings, getSiteOrigin } from "../../utils/settings";
+import { readSettings, buildCanonicalUrl } from "../../utils/settings";
 import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
 
 export const prerender = false;
 
 const settings = readSettings();
-const site = getSiteOrigin(settings) || "https://example.com";
+const canonical = buildCanonicalUrl(settings, { path: "/admin/calendar" });
 
 const isDev = import.meta.env.DEV;
 const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
@@ -20,7 +20,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 <Base
   title="WitchClick — Editorial Calendar"
   description="Manage seasonal editorial calendar and content planning."
-  canon={`${site}/admin/calendar`}
+  canon={canonical}
   wide={true}
   noindex={true}
 >

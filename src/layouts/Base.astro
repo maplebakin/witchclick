@@ -13,7 +13,7 @@ import {
   footerUtilityLinks,
   adminNavSections,
 } from "@/data/navigation";
-import { readSettings, getSiteOrigin, toAbsoluteUrl } from "@/utils/settings";
+import { readSettings, buildCanonicalUrl, toAbsoluteUrl } from "@/utils/settings";
 import { buildAnalyticsInjection } from "@/utils/analytics";
 import { getActiveThemes } from "@/utils/theme";
 
@@ -42,13 +42,11 @@ const {
 } = Astro.props as LayoutProps;
 
 const settings = readSettings();
-const siteOrigin = getSiteOrigin(settings);
 const analytics = buildAnalyticsInjection(settings);
 const brandName = settings.brandName ?? "WitchClick";
 const disclosure = settings.disclosure ?? "";
 const ogUrl = ogImage ? toAbsoluteUrl(ogImage, settings) : "";
-const currentPath = Astro.url?.pathname ?? "/";
-const canonicalUrl = canon || (siteOrigin ? `${siteOrigin}${currentPath}` : "");
+const canonicalUrl = buildCanonicalUrl(settings, { canonical: canon, astroUrl: Astro.url ?? null });
 
 const { midnight: midnightTheme, dawn: dawnTheme } = getActiveThemes();
 

@@ -2,6 +2,12 @@
 import Base from "../../layouts/Base.astro";
 import fs from "node:fs";
 import path from "node:path";
+import HeadSlot from "@/components/HeadSlot.astro";
+import EvergreenCta from "@/components/blocks/EvergreenCta.astro";
+import Testimonials from "@/components/blocks/Testimonials.astro";
+import { readSettings } from "../../utils/settings";
+import { createCollectionPageSchema } from "../../utils/structuredData";
+import { readEvergreenBlocks } from "../../utils/blocks";
 import { collectUnique, loadRitualLabEntries } from "../../utils/ritualLab";
 
 const title = "Ritual Lab";
@@ -19,6 +25,12 @@ const timeOptions = [
 
 const defaultIntent = intents[0] ?? "reset";
 const defaultTime = timeOptions[0]?.value ?? 15;
+
+const settings = readSettings();
+const evergreenBlocks = readEvergreenBlocks();
+const evergreenCta = evergreenBlocks.cta ?? null;
+const testimonialSection = evergreenBlocks.testimonialSection ?? null;
+const testimonials = evergreenBlocks.testimonials ?? [];
 
 const downloadsDirectory = "./content/downloads";
 const downloadFiles = fs.existsSync(downloadsDirectory)
@@ -60,6 +72,30 @@ const downloads = (downloadFiles as {
   return !target.startsWith("/home/");
 });
 
+const downloadCollectionSchema =
+  downloads.length > 0
+    ? createCollectionPageSchema(
+        settings,
+        {
+          name: "Ritual Lab Printables",
+          url: "/lab/#downloads",
+          description:
+            "Download ready-to-print planners or open them in your browser, then export to PDF for gentle ritual support.",
+          itemType: "DigitalDocument",
+        },
+        downloads.map((item) => {
+          const fileTarget = typeof item.file === "string" ? item.file.trim() : "";
+          const urlTarget = typeof item.url === "string" ? item.url.trim() : "";
+          const href = fileTarget || urlTarget || "#";
+          return {
+            name: item.name ?? "Ritual Lab download",
+            url: href,
+            description: item.summary,
+          };
+        }),
+      )
+    : null;
+
 const automationIdeas = [
   "Save your chosen ritual to a shared calendar using the reminder download.",
   "Schedule a weekly email to yourself with Buttondown's digest feature and paste the ritual steps there.",
@@ -86,6 +122,11 @@ const ritualData = entries.map((entry) => ({
 }));
 ---
 <Base {title} {description}>
+  {downloadCollectionSchema && (
+    <HeadSlot slot="head">
+      <script type="application/ld+json" set:html={JSON.stringify(downloadCollectionSchema)} />
+    </HeadSlot>
+  )}
   <section class="mx-auto max-w-6xl space-y-6 py-12">
     <header class="space-y-3 text-center">
       <p class="text-sm uppercase tracking-widest text-accent">Phase 2 Lab</p>
@@ -253,6 +294,27 @@ const ritualData = entries.map((entry) => ({
       )}
     </div>
   </section>
+
+  {evergreenCta && (
+    <div class="lab-evergreen">
+      <EvergreenCta {...evergreenCta} />
+    </div>
+  )}
+
+  {testimonials.length > 0 && (
+    <section class="lab-testimonials" aria-labelledby="lab-testimonials-heading">
+      <div class="lab-testimonials__header">
+        {testimonialSection?.eyebrow && <p class="lab-testimonials__eyebrow">{testimonialSection.eyebrow}</p>}
+        <h2 id="lab-testimonials-heading" class="lab-testimonials__title">
+          {testimonialSection?.title ?? "Community notes"}
+        </h2>
+        {testimonialSection?.description && (
+          <p class="lab-testimonials__description">{testimonialSection.description}</p>
+        )}
+      </div>
+      <Testimonials testimonials={testimonials} />
+    </section>
+  )}
 
   <section class="mx-auto max-w-6xl space-y-4 py-12">
     <h2 class="font-serif text-3xl">Reminders</h2>
@@ -425,7 +487,55 @@ const ritualData = entries.map((entry) => ({
         output.appendChild(empty);
       } else {
         update();
-      }
-    }
-  </script>
+  }
+}
+</script>
+
+<style>
+  .lab-evergreen {
+    margin: clamp(2.5rem, 6vw, 3.5rem) auto;
+    max-width: min(48rem, 90vw);
+  }
+
+  .lab-testimonials {
+    margin: clamp(3rem, 7vw, 4.5rem) auto;
+    max-width: min(72rem, 94vw);
+    display: grid;
+    gap: clamp(1.6rem, 4vw, 2.6rem);
+  }
+
+  .lab-testimonials__header {
+    display: grid;
+    gap: 0.75rem;
+    text-align: center;
+  }
+
+  .lab-testimonials__eyebrow {
+    margin: 0;
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(124, 58, 237, 0.7);
+  }
+
+  .lab-testimonials__title {
+    margin: 0;
+    font-family: var(--font-heading, var(--font-body, inherit));
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .lab-testimonials__description {
+    margin: 0 auto;
+    max-width: 48rem;
+    font-size: 1rem;
+    line-height: 1.7;
+    opacity: 0.85;
+  }
+
+  .lab-testimonials :global(.testimonials) {
+    margin: 0;
+  }
+</style>
 </Base>
