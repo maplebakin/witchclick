@@ -30,7 +30,7 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 
-import generatorPresets from './server/lib/generatorPresets.js';
+import generatorPresets, { resolveGeneratorPresetKey } from './server/lib/generatorPresets.js';
 import generatorStyles from './server/lib/generatorStyles.js';
 import { STRICT_JSON_RULES } from './server/lib/strictJsonRules.js';
 import { buildMasterPrompt } from './server/lib/promptBuilder.js';
@@ -1145,15 +1145,15 @@ const server = http.createServer(async (req, res) => {
       const ads = String(body.ads || 'off') === 'on' ? 'on' : 'off';
       const kofi = String(body.kofi || 'on') === 'on' ? 'on' : 'off';
       const rawMode = typeof body.mode === 'string' ? body.mode.trim() : '';
-      const modeKey = rawMode.toLowerCase();
+      const resolvedModeKey = resolveGeneratorPresetKey(rawMode) ?? '';
       const rawStyle = typeof body.style === 'string' ? body.style.trim() : '';
       const styleKey = rawStyle.toLowerCase();
       const styleDirective = generatorStyles[styleKey] || generatorStyles.cozy;
       const resolvedStyleKey = generatorStyles[styleKey] ? styleKey : 'cozy';
       const strict = body.strict === true || body.strict === 'true';
-      const preset = modeKey ? generatorPresets[modeKey] : undefined;
+      const preset = resolvedModeKey ? generatorPresets[resolvedModeKey] : undefined;
       const prompt = preset
-        ? buildPresetPrompt({ preset, topic, strict, styleDirective, contentType: modeKey })
+        ? buildPresetPrompt({ preset, topic, strict, styleDirective, contentType: resolvedModeKey })
         : buildGenprompt({ topic, words, ads, kofi });
 
       // loud guard so stale prompts never slip through
@@ -1163,7 +1163,7 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, {
         ok: true,
         prompt,
-        options: { topic, mode: rawMode || null, style: resolvedStyleKey, strict, contentType: modeKey || null }
+        options: { topic, mode: rawMode || null, style: resolvedStyleKey, strict, contentType: resolvedModeKey || null }
       });
     }
 
@@ -1988,6 +1988,7 @@ const adminPipelineHelpers = {
   generateMetaDescription,
   normalizeTags,
   buildGenprompt,
+  buildPresetPrompt,
   prepareSpecForPersistence,
   persistPreparedSpec,
 };
@@ -2000,6 +2001,7 @@ export {
   generateMetaDescription,
   normalizeTags,
   buildGenprompt,
+  buildPresetPrompt,
   prepareSpecForPersistence,
   persistPreparedSpec,
   adminPipelineHelpers,

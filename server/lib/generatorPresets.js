@@ -212,4 +212,21 @@ export const generatorPresetOptions = DEFINITIONS.map(({ key, label, goal }) => 
   description: goal
 }));
 
+export function resolveGeneratorPresetKey(value) {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  if (presets[trimmed]) return trimmed;
+  const lower = trimmed.toLowerCase();
+  for (const key of Object.keys(presets)) {
+    if (key.toLowerCase() === lower) return key;
+  }
+  return null;
+}
+
+export function getGeneratorPreset(value) {
+  const key = resolveGeneratorPresetKey(value);
+  return key ? presets[key] : undefined;
+}
+
 export default presets;
