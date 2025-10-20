@@ -14,6 +14,25 @@ describe("validateSettings", () => {
     expect(result.analytics?.siteId).toBe("ABC123");
   });
 
+  it("supports umami analytics configuration", () => {
+    const result = validateSettings({
+      siteUrl: "https://example.org",
+      analytics: {
+        enabled: true,
+        provider: "umami",
+        siteId: "site-123",
+        scriptUrl: "https://analytics.example.org/script.js",
+        outboundTracking: true,
+        outboundEventName: "outbound_link",
+      },
+    });
+
+    expect(result.analytics?.provider).toBe("umami");
+    expect(result.analytics?.siteId).toBe("site-123");
+    expect(result.analytics?.outboundTracking).toBe(true);
+    expect(result.analytics?.outboundEventName).toBe("outbound_link");
+  });
+
   it("throws when provider is enabled without required fields", () => {
     expect(() =>
       validateSettings({

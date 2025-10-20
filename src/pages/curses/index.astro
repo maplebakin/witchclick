@@ -2,13 +2,13 @@
 import Base from "../../layouts/Base.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import PrimaryButton from "../../components/buttons/PrimaryButton.astro";
-import { readSettings, getSiteOrigin } from "../../utils/settings";
+import { readSettings, buildCanonicalUrl } from "../../utils/settings";
 import { loadAllCurses } from "../../utils/curses";
 import SpoonsBadge from "../../components/SpoonsBadge.astro";
 import { normalizeSpoonLevel, summarizeMarkdown } from "../../utils/augment";
 
 const settings = readSettings();
-const site = getSiteOrigin(settings) || "https://example.com";
+const canonical = buildCanonicalUrl(settings, { path: "/curses" });
 const curses = loadAllCurses();
 const breadcrumbs = [
   { label: "Home", href: "/" },
@@ -19,7 +19,7 @@ const breadcrumbs = [
 <Base
   title="White Magic Curses — WitchClick"
   description="Ethical energy returns and poetic accountability rituals for boundary keepers."
-  canon={`${site}/curses`}
+  canon={canonical}
   wide={true}
 >
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />

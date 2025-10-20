@@ -21,7 +21,7 @@ describe("readEvergreenBlocks", () => {
 
   it("returns empty defaults when file is missing", () => {
     const result = readEvergreenBlocks(path.join(tempDir, "missing.json"));
-    expect(result).toEqual({ testimonials: [] });
+    expect(result).toEqual({ testimonials: [], testimonialSection: undefined });
   });
 
   it("parses CTA and testimonials from disk", () => {
@@ -33,6 +33,10 @@ describe("readEvergreenBlocks", () => {
         description: "Stay cozy",
         form: { action: "https://example.com", method: "post" },
       },
+      testimonialSection: {
+        eyebrow: "Notes",
+        title: "Warm fuzzies",
+      },
       testimonials: [
         { quote: "Cozy", author: "A" },
       ],
@@ -42,5 +46,6 @@ describe("readEvergreenBlocks", () => {
     const result = readEvergreenBlocks(filePath);
     expect(result.cta?.title).toBe("Join");
     expect(result.testimonials).toHaveLength(1);
+    expect(result.testimonialSection?.title).toBe("Warm fuzzies");
   });
 });

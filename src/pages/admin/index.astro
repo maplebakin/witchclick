@@ -1,7 +1,7 @@
 ---
 /* Admin: Prompt → JSON → Preview → Ingest */
 import Base from "../../layouts/Base.astro";
-import { readSettings, getSiteOrigin } from "../../utils/settings";
+import { readSettings, buildCanonicalUrl } from "../../utils/settings";
 import generatorStyles from "../../../server/lib/generatorStyles.js";
 import { generatorPresetOptions } from "../../../server/lib/generatorPresets.js";
 import normalizeDraftSpecScript from "../../scripts/normalizeDraftSpec.ts?url";
@@ -17,7 +17,7 @@ import {
 export const prerender = false; // never emit in static builds
 
 const settings = readSettings();
-const site = getSiteOrigin(settings) || "https://example.com";
+const canonical = buildCanonicalUrl(settings, { path: "/admin" });
 
 const toLabel = (key: string) =>
   key
@@ -65,7 +65,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 <Base
   title="WitchClick — Admin"
   description="Prompt, preview, ingest, publish."
-  canon={`${site}/admin`}
+  canon={canonical}
   wide={true}
   noindex={true}
 >

@@ -1,14 +1,14 @@
 ---
 import Base from "../layouts/Base.astro";
-import { readSettings, getSiteOrigin } from "../utils/settings";
+import { readSettings, buildCanonicalUrl } from "../utils/settings";
 
 const settings = readSettings();
-const site = getSiteOrigin(settings);
+const canonical = buildCanonicalUrl(settings, { path: "/privacy" });
 ---
 <Base
   title="Privacy Policy"
   description="How we handle your data."
-  canon={site ? `${site}/privacy` : ""}
+  canon={canonical}
 >
   <article class="prose prose-neutral max-w-none">
     <h1>Privacy Policy</h1>

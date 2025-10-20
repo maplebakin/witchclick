@@ -2,10 +2,10 @@
 import Base from "../layouts/Base.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
 import PrimaryButton from "../components/buttons/PrimaryButton.astro";
-import { readSettings, getSiteOrigin } from "../utils/settings";
+import { readSettings, buildCanonicalUrl } from "../utils/settings";
 
 const settings = readSettings();
-const site = getSiteOrigin(settings);
+const canonical = buildCanonicalUrl(settings, { path: "/about" });
 const breadcrumbs = [
   { label: "Home", href: "/" },
   { label: "About" },
@@ -14,7 +14,7 @@ const breadcrumbs = [
 <Base
   title="About"
   description="About the WitchClick project."
-  canon={site ? `${site}/about` : ""}
+  canon={canonical}
 >
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <article class="prose prose-neutral max-w-none space-y-8">

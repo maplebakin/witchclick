@@ -1,7 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
-import { readSettings, getSiteOrigin } from "../../utils/settings";
+import { readSettings, buildCanonicalUrl } from "../../utils/settings";
 import { loadAllCurses, getCurseBySlug, resetCurseCache } from "../../utils/curses";
 import HeadSlot from "@/components/HeadSlot.astro";
 import SpoonsBadge from "../../components/SpoonsBadge.astro";
@@ -27,10 +27,9 @@ if (!curse) {
 }
 
 const settings = readSettings();
-const site = getSiteOrigin(settings) || "https://example.com";
 const title = curse.title;
 const description = curse.invocation || "White magic curse to return energy with clarity.";
-const canonical = `${site}/curses/${curse.slug}`;
+const canonical = buildCanonicalUrl(settings, { path: `/curses/${curse.slug}` });
 const generator = curse.frontmatter?.generator ?? {};
 const journaling = typeof generator?.journalingFollowUp === "string" ? generator.journalingFollowUp : "";
 const altarItem = typeof generator?.altarItem === "string" ? generator.altarItem : "";

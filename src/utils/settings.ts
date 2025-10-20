@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-export type AnalyticsProvider = "plausible" | "fathom";
+export type AnalyticsProvider = "plausible" | "fathom" | "umami" | "simple-analytics";
 
 export interface AnalyticsSettings {
   enabled: boolean;
@@ -11,6 +11,8 @@ export interface AnalyticsSettings {
   scriptUrl?: string;
   apiHost?: string;
   endpoint?: string;
+  outboundTracking?: boolean;
+  outboundEventName?: string;
 }
 
 export interface AdsSettings {
@@ -128,18 +130,85 @@ export function resetSettingsCache() {
   warned = false;
 }
 
-export function getSiteOrigin(settings: SiteSettings = readSettings()): string {
-  const origin = settings.siteUrl || DEFAULT_SETTINGS.siteUrl;
-  return String(origin).replace(/\/$/, "");
+function normalizeSiteUrl(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    throw new Error("[settings] siteUrl cannot be empty");
+  }
+
+  let parsed: URL;
+  try {
+    parsed = new URL(trimmed);
+  } catch {
+    throw new Error(`[settings] siteUrl must be an absolute URL. Received: ${value}`);
+  }
+
+  parsed.hash = "";
+  parsed.search = "";
+  const path = parsed.pathname === "/" ? "" : parsed.pathname.replace(/\/$/, "");
+  return `${parsed.origin}${path}`;
+}
+
+function ensureAbsoluteUrl(
+  value: string,
+  base: string,
+  options: { stripHash?: boolean } = {},
+): string {
+  const { stripHash = false } = options;
+  const fallbackBase = base || "http://localhost";
+  try {
+    const resolved = new URL(value, fallbackBase);
+    if (stripHash) {
+      resolved.hash = "";
+    }
+    return resolved.toString();
+  } catch {
+    return value;
+  }
+}
+
+export function getSiteOrigin(
+  settings: SiteSettings = readSettings(),
+  options: { strict?: boolean } = {},
+): string {
+  const { strict = true } = options;
+  const raw = typeof settings.siteUrl === "string" ? settings.siteUrl.trim() : "";
+  if (!raw) {
+    if (strict) {
+      throw new Error("[settings] siteUrl is required in content/settings.json");
+    }
+    return "";
+  }
+
+  try {
+    return normalizeSiteUrl(raw);
+  } catch (error) {
+    if (strict) {
+      throw error instanceof Error ? error : new Error(String(error));
+    }
+    return "";
+  }
+}
+
+export function buildCanonicalUrl(
+  settings: SiteSettings = readSettings(),
+  options: { canonical?: string; path?: string; astroUrl?: URL | null } = {},
+): string {
+  const base = getSiteOrigin(settings);
+  const candidate = options.canonical ?? options.path ?? "";
+
+  if (candidate) {
+    return ensureAbsoluteUrl(candidate, base, { stripHash: true });
+  }
+
+  const pathname = options.astroUrl?.pathname ?? "/";
+  return ensureAbsoluteUrl(pathname, base, { stripHash: true });
 }
 
 export function toAbsoluteUrl(url: string, settings: SiteSettings = readSettings()): string {
   if (!url) return url;
-  try {
-    return new URL(url, getSiteOrigin(settings) || "http://localhost").toString();
-  } catch {
-    return url;
-  }
+  const base = getSiteOrigin(settings);
+  return ensureAbsoluteUrl(url, base);
 }
 
 function sanitizeSettings(input: unknown): Partial<SiteSettings> {
@@ -301,10 +370,10 @@ function sanitizeAnalytics(value: unknown, errors: string[]): AnalyticsSettings 
   if ("provider" in data) {
     const provider = expectString(data.provider, "analytics.provider", errors);
     if (provider) {
-      if (provider !== "plausible" && provider !== "fathom") {
-        errors.push("analytics.provider must be either 'plausible' or 'fathom'");
+      if (provider !== "plausible" && provider !== "fathom" && provider !== "umami" && provider !== "simple-analytics") {
+        errors.push("analytics.provider must be 'plausible', 'fathom', 'umami', or 'simple-analytics'");
       } else {
-        analytics.provider = provider;
+        analytics.provider = provider as AnalyticsProvider;
       }
     }
   }
@@ -346,6 +415,20 @@ function sanitizeAnalytics(value: unknown, errors: string[]): AnalyticsSettings 
     if (endpoint) analytics.endpoint = endpoint;
   }
 
+  if ("outboundTracking" in data) {
+    const raw = data.outboundTracking;
+    if (typeof raw === "boolean") {
+      analytics.outboundTracking = raw;
+    } else {
+      errors.push("analytics.outboundTracking must be a boolean");
+    }
+  }
+
+  if ("outboundEventName" in data) {
+    const eventName = expectString(data.outboundEventName, "analytics.outboundEventName", errors, { allowEmpty: false });
+    if (eventName) analytics.outboundEventName = eventName;
+  }
+
   if (analytics.enabled) {
     const provider = analytics.provider ?? "plausible";
     if (provider === "plausible" && !analytics.domain) {
@@ -353,6 +436,9 @@ function sanitizeAnalytics(value: unknown, errors: string[]): AnalyticsSettings 
     }
     if (provider === "fathom" && !analytics.siteId) {
       errors.push("analytics.siteId is required when analytics.provider is 'fathom'");
+    }
+    if (provider === "umami" && !analytics.siteId) {
+      errors.push("analytics.siteId is required when analytics.provider is 'umami'");
     }
   }
 

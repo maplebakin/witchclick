@@ -1,14 +1,14 @@
 ---
 import Base from "../layouts/Base.astro";
-import { readSettings, getSiteOrigin } from "../utils/settings";
+import { readSettings, buildCanonicalUrl } from "../utils/settings";
 
 const settings = readSettings();
-const site = getSiteOrigin(settings);
+const canonical = buildCanonicalUrl(settings, { path: "/contact" });
 ---
 <Base
   title="Contact"
   description="How to reach the WitchClick team."
-  canon={site ? `${site}/contact` : ""}
+  canon={canonical}
 >
   <article class="prose prose-neutral max-w-none">
     <h1>Contact</h1>

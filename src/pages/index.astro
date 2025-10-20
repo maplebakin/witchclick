@@ -2,7 +2,13 @@
 import Base from "@/layouts/Base.astro";
 import Hero from "@/components/Hero.astro";
 import PostCard from "@/components/PostCard.astro";
+import HeadSlot from "@/components/HeadSlot.astro";
+import EvergreenCta from "@/components/blocks/EvergreenCta.astro";
+import Testimonials from "@/components/blocks/Testimonials.astro";
 import { loadAllPosts, firstParagraph, estimateReadingMinutes, extractHeroImage } from "@/utils/posts";
+import { readSettings } from "@/utils/settings";
+import { createCollectionPageSchema } from "@/utils/structuredData";
+import { readEvergreenBlocks } from "@/utils/blocks";
 
 const title = "WitchClick — Cozy secular rituals & tools";
 
@@ -24,6 +30,11 @@ type CardPost = {
 };
 
 const posts = loadAllPosts();
+const settings = readSettings();
+const evergreenBlocks = readEvergreenBlocks();
+const evergreenCta = evergreenBlocks.cta ?? null;
+const testimonialSection = evergreenBlocks.testimonialSection ?? null;
+const testimonials = evergreenBlocks.testimonials ?? [];
 
 const cardPosts: CardPost[] = posts.map((post) => {
   const fm = post.data ?? {};
@@ -142,9 +153,90 @@ if (calmPosts.length < 3) {
 }
 
 const encorePosts = takePosts(cardPosts, 3);
-const hasEncore = encorePosts.length > 0;
+
+const latestSection = {
+  id: "latest-rituals",
+  eyebrow: "Latest rituals",
+  heading: "Fresh guidance from the altar",
+  description: "Recent spells and essays to help you reclaim energy, soften resistance, and make practical magic in daily life.",
+  schemaName: "Latest rituals",
+  url: "/",
+  link: { href: "/page/1", label: "Browse the ritual archive ↗" },
+  posts: latestRituals,
+};
+
+const releaseSection = {
+  id: "release-rituals",
+  eyebrow: "Shadow work & release",
+  heading: "Rituals when you need to move heavy feelings",
+  description: "Name what hurt you, set boundaries, and send the residue back without causing harm.",
+  schemaName: "Shadow work & release rituals",
+  url: "/#release-rituals",
+  tone: true,
+  posts: releasePosts,
+};
+
+const planningSection = {
+  id: "planning-rituals",
+  eyebrow: "Planning & focus",
+  heading: "Soft structure for neurodivergent days",
+  description: "Work with your rhythms using tiny accountability rituals, tarot prompts, and gentle productivity spells.",
+  schemaName: "Planning and focus rituals",
+  url: "/#planning-rituals",
+  posts: planningPosts,
+};
+
+const calmSection = {
+  id: "calm-rituals",
+  eyebrow: "Rest & restoration",
+  heading: "Ground your nervous system with cozy care",
+  description: "Take a breath with soft resets, sensory grounding, and rituals that remind your body it's safe to unclench.",
+  schemaName: "Rest and restoration rituals",
+  url: "/#calm-rituals",
+  tone: true,
+  posts: calmPosts,
+};
+
+const encoreSection = {
+  id: "more-to-explore",
+  eyebrow: "More to explore",
+  heading: "In case you missed these spells",
+  description: "A few extra articles the coven keeps returning to when they need a gentle reset.",
+  schemaName: "More to explore",
+  url: "/#more-to-explore",
+  posts: encorePosts,
+};
+
+const hasEncore = encoreSection.posts.length > 0;
+
+const collectionSchemas = [latestSection, releaseSection, planningSection, calmSection, encoreSection]
+  .filter((section) => section.posts.length > 0)
+  .map((section) =>
+    createCollectionPageSchema(
+      settings,
+      {
+        name: section.schemaName,
+        url: section.url,
+        description: section.description,
+        itemType: "Article",
+      },
+      section.posts.map((post) => ({
+        name: post.title,
+        url: `/post/${post.slug}`,
+        description: post.tldr ?? post.excerpt,
+        image: post.heroImage,
+      })),
+    ),
+  );
 ---
 <Base {title}>
+  {collectionSchemas.length > 0 && (
+    <HeadSlot slot="head">
+      {collectionSchemas.map((schema) => (
+        <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+      ))}
+    </HeadSlot>
+  )}
   <Hero
     kicker={heroKicker}
     title={heroTitle}
@@ -176,18 +268,20 @@ const hasEncore = encorePosts.length > 0;
     </div>
   </section>
 
-  {latestRituals.length > 0 && (
-    <section class="home-section" aria-labelledby="latest-rituals">
+  {latestSection.posts.length > 0 && (
+    <section class="home-section" aria-labelledby={latestSection.id}>
       <div class="home-section__header">
         <div>
-          <p class="home-eyebrow">Latest rituals</p>
-          <h2 id="latest-rituals" class="home-section__title">Fresh guidance from the altar</h2>
-          <p class="home-section__description">Recent spells and essays to help you reclaim energy, soften resistance, and make practical magic in daily life.</p>
+          <p class="home-eyebrow">{latestSection.eyebrow}</p>
+          <h2 id={latestSection.id} class="home-section__title">{latestSection.heading}</h2>
+          <p class="home-section__description">{latestSection.description}</p>
         </div>
-        <a class="home-section__link" href="/page/1">Browse the ritual archive ↗</a>
+        {latestSection.link && (
+          <a class="home-section__link" href={latestSection.link.href}>{latestSection.link.label}</a>
+        )}
       </div>
       <div class="home-section__grid home-section__grid--cards">
-        {latestRituals.map((post) => (
+        {latestSection.posts.map((post) => (
           <PostCard
             post={{
               slug: post.slug,
@@ -210,17 +304,17 @@ const hasEncore = encorePosts.length > 0;
     </section>
   )}
 
-  {releasePosts.length > 0 && (
-    <section class="home-section home-section--tone" aria-labelledby="release-rituals">
+  {releaseSection.posts.length > 0 && (
+    <section class={`home-section${releaseSection.tone ? " home-section--tone" : ""}`} aria-labelledby={releaseSection.id}>
       <div class="home-section__header">
         <div>
-          <p class="home-eyebrow">Shadow work &amp; release</p>
-          <h2 id="release-rituals" class="home-section__title">Rituals when you need to move heavy feelings</h2>
-          <p class="home-section__description">Name what hurt you, set boundaries, and send the residue back without causing harm.</p>
+          <p class="home-eyebrow">{releaseSection.eyebrow}</p>
+          <h2 id={releaseSection.id} class="home-section__title">{releaseSection.heading}</h2>
+          <p class="home-section__description">{releaseSection.description}</p>
         </div>
       </div>
       <div class="home-section__grid home-section__grid--cards">
-        {releasePosts.map((post) => (
+        {releaseSection.posts.map((post) => (
           <PostCard
             post={{
               slug: post.slug,
@@ -243,17 +337,17 @@ const hasEncore = encorePosts.length > 0;
     </section>
   )}
 
-  {planningPosts.length > 0 && (
-    <section class="home-section" aria-labelledby="planning-rituals">
+  {planningSection.posts.length > 0 && (
+    <section class="home-section" aria-labelledby={planningSection.id}>
       <div class="home-section__header">
         <div>
-          <p class="home-eyebrow">Planning &amp; focus</p>
-          <h2 id="planning-rituals" class="home-section__title">Soft structure for neurodivergent days</h2>
-          <p class="home-section__description">Work with your rhythms using tiny accountability rituals, tarot prompts, and gentle productivity spells.</p>
+          <p class="home-eyebrow">{planningSection.eyebrow}</p>
+          <h2 id={planningSection.id} class="home-section__title">{planningSection.heading}</h2>
+          <p class="home-section__description">{planningSection.description}</p>
         </div>
       </div>
       <div class="home-section__grid home-section__grid--cards">
-        {planningPosts.map((post) => (
+        {planningSection.posts.map((post) => (
           <PostCard
             post={{
               slug: post.slug,
@@ -276,17 +370,17 @@ const hasEncore = encorePosts.length > 0;
     </section>
   )}
 
-  {calmPosts.length > 0 && (
-    <section class="home-section home-section--tone" aria-labelledby="calm-rituals">
+  {calmSection.posts.length > 0 && (
+    <section class={`home-section${calmSection.tone ? " home-section--tone" : ""}`} aria-labelledby={calmSection.id}>
       <div class="home-section__header">
         <div>
-          <p class="home-eyebrow">Rest &amp; restoration</p>
-          <h2 id="calm-rituals" class="home-section__title">Ground your nervous system with cozy care</h2>
-          <p class="home-section__description">Take a breath with soft resets, sensory grounding, and rituals that remind your body it&rsquo;s safe to unclench.</p>
+          <p class="home-eyebrow">{calmSection.eyebrow}</p>
+          <h2 id={calmSection.id} class="home-section__title">{calmSection.heading}</h2>
+          <p class="home-section__description">{calmSection.description}</p>
         </div>
       </div>
       <div class="home-section__grid home-section__grid--cards">
-        {calmPosts.map((post) => (
+        {calmSection.posts.map((post) => (
           <PostCard
             post={{
               slug: post.slug,
@@ -326,17 +420,42 @@ const hasEncore = encorePosts.length > 0;
     </div>
   </section>
 
+  {evergreenCta && (
+    <div class="home-evergreen">
+      <EvergreenCta {...evergreenCta} />
+    </div>
+  )}
+
+  {testimonials.length > 0 && (
+    <section class="home-section home-testimonials" aria-labelledby="home-testimonials-heading">
+      <div class="home-section__header home-testimonials__header">
+        <div>
+          {testimonialSection?.eyebrow && <p class="home-eyebrow">{testimonialSection.eyebrow}</p>}
+          <h2 id="home-testimonials-heading" class="home-section__title">
+            {testimonialSection?.title ?? "Community notes"}
+          </h2>
+          {testimonialSection?.description && (
+            <p class="home-section__description home-testimonials__description">
+              {testimonialSection.description}
+            </p>
+          )}
+        </div>
+      </div>
+      <Testimonials testimonials={testimonials} />
+    </section>
+  )}
+
   {hasEncore && (
-    <section class="home-section" aria-labelledby="more-to-explore">
+    <section class="home-section" aria-labelledby={encoreSection.id}>
       <div class="home-section__header">
         <div>
-          <p class="home-eyebrow">More to explore</p>
-          <h2 id="more-to-explore" class="home-section__title">In case you missed these spells</h2>
-          <p class="home-section__description">A few extra articles the coven keeps returning to when they need a gentle reset.</p>
+          <p class="home-eyebrow">{encoreSection.eyebrow}</p>
+          <h2 id={encoreSection.id} class="home-section__title">{encoreSection.heading}</h2>
+          <p class="home-section__description">{encoreSection.description}</p>
         </div>
       </div>
       <div class="home-section__grid home-section__grid--cards">
-        {encorePosts.map((post) => (
+        {encoreSection.posts.map((post) => (
           <PostCard
             post={{
               slug: post.slug,
@@ -517,6 +636,28 @@ const hasEncore = encorePosts.length > 0;
     filter: blur(30px);
     opacity: 0.8;
     pointer-events: none;
+  }
+
+  .home-evergreen {
+    margin: clamp(2.5rem, 6vw, 3.5rem) 0;
+  }
+
+  .home-testimonials {
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .home-testimonials__header {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .home-testimonials__description {
+    max-width: 42rem;
+    margin-inline: auto;
+  }
+
+  .home-testimonials :global(.testimonials) {
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
   }
 
   .home-cta {
