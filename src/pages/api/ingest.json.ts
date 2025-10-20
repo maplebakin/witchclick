@@ -147,6 +147,33 @@ export async function POST({ request }: { request: Request }) {
       return json({ ok:false, error:'No JSON body provided. Paste a PostSpec v2 object.' }, 400);
     }
 
+    const parseDryRunFlag = (value: unknown) => {
+      if (typeof value === 'boolean') return value;
+      if (typeof value === 'number') return value === 1;
+      if (typeof value === 'string') {
+        const normalized = value.trim().toLowerCase();
+        return normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on';
+      }
+      return false;
+    };
+
+    const url = new URL(request.url);
+    const dryRunFromQuery = url.searchParams.get('dryRun') ?? url.searchParams.get('dry_run');
+    let isDryRun = parseDryRunFlag(dryRunFromQuery);
+
+    if (!isDryRun && input && typeof input === 'object') {
+      const candidate = (input as any).dryRun ?? (input as any).dry_run;
+      if (candidate !== undefined) {
+        isDryRun = parseDryRunFlag(candidate);
+        if (isDryRun) {
+          const cloned = { ...(input as any) };
+          delete cloned.dryRun;
+          delete cloned.dry_run;
+          input = cloned;
+        }
+      }
+    }
+
     const CWD = process.cwd();
     const PRODUCTS_PATH = path.join(CWD, 'content', 'products.json');
     const products = safeReadJSON<{ products: { key: string }[] }>(PRODUCTS_PATH, { products: [] });
@@ -198,7 +225,9 @@ export async function POST({ request }: { request: Request }) {
     // Paths & settings
     const POSTS_DIR = path.join(CWD, 'content', 'posts');
     const SETTINGS_PATH = path.join(CWD, 'content', 'settings.json');
-    ensureDirSync(POSTS_DIR);
+    if (!isDryRun) {
+      ensureDirSync(POSTS_DIR);
+    }
 
     const settings = safeReadJSON(SETTINGS_PATH, { siteUrl: 'https://example.com' });
 
@@ -246,10 +275,14 @@ export async function POST({ request }: { request: Request }) {
       specVersion: 2 as const
     };
 
-    ensureEntityStubs(fm.entities);
+    if (!isDryRun) {
+      ensureEntityStubs(fm.entities);
+    }
 
     const siteUrl = String(settings.siteUrl||'').replace(/\/$/,'');
-    const createdPostStubs = ensurePostStubs(internalLinkHints, POSTS_DIR, siteUrl);
+    const createdPostStubs = isDryRun
+      ? []
+      : ensurePostStubs(internalLinkHints, POSTS_DIR, siteUrl);
 
     const body = (spec.sections || [])
       .map((section: PostSpecV2["sections"][number]) =>
@@ -260,7 +293,9 @@ export async function POST({ request }: { request: Request }) {
     const file = `---\n${toFrontmatterYAML(fm)}\n---\n\n${body}\n`;
 
     const outPath = path.join(POSTS_DIR, `${slug}.md`);
-    fs.writeFileSync(outPath, file, 'utf8');
+    if (!isDryRun) {
+      fs.writeFileSync(outPath, file, 'utf8');
+    }
 
     const combinedWarnings = [...new Set([...normalizationWarnings, ...enforcement.warnings, ...structureResult.warnings])];
 
@@ -272,6 +307,7 @@ export async function POST({ request }: { request: Request }) {
       warnings: combinedWarnings,
       normalizations: normalizationReport,
       createdPostStubs,
+      dryRun: isDryRun,
     });
   } catch (e: any) {
     return json({ ok:false, error: e?.message || String(e) }, 500);
