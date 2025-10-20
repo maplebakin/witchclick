@@ -62,6 +62,7 @@ const {
 } = Astro.props;
 
 const settings = readSettings();
+const showEndAd = Boolean(settings.ads?.provider);
 const siteOrigin = getSiteOrigin(settings) || "https://example.com";
 const title = data.title ?? "Untitled";
 const description =
@@ -488,12 +489,17 @@ const jsonLd = {
 
       <div class="card-panel card-panel-strong card-panel-static flex flex-col gap-6 p-6 text-inverse sm:p-8 lg:p-10">
         <RelatedPosts currentSlug={effectiveSlug} tags={Array.isArray(data.tags) ? data.tags : []} />
-        <AdSlot class="mt-6" />
       </div>
 
       <div class="card-panel card-panel-strong card-panel-static flex flex-col gap-6 p-6 text-inverse sm:p-8 lg:p-10">
         <CommentsSection slug={effectiveSlug} title={title} />
       </div>
+
+      {showEndAd && (
+        <div class="card-panel card-panel-strong card-panel-static p-6 text-inverse sm:p-8 lg:p-10">
+          <AdSlot />
+        </div>
+      )}
     </div>
   </div>
 </Base>
