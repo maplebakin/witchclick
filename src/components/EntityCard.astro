@@ -131,9 +131,7 @@ const typeLabel =
       {keywords.length > 0 ? (
         <div class="mt-auto flex flex-wrap gap-2">
           {keywords.map((tag) => (
-            <span class="entity-card-tag rounded-full border px-3 py-1 text-xs uppercase tracking-wide shadow-[0_2px_6px_rgba(15,23,42,0.12)]">
-              {tag}
-            </span>
+            <span class="card-pill card-tag entity-card-tag">{tag}</span>
           ))}
         </div>
       ) : (
@@ -197,9 +195,9 @@ const typeLabel =
   }
 
   .entity-card-tag {
-    color: var(--entity-keyword-text, rgba(88, 28, 135, 0.85));
-    background: var(--entity-keyword-bg, rgba(124, 58, 237, 0.16));
-    border-color: var(--entity-keyword-border, rgba(124, 58, 237, 0.35));
+    --card-pill-text: var(--entity-keyword-text, rgba(88, 28, 135, 0.85));
+    --card-pill-bg: var(--entity-keyword-bg, rgba(124, 58, 237, 0.16));
+    --card-pill-border: var(--entity-keyword-border, rgba(124, 58, 237, 0.35));
   }
 
   .entity-card-empty-keywords {

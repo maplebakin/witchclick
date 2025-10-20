@@ -30,7 +30,11 @@
   --color-muted: rgba(244, 241, 255, 0.72);
   --color-border: rgba(125, 98, 162, 0.45);
   --color-border-strong: rgba(212, 175, 55, 0.65);
-  --color-overlay: rgba(18, 7, 37, 0.65);
+  --color-overlay: rgba(18, 7, 37, 0.48);
+  --color-overlay-strong: rgba(18, 7, 37, 0.62);
+  --surface-plain: rgba(18, 10, 30, 0.92);
+  --surface-plain-border: rgba(124, 78, 176, 0.32);
+  --surface-plain-shadow: 0 24px 55px -28px rgba(3, 2, 12, 0.72);
 
   /* Accessible text color variants - WCAG AA compliant */
   --text-primary: rgba(244, 241, 255, 0.96);      /* ~16:1 contrast on dark backgrounds */
@@ -46,10 +50,11 @@
   --ink-strong: color-mix(in srgb, var(--color-ink) 85%, var(--color-night) 15%);
   --ink-muted: color-mix(in srgb, var(--color-ink) 55%, white 45%);
   --link-color: color-mix(in srgb, var(--color-fog) 55%, var(--color-gold) 45%);
-  --focus-ring-color: color-mix(in srgb, var(--color-gold) 65%, var(--color-ink) 35%);
-  --focus-ring-offset: 3px;
-  --focus-ring-shadow: 0 0 0 2px color-mix(in srgb, var(--color-night) 65%, transparent 35%),
-    0 0 0 4px color-mix(in srgb, var(--focus-ring-color) 80%, white 20%);
+  --focus-ring-color: color-mix(in srgb, var(--color-gold) 72%, white 28%);
+  --focus-ring-offset: 4px;
+  --focus-ring-base-shadow: color-mix(in srgb, var(--color-night) 70%, transparent 30%);
+  --focus-ring-shadow: 0 0 0 2px var(--focus-ring-base-shadow),
+    0 0 0 calc(var(--focus-ring-offset) + 2px) color-mix(in srgb, var(--focus-ring-color) 85%, white 15%);
 
   color-scheme: dark light;
 }
@@ -72,7 +77,11 @@
   --color-muted: rgba(43, 28, 65, 0.88);
   --color-border: rgba(122, 94, 154, 0.35);
   --color-border-strong: rgba(122, 94, 154, 0.55);
-  --color-overlay: rgba(242, 236, 229, 0.65);
+  --color-overlay: rgba(242, 236, 229, 0.48);
+  --color-overlay-strong: rgba(242, 236, 229, 0.6);
+  --surface-plain: rgba(252, 248, 242, 0.96);
+  --surface-plain-border: rgba(155, 134, 200, 0.28);
+  --surface-plain-shadow: 0 24px 50px -28px rgba(84, 62, 116, 0.18);
   --shadow-soft: 0 18px 45px -28px rgba(63, 49, 86, 0.22);
   --shadow-strong: 0 28px 75px -24px rgba(63, 49, 86, 0.32);
 
@@ -80,7 +89,8 @@
   --ink-strong: color-mix(in srgb, var(--color-ink) 90%, var(--color-night) 10%);
   --ink-muted: color-mix(in srgb, var(--color-ink) 60%, white 40%);
   --link-color: color-mix(in srgb, var(--color-iris) 45%, var(--color-gold) 55%);
-  --focus-ring-color: color-mix(in srgb, var(--color-iris) 55%, var(--color-gold) 45%);
+  --focus-ring-color: color-mix(in srgb, var(--color-iris) 58%, var(--color-gold) 42%);
+  --focus-ring-base-shadow: color-mix(in srgb, var(--color-iris) 30%, var(--color-night) 70%);
 
   /* Accessible text variants for dawn theme - WCAG AA compliant */
   --text-primary: rgba(44, 27, 61, 1.0);          /* ~16:1 contrast on light backgrounds */
@@ -178,6 +188,7 @@ textarea {
 :where(a, button, input, select, textarea, summary, [role="button"]):focus-visible {
   outline: 2px solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
+  box-shadow: 0 0 0 2px var(--focus-ring-base-shadow);
 }
 
 .focus-ring {
@@ -185,7 +196,8 @@ textarea {
 }
 
 .focus-ring:focus-visible {
-  outline: none;
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
   box-shadow: var(--focus-ring-shadow);
 }
 
@@ -313,8 +325,9 @@ blockquote {
   border-radius: 999px;
   border: 1px solid transparent;
   font-family: var(--font-accent);
-  font-size: 0.95rem;
-  letter-spacing: 0.15em;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease, color 200ms ease;
   cursor: pointer;
@@ -323,27 +336,31 @@ blockquote {
 .button--primary,
 .wc-button--primary,
 .hero-cta--primary {
-  border-color: var(--color-border-strong);
-  background: linear-gradient(120deg, rgba(212, 175, 55, 0.9), rgba(124, 78, 176, 0.75));
-  color: var(--color-night);
-  box-shadow: 0 15px 35px -18px rgba(212, 175, 55, 0.65);
+  border-color: color-mix(in srgb, var(--color-gold) 68%, transparent 32%);
+  background: linear-gradient(
+    130deg,
+    color-mix(in srgb, var(--color-gold) 88%, white 12%) 0%,
+    color-mix(in srgb, var(--color-iris) 55%, black 45%) 100%
+  );
+  color: color-mix(in srgb, var(--color-night) 92%, black 8%);
+  box-shadow: 0 18px 36px -16px color-mix(in srgb, var(--color-gold) 65%, black 35%);
 }
 
 .button--ghost,
 .wc-button--ghost,
 .hero-cta--secondary {
-  border-color: var(--color-border);
-  background: rgba(18, 7, 37, 0.35);
-  color: var(--color-muted);
-  box-shadow: inset 0 0 0 1px rgba(212, 175, 55, 0.15);
+  border-color: color-mix(in srgb, var(--color-border) 65%, transparent 35%);
+  background: color-mix(in srgb, var(--color-overlay) 45%, transparent 55%);
+  color: var(--text-primary);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-gold) 32%, transparent 68%);
 }
 
 :root[data-comfort-theme="dawn"] .button--ghost,
 :root[data-comfort-theme="dawn"] .wc-button--ghost,
 :root[data-comfort-theme="dawn"] .hero-cta--secondary {
-  background: rgba(235, 227, 243, 0.85);
+  background: color-mix(in srgb, var(--color-overlay) 55%, transparent 45%);
   color: var(--color-ink);
-  box-shadow: inset 0 0 0 1px rgba(122, 94, 154, 0.25);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-iris) 32%, transparent 68%);
 }
 
 .button:hover,
@@ -353,9 +370,9 @@ blockquote {
 .hero-cta:hover,
 .hero-cta:focus-visible {
   transform: translateY(-3px);
-  color: var(--color-night);
-  box-shadow: 0 22px 45px -18px rgba(212, 175, 55, 0.45);
-  border-color: var(--color-border-strong);
+  color: color-mix(in srgb, var(--color-night) 92%, black 8%);
+  box-shadow: 0 24px 48px -18px color-mix(in srgb, var(--color-gold) 55%, black 45%);
+  border-color: color-mix(in srgb, var(--color-gold) 72%, transparent 28%);
 }
 
 .button--ghost:hover,
@@ -365,8 +382,8 @@ blockquote {
 .hero-cta--secondary:hover,
 .hero-cta--secondary:focus-visible {
   color: var(--color-gold);
-  background: rgba(124, 78, 176, 0.35);
-  box-shadow: inset 0 0 0 1px rgba(212, 175, 55, 0.3);
+  background: color-mix(in srgb, var(--color-overlay-strong) 55%, transparent 45%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-gold) 42%, transparent 58%);
 }
 
 :root[data-comfort-theme="dawn"] .button--ghost:hover,
@@ -376,8 +393,8 @@ blockquote {
 :root[data-comfort-theme="dawn"] .hero-cta--secondary:hover,
 :root[data-comfort-theme="dawn"] .hero-cta--secondary:focus-visible {
   color: var(--color-ink);
-  background: rgba(214, 198, 233, 0.75);
-  box-shadow: inset 0 0 0 1px rgba(122, 94, 154, 0.35);
+  background: color-mix(in srgb, var(--color-overlay-strong) 60%, transparent 40%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-iris) 42%, transparent 58%);
 }
 
 .site-header {

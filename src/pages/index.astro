@@ -111,6 +111,11 @@ const heroBlurb = heroPost?.tldr ?? heroPost?.excerpt ??
   "Sometimes anger is the only honest response to betrayal or systemic harm. This ritual gives it a safe container and releases the residue.";
 const heroPrimaryHref = heroPost ? `/post/${heroPost.slug}` : "/page/1";
 const heroPrimaryLabel = heroPost ? "Read this ritual →" : "Browse the latest rituals →";
+const heroImageSrc = heroPost?.heroImageSrc ?? "";
+const heroImageAlt = heroPost?.heroImageAlt ?? heroTitle;
+const heroActionNote = heroPost
+  ? "Read this ritual now or download printable tools if you prefer hands-on support."
+  : undefined;
 
 const usedSlugs = new Set(heroPost ? [heroPost.slug] : []);
 
@@ -245,6 +250,9 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
     primaryLabel={heroPrimaryLabel}
     secondaryHref="/tools/"
     secondaryLabel="Explore printable tools"
+    heroImageSrc={heroImageSrc}
+    heroImageAlt={heroImageAlt}
+    actionNote={heroActionNote}
   />
 
   <section class="home-intro" aria-labelledby="home-intro-title">
