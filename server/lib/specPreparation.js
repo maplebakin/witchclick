@@ -96,6 +96,238 @@ function dedupe(items) {
   return out;
 }
 
+function isPlainObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function toTrimmedString(value) {
+  if (typeof value === 'string') return value.trim();
+  if (typeof value === 'number' && Number.isFinite(value)) return String(value).trim();
+  return '';
+}
+
+function toNumber(value) {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string' && value.trim()) {
+    const parsed = Number(value.trim());
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return null;
+}
+
+function normalizeToggle(value, fallback) {
+  const lower = typeof value === 'string' ? value.trim().toLowerCase() : null;
+  if (lower === 'on' || lower === 'off') return lower;
+  if (lower === 'true' || lower === 'yes' || lower === '1') return 'on';
+  if (lower === 'false' || lower === 'no' || lower === '0') return 'off';
+  if (typeof value === 'boolean') return value ? 'on' : 'off';
+  return fallback;
+}
+
+function parseBoolean(value) {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'string') {
+    const lower = value.trim().toLowerCase();
+    if (lower === 'true' || lower === 'yes' || lower === '1') return true;
+    if (lower === 'false' || lower === 'no' || lower === '0') return false;
+  }
+  return null;
+}
+
+function sanitizeIsoDate(value, fallback) {
+  const attempt = (candidate) => {
+    if (typeof candidate !== 'string') return null;
+    const trimmed = candidate.trim();
+    if (!trimmed) return null;
+    const timestamp = Date.parse(trimmed);
+    if (Number.isNaN(timestamp)) return null;
+    return new Date(timestamp).toISOString();
+  };
+
+  return attempt(value) || attempt(fallback) || new Date().toISOString();
+}
+
+function extractPromptMetadataCandidate(raw) {
+  if (!isPlainObject(raw)) return null;
+  const directKeys = [
+    'promptMetadata',
+    'promptMeta',
+    'prompt',
+    'generatorMetadata',
+    'generator',
+    '__prompt',
+    '__wcPrompt',
+  ];
+  for (const key of directKeys) {
+    const candidate = raw[key];
+    if (isPlainObject(candidate)) return candidate;
+  }
+  if (isPlainObject(raw.meta) && isPlainObject(raw.meta.prompt)) return raw.meta.prompt;
+  if (isPlainObject(raw.metadata) && isPlainObject(raw.metadata.prompt)) return raw.metadata.prompt;
+  return null;
+}
+
+function mergeFocusSignals(target, addition, keyFn) {
+  if (!addition || !Array.isArray(addition)) return;
+  for (const item of addition) {
+    if (!item) continue;
+    const key = keyFn(item);
+    if (!key) continue;
+    if (!target.has(key)) {
+      target.set(key, { ...item });
+      continue;
+    }
+    const existing = target.get(key);
+    if (!existing.reason && item.reason) existing.reason = item.reason;
+    if (item.score !== undefined && (existing.score === undefined || item.score > existing.score)) {
+      existing.score = item.score;
+    }
+    if (
+      item.recencyDays !== undefined &&
+      (existing.recencyDays === undefined || item.recencyDays > existing.recencyDays)
+    ) {
+      existing.recencyDays = item.recencyDays;
+    }
+  }
+}
+
+function normalizeEngagementFocus(raw, fallback) {
+  const tagMap = new Map();
+  const entityMap = new Map();
+
+  const sources = [];
+  if (raw !== undefined) sources.push(raw);
+  if (fallback !== undefined) sources.push(fallback);
+
+  for (const source of sources) {
+    if (!source) continue;
+    if (Array.isArray(source)) {
+      mergeFocusSignals(tagMap, source.map(normalizeTagFocus), (item) => item && item.tag.toLowerCase());
+      continue;
+    }
+    if (!isPlainObject(source)) continue;
+    if (isPlainObject(source.underserved)) {
+      const underserved = source.underserved;
+      if (Array.isArray(underserved.tags)) {
+        mergeFocusSignals(tagMap, underserved.tags.map(normalizeTagFocus), (item) => item && item.tag.toLowerCase());
+      }
+      if (Array.isArray(underserved.entities)) {
+        mergeFocusSignals(entityMap, underserved.entities.map(normalizeEntityFocus), (item) => item && `${item.type || 'entity'}:${item.slug}`.toLowerCase());
+      }
+    }
+    if (Array.isArray(source.tags)) {
+      mergeFocusSignals(tagMap, source.tags.map(normalizeTagFocus), (item) => item && item.tag.toLowerCase());
+    }
+    if (Array.isArray(source.entities)) {
+      mergeFocusSignals(entityMap, source.entities.map(normalizeEntityFocus), (item) => item && `${item.type || 'entity'}:${item.slug}`.toLowerCase());
+    }
+    if (source.tag || source.name || source.value) {
+      mergeFocusSignals(tagMap, [normalizeTagFocus(source)], (item) => item && item.tag.toLowerCase());
+    }
+    if (source.slug || source.id) {
+      mergeFocusSignals(entityMap, [normalizeEntityFocus(source)], (item) => item && `${item.type || 'entity'}:${item.slug}`.toLowerCase());
+    }
+  }
+
+  const tags = Array.from(tagMap.values()).filter(Boolean).slice(0, 5);
+  const entities = Array.from(entityMap.values()).filter(Boolean).slice(0, 5);
+
+  if (!tags.length && !entities.length) return null;
+  return { tags, entities };
+}
+
+function normalizeTagFocus(value) {
+  if (!value) return null;
+  if (typeof value === 'string') {
+    const tag = value.trim();
+    return tag ? { tag } : null;
+  }
+  if (!isPlainObject(value)) return null;
+  const tag = toTrimmedString(value.tag ?? value.name ?? value.value ?? '');
+  if (!tag) return null;
+  const entry = { tag };
+  const reason = toTrimmedString(value.reason ?? value.note ?? value.notes ?? '');
+  if (reason) entry.reason = reason;
+  const score = toNumber(value.score ?? value.weight ?? value.priority ?? value.interest ?? null);
+  if (score !== null) entry.score = score;
+  const recency = toNumber(value.recencyDays ?? value.daysSince ?? value.daysSinceMention ?? null);
+  if (recency !== null) entry.recencyDays = recency;
+  return entry;
+}
+
+function normalizeEntityFocus(value) {
+  if (!value) return null;
+  if (typeof value === 'string') {
+    const slug = value.trim();
+    if (!slug) return null;
+    return { slug };
+  }
+  if (!isPlainObject(value)) return null;
+  const slug = toTrimmedString(value.slug ?? value.id ?? '');
+  const name = toTrimmedString(value.name ?? value.label ?? value.title ?? '');
+  if (!slug && !name) return null;
+  const entry = { slug: slug || name };
+  if (name && name !== entry.slug) entry.name = name;
+  const type = toTrimmedString(value.type ?? value.kind ?? value.category ?? '');
+  if (type) entry.type = type;
+  const reason = toTrimmedString(value.reason ?? value.note ?? value.notes ?? '');
+  if (reason) entry.reason = reason;
+  const score = toNumber(value.score ?? value.weight ?? value.priority ?? value.interest ?? null);
+  if (score !== null) entry.score = score;
+  const recency = toNumber(value.recencyDays ?? value.daysSince ?? value.daysSinceMention ?? null);
+  if (recency !== null) entry.recencyDays = recency;
+  return entry;
+}
+
+function buildPromptMetadata(rawSpec, spec, context) {
+  const candidate = extractPromptMetadataCandidate(rawSpec);
+  const topicSource = candidate?.topic ?? rawSpec?.topic ?? rawSpec?.headline ?? rawSpec?.title ?? '';
+  const topic = toTrimmedString(topicSource) || spec.title || spec.slug;
+  const requested = toNumber(
+    candidate?.words ?? candidate?.wordCount ?? candidate?.targetWordCount ?? rawSpec?.wordCount ?? context.targetWordCount,
+  );
+  const delivered = Number.isFinite(context.wordCount) ? Number(context.wordCount) : undefined;
+
+  const defaultAds = Array.isArray(spec.adPlacements) && spec.adPlacements.length ? 'on' : 'off';
+  const defaultKofi = spec.cta?.type === 'kofi' ? 'on' : 'off';
+  const toggles = {
+    ads: normalizeToggle(candidate?.ads ?? candidate?.includeAds ?? candidate?.toggles?.ads, defaultAds),
+    kofi: normalizeToggle(candidate?.kofi ?? candidate?.includeKofi ?? candidate?.toggles?.kofi ?? candidate?.cta, defaultKofi),
+  };
+  const mode = toTrimmedString(candidate?.mode ?? candidate?.preset ?? candidate?.contentType ?? context.mode);
+  if (mode) toggles.mode = mode;
+  const style = toTrimmedString(candidate?.style ?? candidate?.styleDirective ?? context.style);
+  if (style) toggles.style = style;
+  const strictValue = candidate?.strict ?? candidate?.strictMode ?? candidate?.toggles?.strict ?? context.strict;
+  const strictBool = parseBoolean(strictValue);
+  if (typeof strictBool === 'boolean') toggles.strict = strictBool;
+
+  const generatedAt = sanitizeIsoDate(candidate?.generatedAt ?? candidate?.timestamp, context.generatedAt);
+
+  const focus = normalizeEngagementFocus(candidate?.engagementFocus ?? candidate?.focus, context.engagementFocus);
+
+  const metadata = {
+    topic,
+    requestedWords: requested ?? context.targetWordCount ?? undefined,
+    deliveredWords: delivered,
+    toggles,
+    generatedAt,
+  };
+
+  if (focus) metadata.engagementFocus = focus;
+  if (context.sourcePath) metadata.source = context.sourcePath;
+  if (candidate?.notes) {
+    const notes = toTrimmedString(candidate.notes);
+    if (notes) metadata.notes = notes;
+  }
+
+  if (metadata.requestedWords === undefined && Number.isFinite(context.targetWordCount)) {
+    metadata.requestedWords = Number(context.targetWordCount);
+  }
+
+  return metadata;
+}
+
 function createEntityStubRecords(cwd, entities) {
   if (!Array.isArray(entities) || !entities.length) return [];
   return entities.map((entity) => {
@@ -176,6 +408,11 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
     : [path.join(cwd, 'content', 'posts')];
   const primaryPostsDir = postsDirectories[0];
   const targetWordCount = options.targetWordCount || DEFAULT_WORD_COUNT;
+  const generationTimestamp = sanitizeIsoDate(options.generatedAt, null);
+  const absoluteSourcePath = typeof options.sourcePath === 'string' && options.sourcePath
+    ? path.resolve(cwd, options.sourcePath)
+    : null;
+  const relativeSourcePath = absoluteSourcePath ? path.relative(cwd, absoluteSourcePath) : null;
 
   const allowedAffiliateKeys = Array.isArray(options.allowedAffiliateKeys)
     ? options.allowedAffiliateKeys
@@ -237,6 +474,14 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
   const settings = readJSON(settingsPath) || { siteUrl: 'https://example.com', brandName: 'WitchClick' };
   const siteUrl = String(settings.siteUrl || 'https://example.com').replace(/\/$/, '');
 
+  const promptMetadata = buildPromptMetadata(rawSpec, spec, {
+    targetWordCount,
+    wordCount: enforcement.wordCount,
+    generatedAt: generationTimestamp,
+    sourcePath: relativeSourcePath,
+    engagementFocus: options.engagementSignals,
+  });
+
   const frontmatter = {
     title: spec.title,
     slug: spec.slug,
@@ -261,6 +506,10 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
     specVersion: 2,
   };
 
+  if (promptMetadata) {
+    frontmatter.promptMetadata = promptMetadata;
+  }
+
   const markdownBody = buildMarkdownBody(spec.sections).trimEnd();
   const postContents = `---\n${toFrontmatterYAML(frontmatter)}\n---\n\n${markdownBody}\n`;
   const postFilePath = path.join(primaryPostsDir, `${spec.slug}.md`);
@@ -280,6 +529,7 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
     frontmatter,
     entityStubs,
     postStubs,
+    promptMetadata,
   };
 }
 

@@ -19,6 +19,7 @@ export interface IngestResult {
   markdown: string;
   createdEntities: string[];
   source: string | null;
+  promptMetadata?: Record<string, unknown> | null;
 }
 
 export declare class IngestValidationError extends Error {

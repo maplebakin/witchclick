@@ -418,18 +418,20 @@ export function normalizePostSpec(raw, options = {}) {
     .filter(Boolean)
     .join('\n');
 
-  // Note: We now keep all internal link hints, even if not in content
-  // This allows referencing future posts that will be auto-created as stubs
   if (internalLinkHints.length > 0) {
     const lowerCombined = combinedMarkdown.toLowerCase();
+    const filteredHints = [];
     for (const hint of internalLinkHints) {
       const anchor = hint.anchor || '';
-      if (anchor && !lowerCombined.includes(anchor.toLowerCase())) {
-        const message = `internalLinkHint "${anchor}" not found in content (stub post will be created).`;
+      if (anchor && lowerCombined.includes(anchor.toLowerCase())) {
+        filteredHints.push(hint);
+      } else if (anchor) {
+        const message = `internalLinkHint dropped: anchor "${anchor}" not found in content.`;
         report.push(message);
         warnings.push(message);
       }
     }
+    internalLinkHints = filteredHints;
   }
 
   /** @type {PostSpecV2} */

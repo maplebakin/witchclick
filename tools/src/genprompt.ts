@@ -1,21 +1,9 @@
 // tools/src/genprompt.ts
-import fs from 'node:fs';
-import path from 'node:path';
-
 import { buildMasterPrompt } from '../../server/lib/promptBuilder.js';
 import generatorStyles from '../../server/lib/generatorStyles.js';
 import generatorPresets, { resolveGeneratorPresetKey } from '../../server/lib/generatorPresets.js';
 import { STRICT_JSON_RULES } from '../../server/lib/strictJsonRules.js';
-import { collectPostMetadata } from '../../scripts/lib/postInventory.js';
-import { readSlugHistory, writeSlugHistory } from '../../scripts/lib/slugHistory.js';
-
-function readJSON<T = any>(p: string): T | null {
-  try {
-    return JSON.parse(fs.readFileSync(p, 'utf8')) as T;
-  } catch {
-    return null;
-  }
-}
+import { loadPromptContext } from '../../server/lib/promptContext.js';
 
 type PresetDefinition = {
   system: string;
@@ -86,29 +74,18 @@ export function genprompt({
   strict,
 }: GenpromptOptions) {
   const CWD = process.cwd();
-  const settings =
-    readJSON<{ brandName?: string; siteUrl?: string }>(
-      path.join(CWD, 'content', 'settings.json')
-    ) || { brandName: 'WitchClick', siteUrl: 'https://example.com' };
-
-  const products =
-    readJSON<{ products?: { key?: string }[] }>(
-      path.join(CWD, 'content', 'products.json')
-    ) || { products: [] };
-
-  const allowedKeys = Array.isArray(products.products)
-    ? products.products
-        .map((product) => String(product?.key || '').trim())
-        .filter(Boolean)
+  const context = loadPromptContext({ cwd: CWD });
+  const brandName = context.brandName ?? 'WitchClick';
+  const siteUrl = context.siteUrl ?? 'https://example.com';
+  const allowedKeys = Array.isArray(context.allowedAffiliateKeys)
+    ? context.allowedAffiliateKeys
     : [];
-
-  const metadata = collectPostMetadata(CWD);
-  const existingPostTitles = metadata.map((item) => item.title).filter(Boolean);
-  const currentSlugs = metadata.map((item) => item.slug).filter(Boolean);
-  const historicSlugs = readSlugHistory(CWD);
-  const mergedSlugSet = new Set<string>([...historicSlugs, ...currentSlugs]);
-  const mergedSlugs = Array.from(mergedSlugSet);
-  writeSlugHistory(CWD, mergedSlugs);
+  const existingPostTitles = Array.isArray(context.existingPostTitles)
+    ? context.existingPostTitles
+    : [];
+  const existingPostSlugs = Array.isArray(context.existingPostSlugs)
+    ? context.existingPostSlugs
+    : [];
 
   const resolvedModeKey = resolveGeneratorPresetKey(typeof mode === 'string' ? mode : '') ?? '';
   const preset = resolvedModeKey ? PRESETS[resolvedModeKey] : undefined;
@@ -129,11 +106,12 @@ export function genprompt({
         words,
         ads,
         kofi,
-        brandName: settings.brandName ?? 'WitchClick',
-        siteUrl: settings.siteUrl ?? 'https://example.com',
+        brandName,
+        siteUrl,
         existingPostTitles,
-        existingPostSlugs: mergedSlugs,
+        existingPostSlugs,
         allowedAffiliateKeys: allowedKeys,
+        engagementSignals: context.engagementSignals,
       });
 
   return { prompt };
