@@ -65,8 +65,16 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
                   <input type="url" name="formAction" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-1.5 text-xs" />
                 </label>
                 <label class="block">
+                  <span class="text-xs font-medium text-body">Form Method</span>
+                  <input type="text" name="formMethod" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-1.5 text-xs" />
+                </label>
+                <label class="block">
                   <span class="text-xs font-medium text-body">Email Placeholder</span>
                   <input type="text" name="emailPlaceholder" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-1.5 text-xs" />
+                </label>
+                <label class="block">
+                  <span class="text-xs font-medium text-body">Email Field Name</span>
+                  <input type="text" name="formEmailFieldName" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-1.5 text-xs" />
                 </label>
                 <label class="block">
                   <span class="text-xs font-medium text-body">Submit Label</span>
@@ -133,15 +141,26 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
         function populateCTA(cta) {
           if (!ctaForm || !cta) return;
-          const fields = { eyebrow: '', title: '', description: '', formAction: '', emailPlaceholder: '', submitLabel: '', disclaimer: '' };
+          const fields = {
+            eyebrow: '',
+            title: '',
+            description: '',
+            formAction: '',
+            formMethod: 'post',
+            emailPlaceholder: '',
+            formEmailFieldName: 'email',
+            submitLabel: '',
+            disclaimer: ''
+          };
           Object.keys(fields).forEach(key => {
             const input = ctaForm.querySelector('[name="' + key + '"]');
             if (input) {
               if (key.startsWith('form')) {
                 const formKey = key.replace('form', '').replace(/^./, c => c.toLowerCase());
-                input.value = cta.form?.[formKey] || cta.form?.[key] || '';
+                const defaultValue = fields[key];
+                input.value = cta.form?.[formKey] ?? cta.form?.[key] ?? defaultValue;
               } else {
-                input.value = cta[key] || '';
+                input.value = cta[key] ?? fields[key];
               }
             }
           });
@@ -149,7 +168,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
         function collectCTA() {
           const form = {};
-          ['action', 'emailPlaceholder', 'submitLabel', 'disclaimer'].forEach(key => {
+          ['action', 'method', 'emailPlaceholder', 'emailFieldName', 'submitLabel', 'disclaimer'].forEach(key => {
             const input = ctaForm.querySelector('[name="form' + key.charAt(0).toUpperCase() + key.slice(1) + '"]');
             if (input) form[key] = input.value;
           });
@@ -157,7 +176,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             eyebrow: ctaForm.querySelector('[name="eyebrow"]')?.value || '',
             title: ctaForm.querySelector('[name="title"]')?.value || '',
             description: ctaForm.querySelector('[name="description"]')?.value || '',
-            form: { ...form, method: 'post', emailFieldName: 'email' }
+            form: {
+              ...form,
+              method: form.method || 'post',
+              emailFieldName: form.emailFieldName || 'email'
+            }
           };
         }
 
