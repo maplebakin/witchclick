@@ -156,6 +156,107 @@ a {
     box-shadow: var(--wc-shadow-soft, var(--shadow-1));
   }
 
+  .ad {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    border-radius: var(--wc-radius-lg, 1.5rem);
+    border: 1px solid color-mix(in srgb, var(--ink-muted) 35%, transparent 65%);
+    background:
+      radial-gradient(
+        120% 120% at 12% -10%,
+        color-mix(in srgb, var(--surface-tint, hsl(270 55% 62%)) 12%, transparent) 0%,
+        transparent 72%
+      ),
+      linear-gradient(
+        170deg,
+        color-mix(in srgb, white 92%, var(--surface-tint, hsl(270 55% 62%)) 8%) 0%,
+        color-mix(in srgb, white 86%, var(--surface-tint, hsl(270 55% 62%)) 14%) 100%
+      );
+    padding: clamp(1.15rem, 3vw, 1.6rem);
+    color: var(--ink-body);
+    box-shadow: 0 20px 36px -30px rgb(17 24 39 / 0.32);
+  }
+
+  .ad-shell {
+    display: flex;
+    justify-content: center;
+  }
+
+  .ad-shell > .ad {
+    width: min(100%, 22rem);
+  }
+
+  .ad::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid color-mix(in srgb, var(--surface-tint, hsl(270 55% 62%)) 18%, transparent 82%);
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .ad__label {
+    margin: 0;
+    font-size: 0.7rem;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--ink-muted) 72%, white 28%);
+  }
+
+  .ad__frame {
+    width: 100%;
+  }
+
+  .ad__frame > ins {
+    display: block !important;
+    width: 100% !important;
+    min-height: 160px;
+    border-radius: calc(var(--wc-radius-lg, 1.5rem) - 0.6rem);
+    overflow: hidden;
+  }
+
+  .ad__copy {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--ink-body) 94%, white 6%);
+  }
+
+  .ad__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .ad__link {
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    color: color-mix(in srgb, var(--action-secondary-text) 85%, var(--ink-body) 15%);
+  }
+
+  .ad__link:hover,
+  .ad__link:focus-visible {
+    color: var(--action-primary);
+    text-decoration-thickness: 2px;
+  }
+
+  .ad--side {
+    align-items: stretch;
+  }
+
+  .ad--end,
+  .ad--lead {
+    align-items: flex-start;
+  }
+
   .panel-muted {
     position: relative;
     border-radius: clamp(1.6rem, 4vw, 2.5rem);

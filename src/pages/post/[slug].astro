@@ -459,16 +459,13 @@ const jsonLd = {
 
         <aside class="relative" aria-label="Post sidebar">
           <div class="flex flex-col gap-6 lg:sticky lg:top-28">
-            <div class="soft-card p-6 text-inverse">
-              <AdSlot slot="side" />
-            </div>
             <CtaFooter type={ctaType} id={ctaId} />
             {resolvedEntities.length > 0 && (
               <section class="soft-card space-y-4 p-6 text-inverse">
                 <h2 class="text-xs font-semibold uppercase tracking-[0.32em] text-inverse">Referenced entities</h2>
                 <ul class="space-y-4 text-sm text-inverse-soft">
                   {resolvedEntities.map((entity: any) => (
-                      <li>
+                    <li>
                       <a
                         class="font-semibold text-accent-soft transition-colors hover:text-accent focus-visible:text-accent"
                         href={entity.href}
@@ -483,6 +480,9 @@ const jsonLd = {
                 </ul>
               </section>
             )}
+            <div class="ad-shell">
+              <AdSlot slot="side" />
+            </div>
           </div>
         </aside>
       </div>
