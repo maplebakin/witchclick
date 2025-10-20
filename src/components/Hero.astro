@@ -43,6 +43,23 @@ const {
       linear-gradient(160deg, rgba(26, 14, 38, 0.92), rgba(12, 5, 23, 0.85));
     filter: saturate(1.1);
     opacity: 0.95;
+    transform: translate3d(0, 0, 0) scale(1);
+    animation: heroBackdropDrift 26s ease-in-out infinite;
+    will-change: transform, opacity;
+  }
+
+  .home-hero::before {
+    content: "";
+    position: absolute;
+    inset: -40% 20% auto;
+    height: 55%;
+    border-radius: 999px;
+    background: radial-gradient(circle at 50% 0%, rgba(124, 78, 176, 0.32), transparent 70%);
+    opacity: 0.35;
+    filter: blur(35px);
+    transform: translate3d(0, 0, 0) scale(0.95);
+    animation: heroAuroraSweep 20s ease-in-out infinite;
+    pointer-events: none;
   }
 
   .home-hero::after {
@@ -55,6 +72,8 @@ const {
     filter: blur(40px);
     opacity: 0.35;
     pointer-events: none;
+    transform: translate3d(0, 0, 0) scale(1);
+    animation: heroHaloPulse 18s ease-in-out infinite;
   }
 
   .home-hero__inner {
@@ -63,6 +82,7 @@ const {
     display: grid;
     gap: clamp(1.2rem, 4vw, 2rem);
     max-width: 72rem;
+    animation: heroContentFloat 24s ease-in-out infinite;
   }
 
   .home-hero__eyebrow {
@@ -135,5 +155,69 @@ const {
 
   :root[data-comfort-theme="dawn"] .home-hero__blurb {
     color: rgba(44, 27, 61, 0.78);
+  }
+
+  @keyframes heroBackdropDrift {
+    0% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(-1.5%, 1.25%, 0) scale(1.03);
+    }
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  @keyframes heroHaloPulse {
+    0% {
+      opacity: 0.28;
+      transform: translate3d(0, 0, 0) scale(0.96);
+    }
+    50% {
+      opacity: 0.42;
+      transform: translate3d(0, -4%, 0) scale(1.05);
+    }
+    100% {
+      opacity: 0.28;
+      transform: translate3d(0, 0, 0) scale(0.96);
+    }
+  }
+
+  @keyframes heroAuroraSweep {
+    0% {
+      opacity: 0.28;
+      transform: translate3d(-4%, 6%, 0) scale(0.9) rotate(-6deg);
+    }
+    50% {
+      opacity: 0.42;
+      transform: translate3d(3%, -4%, 0) scale(1.05) rotate(4deg);
+    }
+    100% {
+      opacity: 0.28;
+      transform: translate3d(-4%, 6%, 0) scale(0.9) rotate(-6deg);
+    }
+  }
+
+  @keyframes heroContentFloat {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(0, -0.35rem, 0);
+    }
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-hero__backdrop,
+    .home-hero::before,
+    .home-hero::after,
+    .home-hero__inner {
+      animation: none !important;
+      transform: none !important;
+    }
   }
 </style>

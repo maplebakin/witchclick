@@ -1,7 +1,12 @@
+export type NavMatchMode = "exact" | "prefix";
+export type NavHighlightMode = "glow" | "underline";
+
 export interface NavLink {
   href: string;
   label: string;
   rel?: string;
+  match?: NavMatchMode;
+  highlight?: NavHighlightMode;
 }
 
 export interface AdminNavSection {
@@ -10,17 +15,17 @@ export interface AdminNavSection {
 }
 
 export const primaryNavLinks: NavLink[] = [
-  { href: "/", label: "Home" },
-  { href: "/hub/", label: "Hubs" },
-  { href: "/curses/", label: "Curses" },
-  { href: "/salon/", label: "Salon" },
-  { href: "/tools/", label: "Tools & Prints" },
+  { href: "/", label: "Home", match: "exact", highlight: "glow" },
+  { href: "/hub/", label: "Hubs", match: "prefix", highlight: "glow" },
+  { href: "/curses/", label: "Curses", match: "prefix", highlight: "glow" },
+  { href: "/salon/", label: "Salon", match: "prefix", highlight: "glow" },
+  { href: "/tools/", label: "Tools & Prints", match: "prefix", highlight: "glow" },
 ];
 
 export const secondaryNavLinks: NavLink[] = [
-  { href: "/entities/", label: "Entities" },
-  { href: "/partners/", label: "Partners" },
-  { href: "/about/", label: "About" },
+  { href: "/entities/", label: "Entities", match: "prefix", highlight: "underline" },
+  { href: "/partners/", label: "Partners", match: "prefix", highlight: "underline" },
+  { href: "/about/", label: "About", match: "prefix", highlight: "underline" },
 ];
 
 export const headerUtilityLinks: NavLink[] = [

@@ -24,6 +24,8 @@ export interface AdsSettings {
 
 export type ObservabilityEnvironment = "production" | "staging" | "development";
 
+export type BackgroundIntensity = "soft" | "balanced" | "bold";
+
 export interface ObservabilitySettings {
   enabled: boolean;
   dsn?: string | null;
@@ -36,6 +38,7 @@ export interface SiteSettings {
   disclosure?: string;
   kofiUsername?: string;
   showAccountLink?: boolean;
+  backgroundIntensity?: BackgroundIntensity;
   analytics?: AnalyticsSettings;
   ads?: AdsSettings;
   observability?: ObservabilitySettings;
@@ -49,6 +52,7 @@ const DEFAULT_SETTINGS: SiteSettings = {
   brandName: "WitchClick",
   disclosure:
     "As an affiliate, we may earn a small commission if you purchase through our links.",
+  backgroundIntensity: "balanced",
   analytics: { enabled: false, provider: "plausible" },
   showAccountLink: false,
   observability: { enabled: false, dsn: null, environment: "production" },
@@ -80,6 +84,8 @@ function deepMergeSettings(base: SiteSettings, next: Partial<SiteSettings>): Sit
     ...base,
     ...next,
     showAccountLink: next.showAccountLink ?? base.showAccountLink ?? false,
+    backgroundIntensity:
+      normalizeBackgroundIntensity(next.backgroundIntensity) ?? base.backgroundIntensity ?? "balanced",
     autoSummaries: next.autoSummaries ?? base.autoSummaries ?? true,
     autoSpoons: next.autoSpoons ?? base.autoSpoons ?? true,
     analytics,
@@ -186,6 +192,18 @@ function sanitizeSettings(input: unknown): Partial<SiteSettings> {
     }
   }
 
+  if ("backgroundIntensity" in data) {
+    const raw = expectString(data.backgroundIntensity, "backgroundIntensity", errors);
+    if (raw) {
+      const normalized = normalizeBackgroundIntensity(raw);
+      if (normalized) {
+        out.backgroundIntensity = normalized;
+      } else {
+        errors.push("backgroundIntensity must be 'soft', 'balanced', or 'bold'");
+      }
+    }
+  }
+
   if ("analytics" in data) {
     const value = sanitizeAnalytics(data.analytics, errors);
     if (value) out.analytics = value;
@@ -240,6 +258,16 @@ function sanitizeSettings(input: unknown): Partial<SiteSettings> {
   }
 
   return out;
+}
+
+function normalizeBackgroundIntensity(value: unknown): BackgroundIntensity | null {
+  if (!value) return null;
+  const raw = typeof value === "string" ? value.trim().toLowerCase() : "";
+  if (!raw) return null;
+  if (raw === "soft" || raw === "balanced" || raw === "bold") {
+    return raw;
+  }
+  return null;
 }
 
 function sanitizeObservability(value: unknown, errors: string[]): ObservabilitySettings | undefined {

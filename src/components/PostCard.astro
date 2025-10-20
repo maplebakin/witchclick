@@ -47,6 +47,7 @@ export interface Props {
   imageAlt?: string
   cardImage?: unknown
   cardImageAlt?: string
+  density?: "standard" | "compact"
 }
 
 const {
@@ -70,6 +71,7 @@ const {
   imageAlt,
   cardImage,
   cardImageAlt,
+  density = "standard",
 } = Astro.props as Props
 
 const link = href || (post?.slug ? `/post/${post.slug}` : '#')
@@ -133,7 +135,13 @@ function truncateSummary(value: string | undefined | null, max = 120): string {
     "card-panel card-tier-1 card-panel-soft focus-visible:outline-none ritual-card",
     className,
     _spoon && `ritual-card--${_spoon}`,
+    density === "compact" && "card-density-compact",
   ]}
+  style={
+    density === "compact"
+      ? `--card-hover-translate: -0.2rem; --card-elevation-base: 0 16px 34px -24px rgba(11, 6, 20, 0.42); --card-elevation-hover: 0 20px 44px -26px rgba(11, 6, 20, 0.48); --card-elevation-active: 0 12px 24px -18px rgba(11, 6, 20, 0.38);`
+      : undefined
+  }
   data-spoon-level={_spoon || undefined}
 >
   <span aria-hidden class="card-radial card-radial-top" />
@@ -170,3 +178,53 @@ function truncateSummary(value: string | undefined | null, max = 120): string {
     )}
   </div>
 </a>
+
+<style is:inline>
+  .card-density-compact .card-body {
+    gap: var(--space-2, 0.5rem);
+    padding: var(--space-3, 0.75rem) var(--space-3, 0.75rem) var(--space-4, 1rem);
+  }
+
+  .card-density-compact .card-text {
+    gap: var(--space-1, 0.35rem);
+  }
+
+  .card-density-compact .card-heading {
+    font-size: clamp(1.05rem, 2.8vw, 1.3rem);
+  }
+
+  .card-density-compact .card-subtle {
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+
+  .card-density-compact .card-tags {
+    gap: var(--space-1, 0.35rem);
+    margin-top: var(--space-2, 0.5rem);
+  }
+
+  .card-density-compact .card-pill {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.7rem;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--card-tag-border) 65%, transparent 35%);
+  }
+
+  .card-density-compact .card-metadata {
+    font-size: 0.78rem;
+    gap: 0.35rem;
+  }
+
+  .card-density-compact .card-figure {
+    margin: var(--space-3, 0.75rem) var(--space-3, 0.75rem) 0;
+    border-radius: clamp(0.95rem, 2.8vw, 1.2rem);
+  }
+
+  .card-density-compact .card-radial {
+    opacity: 0.48;
+    filter: blur(1px);
+  }
+
+  .card-density-compact .card-panel::before {
+    opacity: 0.28;
+  }
+</style>

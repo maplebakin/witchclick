@@ -6,6 +6,8 @@ interface NavLink {
   href: string;
   label: string;
   rel?: string;
+  match?: "exact" | "prefix";
+  highlight?: "glow" | "underline";
 }
 
 interface AdminNavSection {
@@ -42,13 +44,25 @@ const hasAdminLinks = visibleAdminSections.length > 0;
 const visibleSecondary = secondaryLinks.filter((link) => link && typeof link.href === "string");
 const visibleUtility = utilityLinks.filter((link) => link && typeof link.href === "string");
 
-function isActive(href: string): boolean {
-  if (!href) return false;
-  const normalized = href.endsWith("/") ? href : `${href}/`;
-  if (normalized === "/") {
+const normalizeHref = (href: string) => {
+  if (!href) return "/";
+  const ensured = href.endsWith("/") ? href : `${href.replace(/\/$/, "")}/`;
+  return ensured || "/";
+};
+
+function isActiveLink(link: NavLink): boolean {
+  if (!link?.href) return false;
+  const normalized = normalizeHref(link.href);
+  const mode = link.match ?? (normalized === "/" ? "exact" : "prefix");
+  if (mode === "exact") {
     return normalizedPath === normalized;
   }
   return normalizedPath.startsWith(normalized);
+}
+
+function getNavClasses(link: NavLink) {
+  const highlightClass = link.highlight === "underline" ? "site-nav__link--underline" : "site-nav__link--glow";
+  return ["site-nav__link", highlightClass, isActiveLink(link) && "is-active"].filter(Boolean);
 }
 ---
 <header class="site-header" data-site-header>
@@ -76,8 +90,8 @@ function isActive(href: string): boolean {
             <a
               href={item.href}
               rel={item.rel}
-              class="site-nav__link"
-              aria-current={isActive(item.href) ? "page" : undefined}
+              class:list={getNavClasses(item)}
+              aria-current={isActiveLink(item) ? "page" : undefined}
             >
               {item.label}
             </a>
@@ -109,7 +123,13 @@ function isActive(href: string): boolean {
               <ul class="site-nav__submenu-list">
                 {visibleSecondary.map((item) => (
                   <li>
-                    <a class="site-nav__submenu-link" href={item.href} rel={item.rel}>
+                    <a
+                      class="site-nav__submenu-link"
+                      href={item.href}
+                      rel={item.rel}
+                      aria-current={isActiveLink(item) ? "page" : undefined}
+                      data-active={isActiveLink(item) ? "true" : undefined}
+                    >
                       <span class="site-nav__submenu-label">{item.label}</span>
                       <span class="site-nav__submenu-meta">Dive deeper into {item.label}</span>
                     </a>
@@ -199,7 +219,7 @@ function isActive(href: string): boolean {
             href={item.href}
             rel={item.rel}
             class="site-nav__mobile-link focus-ring"
-            aria-current={isActive(item.href) ? "page" : undefined}
+            aria-current={isActiveLink(item) ? "page" : undefined}
             data-mobile-link
           >
             {item.label}
@@ -425,6 +445,104 @@ function isActive(href: string): boolean {
 </script>
 
 <style is:inline>
+  .site-nav__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1, 0.25rem);
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--ink-body, #f4f1ff) 88%, white 12%);
+    text-decoration: none;
+    transition: color 180ms ease, text-shadow 220ms ease;
+    isolation: isolate;
+  }
+
+  .site-nav__link:hover,
+  .site-nav__link:focus-visible {
+    color: color-mix(
+      in srgb,
+      var(--color-gold, #d4af37) 60%,
+      var(--color-iris, #7c4eb0) 40%
+    );
+  }
+
+  .site-nav__link:focus-visible {
+    outline: none;
+  }
+
+  .site-nav__link--glow::after {
+    content: "";
+    position: absolute;
+    inset: auto -0.85rem -0.65rem;
+    height: 2.6rem;
+    border-radius: 999px;
+    background: radial-gradient(
+      circle,
+      color-mix(
+          in srgb,
+          var(--background-glow-warm, color-mix(in srgb, var(--color-gold, #d4af37) 34%, transparent 66%)) 62%,
+          var(--background-glow-cool, color-mix(in srgb, var(--color-iris, #7c4eb0) 36%, transparent 64%)) 38%
+        )
+        0%,
+      transparent 72%
+    );
+    opacity: 0;
+    transform: translateY(8px) scale(0.85);
+    transition: opacity 220ms ease, transform 220ms ease;
+    z-index: -1;
+  }
+
+  .site-nav__link--glow.is-active,
+  .site-nav__link--glow:hover,
+  .site-nav__link--glow:focus-visible {
+    color: color-mix(in srgb, var(--color-gold, #d4af37) 70%, white 30%);
+    text-shadow: 0 0 12px
+      color-mix(in srgb, var(--background-glow-warm, rgba(212, 175, 55, 0.4)) 85%, transparent 15%);
+  }
+
+  .site-nav__link--glow.is-active::after,
+  .site-nav__link--glow:hover::after,
+  .site-nav__link--glow:focus-visible::after {
+    opacity: 0.8;
+    transform: translateY(0) scale(1);
+  }
+
+  .site-nav__link--underline {
+    padding-inline: 0.5rem;
+    border-radius: 0.75rem;
+  }
+
+  .site-nav__link--underline::after {
+    content: "";
+    position: absolute;
+    left: 0.5rem;
+    right: 0.5rem;
+    bottom: 0.15rem;
+    height: 2px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-iris, #7c4eb0) 45%, var(--color-gold, #d4af37) 55%);
+    transform-origin: center;
+    transform: scaleX(0.4);
+    opacity: 0;
+    transition: transform 200ms ease, opacity 200ms ease;
+  }
+
+  .site-nav__link--underline.is-active,
+  .site-nav__link--underline:hover,
+  .site-nav__link--underline:focus-visible {
+    color: color-mix(in srgb, var(--color-iris, #7c4eb0) 72%, white 28%);
+  }
+
+  .site-nav__link--underline.is-active::after,
+  .site-nav__link--underline:hover::after,
+  .site-nav__link--underline:focus-visible::after {
+    opacity: 0.95;
+    transform: scaleX(1);
+  }
+
   .site-header__inner {
     flex-wrap: wrap;
     row-gap: var(--space-3, 0.75rem);
@@ -661,6 +779,27 @@ function isActive(href: string): boolean {
   .site-nav__mobile-link--plain {
     border-bottom: 0;
     padding-block: var(--space-1, 0.25rem);
+  }
+
+  .site-nav__submenu-link[data-active="true"] {
+    background: color-mix(
+      in srgb,
+      var(--background-glow-cool, rgba(124, 78, 176, 0.28)) 55%,
+      transparent 45%
+    );
+    border-radius: 0.9rem;
+    color: color-mix(in srgb, var(--color-iris, #7c4eb0) 80%, white 20%);
+  }
+
+  .site-nav__mobile-link[aria-current="page"] {
+    color: color-mix(in srgb, var(--color-gold, #d4af37) 72%, white 28%);
+    background: color-mix(
+      in srgb,
+      var(--background-glow-warm, rgba(212, 175, 55, 0.28)) 60%,
+      transparent 40%
+    );
+    border-radius: 0.9rem;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-gold, #d4af37) 40%, transparent 60%);
   }
 
   .site-search-panel {
