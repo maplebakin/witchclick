@@ -142,40 +142,44 @@ for (const section of navSections) {
 <script>
   // Admin nav dropdown functionality
   function initAdminNav() {
-    const nav = document.querySelector('[data-admin-nav]');
-    const trigger = document.querySelector('[data-admin-trigger]');
-    const dropdown = document.querySelector('[data-admin-dropdown]');
+    const nav = document.querySelector<HTMLElement>('[data-admin-nav]');
+    const trigger = document.querySelector<HTMLButtonElement>('[data-admin-trigger]');
+    const dropdown = document.querySelector<HTMLElement>('[data-admin-dropdown]');
 
     if (!nav || !trigger || !dropdown) return;
+
+    const navEl = nav;
+    const triggerEl = trigger;
+    const dropdownEl = dropdown;
 
     let isOpen = false;
 
     function openDropdown() {
       isOpen = true;
-      nav.classList.add('is-open');
-      trigger.setAttribute('aria-expanded', 'true');
-      dropdown.style.display = 'block';
+      navEl.classList.add('is-open');
+      triggerEl.setAttribute('aria-expanded', 'true');
+      dropdownEl.style.display = 'block';
       // Use requestAnimationFrame to ensure display:block is applied before adding the animation class
       requestAnimationFrame(() => {
-        dropdown.classList.add('is-visible');
+        dropdownEl.classList.add('is-visible');
       });
     }
 
     function closeDropdown() {
       isOpen = false;
-      nav.classList.remove('is-open');
-      trigger.setAttribute('aria-expanded', 'false');
-      dropdown.classList.remove('is-visible');
+      navEl.classList.remove('is-open');
+      triggerEl.setAttribute('aria-expanded', 'false');
+      dropdownEl.classList.remove('is-visible');
       // Wait for transition to complete before hiding
       setTimeout(() => {
         if (!isOpen) {
-          dropdown.style.display = 'none';
+          dropdownEl.style.display = 'none';
         }
       }, 200);
     }
 
     // Toggle handler
-    trigger.addEventListener('click', (e) => {
+    triggerEl.addEventListener('click', (e) => {
       e.stopPropagation();
       if (isOpen) {
         closeDropdown();
@@ -186,7 +190,10 @@ for (const section of navSections) {
 
     // Close on outside click
     document.addEventListener('click', (e) => {
-      if (isOpen && !nav.contains(e.target)) {
+      if (!isOpen) return;
+
+      const target = e.target;
+      if (!(target instanceof Node) || !navEl.contains(target)) {
         closeDropdown();
       }
     });
@@ -195,7 +202,7 @@ for (const section of navSections) {
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && isOpen) {
         closeDropdown();
-        trigger.focus();
+        triggerEl.focus();
       }
     });
   }
