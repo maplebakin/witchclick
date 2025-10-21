@@ -74,12 +74,13 @@ function ensureDir(p) { fs.mkdirSync(p, { recursive: true }); }
 
 const HERO_IMAGE_ROOT = path.join(CWD, 'public', 'images', 'hero');
 const DOWNLOADS_ROOT = path.join(CWD, 'public', 'downloads');
+const THEME_BACKGROUNDS_ROOT = path.join(CWD, 'public', 'images', 'theme-backgrounds');
 const THEMES_DIR = path.join(CWD, 'content', 'themes');
 const ACTIVE_THEME_FILE = path.join(THEMES_DIR, 'active.json');
 const LEGACY_THEME_FILE = path.join(CWD, 'content', 'theme.json');
 
 const THEME_REQUIRED_FIELDS = ['primary', 'accent', 'background', 'fontSerif', 'fontScript'];
-const THEME_OPTIONAL_FIELDS = ['textPrimary', 'textHeading', 'textMuted'];
+const THEME_OPTIONAL_FIELDS = ['textPrimary', 'textHeading', 'textMuted', 'backgroundImage'];
 const DEFAULT_THEME_SETTINGS = {
   midnight: {
     primary: '#6b21a8',
@@ -1757,6 +1758,59 @@ const server = http.createServer(async (req, res) => {
         return send(res, 200, { ok: true, ...data });
       } catch (e) {
         return send(res, 400, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/upload/theme-background') {
+      try {
+        const body = await parseBody(req);
+        if (!body || typeof body !== 'object') {
+          return send(res, 400, { ok: false, error: 'Invalid JSON body' });
+        }
+        const parsed = parseImageDataUrl(body.contentBase64);
+        if (!parsed) {
+          return send(res, 400, { ok: false, error: 'contentBase64 must be a data:image/... URL' });
+        }
+        const fallbackExt = MIME_EXTENSION_MAP[parsed.mime];
+        if (!fallbackExt) {
+          return send(res, 400, { ok: false, error: 'Unsupported image mime type' });
+        }
+        const sanitized = sanitizeHeroFilename(body.filename, fallbackExt);
+        const base = sanitized.base;
+        const ext = fallbackExt;
+        const buffer = Buffer.from(parsed.base64, 'base64');
+        if (!buffer.length) {
+          return send(res, 400, { ok: false, error: 'Image data was empty' });
+        }
+        ensureDir(THEME_BACKGROUNDS_ROOT);
+        const finalName = ensureUniqueFilename(THEME_BACKGROUNDS_ROOT, base, ext);
+        const filePath = path.join(THEME_BACKGROUNDS_ROOT, finalName);
+        const relativePath = `/images/theme-backgrounds/${finalName}`.replace(/\\+/g, '/');
+        await fsp.writeFile(filePath, buffer);
+        return send(res, 200, { ok: true, path: relativePath });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/themes/list-backgrounds') {
+      try {
+        ensureDir(THEME_BACKGROUNDS_ROOT);
+        let files = [];
+        try {
+          files = fs.readdirSync(THEME_BACKGROUNDS_ROOT);
+        } catch {
+          files = [];
+        }
+        const backgrounds = files
+          .filter((f) => /\.(jpg|jpeg|png|webp)$/i.test(f))
+          .map((f) => ({
+            filename: f,
+            path: `/images/theme-backgrounds/${f}`.replace(/\\+/g, '/')
+          }));
+        return send(res, 200, { ok: true, backgrounds });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e?.message || String(e) });
       }
     }
 

@@ -255,6 +255,27 @@ const seasonalSeasons = [
         </div>
 
         <div class="rounded-lg border border-line-subtle bg-surface-soft/50 p-3">
+          <h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-body-muted">Background image</h3>
+          <div class="space-y-3">
+            <div class="flex flex-wrap gap-2">
+              <label class="cursor-pointer rounded-lg border border-line-neutral bg-surface-base px-4 py-2 text-sm font-medium hover:bg-surface-soft">
+                <input type="file" accept="image/*" id="backgroundImageUpload" class="hidden" />
+                Upload image
+              </label>
+              <button
+                type="button"
+                id="clearBackgroundBtn"
+                class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft"
+              >
+                Clear background
+              </button>
+            </div>
+            <div class="text-xs text-body-muted" id="backgroundImageStatus">No background image selected</div>
+            <div class="grid grid-cols-3 gap-2" id="backgroundImageGallery"></div>
+          </div>
+        </div>
+
+        <div class="rounded-lg border border-line-subtle bg-surface-soft/50 p-3">
           <h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-body-muted">Text colours</h3>
           <div class="grid gap-3 md:grid-cols-2">
             <label class="block text-sm">
@@ -538,6 +559,10 @@ const seasonalSeasons = [
           const statusEl = root.querySelector('[data-status]');
           const fontChoices = parseFontOptions(root.getAttribute('data-font-options'));
           const categoryChoices = parseCategoryOptions(root.getAttribute('data-category-options'));
+          const backgroundImageUpload = root.querySelector('#backgroundImageUpload');
+          const clearBackgroundBtn = root.querySelector('#clearBackgroundBtn');
+          const backgroundImageStatus = root.querySelector('#backgroundImageStatus');
+          const backgroundImageGallery = root.querySelector('#backgroundImageGallery');
 
           const colorFields = ['primary','accent','background','textPrimary','textHeading','textMuted'].reduce((acc, key) => {
             acc[key] = {
@@ -589,6 +614,8 @@ const seasonalSeasons = [
             assignments: createSeasonalAssignments(),
             dirty: false
           };
+          let currentBackgroundImage = '';
+          let availableBackgrounds = [];
 
           function parseDefaults(raw, fallback){
             try {
@@ -920,6 +947,13 @@ const seasonalSeasons = [
             previewRoot.style.setProperty('--preview-font-serif', toFontStack(fontSerif, 'serif'));
             previewRoot.style.setProperty('--preview-font-script', toFontStack(fontScript, 'cursive'));
             previewRoot.setAttribute('data-mode', mode);
+            if (currentBackgroundImage) {
+              previewRoot.style.backgroundImage = 'url(' + currentBackgroundImage + ')';
+              previewRoot.style.backgroundSize = 'cover';
+              previewRoot.style.backgroundPosition = 'center';
+            } else {
+              previewRoot.style.backgroundImage = 'none';
+            }
 
             if (previewModeLabel) {
               previewModeLabel.textContent = mode === 'dawn' ? 'Dawn' : 'Midnight';
@@ -1001,7 +1035,8 @@ const seasonalSeasons = [
                 textHeading: colorFields.textHeading?.input?.value.trim() || '',
                 textMuted: colorFields.textMuted?.input?.value.trim() || '',
                 fontSerif: getFontValue(fontSerifSelect),
-                fontScript: getFontValue(fontScriptSelect)
+                fontScript: getFontValue(fontScriptSelect),
+                backgroundImage: currentBackgroundImage || ''
               }
             };
             return payload;
@@ -1027,6 +1062,9 @@ const seasonalSeasons = [
             setColorField('textPrimary', theme?.settings?.textPrimary ?? defaultsForMode.textPrimary);
             setColorField('textHeading', theme?.settings?.textHeading ?? defaultsForMode.textHeading);
             setColorField('textMuted', theme?.settings?.textMuted ?? defaultsForMode.textMuted);
+            currentBackgroundImage = theme?.settings?.backgroundImage || '';
+            updateBackgroundStatus();
+            renderBackgroundGallery();
             updateSetActiveLabel();
             refreshPreview();
           }
@@ -1183,6 +1221,99 @@ const seasonalSeasons = [
 
           function toJSON(response){
             return response.json().catch(() => ({}));
+          }
+
+          async function loadBackgrounds(){
+            try {
+              const res = await fetch(devApi + '/themes/list-backgrounds', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: '{}'
+              });
+              const json = await toJSON(res);
+              if (json && json.ok === true && Array.isArray(json.backgrounds)) {
+                availableBackgrounds = json.backgrounds;
+                renderBackgroundGallery();
+              }
+            } catch (error) {
+              console.error('[theme-admin] Failed to load backgrounds:', error);
+            }
+          }
+
+          function renderBackgroundGallery(){
+            if (!backgroundImageGallery) return;
+            backgroundImageGallery.innerHTML = '';
+            if (!availableBackgrounds.length) {
+              const empty = document.createElement('p');
+              empty.className = 'text-xs text-body-muted col-span-3';
+              empty.textContent = 'No backgrounds uploaded yet.';
+              backgroundImageGallery.appendChild(empty);
+              return;
+            }
+            availableBackgrounds.forEach((bg) => {
+              const card = document.createElement('div');
+              card.className = 'relative aspect-video cursor-pointer overflow-hidden rounded-lg border border-line-neutral hover:border-line-bold transition';
+              if (currentBackgroundImage === bg.path) {
+                card.classList.add('ring-2', 'ring-line-success');
+              }
+              const img = document.createElement('img');
+              img.src = bg.path;
+              img.alt = bg.filename;
+              img.className = 'h-full w-full object-cover';
+              card.appendChild(img);
+              card.addEventListener('click', () => {
+                currentBackgroundImage = bg.path;
+                updateBackgroundStatus();
+                renderBackgroundGallery();
+                refreshPreview();
+              });
+              backgroundImageGallery.appendChild(card);
+            });
+          }
+
+          function updateBackgroundStatus(){
+            if (!backgroundImageStatus) return;
+            if (currentBackgroundImage) {
+              const filename = currentBackgroundImage.split('/').pop();
+              backgroundImageStatus.textContent = 'Selected: ' + filename;
+            } else {
+              backgroundImageStatus.textContent = 'No background image selected';
+            }
+          }
+
+          async function uploadBackground(file){
+            if (!file) return;
+            try {
+              setStatus('Uploading background image…');
+              const reader = new FileReader();
+              reader.onload = async (e) => {
+                try {
+                  const contentBase64 = e.target.result;
+                  const res = await fetch(devApi + '/upload/theme-background', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      filename: file.name,
+                      contentBase64: contentBase64
+                    })
+                  });
+                  const json = await toJSON(res);
+                  if (!json || json.ok !== true) {
+                    throw new Error(json?.error || 'Upload failed');
+                  }
+                  currentBackgroundImage = json.path;
+                  await loadBackgrounds();
+                  updateBackgroundStatus();
+                  refreshPreview();
+                  setStatus('Background image uploaded.', 'success');
+                } catch (error) {
+                  setStatus(error?.message || 'Upload failed.', 'error');
+                }
+              };
+              reader.readAsDataURL(file);
+            } catch (error) {
+              setStatus(error?.message || 'Upload failed.', 'error');
+            }
           }
 
           async function fetchThemes(){
@@ -1426,7 +1557,27 @@ const seasonalSeasons = [
 
           updateSeasonalButtons();
 
+          if (backgroundImageUpload) {
+            backgroundImageUpload.addEventListener('change', (e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                uploadBackground(file);
+              }
+            });
+          }
+
+          if (clearBackgroundBtn) {
+            clearBackgroundBtn.addEventListener('click', () => {
+              currentBackgroundImage = '';
+              updateBackgroundStatus();
+              renderBackgroundGallery();
+              refreshPreview();
+              setStatus('Background image cleared.', 'success');
+            });
+          }
+
           refreshPreview();
+          loadBackgrounds();
           refresh(undefined, undefined, { showStatus: true });
         })();
       `}
