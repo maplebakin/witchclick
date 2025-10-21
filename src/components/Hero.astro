@@ -138,7 +138,7 @@ const resolvedSizes =
     font-size: 0.75rem;
     letter-spacing: 0.32em;
     text-transform: uppercase;
-    color: rgba(244, 241, 255, 0.75);
+    color: var(--text-tertiary);
   }
 
   .home-hero__title {
@@ -146,7 +146,7 @@ const resolvedSizes =
     font-family: var(--font-heading);
     font-size: clamp(2.5rem, 6vw, 4rem);
     line-height: 1.05;
-    color: rgba(244, 241, 255, 0.94);
+    color: var(--text-primary);
     text-transform: uppercase;
     letter-spacing: 0.08em;
   }
@@ -156,7 +156,7 @@ const resolvedSizes =
     max-width: 58ch;
     font-size: clamp(1rem, 2.5vw, 1.2rem);
     line-height: 1.75;
-    color: rgba(244, 241, 255, 0.78);
+    color: var(--text-secondary);
   }
 
   .home-hero__actions {
@@ -169,7 +169,7 @@ const resolvedSizes =
     margin: 0;
     font-size: 0.95rem;
     line-height: 1.6;
-    color: var(--text-tertiary, rgba(244, 241, 255, 0.75));
+    color: var(--text-tertiary);
     max-width: 52ch;
   }
 
@@ -259,19 +259,5 @@ const resolvedSizes =
     background: color-mix(in srgb, var(--color-overlay, rgba(242, 236, 229, 0.48)) 60%, transparent 40%);
   }
 
-  :root[data-comfort-theme="dawn"] .home-hero__eyebrow {
-    color: rgba(44, 27, 61, 0.75);
-  }
-
-  :root[data-comfort-theme="dawn"] .home-hero__title {
-    color: rgba(44, 27, 61, 0.94);
-  }
-
-  :root[data-comfort-theme="dawn"] .home-hero__blurb {
-    color: rgba(44, 27, 61, 0.78);
-  }
-
-  :root[data-comfort-theme="dawn"] .home-hero__note {
-    color: rgba(44, 27, 61, 0.7);
-  }
+  /* Dawn theme text colors are handled by CSS variables */
 </style>

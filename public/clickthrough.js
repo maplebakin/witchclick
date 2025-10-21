@@ -39,8 +39,8 @@
     if (typeof navigator === "undefined" || typeof navigator.sendBeacon !== "function") {
       return;
     }
-    const body = JSON.stringify(payload);
-    // navigator.sendBeacon("/api/track-click", body);
+    const _body = JSON.stringify(payload);
+    // navigator.sendBeacon("/api/track-click", _body);
   }
 
   function handleClick(event) {

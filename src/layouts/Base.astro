@@ -187,6 +187,7 @@ const plainReadingRoutePatterns = [
   /^\/privacy(\/|$)/,
 ];
 
+const currentPath = Astro.url?.pathname ?? "/";
 const isPlainReadingRoute = plainReadingRoutePatterns.some((pattern) => pattern.test(currentPath));
 
 const normalizeAccountLink = (link: { href: string; label: string; rel?: string }) => {

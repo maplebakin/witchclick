@@ -11,7 +11,7 @@ const ritualEntries = getEntitiesForType("ritual", ritualMeta).map((entry) => ({
   tags: Array.isArray(entry.tags) ? entry.tags.slice(0, 5) : [],
 }));
 
-const progressStatuses = [
+const _progressStatuses = [
   { id: "completed", label: "Completed today", hint: "Mark when you complete the ritual.", accent: "✨" },
   { id: "repeat-next-week", label: "Repeat next week", hint: "Schedule a gentle revisit.", accent: "🔁" },
   { id: "resting", label: "Resting / paused", hint: "Pause the ritual to make space for integration.", accent: "🌙" },

@@ -2,7 +2,6 @@
 import { marked } from 'marked';
 import { JSDOM } from 'jsdom';
 import createDOMPurify from 'dompurify';
-import fs from 'node:fs';
 
 // --- DOMPurify singleton (faster than making a JSDOM per call) ---
 const windowAny = new JSDOM('').window as any;

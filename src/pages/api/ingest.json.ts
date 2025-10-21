@@ -28,10 +28,10 @@ function ensureUniqueSlug(base:string, postsDir:string){
   return slug;
 }
 
-function wordCount(md:string){
+function _wordCount(md:string){
   const withoutCode = md.replace(/```[\s\S]*?```/g,' ').replace(/`[^`]*`/g,' ');
   const withoutMd = withoutCode.replace(/<[^>]+>/g,' ').replace(/[\\*_#>~\\-]+/g,' ');
-  const m = withoutMd.match(/\b[\p{L}\p{N}’']+\b/gu);
+  const m = withoutMd.match(/\b[\p{L}\p{N}'']+\b/gu);
   return m ? m.length : 0;
 }
 

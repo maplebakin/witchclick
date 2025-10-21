@@ -48,7 +48,7 @@ const previousHref = previous?.href;
     display: grid;
     gap: 0.35rem;
     font-size: 0.875rem;
-    color: var(--ink-muted, rgba(244, 241, 255, 0.72));
+    color: var(--text-tertiary);
   }
 
   .breadcrumbs__back {
@@ -56,7 +56,7 @@ const previousHref = previous?.href;
     align-items: center;
     gap: 0.35rem;
     font-size: 0.85rem;
-    color: var(--ink-muted, rgba(244, 241, 255, 0.72));
+    color: var(--text-tertiary);
   }
 
   .breadcrumbs__list {
@@ -73,12 +73,12 @@ const previousHref = previous?.href;
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    color: var(--ink-muted, rgba(244, 241, 255, 0.72));
+    color: var(--text-tertiary);
   }
 
   .breadcrumbs__item:not(:first-child)::before {
     content: "›";
-    color: color-mix(in srgb, var(--ink-muted, currentColor) 80%, transparent 20%);
+    color: color-mix(in srgb, var(--text-tertiary, currentColor) 80%, transparent 20%);
     font-size: 0.75rem;
   }
 

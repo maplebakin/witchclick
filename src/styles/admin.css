@@ -151,7 +151,25 @@
 input,
 select,
 textarea {
-  color: #111827 !important; /* gray-900 */
+  color: #111827 !important; /* gray-900 - 14.8:1 contrast on white */
+  background-color: #ffffff !important; /* white background for maximum readability */
+  border-color: #d1d5db !important; /* gray-300 - visible border */
+}
+
+/* Ensure select dropdowns have proper styling */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem !important;
+}
+
+/* Select options need explicit background */
+select option {
+  background-color: #ffffff !important;
+  color: #111827 !important;
 }
 
 input::placeholder,
@@ -166,6 +184,22 @@ select:disabled,
 textarea:disabled {
   color: #9ca3af !important; /* gray-400 */
   background-color: #f3f4f6 !important; /* gray-100 */
+  cursor: not-allowed;
+}
+
+/* Hover and focus states for better UX */
+input:hover:not(:disabled),
+select:hover:not(:disabled),
+textarea:hover:not(:disabled) {
+  border-color: #9ca3af !important; /* gray-400 */
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #7c3aed !important; /* purple-600 */
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1) !important;
 }
 
 /* Button states */
@@ -178,15 +212,14 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* Ensure focus states are visible */
+/* Ensure focus states are visible for buttons and links */
 button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
 a:focus-visible {
   outline: 2px solid #7c3aed !important; /* purple-600 */
   outline-offset: 2px;
 }
+
+/* Form elements use box-shadow for focus (defined above) */
 
 /* Admin-specific utility classes */
 .admin-badge {

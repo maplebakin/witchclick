@@ -35,7 +35,7 @@ lines.push(`/go/${key} ${target} 301!`);
 
 
 const redirectsPath = path.join(PUBLIC_DIR, '_redirects');
-const content = lines.length ? lines.join(String.fromCharCode(10)) + String.fromCharCode(10) : '';
+const _content = lines.length ? lines.join(String.fromCharCode(10)) + String.fromCharCode(10) : '';
 
 
 process.stdout.write(`Built ${lines.length} redirects -> ${redirectsPath}

@@ -123,34 +123,32 @@ body {
   font-size: 1rem;
   color: var(--ink-body, #1f1633);
   letter-spacing: var(--font-body-letter-spacing, normal);
-  background:
-    radial-gradient(120% 160% at 50% 0%, rgba(212, 175, 55, 0.16) 0%, transparent 60%),
-    radial-gradient(140% 200% at 10% 20%, rgba(124, 78, 176, 0.22) 0%, transparent 70%),
-    linear-gradient(180deg, var(--color-midnight) 0%, var(--color-night) 100%);
+  /* Solid midnight background - deep purple-blue */
+  background: #0f0820;
   background-attachment: fixed;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  transition: background-color 220ms ease, color 180ms ease, background 320ms ease;
+  transition: background-color 220ms ease, color 180ms ease;
 }
 
 :root[data-comfort-theme="dawn"] body {
   color: var(--ink-body, #2c1b3d);
-  background: linear-gradient(180deg, hsl(270 60% 98%) 0%, hsl(270 40% 92%) 100%);
+  /* Solid dawn background - soft lavender cream */
+  background: #f7f3f8;
 }
 
+/* Remove gradient overlays for solid color background */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(80% 80% at 50% 0%, rgba(255, 255, 255, 0.08) 0%, transparent 65%);
-  mix-blend-mode: screen;
+  background: transparent;
   z-index: -1;
 }
 
 :root[data-comfort-theme="dawn"] body::before {
-  background: radial-gradient(80% 80% at 50% 0%, rgba(155, 134, 200, 0.12) 0%, transparent 70%);
-  mix-blend-mode: normal;
+  background: transparent;
 }
 
 body[data-menu-open="true"] {

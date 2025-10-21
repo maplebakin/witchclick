@@ -202,7 +202,7 @@ function splitPreservingDelimiters(s: string, re: RegExp): string[] {
   let lastIndex = 0;
   let m: RegExpExecArray | null;
   re.lastIndex = 0;
-  // eslint-disable-next-line no-cond-assign
+   
   while ((m = re.exec(s))) {
     const start = m.index!;
     const end = re.lastIndex!;
@@ -305,7 +305,7 @@ function replaceFirstOrLimited(
   let lastIndex = 0;
   const global = re.global ? re : new RegExp(re.source, re.flags + "g");
   let match: RegExpExecArray | null;
-  // eslint-disable-next-line no-cond-assign
+   
   while ((match = global.exec(text))) {
     if (linked >= limit) break;
     const start = match.index!;

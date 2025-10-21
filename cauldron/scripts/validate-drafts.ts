@@ -38,7 +38,7 @@ async function collectDrafts(): Promise<{ summaries: DraftSummary[]; payloads: M
         title: typeof payload?.title === 'string' && payload.title.trim().length ? payload.title : slug,
         status: typeof payload?.status === 'string' ? payload.status : 'draft',
       });
-    } catch (err) {
+    } catch (_err) {
       summaries.push({ slug, title: `${slug} (invalid JSON)`, status: 'error' });
     }
   }

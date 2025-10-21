@@ -17,7 +17,7 @@ const CANDIDATE_DIRS = [
 ];
 const POSTS_DIR = DIR || (CANDIDATE_DIRS.find((d) => fs.existsSync(d)) || CANDIDATE_DIRS[0]);
 
-function log(...a){ if (DEBUG) console.log('[suggest]', ...a); }
+function _log(...a){ if (DEBUG) console.log('[suggest]', ...a); }
 function readDirRecursive(dir) {
   const out = []; if (!fs.existsSync(dir)) return out; const stack = [dir];
   while (stack.length) { const cur = stack.pop();
@@ -54,7 +54,7 @@ function score(a,b){
 }
 function suggestForOne(posts, i, topN){
   const me = posts[i];
-  const ranked = posts.map((p,j)=>({p,s:score(me,p)})).filter(x=>x.s>0).sort((x,y)=>y.s-x.s);
+  const ranked = posts.map((p,_j)=>({p,s:score(me,p)})).filter(x=>x.s>0).sort((x,y)=>y.s-x.s);
   const taken = new Set([...me.existingLinks, ...me.existingHints]);
   const out = [];
   for (const {p} of ranked) { const text=p.title; const key=norm(text); if (taken.has(key)) continue; out.push(text); if (out.length>=topN) break; }

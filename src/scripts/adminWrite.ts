@@ -27,7 +27,7 @@ function initWriteAdmin() {
   if (siteOriginAttr) {
     try {
       previewHost = new URL(siteOriginAttr).host;
-    } catch (err) {
+    } catch (_err) {
       previewHost = siteOriginAttr.replace(/^https?:\/\//, '');
     }
   }

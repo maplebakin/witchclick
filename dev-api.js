@@ -277,9 +277,20 @@ async function attachHeroToPost({ slug, heroImage, heroAlt }) {
   const block = fmMatch[0];
   const newline = block.includes('\r\n') ? '\r\n' : '\n';
   const remainder = raw.slice(block.length);
-  const lines = Array.isArray(found.lines) ? [...found.lines] : fmMatch[1].split(/\r?\n/);
 
+  // Get lines from parsed frontmatter and filter out trailing empty lines
+  const rawLines = Array.isArray(found.lines) ? [...found.lines] : fmMatch[1].split(/\r?\n/);
+
+  // Remove trailing empty strings that result from split() on strings ending with newlines
+  while (rawLines.length > 0 && rawLines[rawLines.length - 1].trim() === '') {
+    rawLines.pop();
+  }
+  const lines = rawLines;
+
+  // Find specVersion to know where to insert hero fields (should go before specVersion if it exists)
   const specIndex = lines.findIndex((line) => typeof line === 'string' && line.trim().startsWith('specVersion:'));
+
+  // Prepare the hero field lines to insert/update
   const heroImageLine = `heroImage: ${yq(heroPath)}`;
   const heroImageSrcLine = `heroImageSrc: ${yq(heroPath)}`;
   const heroAltLine = `heroAlt: ${yq(heroAltText)}`;
@@ -289,11 +300,15 @@ async function attachHeroToPost({ slug, heroImage, heroAlt }) {
     return match ? match[0] : '';
   }
 
+  // Find or create heroImage field
   let heroImageIndex = lines.findIndex((line) => typeof line === 'string' && line.trim().startsWith('heroImage:'));
   const heroImageIndent = heroImageIndex !== -1 ? indentOf(lines[heroImageIndex]) : '';
+
   if (heroImageIndex !== -1) {
+    // Update existing heroImage line
     lines[heroImageIndex] = `${heroImageIndent}${heroImageLine}`;
   } else {
+    // Insert new heroImage line before specVersion (if exists) or at end
     const insertIndex = specIndex === -1 ? lines.length : specIndex;
     lines.splice(insertIndex, 0, `${heroImageIndent}${heroImageLine}`);
     heroImageIndex = insertIndex;
@@ -320,8 +335,30 @@ async function attachHeroToPost({ slug, heroImage, heroAlt }) {
   }
 
   const updatedFrontmatter = lines.join(newline);
+
+  // Validate that we still have essential frontmatter (title should not be lost)
+  const hasTitle = lines.some((line) => typeof line === 'string' && line.trim().startsWith('title:'));
+  const hasSlug = lines.some((line) => typeof line === 'string' && line.trim().startsWith('slug:'));
+
+  if (!hasTitle && found.data?.title) {
+    const err = new Error('Critical error: title field would be lost during hero image update');
+    err.code = 'FRONTMATTER_CORRUPTION';
+    throw err;
+  }
+
+  if (!hasSlug && found.data?.slug) {
+    const err = new Error('Critical error: slug field would be lost during hero image update');
+    err.code = 'FRONTMATTER_CORRUPTION';
+    throw err;
+  }
+
   const nextBlock = `---${newline}${updatedFrontmatter}${newline}---`;
-  const next = `${nextBlock}${remainder}`;
+
+  // Ensure remainder starts with proper newline spacing
+  // The regex captures everything after the closing ---, which should start with a newline
+  // If remainder doesn't start with newline, add one to separate frontmatter from content
+  const cleanRemainder = remainder.startsWith('\n') || remainder.startsWith('\r') ? remainder : `${newline}${remainder}`;
+  const next = `${nextBlock}${cleanRemainder}`;
 
   if (next !== raw) {
     await fsp.writeFile(found.file, next, 'utf8');

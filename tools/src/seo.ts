@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
-import { clamp, listPostFiles } from './utils';
+import { clamp } from './utils';
 
 export function seoCmd(args: string[]) {
   const slug = getArg(args, '--slug');

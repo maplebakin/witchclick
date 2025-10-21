@@ -17,6 +17,7 @@ const keyOk = ADMIN_KEY && url.searchParams.get('key') === ADMIN_KEY;
 const canUse = isDev || !!keyOk;
 
 const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+const site = Astro.url?.origin ?? "";
 ---
 <Base
   title="WitchClick — Write"
