@@ -45,6 +45,33 @@ const fontOptions = [
   "Great Vibes",
   "Sacramento",
 ];
+
+const seasonalSeasons = [
+  {
+    id: "spring",
+    label: "Spring",
+    icon: "🌸",
+    description: "Light florals and early sunrise palettes for gentle beginnings.",
+  },
+  {
+    id: "summer",
+    label: "Summer",
+    icon: "🌞",
+    description: "Warm evenings, festival energy, and confident contrasts.",
+  },
+  {
+    id: "autumn",
+    label: "Autumn",
+    icon: "🍂",
+    description: "Harvest hues and fireside rituals with grounded depth.",
+  },
+  {
+    id: "winter",
+    label: "Winter",
+    icon: "❄️",
+    description: "Frosty starlight and candlelit focus for deep work.",
+  },
+];
 ---
 <Base
   title="WitchClick — Theme Dashboard"
@@ -304,6 +331,82 @@ const fontOptions = [
 
         <p class="mt-2 text-sm text-body-muted" data-status></p>
       </section>
+
+      <section
+        class="lg:col-span-12 space-y-5 rounded-2xl border border-dashed border-line-neutral bg-surface-base/70 p-4 shadow-sm"
+        data-seasonal-panel
+      >
+        <header class="space-y-1">
+          <h2 class="text-lg font-semibold text-primary">Seasonal theme schedule</h2>
+          <p class="text-sm text-body-muted">
+            Plan ahead for seasonal refreshes by pairing midnight and dawn themes with each quarter. Saving is wired to log a
+            payload until the API endpoint is prepared.
+          </p>
+        </header>
+
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4" data-seasonal-grid>
+          {seasonalSeasons.map((season) => (
+            <article
+              class="space-y-3 rounded-xl border border-line-subtle bg-surface-base/80 p-4"
+              data-season-card
+              data-season={season.id}
+            >
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <h3 class="text-sm font-semibold text-primary">{season.label}</h3>
+                  <p class="text-[11px] text-body-muted">{season.description}</p>
+                </div>
+                <span class="text-lg" aria-hidden="true">{season.icon}</span>
+              </div>
+
+              <div class="space-y-3">
+                <label class="block text-xs">
+                  <span class="font-semibold uppercase tracking-wide text-body-muted">Midnight theme</span>
+                  <select
+                    class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm"
+                    data-season-select="midnight"
+                  >
+                    <option value="">Not assigned</option>
+                  </select>
+                </label>
+                <label class="block text-xs">
+                  <span class="font-semibold uppercase tracking-wide text-body-muted">Dawn theme</span>
+                  <select
+                    class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm"
+                    data-season-select="dawn"
+                  >
+                    <option value="">Not assigned</option>
+                  </select>
+                </label>
+              </div>
+
+              <p class="text-[11px] text-body-muted" data-season-status>Awaiting seasonal plan.</p>
+            </article>
+          ))}
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft"
+            data-seasonal-save
+          >
+            Save seasonal plan
+          </button>
+          <button
+            type="button"
+            class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft"
+            data-seasonal-reset
+          >
+            Reset changes
+          </button>
+        </div>
+
+        <p class="text-xs text-body-muted">
+          Seasonal assignments are stored locally for now and logged to the console when saved — perfect for testing payloads
+          before the endpoint arrives.
+        </p>
+      </section>
       </div>
     </div>
   ) : (
@@ -376,12 +479,36 @@ const fontOptions = [
           const resetBtn = root.querySelector('#resetThemeBtn');
           const loadActiveBtn = root.querySelector('#loadActiveThemeBtn');
           const newButtons = Array.from(root.querySelectorAll('[data-new-theme]'));
+          const seasonalPanel = root.querySelector('[data-seasonal-panel]');
+          const seasonalCards = Array.from(root.querySelectorAll('[data-season-card]'))
+            .map((card) => {
+              const season = card.getAttribute('data-season');
+              if (!season) return null;
+              return {
+                season,
+                card,
+                selects: {
+                  midnight: card.querySelector('[data-season-select="midnight"]'),
+                  dawn: card.querySelector('[data-season-select="dawn"]')
+                },
+                status: card.querySelector('[data-season-status]')
+              };
+            })
+            .filter(Boolean);
+          const seasonalSaveBtn = root.querySelector('[data-seasonal-save]');
+          const seasonalResetBtn = root.querySelector('[data-seasonal-reset]');
+          const seasonIds = seasonalCards.map((entry) => entry.season);
 
           let state = {
             items: { midnight: [], dawn: [] },
             active: { midnight: null, dawn: null }
           };
           let current = null;
+          let seasonal = {
+            original: createSeasonalAssignments(),
+            assignments: createSeasonalAssignments(),
+            dirty: false
+          };
 
           function parseDefaults(raw, fallback){
             try {
@@ -445,6 +572,149 @@ const fontOptions = [
             if (!select) return '';
             const value = typeof select.value === 'string' ? select.value.trim() : '';
             return value;
+          }
+
+          function createSeasonalAssignments(){
+            const base = {};
+            seasonIds.forEach((season) => {
+              base[season] = { midnight: '', dawn: '' };
+            });
+            return base;
+          }
+
+          function cloneSeasonalAssignments(source){
+            const base = createSeasonalAssignments();
+            Object.keys(source || {}).forEach((season) => {
+              if (!base[season]) {
+                base[season] = { midnight: '', dawn: '' };
+              }
+              const value = source[season];
+              if (value && typeof value === 'object') {
+                if (typeof value.midnight === 'string') {
+                  base[season].midnight = value.midnight;
+                }
+                if (typeof value.dawn === 'string') {
+                  base[season].dawn = value.dawn;
+                }
+              }
+            });
+            return base;
+          }
+
+          function parseSeasonalAssignments(raw){
+            if (Array.isArray(raw)) {
+              const mapped = {};
+              raw.forEach((item) => {
+                if (!item || typeof item !== 'object') return;
+                const season = typeof item.season === 'string' ? item.season : '';
+                if (!season) return;
+                if (!mapped[season]) mapped[season] = { midnight: '', dawn: '' };
+                if (typeof item.midnight === 'string') mapped[season].midnight = item.midnight;
+                if (typeof item.dawn === 'string') mapped[season].dawn = item.dawn;
+              });
+              return cloneSeasonalAssignments(mapped);
+            }
+            if (raw && typeof raw === 'object') {
+              return cloneSeasonalAssignments(raw);
+            }
+            return createSeasonalAssignments();
+          }
+
+          function ensureSeasonEntry(store, season){
+            if (!store[season]) {
+              store[season] = { midnight: '', dawn: '' };
+            }
+            return store[season];
+          }
+
+          function isSeasonalEqual(a, b){
+            const seasons = new Set([
+              ...seasonIds,
+              ...Object.keys(a || {}),
+              ...Object.keys(b || {})
+            ]);
+            for (const season of seasons) {
+              const left = a?.[season] || {};
+              const right = b?.[season] || {};
+              if ((left.midnight || '') !== (right.midnight || '')) return false;
+              if ((left.dawn || '') !== (right.dawn || '')) return false;
+            }
+            return true;
+          }
+
+          function updateSeasonalButtons(){
+            if (seasonalSaveBtn) {
+              seasonalSaveBtn.disabled = !seasonal.dirty;
+            }
+            if (seasonalResetBtn) {
+              seasonalResetBtn.disabled = !seasonal.dirty;
+            }
+            if (seasonalPanel) {
+              seasonalPanel.setAttribute('data-dirty', seasonal.dirty ? 'true' : 'false');
+            }
+          }
+
+          function setSeasonalDirtyFlag(){
+            seasonal.dirty = !isSeasonalEqual(seasonal.assignments, seasonal.original);
+            updateSeasonalButtons();
+          }
+
+          function updateSeasonCardStatus(entry){
+            if (!entry || !entry.status) return;
+            const current = seasonal.assignments[entry.season] || { midnight: '', dawn: '' };
+            const saved = seasonal.original[entry.season] || { midnight: '', dawn: '' };
+            if (!current.midnight && !current.dawn) {
+              entry.status.textContent = 'No themes assigned yet.';
+            } else if (current.midnight === saved.midnight && current.dawn === saved.dawn) {
+              entry.status.textContent = 'Matches saved plan.';
+            } else {
+              entry.status.textContent = 'Draft updated — remember to save.';
+            }
+          }
+
+          function renderSeasonalOptions(){
+            if (!seasonalCards.length) return;
+            seasonalCards.forEach((entry) => {
+              ['midnight', 'dawn'].forEach((mode) => {
+                const select = entry.selects[mode];
+                if (!select) return;
+                const themes = state.items[mode] || [];
+                select.innerHTML = '';
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = 'Not assigned';
+                select.appendChild(placeholder);
+                themes.forEach((theme) => {
+                  const option = document.createElement('option');
+                  option.value = theme.slug;
+                  option.textContent = theme.label;
+                  select.appendChild(option);
+                });
+                const target = seasonal.assignments[entry.season]?.[mode] || '';
+                if (target) {
+                  const hasOption = Array.from(select.options).some((option) => option.value === target);
+                  if (!hasOption) {
+                    const missing = document.createElement('option');
+                    missing.value = target;
+                    missing.textContent = target + ' (missing)';
+                    missing.disabled = true;
+                    select.appendChild(missing);
+                  }
+                }
+                select.value = target || '';
+                if (select.value !== (target || '')) {
+                  select.value = '';
+                }
+              });
+              updateSeasonCardStatus(entry);
+            });
+          }
+
+          function handleSeasonalChange(season, mode, value){
+            ensureSeasonEntry(seasonal.assignments, season)[mode] = value;
+            const entry = seasonalCards.find((item) => item.season === season);
+            updateSeasonCardStatus(entry);
+            setSeasonalDirtyFlag();
           }
 
           function setStatus(message, tone){
@@ -814,6 +1084,13 @@ const fontOptions = [
               };
               renderLists();
               updateActiveLabels();
+              if (seasonalCards.length) {
+                const parsedSeasonal = parseSeasonalAssignments(data.seasonal);
+                seasonal.original = cloneSeasonalAssignments(parsedSeasonal);
+                seasonal.assignments = cloneSeasonalAssignments(parsedSeasonal);
+                renderSeasonalOptions();
+                setSeasonalDirtyFlag();
+              }
               const mode = preferredMode || current?.mode || 'midnight';
               const slug = preferredSlug || current?.slug || state.active[mode];
               if (slug) {
@@ -975,6 +1252,45 @@ const fontOptions = [
               startNewTheme(mode);
             });
           });
+
+          if (seasonalCards.length) {
+            seasonalCards.forEach((entry) => {
+              ['midnight', 'dawn'].forEach((mode) => {
+                const select = entry.selects[mode];
+                if (!select) return;
+                select.addEventListener('change', () => {
+                  const value = typeof select.value === 'string' ? select.value.trim() : '';
+                  handleSeasonalChange(entry.season, mode, value);
+                });
+              });
+            });
+          }
+
+          if (seasonalSaveBtn) {
+            seasonalSaveBtn.disabled = true;
+            seasonalSaveBtn.addEventListener('click', () => {
+              if (!seasonal.dirty) {
+                setStatus('No seasonal updates to save yet.', null);
+                return;
+              }
+              const payload = { assignments: seasonal.assignments };
+              console.info('[theme-admin] Seasonal theme draft ready', payload);
+              setSeasonalDirtyFlag();
+              setStatus('Seasonal saving not yet connected — payload logged to console for future wiring.', null);
+            });
+          }
+
+          if (seasonalResetBtn) {
+            seasonalResetBtn.disabled = true;
+            seasonalResetBtn.addEventListener('click', () => {
+              seasonal.assignments = cloneSeasonalAssignments(seasonal.original);
+              renderSeasonalOptions();
+              setSeasonalDirtyFlag();
+              setStatus('Seasonal selections restored to saved values.', null);
+            });
+          }
+
+          updateSeasonalButtons();
 
           refreshPreview();
           refresh(undefined, undefined, { showStatus: true });
