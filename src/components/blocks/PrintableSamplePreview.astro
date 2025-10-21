@@ -1,0 +1,159 @@
+---
+interface Section {
+  label: string;
+  prompts: string[];
+}
+
+interface Props {
+  title: string;
+  description?: string;
+  sections: Section[];
+  accent?: string;
+  note?: string;
+}
+
+const {
+  title,
+  description = "",
+  sections = [],
+  accent = "#7c3aed",
+  note = "Preview of the free three-day ritual sampler printable.",
+} = Astro.props as Props;
+---
+<div class="printable-preview" style={`--preview-accent: ${accent}`}>
+  <header class="printable-preview__header">
+    <p class="printable-preview__kicker">Sampler sneak peek</p>
+    <h3 class="printable-preview__title">{title}</h3>
+    {description && <p class="printable-preview__description">{description}</p>}
+  </header>
+  {sections.length > 0 && (
+    <div class="printable-preview__grid">
+      {sections.map((section) => (
+        <section class="printable-preview__section">
+          <h4 class="printable-preview__section-title">{section.label}</h4>
+          <ul class="printable-preview__list">
+            {section.prompts.map((prompt) => (
+              <li>{prompt}</li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  )}
+  {note && <p class="printable-preview__note">{note}</p>}
+</div>
+
+<style>
+  .printable-preview {
+    display: grid;
+    gap: 1.25rem;
+    padding: clamp(1.5rem, 4vw, 2rem);
+    border-radius: 1.75rem;
+    border: 1px solid color-mix(in srgb, var(--preview-accent) 30%, transparent 70%);
+    background:
+      radial-gradient(140% 120% at 8% 10%, color-mix(in srgb, var(--preview-accent) 16%, transparent 84%), transparent 62%),
+      color-mix(in srgb, var(--surface-plain, rgba(18, 10, 30, 0.92)) 90%, transparent 10%);
+    box-shadow: var(--shadow-soft, 0 18px 45px -28px rgba(11, 6, 20, 0.55));
+  }
+
+  :root[data-comfort-theme="dawn"] .printable-preview {
+    border-color: color-mix(in srgb, var(--preview-accent) 28%, transparent 72%);
+    background:
+      radial-gradient(130% 110% at 8% 10%, color-mix(in srgb, var(--preview-accent) 14%, transparent 86%), transparent 62%),
+      color-mix(in srgb, var(--surface-plain, rgba(252, 248, 242, 0.96)) 94%, transparent 6%);
+    box-shadow: 0 24px 55px -28px rgba(63, 49, 86, 0.24);
+  }
+
+  .printable-preview__header {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .printable-preview__kicker {
+    margin: 0;
+    font-size: 0.65rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--text-tertiary) 88%, transparent 12%);
+  }
+
+  .printable-preview__title {
+    margin: 0;
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+    color: color-mix(in srgb, var(--ink-strong) 95%, white 5%);
+  }
+
+  .printable-preview__description {
+    margin: 0;
+    color: color-mix(in srgb, var(--text-secondary) 94%, transparent 6%);
+  }
+
+  .printable-preview__grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 720px) {
+    .printable-preview__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .printable-preview__section {
+    border-radius: 1.25rem;
+    border: 1px solid color-mix(in srgb, var(--preview-accent) 24%, transparent 76%);
+    background: color-mix(in srgb, var(--surface-plain, rgba(18, 10, 30, 0.92)) 94%, transparent 6%);
+    padding: 1rem;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  :root[data-comfort-theme="dawn"] .printable-preview__section {
+    border-color: color-mix(in srgb, var(--preview-accent) 22%, transparent 78%);
+    background: color-mix(in srgb, var(--surface-plain, rgba(252, 248, 242, 0.96)) 98%, transparent 2%);
+  }
+
+  .printable-preview__section-title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--preview-accent) 72%, white 28%);
+  }
+
+  .printable-preview__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.65rem;
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--text-secondary) 90%, transparent 10%);
+  }
+
+  .printable-preview__list li {
+    display: grid;
+    gap: 0.25rem;
+    position: relative;
+    padding-left: 1.25rem;
+  }
+
+  .printable-preview__list li::before {
+    content: "✶";
+    position: absolute;
+    inset-inline-start: 0;
+    color: color-mix(in srgb, var(--preview-accent) 65%, white 35%);
+    font-size: 0.75rem;
+    line-height: 1;
+    inset-block-start: 0.15rem;
+  }
+
+  .printable-preview__note {
+    margin: 0;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--text-tertiary) 88%, transparent 12%);
+  }
+</style>

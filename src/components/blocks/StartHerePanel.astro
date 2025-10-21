@@ -1,0 +1,188 @@
+---
+const steps = [
+  {
+    title: "Choose your intention",
+    description:
+      "Visit the hub constellation to see Release, Focus, and Calm rituals gathered by need—perfect when you're not sure where to begin.",
+    href: "/hub",
+    label: "Browse hubs ↗",
+  },
+  {
+    title: "Ask the ritual lab",
+    description:
+      "Select how much energy you have and the tools within reach. The ritual lab brews a custom sequence with prompts and timing cues.",
+    href: "/lab/",
+    label: "Open ritual lab",
+  },
+  {
+    title: "Print a gentle companion",
+    description:
+      "Download the free three-day sampler planner to keep a cozy ritual structure nearby while you settle into the rhythm.",
+    href: "/lab/three-day-sampler",
+    label: "Preview sampler",
+  },
+] as const;
+---
+<section class="start-here" aria-labelledby="start-here-title">
+  <div class="start-here__inner">
+    <header class="start-here__header">
+      <p class="start-here__eyebrow">New to WitchClick?</p>
+      <h2 id="start-here-title" class="start-here__title">Start here</h2>
+      <p class="start-here__lead">
+        Ease into the coven with three simple steps. Pick what resonates, skip what doesn’t—each path keeps things cozy and
+        accessible.
+      </p>
+    </header>
+    <div class="start-here__grid">
+      {steps.map((step, index) => (
+        <article class="start-here__card card-panel card-tier-1 card-panel-soft" data-step={index + 1}>
+          <div class="start-here__badge" aria-hidden="true">{index + 1}</div>
+          <h3 class="start-here__card-title">{step.title}</h3>
+          <p class="start-here__card-text">{step.description}</p>
+          <a class="start-here__link focus-ring" href={step.href}>
+            {step.label}
+          </a>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .start-here {
+    margin: clamp(2.25rem, 6vw, 3.5rem) 0;
+  }
+
+  .start-here__inner {
+    position: relative;
+    padding: clamp(2rem, 6vw, 3.25rem);
+    border-radius: clamp(2rem, 5vw, 2.75rem);
+    border: 1px solid color-mix(in srgb, var(--color-iris) 35%, transparent 65%);
+    background:
+      radial-gradient(120% 140% at 90% 0%, color-mix(in srgb, var(--color-gold) 18%, transparent 82%), transparent 70%),
+      radial-gradient(110% 120% at 10% 20%, color-mix(in srgb, var(--color-iris) 24%, transparent 76%), transparent 70%),
+      color-mix(in srgb, var(--surface-plain) 92%, transparent 8%);
+    box-shadow: 0 22px 60px -32px rgba(12, 5, 23, 0.55);
+    overflow: hidden;
+  }
+
+  :root[data-comfort-theme="dawn"] .start-here__inner {
+    border-color: color-mix(in srgb, var(--color-iris) 28%, transparent 72%);
+    background:
+      radial-gradient(120% 140% at 90% 0%, color-mix(in srgb, var(--color-gold) 15%, transparent 85%), transparent 72%),
+      radial-gradient(110% 120% at 10% 20%, color-mix(in srgb, var(--color-iris) 18%, transparent 82%), transparent 72%),
+      color-mix(in srgb, var(--surface-plain) 95%, transparent 5%);
+    box-shadow: 0 22px 60px -38px rgba(63, 49, 86, 0.22);
+  }
+
+  .start-here__header {
+    display: grid;
+    gap: 0.85rem;
+    max-width: 40rem;
+  }
+
+  .start-here__eyebrow {
+    margin: 0;
+    font-size: 0.75rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--text-hint) 90%, transparent 10%);
+  }
+
+  .start-here__title {
+    margin: 0;
+    font-family: var(--font-heading, var(--font-body));
+    font-size: clamp(1.9rem, 4vw, 2.45rem);
+    color: color-mix(in srgb, var(--ink-strong) 92%, white 8%);
+  }
+
+  .start-here__lead {
+    margin: 0;
+    color: color-mix(in srgb, var(--text-secondary) 96%, transparent 4%);
+    max-width: 32rem;
+  }
+
+  .start-here__grid {
+    margin-top: clamp(1.75rem, 5vw, 2.5rem);
+    display: grid;
+    gap: clamp(1rem, 4vw, 1.5rem);
+  }
+
+  .start-here__card {
+    position: relative;
+    display: grid;
+    gap: 0.75rem;
+    padding: clamp(1.25rem, 4vw, 1.75rem);
+    border-radius: clamp(1.5rem, 4vw, 2rem);
+    border: 1px solid color-mix(in srgb, var(--color-iris) 28%, transparent 72%);
+    background:
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--surface-plain) 92%, transparent 8%) 0%,
+        color-mix(in srgb, var(--surface-plain) 85%, transparent 15%) 100%
+      );
+    box-shadow: var(--shadow-soft, 0 18px 45px -28px rgba(11, 6, 20, 0.55));
+    transition: transform 220ms ease, box-shadow 220ms ease;
+  }
+
+  .start-here__card:hover,
+  .start-here__card:focus-within {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-strong, 0 28px 75px -24px rgba(3, 2, 12, 0.72));
+  }
+
+  .start-here__badge {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-iris) 65%, var(--color-gold) 35%);
+    color: color-mix(in srgb, white 92%, var(--color-night) 8%);
+    font-weight: 600;
+    display: grid;
+    place-items: center;
+    font-size: 1rem;
+  }
+
+  .start-here__card-title {
+    margin: 0;
+    font-size: 1.25rem;
+    color: color-mix(in srgb, var(--ink-strong) 90%, white 10%);
+  }
+
+  .start-here__card-text {
+    margin: 0;
+    color: color-mix(in srgb, var(--text-secondary) 92%, transparent 8%);
+    font-size: 0.95rem;
+  }
+
+  .start-here__link {
+    justify-self: flex-start;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--link-color) 65%, var(--color-gold) 35%);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--color-iris) 42%, transparent 58%);
+    background: color-mix(in srgb, var(--surface-plain) 85%, transparent 15%);
+  }
+
+  .start-here__link:hover,
+  .start-here__link:focus-visible {
+    color: color-mix(in srgb, var(--link-color) 55%, var(--color-gold) 45%);
+    border-color: color-mix(in srgb, var(--color-iris) 52%, transparent 48%);
+    background: color-mix(in srgb, var(--surface-plain) 92%, transparent 8%);
+  }
+
+  @media (min-width: 720px) {
+    .start-here__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .start-here__card {
+      height: 100%;
+    }
+  }
+</style>

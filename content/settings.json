@@ -5,9 +5,10 @@
   "kofiUsername": "",
   "showAccountLink": false,
   "analytics": {
-    "enabled": false,
+    "enabled": true,
     "provider": "plausible",
     "domain": "witchclick.space",
+    "scriptUrl": "https://plausible.witchclick.space/js/script.js",
     "apiHost": "https://plausible.witchclick.space"
   },
   "ads": {
