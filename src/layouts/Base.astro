@@ -6,6 +6,7 @@ import "@/styles/tailwind.css";
 
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+import ComfortFab from "@/components/ComfortFab.astro";
 import {
   primaryNavLinks,
   secondaryNavLinks,
@@ -25,6 +26,8 @@ type LayoutProps = {
   wide?: boolean;
   desktopWide?: boolean;
   ogImage?: string;
+  ogType?: string;
+  twitterCard?: string;
   noindex?: boolean;
   ambientColor?: string;
   bodyDataType?: string;
@@ -37,6 +40,8 @@ const {
   wide = false,
   desktopWide = false,
   ogImage = "",
+  ogType = "website",
+  twitterCard = "summary_large_image",
   noindex = false,
   ambientColor = "",
   bodyDataType = "",
@@ -47,6 +52,8 @@ const analytics = buildAnalyticsInjection(settings);
 const brandName = settings.brandName ?? "WitchClick";
 const disclosure = settings.disclosure ?? "";
 const ogUrl = ogImage ? toAbsoluteUrl(ogImage, settings) : "";
+const fallbackOgImage = toAbsoluteUrl("/images/hero/focus-hub-intro/tea-and-light-in-the-morning.png", settings);
+const resolvedOgImage = ogUrl || fallbackOgImage;
 const canonicalUrl = buildCanonicalUrl(settings, { canonical: canon, astroUrl: Astro.url ?? null });
 
 const { midnight: midnightTheme, dawn: dawnTheme } = getActiveThemes();
@@ -228,11 +235,15 @@ const bodyStyle = bodyStyleEntries.map(([key, value]) => `${key}: ${value}`).joi
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     {noindex && <meta name="robots" content="noindex" />}
     <meta property="og:site_name" content={brandName} />
+    <meta property="og:type" content={ogType} />
     <meta property="og:title" content={title} />
     {description && <meta property="og:description" content={description} />}
     {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
-    {ogUrl && <meta property="og:image" content={ogUrl} />}
-    <meta name="twitter:card" content="summary_large_image" />
+    {resolvedOgImage && <meta property="og:image" content={resolvedOgImage} />}
+    <meta name="twitter:card" content={twitterCard} />
+    <meta name="twitter:title" content={title} />
+    {description && <meta name="twitter:description" content={description} />}
+    {resolvedOgImage && <meta name="twitter:image" content={resolvedOgImage} />}
     <meta name="theme-color" content={themeMetaColor} />
 
     {analytics?.head?.attributes && (
@@ -360,6 +371,7 @@ const bodyStyle = bodyStyleEntries.map(([key, value]) => `${key}: ${value}`).joi
       utilityLinks={footerUtilities}
       disclosure={disclosure}
     />
+    <ComfortFab />
     {analytics?.runtime?.inline && (
       <script is:inline>{analytics.runtime.inline}</script>
     )}

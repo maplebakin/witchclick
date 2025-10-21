@@ -329,9 +329,8 @@ const jsonLd = {
 };
 ---
 
-<Base title={title} description={description} canon={canonical} wide={true} ogImage={ogImage}>
+<Base title={title} description={description} canon={canonical} wide={true} ogImage={ogImage} ogType="article">
   <HeadSlot slot="head">
-    <meta property="og:type" content="article" />
     {publishedAt && (
       <meta property="article:published_time" content={new Date(publishedAt).toISOString()} />
     )}

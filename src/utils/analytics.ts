@@ -37,13 +37,14 @@ export function buildAnalyticsInjection(settings: SiteSettings): AnalyticsInject
   switch (provider) {
     case "plausible": {
       headAttributes.defer = true;
-      const domain = analytics.domain ?? "";
+      const domain = resolvePlausibleDomain(analytics.domain, settings);
       if (domain) {
         headAttributes["data-domain"] = domain;
       }
       if (analytics.apiHost) {
-        headAttributes["data-api"] = analytics.apiHost;
+        headAttributes["data-api"] = normalizePlausibleApi(analytics.apiHost);
       }
+      headAttributes["data-no-cookie"] = "true";
       break;
     }
     case "fathom": {
@@ -119,5 +120,27 @@ function resolveScriptUrl(url: string | undefined, provider: NonNullable<Analyti
     return toAbsoluteUrl(url, settings);
   }
   return url;
+}
+
+function resolvePlausibleDomain(domain: string | undefined, settings: SiteSettings): string {
+  if (domain && domain.trim()) {
+    return domain.trim();
+  }
+
+  try {
+    const origin = getSiteOrigin(settings, { strict: false });
+    if (!origin) return "";
+    const parsed = new URL(origin);
+    return parsed.host;
+  } catch {
+    return "";
+  }
+}
+
+function normalizePlausibleApi(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return trimmed;
+  const normalized = trimmed.replace(/\/$/, "");
+  return normalized.endsWith("/api/event") ? normalized : `${normalized}/api/event`;
 }
 

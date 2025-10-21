@@ -4,6 +4,7 @@ import Hero from "@/components/Hero.astro";
 import PostCard from "@/components/PostCard.astro";
 import HeadSlot from "@/components/HeadSlot.astro";
 import EvergreenCta from "@/components/blocks/EvergreenCta.astro";
+import StartHerePanel from "@/components/blocks/StartHerePanel.astro";
 import Testimonials from "@/components/blocks/Testimonials.astro";
 import { loadAllPosts, firstParagraph, estimateReadingMinutes, extractHeroImage } from "@/utils/posts";
 import { readSettings } from "@/utils/settings";
@@ -275,6 +276,8 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
       </div>
     </div>
   </section>
+
+  <StartHerePanel />
 
   {latestSection.posts.length > 0 && (
     <section class="home-section" aria-labelledby={latestSection.id}>

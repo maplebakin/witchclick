@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import HeadSlot from "@/components/HeadSlot.astro";
 import EvergreenCta from "@/components/blocks/EvergreenCta.astro";
+import PrintableSamplePreview from "@/components/blocks/PrintableSamplePreview.astro";
 import Testimonials from "@/components/blocks/Testimonials.astro";
 import { readSettings } from "../../utils/settings";
 import { createCollectionPageSchema } from "../../utils/structuredData";
@@ -101,6 +102,39 @@ const automationIdeas = [
   "Schedule a weekly email to yourself with Buttondown's digest feature and paste the ritual steps there.",
   "Batch print three copies of the sampler planner so you can circle back whenever you feel foggy.",
 ];
+
+const samplerPreview = {
+  title: "Three-Day Ritual Sampler Planner",
+  description:
+    "Day-by-day prompts to check in with your energy, note support tools, and choose one tiny next step without pressure.",
+  sections: [
+    {
+      label: "Morning check-in",
+      prompts: [
+        "Anchor word for today",
+        "Body status + sensations",
+        "Micro-ritual you’ll attempt",
+      ],
+    },
+    {
+      label: "Midday touchpoint",
+      prompts: [
+        "Energy level (0–5 spoons)",
+        "Support tools within reach",
+        "Boundary or break you’ll honour",
+      ],
+    },
+    {
+      label: "Evening unwind",
+      prompts: [
+        "What felt nourishing",
+        "A moment to compost or forgive",
+        "Tomorrow’s gentle intention",
+      ],
+    },
+  ],
+  note: "Every page includes open space for scribbles, tarot pulls, or sensory notes so you can adapt the flow.",
+};
 
 function toLabel(value: string): string {
   return value
@@ -247,6 +281,14 @@ const ritualData = entries.map((entry) => ({
         </a>
       </div>
     </form>
+
+    <PrintableSamplePreview
+      title={samplerPreview.title}
+      description={samplerPreview.description}
+      sections={samplerPreview.sections}
+      note={samplerPreview.note}
+      accent="#7c3aed"
+    />
 
     <div id="downloads" class="grid gap-6 md:grid-cols-2">
       {downloads.length === 0 ? (
