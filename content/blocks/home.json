@@ -12,26 +12,5 @@
       "disclaimer": "You can unsubscribe anytime."
     }
   },
-  "testimonialSection": {
-    "eyebrow": "Coven whispers",
-    "title": "What cozy practitioners say",
-    "description": "Glimpse how these rituals feel in the hands of fellow planners, therapists, and exhausted creatives."
-  },
-  "testimonials": [
-    {
-      "quote": "Every download feels like a little seasonal ritual kit. It's secular witchcraft for exhausted brains.",
-      "author": "Moira G.",
-      "role": "Planner enthusiast"
-    },
-    {
-      "quote": "The prompts are grounded and practical, but still magical enough that I look forward to checking in.",
-      "author": "Hayden B.",
-      "role": "Therapist & tarot reader"
-    },
-    {
-      "quote": "I finally have a ritual that fits my spoons. WitchClick meets me where I am and nudges me gently forward.",
-      "author": "Tori L.",
-      "role": "Creative director"
-    }
-  ]
+  "testimonials": []
 }
