@@ -58,24 +58,50 @@ function isActive(itemPath: string, current: string): boolean {
   if (itemPath !== "/admin" && current.startsWith(itemPath)) return true;
   return false;
 }
+
+// Find current page info
+let currentPageLabel = "Admin Panel";
+let currentPageDescription = "";
+for (const section of navSections) {
+  for (const item of section.items) {
+    if (isActive(item.href, currentPath)) {
+      currentPageLabel = item.label;
+      currentPageDescription = item.description;
+      break;
+    }
+  }
+}
 ---
 
 <nav aria-label="Admin navigation" class="admin-nav" data-admin-nav>
   <div class="admin-nav-header">
-    <div class="admin-nav-header-left">
-      <h2 class="admin-nav-title">Admin Panel</h2>
-      <button
-        type="button"
-        class="admin-nav-toggle"
-        data-admin-toggle
-        aria-expanded="true"
-        aria-label="Toggle admin navigation"
-      >
-        <svg class="admin-nav-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <polyline points="15 18 9 12 15 6"></polyline>
+    <button
+      type="button"
+      class="admin-nav-trigger"
+      data-admin-trigger
+      aria-expanded="false"
+      aria-haspopup="true"
+      aria-label="Open admin navigation menu"
+    >
+      <div class="admin-nav-trigger-content">
+        <div class="admin-nav-trigger-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+        </div>
+        <div class="admin-nav-trigger-text">
+          <span class="admin-nav-trigger-label">{currentPageLabel}</span>
+          <span class="admin-nav-trigger-description">{currentPageDescription}</span>
+        </div>
+        <svg class="admin-nav-trigger-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
-      </button>
-    </div>
+      </div>
+    </button>
+
     <a href="/" class="admin-nav-home-link">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -85,65 +111,91 @@ function isActive(itemPath: string, current: string): boolean {
     </a>
   </div>
 
-  <div class="admin-nav-sections" data-admin-sections>
-    {navSections.map((section) => (
-      <div class="admin-nav-section">
-        <h3 class="admin-nav-section-label">{section.label}</h3>
-        <ul class="admin-nav-list">
-          {section.items.map((item) => {
-            const active = isActive(item.href, currentPath);
-            return (
-              <li>
-                <a
-                  href={item.href}
-                  class:list={["admin-nav-link", { "admin-nav-link--active": active }]}
-                  aria-current={active ? "page" : undefined}
-                >
-                  <span class="admin-nav-link-label">{item.label}</span>
-                  <span class="admin-nav-link-description">{item.description}</span>
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    ))}
+  <div class="admin-nav-dropdown" data-admin-dropdown>
+    <div class="admin-nav-dropdown-content">
+      {navSections.map((section) => (
+        <div class="admin-nav-section">
+          <h3 class="admin-nav-section-label">{section.label}</h3>
+          <ul class="admin-nav-list">
+            {section.items.map((item) => {
+              const active = isActive(item.href, currentPath);
+              return (
+                <li>
+                  <a
+                    href={item.href}
+                    class:list={["admin-nav-link", { "admin-nav-link--active": active }]}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    <span class="admin-nav-link-label">{item.label}</span>
+                    <span class="admin-nav-link-description">{item.description}</span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </div>
   </div>
 </nav>
 
 <script>
-  // Admin nav collapse/expand functionality
-  const STORAGE_KEY = 'witchclick-admin-nav-collapsed';
-
+  // Admin nav dropdown functionality
   function initAdminNav() {
     const nav = document.querySelector('[data-admin-nav]');
-    const toggle = document.querySelector('[data-admin-toggle]');
-    const sections = document.querySelector('[data-admin-sections]');
+    const trigger = document.querySelector('[data-admin-trigger]');
+    const dropdown = document.querySelector('[data-admin-dropdown]');
 
-    if (!nav || !toggle || !sections) return;
+    if (!nav || !trigger || !dropdown) return;
 
-    // Load saved state
-    const savedState = localStorage.getItem(STORAGE_KEY);
-    const isCollapsed = savedState === 'true';
+    let isOpen = false;
 
-    // Apply initial state
-    if (isCollapsed) {
-      nav.classList.add('is-collapsed');
-      toggle.setAttribute('aria-expanded', 'false');
+    function openDropdown() {
+      isOpen = true;
+      nav.classList.add('is-open');
+      trigger.setAttribute('aria-expanded', 'true');
+      dropdown.style.display = 'block';
+      // Use requestAnimationFrame to ensure display:block is applied before adding the animation class
+      requestAnimationFrame(() => {
+        dropdown.classList.add('is-visible');
+      });
+    }
+
+    function closeDropdown() {
+      isOpen = false;
+      nav.classList.remove('is-open');
+      trigger.setAttribute('aria-expanded', 'false');
+      dropdown.classList.remove('is-visible');
+      // Wait for transition to complete before hiding
+      setTimeout(() => {
+        if (!isOpen) {
+          dropdown.style.display = 'none';
+        }
+      }, 200);
     }
 
     // Toggle handler
-    toggle.addEventListener('click', () => {
-      const willCollapse = !nav.classList.contains('is-collapsed');
-
-      if (willCollapse) {
-        nav.classList.add('is-collapsed');
-        toggle.setAttribute('aria-expanded', 'false');
-        localStorage.setItem(STORAGE_KEY, 'true');
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (isOpen) {
+        closeDropdown();
       } else {
-        nav.classList.remove('is-collapsed');
-        toggle.setAttribute('aria-expanded', 'true');
-        localStorage.setItem(STORAGE_KEY, 'false');
+        openDropdown();
+      }
+    });
+
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+      if (isOpen && !nav.contains(e.target)) {
+        closeDropdown();
+      }
+    });
+
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        closeDropdown();
+        trigger.focus();
       }
     });
   }
@@ -158,11 +210,7 @@ function isActive(itemPath: string, current: string): boolean {
 
 <style>
   .admin-nav {
-    background: var(--color-surface-base, #ffffff);
-    border: 1px solid var(--color-line-subtle, #e5e7eb);
-    border-radius: 1rem;
-    padding: 1rem;
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    position: relative;
   }
 
   .admin-nav-header {
@@ -170,104 +218,146 @@ function isActive(itemPath: string, current: string): boolean {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--color-line-subtle, #e5e7eb);
-    margin-bottom: 1rem;
   }
 
-  .admin-nav-header-left {
+  .admin-nav-trigger {
+    flex: 1;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-  }
-
-  .admin-nav-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #111827; /* gray-900 - WCAG AAA compliant */
-    margin: 0;
-  }
-
-  .admin-nav-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
     padding: 0;
-    border: 1px solid #9ca3af; /* gray-400 */
-    border-radius: 0.5rem;
-    background: transparent;
-    color: #374151; /* gray-700 - WCAG AA compliant (8.6:1) */
+    background: var(--color-surface-base, #ffffff);
+    border: 1px solid var(--color-line-neutral, #d1d5db);
+    border-radius: 0.75rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
   }
 
-  .admin-nav-toggle:hover {
-    background: #f3f4f6; /* gray-100 */
-    color: #111827; /* gray-900 */
-    border-color: #6b7280; /* gray-500 */
+  .admin-nav-trigger:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
   }
 
-  .admin-nav-toggle:focus-visible {
+  .admin-nav-trigger:focus-visible {
     outline: 2px solid var(--color-accent-deep, #7c3aed);
     outline-offset: 2px;
   }
 
-  .admin-nav-toggle-icon {
-    width: 1rem;
-    height: 1rem;
+  .admin-nav.is-open .admin-nav-trigger {
+    background: #f3f4f6;
+    border-color: #7c3aed;
+    box-shadow: 0 1px 3px 0 rgb(107 33 168 / 0.1);
+  }
+
+  .admin-nav-trigger-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 1rem;
+  }
+
+  .admin-nav-trigger-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+  }
+
+  .admin-nav-trigger-text {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+  }
+
+  .admin-nav-trigger-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.25;
+  }
+
+  .admin-nav-trigger-description {
+    display: block;
+    font-size: 0.75rem;
+    color: #6b7280;
+    line-height: 1.2;
+  }
+
+  .admin-nav-trigger-chevron {
+    flex-shrink: 0;
+    margin-right: 0.5rem;
+    color: #9ca3af;
     transition: transform 0.2s ease;
   }
 
-  .admin-nav.is-collapsed .admin-nav-toggle-icon {
+  .admin-nav.is-open .admin-nav-trigger-chevron {
     transform: rotate(180deg);
   }
 
   .admin-nav-home-link {
+    flex-shrink: 0;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.375rem 0.75rem;
+    padding: 0.625rem 0.875rem;
     font-size: 0.875rem;
     font-weight: 500;
-    color: #374151; /* gray-700 - WCAG AA compliant */
-    border: 1px solid #d1d5db; /* gray-300 */
-    border-radius: 0.5rem;
+    color: #374151;
+    background: var(--color-surface-base, #ffffff);
+    border: 1px solid #d1d5db;
+    border-radius: 0.75rem;
     text-decoration: none;
     transition: all 0.15s ease;
   }
 
   .admin-nav-home-link:hover {
-    background: #f3f4f6; /* gray-100 */
-    color: #111827; /* gray-900 */
-    border-color: #9ca3af; /* gray-400 */
+    background: #f3f4f6;
+    color: #111827;
+    border-color: #9ca3af;
   }
 
-  .admin-nav-sections {
-    display: grid;
-    gap: 1.5rem;
-    transition: all 0.3s ease;
-    overflow: hidden;
-  }
-
-  .admin-nav.is-collapsed .admin-nav-sections {
+  .admin-nav-dropdown {
     display: none;
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: 0;
+    z-index: 50;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
   }
 
-  .admin-nav.is-collapsed {
-    padding-bottom: 1rem;
+  .admin-nav-dropdown.is-visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 
-  .admin-nav.is-collapsed .admin-nav-header {
-    margin-bottom: 0;
-    border-bottom: none;
-    padding-bottom: 0;
+  .admin-nav-dropdown-content {
+    background: var(--color-surface-base, #ffffff);
+    border: 1px solid var(--color-line-subtle, #e5e7eb);
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    max-height: calc(100vh - 10rem);
+    overflow-y: auto;
   }
 
   .admin-nav-section {
     display: grid;
     gap: 0.5rem;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--color-line-subtle, #e5e7eb);
+  }
+
+  .admin-nav-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
   }
 
   .admin-nav-section-label {
@@ -275,8 +365,8 @@ function isActive(itemPath: string, current: string): boolean {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #6b7280; /* gray-500 - WCAG AA compliant (4.6:1) */
-    margin: 0;
+    color: #6b7280;
+    margin: 0 0 0.25rem 0;
   }
 
   .admin-nav-list {
@@ -298,50 +388,58 @@ function isActive(itemPath: string, current: string): boolean {
   }
 
   .admin-nav-link:hover {
-    background: #f3f4f6; /* gray-100 */
-    border-color: #d1d5db; /* gray-300 */
+    background: #f3f4f6;
+    border-color: #d1d5db;
   }
 
   .admin-nav-link--active {
-    background: #ede9fe; /* purple-100 */
-    border-color: #a78bfa; /* purple-400 */
+    background: #ede9fe;
+    border-color: #a78bfa;
   }
 
   .admin-nav-link--active:hover {
-    background: #ddd6fe; /* purple-200 */
-    border-color: #8b5cf6; /* purple-500 */
+    background: #ddd6fe;
+    border-color: #8b5cf6;
   }
 
   .admin-nav-link-label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #111827; /* gray-900 - WCAG AAA compliant */
+    color: #111827;
   }
 
   .admin-nav-link-description {
     font-size: 0.75rem;
-    color: #4b5563; /* gray-600 - WCAG AA compliant (7:1) */
+    color: #4b5563;
     line-height: 1.2;
   }
 
   .admin-nav-link--active .admin-nav-link-label {
-    color: #6b21a8; /* purple-800 - WCAG AA compliant (9.3:1) */
+    color: #6b21a8;
   }
 
   .admin-nav-link--active .admin-nav-link-description {
-    color: #7c3aed; /* purple-700 - WCAG AA compliant (5.9:1) */
+    color: #7c3aed;
   }
 
-  /* Responsive: horizontal on larger screens */
-  @media (min-width: 1024px) {
-    .admin-nav-sections {
+  /* Responsive: grid on larger screens */
+  @media (min-width: 768px) {
+    .admin-nav-dropdown-content {
+      display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 1rem 1.5rem;
+      padding: 1.25rem;
+    }
+
+    .admin-nav-section {
+      padding-bottom: 0;
+      margin-bottom: 0;
+      border-bottom: none;
     }
   }
 
-  @media (min-width: 1280px) {
-    .admin-nav-sections {
+  @media (min-width: 1024px) {
+    .admin-nav-dropdown-content {
       grid-template-columns: repeat(4, 1fr);
     }
   }

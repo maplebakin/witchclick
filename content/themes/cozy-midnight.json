@@ -2,10 +2,14 @@
   "slug": "cozy-midnight",
   "label": "Cozy Midnight",
   "mode": "midnight",
+  "category": "default",
   "settings": {
     "primary": "#8b7e8f",
     "accent": "#d9b2c4",
     "background": "#120725",
+    "textPrimary": "#fdfcfe",
+    "textHeading": "#ffffff",
+    "textMuted": "#d9b2c4",
     "fontSerif": "Literata",
     "fontScript": "Parisienne"
   }

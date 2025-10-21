@@ -79,11 +79,15 @@ const ACTIVE_THEME_FILE = path.join(THEMES_DIR, 'active.json');
 const LEGACY_THEME_FILE = path.join(CWD, 'content', 'theme.json');
 
 const THEME_REQUIRED_FIELDS = ['primary', 'accent', 'background', 'fontSerif', 'fontScript'];
+const THEME_OPTIONAL_FIELDS = ['textPrimary', 'textHeading', 'textMuted'];
 const DEFAULT_THEME_SETTINGS = {
   midnight: {
     primary: '#6b21a8',
     accent: '#d9b2c4',
     background: '#faf7f5',
+    textPrimary: '#1f1630',
+    textHeading: '#120725',
+    textMuted: '#6b5d70',
     fontSerif: 'Literata',
     fontScript: 'Parisienne'
   },
@@ -91,6 +95,9 @@ const DEFAULT_THEME_SETTINGS = {
     primary: '#9b86c8',
     accent: '#caa043',
     background: '#f6f0e8',
+    textPrimary: '#1f1630',
+    textHeading: '#120725',
+    textMuted: '#6b5d70',
     fontSerif: 'Literata',
     fontScript: 'Parisienne'
   }
@@ -918,8 +925,17 @@ async function listThemes() {
     }
   }
 
-  items.midnight.sort((a, b) => a.label.localeCompare(b.label));
-  items.dawn.sort((a, b) => a.label.localeCompare(b.label));
+  items.midnight.sort((a, b) => {
+    // Sort by category first, then by label
+    const catCompare = (a.category || 'custom').localeCompare(b.category || 'custom');
+    if (catCompare !== 0) return catCompare;
+    return a.label.localeCompare(b.label);
+  });
+  items.dawn.sort((a, b) => {
+    const catCompare = (a.category || 'custom').localeCompare(b.category || 'custom');
+    if (catCompare !== 0) return catCompare;
+    return a.label.localeCompare(b.label);
+  });
 
   const active = readActiveThemeMapping();
   return { items, active };
@@ -932,6 +948,8 @@ async function saveThemeRecord(payload) {
   const slug = slugify(slugInput || label);
   if (!slug) throw new Error('label or slug required');
 
+  const category = typeof payload?.category === 'string' ? payload.category.trim() : 'custom';
+
   const settingsSource = {
     ...extractThemeValues(payload),
     ...extractThemeValues(payload?.settings),
@@ -942,6 +960,7 @@ async function saveThemeRecord(payload) {
     slug,
     label: label || toTitleCase(slug),
     mode,
+    category,
     settings,
   };
 
@@ -998,13 +1017,14 @@ function readThemeRecord(filePath) {
   const mode = normalizeThemeMode(raw.mode);
   const labelRaw = typeof raw.label === 'string' ? raw.label.trim() : '';
   const label = labelRaw || toTitleCase(slug);
+  const category = typeof raw.category === 'string' ? raw.category.trim() : 'custom';
   const settingsSource = {
     ...extractThemeValues(raw),
     ...extractThemeValues(raw.settings),
   };
   const settings = mergeThemeSettings(settingsSource, mode, filePath);
 
-  return { slug, label, mode, settings };
+  return { slug, label, mode, category, settings };
 }
 
 function readActiveThemeMapping() {
@@ -1025,7 +1045,8 @@ function readActiveThemeMapping() {
 function extractThemeValues(source) {
   const values = {};
   if (!source || typeof source !== 'object') return values;
-  for (const key of THEME_REQUIRED_FIELDS) {
+  const allFields = [...THEME_REQUIRED_FIELDS, ...THEME_OPTIONAL_FIELDS];
+  for (const key of allFields) {
     const value = source[key];
     if (typeof value === 'string' && value.trim()) {
       values[key] = value;
@@ -1040,16 +1061,20 @@ function mergeThemeSettings(raw, mode, sourceName) {
     throw new Error(`Unknown theme mode: ${mode}`);
   }
 
+  const allFields = [...THEME_REQUIRED_FIELDS, ...THEME_OPTIONAL_FIELDS];
   const entries = raw && typeof raw === 'object' ? Object.entries(raw) : [];
   for (const [key, value] of entries) {
-    if (!THEME_REQUIRED_FIELDS.includes(key)) continue;
+    if (!allFields.includes(key)) continue;
     if (value === undefined || value === null) continue;
     if (typeof value !== 'string') {
       throw new Error(`[themes] ${key} in ${sourceName} must be a string.`);
     }
     const trimmed = value.trim();
     if (!trimmed) {
-      throw new Error(`[themes] ${key} in ${sourceName} cannot be empty.`);
+      if (THEME_REQUIRED_FIELDS.includes(key)) {
+        throw new Error(`[themes] ${key} in ${sourceName} cannot be empty.`);
+      }
+      continue; // Skip empty optional fields
     }
     base[key] = trimmed;
   }
@@ -1059,13 +1084,22 @@ function mergeThemeSettings(raw, mode, sourceName) {
     throw new Error(`[themes] Missing values for ${missing.join(', ')} in ${sourceName}.`);
   }
 
-  return {
+  const result = {
     primary: base.primary,
     accent: base.accent,
     background: base.background,
     fontSerif: base.fontSerif,
     fontScript: base.fontScript,
   };
+
+  // Add optional fields if present
+  THEME_OPTIONAL_FIELDS.forEach((key) => {
+    if (base[key] && String(base[key]).trim()) {
+      result[key] = base[key];
+    }
+  });
+
+  return result;
 }
 
 function normalizeThemeMode(value) {

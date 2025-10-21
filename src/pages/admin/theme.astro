@@ -21,6 +21,9 @@ const defaultMidnight = {
   primary: "#6b21a8",
   accent: "#d9b2c4",
   background: "#faf7f5",
+  textPrimary: "#1f1630",
+  textHeading: "#120725",
+  textMuted: "#6b5d70",
   fontSerif: "Literata",
   fontScript: "Parisienne",
 };
@@ -29,6 +32,9 @@ const defaultDawn = {
   primary: "#9b86c8",
   accent: "#caa043",
   background: "#f6f0e8",
+  textPrimary: "#1f1630",
+  textHeading: "#120725",
+  textMuted: "#6b5d70",
   fontSerif: "Literata",
   fontScript: "Parisienne",
 };
@@ -44,6 +50,14 @@ const fontOptions = [
   "Dancing Script",
   "Great Vibes",
   "Sacramento",
+];
+
+const categoryOptions = [
+  { value: "custom", label: "Custom", description: "Personal custom themes" },
+  { value: "seasonal", label: "Seasonal", description: "Themes for specific seasons" },
+  { value: "minimal", label: "Minimal", description: "Clean and simple designs" },
+  { value: "vibrant", label: "Vibrant", description: "Bold and energetic palettes" },
+  { value: "default", label: "Default", description: "Built-in default themes" },
 ];
 
 const seasonalSeasons = [
@@ -95,6 +109,7 @@ const seasonalSeasons = [
         data-default-midnight={JSON.stringify(defaultMidnight)}
         data-default-dawn={JSON.stringify(defaultDawn)}
         data-font-options={JSON.stringify(fontOptions)}
+        data-category-options={JSON.stringify(categoryOptions)}
       >
       <section class="lg:col-span-4 space-y-6 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
         <header>
@@ -114,6 +129,18 @@ const seasonalSeasons = [
             <dd class="font-medium text-primary" data-active="dawn">—</dd>
           </div>
         </dl>
+
+        <div class="space-y-3">
+          <label class="block text-sm">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Filter by category</span>
+            <select id="categoryFilter" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm">
+              <option value="">All categories</option>
+              {categoryOptions.map((cat) => (
+                <option value={cat.value}>{cat.label}</option>
+              ))}
+            </select>
+          </label>
+        </div>
 
         <div class="space-y-5">
           <div>
@@ -170,7 +197,17 @@ const seasonalSeasons = [
               placeholder="Cozy Midnight"
             />
           </label>
-          <label class="block text-sm md:col-span-2">
+          <label class="block text-sm">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Category</span>
+            <select id="themeCategory" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2">
+              {categoryOptions.map((cat) => (
+                <option value={cat.value} selected={cat.value === 'custom'}>
+                  {cat.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label class="block text-sm">
             <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Slug</span>
             <input
               id="themeSlug"
@@ -215,6 +252,45 @@ const seasonalSeasons = [
               />
             </div>
           </label>
+        </div>
+
+        <div class="rounded-lg border border-line-subtle bg-surface-soft/50 p-3">
+          <h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-body-muted">Text colours</h3>
+          <div class="grid gap-3 md:grid-cols-2">
+            <label class="block text-sm">
+              <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Primary text</span>
+              <div class="mt-1 flex items-center gap-2">
+                <input type="color" data-color-picker="textPrimary" class="h-9 w-12 rounded border border-line-neutral" />
+                <input
+                  data-color-input="textPrimary"
+                  class="w-full rounded-lg border border-line-neutral px-3 py-2 text-sm"
+                  placeholder="#1f1630"
+                />
+              </div>
+            </label>
+            <label class="block text-sm">
+              <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Heading text</span>
+              <div class="mt-1 flex items-center gap-2">
+                <input type="color" data-color-picker="textHeading" class="h-9 w-12 rounded border border-line-neutral" />
+                <input
+                  data-color-input="textHeading"
+                  class="w-full rounded-lg border border-line-neutral px-3 py-2 text-sm"
+                  placeholder="#120725"
+                />
+              </div>
+            </label>
+            <label class="block text-sm md:col-span-2">
+              <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Muted text</span>
+              <div class="mt-1 flex items-center gap-2">
+                <input type="color" data-color-picker="textMuted" class="h-9 w-12 rounded border border-line-neutral" />
+                <input
+                  data-color-input="textMuted"
+                  class="w-full rounded-lg border border-line-neutral px-3 py-2 text-sm"
+                  placeholder="#6b5d70"
+                />
+              </div>
+            </label>
+          </div>
         </div>
 
         <div class="grid gap-3 md:grid-cols-2">
@@ -455,12 +531,15 @@ const seasonalSeasons = [
           const modeSelect = root.querySelector('#themeMode');
           const labelInput = root.querySelector('#themeLabel');
           const slugInput = root.querySelector('#themeSlug');
+          const categorySelect = root.querySelector('#themeCategory');
+          const categoryFilter = root.querySelector('#categoryFilter');
           const fontSerifSelect = root.querySelector('#themeFontSerif');
           const fontScriptSelect = root.querySelector('#themeFontScript');
           const statusEl = root.querySelector('[data-status]');
           const fontChoices = parseFontOptions(root.getAttribute('data-font-options'));
+          const categoryChoices = parseCategoryOptions(root.getAttribute('data-category-options'));
 
-          const colorFields = ['primary','accent','background'].reduce((acc, key) => {
+          const colorFields = ['primary','accent','background','textPrimary','textHeading','textMuted'].reduce((acc, key) => {
             acc[key] = {
               picker: root.querySelector('[data-color-picker="' + key + '"]'),
               input: root.querySelector('[data-color-input="' + key + '"]')
@@ -504,6 +583,7 @@ const seasonalSeasons = [
             active: { midnight: null, dawn: null }
           };
           let current = null;
+          let categoryFilterValue = '';
           let seasonal = {
             original: createSeasonalAssignments(),
             assignments: createSeasonalAssignments(),
@@ -515,7 +595,7 @@ const seasonalSeasons = [
               const parsed = JSON.parse(raw || 'null');
               if (parsed && typeof parsed === 'object') {
                 const result = { ...fallback };
-                ['primary','accent','background','fontSerif','fontScript'].forEach((key) => {
+                ['primary','accent','background','textPrimary','textHeading','textMuted','fontSerif','fontScript'].forEach((key) => {
                   if (typeof parsed[key] === 'string' && parsed[key].trim()) {
                     result[key] = parsed[key];
                   }
@@ -534,6 +614,16 @@ const seasonalSeasons = [
                   .map((item) => (typeof item === 'string' ? item.trim() : ''))
                   .filter(Boolean);
                 return Array.from(new Set(values));
+              }
+            } catch {}
+            return [];
+          }
+
+          function parseCategoryOptions(raw){
+            try {
+              const parsed = JSON.parse(raw || '[]');
+              if (Array.isArray(parsed)) {
+                return parsed.filter((item) => item && typeof item === 'object' && item.value);
               }
             } catch {}
             return [];
@@ -803,13 +893,17 @@ const seasonalSeasons = [
               normalizeHex(colorFields.accent?.input?.value) || normalizeHex(defaultsForMode.accent) || '#d9b2c4';
             const background =
               normalizeHex(colorFields.background?.input?.value) || normalizeHex(defaultsForMode.background) || '#120725';
+            const textPrimary =
+              normalizeHex(colorFields.textPrimary?.input?.value) || normalizeHex(defaultsForMode.textPrimary) || pickContrastColor(background);
+            const textHeading =
+              normalizeHex(colorFields.textHeading?.input?.value) || normalizeHex(defaultsForMode.textHeading) || pickContrastColor(background);
+            const textMuted =
+              normalizeHex(colorFields.textMuted?.input?.value) || normalizeHex(defaultsForMode.textMuted) || adjustHex(textPrimary, 0.3);
             const fontSerif = getFontValue(fontSerifSelect) || defaultsForMode.fontSerif;
             const fontScript = getFontValue(fontScriptSelect) || defaultsForMode.fontScript;
 
             const bgRgb = hexToRgb(background);
             const luminance = getLuminance(bgRgb);
-            const textColor = pickContrastColor(background);
-            const muted = adjustHex(background, luminance > 0.5 ? -0.25 : 0.35);
             const surface = adjustHex(background, luminance > 0.5 ? -0.08 : 0.22);
             const border = adjustHex(background, luminance > 0.5 ? -0.3 : 0.28);
 
@@ -818,8 +912,9 @@ const seasonalSeasons = [
             previewRoot.style.setProperty('--preview-background', background);
             previewRoot.style.setProperty('--preview-surface', surface);
             previewRoot.style.setProperty('--preview-border', border);
-            previewRoot.style.setProperty('--preview-text', textColor);
-            previewRoot.style.setProperty('--preview-muted', muted);
+            previewRoot.style.setProperty('--preview-text', textPrimary);
+            previewRoot.style.setProperty('--preview-text-heading', textHeading);
+            previewRoot.style.setProperty('--preview-muted', textMuted);
             previewRoot.style.setProperty('--preview-primary-contrast', pickContrastColor(primary));
             previewRoot.style.setProperty('--preview-accent-contrast', pickContrastColor(accent));
             previewRoot.style.setProperty('--preview-font-serif', toFontStack(fontSerif, 'serif'));
@@ -847,6 +942,9 @@ const seasonalSeasons = [
                 { label: 'Accent', value: accent },
                 { label: 'Background', value: background },
                 { label: 'Surface', value: surface },
+                { label: 'Text Primary', value: textPrimary },
+                { label: 'Text Heading', value: textHeading },
+                { label: 'Text Muted', value: textMuted },
               ];
               swatchData.forEach((item) => {
                 const row = document.createElement('div');
@@ -894,10 +992,14 @@ const seasonalSeasons = [
               mode,
               label: labelInput ? labelInput.value.trim() : '',
               slug: slugInput ? slugInput.value.trim() : '',
+              category: categorySelect ? categorySelect.value.trim() : 'custom',
               settings: {
                 primary: colorFields.primary?.input?.value.trim() || '',
                 accent: colorFields.accent?.input?.value.trim() || '',
                 background: colorFields.background?.input?.value.trim() || '',
+                textPrimary: colorFields.textPrimary?.input?.value.trim() || '',
+                textHeading: colorFields.textHeading?.input?.value.trim() || '',
+                textMuted: colorFields.textMuted?.input?.value.trim() || '',
                 fontSerif: getFontValue(fontSerifSelect),
                 fontScript: getFontValue(fontScriptSelect)
               }
@@ -912,6 +1014,7 @@ const seasonalSeasons = [
             if (modeSelect) modeSelect.value = mode;
             if (labelInput) labelInput.value = theme?.label || '';
             if (slugInput) slugInput.value = theme?.slug || '';
+            if (categorySelect) categorySelect.value = theme?.category || 'custom';
             if (fontSerifSelect) {
               setFontSelectValue(fontSerifSelect, theme?.settings?.fontSerif, defaultsForMode.fontSerif);
             }
@@ -921,6 +1024,9 @@ const seasonalSeasons = [
             setColorField('primary', theme?.settings?.primary ?? defaultsForMode.primary);
             setColorField('accent', theme?.settings?.accent ?? defaultsForMode.accent);
             setColorField('background', theme?.settings?.background ?? defaultsForMode.background);
+            setColorField('textPrimary', theme?.settings?.textPrimary ?? defaultsForMode.textPrimary);
+            setColorField('textHeading', theme?.settings?.textHeading ?? defaultsForMode.textHeading);
+            setColorField('textMuted', theme?.settings?.textMuted ?? defaultsForMode.textMuted);
             updateSetActiveLabel();
             refreshPreview();
           }
@@ -953,16 +1059,36 @@ const seasonalSeasons = [
             ['midnight','dawn'].forEach((mode) => {
               const listEl = lists[mode];
               if (!listEl) return;
-              const themes = state.items[mode] || [];
+              const allThemes = state.items[mode] || [];
+              const themes = categoryFilterValue
+                ? allThemes.filter((theme) => (theme.category || 'custom') === categoryFilterValue)
+                : allThemes;
               listEl.innerHTML = '';
               if (!themes.length) {
                 const empty = document.createElement('p');
                 empty.className = 'text-xs text-body-muted';
-                empty.textContent = 'No saved themes yet.';
+                empty.textContent = categoryFilterValue ? 'No themes in this category.' : 'No saved themes yet.';
                 listEl.appendChild(empty);
                 return;
               }
+
+              // Group themes by category
+              const grouped = {};
               themes.forEach((theme) => {
+                const cat = theme.category || 'custom';
+                if (!grouped[cat]) grouped[cat] = [];
+                grouped[cat].push(theme);
+              });
+
+              // Render each category group
+              Object.keys(grouped).sort().forEach((cat) => {
+                const catLabel = categoryChoices.find((c) => c.value === cat)?.label || cat;
+                const catHeader = document.createElement('div');
+                catHeader.className = 'mb-2 mt-3 first:mt-0';
+                catHeader.innerHTML = '<h3 class="text-[11px] font-semibold uppercase tracking-wider text-body-muted">' + catLabel + '</h3>';
+                listEl.appendChild(catHeader);
+
+                grouped[cat].forEach((theme) => {
                 const card = document.createElement('div');
                 card.className =
                   'group rounded-xl border border-line-neutral bg-surface-base px-3 py-3 text-sm transition hover:border-line-bold hover:bg-surface-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-line-bold focus-visible:ring-offset-2';
@@ -1050,6 +1176,7 @@ const seasonalSeasons = [
                 }
                 card.appendChild(actions);
                 listEl.appendChild(card);
+                });
               });
             });
           }
@@ -1207,6 +1334,13 @@ const seasonalSeasons = [
             });
           }
 
+          if (categoryFilter) {
+            categoryFilter.addEventListener('change', () => {
+              categoryFilterValue = categoryFilter.value.trim();
+              renderLists();
+            });
+          }
+
           Object.keys(colorFields).forEach((key) => {
             const field = colorFields[key];
             if (field.picker) {
@@ -1307,6 +1441,7 @@ const seasonalSeasons = [
       --preview-surface: #1d1033;
       --preview-border: #2e1b4a;
       --preview-text: #fdfcfe;
+      --preview-text-heading: #fdfcfe;
       --preview-muted: #d9b2c4;
       --preview-primary-contrast: #fdfcfe;
       --preview-accent-contrast: #1f1630;
@@ -1329,6 +1464,7 @@ const seasonalSeasons = [
 
     [data-theme-preview] .preview-card h3 {
       font-family: var(--preview-font-serif, 'Literata', serif);
+      color: var(--preview-text-heading);
     }
 
     [data-theme-preview] .preview-card p[data-preview-eyebrow] {

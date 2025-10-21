@@ -2,10 +2,14 @@
   "slug": "cozy-dawn",
   "label": "Cozy Dawn",
   "mode": "dawn",
+  "category": "default",
   "settings": {
     "primary": "#9b86c8",
     "accent": "#caa043",
     "background": "#f6f0e8",
+    "textPrimary": "#1f1630",
+    "textHeading": "#120725",
+    "textMuted": "#6b5d70",
     "fontSerif": "Literata",
     "fontScript": "Parisienne"
   }
