@@ -1,0 +1,204 @@
+---
+import Base from "@/layouts/Base.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import HeadSlot from "@/components/HeadSlot.astro";
+import { readSettings } from "@/utils/settings";
+import { createArticleSchema } from "@/utils/structuredData";
+
+const title = "Start Here — Your Guide to WitchClick";
+const description = "New to WitchClick? Start here. Discover secular rituals, ADHD-friendly practices, and cozy tools for everyday magic without dogma.";
+
+const settings = readSettings();
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Start Here" },
+];
+
+const jsonLd = createArticleSchema(settings, {
+  headline: title,
+  description,
+  url: "/start",
+  datePublished: new Date().toISOString(),
+  dateModified: new Date().toISOString(),
+});
+---
+
+<Base {title} description={description}>
+  <HeadSlot slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </HeadSlot>
+
+  <article class="container mx-auto px-4 py-8 max-w-4xl">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="mt-8 mb-12">
+      <p class="text-sm uppercase tracking-wide text-orange-600 dark:text-orange-400 mb-2">
+        Welcome
+      </p>
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">
+        Start Here: Your Guide to WitchClick
+      </h1>
+      <p class="text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
+        Cozy, secular rituals and tools for everyday magic. No dogma, no gatekeeping, just practical prompts that meet you where you are.
+      </p>
+    </header>
+
+    <div class="prose prose-lg dark:prose-invert max-w-none">
+      <section class="mb-12">
+        <h2>What is WitchClick?</h2>
+        <p>
+          WitchClick is a collection of <strong>secular rituals, tarot spreads, and gentle practices</strong> designed for
+          modern, neurodivergent, and skeptically-curious folks. We believe ritual can be meaningful without requiring
+          supernatural beliefs—it's about creating intentional space, processing emotions, and building sustainable habits.
+        </p>
+        <p>
+          Whether you're ADHD-friendly seeking low-spoons options, a recovering ex-religious person looking for meaning without
+          dogma, or just someone who wants cozy structure in your life—you're in the right place.
+        </p>
+      </section>
+
+      <section class="mb-12 bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+        <h2 class="mt-0">Three Ways to Begin</h2>
+        <p>We organize our content around three core needs:</p>
+
+        <div class="grid md:grid-cols-3 gap-6 not-prose my-8">
+          <a href="/hub/calm" class="block p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow border-l-4 border-blue-500">
+            <h3 class="text-xl font-bold mb-2 text-blue-600 dark:text-blue-400">Calm</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300">
+              Grounding rituals, breathwork, and nervous system resets for when everything feels too much.
+            </p>
+          </a>
+
+          <a href="/hub/focus" class="block p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow border-l-4 border-indigo-500">
+            <h3 class="text-xl font-bold mb-2 text-indigo-600 dark:text-indigo-400">Focus</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300">
+              ADHD-friendly rituals, tea ceremonies, and gentle accountability for sustainable attention.
+            </p>
+          </a>
+
+          <a href="/hub/release" class="block p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow border-l-4 border-orange-500">
+            <h3 class="text-xl font-bold mb-2 text-orange-600 dark:text-orange-400">Release</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300">
+              Cord-cutting, boundary work, and ethical "cursing" rituals for letting go with softness.
+            </p>
+          </a>
+        </div>
+      </section>
+
+      <section class="mb-12">
+        <h2>Start with These Popular Posts</h2>
+        <ul>
+          <li>
+            <a href="/post/tarot-as-a-secular-tool">Tarot as a Secular Tool</a> — Pattern-reading for everyday
+            decisions, no mysticism required
+          </li>
+          <li>
+            <a href="/post/when-everything-feels-pointless">When Everything Feels Pointless</a> — Gentle rituals to
+            re-enter meaning when the fog rolls in
+          </li>
+          <li>
+            <a href="/post/calming-strategies-when-partner-pisses-you-off">When Your Partner Pisses You Off</a> —
+            Calm-first strategies that keep love in the room
+          </li>
+          <li>
+            <a href="/post/secular-tarot-spread-for-a-sign">Secular Tarot Spread for Seeking a Sign</a> — Notice
+            patterns, name options, choose a testable next step
+          </li>
+          <li>
+            <a href="/post/anxiety-from-avoiding-responsibilities-gentle-rituals">When Avoiding Makes You Anxious</a> —
+            Tiny, kind moves to re-enter your day without bullying yourself
+          </li>
+        </ul>
+      </section>
+
+      <section class="mb-12">
+        <h2>Our Approach: What Makes WitchClick Different</h2>
+
+        <h3>Secular & Science-Adjacent</h3>
+        <p>
+          We treat tarot as pattern recognition, rituals as embodied mindfulness, and "magic" as intentional
+          action. No supernatural claims, just tools that work regardless of what you believe about them.
+        </p>
+
+        <h3>Neurodivergent-Friendly</h3>
+        <p>
+          Every ritual comes in <strong>two versions</strong>: a 5-minute low-spoons path and a deeper
+          option for when you have more capacity. We honor energy fluctuation as normal.
+        </p>
+
+        <h3>Ethics-First</h3>
+        <p>
+          Our "cursing" rituals focus on energetic accountability—returning harm to its origin,
+          setting boundaries, naming truth—not revenge or manipulation. We believe in clean magic.
+        </p>
+
+        <h3>No Gatekeeping</h3>
+        <p>
+          You don't need special tools, training, or lineage. A deck of playing cards can be a tarot deck.
+          A kitchen candle can anchor a ritual. Your journal is your grimoire. Start where you are.
+        </p>
+      </section>
+
+      <section class="mb-12">
+        <h2>Explore by Interest</h2>
+        <ul>
+          <li><a href="/tag/secular-tarot">Secular Tarot</a> — Pattern-reading, spreads, and reflection prompts</li>
+          <li><a href="/tag/ritual">Rituals</a> — Grounding, releasing, focusing, and transitioning</li>
+          <li><a href="/tag/adhd-friendly">ADHD-Friendly</a> — Low-spoons options and neurodivergent support</li>
+          <li><a href="/tag/gentle-rituals">Gentle Rituals</a> — When you need softness, not intensity</li>
+          <li><a href="/tag/cursing%20ritual">Ethical Cursing</a> — Boundary work and energetic accountability</li>
+          <li><a href="/entities/ritual">Ritual Library</a> — Browse all our structured practices</li>
+          <li><a href="/entities/tarot">Tarot Card Reference</a> — Secular interpretations for every card</li>
+        </ul>
+      </section>
+
+      <section class="mb-12 bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg">
+        <h2 class="mt-0">Looking for Something Specific?</h2>
+        <ul class="mb-4">
+          <li><strong>Job interview anxiety?</strong> Try the <a href="/post/pre-interview-grounding-ritual">Pre-Interview Grounding Ritual</a></li>
+          <li><strong>First day at new job?</strong> Check out <a href="/post/first-day-new-job-secular-tarot-spread-journal">First-Day Tarot Spread</a></li>
+          <li><strong>Relationship conflict?</strong> Start with <a href="/post/calming-strategies-when-partner-pisses-you-off">Calm-First Conflict Strategies</a></li>
+          <li><strong>Feeling burnt out?</strong> Read <a href="/post/when-to-let-yourself-rest">When to Let Yourself Rest</a></li>
+          <li><strong>Need to make a decision?</strong> Use <a href="/post/using-different-perspectives-a-gentle-practical-guide">Different Perspectives Guide</a></li>
+          <li><strong>Creative block?</strong> Try <a href="/post/creativity-tarot-ritual">Creativity Tarot Ritual</a></li>
+        </ul>
+      </section>
+
+      <section class="mb-12">
+        <h2>Tools & Resources</h2>
+        <ul>
+          <li><a href="/lab">The Lab</a> — Experimental rituals and printable downloads</li>
+          <li><a href="/curses">White Magic Curses</a> — Ethical boundary-setting rituals</li>
+          <li><a href="/tools">Recommended Tools</a> — Curated affiliate links for decks, journals, and ritual supplies</li>
+          <li><a href="/partners">Partners</a> — Small businesses and ethical brands we love</li>
+        </ul>
+      </section>
+
+      <section class="mb-12">
+        <h2>Stay Connected</h2>
+        <p>
+          Get gentle emails twice a month with new rituals, printable drops, and secular tarot spreads.
+          No spam, just cozy prompts.
+        </p>
+        <p>
+          <a href="https://witchclick.substack.com/api/v1/free" class="inline-block px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg transition-colors">
+            Sign up for the WitchClick dispatch
+          </a>
+        </p>
+      </section>
+
+      <section>
+        <h2>Questions?</h2>
+        <p>
+          Check out our <a href="/about">About page</a> to learn more about the humans behind WitchClick,
+          or <a href="/contact">get in touch</a> if you have questions, feedback, or collaboration ideas.
+        </p>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mt-8">
+          <strong>A note on affiliate links:</strong> Some links on this site are affiliate links, which means we may
+          earn a small commission at no extra cost to you. We only recommend tools we genuinely use and love.
+          <a href="/privacy">Learn more</a>.
+        </p>
+      </section>
+    </div>
+  </article>
+</Base>

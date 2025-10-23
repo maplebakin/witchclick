@@ -6,12 +6,14 @@
   "scripts": {
     "dev": "astro dev",
     "prebuild": "node ./scripts/ensure-npm-proxy.mjs",
-    "build": "node ./scripts/build-clean.mjs",
+    "build": "node ./scripts/build-clean.mjs && node ./scripts/generate-sitemap.mjs",
+    "postbuild": "echo '✅ Build complete with sitemap'",
     "preview": "astro preview",
     "format": "prettier -w .",
     "test": "vitest",
     "lint": "eslint . --ext .ts,.tsx,.js,.cjs,.mjs,.astro",
     "check": "astro check && tsc -p . --noEmit && npm run lint",
+    "check:affiliates": "node ./scripts/check-affiliate-ids.mjs",
     "test:e2e": "playwright test",
     "linkcheck": "linkinator ./dist --recurse --skip \"^https?://\""
   },

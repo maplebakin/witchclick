@@ -1,7 +1,6 @@
 // astro.config.mjs — drop‑in with '@' alias preserved around your existing config
 import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
-import sitemap from "@astrojs/sitemap";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from 'node:url';
@@ -36,10 +35,9 @@ function normalizeSite(u) {
 }
 
 // Server in DEV so /api routes accept POST; Static in BUILD so deploys stay simple.
+// Note: Sitemap generation handled by scripts/generate-sitemap.mjs post-build
 export default defineConfig(({ command }) => {
   const output = command === "dev" ? "server" : "static";
-  console.log("[astro.config] command =", command, "→ output =", output);
-
   const site = normalizeSite(settings.siteUrl);
 
   return {
@@ -50,14 +48,6 @@ export default defineConfig(({ command }) => {
 
     integrations: [
       tailwind(),
-      sitemap({
-        filter: (page) => {
-          if (/\/admin(\/|$)/.test(page)) return false;
-          if (/\/api\//.test(page)) return false;
-          if (/\/404(\.html)?$/.test(page)) return false;
-          return true;
-        },
-      }),
     ],
 
     markdown: {
