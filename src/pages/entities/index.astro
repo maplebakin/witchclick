@@ -106,14 +106,14 @@ const breadcrumbs = [
     font-size: clamp(2.35rem, 5.5vw, 3.25rem);
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--section-heading, #3b1b70);
+    color: #f4f1ff;
   }
 
   .entity-hub__intro {
     margin: 0;
     font-size: 1.1rem;
     line-height: 1.75;
-    color: var(--section-text, color-mix(in srgb, #2a1a3f 92%, black 8%));
+    color: rgba(244, 241, 255, 0.88);
   }
 
   .entity-grid {
@@ -136,46 +136,28 @@ const breadcrumbs = [
 
   .entity-hub-card {
     --card-hover-translate: -0.4rem;
-    --card-elevation-base: var(--elevation-tier-2);
-    --card-elevation-hover: var(--elevation-tier-3);
-    --entity-card-border: rgba(124, 58, 237, 0.28);
-    --entity-card-glow: rgba(124, 58, 237, 0.16);
-    --entity-card-highlight: #f7f0ff;
-    --entity-card-surface-top: #fefbff;
-    --entity-card-surface-bottom: #f9f2ff;
-    --entity-card-heading: color-mix(in srgb, #3b1b70 90%, black 10%);
-    --entity-card-text: color-mix(in srgb, #3c2a55 90%, black 10%);
-    --entity-card-label: color-mix(in srgb, var(--ink-muted, currentColor) 80%, white 20%);
-    --entity-card-cta: color-mix(in srgb, var(--wc-ink-label) 68%, var(--ink-body, currentColor) 32%);
-    --entity-card-cta-hover: color-mix(in srgb, var(--ink-strong, currentColor) 85%, var(--ambient-color, var(--color-primary)) 15%);
-    --entity-card-icon: var(--ambient-color, var(--color-primary));
-    --entity-card-icon-shadow: rgba(79, 70, 229, 0.28);
     display: grid;
     gap: clamp(1.5rem, 3vw, 2.25rem);
     padding: clamp(1.85rem, 4vw, 2.5rem);
-    border-color: color-mix(in srgb, var(--entity-card-border) 85%, transparent 15%);
-    background:
-      radial-gradient(120% 120% at 18% -15%, color-mix(in srgb, var(--entity-card-glow) 85%, transparent) 0%, transparent 70%),
-      linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--entity-card-surface-top) 92%, var(--entity-card-highlight) 8%) 0%,
-        color-mix(in srgb, var(--entity-card-surface-bottom) 94%, white 6%) 100%
-      ),
-      var(--card-panel-surface);
-    color: var(--entity-card-text);
-    box-shadow: var(--card-elevation-base, var(--elevation-tier-2));
+    border: 1px solid rgba(124, 58, 237, 0.35);
+    background: #0f0820;
+    color: #f4f1ff;
+    box-shadow: 0 20px 52px -30px rgba(0, 0, 0, 0.6);
     min-height: 100%;
     transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+    border-radius: clamp(1.5rem, 4vw, 2rem);
   }
 
   .entity-hub-card:hover,
   .entity-hub-card:focus-visible {
-    border-color: color-mix(in srgb, var(--section-border, rgba(124, 58, 237, 0.18)) 92%, transparent 8%);
-    box-shadow: var(--card-elevation-hover, var(--elevation-tier-3));
+    border-color: rgba(124, 58, 237, 0.55);
+    box-shadow: 0 28px 75px -24px rgba(0, 0, 0, 0.7);
+    transform: translateY(var(--card-hover-translate));
   }
 
   .entity-hub-card:focus-visible {
-    box-shadow: var(--card-focus-ring, 0 0 0 3px var(--glass-pill-border-active)), var(--card-elevation-hover, var(--elevation-tier-3));
+    outline: 2px solid rgba(124, 58, 237, 0.6);
+    outline-offset: 2px;
   }
 
   .entity-card {
@@ -196,13 +178,13 @@ const breadcrumbs = [
     display: flex;
     align-items: center;
     gap: 1rem;
-    color: var(--entity-card-label);
+    color: rgba(212, 175, 55, 0.85);
   }
 
   .entity-card-icon {
     font-size: clamp(1.75rem, 3vw, 2.25rem);
-    color: var(--entity-card-icon);
-    filter: drop-shadow(0 6px 18px var(--entity-card-icon-shadow));
+    color: rgba(212, 175, 55, 0.9);
+    filter: drop-shadow(0 6px 18px rgba(212, 175, 55, 0.3));
   }
 
   .entity-card-label {
@@ -233,14 +215,14 @@ const breadcrumbs = [
     font-size: clamp(1.65rem, 4vw, 2.15rem);
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    color: var(--entity-card-heading);
+    color: #f4f1ff;
   }
 
   .entity-card-body p {
     margin-bottom: 0;
     line-height: 1.65;
     font-size: 1rem;
-    color: var(--entity-card-text);
+    color: rgba(244, 241, 255, 0.88);
   }
 
   .entity-card-cta {
@@ -251,12 +233,12 @@ const breadcrumbs = [
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    color: var(--entity-card-cta);
+    color: rgba(212, 175, 55, 0.85);
     transition: color 220ms ease;
   }
 
   .entity-hub-card:hover .entity-card-cta,
   .entity-hub-card:focus-visible .entity-card-cta {
-    color: var(--entity-card-cta-hover);
+    color: rgba(212, 175, 55, 1);
   }
 </style>

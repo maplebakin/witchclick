@@ -517,18 +517,18 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
     font-size: 0.75rem;
     letter-spacing: 0.32em;
     text-transform: uppercase;
-    color: color-mix(in srgb, rgba(244, 241, 255, 0.75) 90%, transparent 10%);
+    color: rgba(212, 175, 55, 0.85);
   }
 
   .home-intro {
     margin-top: clamp(2.5rem, 6vw, 4rem);
     margin-bottom: clamp(2.5rem, 6vw, 4rem);
     border-radius: clamp(1.75rem, 4vw, 2.5rem);
-    border: 1px solid var(--card-border-midnight);
-    background: var(--gradient-accent-1), var(--gradient-accent-2), var(--card-bg-midnight);
-    color: color-mix(in srgb, var(--ink-body, #1f1430) 90%, white 10%);
+    border: 1px solid rgba(124, 58, 237, 0.35);
+    background: #0f0820;
+    color: #f4f1ff;
     padding: clamp(1.75rem, 4vw, 2.75rem);
-    box-shadow: var(--card-shadow);
+    box-shadow: 0 20px 52px -30px rgba(0, 0, 0, 0.6);
   }
 
   .home-intro__grid {
@@ -542,7 +542,7 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
     font-size: clamp(1.9rem, 4vw, 2.6rem);
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--ink-heading, #321056) 92%, white 8%);
+    color: #f4f1ff;
   }
 
   .home-intro__text {
@@ -551,7 +551,7 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
     font-size: 1.05rem;
     line-height: 1.8;
     max-width: 64ch;
-    color: color-mix(in srgb, var(--ink-body, #2a1a3f) 92%, white 8%);
+    color: rgba(244, 241, 255, 0.88);
   }
 
   .home-intro__list {
@@ -565,7 +565,7 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--ink-heading, #321056) 85%, white 15%);
+    color: #f4f1ff;
   }
 
   .home-intro__bullets {
@@ -580,7 +580,7 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
     position: relative;
     padding-left: 1.8rem;
     line-height: 1.7;
-    color: color-mix(in srgb, var(--ink-body, #2a1a3f) 90%, white 10%);
+    color: rgba(244, 241, 255, 0.88);
   }
 
   .home-intro__bullets li::before {
@@ -768,6 +768,26 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
   }
 
   /* Dawn theme text color overrides */
+  :root[data-comfort-theme="dawn"] .home-intro {
+    background: #f8f5f0;
+    border-color: rgba(122, 94, 154, 0.35);
+    box-shadow: 0 20px 52px -30px rgba(71, 54, 96, 0.28);
+  }
+
+  :root[data-comfort-theme="dawn"] .home-intro__title,
+  :root[data-comfort-theme="dawn"] .home-intro__list-title {
+    color: #321056;
+  }
+
+  :root[data-comfort-theme="dawn"] .home-intro__text,
+  :root[data-comfort-theme="dawn"] .home-intro__bullets li {
+    color: #2a1a3f;
+  }
+
+  :root[data-comfort-theme="dawn"] .home-eyebrow {
+    color: rgba(122, 94, 154, 0.85);
+  }
+
   :root[data-comfort-theme="dawn"] .home-section__header .home-eyebrow {
     color: color-mix(in srgb, rgba(44, 27, 61, 0.75) 90%, transparent 10%);
   }
