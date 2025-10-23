@@ -98,24 +98,8 @@ const resolvedSizes =
     position: absolute;
     inset: 0;
     z-index: 0;
-    background:
-      radial-gradient(75% 60% at 15% 10%, rgba(212, 175, 55, 0.28), transparent 70%),
-      radial-gradient(85% 65% at 85% 0%, rgba(124, 78, 176, 0.35), transparent 70%),
-      linear-gradient(160deg, rgba(26, 14, 38, 0.92), rgba(12, 5, 23, 0.85));
-    filter: saturate(1.1);
-    opacity: 0.95;
-  }
-
-  .home-hero::after {
-    content: "";
-    position: absolute;
-    inset: -20% 10% auto;
-    height: 65%;
-    border-radius: 50%;
-    background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.2), transparent 70%);
-    filter: blur(40px);
-    opacity: 0.35;
-    pointer-events: none;
+    background: linear-gradient(160deg, rgba(26, 14, 38, 0.5), rgba(12, 5, 23, 0.4));
+    opacity: 0.6;
   }
 
   .home-hero__inner {
@@ -244,14 +228,8 @@ const resolvedSizes =
 
   /* Dawn theme overrides */
   :root[data-comfort-theme="dawn"] .home-hero__backdrop {
-    background:
-      radial-gradient(75% 60% at 15% 10%, rgba(155, 134, 200, 0.18), transparent 70%),
-      radial-gradient(85% 65% at 85% 0%, rgba(180, 154, 217, 0.22), transparent 70%),
-      linear-gradient(160deg, rgba(252, 248, 242, 0.92), rgba(248, 242, 238, 0.95));
-  }
-
-  :root[data-comfort-theme="dawn"] .home-hero::after {
-    background: radial-gradient(circle at 50% 0%, rgba(155, 134, 200, 0.25), transparent 70%);
+    background: linear-gradient(160deg, rgba(252, 248, 242, 0.5), rgba(248, 242, 238, 0.6));
+    opacity: 0.5;
   }
 
   :root[data-comfort-theme="dawn"] .home-hero__image {

@@ -413,52 +413,11 @@ const bodyStyle = bodyStyleEntries.map(([key, value]) => `${key}: ${value}`).joi
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background:
-      radial-gradient(
-        120% 160% at 50% -10%,
-        color-mix(
-            in srgb,
-            var(--ambient-highlight, var(--color-gold, #d4af37)) 38%,
-            transparent 62%
-          )
-          0%,
-        transparent 62%
-      ),
-      radial-gradient(
-        140% 200% at 12% 18%,
-        color-mix(
-            in srgb,
-            var(--ambient-aurora, var(--color-iris, #7c3aed)) 32%,
-            transparent 68%
-          )
-          0%,
-        transparent 72%
-      ),
-      radial-gradient(
-        160% 200% at 82% 12%,
-        color-mix(
-            in srgb,
-            var(--ambient-overlay, rgba(20, 10, 35, 0.3)) 42%,
-            transparent 58%
-          )
-          0%,
-        transparent 75%
-      ),
-      linear-gradient(
-        180deg,
-        color-mix(
-            in srgb,
-            var(--ambient-depth, var(--color-midnight, #07020f)) 72%,
-            var(--color-midnight, #07020f) 28%
-          )
-          0%,
-        color-mix(
-            in srgb,
-            var(--ambient-shadow, var(--color-night, #120725)) 82%,
-            var(--color-night, #120725) 18%
-          )
-          100%
-      );
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-midnight, #07020f) 96%, var(--ambient-depth, #1a0f2e) 4%) 0%,
+      color-mix(in srgb, var(--color-night, #120725) 92%, black 8%) 100%
+    );
     color: color-mix(in srgb, var(--ink-strong, #f4f1ff) 92%, var(--ambient-highlight, #e9d4ff) 8%);
   }
 
