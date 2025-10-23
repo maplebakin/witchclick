@@ -18,6 +18,7 @@ export const primaryNavLinks: NavLink[] = [
 ];
 
 export const secondaryNavLinks: NavLink[] = [
+  { href: "/start", label: "Start Here" },
   { href: "/entities/", label: "Entities" },
   { href: "/partners/", label: "Partners" },
   { href: "/about/", label: "About" },

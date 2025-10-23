@@ -3,7 +3,6 @@ import Base from "@/layouts/Base.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import HeadSlot from "@/components/HeadSlot.astro";
 import { readSettings } from "@/utils/settings";
-import { createArticleSchema } from "@/utils/structuredData";
 
 const title = "Start Here — Your Guide to WitchClick";
 const description = "New to WitchClick? Start here. Discover secular rituals, ADHD-friendly practices, and cozy tools for everyday magic without dogma.";
@@ -14,13 +13,14 @@ const breadcrumbs = [
   { label: "Start Here" },
 ];
 
-const jsonLd = createArticleSchema(settings, {
-  headline: title,
-  description,
-  url: "/start",
-  datePublished: new Date().toISOString(),
-  dateModified: new Date().toISOString(),
-});
+// Simple WebPage structured data
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": title,
+  "description": description,
+  "url": `${settings.siteUrl}/start`,
+};
 ---
 
 <Base {title} description={description}>
