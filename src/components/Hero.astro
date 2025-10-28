@@ -39,6 +39,8 @@ const resolvedSizes =
   typeof heroImageSizes === 'string' && heroImageSizes.trim().length
     ? heroImageSizes.trim()
     : '(max-width: 768px) 88vw, (max-width: 1200px) 360px, 420px';
+const heroLoading = hasHeroImage ? 'eager' : 'lazy';
+const heroFetchPriority = hasHeroImage ? 'high' : undefined;
 ---
 <section role="banner" class="home-hero" aria-labelledby="home-hero-title">
   <div class="home-hero__backdrop" aria-hidden="true"></div>
@@ -77,7 +79,8 @@ const resolvedSizes =
           class="home-hero__image"
           src={heroSrc}
           alt={heroAlt}
-          loading="lazy"
+          loading={heroLoading}
+          fetchpriority={heroFetchPriority}
           decoding="async"
           srcset={resolvedSrcset || undefined}
           sizes={resolvedSrcset ? resolvedSizes : undefined}
