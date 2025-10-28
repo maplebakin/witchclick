@@ -32,6 +32,111 @@ function firstSlugFrom(directory: string): string | null {
   return null;
 }
 
+type EntityRef = { type: string; slug: string };
+
+type EntityWithPost = EntityRef & { postSlug: string; postTitle: string };
+
+function normalizeEntity(candidate: unknown): EntityRef | null {
+  if (!candidate) return null;
+
+  if (typeof candidate === "string") {
+    const [typePart = "", slugPart = ""] = candidate.split("/");
+    const type = typePart.trim().toLowerCase();
+    const slug = slugPart.trim().toLowerCase();
+    if (type && slug) return { type, slug };
+    return null;
+  }
+
+  if (typeof candidate === "object") {
+    const type = "type" in candidate ? String(candidate.type ?? "").trim().toLowerCase() : "";
+    const slug = "slug" in candidate ? String(candidate.slug ?? "").trim().toLowerCase() : "";
+    if (type && slug) return { type, slug };
+  }
+
+  return null;
+}
+
+function collectEntityReferences(): EntityWithPost[] {
+  const postsDir = path.join(contentRoot, "posts");
+  const references: EntityWithPost[] = [];
+
+  try {
+    const files = fs
+      .readdirSync(postsDir, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".md"));
+
+    for (const file of files) {
+      const raw = fs.readFileSync(path.join(postsDir, file.name), "utf8");
+      const fm = matter(raw);
+      const postSlug = typeof fm.data?.slug === "string" && fm.data.slug.trim()
+        ? fm.data.slug.trim()
+        : file.name.replace(/\.md$/i, "");
+      const postTitle = typeof fm.data?.title === "string" && fm.data.title.trim()
+        ? fm.data.title.trim()
+        : postSlug;
+      const entities = Array.isArray(fm.data?.entities) ? fm.data.entities : [];
+
+      for (const entity of entities) {
+        const normalized = normalizeEntity(entity);
+        if (normalized) {
+          references.push({ ...normalized, postSlug, postTitle });
+        }
+      }
+    }
+  } catch (error) {
+    console.warn(`[smoke] unable to collect entity references`, error);
+  }
+
+  return references;
+}
+
+function collectAllEntities(): EntityRef[] {
+  const entitiesRoot = path.join(contentRoot, "entities");
+  const results: EntityRef[] = [];
+
+  try {
+    const types = fs
+      .readdirSync(entitiesRoot, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name);
+
+    for (const type of types) {
+      const dir = path.join(entitiesRoot, type);
+      const files = fs
+        .readdirSync(dir, { withFileTypes: true })
+        .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".json"));
+
+      for (const file of files) {
+        results.push({ type, slug: file.name.replace(/\.json$/i, "") });
+      }
+    }
+  } catch (error) {
+    console.warn(`[smoke] unable to collect entity catalog`, error);
+  }
+
+  return results;
+}
+
+function findEntityWithRelatedPost(): EntityWithPost | null {
+  const references = collectEntityReferences();
+  return references.length > 0 ? references[0] : null;
+}
+
+function findEntityWithoutRelatedPost(): EntityRef | null {
+  const references = collectEntityReferences();
+  const referencedKeys = new Set(references.map((ref) => `${ref.type}/${ref.slug}`));
+  const allEntities = collectAllEntities();
+
+  for (const entity of allEntities) {
+    const key = `${entity.type}/${entity.slug}`;
+    if (!referencedKeys.has(key)) {
+      return entity;
+    }
+  }
+
+  return null;
+}
+
 test.describe("site smoke", () => {
   test("core routes render without errors", async ({ page }, testInfo) => {
     const consoleLogs: string[] = [];
@@ -145,5 +250,40 @@ test.describe("site smoke", () => {
 
     expect(consoleErrors, "Console should be clean").toEqual([]);
     expect(networkFailures, "Network requests should succeed").toEqual([]);
+  });
+
+  test("entity pages surface related post cards", async ({ page }) => {
+    const entity = findEntityWithRelatedPost();
+    test.skip(!entity, "No entities with related posts found in content");
+    if (!entity) return;
+
+    const response = await page.goto(`/entities/${entity.type}/${entity.slug}/`, {
+      waitUntil: "networkidle",
+    });
+    expect(response?.status()).toBe(200);
+
+    const cards = page.locator(".entity-related-list .ritual-card");
+    const count = await cards.count();
+    expect(count).toBeGreaterThan(0);
+
+    const firstCardHeading = cards.first().locator(".card-heading");
+    await expect(firstCardHeading).toContainText(entity.postTitle, { timeout: 5_000 });
+    await expect(cards.first().locator(".card-metadata")).toContainText(/\d{4}/);
+  });
+
+  test("entity pages invite contributions when empty", async ({ page }) => {
+    const entity = findEntityWithoutRelatedPost();
+    test.skip(!entity, "All entities currently referenced by posts");
+    if (!entity) return;
+
+    const response = await page.goto(`/entities/${entity.type}/${entity.slug}/`, {
+      waitUntil: "networkidle",
+    });
+    expect(response?.status()).toBe(200);
+
+    const placeholder = page.locator(".entity-related-placeholder");
+    await expect(placeholder).toBeVisible();
+    await expect(placeholder).toContainText("Lore Hub");
+    await expect(placeholder.locator('a[href="/hub/"]')).toBeVisible();
   });
 });
