@@ -46,6 +46,7 @@ The WitchClick pipeline turns generated outlines into live posts. Follow this ch
 - Fathom requires a `siteId` (your public key). Optional `scriptUrl` and `apiHost` fields support vanity domains.
 - Invalid combinations fail fast during build and are covered by tests—double-check field names before committing.
 - Outbound affiliate and download buttons already emit analytics events via `data-analytics` attributes.
+- Affiliate anchors also post to `/api/affiliate-click`, which validates each beacon and forwards it to your configured analytics endpoint (`settings.analytics.endpoint`).
 
 ## 9. Evergreen homepage blocks
 - Edit newsletter copy and Ko‑fi testimonials in `content/blocks/home.json`. Changes render automatically without code tweaks.
