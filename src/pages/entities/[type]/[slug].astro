@@ -2,6 +2,7 @@
 // src/pages/entities/[type]/[slug].astro — static build friendly
 import Base from "../../../layouts/Base.astro";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import PostCard from "../../../components/PostCard.astro";
 import fs from "node:fs";
 import path from "node:path";
 import { getTypeMetadata } from "../../../data/typeMetadata";
@@ -91,6 +92,8 @@ const typeLabel = ent.type
   .map((part) => (part ? part.charAt(0).toUpperCase() + part.slice(1) : ""))
   .join(" ");
 
+const typeLabelLower = typeLabel.toLowerCase();
+
 function startCase(value: string): string {
   return value
     .split(/[-_\s]+/)
@@ -144,7 +147,13 @@ const centerNode = {
 };
 const hasRelations = outboundRelations.length > 0 || inboundRelations.length > 0;
 
-let relatedPosts: Array<{ title: string; href: string; excerpt?: string }> = [];
+let relatedPosts: Array<{
+  title: string;
+  href: string;
+  slug: string;
+  excerpt?: string;
+  publishedAt?: string;
+}> = [];
 try {
   // This helper will be wired to real content soon; we fall back quietly for now.
   const maybePosts = await getPostsForEntity?.(ent.type, ent.slug);
@@ -266,23 +275,34 @@ function pretty(v: unknown) {
     <section class="card-panel card-tier-1 card-panel-soft entity-related">
       <div class="entity-related-header">
         <h2 class="entity-section-title">Related Posts</h2>
-        <p class="entity-related-sub">Stories that will eventually echo this lore.</p>
+        <p class="entity-related-sub">Rituals and guides that already reference this ally.</p>
       </div>
       {relatedPosts.length > 0 ? (
         <ul class="entity-related-list">
           {relatedPosts.map((post) => (
-            <li>
-              <a href={post.href} class="card-panel card-tier-1 card-panel-soft entity-related-card">
-                <h3>{post.title}</h3>
-                {post.excerpt && <p>{post.excerpt}</p>}
-              </a>
+            <li class="entity-related-item">
+              <PostCard
+                href={post.href}
+                post={{
+                  slug: post.slug,
+                  title: post.title,
+                  excerpt: post.excerpt,
+                  tldr: post.excerpt,
+                  publishedAt: post.publishedAt,
+                }}
+              />
             </li>
           ))}
         </ul>
       ) : (
         <div class="entity-related-placeholder">
-          <p>Our scribes are gathering tales to weave here soon.</p>
-          {/* TODO: Once getPostsForEntity resolves real data, replace this placeholder copy. */}
+          <p>
+            No posts have woven {entityDisplayName} into our rituals yet. Visit the
+            {" "}
+            <a href="/hub/">Lore Hub</a>
+            {" "}
+            to share a story or request a {typeLabelLower} update.
+          </p>
         </div>
       )}
     </section>
@@ -462,36 +482,13 @@ function pretty(v: unknown) {
   .entity-related-list {
     display: grid;
     gap: 1.25rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
   }
 
-  .entity-related-card {
-    --card-hover-translate: -0.25rem;
-    --card-elevation-base: var(--elevation-tier-1);
-    --card-elevation-hover: var(--elevation-tier-2);
+  .entity-related-item {
     display: block;
-    padding: 1.25rem 1.5rem;
-    border: 1px solid color-mix(in srgb, var(--entity-accent-border, rgba(124, 58, 237, 0.22)) 85%, transparent 15%);
-    background:
-      radial-gradient(circle at top right, color-mix(in srgb, var(--entity-accent-highlight, rgba(124, 58, 237, 0.15)) 45%, transparent) 0%, transparent 70%),
-      var(--card-panel-surface);
-    transition: border-color var(--card-transition), color var(--card-transition);
-  }
-
-  .entity-related-card h3 {
-    font-family: var(--font-serif, "Literata", serif);
-    font-size: 1.2rem;
-    color: var(--entity-accent-heading, #4c1d95);
-    margin-bottom: 0.5rem;
-  }
-
-  .entity-related-card p {
-    color: var(--ink-body, #111827);
-    font-size: 0.95rem;
-  }
-
-  .entity-related-card:hover,
-  .entity-related-card:focus-visible {
-    border-color: color-mix(in srgb, var(--entity-accent, rgba(124, 58, 237, 0.55)) 85%, transparent 15%);
   }
 
   .entity-related-placeholder {
