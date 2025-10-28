@@ -334,23 +334,22 @@ main {
    --------------------------------------------------------------------------- */
 
 .wc-container {
-  width: 100%;
-  max-width: 80rem;
+  --wc-container-max: 80rem;
+  --wc-container-padding: clamp(1.25rem, 4vw, 2.75rem);
+  width: min(100%, var(--wc-container-max));
   margin-inline: auto;
-  padding-inline: var(--space-4);
+  padding-inline: var(--wc-container-padding);
 }
 
 @media (min-width: 768px) {
   .wc-container {
-    max-width: 84rem;
-    padding-inline: var(--space-6);
+    --wc-container-max: 86rem;
   }
 }
 
 @media (min-width: 1024px) {
   .wc-container {
-    max-width: 88rem;
-    padding-inline: var(--space-7);
+    --wc-container-max: 92rem;
   }
 }
 
