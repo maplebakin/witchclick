@@ -31,6 +31,9 @@ interface LayoutProps {
   noindex?: boolean;
   ambientColor?: string;
   bodyDataType?: string;
+  mainClass?: string | string[];
+  containerClass?: string | string[];
+  contentClass?: string | string[];
 }
 
 const {
@@ -45,6 +48,9 @@ const {
   noindex = false,
   ambientColor = "",
   bodyDataType = "",
+  mainClass: mainClassProp,
+  containerClass: containerClassProp,
+  contentClass: contentClassProp,
 } = Astro.props as LayoutProps;
 
 // Constants
@@ -143,6 +149,16 @@ const buildThemeCss = (
 }`;
 };
 
+const normalizeClassList = (value: string | string[] | null | undefined): string[] => {
+  if (!value) return [];
+
+  const values = Array.isArray(value) ? value : [value];
+
+  return values
+    .filter((item): item is string => typeof item === "string")
+    .flatMap((item) => item.split(/\s+/g).filter(Boolean));
+};
+
 const normalizeAccountLink = (
   link: { href: string; label: string; rel?: string },
   showAccountLink: boolean,
@@ -204,6 +220,23 @@ const canonicalUrl = buildCanonicalUrl(settings, { canonical: canon, astroUrl: A
 // Navigation Configuration
 const currentPath = Astro.url?.pathname ?? "/";
 const isPlainReadingRoute = PLAIN_READING_ROUTE_PATTERNS.some((pattern) => pattern.test(currentPath));
+
+const mainClassList = [
+  "site-main",
+  isPlainReadingRoute && "site-main--plain",
+  ...normalizeClassList(mainClassProp),
+].filter(Boolean);
+
+const containerClassList = [
+  "site-main__container",
+  "wc-container",
+  wide && "site-main__container--wide",
+  desktopWide && "site-main__container--desktop-wide",
+  isPlainReadingRoute && "site-main__container--plain",
+  ...normalizeClassList(containerClassProp),
+].filter(Boolean);
+
+const contentClassList = ["site-main__content", ...normalizeClassList(contentClassProp)].filter(Boolean);
 
 const navLinks = primaryNavLinks;
 const secondaryLinks = secondaryNavLinks;
@@ -377,22 +410,16 @@ const observabilityConfig = shouldLoadObservability
     
     <main
       id="main"
-      class:list={["site-main", isPlainReadingRoute && "site-main--plain"].filter(Boolean)}
+      class:list={mainClassList}
       data-plain-reading={isPlainReadingRoute ? "true" : undefined}
     >
       <div
-        class:list={[
-          "site-main__container",
-          "wc-container",
-          wide && "site-main__container--wide",
-          desktopWide && "site-main__container--desktop-wide",
-          isPlainReadingRoute && "site-main__container--plain",
-        ].filter(Boolean)}
+        class:list={containerClassList}
       >
         <div class="site-main__breadcrumbs">
           <slot name="breadcrumbs" />
         </div>
-        <div class="site-main__content">
+        <div class:list={contentClassList}>
           <slot />
         </div>
       </div>
@@ -517,11 +544,11 @@ const observabilityConfig = shouldLoadObservability
   }
 
   .site-main__container--wide {
-    max-width: 72rem;
+    --wc-container-max: 96rem;
   }
 
   .site-main__container--desktop-wide {
-    max-width: 72rem;
+    --wc-container-max: 96rem;
   }
 
   @media (max-width: 640px) {
@@ -534,7 +561,7 @@ const observabilityConfig = shouldLoadObservability
 
   @media (min-width: 1024px) {
     .site-main__container--desktop-wide {
-      max-width: 82rem;
+      --wc-container-max: 104rem;
     }
   }
 </style>
