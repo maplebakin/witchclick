@@ -6,6 +6,7 @@
   const STORAGE_KEY = "wc-affiliate-clicks";
   const DATASET_FLAG = "affiliateBound";
   const MAX_ENTRIES = 100;
+  const analyticsEnabled = Boolean(window.__WC_ANALYTICS__);
 
   function readLog() {
     try {
@@ -35,12 +36,31 @@
   }
 
   function sendClickBeacon(payload) {
-    // TODO: Wire up server-side tracking endpoint when ready.
-    if (typeof navigator === "undefined" || typeof navigator.sendBeacon !== "function") {
-      return;
+    if (!analyticsEnabled) return;
+
+    const body = JSON.stringify(payload);
+
+    if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
+      try {
+        const data = typeof Blob === "function" ? new Blob([body], { type: "application/json" }) : body;
+        if (navigator.sendBeacon("/api/affiliate-click", data)) {
+          return;
+        }
+      } catch (error) {
+        console.warn("Affiliate beacon sendBeacon failed", error);
+      }
     }
-    const _body = JSON.stringify(payload);
-    // navigator.sendBeacon("/api/track-click", _body);
+
+    if (typeof fetch === "function") {
+      fetch("/api/affiliate-click", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body,
+        keepalive: true,
+      }).catch((error) => {
+        console.warn("Affiliate beacon fetch failed", error);
+      });
+    }
   }
 
   function handleClick(event) {
