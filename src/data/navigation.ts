@@ -26,7 +26,6 @@ export const secondaryNavLinks: NavLink[] = [
 
 export const headerUtilityLinks: NavLink[] = [
   { href: "/contact/", label: "Contact" },
-  { href: "/account/", label: "Account" },
 ];
 
 export const footerUtilityLinks: NavLink[] = [

@@ -1,5 +1,4 @@
-// public/robots.txt
 User-agent: *
-Allow: /
-Disallow: /admin
-Sitemap: /sitemap-index.xml
+Disallow: /author
+Disallow: /account
+Sitemap: https://witchclick.space/sitemap-index.xml
