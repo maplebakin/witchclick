@@ -1,4 +1,3 @@
-export const prerender = false;
 
 import { listComments, setCommentStatus } from "../../../../server/lib/commentsStore.js";
 

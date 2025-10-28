@@ -14,7 +14,6 @@ import {
   CURSE_TAGS,
 } from "../../../server/lib/curseSpecSchema.js";
 
-export const prerender = false; // never emit in static builds
 
 const settings = readSettings();
 const canonical = buildCanonicalUrl(settings, { path: "/admin" });

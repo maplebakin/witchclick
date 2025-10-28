@@ -1,0 +1,36 @@
+---
+/**
+ * ThemeColorControl - Reusable color input component
+ * Shows color picker + hex input with live sync
+ */
+interface Props {
+  label: string;
+  variableKey: string;
+  placeholder?: string;
+  description?: string;
+}
+
+const { label, variableKey, placeholder = "#000000", description } = Astro.props;
+---
+
+<label class="block text-sm">
+  <span class="text-xs font-medium uppercase tracking-wide text-body-muted flex items-center gap-2">
+    {label}
+    {description && (
+      <span class="text-[10px] normal-case font-normal opacity-75">({description})</span>
+    )}
+  </span>
+  <div class="mt-1 flex items-center gap-2">
+    <input
+      type="color"
+      data-color-picker={variableKey}
+      class="h-9 w-12 rounded border border-line-neutral cursor-pointer"
+    />
+    <input
+      data-color-input={variableKey}
+      type="text"
+      class="flex-1 rounded-lg border border-line-neutral px-3 py-2 font-mono text-sm"
+      placeholder={placeholder}
+    />
+  </div>
+</label>

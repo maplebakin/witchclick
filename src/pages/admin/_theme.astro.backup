@@ -1,0 +1,1690 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readSettings, buildCanonicalUrl } from "../../utils/settings";
+import HeadSlot from "@/components/HeadSlot.astro";
+import AdminNav from "@/components/AdminNav.astro";
+
+export const prerender = false;
+
+const settings = readSettings();
+const canonical = buildCanonicalUrl(settings, { path: "/admin/theme" });
+
+const isDev = import.meta.env.DEV;
+const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
+const url = new URL(Astro.request.url);
+const keyOk = ADMIN_KEY && url.searchParams.get('key') === ADMIN_KEY;
+const canUse = isDev || !!keyOk;
+
+const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+
+const defaultMidnight = {
+  primary: "#6b21a8",
+  accent: "#d9b2c4",
+  background: "#faf7f5",
+  textPrimary: "#1f1630",
+  textHeading: "#120725",
+  textMuted: "#6b5d70",
+  fontSerif: "Literata",
+  fontScript: "Parisienne",
+};
+
+const defaultDawn = {
+  primary: "#9b86c8",
+  accent: "#caa043",
+  background: "#f6f0e8",
+  textPrimary: "#1f1630",
+  textHeading: "#120725",
+  textMuted: "#6b5d70",
+  fontSerif: "Literata",
+  fontScript: "Parisienne",
+};
+
+const fontOptions = [
+  "Literata",
+  "Litera",
+  "EB Garamond",
+  "Playfair Display",
+  "Fraunces",
+  "Cormorant Garamond",
+  "Parisienne",
+  "Dancing Script",
+  "Great Vibes",
+  "Sacramento",
+];
+
+const categoryOptions = [
+  { value: "custom", label: "Custom", description: "Personal custom themes" },
+  { value: "seasonal", label: "Seasonal", description: "Themes for specific seasons" },
+  { value: "minimal", label: "Minimal", description: "Clean and simple designs" },
+  { value: "vibrant", label: "Vibrant", description: "Bold and energetic palettes" },
+  { value: "default", label: "Default", description: "Built-in default themes" },
+];
+
+const seasonalSeasons = [
+  {
+    id: "spring",
+    label: "Spring",
+    icon: "🌸",
+    description: "Light florals and early sunrise palettes for gentle beginnings.",
+  },
+  {
+    id: "summer",
+    label: "Summer",
+    icon: "🌞",
+    description: "Warm evenings, festival energy, and confident contrasts.",
+  },
+  {
+    id: "autumn",
+    label: "Autumn",
+    icon: "🍂",
+    description: "Harvest hues and fireside rituals with grounded depth.",
+  },
+  {
+    id: "winter",
+    label: "Winter",
+    icon: "❄️",
+    description: "Frosty starlight and candlelit focus for deep work.",
+  },
+];
+---
+<Base
+  title="WitchClick — Theme Dashboard"
+  description="Craft, save, and activate WitchClick theme palettes."
+  canon={canonical}
+  wide={true}
+  noindex={true}
+>
+  <HeadSlot slot="head">
+    <meta name="robots" content="noindex" />
+  </HeadSlot>
+
+  {canUse ? (
+    <div class="space-y-6">
+      <AdminNav currentPath="/admin/theme" />
+
+      <div
+        class="grid grid-cols-1 gap-6 lg:grid-cols-12"
+        data-theme-admin
+        data-dev-api={DEV_API}
+        data-default-midnight={JSON.stringify(defaultMidnight)}
+        data-default-dawn={JSON.stringify(defaultDawn)}
+        data-font-options={JSON.stringify(fontOptions)}
+        data-category-options={JSON.stringify(categoryOptions)}
+      >
+      <section class="lg:col-span-4 space-y-6 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
+        <header>
+          <h1 class="text-xl font-semibold text-primary">Theme Dashboard</h1>
+          <p class="mt-1 text-sm text-body-muted">
+            Adjust palettes, typography, and assign active comfort themes for midnight and dawn.
+          </p>
+        </header>
+
+        <dl class="space-y-2 text-sm">
+          <div class="flex items-center justify-between gap-3">
+            <dt class="text-body-muted">Active midnight theme</dt>
+            <dd class="font-medium text-primary" data-active="midnight">—</dd>
+          </div>
+          <div class="flex items-center justify-between gap-3">
+            <dt class="text-body-muted">Active dawn theme</dt>
+            <dd class="font-medium text-primary" data-active="dawn">—</dd>
+          </div>
+        </dl>
+
+        <div class="space-y-3">
+          <label class="block text-sm">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Filter by category</span>
+            <select id="categoryFilter" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm">
+              <option value="">All categories</option>
+              {categoryOptions.map((cat) => (
+                <option value={cat.value}>{cat.label}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div class="space-y-5">
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <h2 class="text-[13px] font-semibold uppercase tracking-wide text-body-muted">Midnight themes</h2>
+              <button
+                type="button"
+                class="rounded-lg border border-line-neutral px-3 py-1 text-xs font-medium hover:bg-surface-soft"
+                data-new-theme="midnight"
+              >
+                New
+              </button>
+            </div>
+            <div class="mt-2 space-y-2" data-theme-list="midnight"></div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <h2 class="text-[13px] font-semibold uppercase tracking-wide text-body-muted">Dawn themes</h2>
+              <button
+                type="button"
+                class="rounded-lg border border-line-neutral px-3 py-1 text-xs font-medium hover:bg-surface-soft"
+                data-new-theme="dawn"
+              >
+                New
+              </button>
+            </div>
+            <div class="mt-2 space-y-2" data-theme-list="dawn"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lg:col-span-8 space-y-4 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
+        <header>
+          <h2 class="text-lg font-semibold text-primary">Theme editor</h2>
+          <p class="mt-1 text-sm text-body-muted">
+            Update individual colour tokens and fonts, then save them as reusable themes.
+          </p>
+        </header>
+
+        <div class="grid gap-3 md:grid-cols-2">
+          <label class="block text-sm">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Comfort mode</span>
+            <select id="themeMode" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2">
+              <option value="midnight">Midnight (dark)</option>
+              <option value="dawn">Dawn (light)</option>
+            </select>
+          </label>
+          <label class="block text-sm">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Theme name</span>
+            <input
+              id="themeLabel"
+              class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2"
+              placeholder="Cozy Midnight"
+            />
+          </label>
+          <label class="block text-sm">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Category</span>
+            <select id="themeCategory" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2">
+              {categoryOptions.map((cat) => (
+                <option value={cat.value} selected={cat.value === 'custom'}>
+                  {cat.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label class="block text-sm">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Slug</span>
+            <input
+              id="themeSlug"
+              class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2"
+              placeholder="cozy-midnight"
+            />
+            <p class="mt-1 text-xs text-body-muted">Leave blank to generate from the theme name.</p>
+          </label>
+        </div>
+
+        <div class="grid gap-3 md:grid-cols-2">
+          <label class="block text-sm">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Primary colour</span>
+            <div class="mt-1 flex items-center gap-2">
+              <input type="color" data-color-picker="primary" class="h-9 w-12 rounded border border-line-neutral" />
+              <input
+                data-color-input="primary"
+                class="w-full rounded-lg border border-line-neutral px-3 py-2"
+                placeholder="#6b21a8"
+              />
+            </div>
+          </label>
+          <label class="block text-sm">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Accent colour</span>
+            <div class="mt-1 flex items-center gap-2">
+              <input type="color" data-color-picker="accent" class="h-9 w-12 rounded border border-line-neutral" />
+              <input
+                data-color-input="accent"
+                class="w-full rounded-lg border border-line-neutral px-3 py-2"
+                placeholder="#d9b2c4"
+              />
+            </div>
+          </label>
+          <label class="block text-sm md:col-span-2">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Background colour</span>
+            <div class="mt-1 flex items-center gap-2">
+              <input type="color" data-color-picker="background" class="h-9 w-12 rounded border border-line-neutral" />
+              <input
+                data-color-input="background"
+                class="w-full rounded-lg border border-line-neutral px-3 py-2"
+                placeholder="#120725"
+              />
+            </div>
+          </label>
+        </div>
+
+        <div class="rounded-lg border border-line-subtle bg-surface-soft/50 p-3">
+          <h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-body-muted">Background image</h3>
+          <div class="space-y-3">
+            <div class="flex flex-wrap gap-2">
+              <label class="cursor-pointer rounded-lg border border-line-neutral bg-surface-base px-4 py-2 text-sm font-medium hover:bg-surface-soft">
+                <input type="file" accept="image/*" id="backgroundImageUpload" class="hidden" />
+                Upload image
+              </label>
+              <button
+                type="button"
+                id="clearBackgroundBtn"
+                class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft"
+              >
+                Clear background
+              </button>
+            </div>
+            <div class="text-xs text-body-muted" id="backgroundImageStatus">No background image selected</div>
+            <div class="grid grid-cols-3 gap-2" id="backgroundImageGallery"></div>
+          </div>
+        </div>
+
+        <div class="rounded-lg border border-line-subtle bg-surface-soft/50 p-3">
+          <h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-body-muted">Text colours</h3>
+          <div class="grid gap-3 md:grid-cols-2">
+            <label class="block text-sm">
+              <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Primary text</span>
+              <div class="mt-1 flex items-center gap-2">
+                <input type="color" data-color-picker="textPrimary" class="h-9 w-12 rounded border border-line-neutral" />
+                <input
+                  data-color-input="textPrimary"
+                  class="w-full rounded-lg border border-line-neutral px-3 py-2 text-sm"
+                  placeholder="#1f1630"
+                />
+              </div>
+            </label>
+            <label class="block text-sm">
+              <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Heading text</span>
+              <div class="mt-1 flex items-center gap-2">
+                <input type="color" data-color-picker="textHeading" class="h-9 w-12 rounded border border-line-neutral" />
+                <input
+                  data-color-input="textHeading"
+                  class="w-full rounded-lg border border-line-neutral px-3 py-2 text-sm"
+                  placeholder="#120725"
+                />
+              </div>
+            </label>
+            <label class="block text-sm md:col-span-2">
+              <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Muted text</span>
+              <div class="mt-1 flex items-center gap-2">
+                <input type="color" data-color-picker="textMuted" class="h-9 w-12 rounded border border-line-neutral" />
+                <input
+                  data-color-input="textMuted"
+                  class="w-full rounded-lg border border-line-neutral px-3 py-2 text-sm"
+                  placeholder="#6b5d70"
+                />
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="grid gap-3 md:grid-cols-2">
+          <label class="block text-sm">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Serif body font</span>
+            <select
+              id="themeFontSerif"
+              class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2"
+            >
+              {fontOptions.map((font) => (
+                <option value={font} selected={font === defaultMidnight.fontSerif}>
+                  {font}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label class="block text-sm">
+            <span class="text-xs font-medium uppercase tracking-wide text-body-muted">Script accent font</span>
+            <select
+              id="themeFontScript"
+              class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2"
+            >
+              {fontOptions.map((font) => (
+                <option value={font} selected={font === defaultMidnight.fontScript}>
+                  {font}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div
+          class="rounded-2xl border border-line-subtle bg-surface-neutral-soft/60 p-4 md:p-6"
+          data-theme-preview
+        >
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <p class="text-xs font-semibold uppercase tracking-wide text-body-muted">Live preview</p>
+            <span
+              class="rounded-full border border-line-neutral bg-surface-base px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-body"
+              data-preview-mode
+            >
+              Midnight
+            </span>
+          </div>
+          <div class="mt-4 grid gap-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+            <div class="space-y-4">
+              <article class="preview-card space-y-3 rounded-xl border p-4 shadow-sm" data-preview-card>
+                <p class="text-xs font-semibold uppercase tracking-wide text-body-muted" data-preview-eyebrow>
+                  Hero example
+                </p>
+                <h3 class="text-lg font-semibold" data-preview-title>Soft rituals for tired hearts</h3>
+                <p class="text-sm leading-relaxed" data-preview-body>
+                  Gentle copy shows how serif body text feels in paragraphs. Adjust colours and fonts above to see instant
+                  changes.
+                </p>
+                <div class="flex flex-wrap gap-2" data-preview-chips>
+                  <span class="preview-chip" data-preview-chip="primary">Primary</span>
+                  <span class="preview-chip" data-preview-chip="accent">Accent</span>
+                  <span class="preview-chip" data-preview-chip="background">Background</span>
+                </div>
+                <div class="flex flex-wrap gap-2 pt-1" data-preview-actions>
+                  <button type="button" class="preview-button preview-button--primary" data-preview-primary>
+                    Primary CTA
+                  </button>
+                  <button type="button" class="preview-button preview-button--ghost" data-preview-secondary>
+                    Secondary CTA
+                  </button>
+                </div>
+              </article>
+              <p class="text-sm" data-preview-copy>
+                Body text uses <span class="font-semibold" data-preview-serif>Literata</span>. Script flourishes render as
+                <span class="preview-script" data-preview-script>Moonlit Whispers</span>.
+              </p>
+            </div>
+            <div class="space-y-4">
+              <div class="rounded-xl border border-dashed border-line-muted/60 bg-surface-base/80 p-4" data-preview-surface>
+                <p class="text-xs font-semibold uppercase tracking-wide text-body-muted">Palette swatches</p>
+                <div class="mt-3 flex flex-col gap-2" data-preview-swatches></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            id="saveThemeBtn"
+            class="rounded-lg bg-surface-success px-4 py-2 text-sm font-medium text-inverse hover:bg-surface-success-strong"
+          >
+            Save theme
+          </button>
+          <button
+            type="button"
+            id="setActiveThemeBtn"
+            class="rounded-lg bg-surface-info px-4 py-2 text-sm font-medium text-inverse hover:bg-surface-info-strong"
+          >
+            Set as active midnight theme
+          </button>
+          <button
+            type="button"
+            id="loadActiveThemeBtn"
+            class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft"
+          >
+            Load active theme
+          </button>
+          <button
+            type="button"
+            id="resetThemeBtn"
+            class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft"
+          >
+            Load defaults
+          </button>
+        </div>
+
+        <p class="mt-2 text-sm text-body-muted" data-status></p>
+      </section>
+
+      <section
+        class="lg:col-span-12 space-y-5 rounded-2xl border border-dashed border-line-neutral bg-surface-base/70 p-4 shadow-sm"
+        data-seasonal-panel
+      >
+        <header class="space-y-1">
+          <h2 class="text-lg font-semibold text-primary">Seasonal theme schedule</h2>
+          <p class="text-sm text-body-muted">
+            Plan ahead for seasonal refreshes by pairing midnight and dawn themes with each quarter. Saving is wired to log a
+            payload until the API endpoint is prepared.
+          </p>
+        </header>
+
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4" data-seasonal-grid>
+          {seasonalSeasons.map((season) => (
+            <article
+              class="space-y-3 rounded-xl border border-line-subtle bg-surface-base/80 p-4"
+              data-season-card
+              data-season={season.id}
+            >
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <h3 class="text-sm font-semibold text-primary">{season.label}</h3>
+                  <p class="text-[11px] text-body-muted">{season.description}</p>
+                </div>
+                <span class="text-lg" aria-hidden="true">{season.icon}</span>
+              </div>
+
+              <div class="space-y-3">
+                <label class="block text-xs">
+                  <span class="font-semibold uppercase tracking-wide text-body-muted">Midnight theme</span>
+                  <select
+                    class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm"
+                    data-season-select="midnight"
+                  >
+                    <option value="">Not assigned</option>
+                  </select>
+                </label>
+                <label class="block text-xs">
+                  <span class="font-semibold uppercase tracking-wide text-body-muted">Dawn theme</span>
+                  <select
+                    class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm"
+                    data-season-select="dawn"
+                  >
+                    <option value="">Not assigned</option>
+                  </select>
+                </label>
+              </div>
+
+              <p class="text-[11px] text-body-muted" data-season-status>Awaiting seasonal plan.</p>
+            </article>
+          ))}
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft"
+            data-seasonal-save
+          >
+            Save seasonal plan
+          </button>
+          <button
+            type="button"
+            class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft"
+            data-seasonal-reset
+          >
+            Reset changes
+          </button>
+        </div>
+
+        <p class="text-xs text-body-muted">
+          Seasonal assignments are stored locally for now and logged to the console when saved — perfect for testing payloads
+          before the endpoint arrives.
+        </p>
+      </section>
+      </div>
+    </div>
+  ) : (
+    <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
+      <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
+      <p class="text-body-muted">This dashboard is only available in <strong>development</strong> (or with a temporary key).</p>
+      <p class="mt-3 text-sm text-body-muted">Update <code>content/themes/*.json</code> manually when the panel is unavailable.</p>
+    </section>
+  )}
+
+  {canUse && (
+    <script is:inline>
+      {`
+        (function(){
+          const root = document.querySelector('[data-theme-admin]');
+          if (!root) return;
+
+          const devApi = root.getAttribute('data-dev-api') || 'http://localhost:8787';
+          const defaults = {
+            midnight: parseDefaults(root.getAttribute('data-default-midnight'), {
+              primary: '#6b21a8',
+              accent: '#d9b2c4',
+              background: '#faf7f5',
+              fontSerif: 'Literata',
+              fontScript: 'Parisienne'
+            }),
+            dawn: parseDefaults(root.getAttribute('data-default-dawn'), {
+              primary: '#9b86c8',
+              accent: '#caa043',
+              background: '#f6f0e8',
+              fontSerif: 'Literata',
+              fontScript: 'Parisienne'
+            })
+          };
+
+          const lists = {
+            midnight: root.querySelector('[data-theme-list="midnight"]'),
+            dawn: root.querySelector('[data-theme-list="dawn"]')
+          };
+
+          const activeLabels = {
+            midnight: root.querySelector('[data-active="midnight"]'),
+            dawn: root.querySelector('[data-active="dawn"]')
+          };
+
+          const modeSelect = root.querySelector('#themeMode');
+          const labelInput = root.querySelector('#themeLabel');
+          const slugInput = root.querySelector('#themeSlug');
+          const categorySelect = root.querySelector('#themeCategory');
+          const categoryFilter = root.querySelector('#categoryFilter');
+          const fontSerifSelect = root.querySelector('#themeFontSerif');
+          const fontScriptSelect = root.querySelector('#themeFontScript');
+          const statusEl = root.querySelector('[data-status]');
+          const fontChoices = parseFontOptions(root.getAttribute('data-font-options'));
+          const categoryChoices = parseCategoryOptions(root.getAttribute('data-category-options'));
+          const backgroundImageUpload = root.querySelector('#backgroundImageUpload');
+          const clearBackgroundBtn = root.querySelector('#clearBackgroundBtn');
+          const backgroundImageStatus = root.querySelector('#backgroundImageStatus');
+          const backgroundImageGallery = root.querySelector('#backgroundImageGallery');
+
+          const colorFields = ['primary','accent','background','textPrimary','textHeading','textMuted'].reduce((acc, key) => {
+            acc[key] = {
+              picker: root.querySelector('[data-color-picker="' + key + '"]'),
+              input: root.querySelector('[data-color-input="' + key + '"]')
+            };
+            return acc;
+          }, {});
+
+          const previewRoot = root.querySelector('[data-theme-preview]');
+          const previewModeLabel = root.querySelector('[data-preview-mode]');
+          const previewSerif = root.querySelector('[data-preview-serif]');
+          const previewScript = root.querySelector('[data-preview-script]');
+          const previewSwatches = root.querySelector('[data-preview-swatches]');
+
+          const saveBtn = root.querySelector('#saveThemeBtn');
+          const setActiveBtn = root.querySelector('#setActiveThemeBtn');
+          const resetBtn = root.querySelector('#resetThemeBtn');
+          const loadActiveBtn = root.querySelector('#loadActiveThemeBtn');
+          const newButtons = Array.from(root.querySelectorAll('[data-new-theme]'));
+          const seasonalPanel = root.querySelector('[data-seasonal-panel]');
+          const seasonalCards = Array.from(root.querySelectorAll('[data-season-card]'))
+            .map((card) => {
+              const season = card.getAttribute('data-season');
+              if (!season) return null;
+              return {
+                season,
+                card,
+                selects: {
+                  midnight: card.querySelector('[data-season-select="midnight"]'),
+                  dawn: card.querySelector('[data-season-select="dawn"]')
+                },
+                status: card.querySelector('[data-season-status]')
+              };
+            })
+            .filter(Boolean);
+          const seasonalSaveBtn = root.querySelector('[data-seasonal-save]');
+          const seasonalResetBtn = root.querySelector('[data-seasonal-reset]');
+          const seasonIds = seasonalCards.map((entry) => entry.season);
+
+          let state = {
+            items: { midnight: [], dawn: [] },
+            active: { midnight: null, dawn: null }
+          };
+          let current = null;
+          let categoryFilterValue = '';
+          let seasonal = {
+            original: createSeasonalAssignments(),
+            assignments: createSeasonalAssignments(),
+            dirty: false
+          };
+          let currentBackgroundImage = '';
+          let availableBackgrounds = [];
+
+          function parseDefaults(raw, fallback){
+            try {
+              const parsed = JSON.parse(raw || 'null');
+              if (parsed && typeof parsed === 'object') {
+                const result = { ...fallback };
+                ['primary','accent','background','textPrimary','textHeading','textMuted','fontSerif','fontScript'].forEach((key) => {
+                  if (typeof parsed[key] === 'string' && parsed[key].trim()) {
+                    result[key] = parsed[key];
+                  }
+                });
+                return result;
+              }
+            } catch {}
+            return { ...fallback };
+          }
+
+          function parseFontOptions(raw){
+            try {
+              const parsed = JSON.parse(raw || '[]');
+              if (Array.isArray(parsed)) {
+                const values = parsed
+                  .map((item) => (typeof item === 'string' ? item.trim() : ''))
+                  .filter(Boolean);
+                return Array.from(new Set(values));
+              }
+            } catch {}
+            return [];
+          }
+
+          function parseCategoryOptions(raw){
+            try {
+              const parsed = JSON.parse(raw || '[]');
+              if (Array.isArray(parsed)) {
+                return parsed.filter((item) => item && typeof item === 'object' && item.value);
+              }
+            } catch {}
+            return [];
+          }
+
+          function ensureFontOption(select, value){
+            if (!select) return;
+            const trimmed = typeof value === 'string' ? value.trim() : '';
+            if (!trimmed) return;
+            const options = Array.from(select.options || []);
+            if (!options.some((option) => option.value === trimmed)) {
+              const option = document.createElement('option');
+              option.value = trimmed;
+              option.textContent = trimmed;
+              select.appendChild(option);
+            }
+            if (!fontChoices.includes(trimmed)) {
+              fontChoices.push(trimmed);
+            }
+          }
+
+          function setFontSelectValue(select, value, fallback){
+            if (!select) return;
+            const trimmed = typeof value === 'string' ? value.trim() : '';
+            const fallbackValue = typeof fallback === 'string' ? fallback.trim() : '';
+            const toUse = trimmed || fallbackValue;
+            if (toUse) {
+              ensureFontOption(select, toUse);
+              select.value = toUse;
+            } else {
+              select.value = '';
+            }
+          }
+
+          function getFontValue(select){
+            if (!select) return '';
+            const value = typeof select.value === 'string' ? select.value.trim() : '';
+            return value;
+          }
+
+          function createSeasonalAssignments(){
+            const base = {};
+            seasonIds.forEach((season) => {
+              base[season] = { midnight: '', dawn: '' };
+            });
+            return base;
+          }
+
+          function cloneSeasonalAssignments(source){
+            const base = createSeasonalAssignments();
+            Object.keys(source || {}).forEach((season) => {
+              if (!base[season]) {
+                base[season] = { midnight: '', dawn: '' };
+              }
+              const value = source[season];
+              if (value && typeof value === 'object') {
+                if (typeof value.midnight === 'string') {
+                  base[season].midnight = value.midnight;
+                }
+                if (typeof value.dawn === 'string') {
+                  base[season].dawn = value.dawn;
+                }
+              }
+            });
+            return base;
+          }
+
+          function parseSeasonalAssignments(raw){
+            if (Array.isArray(raw)) {
+              const mapped = {};
+              raw.forEach((item) => {
+                if (!item || typeof item !== 'object') return;
+                const season = typeof item.season === 'string' ? item.season : '';
+                if (!season) return;
+                if (!mapped[season]) mapped[season] = { midnight: '', dawn: '' };
+                if (typeof item.midnight === 'string') mapped[season].midnight = item.midnight;
+                if (typeof item.dawn === 'string') mapped[season].dawn = item.dawn;
+              });
+              return cloneSeasonalAssignments(mapped);
+            }
+            if (raw && typeof raw === 'object') {
+              return cloneSeasonalAssignments(raw);
+            }
+            return createSeasonalAssignments();
+          }
+
+          function ensureSeasonEntry(store, season){
+            if (!store[season]) {
+              store[season] = { midnight: '', dawn: '' };
+            }
+            return store[season];
+          }
+
+          function isSeasonalEqual(a, b){
+            const seasons = new Set([
+              ...seasonIds,
+              ...Object.keys(a || {}),
+              ...Object.keys(b || {})
+            ]);
+            for (const season of seasons) {
+              const left = a?.[season] || {};
+              const right = b?.[season] || {};
+              if ((left.midnight || '') !== (right.midnight || '')) return false;
+              if ((left.dawn || '') !== (right.dawn || '')) return false;
+            }
+            return true;
+          }
+
+          function updateSeasonalButtons(){
+            if (seasonalSaveBtn) {
+              seasonalSaveBtn.disabled = !seasonal.dirty;
+            }
+            if (seasonalResetBtn) {
+              seasonalResetBtn.disabled = !seasonal.dirty;
+            }
+            if (seasonalPanel) {
+              seasonalPanel.setAttribute('data-dirty', seasonal.dirty ? 'true' : 'false');
+            }
+          }
+
+          function setSeasonalDirtyFlag(){
+            seasonal.dirty = !isSeasonalEqual(seasonal.assignments, seasonal.original);
+            updateSeasonalButtons();
+          }
+
+          function updateSeasonCardStatus(entry){
+            if (!entry || !entry.status) return;
+            const current = seasonal.assignments[entry.season] || { midnight: '', dawn: '' };
+            const saved = seasonal.original[entry.season] || { midnight: '', dawn: '' };
+            if (!current.midnight && !current.dawn) {
+              entry.status.textContent = 'No themes assigned yet.';
+            } else if (current.midnight === saved.midnight && current.dawn === saved.dawn) {
+              entry.status.textContent = 'Matches saved plan.';
+            } else {
+              entry.status.textContent = 'Draft updated — remember to save.';
+            }
+          }
+
+          function renderSeasonalOptions(){
+            if (!seasonalCards.length) return;
+            seasonalCards.forEach((entry) => {
+              ['midnight', 'dawn'].forEach((mode) => {
+                const select = entry.selects[mode];
+                if (!select) return;
+                const themes = state.items[mode] || [];
+                select.innerHTML = '';
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = 'Not assigned';
+                select.appendChild(placeholder);
+                themes.forEach((theme) => {
+                  const option = document.createElement('option');
+                  option.value = theme.slug;
+                  option.textContent = theme.label;
+                  select.appendChild(option);
+                });
+                const target = seasonal.assignments[entry.season]?.[mode] || '';
+                if (target) {
+                  const hasOption = Array.from(select.options).some((option) => option.value === target);
+                  if (!hasOption) {
+                    const missing = document.createElement('option');
+                    missing.value = target;
+                    missing.textContent = target + ' (missing)';
+                    missing.disabled = true;
+                    select.appendChild(missing);
+                  }
+                }
+                select.value = target || '';
+                if (select.value !== (target || '')) {
+                  select.value = '';
+                }
+              });
+              updateSeasonCardStatus(entry);
+            });
+          }
+
+          function handleSeasonalChange(season, mode, value){
+            ensureSeasonEntry(seasonal.assignments, season)[mode] = value;
+            const entry = seasonalCards.find((item) => item.season === season);
+            updateSeasonCardStatus(entry);
+            setSeasonalDirtyFlag();
+          }
+
+          function setStatus(message, tone){
+            if (!statusEl) return;
+            const base = 'mt-2 text-sm';
+            if (!message) {
+              statusEl.textContent = '';
+              statusEl.className = base + ' text-body-muted';
+              return;
+            }
+            if (tone === 'error') {
+              statusEl.className = base + ' text-danger';
+            } else if (tone === 'success') {
+              statusEl.className = base + ' text-success';
+            } else {
+              statusEl.className = base + ' text-body-muted';
+            }
+            statusEl.textContent = message;
+          }
+
+          function normalizeHex(value){
+            const str = String(value || '').trim();
+            const match = /^#?([0-9a-fA-F]{6})$/.exec(str);
+            return match ? '#' + match[1].toLowerCase() : '';
+          }
+
+          function hexToRgb(hex){
+            const match = /^#?([0-9a-fA-F]{6})$/.exec(String(hex || '').trim());
+            if (!match) return null;
+            const value = match[1];
+            return {
+              r: parseInt(value.slice(0, 2), 16),
+              g: parseInt(value.slice(2, 4), 16),
+              b: parseInt(value.slice(4, 6), 16)
+            };
+          }
+
+          function rgbToHex(r, g, b){
+            const clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
+            return '#' + [clamp(r), clamp(g), clamp(b)].map((v) => v.toString(16).padStart(2, '0')).join('');
+          }
+
+          function adjustHex(hex, amount){
+            const rgb = hexToRgb(hex);
+            if (!rgb) return hex;
+            const safeAmount = Math.max(-1, Math.min(1, amount || 0));
+            const towardWhite = safeAmount >= 0;
+            const ratio = Math.abs(safeAmount);
+            const target = towardWhite ? { r: 255, g: 255, b: 255 } : { r: 0, g: 0, b: 0 };
+            const r = rgb.r + (target.r - rgb.r) * ratio;
+            const g = rgb.g + (target.g - rgb.g) * ratio;
+            const b = rgb.b + (target.b - rgb.b) * ratio;
+            return rgbToHex(r, g, b);
+          }
+
+          function getLuminance(rgb){
+            if (!rgb) return 0;
+            const channel = (value) => {
+              const v = value / 255;
+              return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+            };
+            return 0.2126 * channel(rgb.r) + 0.7152 * channel(rgb.g) + 0.0722 * channel(rgb.b);
+          }
+
+          function pickContrastColor(hex){
+            const rgb = hexToRgb(hex);
+            if (!rgb) return '#1f1630';
+            const luminance = getLuminance(rgb);
+            return luminance > 0.5 ? '#1f1630' : '#fdfcfe';
+          }
+
+          function toFontStack(name, fallback){
+            const raw = String(name || '').trim();
+            if (!raw) return fallback;
+            const safe = raw.replace(/["']/g, '');
+            return "'" + safe + "'" + (fallback ? ", " + fallback : "");
+          }
+
+          function refreshPreview(){
+            if (!previewRoot) return;
+            const mode = modeSelect && modeSelect.value === 'dawn' ? 'dawn' : 'midnight';
+            const defaultsForMode = defaults[mode] || defaults.midnight;
+            const primary =
+              normalizeHex(colorFields.primary?.input?.value) || normalizeHex(defaultsForMode.primary) || '#8b7e8f';
+            const accent =
+              normalizeHex(colorFields.accent?.input?.value) || normalizeHex(defaultsForMode.accent) || '#d9b2c4';
+            const background =
+              normalizeHex(colorFields.background?.input?.value) || normalizeHex(defaultsForMode.background) || '#120725';
+            const textPrimary =
+              normalizeHex(colorFields.textPrimary?.input?.value) || normalizeHex(defaultsForMode.textPrimary) || pickContrastColor(background);
+            const textHeading =
+              normalizeHex(colorFields.textHeading?.input?.value) || normalizeHex(defaultsForMode.textHeading) || pickContrastColor(background);
+            const textMuted =
+              normalizeHex(colorFields.textMuted?.input?.value) || normalizeHex(defaultsForMode.textMuted) || adjustHex(textPrimary, 0.3);
+            const fontSerif = getFontValue(fontSerifSelect) || defaultsForMode.fontSerif;
+            const fontScript = getFontValue(fontScriptSelect) || defaultsForMode.fontScript;
+
+            const bgRgb = hexToRgb(background);
+            const luminance = getLuminance(bgRgb);
+            const surface = adjustHex(background, luminance > 0.5 ? -0.08 : 0.22);
+            const border = adjustHex(background, luminance > 0.5 ? -0.3 : 0.28);
+
+            previewRoot.style.setProperty('--preview-primary', primary);
+            previewRoot.style.setProperty('--preview-accent', accent);
+            previewRoot.style.setProperty('--preview-background', background);
+            previewRoot.style.setProperty('--preview-surface', surface);
+            previewRoot.style.setProperty('--preview-border', border);
+            previewRoot.style.setProperty('--preview-text', textPrimary);
+            previewRoot.style.setProperty('--preview-text-heading', textHeading);
+            previewRoot.style.setProperty('--preview-muted', textMuted);
+            previewRoot.style.setProperty('--preview-primary-contrast', pickContrastColor(primary));
+            previewRoot.style.setProperty('--preview-accent-contrast', pickContrastColor(accent));
+            previewRoot.style.setProperty('--preview-font-serif', toFontStack(fontSerif, 'serif'));
+            previewRoot.style.setProperty('--preview-font-script', toFontStack(fontScript, 'cursive'));
+            previewRoot.setAttribute('data-mode', mode);
+            if (currentBackgroundImage) {
+              previewRoot.style.backgroundImage = 'url(' + currentBackgroundImage + ')';
+              previewRoot.style.backgroundSize = 'cover';
+              previewRoot.style.backgroundPosition = 'center';
+            } else {
+              previewRoot.style.backgroundImage = 'none';
+            }
+
+            if (previewModeLabel) {
+              previewModeLabel.textContent = mode === 'dawn' ? 'Dawn' : 'Midnight';
+            }
+            if (previewSerif) {
+              const serifLabel = fontSerif || defaultsForMode.fontSerif;
+              previewSerif.textContent = serifLabel;
+              previewSerif.style.fontFamily = toFontStack(serifLabel, 'serif');
+            }
+            if (previewScript) {
+              const scriptLabel = fontScript || defaultsForMode.fontScript;
+              previewScript.textContent = scriptLabel;
+              previewScript.style.fontFamily = toFontStack(scriptLabel, 'cursive');
+            }
+
+            if (previewSwatches) {
+              previewSwatches.innerHTML = '';
+              const swatchData = [
+                { label: 'Primary', value: primary },
+                { label: 'Accent', value: accent },
+                { label: 'Background', value: background },
+                { label: 'Surface', value: surface },
+                { label: 'Text Primary', value: textPrimary },
+                { label: 'Text Heading', value: textHeading },
+                { label: 'Text Muted', value: textMuted },
+              ];
+              swatchData.forEach((item) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between gap-3 text-sm';
+                const left = document.createElement('div');
+                left.className = 'flex items-center gap-2';
+                const circle = document.createElement('span');
+                circle.className = 'h-6 w-6 rounded-full border border-white/60 shadow-sm';
+                circle.style.backgroundColor = item.value;
+                const label = document.createElement('span');
+                label.textContent = item.label;
+                left.appendChild(circle);
+                left.appendChild(label);
+                const code = document.createElement('code');
+                code.className = 'text-xs text-body-muted';
+                code.textContent = item.value;
+                row.appendChild(left);
+                row.appendChild(code);
+                previewSwatches.appendChild(row);
+              });
+            }
+          }
+
+          function setColorField(key, value){
+            const field = colorFields[key];
+            if (!field) return;
+            const normalized = typeof value === 'string' ? value.trim() : '';
+            const hex = normalizeHex(normalized);
+            if (field.picker) {
+              if (hex) {
+                field.picker.value = hex;
+              } else if (defaults[current?.mode || 'midnight']) {
+                const fallback = normalizeHex(defaults[current?.mode || 'midnight'][key]);
+                if (fallback) field.picker.value = fallback;
+              }
+            }
+            if (field.input) {
+              field.input.value = normalized;
+            }
+          }
+
+          function collectForm(){
+            const mode = modeSelect && modeSelect.value === 'dawn' ? 'dawn' : 'midnight';
+            const payload = {
+              mode,
+              label: labelInput ? labelInput.value.trim() : '',
+              slug: slugInput ? slugInput.value.trim() : '',
+              category: categorySelect ? categorySelect.value.trim() : 'custom',
+              settings: {
+                primary: colorFields.primary?.input?.value.trim() || '',
+                accent: colorFields.accent?.input?.value.trim() || '',
+                background: colorFields.background?.input?.value.trim() || '',
+                textPrimary: colorFields.textPrimary?.input?.value.trim() || '',
+                textHeading: colorFields.textHeading?.input?.value.trim() || '',
+                textMuted: colorFields.textMuted?.input?.value.trim() || '',
+                fontSerif: getFontValue(fontSerifSelect),
+                fontScript: getFontValue(fontScriptSelect),
+                backgroundImage: currentBackgroundImage || ''
+              }
+            };
+            return payload;
+          }
+
+          function populateForm(theme){
+            current = theme ? { ...theme, settings: { ...theme.settings } } : null;
+            const mode = theme?.mode || 'midnight';
+            const defaultsForMode = defaults[mode] || defaults.midnight;
+            if (modeSelect) modeSelect.value = mode;
+            if (labelInput) labelInput.value = theme?.label || '';
+            if (slugInput) slugInput.value = theme?.slug || '';
+            if (categorySelect) categorySelect.value = theme?.category || 'custom';
+            if (fontSerifSelect) {
+              setFontSelectValue(fontSerifSelect, theme?.settings?.fontSerif, defaultsForMode.fontSerif);
+            }
+            if (fontScriptSelect) {
+              setFontSelectValue(fontScriptSelect, theme?.settings?.fontScript, defaultsForMode.fontScript);
+            }
+            setColorField('primary', theme?.settings?.primary ?? defaultsForMode.primary);
+            setColorField('accent', theme?.settings?.accent ?? defaultsForMode.accent);
+            setColorField('background', theme?.settings?.background ?? defaultsForMode.background);
+            setColorField('textPrimary', theme?.settings?.textPrimary ?? defaultsForMode.textPrimary);
+            setColorField('textHeading', theme?.settings?.textHeading ?? defaultsForMode.textHeading);
+            setColorField('textMuted', theme?.settings?.textMuted ?? defaultsForMode.textMuted);
+            currentBackgroundImage = theme?.settings?.backgroundImage || '';
+            updateBackgroundStatus();
+            renderBackgroundGallery();
+            updateSetActiveLabel();
+            refreshPreview();
+          }
+
+          function updateSetActiveLabel(){
+            if (!setActiveBtn) return;
+            const mode = modeSelect && modeSelect.value === 'dawn' ? 'dawn' : 'midnight';
+            setActiveBtn.textContent = mode === 'dawn' ? 'Set as active dawn theme' : 'Set as active midnight theme';
+          }
+
+          function updateActiveLabels(){
+            (['midnight','dawn']).forEach((mode) => {
+              if (!activeLabels[mode]) return;
+              const slug = state.active[mode];
+              if (!slug) {
+                activeLabels[mode].textContent = '—';
+                return;
+              }
+              const theme = findTheme(mode, slug);
+              activeLabels[mode].textContent = theme ? theme.label : slug;
+            });
+          }
+
+          function findTheme(mode, slug){
+            const list = state.items[mode] || [];
+            return list.find((item) => item.slug === slug) || null;
+          }
+
+          function renderLists(){
+            ['midnight','dawn'].forEach((mode) => {
+              const listEl = lists[mode];
+              if (!listEl) return;
+              const allThemes = state.items[mode] || [];
+              const themes = categoryFilterValue
+                ? allThemes.filter((theme) => (theme.category || 'custom') === categoryFilterValue)
+                : allThemes;
+              listEl.innerHTML = '';
+              if (!themes.length) {
+                const empty = document.createElement('p');
+                empty.className = 'text-xs text-body-muted';
+                empty.textContent = categoryFilterValue ? 'No themes in this category.' : 'No saved themes yet.';
+                listEl.appendChild(empty);
+                return;
+              }
+
+              // Group themes by category
+              const grouped = {};
+              themes.forEach((theme) => {
+                const cat = theme.category || 'custom';
+                if (!grouped[cat]) grouped[cat] = [];
+                grouped[cat].push(theme);
+              });
+
+              // Render each category group
+              Object.keys(grouped).sort().forEach((cat) => {
+                const catLabel = categoryChoices.find((c) => c.value === cat)?.label || cat;
+                const catHeader = document.createElement('div');
+                catHeader.className = 'mb-2 mt-3 first:mt-0';
+                catHeader.innerHTML = '<h3 class="text-[11px] font-semibold uppercase tracking-wider text-body-muted">' + catLabel + '</h3>';
+                listEl.appendChild(catHeader);
+
+                grouped[cat].forEach((theme) => {
+                const card = document.createElement('div');
+                card.className =
+                  'group rounded-xl border border-line-neutral bg-surface-base px-3 py-3 text-sm transition hover:border-line-bold hover:bg-surface-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-line-bold focus-visible:ring-offset-2';
+                card.setAttribute('role', 'button');
+                card.tabIndex = 0;
+                card.dataset.themeItem = theme.slug;
+
+                const activateClassList = ['border-line-emerald', 'bg-surface-emerald-soft'];
+                if (state.active[mode] === theme.slug) {
+                  activateClassList.forEach((cls) => card.classList.add(cls));
+                }
+
+                const handleLoad = () => {
+                  populateForm(theme);
+                  setStatus('Loaded "' + theme.label + '".', 'success');
+                };
+
+                card.addEventListener('click', handleLoad);
+                card.addEventListener('keydown', (event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    handleLoad();
+                  }
+                });
+
+                const header = document.createElement('div');
+                header.className = 'flex items-center justify-between gap-3';
+                const labelSpan = document.createElement('span');
+                labelSpan.className = 'font-medium text-primary';
+                labelSpan.textContent = theme.label;
+                header.appendChild(labelSpan);
+
+                const headerMeta = document.createElement('div');
+                headerMeta.className = 'flex items-center gap-2';
+                const modeBadge = document.createElement('span');
+                modeBadge.className = 'rounded-full bg-surface-neutral-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-body-muted';
+                modeBadge.textContent = theme.mode === 'dawn' ? 'Dawn' : 'Midnight';
+                headerMeta.appendChild(modeBadge);
+                if (state.active[mode] === theme.slug) {
+                  const badge = document.createElement('span');
+                  badge.className = 'rounded bg-surface-success px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-inverse';
+                  badge.textContent = 'Active';
+                  headerMeta.appendChild(badge);
+                }
+                header.appendChild(headerMeta);
+
+                const slugLine = document.createElement('p');
+                slugLine.className = 'mt-1 text-[11px] text-body-muted';
+                slugLine.textContent = theme.slug;
+
+                const paletteRow = document.createElement('div');
+                paletteRow.className = 'mt-3 flex flex-wrap items-center gap-2';
+                ['primary', 'accent', 'background'].forEach((key) => {
+                  const tone = typeof theme.settings?.[key] === 'string' ? theme.settings[key] : '';
+                  if (!tone) return;
+                  const chip = document.createElement('span');
+                  chip.className =
+                    'flex items-center gap-1 rounded-full border border-line-subtle bg-surface-base/70 px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide';
+                  const dot = document.createElement('span');
+                  dot.className = 'h-3 w-3 rounded-full border border-white/60 shadow-sm';
+                  dot.style.backgroundColor = tone;
+                  const code = document.createElement('span');
+                  code.textContent = tone;
+                  chip.appendChild(dot);
+                  chip.appendChild(code);
+                  paletteRow.appendChild(chip);
+                });
+
+                const actions = document.createElement('div');
+                actions.className = 'mt-3 flex flex-wrap gap-2';
+                const activateBtn = document.createElement('button');
+                activateBtn.type = 'button';
+                activateBtn.className = 'rounded-md border border-line-neutral px-2 py-1 text-[11px] font-semibold uppercase tracking-wide transition hover:bg-surface-soft';
+                activateBtn.textContent = 'Activate';
+                activateBtn.addEventListener('click', (event) => {
+                  event.stopPropagation();
+                  quickActivateTheme(theme);
+                });
+                actions.appendChild(activateBtn);
+
+                card.appendChild(header);
+                card.appendChild(slugLine);
+                if (paletteRow.childElementCount) {
+                  card.appendChild(paletteRow);
+                }
+                card.appendChild(actions);
+                listEl.appendChild(card);
+                });
+              });
+            });
+          }
+
+          function toJSON(response){
+            return response.json().catch(() => ({}));
+          }
+
+          async function loadBackgrounds(){
+            try {
+              const res = await fetch(devApi + '/themes/list-backgrounds', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: '{}'
+              });
+              const json = await toJSON(res);
+              if (json && json.ok === true && Array.isArray(json.backgrounds)) {
+                availableBackgrounds = json.backgrounds;
+                renderBackgroundGallery();
+              }
+            } catch (error) {
+              console.error('[theme-admin] Failed to load backgrounds:', error);
+            }
+          }
+
+          function renderBackgroundGallery(){
+            if (!backgroundImageGallery) return;
+            backgroundImageGallery.innerHTML = '';
+            if (!availableBackgrounds.length) {
+              const empty = document.createElement('p');
+              empty.className = 'text-xs text-body-muted col-span-3';
+              empty.textContent = 'No backgrounds uploaded yet.';
+              backgroundImageGallery.appendChild(empty);
+              return;
+            }
+            availableBackgrounds.forEach((bg) => {
+              const card = document.createElement('div');
+              card.className = 'relative aspect-video cursor-pointer overflow-hidden rounded-lg border border-line-neutral hover:border-line-bold transition';
+              if (currentBackgroundImage === bg.path) {
+                card.classList.add('ring-2', 'ring-line-success');
+              }
+              const img = document.createElement('img');
+              img.src = bg.path;
+              img.alt = bg.filename;
+              img.className = 'h-full w-full object-cover';
+              card.appendChild(img);
+              card.addEventListener('click', () => {
+                currentBackgroundImage = bg.path;
+                updateBackgroundStatus();
+                renderBackgroundGallery();
+                refreshPreview();
+              });
+              backgroundImageGallery.appendChild(card);
+            });
+          }
+
+          function updateBackgroundStatus(){
+            if (!backgroundImageStatus) return;
+            if (currentBackgroundImage) {
+              const filename = currentBackgroundImage.split('/').pop();
+              backgroundImageStatus.textContent = 'Selected: ' + filename;
+            } else {
+              backgroundImageStatus.textContent = 'No background image selected';
+            }
+          }
+
+          async function uploadBackground(file){
+            if (!file) return;
+            try {
+              setStatus('Uploading background image…');
+              const reader = new FileReader();
+              reader.onload = async (e) => {
+                try {
+                  const contentBase64 = e.target.result;
+                  const res = await fetch(devApi + '/upload/theme-background', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      filename: file.name,
+                      contentBase64: contentBase64
+                    })
+                  });
+                  const json = await toJSON(res);
+                  if (!json || json.ok !== true) {
+                    throw new Error(json?.error || 'Upload failed');
+                  }
+                  currentBackgroundImage = json.path;
+                  await loadBackgrounds();
+                  updateBackgroundStatus();
+                  refreshPreview();
+                  setStatus('Background image uploaded.', 'success');
+                } catch (error) {
+                  setStatus(error?.message || 'Upload failed.', 'error');
+                }
+              };
+              reader.readAsDataURL(file);
+            } catch (error) {
+              setStatus(error?.message || 'Upload failed.', 'error');
+            }
+          }
+
+          async function fetchThemes(){
+            const res = await fetch(devApi + '/themes/list', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: '{}'
+            });
+            const json = await toJSON(res);
+            if (!json || json.ok !== true) {
+              throw new Error(json?.error || 'Unable to load themes');
+            }
+            return json;
+          }
+
+          async function refresh(preferredMode, preferredSlug, options){
+            const announce = options && options.showStatus;
+            if (announce) {
+              setStatus('Loading themes…');
+            }
+            try {
+              const data = await fetchThemes();
+              state = {
+                items: data.items || { midnight: [], dawn: [] },
+                active: data.active || { midnight: null, dawn: null }
+              };
+              renderLists();
+              updateActiveLabels();
+              if (seasonalCards.length) {
+                const parsedSeasonal = parseSeasonalAssignments(data.seasonal);
+                seasonal.original = cloneSeasonalAssignments(parsedSeasonal);
+                seasonal.assignments = cloneSeasonalAssignments(parsedSeasonal);
+                renderSeasonalOptions();
+                setSeasonalDirtyFlag();
+              }
+              const mode = preferredMode || current?.mode || 'midnight';
+              const slug = preferredSlug || current?.slug || state.active[mode];
+              if (slug) {
+                const theme = findTheme(mode, slug);
+                if (theme) {
+                  populateForm(theme);
+                } else {
+                  startNewTheme(mode, true);
+                }
+              } else {
+                startNewTheme(mode, true);
+              }
+              if (announce) {
+                setStatus('Themes refreshed.', 'success');
+              }
+            } catch (error) {
+              setStatus(error?.message || 'Failed to load themes.', 'error');
+            }
+          }
+
+          function startNewTheme(mode, silent){
+            const safeMode = mode === 'dawn' ? 'dawn' : 'midnight';
+            const base = defaults[safeMode];
+            populateForm({
+              slug: '',
+              label: '',
+              mode: safeMode,
+              settings: { ...base }
+            });
+            if (!silent) {
+              setStatus('Ready to craft a new ' + (safeMode === 'dawn' ? 'dawn' : 'midnight') + ' theme.', null);
+            }
+          }
+
+          async function saveTheme(){
+            const payload = collectForm();
+            try {
+              setStatus('Saving theme…');
+              const res = await fetch(devApi + '/themes/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+              const json = await toJSON(res);
+              if (!json || json.ok !== true) {
+                throw new Error(json?.error || 'Theme save failed');
+              }
+              const theme = json.theme;
+              setStatus('Saved "' + (theme?.label || payload.label || payload.slug) + '".', 'success');
+              await refresh(theme?.mode || payload.mode, theme?.slug || payload.slug);
+            } catch (error) {
+              setStatus(error?.message || 'Theme save failed.', 'error');
+            }
+          }
+
+          async function setThemeActive(mode, slug, label){
+            const safeMode = mode === 'dawn' ? 'dawn' : 'midnight';
+            const safeSlug = typeof slug === 'string' ? slug.trim() : '';
+            if (!safeSlug) {
+              setStatus('Save the theme before activating it.', 'error');
+              return;
+            }
+            try {
+              setStatus('Setting active theme…');
+              const res = await fetch(devApi + '/themes/set-active', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mode: safeMode, slug: safeSlug })
+              });
+              const json = await toJSON(res);
+              if (!json || json.ok !== true) {
+                throw new Error(json?.error || 'Unable to set active theme');
+              }
+              const labelText = json?.theme?.label || label || safeSlug;
+              setStatus('Activated "' + labelText + '" for ' + safeMode + '.', 'success');
+              await refresh(safeMode, safeSlug);
+            } catch (error) {
+              setStatus(error?.message || 'Failed to activate theme.', 'error');
+            }
+          }
+
+          async function activateTheme(){
+            const payload = collectForm();
+            await setThemeActive(payload.mode, payload.slug, payload.label || payload.slug);
+          }
+
+          async function quickActivateTheme(theme){
+            if (!theme || typeof theme.slug !== 'string') return;
+            await setThemeActive(theme.mode, theme.slug, theme.label);
+          }
+
+          function loadActiveTheme(){
+            const mode = modeSelect && modeSelect.value === 'dawn' ? 'dawn' : 'midnight';
+            const slug = state.active[mode];
+            if (!slug) {
+              startNewTheme(mode);
+              setStatus('No active theme yet — loaded defaults.', null);
+              return;
+            }
+            const theme = findTheme(mode, slug);
+            if (theme) {
+              populateForm(theme);
+              setStatus('Loaded active ' + mode + ' theme.', 'success');
+            } else {
+              startNewTheme(mode);
+              setStatus('Active theme file missing — restored defaults.', 'error');
+            }
+          }
+
+          if (modeSelect) {
+            modeSelect.addEventListener('change', () => {
+              updateSetActiveLabel();
+              refreshPreview();
+            });
+          }
+
+          if (categoryFilter) {
+            categoryFilter.addEventListener('change', () => {
+              categoryFilterValue = categoryFilter.value.trim();
+              renderLists();
+            });
+          }
+
+          Object.keys(colorFields).forEach((key) => {
+            const field = colorFields[key];
+            if (field.picker) {
+              field.picker.addEventListener('input', () => {
+                if (field.input) {
+                  field.input.value = field.picker.value;
+                }
+                refreshPreview();
+              });
+            }
+            if (field.input) {
+              field.input.addEventListener('input', () => {
+                refreshPreview();
+              });
+              field.input.addEventListener('blur', () => {
+                const hex = normalizeHex(field.input.value);
+                if (hex && field.picker) {
+                  field.picker.value = hex;
+                }
+                refreshPreview();
+              });
+            }
+          });
+
+          if (fontSerifSelect) {
+            fontSerifSelect.addEventListener('change', () => refreshPreview());
+          }
+          if (fontScriptSelect) {
+            fontScriptSelect.addEventListener('change', () => refreshPreview());
+          }
+
+          if (saveBtn) saveBtn.addEventListener('click', saveTheme);
+          if (setActiveBtn) setActiveBtn.addEventListener('click', activateTheme);
+          if (resetBtn) resetBtn.addEventListener('click', () => {
+            const mode = modeSelect && modeSelect.value === 'dawn' ? 'dawn' : 'midnight';
+            startNewTheme(mode);
+          });
+          if (loadActiveBtn) loadActiveBtn.addEventListener('click', loadActiveTheme);
+
+          newButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+              const mode = button.getAttribute('data-new-theme') === 'dawn' ? 'dawn' : 'midnight';
+              startNewTheme(mode);
+            });
+          });
+
+          if (seasonalCards.length) {
+            seasonalCards.forEach((entry) => {
+              ['midnight', 'dawn'].forEach((mode) => {
+                const select = entry.selects[mode];
+                if (!select) return;
+                select.addEventListener('change', () => {
+                  const value = typeof select.value === 'string' ? select.value.trim() : '';
+                  handleSeasonalChange(entry.season, mode, value);
+                });
+              });
+            });
+          }
+
+          if (seasonalSaveBtn) {
+            seasonalSaveBtn.disabled = true;
+            seasonalSaveBtn.addEventListener('click', () => {
+              if (!seasonal.dirty) {
+                setStatus('No seasonal updates to save yet.', null);
+                return;
+              }
+              const payload = { assignments: seasonal.assignments };
+              console.info('[theme-admin] Seasonal theme draft ready', payload);
+              setSeasonalDirtyFlag();
+              setStatus('Seasonal saving not yet connected — payload logged to console for future wiring.', null);
+            });
+          }
+
+          if (seasonalResetBtn) {
+            seasonalResetBtn.disabled = true;
+            seasonalResetBtn.addEventListener('click', () => {
+              seasonal.assignments = cloneSeasonalAssignments(seasonal.original);
+              renderSeasonalOptions();
+              setSeasonalDirtyFlag();
+              setStatus('Seasonal selections restored to saved values.', null);
+            });
+          }
+
+          updateSeasonalButtons();
+
+          if (backgroundImageUpload) {
+            backgroundImageUpload.addEventListener('change', (e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                uploadBackground(file);
+              }
+            });
+          }
+
+          if (clearBackgroundBtn) {
+            clearBackgroundBtn.addEventListener('click', () => {
+              currentBackgroundImage = '';
+              updateBackgroundStatus();
+              renderBackgroundGallery();
+              refreshPreview();
+              setStatus('Background image cleared.', 'success');
+            });
+          }
+
+          refreshPreview();
+          loadBackgrounds();
+          refresh(undefined, undefined, { showStatus: true });
+        })();
+      `}
+    </script>
+  )}
+
+  <style>
+    [data-theme-preview] {
+      --preview-primary: #8b7e8f;
+      --preview-accent: #d9b2c4;
+      --preview-background: #120725;
+      --preview-surface: #1d1033;
+      --preview-border: #2e1b4a;
+      --preview-text: #fdfcfe;
+      --preview-text-heading: #fdfcfe;
+      --preview-muted: #d9b2c4;
+      --preview-primary-contrast: #fdfcfe;
+      --preview-accent-contrast: #1f1630;
+      --preview-font-serif: 'Literata', serif;
+      --preview-font-script: 'Parisienne', cursive;
+      background: var(--preview-background);
+      color: var(--preview-text);
+      border-color: var(--preview-border);
+      font-family: var(--preview-font-serif, 'Literata', serif);
+      transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    }
+
+    [data-theme-preview] .preview-card {
+      background: var(--preview-surface);
+      border-color: var(--preview-border);
+      color: var(--preview-text);
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+      font-family: var(--preview-font-serif, 'Literata', serif);
+    }
+
+    [data-theme-preview] .preview-card h3 {
+      font-family: var(--preview-font-serif, 'Literata', serif);
+      color: var(--preview-text-heading);
+    }
+
+    [data-theme-preview] .preview-card p[data-preview-eyebrow] {
+      color: var(--preview-muted);
+      letter-spacing: 0.1em;
+    }
+
+    [data-theme-preview] .preview-chip {
+      background: var(--preview-surface);
+      border: 1px solid var(--preview-border);
+      border-radius: 9999px;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--preview-text);
+    }
+
+    [data-theme-preview] .preview-button {
+      border-radius: 9999px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: 0.4rem 1.05rem;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+    }
+
+    [data-theme-preview] .preview-button--primary {
+      background: var(--preview-primary);
+      color: var(--preview-primary-contrast);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    [data-theme-preview] .preview-button--primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.22);
+    }
+
+    [data-theme-preview] .preview-button--ghost {
+      border: 1px solid var(--preview-border);
+      background: transparent;
+      color: var(--preview-text);
+    }
+
+    [data-theme-preview] .preview-button--ghost:hover {
+      background: var(--preview-surface);
+    }
+
+    [data-theme-preview] .preview-script {
+      font-family: var(--preview-font-script, 'Parisienne', cursive);
+      font-size: 1.125rem;
+      color: var(--preview-text);
+    }
+
+    [data-theme-preview] [data-preview-copy] {
+      color: var(--preview-text);
+    }
+
+    [data-theme-preview] [data-preview-surface] {
+      border-color: var(--preview-border);
+      color: var(--preview-text);
+      background: var(--preview-surface);
+    }
+
+    [data-theme-preview] code {
+      background: rgba(0, 0, 0, 0.18);
+      color: var(--preview-text);
+      border-radius: 0.375rem;
+      padding: 0.125rem 0.375rem;
+    }
+  </style>
+</Base>

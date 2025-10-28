@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 import { readSettings } from "@/utils/settings";
 
-export const prerender = false;
 
 const JSON_HEADERS = { "Content-Type": "application/json; charset=utf-8" } as const;
 

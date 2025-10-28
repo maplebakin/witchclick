@@ -4,7 +4,6 @@ import { readSettings, buildCanonicalUrl } from "../../utils/settings";
 import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
 
-export const prerender = false;
 
 const settings = readSettings();
 const canonical = buildCanonicalUrl(settings, { path: "/admin/products" });

@@ -6,7 +6,6 @@ import adminEntitiesScript from "../../scripts/adminEntities.ts?url";
 import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
 
-export const prerender = false; // never emit in static builds
 
 const settings = readSettings();
 const canonical = buildCanonicalUrl(settings, { path: "/admin/entities" });

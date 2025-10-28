@@ -34,50 +34,49 @@ function normalizeSite(u) {
   }
 }
 
-// Server in DEV so /api routes accept POST; Static in BUILD so deploys stay simple.
+// Static site generation for zero-server deployment
+// Admin pages work as static HTML calling dev-api.js (port 8787)
 // Note: Sitemap generation handled by scripts/generate-sitemap.mjs post-build
-export default defineConfig(({ command }) => {
-  const output = command === "dev" ? "server" : "static";
-  const site = normalizeSite(settings.siteUrl);
 
-  return {
-    site,
-    output,
-    trailingSlash: "never",
-    compressHTML: true,
+const site = normalizeSite(settings.siteUrl);
 
-    integrations: [
-      tailwind(),
-    ],
+export default defineConfig({
+  site,
+  output: "static",
+  trailingSlash: "never",
+  compressHTML: true,
 
-    markdown: {
-      syntaxHighlight: false,
-      gfm: true,
-      smartypants: true,
+  integrations: [
+    tailwind(),
+  ],
+
+  markdown: {
+    syntaxHighlight: false,
+    gfm: true,
+    smartypants: true,
+  },
+
+  redirects: {
+    "/rss": "/rss.xml",
+    "/feed": "/rss.xml",
+  },
+
+  server: {
+    host: true,
+    // port: 4321,
+  },
+
+  // ✅ Vite alias so `@/…` resolves to `src/…`
+  vite: {
+    define: {
+      __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
     },
-
-    redirects: {
-      "/rss": "/rss.xml",
-      "/feed": "/rss.xml",
-    },
-
-    server: {
-      host: true,
-      // port: 4321,
-    },
-
-    // ✅ Vite alias so `@/…` resolves to `src/…`
-    vite: {
-      define: {
-        __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
-      resolve: {
-        alias: {
-          '@': fileURLToPath(new URL('./src', import.meta.url)),
-        },
-      },
-      // optimizeDeps: { include: [] },
-      // ssr: { external: [] },
     },
-  };
+    // optimizeDeps: { include: [] },
+    // ssr: { external: [] },
+  },
 });

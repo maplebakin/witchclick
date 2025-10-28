@@ -1,5 +1,4 @@
 // src/pages/api/ingest.json.ts
-export const prerender = false;
 
 export type { PostSpecV2 } from '../../lib/postSpecSchema';
 import fs from 'node:fs';

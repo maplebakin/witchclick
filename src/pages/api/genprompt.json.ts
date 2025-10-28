@@ -1,5 +1,4 @@
 // src/pages/api/genprompt.json.ts
-export const prerender = false;
 
 // 👇 pin to the source file with extension
 import { genprompt } from '../../../tools/src/genprompt';;

@@ -1,4 +1,3 @@
-export const prerender = false;
 
 import { gencurse } from '../../../../tools/src/gencurse';;
 import { CURSE_TARGETS, CURSE_TONES, CURSE_TYPES } from '../../../../server/lib/curseSpecSchema.js';

@@ -1,5 +1,4 @@
 // src/pages/api/ping.json.ts
-export const prerender = false;
 
 const MAX_BYTES = 1_000_000; // ~1MB; tweak as you like
 

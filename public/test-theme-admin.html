@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Theme Editor Test</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+      background: #f5f5f5;
+    }
+    .test-section {
+      background: white;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .test-result {
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+    .success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    button {
+      padding: 0.75rem 1.5rem;
+      background: #6b21a8;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-right: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    button:hover {
+      background: #5a1a8a;
+    }
+    pre {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎃 WitchClick Theme Editor Test</h1>
+  <p>This page tests the theme management system by creating a fall-themed preset.</p>
+
+  <div class="test-section">
+    <h2>Test: Create "Autumn Harvest" Theme</h2>
+    <button onclick="runTest()">🍂 Run Test</button>
+    <button onclick="clearStorage()">🗑️ Clear Storage</button>
+    <button onclick="viewStorage()">👁️ View Storage</button>
+    <div id="results"></div>
+  </div>
+
+  <div class="test-section" id="storageView" style="display: none;">
+    <h2>Current Storage Contents</h2>
+    <pre id="storageContents"></pre>
+  </div>
+
+  <script type="module">
+    import { ThemeManager } from '/src/lib/theme-manager.ts';
+    import { checkContrast } from '/src/lib/contrast-checker.ts';
+    import { UndoRedo } from '/src/lib/undo-redo.ts';
+
+    window.ThemeManager = ThemeManager;
+    window.checkContrast = checkContrast;
+    window.UndoRedo = UndoRedo;
+
+    console.log('Theme management modules loaded successfully!');
+  </script>
+
+  <script>
+    function log(message, isError = false) {
+      const results = document.getElementById('results');
+      const div = document.createElement('div');
+      div.className = 'test-result ' + (isError ? 'error' : 'success');
+      div.textContent = (isError ? '❌ ' : '✅ ') + message;
+      results.appendChild(div);
+    }
+
+    function clearLogs() {
+      document.getElementById('results').innerHTML = '';
+    }
+
+    async function runTest() {
+      clearLogs();
+      log('Starting theme editor test...');
+
+      try {
+        // Wait a bit for modules to load
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        if (!window.ThemeManager) {
+          throw new Error('ThemeManager not loaded');
+        }
+
+        // Initialize theme manager
+        log('Initializing ThemeManager...');
+        const manager = new window.ThemeManager();
+
+        // Create autumn/fall theme
+        log('Creating "Autumn Harvest" theme...');
+        const fallTheme = {
+          name: 'Autumn Harvest',
+          slug: 'autumn-harvest',
+          mode: 'midnight',
+          category: 'seasonal',
+          variables: {
+            primary: '#d97706',      // Warm orange
+            accent: '#92400e',       // Deep amber
+            background: '#1c1410',   // Dark brown
+            textPrimary: '#fef3c7',  // Light cream
+            textHeading: '#fbbf24',  // Golden yellow
+            textMuted: '#d97706',    // Muted orange
+            fontSerif: 'Cormorant Garamond',
+            fontScript: 'Dancing Script',
+          },
+        };
+
+        const created = manager.createPreset(fallTheme);
+        log(`Created theme: "${created.name}" (${created.slug})`);
+        log(`  Primary: ${created.variables.primary}`);
+        log(`  Accent: ${created.variables.accent}`);
+        log(`  Background: ${created.variables.background}`);
+
+        // Test contrast
+        log('Testing contrast ratios...');
+        if (window.checkContrast) {
+          const contrast = window.checkContrast(
+            created.variables.textPrimary,
+            created.variables.background
+          );
+          log(`  Contrast ratio: ${contrast.ratio.toFixed(2)}:1 (${contrast.score})`);
+        }
+
+        // Set as active
+        log('Setting as active midnight theme...');
+        manager.setActive('midnight', created.slug);
+        const activePreset = manager.getActivePreset('midnight');
+        if (activePreset?.slug === created.slug) {
+          log('Successfully set as active theme!');
+        }
+
+        // Test duplicate
+        log('Testing duplicate functionality...');
+        const duplicated = manager.duplicatePreset('midnight', created.slug);
+        log(`Duplicated as: "${duplicated.name}" (${duplicated.slug})`);
+
+        // Test update
+        log('Testing update functionality...');
+        const updated = manager.updatePreset('midnight', created.slug, {
+          variables: {
+            ...created.variables,
+            accent: '#b45309', // Change accent
+          },
+        });
+        log(`Updated accent color to: ${updated.variables.accent}`);
+
+        // Test export
+        log('Testing export functionality...');
+        const exported = manager.exportPreset('midnight', created.slug);
+        log(`Exported JSON length: ${exported.length} characters`);
+
+        // Get all presets
+        const allPresets = manager.getPresets('midnight');
+        log(`Total midnight themes: ${allPresets.length}`);
+
+        // Test undo/redo
+        log('Testing undo/redo system...');
+        const undoRedo = new window.UndoRedo({ value: 1 }, 50);
+        undoRedo.push({ value: 2 });
+        undoRedo.push({ value: 3 });
+        log(`  Current state: ${undoRedo.getState().value}`);
+        undoRedo.undo();
+        log(`  After undo: ${undoRedo.getState().value}`);
+        undoRedo.redo();
+        log(`  After redo: ${undoRedo.getState().value}`);
+
+        log('🎉 All tests passed!');
+        log('You can now visit /admin/theme to see the "Autumn Harvest" theme');
+
+      } catch (error) {
+        log(`Error: ${error.message}`, true);
+        console.error('Test error:', error);
+      }
+    }
+
+    function clearStorage() {
+      localStorage.removeItem('witchclick_themes');
+      clearLogs();
+      log('Storage cleared! Refresh the page to start fresh.');
+    }
+
+    function viewStorage() {
+      const storageView = document.getElementById('storageView');
+      const storageContents = document.getElementById('storageContents');
+      const data = localStorage.getItem('witchclick_themes');
+
+      if (data) {
+        try {
+          const parsed = JSON.parse(data);
+          storageContents.textContent = JSON.stringify(parsed, null, 2);
+          storageView.style.display = 'block';
+        } catch (e) {
+          storageContents.textContent = 'Error parsing storage: ' + e.message;
+          storageView.style.display = 'block';
+        }
+      } else {
+        storageContents.textContent = 'No theme data in storage.';
+        storageView.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>

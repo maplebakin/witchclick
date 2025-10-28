@@ -1,4 +1,3 @@
-export const prerender = false;
 
 import { persistPreparedCurse, prepareCurseForPersistence } from '../../../../server/lib/cursePreparation.js';
 
