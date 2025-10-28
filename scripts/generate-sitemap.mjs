@@ -12,6 +12,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distDir = path.join(__dirname, '..', 'dist');
 const siteUrl = 'https://witchclick.space';
 
+const EXCLUDE_PREFIXES = ['/author', '/account', '/admin', '/api'];
+const EXCLUDE_EXACT = new Set(['/author', '/account']);
+
+function shouldIncludePathname(pathname) {
+  if (!pathname) return true;
+  if (EXCLUDE_EXACT.has(pathname)) return false;
+  return !EXCLUDE_PREFIXES.some(prefix => pathname.startsWith(prefix));
+}
+
 // Read settings to get the actual site URL
 function getSiteUrl() {
   try {
@@ -148,6 +157,9 @@ function main() {
   const urls = htmlFiles
     .map(file => filePathToUrl(file, baseUrl))
     .filter(url => !shouldExclude(url))
+    .map(url => ({ url, pathname: new URL(url).pathname }))
+    .filter(({ pathname }) => shouldIncludePathname(pathname))
+    .map(({ url }) => url)
     .sort();
 
   console.log(`✅ Including ${urls.length} URLs in sitemap`);
