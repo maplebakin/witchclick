@@ -126,7 +126,7 @@ npm run check:affiliates
 ## 🚀 IMMEDIATE LAUNCH CHECKLIST
 
 ### Must Do (5 minutes):
-- [ ] **Configure affiliate IDs** in `content/products.json`
+- [x] **Configure affiliate IDs** in `content/products.json`
   ```bash
   # Check current status:
   npm run check:affiliates
@@ -152,7 +152,7 @@ npm run check:affiliates
 - [ ] Verify sitemap loads: https://witchclick.space/sitemap-index.xml
 - [ ] Check robots.txt: https://witchclick.space/robots.txt
 - [ ] Test social sharing (Twitter/Facebook link preview)
-- [ ] Add Ko-fi username to `content/settings.json` (if using tips)
+- [x] Add Ko-fi username to `content/settings.json` (if using tips)
 
 ---
 

@@ -43,7 +43,7 @@
 ## ⚠️ PRE-LAUNCH CHECKLIST
 
 ### Must Do Before Launch:
-- [ ] **Configure real affiliate IDs** in `content/products.json`
+- [x] **Configure real affiliate IDs** in `content/products.json`
   - Replace `YOURTAG-20` with actual Amazon affiliate tag
   - Replace `YOUR_BOOKSHOP_ID` with actual Bookshop.org ID
   - Currently all affiliate links are placeholders
@@ -59,7 +59,7 @@
   - Test RSS feed: `https://witchclick.space/rss.xml`
 
 ### Optional (Can Do Post-Launch):
-- [ ] Add Ko-fi username to `content/settings.json` if using tip jar
+- [x] Add Ko-fi username to `content/settings.json` if using tip jar
 - [ ] Consider publishing 5-10 draft posts for more content
 - [ ] Enable Sentry observability if desired (currently disabled)
 
