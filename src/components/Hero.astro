@@ -189,8 +189,8 @@ const heroFetchPriority = hasHeroImage ? 'high' : undefined;
   .home-hero__image {
     width: min(100%, 21rem);
     border-radius: 1.8rem;
-    border: 1px solid color-mix(in srgb, var(--color-border, rgba(212, 175, 55, 0.35)) 70%, transparent 30%);
-    background: color-mix(in srgb, var(--color-overlay, rgba(18, 7, 37, 0.45)) 55%, transparent 45%);
+    border: 1px solid color-mix(in srgb, var(--border-accent-medium) 70%, transparent 30%);
+    background: color-mix(in srgb, var(--overlay-panel) 55%, transparent 45%);
     box-shadow: var(--shadow-soft, 0 24px 55px -30px rgba(11, 6, 20, 0.65));
     aspect-ratio: 4 / 5;
     object-fit: cover;
@@ -260,8 +260,8 @@ const heroFetchPriority = hasHeroImage ? 'high' : undefined;
   }
 
   :root[data-comfort-theme="dawn"] .home-hero__image {
-    border-color: color-mix(in srgb, var(--color-border, rgba(122, 94, 154, 0.35)) 75%, transparent 25%);
-    background: color-mix(in srgb, var(--color-overlay, rgba(242, 236, 229, 0.48)) 60%, transparent 40%);
+    border-color: color-mix(in srgb, var(--border-accent-medium) 75%, transparent 25%);
+    background: color-mix(in srgb, var(--overlay-panel) 60%, transparent 40%);
   }
 
   /* Dawn theme text colors are handled by CSS variables */

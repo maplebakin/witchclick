@@ -94,9 +94,9 @@ const panelId = `comfort-fab-${globalThis.crypto?.randomUUID?.() ?? Math.random(
     align-items: center;
     gap: 0.5rem;
     border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--color-gold) 45%, transparent 55%);
-    background: color-mix(in srgb, var(--color-night) 82%, transparent 18%);
-    color: color-mix(in srgb, var(--text-primary, rgba(244, 241, 255, 0.96)) 94%, transparent 6%);
+    border: 1px solid color-mix(in srgb, var(--border-accent-strong) 45%, transparent 55%);
+    background: color-mix(in srgb, var(--surface-panel-primary) 82%, transparent 18%);
+    color: color-mix(in srgb, var(--text-strong) 94%, transparent 6%);
     font-family: var(--font-accent);
     font-size: 0.85rem;
     letter-spacing: 0.22em;
@@ -109,21 +109,21 @@ const panelId = `comfort-fab-${globalThis.crypto?.randomUUID?.() ?? Math.random(
   .comfort-fab__trigger:hover,
   .comfort-fab__trigger:focus-visible,
   .comfort-fab.is-open .comfort-fab__trigger {
-    background: color-mix(in srgb, var(--color-night) 70%, var(--color-iris) 30%);
+    background: color-mix(in srgb, var(--surface-panel-primary) 70%, var(--accent-purple-strong) 30%);
     transform: translateY(-2px);
     box-shadow: var(--shadow-strong, 0 28px 75px -24px rgba(3, 2, 12, 0.72));
   }
 
   :root[data-comfort-theme="dawn"] .comfort-fab__trigger {
-    border-color: color-mix(in srgb, var(--color-iris) 45%, transparent 55%);
-    background: color-mix(in srgb, var(--surface-plain) 94%, transparent 6%);
-    color: color-mix(in srgb, var(--ink-body) 92%, white 8%);
+    border-color: color-mix(in srgb, var(--accent-purple-strong) 45%, transparent 55%);
+    background: color-mix(in srgb, var(--surface-panel-primary) 94%, transparent 6%);
+    color: color-mix(in srgb, var(--text-strong) 92%, white 8%);
   }
 
   :root[data-comfort-theme="dawn"] .comfort-fab__trigger:hover,
   :root[data-comfort-theme="dawn"] .comfort-fab__trigger:focus-visible,
   :root[data-comfort-theme="dawn"] .comfort-fab.is-open .comfort-fab__trigger {
-    background: color-mix(in srgb, var(--surface-plain) 98%, transparent 2%);
+    background: color-mix(in srgb, var(--surface-panel-primary) 98%, transparent 2%);
   }
 
   .comfort-fab__icon {
@@ -138,8 +138,8 @@ const panelId = `comfort-fab-${globalThis.crypto?.randomUUID?.() ?? Math.random(
     pointer-events: auto;
     width: min(22rem, calc(100vw - 2rem));
     border-radius: 1.5rem;
-    border: 1px solid color-mix(in srgb, var(--color-gold) 38%, transparent 62%);
-    background: color-mix(in srgb, var(--color-night) 86%, transparent 14%);
+    border: 1px solid color-mix(in srgb, var(--border-accent-medium) 38%, transparent 62%);
+    background: color-mix(in srgb, var(--surface-panel-primary) 86%, transparent 14%);
     box-shadow: 0 24px 55px -24px rgba(12, 5, 23, 0.62);
     padding: 1rem;
     backdrop-filter: blur(20px);
@@ -152,8 +152,8 @@ const panelId = `comfort-fab-${globalThis.crypto?.randomUUID?.() ?? Math.random(
   }
 
   :root[data-comfort-theme="dawn"] .comfort-fab__panel {
-    border-color: color-mix(in srgb, var(--color-iris) 32%, transparent 68%);
-    background: color-mix(in srgb, var(--surface-plain) 98%, transparent 2%);
+    border-color: color-mix(in srgb, var(--accent-purple-soft) 32%, transparent 68%);
+    background: color-mix(in srgb, var(--surface-panel-primary) 98%, transparent 2%);
     box-shadow: 0 24px 55px -28px rgba(63, 49, 86, 0.25);
   }
 

@@ -120,7 +120,7 @@ const themeToggleId = `comfort-theme-${variant}`;
     gap: var(--space-2, 0.5rem);
     padding: var(--space-1, 0.25rem) var(--space-3, 0.75rem);
     border-radius: 999px;
-    border: 1px solid rgba(212, 175, 55, 0.3);
+    border: 1px solid var(--border-accent-medium);
     background: rgba(12, 5, 23, 0.45);
     font-family: var(--font-accent);
     font-size: 0.75rem;
@@ -135,7 +135,7 @@ const themeToggleId = `comfort-theme-${variant}`;
   }
 
   .comfort-settings__summary:focus-visible {
-    outline: 2px solid var(--color-gold, #d4af37);
+    outline: 2px solid var(--focus-ring);
     outline-offset: 3px;
   }
 
@@ -160,8 +160,8 @@ const themeToggleId = `comfort-theme-${variant}`;
     margin-top: var(--space-2, 0.5rem);
     padding: var(--space-4, 1rem);
     border-radius: 1rem;
-    border: 1px solid rgba(212, 175, 55, 0.25);
-    background: rgba(12, 5, 23, 0.92);
+    border: 1px solid var(--border-accent-subtle);
+    background: var(--surface-panel-primary);
     box-shadow: var(--shadow-soft, 0 18px 45px -28px rgba(11, 6, 20, 0.55));
     min-width: 18rem;
     display: grid;
@@ -191,9 +191,9 @@ const themeToggleId = `comfort-theme-${variant}`;
     width: 1.15rem;
     height: 1.15rem;
     border-radius: 0.35rem;
-    border: 1px solid rgba(212, 175, 55, 0.4);
-    background: rgba(12, 5, 23, 0.65);
-    accent-color: var(--color-gold, #d4af37);
+    border: 1px solid var(--border-accent-strong);
+    background: var(--surface-muted);
+    accent-color: var(--text-accent-strong);
   }
 
   .comfort-settings__label {
@@ -232,21 +232,21 @@ const themeToggleId = `comfort-theme-${variant}`;
   }
 
   :root[data-comfort-theme='dawn'] .comfort-settings__summary {
-    border-color: rgba(121, 90, 150, 0.35);
-    background: rgba(250, 246, 240, 0.85);
-    color: var(--color-ink, #2c1b3d);
+    border-color: var(--border-purple-medium);
+    background: var(--surface-panel-secondary);
+    color: var(--text-strong);
   }
 
   :root[data-comfort-theme='dawn'] .comfort-settings__panel {
-    background: rgba(255, 252, 247, 0.95);
-    border-color: rgba(121, 90, 150, 0.28);
-    color: var(--color-ink, #2c1b3d);
+    background: var(--surface-panel-primary);
+    border-color: var(--border-purple-subtle);
+    color: var(--text-strong);
     box-shadow: 0 18px 45px -28px rgba(71, 54, 96, 0.25);
   }
 
   :root[data-comfort-theme='dawn'] .comfort-settings__control {
-    background: rgba(252, 248, 242, 0.9);
-    border-color: rgba(121, 90, 150, 0.45);
+    background: var(--surface-card);
+    border-color: var(--border-purple-medium);
   }
 
   /* Dawn theme text colors are handled by CSS variables */

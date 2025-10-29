@@ -190,12 +190,12 @@ const nextLabel = p < totalPages ? "Turn the page" : "Story complete";
     min-width: min(100%, 15.5rem);
     padding: 1rem 1.75rem;
     border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--ambient-color, var(--color-iris, #7c3aed)) 32%, transparent 68%);
+    border: 1px solid color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 32%, transparent 68%);
     background:
-      radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--ambient-highlight, var(--color-iris, #7c3aed)) 28%, transparent 72%), transparent 68%),
-      linear-gradient(135deg, color-mix(in srgb, var(--ambient-color, var(--color-iris, #7c3aed)) 54%, rgba(8, 2, 16, 0.65) 46%) 0%, color-mix(in srgb, var(--ambient-color, var(--color-iris, #7c3aed)) 42%, rgba(13, 5, 24, 0.92) 58%) 100%);
+      radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--ambient-highlight, var(--accent-purple-soft)) 28%, transparent 72%), transparent 68%),
+      linear-gradient(135deg, color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 54%, rgba(8, 2, 16, 0.65) 46%) 0%, color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 42%, rgba(13, 5, 24, 0.92) 58%) 100%);
     color: color-mix(in srgb, var(--ink-strong, #f4f1ff) 94%, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 6%);
-    box-shadow: 0 18px 45px -26px color-mix(in srgb, var(--ambient-color, var(--color-iris, #7c3aed)) 38%, black 62%);
+    box-shadow: 0 18px 45px -26px color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 38%, black 62%);
     text-decoration: none;
     transition:
       transform 220ms ease,
@@ -223,15 +223,15 @@ const nextLabel = p < totalPages ? "Turn the page" : "Story complete";
   .pagination__link:hover,
   .pagination__link:focus-visible {
     transform: translateY(-4px);
-    box-shadow: 0 28px 60px -24px color-mix(in srgb, var(--ambient-color, var(--color-iris, #7c3aed)) 46%, black 54%);
-    border-color: color-mix(in srgb, var(--ambient-color, var(--color-iris, #7c3aed)) 48%, transparent 52%);
+    box-shadow: 0 28px 60px -24px color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 46%, black 54%);
+    border-color: color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 48%, transparent 52%);
   }
 
   .pagination__link:focus-visible {
     outline: none;
     box-shadow:
-      0 0 0 3px color-mix(in srgb, var(--ambient-color, var(--color-iris, #7c3aed)) 32%, transparent 68%),
-      0 28px 60px -24px color-mix(in srgb, var(--ambient-color, var(--color-iris, #7c3aed)) 46%, black 54%);
+      0 0 0 3px color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 32%, transparent 68%),
+      0 28px 60px -24px color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 46%, black 54%);
   }
 
   .pagination__link--next {
@@ -240,8 +240,8 @@ const nextLabel = p < totalPages ? "Turn the page" : "Story complete";
 
   .pagination__link--disabled {
     pointer-events: none;
-    background: linear-gradient(135deg, color-mix(in srgb, var(--ambient-color, var(--color-iris, #7c3aed)) 22%, transparent 78%) 0%, color-mix(in srgb, var(--color-night, #120725) 86%, transparent 14%) 100%);
-    border-color: color-mix(in srgb, var(--ambient-color, var(--color-iris, #7c3aed)) 20%, transparent 80%);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 22%, transparent 78%) 0%, color-mix(in srgb, var(--surface-panel-primary) 86%, transparent 14%) 100%);
+    border-color: color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 20%, transparent 80%);
     color: color-mix(in srgb, var(--ink-muted, #d6cffa) 85%, white 15%);
     box-shadow: none;
     transform: none;
@@ -274,7 +274,7 @@ const nextLabel = p < totalPages ? "Turn the page" : "Story complete";
     width: 2.2rem;
     height: 2.2rem;
     color: color-mix(in srgb, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 68%, white 32%);
-    filter: drop-shadow(0 8px 18px color-mix(in srgb, var(--ambient-color, var(--color-iris, #7c3aed)) 35%, transparent 65%));
+    filter: drop-shadow(0 8px 18px color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 35%, transparent 65%));
   }
 
   .pagination__icon-svg {
@@ -290,11 +290,11 @@ const nextLabel = p < totalPages ? "Turn the page" : "Story complete";
     gap: 1.1rem;
     padding: 1.2rem 1.75rem;
     border-radius: clamp(1.6rem, 4vw, 2.4rem);
-    border: 1px solid color-mix(in srgb, var(--ambient-color, var(--color-iris, #7c3aed)) 26%, transparent 74%);
+    border: 1px solid color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 26%, transparent 74%);
     background:
       radial-gradient(circle at 20% 0%, color-mix(in srgb, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 18%, transparent 82%), transparent 70%),
-      linear-gradient(180deg, color-mix(in srgb, var(--ambient-color, var(--color-iris, #7c3aed)) 24%, rgba(8, 2, 18, 0.78)) 0%, color-mix(in srgb, var(--ambient-color, var(--color-iris, #7c3aed)) 18%, rgba(6, 1, 14, 0.92)) 100%);
-    box-shadow: 0 20px 50px -26px color-mix(in srgb, var(--ambient-color, var(--color-iris, #7c3aed)) 40%, black 60%);
+      linear-gradient(180deg, color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 24%, rgba(8, 2, 18, 0.78)) 0%, color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 18%, rgba(6, 1, 14, 0.92)) 100%);
+    box-shadow: 0 20px 50px -26px color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 40%, black 60%);
   }
 
   .pagination__status::after {
@@ -312,7 +312,7 @@ const nextLabel = p < totalPages ? "Turn the page" : "Story complete";
     width: 2.6rem;
     height: 2.6rem;
     color: color-mix(in srgb, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 78%, white 22%);
-    filter: drop-shadow(0 10px 18px color-mix(in srgb, var(--ambient-color, var(--color-iris, #7c3aed)) 38%, transparent 62%));
+    filter: drop-shadow(0 10px 18px color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 38%, transparent 62%));
   }
 
   .pagination__status-svg {
