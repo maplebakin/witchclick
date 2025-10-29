@@ -302,6 +302,7 @@ interface ThemeRecord {
   mode: ThemeMode;
   category?: string;
   settings?: Record<string, string>;
+  overrides?: ThemeOverride[];
 }
 
 interface ThemeListResponse {
@@ -716,6 +717,52 @@ export class ThemeManager {
     }));
   }
 
+  private serializeOverrides(overrides?: ThemeOverride[]): ThemeOverride[] | undefined {
+    if (!Array.isArray(overrides)) {
+      return undefined;
+    }
+
+    const sanitized: ThemeOverride[] = [];
+
+    for (const override of overrides) {
+      const scope = typeof override.scope === 'string' ? override.scope.trim() : '';
+      if (!scope) continue;
+
+      const variables: ThemeVariables = {};
+      if (override.variables && typeof override.variables === 'object') {
+        for (const [key, value] of Object.entries(override.variables)) {
+          if (typeof value !== 'string') continue;
+          const trimmed = value.trim();
+          if (!trimmed) continue;
+          variables[key] = trimmed;
+        }
+      }
+
+      if (Object.keys(variables).length === 0) continue;
+
+      sanitized.push({
+        scope,
+        variables,
+      });
+    }
+
+    return sanitized;
+  }
+
+  private mergeOverridesFromRecord(record: ThemeRecord, existing: ThemePreset | null): ThemeOverride[] | undefined {
+    const hasOverridesField = Object.prototype.hasOwnProperty.call(record, 'overrides');
+
+    if (Array.isArray(record.overrides)) {
+      return this.cloneOverrides(record.overrides);
+    }
+
+    if (!hasOverridesField && existing?.overrides) {
+      return this.cloneOverrides(existing.overrides);
+    }
+
+    return undefined;
+  }
+
   private sortPresets(): void {
     (['midnight', 'dawn'] as ThemeMode[]).forEach((mode) => {
       this.sortList(this.state.presets[mode]);
@@ -726,7 +773,14 @@ export class ThemeManager {
     list.sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  private buildSavePayload(preset: ThemePreset) {
+  private buildSavePayload(preset: ThemePreset): {
+    label: string;
+    slug: string;
+    mode: ThemeMode;
+    category: string;
+    settings: Record<string, string>;
+    overrides?: ThemeOverride[];
+  } {
     const defaults = this.getDefaultVariables(preset.mode);
     const mergedVariables: Record<string, string> = {};
 
@@ -738,13 +792,28 @@ export class ThemeManager {
       mergedVariables[key] = trimmed;
     }
 
-    return {
+    const overrides = this.serializeOverrides(preset.overrides);
+
+    const payload: {
+      label: string;
+      slug: string;
+      mode: ThemeMode;
+      category: string;
+      settings: Record<string, string>;
+      overrides?: ThemeOverride[];
+    } = {
       label: preset.name,
       slug: preset.slug,
       mode: preset.mode,
       category: preset.category,
       settings: mergedVariables,
     };
+
+    if (overrides !== undefined) {
+      payload.overrides = overrides;
+    }
+
+    return payload;
   }
 
   private mergePresetFromRecord(
@@ -767,7 +836,7 @@ export class ThemeManager {
       mode: record.mode,
       category: record.category || existing?.category || 'custom',
       variables,
-      overrides: existing?.overrides ? this.cloneOverrides(existing.overrides) : undefined,
+      overrides: this.mergeOverridesFromRecord(record, existing),
       createdAt: existing?.createdAt || now,
       updatedAt: now,
     };

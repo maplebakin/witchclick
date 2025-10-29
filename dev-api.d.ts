@@ -68,11 +68,17 @@ export interface AdminThemeSettings {
 
 export type AdminThemeMode = "midnight" | "dawn";
 
+export interface AdminThemeOverride {
+  scope: string;
+  variables: Record<string, string>;
+}
+
 export interface AdminThemeRecord {
   slug: string;
   label: string;
   mode: AdminThemeMode;
   settings: AdminThemeSettings;
+  overrides: AdminThemeOverride[];
 }
 
 export interface AdminThemeListing {
