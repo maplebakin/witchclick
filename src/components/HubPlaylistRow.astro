@@ -12,9 +12,10 @@ interface Props {
   description: string;
   groupChips: string[];
   posts: PlaylistPost[];
+  maxChipsPerCard?: number;
 }
 
-const { title, description, groupChips, posts } = Astro.props as Props;
+const { title, description, groupChips, posts, maxChipsPerCard = 3 } = Astro.props as Props;
 const headingId = `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'playlist'}-heading`;
 ---
 <section class="hub-playlist" aria-labelledby={headingId}>
@@ -40,9 +41,14 @@ const headingId = `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'playlis
         {post.excerpt && <span class="hub-playlist__card-excerpt">{post.excerpt}</span>}
         {post.chips.length > 0 && (
           <ul class="hub-playlist__card-chips">
-            {post.chips.slice(0, 3).map((chip) => (
+            {post.chips.slice(0, maxChipsPerCard).map((chip) => (
               <li>{chip}</li>
             ))}
+            {post.chips.length > maxChipsPerCard && (
+              <li class="hub-playlist__chip-overflow">
+                +{post.chips.length - maxChipsPerCard}
+              </li>
+            )}
           </ul>
         )}
       </a>
@@ -150,6 +156,11 @@ const headingId = `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'playlis
     text-transform: uppercase;
   }
 
+  .hub-playlist__chip-overflow {
+    background: rgba(124, 78, 176, 0.2) !important;
+    font-weight: 600;
+  }
+
   :root[data-comfort-theme="dawn"] .hub-playlist__description {
     color: rgba(87, 63, 115, 0.75);
   }
@@ -177,6 +188,10 @@ const headingId = `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'playlis
   :root[data-comfort-theme="dawn"] .hub-playlist__card-chips li {
     background: rgba(186, 166, 220, 0.25);
     color: rgba(87, 63, 115, 0.75);
+  }
+
+  :root[data-comfort-theme="dawn"] .hub-playlist__chip-overflow {
+    background: rgba(155, 134, 200, 0.35) !important;
   }
 
   @media (max-width: 640px) {

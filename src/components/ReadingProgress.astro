@@ -5,7 +5,16 @@ interface Props {
 
 const { target = '[data-reading-target="article"]' } = Astro.props as Props;
 ---
-<div class="reading-progress" data-reading-progress data-target={target} aria-hidden="true">
+<div
+  class="reading-progress"
+  data-reading-progress
+  data-target={target}
+  role="progressbar"
+  aria-label="Reading progress"
+  aria-valuemin="0"
+  aria-valuemax="100"
+  aria-valuenow="0"
+>
   <div class="reading-progress__bar" data-reading-progress-bar></div>
 </div>
 
@@ -23,17 +32,19 @@ const { target = '[data-reading-target="article"]' } = Astro.props as Props;
     if (!target || !(bar instanceof HTMLElement)) return;
 
     const candidates = Array.from(
-      target.querySelectorAll<HTMLElement>('h2, h3, h4, p, li, blockquote, figure, pre, table')
+      target.querySelectorAll('h2, h3, h4, p, li, blockquote, figure, pre, table')
     );
     if (!candidates.length) {
-      candidates.push(target as HTMLElement);
+      candidates.push(target);
     }
 
-    const seen = new Set<Element>();
+    const seen = new Set();
 
     const update = () => {
       const progress = Math.min(1, seen.size / candidates.length);
+      const percent = Math.round(progress * 100);
       bar.style.setProperty('--reading-progress', progress.toString());
+      container.setAttribute('aria-valuenow', String(percent));
     };
 
     const observer = new IntersectionObserver(

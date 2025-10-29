@@ -595,7 +595,8 @@ const site = Astro.url?.origin ?? "";
           lines.push(
             'Style: cozy, inclusive, painterly digital illustration with soft light, tactile textures, and subtle magical realism details.'
           );
-          lines.push('Constraints: no text or lettering, no watermarks or logos, 3:2 landscape hero composition, high resolution.');
+          lines.push('Image dimensions: 1920×1280 pixels (3:2 landscape aspect ratio). Generate at high resolution suitable for web hero images.');
+          lines.push('Constraints: no text or lettering, no watermarks or logos, no human faces or specific individuals, suitable for web display.');
           return lines.join('\n');
         }
 
@@ -876,7 +877,36 @@ const site = Astro.url?.origin ?? "";
               );
             };
 
-            let theme = findTheme('midnight', activeMidnight) || findTheme('dawn', activeDawn);
+            // Get user's current theme preference from comfort settings
+            const getUserThemePreference = () => {
+              try {
+                const stored = localStorage.getItem('witchclick-comfort');
+                if (stored) {
+                  const prefs = JSON.parse(stored);
+                  return prefs?.theme === 'dawn' ? 'dawn' : 'midnight';
+                }
+              } catch {
+                // Ignore parse errors
+              }
+              // Check if __wcComfort is available
+              if (window.__wcComfort) {
+                const prefs = window.__wcComfort.get();
+                return prefs?.theme === 'dawn' ? 'dawn' : 'midnight';
+              }
+              return 'midnight'; // Default fallback
+            };
+
+            // Prioritize the user's current theme preference
+            const preferredMode = getUserThemePreference();
+            let theme;
+
+            if (preferredMode === 'dawn') {
+              // User prefers dawn, try dawn first then fall back to midnight
+              theme = findTheme('dawn', activeDawn) || findTheme('midnight', activeMidnight);
+            } else {
+              // User prefers midnight (default), try midnight first then fall back to dawn
+              theme = findTheme('midnight', activeMidnight) || findTheme('dawn', activeDawn);
+            }
             if (!theme) {
               const candidateLists = [
                 ...(Array.isArray(items?.midnight) ? items.midnight : []),

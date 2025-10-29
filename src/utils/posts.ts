@@ -6,6 +6,30 @@ import { marked } from "marked";
 import { normalizeAuthorSlug } from "./authors";
 import { augmentPost, normalizeSpoonLevel, type SpoonLevel } from "./augment";
 
+// Simple Slugger class to replace marked.Slugger (removed in marked v16)
+class Slugger {
+  private seen: Record<string, number> = {};
+
+  slug(text: string): string {
+    let slug = text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+    const originalSlug = slug;
+    let count = this.seen[originalSlug] || 0;
+
+    if (count > 0) {
+      slug = `${originalSlug}-${count}`;
+    }
+
+    this.seen[originalSlug] = count + 1;
+    return slug;
+  }
+}
+
 export interface LoadedPost {
   slug: string;
   title: string;
@@ -224,7 +248,7 @@ export function extractHeadingOutline(
   if (!markdown) return [];
 
   const tokens = marked.lexer(markdown);
-  const slugger = new marked.Slugger();
+  const slugger = new Slugger();
   const results: HeadingOutlineItem[] = [];
 
   const clampLevel = (depth: number) => Math.min(Math.max(depth, 1), 6);
@@ -381,4 +405,18 @@ export function extractHeroImage(
     src: src || undefined,
     alt: alt || undefined,
   };
+}
+
+/**
+ * Extract and format tag chips from post data
+ * @param data Post frontmatter data
+ * @param maxTags Maximum number of tags to return
+ * @returns Array of formatted tag strings (e.g., ["#witchcraft", "#ritual"])
+ */
+export function extractTagChips(data: Record<string, any>, maxTags = 3): string[] {
+  const tags = Array.isArray(data?.tags) ? data.tags : [];
+  return tags
+    .map((tag) => `#${String(tag ?? "").toLowerCase()}`)
+    .filter((tag) => tag.length > 1)
+    .slice(0, maxTags);
 }

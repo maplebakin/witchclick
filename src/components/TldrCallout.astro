@@ -11,9 +11,8 @@ interface Props {
 
 const { summary = "", bullets = [], spoonLevel, class: className } = Astro.props as Props;
 
-const normalizedBullets = bullets
-  .map((entry) => (typeof entry === "string" ? entry.trim() : ""))
-  .filter((entry) => entry.length > 0);
+const normalizedBullets = (Array.isArray(bullets) ? bullets : [])
+  .filter((entry): entry is string => typeof entry === "string" && entry.trim().length > 0);
 
 const hasList = normalizedBullets.length > 0;
 const description = summary.trim();

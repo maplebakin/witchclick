@@ -1,0 +1,16 @@
+{
+  "slug": "autumn-twilight",
+  "label": "Autumn Twilight",
+  "mode": "midnight",
+  "category": "seasonal",
+  "settings": {
+    "primary": "#d97642",
+    "accent": "#e5a82e",
+    "background": "#1a0f0d",
+    "textPrimary": "#f4e8dc",
+    "textHeading": "#fef3e7",
+    "textMuted": "#d9a882",
+    "fontSerif": "Literata",
+    "fontScript": "Parisienne"
+  }
+}

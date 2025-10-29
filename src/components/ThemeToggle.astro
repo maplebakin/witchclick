@@ -1,4 +1,6 @@
 ---
+import comfortPreferencesUrl from "../scripts/comfort-preferences.ts?url";
+
 interface Props {
   class?: string;
 }
@@ -30,14 +32,14 @@ const { class: className = "" } = Astro.props as Props;
   </span>
 </button>
 
-<script type="module" src={Astro.resolve("../scripts/comfort-preferences.ts")} />
+<script type="module" src={comfortPreferencesUrl} />
 <script is:inline>
   (() => {
     if (typeof window === 'undefined') return;
     const script = document.currentScript;
-    let button = script?.previousElementSibling as HTMLElement | null;
+    let button = script?.previousElementSibling;
     while (button && !(button instanceof HTMLButtonElement)) {
-      button = button.previousElementSibling as HTMLElement | null;
+      button = button.previousElementSibling;
     }
     if (!(button instanceof HTMLButtonElement)) return;
 

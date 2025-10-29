@@ -1,4 +1,6 @@
 ---
+import comfortPreferencesUrl from "../scripts/comfort-preferences.ts?url";
+
 interface Props {
   variant?: 'inline' | 'stacked';
 }
@@ -45,14 +47,14 @@ const themeToggleId = `comfort-theme-${variant}`;
   </div>
 </details>
 
-<script type="module" src={Astro.resolve("../scripts/comfort-preferences.ts")} />
+<script type="module" src={comfortPreferencesUrl} />
 <script is:inline>
   (() => {
     if (typeof window === 'undefined') return;
     const script = document.currentScript;
-    let host = script?.previousElementSibling as HTMLElement | null;
+    let host = script?.previousElementSibling;
     while (host && !host.classList?.contains('comfort-settings')) {
-      host = host.previousElementSibling as HTMLElement | null;
+      host = host.previousElementSibling;
     }
     if (!host) return;
 

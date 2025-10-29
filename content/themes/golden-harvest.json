@@ -1,0 +1,16 @@
+{
+  "slug": "golden-harvest",
+  "label": "Golden Harvest",
+  "mode": "dawn",
+  "category": "seasonal",
+  "settings": {
+    "primary": "#a85a33",
+    "accent": "#d4a843",
+    "background": "#f9f3eb",
+    "textPrimary": "#2a1810",
+    "textHeading": "#1a0f0a",
+    "textMuted": "#7d5940",
+    "fontSerif": "Literata",
+    "fontScript": "Parisienne"
+  }
+}
