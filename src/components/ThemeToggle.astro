@@ -1,0 +1,143 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props as Props;
+---
+<button
+  type="button"
+  class:list={["theme-toggle focus-ring", className].filter(Boolean)}
+  data-theme-toggle
+  aria-pressed="false"
+>
+  <span class="sr-only">Toggle theme</span>
+  <span aria-hidden="true" class="theme-toggle__icon theme-toggle__icon--sun">
+    <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+      <path
+        d="M12 5a1 1 0 0 0 1-1V2.75a1 1 0 1 0-2 0V4a1 1 0 0 0 1 1Zm5.657 2.343a1 1 0 0 0 1.414-1.414l-1.06-1.061a1 1 0 1 0-1.415 1.414l1.061 1.061ZM19 11h1.25a1 1 0 1 0 0-2H19a1 1 0 1 0 0 2Zm-7 8a1 1 0 0 0-1 1v1.25a1 1 0 1 0 2 0V20a1 1 0 0 0-1-1Zm7.071-2.071-1.061-1.06a1 1 0 1 0-1.414 1.414l1.06 1.06a1 1 0 1 0 1.415-1.414ZM5 11H3.75a1 1 0 1 0 0 2H5a1 1 0 0 0 0-2Zm2.475-5.132a1 1 0 0 0-1.414-1.414L5 5.515A1 1 0 1 0 6.414 6.93l1.061-1.061ZM4.343 17.657a1 1 0 0 0 1.414 1.414l1.061-1.06A1 1 0 1 0 5.404 16.6l-1.06 1.06ZM12 7.25a4.75 4.75 0 1 0 0 9.5 4.75 4.75 0 0 0 0-9.5Z"
+        fill="currentColor"
+      />
+    </svg>
+  </span>
+  <span aria-hidden="true" class="theme-toggle__icon theme-toggle__icon--moon">
+    <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+      <path
+        d="M21.25 14.02a9 9 0 0 1-11.27-11.27 1 1 0 0 0-1.37-1.16A10.999 10.999 0 1 0 22.43 16.64a1 1 0 0 0-1.18-1.37Z"
+        fill="currentColor"
+      />
+    </svg>
+  </span>
+</button>
+
+<script type="module" src={Astro.resolve("../scripts/comfort-preferences.ts")} />
+<script is:inline>
+  (() => {
+    if (typeof window === 'undefined') return;
+    const script = document.currentScript;
+    let button = script?.previousElementSibling as HTMLElement | null;
+    while (button && !(button instanceof HTMLButtonElement)) {
+      button = button.previousElementSibling as HTMLElement | null;
+    }
+    if (!(button instanceof HTMLButtonElement)) return;
+
+    const run = () => {
+      const comfort = window.__wcComfort;
+      if (!comfort) return;
+
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      const update = (prefs) => {
+        button.dataset.theme = prefs.theme ?? 'midnight';
+        button.setAttribute('aria-pressed', prefs.theme === 'dawn' ? 'true' : 'false');
+      };
+
+      const unsubscribe = comfort.subscribe(update);
+
+      button.addEventListener('click', () => {
+        const nextTheme = button.dataset.theme === 'dawn' ? 'midnight' : 'dawn';
+        if (!prefersReduced.matches) {
+          button.classList.add('theme-toggle--animating');
+          window.setTimeout(() => button.classList.remove('theme-toggle--animating'), 220);
+        }
+        comfort.set({ theme: nextTheme });
+      });
+
+      window.addEventListener(
+        'astro:beforeunload',
+        () => {
+          unsubscribe();
+        },
+        { once: true },
+      );
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  })();
+</script>
+
+<style is:inline>
+  .theme-toggle {
+    --toggle-size: 2.25rem;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--toggle-size);
+    height: var(--toggle-size);
+    border-radius: 999px;
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    background:
+      radial-gradient(circle at 30% 25%, rgba(255, 200, 120, 0.2), transparent 65%),
+      rgba(19, 9, 35, 0.85);
+    color: rgba(249, 245, 255, 0.92);
+    transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
+  }
+
+  .theme-toggle--animating {
+    transform: translateY(-1px);
+    transition: transform 200ms ease;
+  }
+
+  .theme-toggle__icon {
+    position: absolute;
+    width: 1.15rem;
+    height: 1.15rem;
+    opacity: 0;
+    transform: scale(0.75);
+    transition: opacity 200ms ease, transform 200ms ease;
+  }
+
+  .theme-toggle__icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .theme-toggle[data-theme='midnight'] .theme-toggle__icon--moon,
+  .theme-toggle[data-theme='dawn'] .theme-toggle__icon--sun {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .theme-toggle[data-theme='dawn'] {
+    background:
+      radial-gradient(circle at 70% 30%, rgba(255, 239, 180, 0.45), transparent 72%),
+      rgba(253, 247, 238, 0.92);
+    color: rgba(87, 63, 115, 0.95);
+    border-color: rgba(155, 134, 200, 0.5);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-toggle,
+    .theme-toggle__icon,
+    .theme-toggle--animating {
+      transition: none !important;
+      transform: none !important;
+    }
+  }
+</style>

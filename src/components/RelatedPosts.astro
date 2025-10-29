@@ -1,75 +1,115 @@
 ---
-import fs from "node:fs";
-import path from "node:path";
-import matter from "gray-matter";
-import PostCard from "./PostCard.astro";
+import { getRelatedPosts } from "../utils/recommendations";
 
 interface Props {
   currentSlug: string;
-  tags?: string[];
+  data?: Record<string, any>;
   limit?: number;
 }
 
-interface PostSummary {
-  slug: string;
-  data: Record<string, unknown>;
-  date: Date;
-  tagSet: Set<string>;
-}
+const { currentSlug, data = {}, limit = 4 } = Astro.props as Props;
 
-const { currentSlug, tags = [], limit = 3 } = Astro.props as Props;
-
-const postsDir = path.join(process.cwd(), "content", "posts");
-const files = fs.existsSync(postsDir)
-  ? fs.readdirSync(postsDir).filter((file) => file.endsWith(".md"))
-  : [];
-
-const sanitizedTags = tags
-  .map((tag) => (typeof tag === "string" ? tag.trim().toLowerCase() : ""))
-  .filter((tag): tag is string => Boolean(tag));
-
-const all: PostSummary[] = files
-  .map((file) => {
-    const raw = fs.readFileSync(path.join(postsDir, file), "utf8");
-    const { data } = matter(raw);
-    const slugSource = typeof data?.slug === "string" ? data.slug : file.replace(/\.md$/, "");
-    const slug = slugSource.trim().toLowerCase();
-    const timestamp = data?.publishedAt || data?.pubDate || data?.date;
-    const date = new Date(typeof timestamp === "string" || typeof timestamp === "number" ? timestamp : 0);
-    const tagValues = Array.isArray(data?.tags) ? data.tags : [];
-    const tagSet = new Set(
-      tagValues
-        .map((value) => (typeof value === "string" ? value.trim().toLowerCase() : ""))
-        .filter((value): value is string => Boolean(value)),
-    );
-
-    return { slug, data, date, tagSet } satisfies PostSummary;
-  })
-  .filter((post) => post.slug !== currentSlug.toLowerCase());
-
-const score = (post: PostSummary) => {
-  let result = 0;
-  for (const tag of sanitizedTags) {
-    if (post.tagSet.has(tag)) {
-      result += 1;
-    }
-  }
-  return result;
-};
-
-const ranked = all
-  .map((post) => ({ ...post, _score: score(post) }))
-  .filter((post) => post._score > 0)
-  .sort((a, b) => b._score - a._score || b.date.getTime() - a.date.getTime())
-  .slice(0, limit);
+const recommendations = getRelatedPosts({ currentSlug, currentData: data, limit });
 ---
-{ranked.length > 0 ? (
-<section class="mt-12">
-<h2 class="mb-3 text-lg font-semibold">You might also enjoy</h2>
-<div class="grid gap-4 sm:grid-cols-2">
-{ranked.map((p) => (
-<PostCard post={p.data} />
-))}
-</div>
-</section>
+{recommendations.length > 0 ? (
+  <section class="related-posts" aria-label="Recommended posts">
+    <h2 class="related-posts__title">Recommended</h2>
+    <ul class="related-posts__list">
+      {recommendations.map((item) => (
+        <li>
+          <a class="related-posts__card" href={item.href}>
+            <span class="related-posts__headline">{item.title}</span>
+            {item.excerpt && <span class="related-posts__excerpt">{item.excerpt}</span>}
+            <span class="related-posts__meta">
+              {item.readingMinutes && <span>{item.readingMinutes} min</span>}
+              {item.spoonLevel && <span>{item.spoonLevel} spoons</span>}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
 ) : null}
+
+<style is:inline>
+  .related-posts {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .related-posts__title {
+    margin: 0;
+    font-size: 0.85rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(249, 245, 255, 0.75);
+  }
+
+  .related-posts__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .related-posts__card {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.85rem 1rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(212, 175, 55, 0.28);
+    background: rgba(18, 7, 37, 0.78);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+  }
+
+  .related-posts__card:hover,
+  .related-posts__card:focus-visible {
+    transform: translateY(-2px);
+    border-color: rgba(212, 175, 55, 0.48);
+    background: rgba(28, 12, 47, 0.85);
+  }
+
+  .related-posts__headline {
+    font-weight: 600;
+    font-size: 0.98rem;
+  }
+
+  .related-posts__excerpt {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: rgba(249, 245, 255, 0.72);
+  }
+
+  .related-posts__meta {
+    display: inline-flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(212, 175, 55, 0.7);
+  }
+
+  :root[data-comfort-theme="dawn"] .related-posts__card {
+    background: rgba(255, 255, 255, 0.92);
+    border-color: rgba(180, 154, 217, 0.28);
+    color: rgba(58, 40, 84, 0.92);
+  }
+
+  :root[data-comfort-theme="dawn"] .related-posts__card:hover,
+  :root[data-comfort-theme="dawn"] .related-posts__card:focus-visible {
+    background: rgba(255, 255, 255, 0.98);
+    border-color: rgba(212, 175, 55, 0.42);
+  }
+
+  :root[data-comfort-theme="dawn"] .related-posts__excerpt {
+    color: rgba(87, 63, 115, 0.7);
+  }
+
+  :root[data-comfort-theme="dawn"] .related-posts__meta {
+    color: rgba(155, 134, 200, 0.72);
+  }
+</style>

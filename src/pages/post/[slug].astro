@@ -4,15 +4,15 @@ import Base from "../../layouts/Base.astro";
 import AdSlot from "../../components/AdSlot.astro";
 import Disclosure from "../../components/Disclosure.astro";
 import DownloadCard from "../../components/DownloadCard.astro";
-import RelatedPosts from "../../components/RelatedPosts.astro";
-import CtaFooter from "../../components/CtaFooter.astro";
 import ProductRecommendations from "../../components/ProductRecommendations.astro";
 import CommentsSection from "../../components/CommentsSection.astro";
-import AuthorSpotlight from "../../components/AuthorSpotlight.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import PostRail from "../../components/PostRail.astro";
+import ReadingProgress from "../../components/ReadingProgress.astro";
+import TldrCallout from "../../components/TldrCallout.astro";
+import WitchClickBlurb from "../../components/WitchClickBlurb.astro";
 import { readEntity } from "../../utils/entities";
 import HeadSlot from "@/components/HeadSlot.astro";
-import SpoonsBadge from "../../components/SpoonsBadge.astro";
 
 import fs from "node:fs";
 import path from "node:path";
@@ -28,8 +28,10 @@ import {
   estimateReadingMinutes,
   firstParagraph,
   extractAuthorSlugs,
+  extractHeadingOutline,
 } from "../../utils/posts";
 import { getAuthorBySlug, normalizeAuthorSlug, type AuthorProfile } from "../../utils/authors";
+import { getRelatedPosts } from "../../utils/recommendations";
 
 const dom = new JSDOM("<body></body>");
 const DOMPurify = createDOMPurify(dom.window);
@@ -83,6 +85,20 @@ const readingMinutes = data.readingMinutes ?? estimateReadingMinutes(content);
 const htmlRaw = marked.parse(content || "");
 let html = DOMPurify.sanitize(String(htmlRaw), { USE_PROFILES: { html: true } });
 
+const wrapper = dom.window.document.createElement("div");
+wrapper.innerHTML = html;
+const slugger = new marked.Slugger();
+const headingNodes = wrapper.querySelectorAll<HTMLHeadingElement>("h2, h3, h4");
+headingNodes.forEach((node) => {
+  const text = node.textContent?.trim();
+  if (!text) return;
+  const existing = node.getAttribute("id");
+  const id = existing && existing.trim().length ? existing : slugger.slug(text);
+  node.setAttribute("id", id);
+});
+html = wrapper.innerHTML;
+const headingOutline = extractHeadingOutline(content, { minLevel: 2, maxLevel: 3 });
+
 const heroImage = typeof data.heroImage === "string" ? data.heroImage.trim() : "";
 const heroAlt =
   typeof data.heroAlt === "string" && data.heroAlt.trim().length
@@ -96,6 +112,11 @@ const providedTldr =
       ? injectedTldr
       : "";
 const tldr = providedTldr.trim();
+const tldrBullets = Array.isArray((data as any).tldrBullets)
+  ? (data as any).tldrBullets
+      .map((entry: any) => (typeof entry === "string" ? entry : String(entry ?? "")))
+      .filter((entry: string) => entry.trim().length > 0)
+  : [];
 
 const spoonsRaw = data.spoons ?? data.spoonLevel ?? injectedSpoons ?? null;
 const spoonLevel = normalizeSpoonLevel(spoonsRaw);
@@ -248,10 +269,6 @@ const authorSegments = authorLinks.map((author, index) => {
   return { ...author, separator };
 });
 
-const authorsWithProfiles = pageAuthors
-  .map((author) => author.profile)
-  .filter((profile): profile is AuthorProfile => Boolean(profile));
-
 const jsonLdAuthors = pageAuthors
   .map((author) => ({
     "@type": "Person",
@@ -314,6 +331,24 @@ const resolvedEntities = entList
   })
   .filter(Boolean);
 
+const railEntities = (resolvedEntities as any[]).map((entity) => ({
+  name: entity.name,
+  href: entity.href,
+  description: entity.description,
+}));
+
+const recommendations = getRelatedPosts({
+  currentSlug: effectiveSlug,
+  currentData: data,
+  limit: 4,
+}).map((item) => ({
+  title: item.title,
+  href: item.href,
+  excerpt: item.excerpt,
+  readingMinutes: item.readingMinutes,
+  spoonLevel: item.spoonLevel,
+}));
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Article",
@@ -343,8 +378,13 @@ const jsonLd = {
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
 
   <div class="flex w-full flex-col gap-12 px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
-    <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
-        <article class="flex min-w-0 flex-col gap-8 lg:gap-10" aria-labelledby="post-title">
+    <ReadingProgress target='[data-reading-target="article"]' />
+    <div class="grid gap-10 md:grid-cols-[minmax(0,1fr)_320px] md:items-start">
+      <article
+        class="flex min-w-0 flex-col gap-8 md:gap-10"
+        aria-labelledby="post-title"
+        data-reading-target="article"
+      >
           <header class="card-panel card-tier-2 card-panel-strong card-panel-static overflow-hidden p-6 sm:p-8 lg:p-10">
             <div
               class:list={["flex flex-col gap-8 lg:gap-10", heroImage ? "lg:flex-row lg:items-start" : "lg:max-w-3xl"]}
@@ -410,15 +450,9 @@ const jsonLd = {
                   </ul>
                 )}
 
-                {(spoonLevel || tldr) && (
-                  <div class="mt-6 flex flex-col gap-4 lg:flex-row lg:items-stretch">
-                    {spoonLevel && <SpoonsBadge level={spoonLevel} class="self-start" />}
-                    {tldr && (
-                      <aside class="soft-card flex-1 space-y-3 p-5 text-inverse sm:p-6" aria-label="TL;DR">
-                        <span class="card-pill card-badge">TL;DR</span>
-                        <p class="text-base leading-relaxed text-inverse-soft">{tldr}</p>
-                      </aside>
-                    )}
+                {(tldr || tldrBullets.length > 0 || spoonLevel) && (
+                  <div class="mt-6">
+                    <TldrCallout summary={tldr} bullets={tldrBullets} spoonLevel={spoonLevel} />
                   </div>
                 )}
               </div>
@@ -437,51 +471,18 @@ const jsonLd = {
               <DownloadCard id={String(data.downloadId)} />
             ) : null}
 
-            {authorsWithProfiles.length > 0 && (
-              <section class="border-t border-line-inverse/30 pt-6 sm:pt-8">
-                <h2 class="text-sm font-semibold uppercase tracking-[0.26em] text-inverse-muted">
-                  About the author{authorsWithProfiles.length > 1 ? "s" : ""}
-                </h2>
-                <div class="mt-4 grid gap-4 sm:grid-cols-2">
-                  {authorsWithProfiles.map((author) => (
-                    <AuthorSpotlight author={author} compact={true} />
-                  ))}
-                </div>
-              </section>
-            )}
+            <WitchClickBlurb class="mt-2" />
           </div>
-        </article>
+      </article>
 
-        <aside class="relative" aria-label="Post sidebar">
-          <div class="flex flex-col gap-6 lg:sticky lg:top-28">
-            <CtaFooter type={ctaType} id={ctaId} />
-            {resolvedEntities.length > 0 && (
-              <section class="soft-card space-y-4 p-6 text-inverse">
-                <h2 class="text-xs font-semibold uppercase tracking-[0.32em] text-inverse">Referenced entities</h2>
-                <ul class="space-y-4 text-sm text-inverse-soft">
-                  {resolvedEntities.map((entity: any) => (
-                    <li>
-                      <a
-                        class="font-semibold text-accent-soft transition-colors hover:text-accent focus-visible:text-accent"
-                        href={entity.href}
-                      >
-                        {entity.name}
-                      </a>
-                      {entity.description && (
-                        <p class="mt-2 text-sm leading-relaxed text-inverse-muted">{entity.description}</p>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-          </div>
-        </aside>
-      </div>
-
-      <div class="card-panel card-panel-strong card-panel-static flex flex-col gap-6 p-6 text-inverse sm:p-8 lg:p-10">
-        <RelatedPosts currentSlug={effectiveSlug} tags={Array.isArray(data.tags) ? data.tags : []} />
-      </div>
+      <PostRail
+        recommendations={recommendations}
+        entities={railEntities}
+        toc={headingOutline}
+        ctaType={ctaType}
+        ctaId={ctaId}
+      />
+    </div>
 
       <div class="card-panel card-panel-strong card-panel-static flex flex-col gap-6 p-6 text-inverse sm:p-8 lg:p-10">
         <CommentsSection slug={effectiveSlug} title={title} />

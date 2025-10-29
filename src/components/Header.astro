@@ -1,6 +1,7 @@
 ---
 import SearchBox from "./SearchBox.astro";
 import ComfortSettings from "./ComfortSettings.astro";
+import ThemeToggle from "./ThemeToggle.astro";
 
 interface NavLink {
   href: string;
@@ -76,7 +77,10 @@ function isActive(href: string): boolean {
             <a
               href={item.href}
               rel={item.rel}
-              class="site-nav__link"
+              class:list={[
+                "site-nav__link",
+                item.variant === "pill" && "site-nav__link--pill",
+              ].filter(Boolean)}
               aria-current={isActive(item.href) ? "page" : undefined}
             >
               {item.label}
@@ -121,6 +125,7 @@ function isActive(href: string): boolean {
         )}
       </ul>
       <div class="site-nav__actions">
+        <ThemeToggle class="site-nav__theme" />
         {visibleUtility.length > 0 && (
           <div class="site-nav__utility">
             {visibleUtility.map((item) => (
@@ -188,6 +193,9 @@ function isActive(href: string): boolean {
       <button type="button" class="site-nav__toggle focus-ring" data-mobile-close aria-label="Close menu">
         ✕
       </button>
+    </div>
+    <div class="site-nav__mobile-theme">
+      <ThemeToggle />
     </div>
     <div class="site-nav__mobile-search">
       <SearchBox />
@@ -425,6 +433,22 @@ function isActive(href: string): boolean {
 </script>
 
 <style is:inline>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    backdrop-filter: blur(14px);
+    background: rgba(12, 5, 23, 0.82);
+    border-bottom: 1px solid rgba(124, 58, 237, 0.18);
+    min-height: 3.5rem;
+    padding-block: clamp(0.75rem, 2vw, 1rem);
+  }
+
+  :root[data-comfort-theme="dawn"] .site-header {
+    background: rgba(250, 245, 238, 0.92);
+    border-bottom-color: rgba(155, 134, 200, 0.25);
+  }
+
   .site-header__inner {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -461,6 +485,10 @@ function isActive(href: string): boolean {
     align-items: center;
     gap: var(--space-2, 0.5rem);
     flex-wrap: wrap;
+  }
+
+  .site-nav__theme {
+    flex: 0 0 auto;
   }
 
   @media (min-width: 768px) {
@@ -514,6 +542,21 @@ function isActive(href: string): boolean {
 
   .site-nav__item--submenu {
     position: relative;
+  }
+
+  .site-nav__link--pill {
+    padding-inline: 1.1rem;
+    padding-block: 0.45rem;
+    border-radius: 999px;
+    border: 1px solid rgba(212, 175, 55, 0.38);
+    background: rgba(124, 78, 176, 0.18);
+    font-weight: 600;
+  }
+
+  .site-nav__link--pill:hover,
+  .site-nav__link--pill:focus-visible {
+    background: rgba(212, 175, 55, 0.22);
+    color: var(--color-gold, #d4af37);
   }
 
   .site-nav__button--more {
@@ -635,6 +678,12 @@ function isActive(href: string): boolean {
     border-top: 1px solid rgba(212, 175, 55, 0.18);
     display: grid;
     gap: var(--space-4, 1rem);
+  }
+
+  .site-nav__mobile-theme {
+    display: flex;
+    justify-content: flex-end;
+    padding: var(--space-3, 0.75rem) var(--space-4, 1rem) 0;
   }
 
   .site-nav__mobile-admin-section {

@@ -271,13 +271,16 @@ blockquote {
 /* Links */
 a {
   color: var(--link-color);
-  text-decoration: none;
+  text-decoration-line: underline;
+  text-decoration-thickness: max(2px, 0.1em);
+  text-underline-offset: 0.2em;
   transition: color 160ms ease;
 }
 
 a:hover,
 a:focus-visible {
   color: color-mix(in srgb, var(--focus-ring-color) 60%, var(--link-color) 40%);
+  text-decoration-color: currentColor;
 }
 
 /* Media Elements */

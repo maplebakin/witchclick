@@ -1,11 +1,11 @@
 ---
 import Base from "@/layouts/Base.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
-import PostCard from "@/components/PostCard.astro";
+import HubPlaylistRow from "@/components/HubPlaylistRow.astro";
 import PartnerProductCard from "@/components/PartnerProductCard.astro";
 import { createCollectionPageSchema } from "@/utils/structuredData";
 import { readSettings } from "@/utils/settings";
-import { getPostBySlug, extractHeroImage } from "@/utils/posts";
+import { getPostBySlug } from "@/utils/posts";
 import { readPartnerBlocks } from "@/utils/partners";
 import { readEditorialCalendar } from "@/utils/editorialCalendar";
 import HeadSlot from "@/components/HeadSlot.astro";
@@ -33,21 +33,36 @@ const partnerHighlight = hub.partnerHighlight
 
 type HubPost = NonNullable<ReturnType<typeof getPostBySlug>>;
 
-const sections = hub.sections.map((section) => {
-  const posts: HubPost[] = section.posts
+const playlists = hub.playlists.map((playlist) => {
+  const items = playlist.posts
     .map((postSlug) => getPostBySlug(postSlug))
-    .filter((post): post is HubPost => Boolean(post));
+    .filter((post): post is HubPost => Boolean(post))
+    .map((post) => {
+      const data = post.data ?? {};
+      const tags = Array.isArray((data as any).tags)
+        ? (data as any).tags
+            .map((tag: any) => `#${String(tag ?? "").toLowerCase()}`)
+            .filter((tag: string) => tag.length > 1)
+        : [];
 
-  return { ...section, posts };
+      return {
+        slug: post.slug,
+        title: post.title,
+        href: `/post/${post.slug}`,
+        excerpt: data.excerpt ?? data.metaDescription ?? post.tldr ?? "",
+        chips: tags.slice(0, 3),
+      };
+    });
+
+  return { ...playlist, posts: items };
 });
 
 const uniquePosts = new Map<string, HubPost>();
-for (const section of sections) {
-  for (const post of section.posts) {
-    if (!post) continue;
-    if (!uniquePosts.has(post.slug)) {
-      uniquePosts.set(post.slug, post);
-    }
+for (const playlist of hub.playlists) {
+  for (const postSlug of playlist.posts) {
+    const post = getPostBySlug(postSlug);
+    if (!post || uniquePosts.has(post.slug)) continue;
+    uniquePosts.set(post.slug, post);
   }
 }
 
@@ -97,43 +112,16 @@ const breadcrumbs = [
     </div>
   </section>
 
-  {sections.map((section) => (
-    <section class="hub-section">
-      <header class="hub-section__header">
-        <h2>{section.title}</h2>
-        <p>{section.description}</p>
-      </header>
-      <div class="hub-section__grid">
-        {section.posts.map((post) => {
-          const hero = extractHeroImage(post.data ?? {});
-          return (
-            <PostCard
-              post={{
-                slug: post.slug,
-                title: post.title,
-                excerpt: post.data?.excerpt ?? post.data?.metaDescription ?? "",
-                tldr: typeof post.tldr === "string" ? post.tldr : post.data?.tldr,
-                tags: post.data?.tags ?? [],
-                readingMinutes: post.data?.readingMinutes,
-                publishedAt: post.data?.publishedAt ?? post.data?.pubDate ?? post.data?.date,
-                spoonLevel: post.data?.spoonLevel,
-                spoons:
-                  typeof post.spoons === "string"
-                    ? post.spoons
-                    : typeof post.data?.spoons === "string"
-                      ? post.data.spoons
-                      : undefined,
-                heroImage: hero?.src,
-                heroImageSrc: hero?.src,
-                heroImageAlt: hero?.alt,
-                heroAlt: hero?.alt,
-              }}
-            />
-          );
-        })}
-      </div>
-    </section>
-  ))}
+  <div class="hub-playlists">
+    {playlists.map((playlist) => (
+      <HubPlaylistRow
+        title={playlist.title}
+        description={playlist.description}
+        groupChips={playlist.chips}
+        posts={playlist.posts}
+      />
+    ))}
+  </div>
 
   {partnerHighlight && hub.partnerHighlight && (
     <section class="hub-partner">
@@ -224,33 +212,40 @@ const breadcrumbs = [
     color: rgba(244, 241, 255, 0.88);
   }
 
-  .hub-section {
-    margin: clamp(2rem, 6vw, 3.5rem) auto;
+  .hub-playlists {
+    margin: clamp(2.25rem, 6vw, 4.25rem) auto;
     display: grid;
-    gap: 1.75rem;
+    gap: clamp(2rem, 5vw, 3.5rem);
   }
 
-  .hub-section__header {
-    display: grid;
-    gap: 0.5rem;
-    max-width: 48rem;
+  .hub-playlists :global(.hub-playlist) {
+    padding: clamp(1.75rem, 5vw, 2.75rem);
+    border-radius: clamp(1.75rem, 4vw, 2.5rem);
+    background: linear-gradient(145deg, rgba(20, 13, 35, 0.95), rgba(12, 6, 20, 0.85));
+    border: 1px solid rgba(124, 58, 237, 0.28);
+    box-shadow: 0 28px 60px -36px rgba(5, 3, 12, 0.75);
   }
 
-  .hub-section__header h2 {
-    margin: 0;
-    font-size: clamp(1.75rem, 4vw, 2.4rem);
-    color: #f4f1ff;
+  .hub-playlists :global(.hub-playlist__title) {
+    color: rgba(244, 241, 255, 0.96);
   }
 
-  .hub-section__header p {
-    margin: 0;
-    font-size: 1rem;
-    color: rgba(244, 241, 255, 0.88);
+  .hub-playlists :global(.hub-playlist__description) {
+    color: rgba(244, 241, 255, 0.8);
   }
 
-  .hub-section__grid {
-    display: grid;
-    gap: clamp(1rem, 3vw, 1.6rem);
+  :global(:root[data-comfort-theme="dawn"]) .hub-playlists :global(.hub-playlist) {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(241, 236, 255, 0.9));
+    border-color: rgba(155, 134, 200, 0.35);
+    box-shadow: 0 28px 48px -34px rgba(83, 63, 112, 0.32);
+  }
+
+  :global(:root[data-comfort-theme="dawn"]) .hub-playlists :global(.hub-playlist__title) {
+    color: rgba(58, 40, 84, 0.92);
+  }
+
+  :global(:root[data-comfort-theme="dawn"]) .hub-playlists :global(.hub-playlist__description) {
+    color: rgba(87, 63, 115, 0.75);
   }
 
   .hub-partner {
@@ -344,8 +339,8 @@ const breadcrumbs = [
   }
 
   @media (min-width: 768px) {
-    .hub-section__grid {
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    .hub-playlists {
+      gap: clamp(2.5rem, 6vw, 4rem);
     }
 
     .hub-partner__inner {

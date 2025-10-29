@@ -314,68 +314,102 @@ const observabilityConfig = shouldLoadObservability
     <!-- Theme Preference Script (must run before body render) -->
     <script is:inline>
       (() => {
-        try {
-          const stored = localStorage.getItem('comfort-preferences');
-          
-          if (!stored) {
-            document.documentElement?.removeAttribute('data-comfort-theme');
-            document.documentElement?.removeAttribute('data-comfort-font');
-            
-            const removeBodyAttrs = () => {
-              document.body?.removeAttribute('data-comfort-theme');
-              document.body?.removeAttribute('data-comfort-font');
+        const STORAGE_KEY = 'witchclick-comfort';
+        const LEGACY_KEYS = ['comfort-preferences'];
+
+        const migrateLegacy = () => {
+          try {
+            if (localStorage.getItem(STORAGE_KEY)) return;
+            for (const key of LEGACY_KEYS) {
+              const value = localStorage.getItem(key);
+              if (value) {
+                localStorage.setItem(STORAGE_KEY, value);
+                localStorage.removeItem(key);
+                break;
+              }
+            }
+          } catch (error) {
+            /* no-op */
+          }
+        };
+
+        const readPrefs = () => {
+          migrateLegacy();
+          try {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (!stored) return null;
+            const parsed = JSON.parse(stored);
+            if (!parsed || typeof parsed !== 'object') return null;
+            return {
+              theme: parsed.theme === 'dawn' ? 'dawn' : null,
+              font: parsed.font === 'sans' ? 'sans' : null,
             };
-            
-            if (document.readyState === 'complete') {
-              removeBodyAttrs();
+          } catch (error) {
+            return null;
+          }
+        };
+
+        try {
+          const prefs = readPrefs();
+          const root = document.documentElement;
+
+          if (!root) return;
+
+          const applyTheme = (theme) => {
+            if (theme) {
+              root.setAttribute('data-comfort-theme', theme);
             } else {
-              document.addEventListener('DOMContentLoaded', removeBodyAttrs, { once: true });
+              root.removeAttribute('data-comfort-theme');
             }
+          };
+
+          const applyFont = (font) => {
+            if (font) {
+              root.setAttribute('data-comfort-font', font);
+            } else {
+              root.removeAttribute('data-comfort-font');
+            }
+          };
+
+          const syncBody = (theme, font) => {
+            const body = document.body;
+            if (!body) return;
+
+            if (theme) {
+              body.setAttribute('data-comfort-theme', theme);
+            } else {
+              body.removeAttribute('data-comfort-theme');
+            }
+
+            if (font) {
+              body.setAttribute('data-comfort-font', font);
+            } else {
+              body.removeAttribute('data-comfort-font');
+            }
+          };
+
+          if (!prefs) {
+            applyTheme(null);
+            applyFont(null);
+
+            const clearBody = () => syncBody(null, null);
+            if (document.readyState === 'complete') {
+              clearBody();
+            } else {
+              document.addEventListener('DOMContentLoaded', clearBody, { once: true });
+            }
+            return;
+          }
+
+          applyTheme(prefs.theme);
+          applyFont(prefs.font);
+
+          const applyBody = () => syncBody(prefs.theme, prefs.font);
+
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', applyBody, { once: true });
           } else {
-            const prefs = JSON.parse(stored);
-            const root = document.documentElement;
-            
-            if (prefs && typeof prefs === 'object' && root) {
-              const theme = prefs.theme === 'dawn' ? 'dawn' : null;
-              const font = prefs.font === 'sans' ? 'sans' : null;
-
-              // Apply to documentElement immediately
-              if (theme) {
-                root.setAttribute('data-comfort-theme', theme);
-              } else {
-                root.removeAttribute('data-comfort-theme');
-              }
-
-              if (font) {
-                root.setAttribute('data-comfort-font', font);
-              } else {
-                root.removeAttribute('data-comfort-font');
-              }
-
-              // Apply to body when ready
-              const applyToBody = () => {
-                const body = document.body;
-                if (!body) return;
-                
-                if (theme) {
-                  body.setAttribute('data-comfort-theme', theme);
-                } else {
-                  body.removeAttribute('data-comfort-theme');
-                }
-                
-                if (font) {
-                  body.setAttribute('data-comfort-font', font);
-                } else {
-                  body.removeAttribute('data-comfort-font');
-                }
-              };
-
-              if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', applyToBody, { once: true });
-              } else {
-                applyToBody();
-              }
-            }
+            applyBody();
           }
         } catch (error) {
           // Silent fail - preferences will use defaults

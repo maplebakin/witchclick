@@ -45,95 +45,64 @@ const themeToggleId = `comfort-theme-${variant}`;
   </div>
 </details>
 
+<script type="module" src={Astro.resolve("../scripts/comfort-preferences.ts")} />
 <script is:inline>
   (() => {
     if (typeof window === 'undefined') return;
-    if (window.__wcComfortLoaded) return;
-    window.__wcComfortLoaded = true;
+    const script = document.currentScript;
+    let host = script?.previousElementSibling as HTMLElement | null;
+    while (host && !host.classList?.contains('comfort-settings')) {
+      host = host.previousElementSibling as HTMLElement | null;
+    }
+    if (!host) return;
 
-    const storageKey = 'witchclick-comfort';
-    const defaults = { theme: 'midnight', font: 'serif' };
+    const run = () => {
+      const comfort = window.__wcComfort;
+      if (!comfort) return;
 
-    const applyPreferences = (prefs) => {
-      const root = document.documentElement;
-      const body = document.body;
-      if (!root) return;
+      const fontToggles = Array.from(
+        host.querySelectorAll<HTMLInputElement>('[data-comfort-font-toggle]')
+      );
+      const themeToggles = Array.from(
+        host.querySelectorAll<HTMLInputElement>('[data-comfort-theme-toggle]')
+      );
 
-      if (prefs.font === 'sans') {
-        root.setAttribute('data-comfort-font', 'sans');
-        body?.setAttribute('data-comfort-font', 'sans');
-      } else {
-        root.removeAttribute('data-comfort-font');
-        body?.removeAttribute('data-comfort-font');
-      }
-
-      if (prefs.theme === 'dawn') {
-        root.setAttribute('data-comfort-theme', 'dawn');
-        body?.setAttribute('data-comfort-theme', 'dawn');
-      } else {
-        root.removeAttribute('data-comfort-theme');
-        body?.removeAttribute('data-comfort-theme');
-      }
-    };
-
-    const persist = (prefs) => {
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(prefs));
-      } catch (error) {
-        /* no-op */
-      }
-    };
-
-    const setup = () => {
-      let current = { ...defaults };
-      try {
-        const stored = localStorage.getItem(storageKey);
-        if (stored) {
-          current = { ...current, ...JSON.parse(stored) };
-        }
-      } catch (error) {
-        /* no-op */
-      }
-
-      applyPreferences(current);
-
-      const fontToggles = Array.from(document.querySelectorAll('[data-comfort-font-toggle]'));
-      const themeToggles = Array.from(document.querySelectorAll('[data-comfort-theme-toggle]'));
-
-      const syncInputs = () => {
+      const sync = (prefs) => {
         fontToggles.forEach((toggle) => {
-          toggle.checked = current.font === 'sans';
+          toggle.checked = prefs.font === 'sans';
         });
         themeToggles.forEach((toggle) => {
-          toggle.checked = current.theme === 'dawn';
+          toggle.checked = prefs.theme === 'dawn';
         });
       };
 
-      syncInputs();
+      const unsubscribe = comfort.subscribe(sync);
 
       fontToggles.forEach((toggle) => {
         toggle.addEventListener('change', () => {
-          current = { ...current, font: toggle.checked ? 'sans' : 'serif' };
-          applyPreferences(current);
-          persist(current);
-          syncInputs();
+          comfort.set({ font: toggle.checked ? 'sans' : 'serif' });
         });
       });
 
       themeToggles.forEach((toggle) => {
         toggle.addEventListener('change', () => {
-          current = { ...current, theme: toggle.checked ? 'dawn' : 'midnight' };
-          applyPreferences(current);
-          persist(current);
-          syncInputs();
+          comfort.set({ theme: toggle.checked ? 'dawn' : 'midnight' });
         });
       });
+
+      window.addEventListener(
+        'astro:beforeunload',
+        () => {
+          unsubscribe();
+        },
+        { once: true },
+      );
     };
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', setup, { once: true });
+      document.addEventListener('DOMContentLoaded', run, { once: true });
     } else {
-      setup();
+      run();
     }
   })();
 </script>
