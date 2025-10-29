@@ -5,7 +5,7 @@
 
 import { ThemeManager, type ThemeMode, type ThemePreset, type ThemeVariables, slugify } from './theme-manager';
 import { UndoRedo } from './undo-redo';
-import { checkContrast, formatRatio, pickContrastColor, hexToRgb } from './contrast-checker';
+import { checkContrast, formatRatio, hexToRgb } from './contrast-checker';
 import {
   initializeAllColorElements,
   setupAllColorListeners,
@@ -28,7 +28,10 @@ export class ThemeEditor {
   private elements: Record<string, HTMLElement | null> = {};
 
   constructor() {
-    this.manager = new ThemeManager();
+    const root = document.getElementById('themeEditorRoot');
+    const devApi = root?.getAttribute('data-dev-api') || 'http://localhost:8787';
+
+    this.manager = new ThemeManager({ baseUrl: devApi });
 
     // Initialize with default state
     this.state = {
@@ -46,7 +49,7 @@ export class ThemeEditor {
 
     this.initializeElements();
     this.setupEventListeners();
-    this.loadInitialState();
+    void this.loadInitialState();
     this.render();
   }
 
@@ -196,10 +199,18 @@ export class ThemeEditor {
     this.elements.fontScriptSelect?.addEventListener('change', () => this.updatePreview());
 
     // Action buttons
-    this.elements.saveBtn?.addEventListener('click', () => this.save());
-    this.elements.setActiveBtn?.addEventListener('click', () => this.setActive());
-    this.elements.deleteBtn?.addEventListener('click', () => this.delete());
-    this.elements.duplicateBtn?.addEventListener('click', () => this.duplicate());
+    this.elements.saveBtn?.addEventListener('click', () => {
+      void this.save();
+    });
+    this.elements.setActiveBtn?.addEventListener('click', () => {
+      void this.setActive();
+    });
+    this.elements.deleteBtn?.addEventListener('click', () => {
+      void this.delete();
+    });
+    this.elements.duplicateBtn?.addEventListener('click', () => {
+      void this.duplicate();
+    });
 
     // New theme buttons
     this.elements.newMidnightBtn?.addEventListener('click', () => this.newTheme('midnight'));
@@ -215,7 +226,7 @@ export class ThemeEditor {
     this.elements.importBtn?.addEventListener('click', () => this.elements.importInput?.click());
     this.elements.importInput?.addEventListener('change', (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) this.importFromFile(file);
+      if (file) void this.importFromFile(file);
     });
 
     // Subscribe to theme manager changes
@@ -231,18 +242,32 @@ export class ThemeEditor {
         this.redo();
       } else if ((e.metaKey || e.ctrlKey) && e.key === 's') {
         e.preventDefault();
-        this.save();
+        void this.save();
       }
     });
   }
 
-  private loadInitialState(): void {
-    // Try to load active theme or create new one
-    const activePreset = this.manager.getActivePreset('midnight');
-    if (activePreset) {
-      this.loadPreset(activePreset);
-    } else {
-      this.newTheme('midnight');
+  private async loadInitialState(): Promise<void> {
+    try {
+      this.setStatus('Loading themes…', 'info');
+      await this.manager.initialize();
+
+      const activeMidnight = this.manager.getActivePreset('midnight');
+      const activeDawn = this.manager.getActivePreset('dawn');
+      const fallbackMidnight = this.manager.getPresets('midnight')[0] || null;
+      const fallbackDawn = this.manager.getPresets('dawn')[0] || null;
+
+      const preset = activeMidnight || activeDawn || fallbackMidnight || fallbackDawn;
+
+      if (preset) {
+        this.loadPreset(preset, true);
+        this.setStatus(`Loaded "${preset.name}"`, 'success');
+      } else {
+        this.newTheme('midnight');
+        this.setStatus('Ready to create a new theme', 'info');
+      }
+    } catch (error) {
+      this.setStatus(error instanceof Error ? error.message : 'Failed to load themes', 'error');
     }
   }
 
@@ -258,6 +283,7 @@ export class ThemeEditor {
   }
 
   private render(): void {
+    this.syncCurrentPreset();
     this.updateBreadcrumbs();
     this.updateUndoRedoButtons();
     this.renderForm();
@@ -267,6 +293,18 @@ export class ThemeEditor {
     this.updateScopeSections();
     this.updatePreview();
     this.updateContrastCheck();
+  }
+
+  private syncCurrentPreset(): void {
+    if (!this.state.currentPreset) return;
+
+    const latest = this.manager.getPreset(this.state.currentPreset.mode, this.state.currentPreset.slug);
+    if (latest && latest.updatedAt !== this.state.currentPreset.updatedAt) {
+      this.state = {
+        ...this.state,
+        currentPreset: latest,
+      };
+    }
   }
 
   private renderForm(): void {
@@ -583,13 +621,15 @@ export class ThemeEditor {
     };
   }
 
-  private loadPreset(preset: ThemePreset): void {
+  private loadPreset(preset: ThemePreset, silent = false): void {
     this.pushState({
       ...this.state,
       mode: preset.mode,
       currentPreset: preset,
     });
-    this.setStatus(`Loaded "${preset.name}"`, 'success');
+    if (!silent) {
+      this.setStatus(`Loaded "${preset.name}"`, 'success');
+    }
   }
 
   private newTheme(mode: ThemeMode): void {
@@ -601,57 +641,75 @@ export class ThemeEditor {
     this.setStatus(`Ready to create a new ${mode} theme`, 'info');
   }
 
-  private save(): void {
+  private async save(): Promise<void> {
+    const data = this.collectFormData();
+
+    if (!data.name || !data.slug) {
+      this.setStatus('Please provide a theme name', 'error');
+      return;
+    }
+
+    const isUpdate = !!this.state.currentPreset;
+
     try {
-      const data = this.collectFormData();
+      this.setStatus(isUpdate ? 'Updating theme…' : 'Creating theme…', 'info');
 
-      if (!data.name || !data.slug) {
-        this.setStatus('Please provide a theme name', 'error');
-        return;
-      }
+      const mode = (data.mode as ThemeMode) || this.state.mode;
 
-      if (this.state.currentPreset) {
-        // Update existing
-        const updated = this.manager.updatePreset(this.state.mode, this.state.currentPreset.slug, data);
-        this.pushState({ ...this.state, currentPreset: updated });
-        this.setStatus(`Updated "${updated.name}"`, 'success');
+      let result: ThemePreset;
+      if (isUpdate && this.state.currentPreset) {
+        result = await this.manager.updatePreset(this.state.mode, this.state.currentPreset.slug, {
+          name: data.name,
+          category: data.category,
+          variables: data.variables || {},
+          overrides: data.overrides,
+        });
       } else {
-        // Create new
-        const created = this.manager.createPreset(data as any);
-        this.pushState({ ...this.state, currentPreset: created });
-        this.setStatus(`Created "${created.name}"`, 'success');
+        result = await this.manager.createPreset({
+          name: data.name,
+          slug: data.slug,
+          mode,
+          category: data.category || 'custom',
+          variables: data.variables || {},
+          overrides: data.overrides,
+        });
       }
+
+      this.pushState({ ...this.state, mode: result.mode, currentPreset: result });
+      this.setStatus(`${isUpdate ? 'Updated' : 'Created'} "${result.name}"`, 'success');
     } catch (error) {
       this.setStatus(error instanceof Error ? error.message : 'Failed to save', 'error');
     }
   }
 
-  private setActive(): void {
-    try {
-      const preset = this.state.currentPreset;
-      if (!preset) {
-        this.setStatus('Please save the theme first', 'error');
-        return;
-      }
+  private async setActive(): Promise<void> {
+    const preset = this.state.currentPreset;
+    if (!preset) {
+      this.setStatus('Please save the theme first', 'error');
+      return;
+    }
 
-      this.manager.setActive(preset.mode, preset.slug);
-      this.render();
+    try {
+      this.setStatus('Setting active theme…', 'info');
+      await this.manager.setActive(preset.mode, preset.slug);
       this.setStatus(`Set "${preset.name}" as active ${preset.mode} theme`, 'success');
+      this.render();
     } catch (error) {
       this.setStatus(error instanceof Error ? error.message : 'Failed to set active', 'error');
     }
   }
 
-  private delete(): void {
+  private async delete(): Promise<void> {
+    const preset = this.state.currentPreset;
+    if (!preset) return;
+
+    if (!confirm(`Delete "${preset.name}"? This cannot be undone.`)) {
+      return;
+    }
+
     try {
-      const preset = this.state.currentPreset;
-      if (!preset) return;
-
-      if (!confirm(`Delete "${preset.name}"? This cannot be undone.`)) {
-        return;
-      }
-
-      this.manager.deletePreset(preset.mode, preset.slug);
+      this.setStatus('Deleting theme…', 'info');
+      await this.manager.deletePreset(preset.mode, preset.slug);
       this.newTheme(preset.mode);
       this.setStatus(`Deleted "${preset.name}"`, 'success');
     } catch (error) {
@@ -659,13 +717,14 @@ export class ThemeEditor {
     }
   }
 
-  private duplicate(): void {
-    try {
-      const preset = this.state.currentPreset;
-      if (!preset) return;
+  private async duplicate(): Promise<void> {
+    const preset = this.state.currentPreset;
+    if (!preset) return;
 
-      const duplicated = this.manager.duplicatePreset(preset.mode, preset.slug);
-      this.loadPreset(duplicated);
+    try {
+      this.setStatus('Duplicating theme…', 'info');
+      const duplicated = await this.manager.duplicatePreset(preset.mode, preset.slug);
+      this.loadPreset(duplicated, true);
       this.setStatus(`Duplicated as "${duplicated.name}"`, 'success');
     } catch (error) {
       this.setStatus(error instanceof Error ? error.message : 'Failed to duplicate', 'error');
@@ -714,19 +773,16 @@ export class ThemeEditor {
     try {
       const text = await file.text();
 
-      // Try to detect if it's a single preset or full state
       const parsed = JSON.parse(text);
       if (parsed.presets) {
-        // Full state
         const merge = confirm('Merge with existing themes? (Cancel to replace all themes)');
-        this.manager.importAll(text, merge);
+        await this.manager.importAll(text, merge);
         this.render();
         this.setStatus('Imported themes', 'success');
       } else {
-        // Single preset
         const overwrite = confirm('Overwrite if theme already exists?');
-        const imported = this.manager.importPreset(text, overwrite);
-        this.loadPreset(imported);
+        const imported = await this.manager.importPreset(text, overwrite);
+        this.loadPreset(imported, true);
         this.setStatus(`Imported "${imported.name}"`, 'success');
       }
     } catch (error) {

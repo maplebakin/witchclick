@@ -1,6 +1,6 @@
 /**
  * Theme Manager
- * Manages theme presets with localStorage persistence
+ * Thin client around the development API for managing theme presets.
  */
 
 export type ThemeMode = 'midnight' | 'dawn';
@@ -128,8 +128,6 @@ export interface ThemeState {
   };
 }
 
-const STORAGE_KEY = 'witchclick_themes';
-
 const DEFAULT_VARIABLES: Record<ThemeMode, ThemeVariables> = {
   midnight: {
     // Core Brand Colors
@@ -199,24 +197,32 @@ const DEFAULT_VARIABLES: Record<ThemeMode, ThemeVariables> = {
     colorAmethyst: '#b49ad9',
     colorDusk: '#f2ecfa',
     colorGold: '#caa043',
-    colorRune: '#fffdf6',
-    colorFog: '#e5daf5',
+    colorRune: '#2c1b3d',
+    colorFog: '#f6f0e8',
     colorInk: '#2c1b3d',
+    colorMuted: '#6b5d70',
+    colorBorder: '#f0e5ff',
+    colorBorderStrong: '#c7b6e8',
+    colorOverlay: 'rgba(244, 236, 255, 0.35)',
+    colorOverlayStrong: 'rgba(215, 197, 248, 0.55)',
 
     // Surface Colors
-    surfacePlain: 'rgba(252, 248, 242, 0.96)',
-    cardPanelSurface: 'rgba(255, 252, 247, 0.92)',
-    cardPanelSurfaceStrong: 'rgba(248, 244, 240, 0.95)',
-    cardPanelBorder: 'rgba(155, 134, 200, 0.32)',
-    cardPanelBorderStrong: 'rgba(155, 134, 200, 0.48)',
-    cardPanelBorderSoft: 'rgba(155, 134, 200, 0.28)',
+    surfacePlain: '#f7f3f8',
+    surfacePlainBorder: 'rgba(155, 134, 200, 0.28)',
+    cardPanelSurface: '#f6f0e8',
+    cardPanelSurfaceStrong: '#efe6f7',
+    cardPanelBorder: 'rgba(155, 134, 200, 0.35)',
+    cardPanelBorderStrong: 'rgba(155, 134, 200, 0.45)',
+    cardPanelBorderSoft: 'rgba(155, 134, 200, 0.26)',
 
     // Text Colors
-    textPrimary: 'rgba(44, 27, 61, 1)',
-    textSecondary: 'rgba(44, 27, 61, 0.9)',
-    textTertiary: 'rgba(44, 27, 61, 0.75)',
+    textPrimary: '#2c1b3d',
+    textSecondary: '#4a375f',
+    textTertiary: '#6b5d70',
+    textHint: '#8f77b8',
+    textDisabled: '#bfaed9',
     inkBody: '#2c1b3d',
-    inkStrong: '#1a0e28',
+    inkStrong: '#120725',
     inkMuted: '#6b5d70',
     linkColor: '#8f77b8',
 
@@ -286,12 +292,67 @@ export function validatePreset(preset: Partial<ThemePreset>): string[] {
   return errors;
 }
 
-export class ThemeManager {
-  private state: ThemeState;
-  private listeners: Set<(state: ThemeState) => void> = new Set();
+export interface ThemeManagerOptions {
+  baseUrl?: string;
+}
 
-  constructor() {
-    this.state = this.loadState();
+interface ThemeRecord {
+  slug: string;
+  label?: string;
+  mode: ThemeMode;
+  category?: string;
+  settings?: Record<string, string>;
+}
+
+interface ThemeListResponse {
+  items?: {
+    midnight?: ThemeRecord[];
+    dawn?: ThemeRecord[];
+  };
+  active?: {
+    midnight?: string | null;
+    dawn?: string | null;
+  };
+}
+
+interface ThemeSaveResponse {
+  theme: ThemeRecord;
+}
+
+interface ThemeSetActiveResponse {
+  active?: {
+    midnight?: string | null;
+    dawn?: string | null;
+  };
+  theme?: ThemeRecord;
+}
+
+interface ThemeDeleteResponse {
+  slug: string;
+  mode: ThemeMode;
+  active?: {
+    midnight?: string | null;
+    dawn?: string | null;
+  };
+}
+
+export class ThemeManager {
+  private state: ThemeState = {
+    presets: {
+      midnight: [],
+      dawn: [],
+    },
+    active: {
+      midnight: null,
+      dawn: null,
+    },
+  };
+
+  private listeners: Set<(state: ThemeState) => void> = new Set();
+  private readonly baseUrl: string;
+
+  constructor(options: ThemeManagerOptions = {}) {
+    this.baseUrl = this.normalizeBaseUrl(options.baseUrl);
   }
 
   /**
@@ -306,21 +367,28 @@ export class ThemeManager {
    * Get current state
    */
   getState(): ThemeState {
-    return JSON.parse(JSON.stringify(this.state));
+    return {
+      presets: {
+        midnight: this.state.presets.midnight.map((preset) => this.clonePreset(preset)),
+        dawn: this.state.presets.dawn.map((preset) => this.clonePreset(preset)),
+      },
+      active: { ...this.state.active },
+    };
   }
 
   /**
    * Get all presets for a mode
    */
   getPresets(mode: ThemeMode): ThemePreset[] {
-    return [...this.state.presets[mode]];
+    return this.state.presets[mode].map((preset) => this.clonePreset(preset));
   }
 
   /**
    * Get a preset by slug
    */
   getPreset(mode: ThemeMode, slug: string): ThemePreset | null {
-    return this.state.presets[mode].find((p) => p.slug === slug) || null;
+    const preset = this.state.presets[mode].find((p) => p.slug === slug);
+    return preset ? this.clonePreset(preset) : null;
   }
 
   /**
@@ -333,167 +401,154 @@ export class ThemeManager {
   }
 
   /**
+   * Load the latest data from the backend
+   */
+  async initialize(): Promise<void> {
+    const data = await this.request<ThemeListResponse>('/themes/list');
+
+    const midnightRecords = Array.isArray(data.items?.midnight) ? data.items?.midnight ?? [] : [];
+    const dawnRecords = Array.isArray(data.items?.dawn) ? data.items?.dawn ?? [] : [];
+
+    this.state = {
+      presets: {
+        midnight: midnightRecords.map((record) => this.mergePresetFromRecord(record, null, false)),
+        dawn: dawnRecords.map((record) => this.mergePresetFromRecord(record, null, false)),
+      },
+      active: {
+        midnight: data.active?.midnight ?? null,
+        dawn: data.active?.dawn ?? null,
+      },
+    };
+
+    this.sortPresets();
+    this.notifyListeners();
+  }
+
+  /**
    * Create a new preset
    */
-  createPreset(preset: Omit<ThemePreset, 'createdAt' | 'updatedAt'>): ThemePreset {
-    const errors = validatePreset(preset);
-    if (errors.length > 0) {
-      throw new Error(errors.join(', '));
-    }
-
-    // Check for duplicate slug
-    if (this.getPreset(preset.mode, preset.slug)) {
-      throw new Error(`A theme with slug "${preset.slug}" already exists`);
-    }
-
+  async createPreset(preset: Omit<ThemePreset, 'createdAt' | 'updatedAt'>): Promise<ThemePreset> {
     const now = new Date().toISOString();
-    const newPreset: ThemePreset = {
+    const draft: ThemePreset = {
       ...preset,
       createdAt: now,
       updatedAt: now,
     };
 
-    this.state.presets[preset.mode].push(newPreset);
-    this.saveState();
-    this.notifyListeners();
+    const errors = validatePreset(draft);
+    if (errors.length > 0) {
+      throw new Error(errors.join(', '));
+    }
 
-    return { ...newPreset };
+    return this.persistPreset(draft);
   }
 
   /**
    * Update a preset
    */
-  updatePreset(mode: ThemeMode, slug: string, updates: Partial<Omit<ThemePreset, 'slug' | 'mode' | 'createdAt'>>): ThemePreset {
-    const index = this.state.presets[mode].findIndex((p) => p.slug === slug);
-    if (index === -1) {
+  async updatePreset(
+    mode: ThemeMode,
+    slug: string,
+    updates: Partial<Omit<ThemePreset, 'slug' | 'mode' | 'createdAt'>>
+  ): Promise<ThemePreset> {
+    const existing = this.state.presets[mode].find((p) => p.slug === slug);
+    if (!existing) {
       throw new Error(`Theme with slug "${slug}" not found`);
     }
 
-    const preset = this.state.presets[mode][index];
-    if (!preset) {
-      throw new Error(`Theme at index ${index} not found`);
-    }
-    const updatedPreset: ThemePreset = {
-      ...preset,
+    const merged: ThemePreset = {
+      ...existing,
       ...updates,
-      slug: preset.slug, // Prevent slug changes
-      mode: preset.mode, // Prevent mode changes
-      createdAt: preset.createdAt, // Preserve creation date
+      name: updates.name ?? existing.name,
+      category: updates.category ?? existing.category,
+      variables: { ...existing.variables, ...(updates.variables || {}) },
+      overrides: updates.overrides
+        ? this.cloneOverrides(updates.overrides)
+        : existing.overrides
+        ? this.cloneOverrides(existing.overrides)
+        : undefined,
       updatedAt: new Date().toISOString(),
     };
 
-    this.state.presets[mode][index] = updatedPreset;
-    this.saveState();
-    this.notifyListeners();
-
-    return { ...updatedPreset };
-  }
-
-  /**
-   * Rename a preset (changes slug)
-   */
-  renamePreset(mode: ThemeMode, oldSlug: string, newName: string, newSlug?: string): ThemePreset {
-    const preset = this.getPreset(mode, oldSlug);
-    if (!preset) {
-      throw new Error(`Theme with slug "${oldSlug}" not found`);
+    const errors = validatePreset(merged);
+    if (errors.length > 0) {
+      throw new Error(errors.join(', '));
     }
 
-    const finalSlug = newSlug || slugify(newName);
-
-    // Check if new slug conflicts with another preset
-    if (finalSlug !== oldSlug && this.getPreset(mode, finalSlug)) {
-      throw new Error(`A theme with slug "${finalSlug}" already exists`);
-    }
-
-    // Update preset
-    const index = this.state.presets[mode].findIndex((p) => p.slug === oldSlug);
-    const updatedPreset: ThemePreset = {
-      ...preset,
-      name: newName,
-      slug: finalSlug,
-      updatedAt: new Date().toISOString(),
-    };
-
-    this.state.presets[mode][index] = updatedPreset;
-
-    // Update active reference if this was the active theme
-    if (this.state.active[mode] === oldSlug) {
-      this.state.active[mode] = finalSlug;
-    }
-
-    this.saveState();
-    this.notifyListeners();
-
-    return { ...updatedPreset };
+    return this.persistPreset(merged, existing);
   }
 
   /**
    * Duplicate a preset
    */
-  duplicatePreset(mode: ThemeMode, slug: string, newName?: string): ThemePreset {
-    const preset = this.getPreset(mode, slug);
+  async duplicatePreset(mode: ThemeMode, slug: string): Promise<ThemePreset> {
+    const preset = this.state.presets[mode].find((p) => p.slug === slug);
     if (!preset) {
       throw new Error(`Theme with slug "${slug}" not found`);
     }
 
-    const baseName = newName || `${preset.name} (Copy)`;
-    let finalName = baseName;
-    let finalSlug = slugify(finalName);
+    const baseName = `${preset.name} (Copy)`;
     let counter = 1;
+    let nextName = baseName;
+    let nextSlug = slugify(nextName);
 
-    // Ensure unique slug
-    while (this.getPreset(mode, finalSlug)) {
-      finalName = `${baseName} ${counter}`;
-      finalSlug = slugify(finalName);
-      counter++;
+    while (this.state.presets[mode].some((p) => p.slug === nextSlug)) {
+      counter += 1;
+      nextName = `${baseName} ${counter}`;
+      nextSlug = slugify(nextName);
     }
 
     const now = new Date().toISOString();
-    const duplicatedPreset: ThemePreset = {
+    const duplicate: ThemePreset = {
       ...preset,
-      name: finalName,
-      slug: finalSlug,
+      name: nextName,
+      slug: nextSlug,
       createdAt: now,
       updatedAt: now,
+      variables: { ...preset.variables },
+      overrides: preset.overrides ? this.cloneOverrides(preset.overrides) : undefined,
     };
 
-    this.state.presets[mode].push(duplicatedPreset);
-    this.saveState();
-    this.notifyListeners();
-
-    return { ...duplicatedPreset };
+    return this.persistPreset(duplicate);
   }
 
   /**
    * Delete a preset
    */
-  deletePreset(mode: ThemeMode, slug: string): void {
-    const index = this.state.presets[mode].findIndex((p) => p.slug === slug);
-    if (index === -1) {
-      throw new Error(`Theme with slug "${slug}" not found`);
+  async deletePreset(mode: ThemeMode, slug: string): Promise<void> {
+    await this.request<ThemeDeleteResponse>('/themes/delete', { mode, slug });
+
+    const list = this.state.presets[mode];
+    const index = list.findIndex((p) => p.slug === slug);
+    if (index !== -1) {
+      list.splice(index, 1);
     }
 
-    this.state.presets[mode].splice(index, 1);
-
-    // Clear active if this was the active theme
     if (this.state.active[mode] === slug) {
       this.state.active[mode] = null;
     }
 
-    this.saveState();
     this.notifyListeners();
   }
 
   /**
    * Set active preset
    */
-  setActive(mode: ThemeMode, slug: string | null): void {
-    if (slug && !this.getPreset(mode, slug)) {
-      throw new Error(`Theme with slug "${slug}" not found`);
+  async setActive(mode: ThemeMode, slug: string): Promise<void> {
+    const data = await this.request<ThemeSetActiveResponse>('/themes/set-active', { mode, slug });
+
+    if (data.active) {
+      this.state.active = {
+        midnight: data.active.midnight ?? this.state.active.midnight,
+        dawn: data.active.dawn ?? this.state.active.dawn,
+      };
     }
 
-    this.state.active[mode] = slug;
-    this.saveState();
+    if (data.theme) {
+      const merged = this.mergePresetFromRecord(data.theme, this.state.presets[mode].find((p) => p.slug === data.theme.slug));
+      this.upsertPreset(merged, false);
+    }
+
     this.notifyListeners();
   }
 
@@ -501,25 +556,25 @@ export class ThemeManager {
    * Export preset as JSON
    */
   exportPreset(mode: ThemeMode, slug: string): string {
-    const preset = this.getPreset(mode, slug);
+    const preset = this.state.presets[mode].find((p) => p.slug === slug);
     if (!preset) {
       throw new Error(`Theme with slug "${slug}" not found`);
     }
 
-    return JSON.stringify(preset, null, 2);
+    return JSON.stringify(this.clonePreset(preset), null, 2);
   }
 
   /**
    * Export all presets as JSON
    */
   exportAll(): string {
-    return JSON.stringify(this.state, null, 2);
+    return JSON.stringify(this.getState(), null, 2);
   }
 
   /**
    * Import preset from JSON
    */
-  importPreset(json: string, overwrite = false): ThemePreset {
+  async importPreset(json: string, overwrite = false): Promise<ThemePreset> {
     let preset: ThemePreset;
     try {
       preset = JSON.parse(json);
@@ -532,8 +587,8 @@ export class ThemeManager {
       throw new Error(`Invalid preset: ${errors.join(', ')}`);
     }
 
-    // Check if preset already exists
-    const existing = this.getPreset(preset.mode, preset.slug);
+    const existing = this.state.presets[preset.mode].find((p) => p.slug === preset.slug);
+
     if (existing && !overwrite) {
       throw new Error(`Theme with slug "${preset.slug}" already exists. Use overwrite option to replace it.`);
     }
@@ -545,22 +600,22 @@ export class ThemeManager {
         variables: preset.variables,
         overrides: preset.overrides,
       });
-    } else {
-      return this.createPreset({
-        name: preset.name,
-        slug: preset.slug,
-        mode: preset.mode,
-        category: preset.category,
-        variables: preset.variables,
-        overrides: preset.overrides,
-      });
     }
+
+    return this.createPreset({
+      name: preset.name,
+      slug: preset.slug,
+      mode: preset.mode,
+      category: preset.category,
+      variables: preset.variables,
+      overrides: preset.overrides,
+    });
   }
 
   /**
    * Import all presets from JSON
    */
-  importAll(json: string, merge = false): void {
+  async importAll(json: string, merge = false): Promise<void> {
     let importedState: ThemeState;
     try {
       importedState = JSON.parse(json);
@@ -572,41 +627,52 @@ export class ThemeManager {
       throw new Error('Invalid theme state format');
     }
 
-    if (merge) {
-      // Merge with existing presets
-      importedState.presets.midnight.forEach((preset) => {
-        const existing = this.getPreset('midnight', preset.slug);
-        if (existing) {
-          this.updatePreset('midnight', preset.slug, {
-            name: preset.name,
-            category: preset.category,
-            variables: preset.variables,
-            overrides: preset.overrides,
-          });
-        } else {
-          this.createPreset(preset);
-        }
-      });
+    if (!merge) {
+      const existing = [
+        ...this.state.presets.midnight.map((preset) => ({ mode: 'midnight' as ThemeMode, slug: preset.slug })),
+        ...this.state.presets.dawn.map((preset) => ({ mode: 'dawn' as ThemeMode, slug: preset.slug })),
+      ];
 
-      importedState.presets.dawn.forEach((preset) => {
-        const existing = this.getPreset('dawn', preset.slug);
-        if (existing) {
-          this.updatePreset('dawn', preset.slug, {
-            name: preset.name,
-            category: preset.category,
-            variables: preset.variables,
-            overrides: preset.overrides,
-          });
-        } else {
-          this.createPreset(preset);
-        }
-      });
-    } else {
-      // Replace all presets
-      this.state = importedState;
-      this.saveState();
-      this.notifyListeners();
+      for (const { mode, slug } of existing) {
+        await this.deletePreset(mode, slug);
+      }
     }
+
+    for (const preset of importedState.presets.midnight) {
+      await this.createPreset({
+        name: preset.name,
+        slug: preset.slug,
+        mode: 'midnight',
+        category: preset.category,
+        variables: preset.variables,
+        overrides: preset.overrides,
+      });
+    }
+
+    for (const preset of importedState.presets.dawn) {
+      await this.createPreset({
+        name: preset.name,
+        slug: preset.slug,
+        mode: 'dawn',
+        category: preset.category,
+        variables: preset.variables,
+        overrides: preset.overrides,
+      });
+    }
+
+    if (importedState.active.midnight) {
+      await this.setActive('midnight', importedState.active.midnight);
+    } else {
+      this.state.active.midnight = null;
+    }
+
+    if (importedState.active.dawn) {
+      await this.setActive('dawn', importedState.active.dawn);
+    } else {
+      this.state.active.dawn = null;
+    }
+
+    this.notifyListeners();
   }
 
   /**
@@ -617,74 +683,153 @@ export class ThemeManager {
   }
 
   /**
-   * Load state from localStorage
+   * Clear all presets (helper for tests)
    */
-  private loadState(): ThemeState {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored) as ThemeState;
-        return {
-          presets: {
-            midnight: Array.isArray(parsed.presets?.midnight) ? parsed.presets.midnight : [],
-            dawn: Array.isArray(parsed.presets?.dawn) ? parsed.presets.dawn : [],
-          },
-          active: {
-            midnight: parsed.active?.midnight || null,
-            dawn: parsed.active?.dawn || null,
-          },
-        };
-      }
-    } catch (error) {
-      console.error('[ThemeManager] Failed to load state:', error);
+  async clearAll(): Promise<void> {
+    await this.importAll(
+      JSON.stringify({
+        presets: { midnight: [], dawn: [] },
+        active: { midnight: null, dawn: null },
+      }),
+      false
+    );
+  }
+
+  private normalizeBaseUrl(baseUrl?: string): string {
+    const fallback = 'http://localhost:8787';
+    if (!baseUrl) return fallback;
+    return baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  }
+
+  private clonePreset(preset: ThemePreset): ThemePreset {
+    return {
+      ...preset,
+      variables: { ...preset.variables },
+      overrides: preset.overrides ? this.cloneOverrides(preset.overrides) : undefined,
+    };
+  }
+
+  private cloneOverrides(overrides: ThemeOverride[]): ThemeOverride[] {
+    return overrides.map((override) => ({
+      scope: override.scope,
+      variables: { ...override.variables },
+    }));
+  }
+
+  private sortPresets(): void {
+    (['midnight', 'dawn'] as ThemeMode[]).forEach((mode) => {
+      this.sortList(this.state.presets[mode]);
+    });
+  }
+
+  private sortList(list: ThemePreset[]): void {
+    list.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  private buildSavePayload(preset: ThemePreset) {
+    const defaults = this.getDefaultVariables(preset.mode);
+    const mergedVariables: Record<string, string> = {};
+
+    const combined = { ...defaults, ...preset.variables } as Record<string, string | undefined>;
+    for (const [key, value] of Object.entries(combined)) {
+      if (typeof value !== 'string') continue;
+      const trimmed = value.trim();
+      if (!trimmed) continue;
+      mergedVariables[key] = trimmed;
     }
 
     return {
-      presets: {
-        midnight: [],
-        dawn: [],
-      },
-      active: {
-        midnight: null,
-        dawn: null,
-      },
+      label: preset.name,
+      slug: preset.slug,
+      mode: preset.mode,
+      category: preset.category,
+      settings: mergedVariables,
     };
   }
 
-  /**
-   * Save state to localStorage
-   */
-  private saveState(): void {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
-    } catch (error) {
-      console.error('[ThemeManager] Failed to save state:', error);
-      throw new Error('Failed to save theme state. localStorage might be full or disabled.');
+  private mergePresetFromRecord(
+    record: ThemeRecord,
+    fallback: ThemePreset | null = null,
+    notify = true
+  ): ThemePreset {
+    const existing = fallback ?? this.state.presets[record.mode].find((p) => p.slug === record.slug) ?? null;
+    const defaults = this.getDefaultVariables(record.mode);
+    const variables = {
+      ...defaults,
+      ...(existing?.variables || {}),
+      ...(record.settings || {}),
+    };
+    const now = new Date().toISOString();
+
+    const merged: ThemePreset = {
+      name: record.label || existing?.name || record.slug,
+      slug: record.slug,
+      mode: record.mode,
+      category: record.category || existing?.category || 'custom',
+      variables,
+      overrides: existing?.overrides ? this.cloneOverrides(existing.overrides) : undefined,
+      createdAt: existing?.createdAt || now,
+      updatedAt: now,
+    };
+
+    if (notify) {
+      this.upsertPreset(merged);
+    }
+
+    return merged;
+  }
+
+  private upsertPreset(preset: ThemePreset, notify = true): void {
+    const list = this.state.presets[preset.mode];
+    const index = list.findIndex((p) => p.slug === preset.slug);
+    if (index >= 0) {
+      list[index] = preset;
+    } else {
+      list.push(preset);
+    }
+    this.sortList(list);
+    if (notify) {
+      this.notifyListeners();
     }
   }
 
-  /**
-   * Notify all listeners
-   */
-  private notifyListeners(): void {
-    this.listeners.forEach((listener) => listener(this.getState()));
+  private async persistPreset(preset: ThemePreset, existing?: ThemePreset): Promise<ThemePreset> {
+    const payload = this.buildSavePayload(preset);
+    const data = await this.request<ThemeSaveResponse>('/themes/save', payload);
+
+    const merged = this.mergePresetFromRecord(data.theme, existing ?? preset, false);
+    this.upsertPreset(merged);
+    return this.clonePreset(merged);
   }
 
-  /**
-   * Clear all data (for testing or reset)
-   */
-  clearAll(): void {
-    this.state = {
-      presets: {
-        midnight: [],
-        dawn: [],
-      },
-      active: {
-        midnight: null,
-        dawn: null,
-      },
-    };
-    this.saveState();
-    this.notifyListeners();
+  private async request<T>(path: string, payload?: unknown): Promise<T> {
+    const url = `${this.baseUrl}${path}`;
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: payload ? { 'Content-Type': 'application/json' } : undefined,
+        body: payload ? JSON.stringify(payload) : undefined,
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok || !data?.ok) {
+        const message = data?.error || `Request to ${path} failed with status ${response.status}`;
+        throw new Error(message);
+      }
+
+      return data as T;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error(`Request to ${path} failed`);
+    }
+  }
+
+  private notifyListeners(): void {
+    const snapshot = this.getState();
+    this.listeners.forEach((listener) => listener(snapshot));
   }
 }

@@ -63,15 +63,24 @@
 
   <div class="test-section">
     <h2>Test: Create "Autumn Harvest" Theme</h2>
+    <label class="block text-sm font-medium mb-2">
+      Dev API base URL
+      <input
+        id="devApiBase"
+        type="text"
+        value="http://localhost:8787"
+        class="mt-1 w-full rounded border px-2 py-1"
+        placeholder="http://localhost:8787"
+      />
+    </label>
     <button onclick="runTest()">🍂 Run Test</button>
-    <button onclick="clearStorage()">🗑️ Clear Storage</button>
-    <button onclick="viewStorage()">👁️ View Storage</button>
+    <button onclick="refreshThemes()">🔄 Refresh Theme List</button>
     <div id="results"></div>
   </div>
 
-  <div class="test-section" id="storageView" style="display: none;">
-    <h2>Current Storage Contents</h2>
-    <pre id="storageContents"></pre>
+  <div class="test-section" id="themeListSection" style="display: none;">
+    <h2>Current Theme State</h2>
+    <pre id="themeList"></pre>
   </div>
 
   <script type="module">
@@ -87,8 +96,11 @@
   </script>
 
   <script>
+    const DEFAULT_API_BASE = 'http://localhost:8787';
+
     function log(message, isError = false) {
       const results = document.getElementById('results');
+      if (!results) return;
       const div = document.createElement('div');
       div.className = 'test-result ' + (isError ? 'error' : 'success');
       div.textContent = (isError ? '❌ ' : '✅ ') + message;
@@ -96,7 +108,50 @@
     }
 
     function clearLogs() {
-      document.getElementById('results').innerHTML = '';
+      const results = document.getElementById('results');
+      if (results) results.innerHTML = '';
+    }
+
+    function getDevApiBase() {
+      const input = document.getElementById('devApiBase');
+      const value = input && 'value' in input ? input.value : '';
+      const trimmed = (value || '').trim();
+      return trimmed || DEFAULT_API_BASE;
+    }
+
+    function showThemeState(state) {
+      const section = document.getElementById('themeListSection');
+      const pre = document.getElementById('themeList');
+      if (!section || !pre) return;
+      pre.textContent = JSON.stringify(state, null, 2);
+      section.style.display = 'block';
+    }
+
+    async function createManager() {
+      if (!window.ThemeManager) {
+        throw new Error('ThemeManager not loaded');
+      }
+      const baseUrl = getDevApiBase();
+      const manager = new window.ThemeManager({ baseUrl });
+      await manager.initialize();
+      return manager;
+    }
+
+    async function refreshThemes(existingManager, quiet = false) {
+      try {
+        const manager = existingManager || (await createManager());
+        showThemeState(manager.getState());
+        if (!quiet) {
+          log('Theme list refreshed from API.');
+        }
+        return manager;
+      } catch (error) {
+        if (!quiet) {
+          log(`Failed to refresh themes: ${error?.message || error}`, true);
+          return existingManager || null;
+        }
+        throw error;
+      }
     }
 
     async function runTest() {
@@ -104,127 +159,79 @@
       log('Starting theme editor test...');
 
       try {
-        // Wait a bit for modules to load
-        await new Promise(resolve => setTimeout(resolve, 500));
+        const manager = await createManager();
+        log('Connected to dev API and synced themes.');
 
-        if (!window.ThemeManager) {
-          throw new Error('ThemeManager not loaded');
-        }
-
-        // Initialize theme manager
-        log('Initializing ThemeManager...');
-        const manager = new window.ThemeManager();
-
-        // Create autumn/fall theme
-        log('Creating "Autumn Harvest" theme...');
         const fallTheme = {
           name: 'Autumn Harvest',
           slug: 'autumn-harvest',
           mode: 'midnight',
           category: 'seasonal',
           variables: {
-            primary: '#d97706',      // Warm orange
-            accent: '#92400e',       // Deep amber
-            background: '#1c1410',   // Dark brown
-            textPrimary: '#fef3c7',  // Light cream
-            textHeading: '#fbbf24',  // Golden yellow
-            textMuted: '#d97706',    // Muted orange
+            primary: '#d97706',
+            accent: '#92400e',
+            background: '#1c1410',
+            textPrimary: '#fef3c7',
+            textHeading: '#fbbf24',
+            textMuted: '#d97706',
             fontSerif: 'Cormorant Garamond',
             fontScript: 'Dancing Script',
           },
         };
 
-        const created = manager.createPreset(fallTheme);
+        const existing = manager.getPreset('midnight', fallTheme.slug);
+        if (existing) {
+          log('Removing existing test theme before running checks...');
+          await manager.deletePreset('midnight', fallTheme.slug);
+        }
+
+        log('Creating "Autumn Harvest" theme...');
+        const created = await manager.createPreset(fallTheme);
         log(`Created theme: "${created.name}" (${created.slug})`);
         log(`  Primary: ${created.variables.primary}`);
         log(`  Accent: ${created.variables.accent}`);
         log(`  Background: ${created.variables.background}`);
 
-        // Test contrast
-        log('Testing contrast ratios...');
         if (window.checkContrast) {
           const contrast = window.checkContrast(
             created.variables.textPrimary,
             created.variables.background
           );
-          log(`  Contrast ratio: ${contrast.ratio.toFixed(2)}:1 (${contrast.score})`);
+          log(`Contrast ratio: ${contrast.ratio.toFixed(2)}:1 (${contrast.score})`);
         }
 
-        // Set as active
         log('Setting as active midnight theme...');
-        manager.setActive('midnight', created.slug);
-        const activePreset = manager.getActivePreset('midnight');
-        if (activePreset?.slug === created.slug) {
-          log('Successfully set as active theme!');
-        }
+        await manager.setActive('midnight', created.slug);
 
-        // Test duplicate
-        log('Testing duplicate functionality...');
-        const duplicated = manager.duplicatePreset('midnight', created.slug);
-        log(`Duplicated as: "${duplicated.name}" (${duplicated.slug})`);
+        log('Duplicating theme for comparison...');
+        const duplicated = await manager.duplicatePreset('midnight', created.slug);
+        log(`Duplicated as "${duplicated.name}" (${duplicated.slug})`);
 
-        // Test update
-        log('Testing update functionality...');
-        const updated = manager.updatePreset('midnight', created.slug, {
+        log('Updating accent color via API...');
+        const updated = await manager.updatePreset('midnight', created.slug, {
           variables: {
             ...created.variables,
-            accent: '#b45309', // Change accent
+            accent: '#b45309',
           },
         });
         log(`Updated accent color to: ${updated.variables.accent}`);
 
-        // Test export
-        log('Testing export functionality...');
         const exported = manager.exportPreset('midnight', created.slug);
         log(`Exported JSON length: ${exported.length} characters`);
 
-        // Get all presets
-        const allPresets = manager.getPresets('midnight');
-        log(`Total midnight themes: ${allPresets.length}`);
+        await refreshThemes(manager, true);
 
-        // Test undo/redo
-        log('Testing undo/redo system...');
-        const undoRedo = new window.UndoRedo({ value: 1 }, 50);
-        undoRedo.push({ value: 2 });
-        undoRedo.push({ value: 3 });
-        log(`  Current state: ${undoRedo.getState().value}`);
-        undoRedo.undo();
-        log(`  After undo: ${undoRedo.getState().value}`);
-        undoRedo.redo();
-        log(`  After redo: ${undoRedo.getState().value}`);
+        log(`Cleaning up duplicate theme (${duplicated.slug})...`);
+        await manager.deletePreset('midnight', duplicated.slug);
 
+        log('Cleaning up primary test theme...');
+        await manager.deletePreset('midnight', created.slug);
+
+        await refreshThemes(manager, true);
         log('🎉 All tests passed!');
-        log('You can now visit /admin/theme to see the "Autumn Harvest" theme');
-
       } catch (error) {
-        log(`Error: ${error.message}`, true);
+        log(`Error: ${error?.message || error}`, true);
         console.error('Test error:', error);
-      }
-    }
-
-    function clearStorage() {
-      localStorage.removeItem('witchclick_themes');
-      clearLogs();
-      log('Storage cleared! Refresh the page to start fresh.');
-    }
-
-    function viewStorage() {
-      const storageView = document.getElementById('storageView');
-      const storageContents = document.getElementById('storageContents');
-      const data = localStorage.getItem('witchclick_themes');
-
-      if (data) {
-        try {
-          const parsed = JSON.parse(data);
-          storageContents.textContent = JSON.stringify(parsed, null, 2);
-          storageView.style.display = 'block';
-        } catch (e) {
-          storageContents.textContent = 'Error parsing storage: ' + e.message;
-          storageView.style.display = 'block';
-        }
-      } else {
-        storageContents.textContent = 'No theme data in storage.';
-        storageView.style.display = 'block';
       }
     }
   </script>
