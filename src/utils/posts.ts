@@ -19,7 +19,7 @@ class Slugger {
       .replace(/^-+|-+$/g, "");
 
     const originalSlug = slug;
-    let count = this.seen[originalSlug] || 0;
+    const count = this.seen[originalSlug] || 0;
 
     if (count > 0) {
       slug = `${originalSlug}-${count}`;
