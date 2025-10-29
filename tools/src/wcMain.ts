@@ -224,12 +224,18 @@ async function cmdExport(flags: Flags) {
   const slug = String(flags.slug ?? '');
   const format = String(flags.format ?? 'html');
   if (!slug) {
-    console.error('Usage: export --slug my-post [--format html]');
+    console.error('Usage: export --slug my-post [--format html|pdf]');
     process.exitCode = 1;
     return;
   }
   const mod = await import('./export.js');
-  await (mod as any).exportCmd(['--slug', slug, '--format', format]);
+  try {
+    await (mod as any).exportCmd(['--slug', slug, '--format', format]);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`[export] ${message}`);
+    process.exitCode = 1;
+  }
 }
 
 async function cmdCursesExport(flags: Flags) {
@@ -324,7 +330,8 @@ export async function main(argv: string[] = process.argv.slice(2)) {
           '  node tools/wc.js ingest --from-file drafts/latest.json',
           '  node tools/wc.js linker',
           '  node tools/wc.js seo --slug my-post [--apply]',
-          '  node tools/wc.js export --slug my-post --format html',
+          '  node tools/wc.js export --slug my-post --format html|pdf',
+          '      (PDF output requires `npm run tools:export:install` once)',
           '  node tools/wc.js go:build',
           '  node tools/wc.js health',
           '',

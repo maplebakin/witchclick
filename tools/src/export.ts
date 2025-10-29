@@ -3,9 +3,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
 import { renderMarkdown } from './render';
-import { readJSON, writeFileEnsure } from './utils';
+import { readJSON, writeBufferEnsure, writeFileEnsure } from './utils';
 
-export function exportCmd(args: string[]) {
+export async function exportCmd(args: string[]) {
   const slug = getArg(args, '--slug');
   const format = getArg(args, '--format', 'html');
   if (!slug) throw new Error('--slug required');
@@ -60,22 +60,71 @@ export function exportCmd(args: string[]) {
     heroImageAlt: heroAlt,
   });
 
-  if (format === 'html') {
-    const page = htmlShell({
-      title: String(data.title || ''),
-      description: String(data.metaDescription || ''),
-      canonical: toAbsoluteUrl(settings.siteUrl, `/post/${slug}`),
-      ogImage: heroSrc || '',
-      bodyHtml: `<div class="post">${htmlBody}</div>`,
-    });
+  const pageHtml = htmlShell({
+    title: String(data.title || ''),
+    description: String(data.metaDescription || ''),
+    canonical: toAbsoluteUrl(settings.siteUrl, `/post/${slug}`),
+    ogImage: heroSrc || '',
+    bodyHtml: `<div class="post">${htmlBody}</div>`,
+  });
 
+  if (format === 'html') {
     const out = path.join(DIST_EXPORTS, `${slug}.html`);
-    writeFileEnsure(out, page);
+    writeFileEnsure(out, pageHtml);
     process.stdout.write(`Wrote ${out}\n`);
   } else if (format === 'pdf') {
-    throw new Error('PDF export not implemented in this build. Use --format html.');
+    const out = path.join(DIST_EXPORTS, `${slug}.pdf`);
+    try {
+      await renderPdf(pageHtml, out);
+      process.stdout.write(`Wrote ${out}\n`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`PDF export failed: ${message}`);
+    }
   } else {
     throw new Error('Unknown format');
+  }
+}
+
+async function renderPdf(html: string, outPath: string) {
+  let playwright: typeof import('playwright');
+  try {
+    playwright = await import('playwright');
+  } catch {
+    throw new Error(
+      'Playwright is not installed. Run `npm run tools:export:install` (or `npx playwright install chromium`) and try again.',
+    );
+  }
+
+  let browser: any = null;
+  let page: any = null;
+  try {
+    browser = await playwright.chromium.launch();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `Failed to launch Chromium for PDF rendering. Install the browser binaries with \`npm run tools:export:install\`. (${message})`,
+    );
+  }
+
+  try {
+    page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle' });
+    if (typeof page.emulateMedia === 'function') {
+      await page.emulateMedia({ media: 'print' }).catch(() => undefined);
+    }
+    const pdf = await page.pdf({ format: 'A4', printBackground: true });
+    writeBufferEnsure(outPath, pdf);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed while rendering PDF: ${message}`);
+  } finally {
+    if (page && typeof page.close === 'function') {
+      await page.close().catch(() => undefined);
+    }
+    if (browser && typeof browser.close === 'function') {
+      await browser.close().catch(() => undefined);
+    }
   }
 }
 
