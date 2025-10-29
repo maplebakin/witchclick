@@ -28,6 +28,9 @@ Editors can reference the following affiliate keys in post specs and frontmatter
 1. Generate a PostSpec prompt via the admin console (`/admin`) or CLI (`npm run genprompt`).
 2. Feed the prompt to your model, paste the JSON back into the admin panel, and validate.
 3. Ingest with `npm run ingest -- --from-file my-spec.json` or via the admin UI.
+4. Export shareable files:
+   - `node tools/wc.js export --slug my-post --format html` writes static HTML to `dist/exports/`.
+   - `node tools/wc.js export --slug my-post --format pdf` renders a printable PDF. Run `npm run tools:export:install` once to install the Chromium engine Playwright uses.
 
 ### White Magic Curses
 

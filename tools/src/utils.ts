@@ -17,6 +17,11 @@ export function writeFileEnsure(p: string, data: string) {
   fs.writeFileSync(p, data, 'utf8');
 }
 
+export function writeBufferEnsure(p: string, data: Buffer | Uint8Array) {
+  fs.mkdirSync(path.dirname(p), { recursive: true });
+  fs.writeFileSync(p, data);
+}
+
 export function ensureDirSync(dir: string) {
   fs.mkdirSync(dir, { recursive: true });
 }
