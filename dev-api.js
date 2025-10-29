@@ -1009,6 +1009,37 @@ async function setActiveThemeRecord(payload) {
   return { active: next, theme };
 }
 
+async function deleteThemeRecord(payload) {
+  const slug = typeof payload?.slug === 'string' ? payload.slug.trim() : '';
+  if (!slug) throw new Error('slug required');
+
+  const filePath = path.join(THEMES_DIR, `${slug}.json`);
+  if (!fs.existsSync(filePath)) throw new Error('theme not found');
+
+  const theme = readThemeRecord(filePath);
+  await fsp.unlink(filePath);
+
+  const active = readActiveThemeMapping();
+  const next = {
+    midnight: active.midnight,
+    dawn: active.dawn,
+  };
+
+  if (next.midnight === slug && theme.mode === 'midnight') {
+    next.midnight = null;
+  }
+  if (next.dawn === slug && theme.mode === 'dawn') {
+    next.dawn = null;
+  }
+
+  if (next.midnight !== active.midnight || next.dawn !== active.dawn) {
+    ensureDir(THEMES_DIR);
+    await fsp.writeFile(ACTIVE_THEME_FILE, JSON.stringify(next, null, 2), 'utf8');
+  }
+
+  return { slug, mode: theme.mode, active: next };
+}
+
 function readThemeRecord(filePath) {
   const raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
   if (!raw || typeof raw !== 'object') throw new Error('Invalid theme file');
@@ -1755,6 +1786,16 @@ const server = http.createServer(async (req, res) => {
       try {
         const body = await parseBody(req);
         const data = await setActiveThemeRecord(body || {});
+        return send(res, 200, { ok: true, ...data });
+      } catch (e) {
+        return send(res, 400, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/themes/delete') {
+      try {
+        const body = await parseBody(req);
+        const data = await deleteThemeRecord(body || {});
         return send(res, 200, { ok: true, ...data });
       } catch (e) {
         return send(res, 400, { ok: false, error: e?.message || String(e) });
