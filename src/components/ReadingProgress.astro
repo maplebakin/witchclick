@@ -1,0 +1,105 @@
+---
+interface Props {
+  target?: string;
+}
+
+const { target = '[data-reading-target="article"]' } = Astro.props as Props;
+---
+<div class="reading-progress" data-reading-progress data-target={target} aria-hidden="true">
+  <div class="reading-progress__bar" data-reading-progress-bar></div>
+</div>
+
+<script is:inline>
+  (() => {
+    if (typeof window === 'undefined') return;
+    const container = document.currentScript?.previousElementSibling;
+    if (!(container instanceof HTMLElement)) return;
+
+    const selector = container.dataset.target;
+    if (!selector) return;
+
+    const target = document.querySelector(selector);
+    const bar = container.querySelector('[data-reading-progress-bar]');
+    if (!target || !(bar instanceof HTMLElement)) return;
+
+    const candidates = Array.from(
+      target.querySelectorAll<HTMLElement>('h2, h3, h4, p, li, blockquote, figure, pre, table')
+    );
+    if (!candidates.length) {
+      candidates.push(target as HTMLElement);
+    }
+
+    const seen = new Set<Element>();
+
+    const update = () => {
+      const progress = Math.min(1, seen.size / candidates.length);
+      bar.style.setProperty('--reading-progress', progress.toString());
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0) {
+            seen.add(entry.target);
+            continue;
+          }
+
+          const bounds = entry.rootBounds;
+          const viewportBottom = bounds ? bounds.bottom : window.innerHeight;
+          if (entry.boundingClientRect.top > viewportBottom) {
+            seen.delete(entry.target);
+          }
+        }
+        update();
+      },
+      {
+        root: null,
+        threshold: [0, 0.1],
+        rootMargin: '0px 0px -35% 0px',
+      },
+    );
+
+    candidates.forEach((node) => observer.observe(node));
+
+    const cleanup = () => {
+      observer.disconnect();
+      seen.clear();
+    };
+
+    window.addEventListener(
+      'astro:beforeunload',
+      () => {
+        cleanup();
+      },
+      { once: true },
+    );
+  })();
+</script>
+
+<style is:inline>
+  .reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    z-index: 60;
+    pointer-events: none;
+    background: transparent;
+  }
+
+  .reading-progress__bar {
+    width: 100%;
+    height: 100%;
+    transform-origin: left center;
+    transform: scaleX(var(--reading-progress, 0));
+    transition: transform 160ms ease;
+    background: linear-gradient(90deg, rgba(212, 175, 55, 0.9), rgba(124, 78, 176, 0.9));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reading-progress__bar {
+      transition: none;
+    }
+  }
+</style>

@@ -2,6 +2,7 @@ export interface NavLink {
   href: string;
   label: string;
   rel?: string;
+  variant?: 'pill' | 'default';
 }
 
 export interface AdminNavSection {
@@ -10,18 +11,18 @@ export interface AdminNavSection {
 }
 
 export const primaryNavLinks: NavLink[] = [
-  { href: "/", label: "Home" },
+  { href: "/start", label: "Start Here" },
   { href: "/hub/", label: "Hubs" },
-  { href: "/curses/", label: "Curses" },
-  { href: "/salon/", label: "Salon" },
-  { href: "/tools/", label: "Tools & Prints" },
+  { href: "/tools/", label: "Tools" },
+  { href: "/curses/", label: "Curses", variant: "pill" },
 ];
 
 export const secondaryNavLinks: NavLink[] = [
-  { href: "/start", label: "Start Here" },
+  { href: "/", label: "Home" },
   { href: "/entities/", label: "Entities" },
   { href: "/partners/", label: "Partners" },
   { href: "/about/", label: "About" },
+  { href: "/salon/", label: "Salon" },
 ];
 
 export const headerUtilityLinks: NavLink[] = [

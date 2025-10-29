@@ -1,9 +1,3 @@
-export interface CuratedSection {
-  title: string;
-  description: string;
-  posts: string[];
-}
-
 export interface HubDefinition {
   slug: string;
   hero: {
@@ -13,12 +7,20 @@ export interface HubDefinition {
   };
   ambient: string;
   seoDescription: string;
-  sections: CuratedSection[];
+  playlists: PlaylistGroup[];
   partnerHighlight?: {
     slug: string;
     blurb: string;
   };
   seasonSlug?: string;
+}
+
+export interface PlaylistGroup {
+  key: string;
+  title: string;
+  description: string;
+  chips: string[];
+  posts: string[];
 }
 
 export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
@@ -33,22 +35,49 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
     },
     seoDescription:
       "Explore WitchClick's Release hub for gentle cord-cutting rituals, boundary prompts, and seasonal partner offerings that help you let go without collapse.",
-    sections: [
+    playlists: [
       {
-        title: "Start with a gentle exhale",
-        description: "Short rituals and essays to open the door to release days.",
+        key: "start-here",
+        title: "Start here",
+        description: "A gentle welcome into release work with rituals that return energy and make room for softness.",
+        chips: ["Energy return", "Kind closures"],
         posts: [
           "clean-cursing-return-energy-to-origin",
           "cozy-cursing-ritual-release-anger-banishment",
-          "energy-return-ritual-restore-balance",
+          "anxiety-from-avoiding-responsibilities-gentle-rituals",
         ],
       },
       {
-        title: "Keep the boundary loving",
-        description: "When you are ready for deeper shifts, these guides help you protect the space you just cleared.",
+        key: "quick-rituals",
+        title: "Quick rituals",
+        description: "Pocket-length releases when you have ten minutes and need a grounded exhale.",
+        chips: ["5-minute reset", "Calm composting"],
         posts: [
-          "anxiety-from-avoiding-responsibilities-gentle-rituals",
+          "closing-gratitude",
+          "energy-return-ritual-restore-balance",
+          "cozy-cursing-ritual",
+        ],
+      },
+      {
+        key: "deep-dives",
+        title: "Deep dives",
+        description: "Longer rituals and essays for when you want to sit with endings and practice loving boundaries.",
+        chips: ["Boundary tending", "Integration"],
+        posts: [
           "knowing-when-to-give-up",
+          "consent-to-continue",
+          "collective-intelligence",
+        ],
+      },
+      {
+        key: "tools",
+        title: "Tools & printables",
+        description: "Worksheets, prompts, and checklists that keep your release ritual grounded after the moment passes.",
+        chips: ["Checklists", "Printable prompts"],
+        posts: [
+          "day-after-acupuncture-recovery-gentle-body-awareness",
+          "when-life-feels-on-pause",
+          "when-everything-feels-pointless",
         ],
       },
     ],
@@ -69,18 +98,49 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
     },
     seoDescription:
       "Explore WitchClick's Focus hub for ADHD-friendly rituals, body-led planning, and partner offerings that nourish concentration without force.",
-    sections: [
+    playlists: [
       {
-        title: "Ease into momentum",
-        description: "Begin with rituals that reconnect you to curiosity and forward motion.",
-        posts: ["focus-hub-intro", "tea-ritual-for-focus", "focus-tea-rituals-gentle-brains"],
+        key: "start-here",
+        title: "Start here",
+        description: "Warm up attention with ritual teas and a primer on how WitchClick treats focus as kindness, not grind.",
+        chips: ["Tea rituals", "Gentle planning"],
+        posts: [
+          "focus-tea-rituals-gentle-brains",
+          "quick-low-energy-variant",
+          "pre-interview-grounding-ritual",
+        ],
       },
       {
-        title: "Support your nervous system",
-        description: "Keep the focus gentle with body-led prompts and creative spreads.",
+        key: "quick-rituals",
+        title: "Quick rituals",
+        description: "Fast resets to restart momentum without overwhelming your nervous system.",
+        chips: ["Micro moves", "ADHD-friendly"],
         posts: [
           "anxiety-from-avoiding-responsibilities-gentle-rituals",
+          "when-to-let-yourself-rest",
+          "gentle-heart-check-in",
+        ],
+      },
+      {
+        key: "deep-dives",
+        title: "Deep dives",
+        description: "Explore body-led planning, creative focus spreads, and stamina rituals for longer projects.",
+        chips: ["Somatic focus", "Creative flow"],
+        posts: [
           "creativity-tarot-ritual",
+          "worldbuilding-tarot-spread-and-ritual",
+          "tarot-as-a-secular-tool",
+        ],
+      },
+      {
+        key: "tools",
+        title: "Tools & printables",
+        description: "Printable check-ins and planning prompts that keep momentum gentle and sustainable.",
+        chips: ["Planning kits", "Prompt pages"],
+        posts: [
+          "mindful-breathing",
+          "reflection-journal",
+          "pillow-and-blanket-altar",
         ],
       },
     ],
@@ -101,23 +161,49 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
     },
     seoDescription:
       "Explore WitchClick's Calm hub for nervous-system care, community soothing rituals, and partner offerings that redistribute rest.",
-    sections: [
+    playlists: [
       {
-        title: "Ground and soothe",
-        description: "Arrive gently with practices that steady your body and breath.",
+        key: "start-here",
+        title: "Start here",
+        description: "Step into the Calm hub with grounding rituals that steady breath and create immediate softness.",
+        chips: ["Grounding", "Nervous system"],
         posts: [
           "calm-space-during-political-unrest-2",
           "calming-strategies-when-partner-pisses-you-off",
-          "when-to-let-yourself-rest",
+          "gentle-self-care-practices",
         ],
       },
       {
-        title: "Restore together",
-        description: "Share calm with your pod through mutual-aid minded rituals.",
+        key: "quick-rituals",
+        title: "Quick rituals",
+        description: "Low-spoon resets to calm spirals, reconnect with body, and invite a softer pace.",
+        chips: ["Low spoons", "Cozy pauses"],
+        posts: [
+          "low-spoon-option",
+          "gentle-heart-check-in",
+          "mindful-breathing",
+        ],
+      },
+      {
+        key: "deep-dives",
+        title: "Deep dives",
+        description: "Longer practices for community soothing, mutual aid, and tending grief together.",
+        chips: ["Community care", "Tender repair"],
         posts: [
           "energy-return-ritual-restore-balance",
           "day-after-acupuncture-recovery-gentle-body-awareness",
-          "pre-interview-grounding-ritual",
+          "forgiveness-and-boundaries",
+        ],
+      },
+      {
+        key: "tools",
+        title: "Tools & printables",
+        description: "Downloads and prompts that help you keep calm rituals close even on wobblier days.",
+        chips: ["Worksheets", "Prompt decks"],
+        posts: [
+          "safety-notes",
+          "medical-care-plan",
+          "gentle-rituals",
         ],
       },
     ],

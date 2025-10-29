@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import { marked } from "marked";
 
 import { normalizeAuthorSlug } from "./authors";
 import { augmentPost, normalizeSpoonLevel, type SpoonLevel } from "./augment";
@@ -208,6 +209,47 @@ export function getPrevNext(slug: string): {
     prev: prev ? { slug: prev.slug, title: prev.title } : null,
     next: next ? { slug: next.slug, title: next.title } : null,
   };
+}
+
+export interface HeadingOutlineItem {
+  id: string;
+  label: string;
+  level: number;
+}
+
+export function extractHeadingOutline(
+  markdown: string,
+  { minLevel = 2, maxLevel = 3 }: { minLevel?: number; maxLevel?: number } = {},
+): HeadingOutlineItem[] {
+  if (!markdown) return [];
+
+  const tokens = marked.lexer(markdown);
+  const slugger = new marked.Slugger();
+  const results: HeadingOutlineItem[] = [];
+
+  const clampLevel = (depth: number) => Math.min(Math.max(depth, 1), 6);
+
+  const walk = (list: any[]) => {
+    for (const token of list) {
+      if (!token) continue;
+      if (token.type === "heading") {
+        const level = clampLevel(Number(token.depth ?? token.level ?? 0));
+        if (level >= minLevel && level <= maxLevel) {
+          const text = typeof token.text === "string" ? token.text.trim() : "";
+          if (!text) continue;
+          const id = slugger.slug(text);
+          results.push({ id, label: text, level });
+        }
+      }
+
+      if (Array.isArray((token as any).tokens)) {
+        walk((token as any).tokens as any[]);
+      }
+    }
+  };
+
+  walk(tokens as any[]);
+  return results;
 }
 
 export function estimateReadingMinutes(content: string): number {
