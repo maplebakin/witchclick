@@ -957,16 +957,30 @@ async function saveThemeRecord(payload) {
   };
 
   const settings = mergeThemeSettings(settingsSource, mode, `theme payload (${slug})`);
+  const overridesProvided = payload && Object.prototype.hasOwnProperty.call(payload, 'overrides');
+  let overrides = normalizeThemeOverrides(payload?.overrides);
+
   const record = {
     slug,
     label: label || toTitleCase(slug),
     mode,
     category,
     settings,
+    overrides,
   };
 
   ensureDir(THEMES_DIR);
   const filePath = path.join(THEMES_DIR, `${slug}.json`);
+
+  if (!overridesProvided && fs.existsSync(filePath)) {
+    try {
+      const existing = readThemeRecord(filePath);
+      record.overrides = normalizeThemeOverrides(existing.overrides);
+    } catch {
+      record.overrides = overrides;
+    }
+  }
+
   await fsp.writeFile(filePath, JSON.stringify(record, null, 2), 'utf8');
 
   const active = readActiveThemeMapping();
@@ -1055,8 +1069,9 @@ function readThemeRecord(filePath) {
     ...extractThemeValues(raw.settings),
   };
   const settings = mergeThemeSettings(settingsSource, mode, filePath);
+  const overrides = normalizeThemeOverrides(raw.overrides);
 
-  return { slug, label, mode, category, settings };
+  return { slug, label, mode, category, settings, overrides };
 }
 
 function readActiveThemeMapping() {
@@ -1132,6 +1147,34 @@ function mergeThemeSettings(raw, mode, sourceName) {
   });
 
   return result;
+}
+
+function normalizeThemeOverrides(source) {
+  if (!Array.isArray(source)) return [];
+
+  const overrides = [];
+  for (const entry of source) {
+    if (!entry || typeof entry !== 'object') continue;
+
+    const scopeRaw = typeof entry.scope === 'string' ? entry.scope.trim() : '';
+    if (!scopeRaw) continue;
+
+    const variablesSource = entry.variables && typeof entry.variables === 'object' ? entry.variables : {};
+    const variables = {};
+
+    for (const [key, value] of Object.entries(variablesSource)) {
+      if (typeof value !== 'string') continue;
+      const trimmed = value.trim();
+      if (!trimmed) continue;
+      variables[key] = trimmed;
+    }
+
+    if (Object.keys(variables).length === 0) continue;
+
+    overrides.push({ scope: scopeRaw, variables });
+  }
+
+  return overrides;
 }
 
 function normalizeThemeMode(value) {

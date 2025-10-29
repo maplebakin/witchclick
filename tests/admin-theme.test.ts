@@ -143,4 +143,47 @@ describe("admin theme dashboard", () => {
     expect(theme.settings.fontSerif).toBe("Literata");
     expect(theme.settings.fontScript).toBe("Parisienne");
   });
+
+  it("persists theme overrides when saving presets", async () => {
+    const overrides = [
+      {
+        scope: "header",
+        variables: {
+          background: "#0b0315",
+          textPrimary: "#ffeeee",
+        },
+      },
+      {
+        scope: "cta",
+        variables: {
+          accent: "#ffaa33",
+        },
+      },
+    ];
+
+    const theme = await saveThemeRecord({
+      mode: "midnight",
+      label: "Midnight Overrides",
+      settings: {
+        primary: "#332244",
+        accent: "#d4a373",
+        background: "#120725",
+        fontSerif: "Literata",
+        fontScript: "Parisienne",
+      },
+      overrides,
+    });
+
+    expect(theme.overrides).toEqual(overrides);
+
+    const themeDir = path.join(tempDir, "content", "themes");
+    const savedFile = JSON.parse(
+      await fs.readFile(path.join(themeDir, `${theme.slug}.json`), "utf8"),
+    );
+    expect(savedFile.overrides).toEqual(overrides);
+
+    const listing = await listThemes();
+    const listed = listing.items.midnight.find((item) => item.slug === theme.slug);
+    expect(listed?.overrides).toEqual(overrides);
+  });
 });
