@@ -1,0 +1,30 @@
+{
+  "generated": "2025-10-29T15:05:04.826Z",
+  "count": 4,
+  "themes": [
+    {
+      "slug": "cozy-dawn",
+      "label": "Cozy Dawn",
+      "mode": "dawn",
+      "category": "default"
+    },
+    {
+      "slug": "cozy-midnight",
+      "label": "Cozy Midnight",
+      "mode": "midnight",
+      "category": "default"
+    },
+    {
+      "slug": "golden-harvest",
+      "label": "Golden Harvest",
+      "mode": "dawn",
+      "category": "seasonal"
+    },
+    {
+      "slug": "autumn-twilight",
+      "label": "Autumn Twilight",
+      "mode": "midnight",
+      "category": "seasonal"
+    }
+  ]
+}

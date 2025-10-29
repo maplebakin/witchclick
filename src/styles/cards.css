@@ -403,7 +403,7 @@
    --------------------------------------------------------------------------- */
 
 .post-article-unified-card {
-  background-color: var(--color-ink, #f4f1ff);
+  background-color: var(--surface-card, #f4f1ff);
   border-radius: var(--card-radius);
   padding: clamp(2rem, 5vw, 3rem);
   max-width: 900px;

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "node ./scripts/ensure-npm-proxy.mjs",
+    "prebuild": "node ./scripts/ensure-npm-proxy.mjs && node ./scripts/generate-theme-css.mjs",
     "build": "node ./scripts/build-clean.mjs && node ./scripts/generate-sitemap.mjs",
     "postbuild": "echo '✅ Build complete with sitemap'",
     "preview": "astro preview",
@@ -15,7 +15,9 @@
     "check": "astro check && tsc -p . --noEmit && npm run lint",
     "check:affiliates": "node ./scripts/check-affiliate-ids.mjs",
     "test:e2e": "playwright test",
-    "linkcheck": "linkinator ./dist --recurse --skip \"^https?://\""
+    "linkcheck": "linkinator ./dist --recurse --skip \"^https?://\"",
+    "themes:build": "node ./scripts/generate-theme-css.mjs",
+    "themes:watch": "node ./scripts/generate-theme-css.mjs --watch"
   },
   "dependencies": {
     "@astrojs/tailwind": "^5.1.0",
