@@ -50,10 +50,10 @@ if (target === "_blank") {
 
 <style>
   .wc-button {
-    --btn-bg: color-mix(in srgb, var(--color-night) 78%, var(--color-iris) 22%);
-    --btn-bg-hover: color-mix(in srgb, var(--color-night) 68%, var(--color-iris) 32%);
-    --btn-text: var(--color-ink);
-    --btn-border: color-mix(in srgb, var(--color-gold) 40%, transparent 60%);
+    --btn-bg: color-mix(in srgb, var(--surface-panel-primary) 78%, var(--accent-purple-strong) 22%);
+    --btn-bg-hover: color-mix(in srgb, var(--surface-panel-primary) 68%, var(--accent-purple-strong) 32%);
+    --btn-text: var(--text-strong);
+    --btn-border: color-mix(in srgb, var(--border-accent-strong) 40%, transparent 60%);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -77,7 +77,7 @@ if (target === "_blank") {
   .wc-button:focus-visible {
     background: var(--btn-bg-hover);
     color: var(--btn-text);
-    border-color: color-mix(in srgb, var(--color-gold) 60%, transparent 40%);
+    border-color: color-mix(in srgb, var(--border-accent-strong) 60%, transparent 40%);
   }
 
   .wc-button:active {
@@ -101,9 +101,9 @@ if (target === "_blank") {
   }
 
   :global(:root[data-comfort-theme="dawn"]) .wc-button {
-    --btn-bg: color-mix(in srgb, var(--color-ink) 18%, var(--color-iris) 82%);
-    --btn-bg-hover: color-mix(in srgb, var(--color-ink) 24%, var(--color-iris) 76%);
-    --btn-text: color-mix(in srgb, var(--color-ink) 92%, white 8%);
-    --btn-border: color-mix(in srgb, var(--color-gold) 45%, transparent 55%);
+    --btn-bg: color-mix(in srgb, var(--text-strong) 18%, var(--accent-purple-strong) 82%);
+    --btn-bg-hover: color-mix(in srgb, var(--text-strong) 24%, var(--accent-purple-strong) 76%);
+    --btn-text: color-mix(in srgb, var(--text-strong) 92%, white 8%);
+    --btn-border: color-mix(in srgb, var(--border-accent-strong) 45%, transparent 55%);
   }
 </style>

@@ -118,15 +118,15 @@ const steps = [
   .start-here__card:focus-within {
     transform: translateY(-4px);
     box-shadow: 0 28px 75px -24px rgba(0, 0, 0, 0.7);
-    border-color: rgba(124, 58, 237, 0.45);
+    border-color: var(--accent-purple-soft);
   }
 
   .start-here__badge {
     width: 2rem;
     height: 2rem;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--color-iris) 65%, var(--color-gold) 35%);
-    color: color-mix(in srgb, white 92%, var(--color-night) 8%);
+    background: color-mix(in srgb, var(--accent-purple-strong) 65%, var(--text-accent-strong) 35%);
+    color: color-mix(in srgb, white 92%, var(--surface-panel-primary) 8%);
     font-weight: 600;
     display: grid;
     place-items: center;
@@ -149,21 +149,21 @@ const steps = [
     justify-self: flex-start;
     font-size: 0.9rem;
     font-weight: 600;
-    color: color-mix(in srgb, var(--link-color) 65%, var(--color-gold) 35%);
+    color: color-mix(in srgb, var(--link-color) 65%, var(--text-accent-strong) 35%);
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
     padding: 0.4rem 0.85rem;
     border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--color-iris) 42%, transparent 58%);
-    background: color-mix(in srgb, var(--surface-plain) 85%, transparent 15%);
+    border: 1px solid color-mix(in srgb, var(--accent-purple-strong) 42%, transparent 58%);
+    background: color-mix(in srgb, var(--surface-panel-primary) 85%, transparent 15%);
   }
 
   .start-here__link:hover,
   .start-here__link:focus-visible {
-    color: color-mix(in srgb, var(--link-color) 55%, var(--color-gold) 45%);
-    border-color: color-mix(in srgb, var(--color-iris) 52%, transparent 48%);
-    background: color-mix(in srgb, var(--surface-plain) 92%, transparent 8%);
+    color: color-mix(in srgb, var(--link-color) 55%, var(--text-accent-strong) 45%);
+    border-color: color-mix(in srgb, var(--accent-purple-strong) 52%, transparent 48%);
+    background: color-mix(in srgb, var(--surface-panel-primary) 92%, transparent 8%);
   }
 
   @media (min-width: 720px) {

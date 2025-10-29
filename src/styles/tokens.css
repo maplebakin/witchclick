@@ -28,6 +28,26 @@
   --text-accent: rgba(212, 175, 55, 0.7);
   --text-accent-strong: rgba(212, 175, 55, 0.92);
 
+  /* === Accent Colors === */
+  --accent-purple-strong: rgba(124, 78, 176, 0.85);
+  --accent-purple-soft: rgba(124, 78, 176, 0.6);
+
+  /* === Overlay Colors === */
+  --overlay-panel: rgba(18, 7, 37, 0.45);
+  --overlay-panel-strong: rgba(18, 7, 37, 0.62);
+
+  /* === Admin Interface Colors === */
+  --admin-surface-base: #ffffff;
+  --admin-surface-muted: #f9fafb;
+  --admin-surface-hover: #f3f4f6;
+  --admin-border-neutral: #d1d5db;
+  --admin-border-subtle: #e5e7eb;
+  --admin-border-strong: #9ca3af;
+  --admin-accent: #7c3aed;
+  --admin-text-primary: #111827;
+  --admin-text-muted: #6b7280;
+  --admin-icon-muted: #9ca3af;
+
   /* === Gradient Overlays === */
   --gradient-purple-radial: radial-gradient(120% 120% at 8% 10%, rgba(124, 78, 176, 0.18), transparent 70%);
   --gradient-gold-radial: radial-gradient(80% 120% at 15% 10%, rgba(212, 175, 55, 0.18), transparent 70%);
@@ -67,6 +87,26 @@
   --text-subtle: rgba(87, 63, 115, 0.65);
   --text-accent: rgba(155, 134, 200, 0.7);
   --text-accent-strong: rgba(87, 63, 115, 0.9);
+
+  /* Accent Colors */
+  --accent-purple-strong: rgba(155, 134, 200, 0.85);
+  --accent-purple-soft: rgba(155, 134, 200, 0.65);
+
+  /* Overlay Colors */
+  --overlay-panel: rgba(242, 236, 229, 0.48);
+  --overlay-panel-strong: rgba(242, 236, 229, 0.6);
+
+  /* Admin Interface Colors */
+  --admin-surface-base: #ffffff;
+  --admin-surface-muted: #f9fafb;
+  --admin-surface-hover: #f3f4f6;
+  --admin-border-neutral: #d1d5db;
+  --admin-border-subtle: #e5e7eb;
+  --admin-border-strong: #9ca3af;
+  --admin-accent: #7c3aed;
+  --admin-text-primary: #111827;
+  --admin-text-muted: #6b7280;
+  --admin-icon-muted: #9ca3af;
 
   /* Gradient Overlays */
   --gradient-purple-radial: radial-gradient(120% 120% at 8% 10%, rgba(180, 154, 217, 0.2), transparent 72%);
