@@ -434,32 +434,29 @@ async function attachHeroToPost({ slug, heroImage, heroAlt }) {
   }
 
   const block = fmMatch[0];
+  const frontmatterBody = fmMatch[1] ?? '';
   const newline = block.includes('\r\n') ? '\r\n' : '\n';
   const remainder = raw.slice(block.length);
 
-  const blockLines = block.split(newline);
-  if (blockLines.length < 2) {
-    const err = new Error('Frontmatter block is malformed');
+  if (!block.startsWith('---')) {
+    const err = new Error('Frontmatter opening delimiter is malformed');
     err.code = 'INVALID_FRONTMATTER';
     throw err;
   }
 
-  // Remove the opening and closing --- delimiters while keeping the original content intact
-  blockLines.shift();
-  const closingLine = blockLines.pop();
-  if (typeof closingLine !== 'string' || closingLine.trim() !== '---') {
+  const closingMarker = `${newline}---`;
+  if (!block.endsWith('---') || block.lastIndexOf(closingMarker) === -1) {
     const err = new Error('Frontmatter closing delimiter is malformed');
     err.code = 'INVALID_FRONTMATTER';
     throw err;
   }
 
-  const rawLines = blockLines;
+  const lines = frontmatterBody ? frontmatterBody.split(newline) : [];
 
   // Remove trailing empty strings that result from split() on strings ending with newlines
-  while (rawLines.length > 0 && rawLines[rawLines.length - 1].trim() === '') {
-    rawLines.pop();
+  while (lines.length > 0 && lines[lines.length - 1].trim() === '') {
+    lines.pop();
   }
-  const lines = rawLines;
 
   // Find specVersion to know where to insert hero fields (should go before specVersion if it exists)
   const specIndex = lines.findIndex((line) => typeof line === 'string' && line.trim().startsWith('specVersion:'));
