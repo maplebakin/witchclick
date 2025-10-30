@@ -437,14 +437,23 @@ async function attachHeroToPost({ slug, heroImage, heroAlt }) {
   const newline = block.includes('\r\n') ? '\r\n' : '\n';
   const remainder = raw.slice(block.length);
 
-  // Always use the parsed frontmatter lines from gray-matter (validated in findPostFileBySlug)
-  // This avoids regex parsing issues with embedded --- in frontmatter content
-  if (!Array.isArray(found.lines) || found.lines.length === 0) {
-    const err = new Error('Frontmatter lines array is invalid');
+  const blockLines = block.split(newline);
+  if (blockLines.length < 2) {
+    const err = new Error('Frontmatter block is malformed');
     err.code = 'INVALID_FRONTMATTER';
     throw err;
   }
-  const rawLines = [...found.lines];
+
+  // Remove the opening and closing --- delimiters while keeping the original content intact
+  blockLines.shift();
+  const closingLine = blockLines.pop();
+  if (typeof closingLine !== 'string' || closingLine.trim() !== '---') {
+    const err = new Error('Frontmatter closing delimiter is malformed');
+    err.code = 'INVALID_FRONTMATTER';
+    throw err;
+  }
+
+  const rawLines = blockLines;
 
   // Remove trailing empty strings that result from split() on strings ending with newlines
   while (rawLines.length > 0 && rawLines[rawLines.length - 1].trim() === '') {
