@@ -17,7 +17,6 @@ const repoRoot = path.resolve(testDir, "..");
 
 async function prepareTempDir() {
   tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "wc-hero-attach-"));
-  await fs.mkdir(path.join(tempDir, "content", "posts"), { recursive: true });
   await fs.mkdir(path.join(tempDir, "public", "images", "hero"), { recursive: true });
   cwdSpy = vi.spyOn(process, "cwd").mockReturnValue(tempDir);
 }
@@ -46,6 +45,7 @@ describe("attachHeroToPost", () => {
     const postPath = path.join(tempDir, "content", "posts", `${slug}.md`);
     const heroDir = path.join(tempDir, "public", "images", "hero", slug);
     await fs.mkdir(heroDir, { recursive: true });
+    await fs.mkdir(path.dirname(postPath), { recursive: true });
     await fs.writeFile(
       postPath,
       `---\ntitle: Cozy Hero\nslug: ${slug}\nexcerpt: Gentle intro\n---\n\nContent`,
@@ -68,31 +68,75 @@ describe("attachHeroToPost", () => {
   });
 
   it("preserves existing title and slug for real post frontmatter", async () => {
-    const slug = "anxiety-from-avoiding-responsibilities-gentle-rituals";
-    const fixturePath = path.join(repoRoot, "content", "posts", `${slug}.md`);
-    const originalRaw = await fs.readFile(fixturePath, "utf8");
-    const tempPostPath = path.join(tempDir, "content", "posts", `${slug}.md`);
-    await fs.writeFile(tempPostPath, originalRaw, "utf8");
+    const fixture = await loadSamplePostFrontmatter();
+    const tempPostDir = path.join(tempDir, fixture.relativeDir);
+    await fs.mkdir(tempPostDir, { recursive: true });
 
-    const heroDir = path.join(tempDir, "public", "images", "hero", slug);
+    const tempPostPath = path.join(tempPostDir, fixture.fileName);
+    await fs.writeFile(tempPostPath, fixture.raw, "utf8");
+
+    const heroDir = path.join(tempDir, "public", "images", "hero", fixture.slug);
     await fs.mkdir(heroDir, { recursive: true });
     const heroFile = path.join(heroDir, "hero.png");
     await fs.writeFile(heroFile, Buffer.from("fake", "utf8"));
 
-    const heroPath = `/images/hero/${slug}/hero.png`;
-    const original = matter(originalRaw);
+    const heroPath = `/images/hero/${fixture.slug}/hero.png`;
 
     await expect(
-      attachHeroToPost({ slug, heroImage: heroPath, heroAlt: "Gleaming focus" }),
-    ).resolves.toEqual({ path: `content/posts/${slug}.md` });
+      attachHeroToPost({ slug: fixture.slug, heroImage: heroPath, heroAlt: "Gleaming focus" }),
+    ).resolves.toEqual({
+      path: path.relative(tempDir, tempPostPath).replace(/\\/g, "/"),
+    });
 
     const updatedRaw = await fs.readFile(tempPostPath, "utf8");
     const parsed = matter(updatedRaw);
 
-    expect(parsed.data.title).toBe(original.data.title);
-    expect(parsed.data.slug).toBe(original.data.slug);
+    expect(parsed.data.title).toBe(fixture.title);
+    expect(parsed.data.slug).toBe(fixture.slug);
     expect(parsed.data.heroImage).toBe(heroPath);
     expect(parsed.data.heroImageSrc).toBe(heroPath);
     expect(parsed.data.heroAlt).toBe("Gleaming focus");
   });
 });
+
+async function loadSamplePostFrontmatter() {
+  const candidateDirs = [
+    path.join(repoRoot, "src", "content", "posts"),
+    path.join(repoRoot, "content", "posts"),
+  ];
+
+  for (const candidate of candidateDirs) {
+    let entries;
+    try {
+      entries = await fs.readdir(candidate, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+
+    const files = entries
+      .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".md"))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    for (const entry of files) {
+      const filePath = path.join(candidate, entry.name);
+      const raw = await fs.readFile(filePath, "utf8");
+      const parsed = matter(raw);
+      const title = typeof parsed.data.title === "string" ? parsed.data.title : "";
+      const slug = typeof parsed.data.slug === "string" ? parsed.data.slug.trim() : "";
+
+      if (title && slug) {
+        const relativeDir = path.dirname(path.relative(repoRoot, filePath));
+
+        return {
+          raw,
+          title,
+          slug,
+          relativeDir: relativeDir === "." ? "" : relativeDir,
+          fileName: entry.name,
+        };
+      }
+    }
+  }
+
+  throw new Error("No sample post frontmatter found for hero attach regression test");
+}
