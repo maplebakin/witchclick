@@ -12,6 +12,7 @@ import {
   populateAllFormInputs,
   collectAllFormValues,
   updateAllPreviewVariables,
+  colorToHex,
 } from './theme-editor-comprehensive';
 
 interface EditorState {
@@ -339,12 +340,13 @@ export class ThemeEditor {
     // Legacy colors
     ['primary', 'accent', 'background', 'textPrimary', 'textHeading', 'textMuted'].forEach((key) => {
       const value = preset?.variables[key] || defaults[key] || '';
-      const normalized = this.normalizeHex(value);
+      // Use colorToHex to handle rgba/rgb values for the color picker
+      const hexValue = colorToHex(value);
 
       const picker = this.elements[`${key}Picker`] as HTMLInputElement;
       const input = this.elements[`${key}Input`] as HTMLInputElement;
 
-      if (picker && normalized) picker.value = normalized;
+      if (picker && hexValue) picker.value = hexValue;
       if (input) input.value = value;
     });
 
@@ -530,11 +532,12 @@ export class ThemeEditor {
     preview.style.setProperty('--preview-muted', legacyVariables.textMuted);
 
     // Calculate derived colors
-    const bgRgb = hexToRgb(variables.background);
+    const bg = variables.background || defaults.background || '#0f0820';
+    const bgRgb = hexToRgb(bg);
     if (bgRgb) {
       const luminance = this.getLuminance(bgRgb);
-      const surface = this.adjustHex(variables.background, luminance > 0.5 ? -0.08 : 0.22);
-      const border = this.adjustHex(variables.background, luminance > 0.5 ? -0.3 : 0.28);
+      const surface = this.adjustHex(bg, luminance > 0.5 ? -0.08 : 0.22);
+      const border = this.adjustHex(bg, luminance > 0.5 ? -0.3 : 0.28);
       preview.style.setProperty('--preview-surface', surface);
       preview.style.setProperty('--preview-border', border);
     }
@@ -962,7 +965,7 @@ export class ThemeEditor {
 
       const existingIndex = preset.overrides.findIndex((o) => o.scope === scope);
 
-      if (existingIndex >= 0) {
+      if (existingIndex >= 0 && preset.overrides[existingIndex]) {
         // Update existing override
         preset.overrides[existingIndex].variables = {
           ...preset.overrides[existingIndex].variables,

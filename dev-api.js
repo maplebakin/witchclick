@@ -139,31 +139,31 @@ const COLOR_TOKEN_KEYS = [
 ];
 const DEFAULT_COLOR_TOKENS = {
   midnight: {
-    textPrimary: 'rgba(244, 241, 255, 0.96)',
-    textSecondary: 'rgba(244, 241, 255, 0.85)',
-    textTertiary: 'rgba(244, 241, 255, 0.75)',
-    textHint: 'rgba(244, 241, 255, 0.65)',
-    textDisabled: 'rgba(244, 241, 255, 0.45)',
-    textBody: 'rgba(249, 245, 255, 0.82)',
-    textSubtle: 'rgba(249, 245, 255, 0.7)',
-    textAccent: 'rgba(212, 175, 55, 0.7)',
-    textAccentStrong: 'rgba(212, 175, 55, 0.92)',
-    textStrong: 'rgba(249, 245, 255, 0.95)',
-    textMuted: 'rgba(249, 245, 255, 0.72)',
+    textPrimary: '#f4f1ff',
+    textSecondary: '#f4f1ff',
+    textTertiary: '#f4f1ff',
+    textHint: '#f4f1ff',
+    textDisabled: '#f4f1ff',
+    textBody: '#f9f5ff',
+    textSubtle: '#f9f5ff',
+    textAccent: '#d4af37',
+    textAccentStrong: '#d4af37',
+    textStrong: '#f9f5ff',
+    textMuted: '#f9f5ff',
     linkColor: '#e0c07d'
   },
   dawn: {
-    textPrimary: 'rgba(44, 27, 61, 1)',
-    textSecondary: 'rgba(44, 27, 61, 0.9)',
-    textTertiary: 'rgba(44, 27, 61, 0.75)',
-    textHint: 'rgba(44, 27, 61, 0.6)',
-    textDisabled: 'rgba(44, 27, 61, 0.4)',
-    textBody: 'rgba(87, 63, 115, 0.82)',
-    textSubtle: 'rgba(87, 63, 115, 0.65)',
-    textAccent: 'rgba(155, 134, 200, 0.7)',
-    textAccentStrong: 'rgba(87, 63, 115, 0.9)',
-    textStrong: 'rgba(58, 40, 84, 0.95)',
-    textMuted: 'rgba(87, 63, 115, 0.7)',
+    textPrimary: '#2c1b3d',
+    textSecondary: '#2c1b3d',
+    textTertiary: '#2c1b3d',
+    textHint: '#2c1b3d',
+    textDisabled: '#2c1b3d',
+    textBody: '#573f73',
+    textSubtle: '#573f73',
+    textAccent: '#9b86c8',
+    textAccentStrong: '#573f73',
+    textStrong: '#3a2854',
+    textMuted: '#573f73',
     linkColor: '#caa043'
   }
 };
@@ -426,7 +426,7 @@ async function attachHeroToPost({ slug, heroImage, heroAlt }) {
   }
 
   const raw = typeof found.raw === 'string' ? found.raw : await fsp.readFile(found.file, 'utf8');
-  const fmMatch = /^---\r?\n([\s\S]*?)\r?\n---/.exec(raw);
+  const fmMatch = /^---\s*?\r?\n([\s\S]*?)\r?\n---/.exec(raw);
   if (!fmMatch) {
     const err = new Error('Frontmatter missing from post');
     err.code = 'MISSING_FRONTMATTER';
@@ -437,8 +437,14 @@ async function attachHeroToPost({ slug, heroImage, heroAlt }) {
   const newline = block.includes('\r\n') ? '\r\n' : '\n';
   const remainder = raw.slice(block.length);
 
-  // Get lines from parsed frontmatter and filter out trailing empty lines
-  const rawLines = Array.isArray(found.lines) ? [...found.lines] : fmMatch[1].split(/\r?\n/);
+  // Always use the parsed frontmatter lines from gray-matter (validated in findPostFileBySlug)
+  // This avoids regex parsing issues with embedded --- in frontmatter content
+  if (!Array.isArray(found.lines) || found.lines.length === 0) {
+    const err = new Error('Frontmatter lines array is invalid');
+    err.code = 'INVALID_FRONTMATTER';
+    throw err;
+  }
+  const rawLines = [...found.lines];
 
   // Remove trailing empty strings that result from split() on strings ending with newlines
   while (rawLines.length > 0 && rawLines[rawLines.length - 1].trim() === '') {
