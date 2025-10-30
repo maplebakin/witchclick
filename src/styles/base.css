@@ -6,6 +6,9 @@
 /* Import color tokens */
 @import "./tokens.css";
 
+/* Import editable color token overrides */
+@import "./color-tokens.generated.css";
+
 /* Import generated theme CSS */
 @import "./themes.generated.css";
 
@@ -55,13 +58,6 @@
   --surface-plain: rgba(18, 10, 30, 0.92);
   --surface-plain-border: rgba(124, 78, 176, 0.32);
   --surface-plain-shadow: 0 24px 55px -28px rgba(3, 2, 12, 0.72);
-
-  /* Accessible Text Colors - WCAG AA Compliant */
-  --text-primary: rgba(244, 241, 255, 0.96); /* ~16:1 contrast */
-  --text-secondary: rgba(244, 241, 255, 0.85); /* ~9:1 contrast */
-  --text-tertiary: rgba(244, 241, 255, 0.75); /* ~6:1 contrast */
-  --text-hint: rgba(244, 241, 255, 0.65); /* ~4.5:1 contrast */
-  --text-disabled: rgba(244, 241, 255, 0.45); /* Disabled states only */
 
   /* Shadows */
   --shadow-soft: 0 18px 45px -28px rgba(11, 6, 20, 0.55);
@@ -127,12 +123,6 @@
   --focus-ring-color: color-mix(in srgb, var(--color-iris) 58%, var(--color-gold) 42%);
   --focus-ring-base-shadow: color-mix(in srgb, var(--color-iris) 30%, var(--color-night) 70%);
 
-  /* Accessible Text Colors - Dawn Variants (WCAG AA) */
-  --text-primary: rgba(44, 27, 61, 1); /* ~16:1 contrast */
-  --text-secondary: rgba(44, 27, 61, 0.9); /* ~10:1 contrast */
-  --text-tertiary: rgba(44, 27, 61, 0.75); /* ~6.5:1 contrast */
-  --text-hint: rgba(44, 27, 61, 0.6); /* ~4.5:1 contrast */
-  --text-disabled: rgba(44, 27, 61, 0.4); /* Disabled states only */
 }
 
 /* ---------------------------------------------------------------------------

@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2025-10-29T00:00:00.000Z",
+  "tokens": {
+    "midnight": {
+      "textPrimary": "rgba(244, 241, 255, 0.96)",
+      "textSecondary": "rgba(244, 241, 255, 0.85)",
+      "textTertiary": "rgba(244, 241, 255, 0.75)",
+      "textHint": "rgba(244, 241, 255, 0.65)",
+      "textDisabled": "rgba(244, 241, 255, 0.45)",
+      "textStrong": "rgba(249, 245, 255, 0.95)",
+      "textBody": "rgba(249, 245, 255, 0.82)",
+      "textMuted": "rgba(249, 245, 255, 0.72)",
+      "textSubtle": "rgba(249, 245, 255, 0.7)",
+      "textAccent": "rgba(212, 175, 55, 0.7)",
+      "textAccentStrong": "rgba(212, 175, 55, 0.92)",
+      "linkColor": "#e0c07d"
+    },
+    "dawn": {
+      "textPrimary": "rgba(44, 27, 61, 1)",
+      "textSecondary": "rgba(44, 27, 61, 0.9)",
+      "textTertiary": "rgba(44, 27, 61, 0.75)",
+      "textHint": "rgba(44, 27, 61, 0.6)",
+      "textDisabled": "rgba(44, 27, 61, 0.4)",
+      "textStrong": "rgba(58, 40, 84, 0.95)",
+      "textBody": "rgba(87, 63, 115, 0.82)",
+      "textMuted": "rgba(87, 63, 115, 0.7)",
+      "textSubtle": "rgba(87, 63, 115, 0.65)",
+      "textAccent": "rgba(155, 134, 200, 0.7)",
+      "textAccentStrong": "rgba(87, 63, 115, 0.9)",
+      "linkColor": "#caa043"
+    }
+  }
+}

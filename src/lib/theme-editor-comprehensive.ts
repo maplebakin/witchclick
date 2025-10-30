@@ -13,7 +13,8 @@ export const ALL_COLOR_VARIABLES = [
   'cardPanelBorder', 'cardPanelBorderStrong', 'cardPanelBorderSoft',
 
   // Text Colors
-  'textPrimary', 'textSecondary', 'textTertiary', 'textHint', 'textDisabled',
+  'textPrimary', 'textSecondary', 'textTertiary', 'textStrong', 'textHint', 'textDisabled',
+  'textBody', 'textSubtle', 'textAccent', 'textAccentStrong',
   'inkBody', 'inkStrong', 'inkMuted', 'linkColor',
 
   // Card Components
@@ -154,13 +155,13 @@ export function updateAllPreviewVariables(
 
   // Text colors
   previewRoot.style.setProperty('--preview-text-primary',
-    variables.textPrimary || defaults.textPrimary || 'rgba(244, 241, 255, 0.96)');
+    variables.textBody || defaults.textBody || variables.textPrimary || defaults.textPrimary || 'rgba(244, 241, 255, 0.96)');
   previewRoot.style.setProperty('--preview-text-secondary',
     variables.textSecondary || defaults.textSecondary || 'rgba(244, 241, 255, 0.85)');
   previewRoot.style.setProperty('--preview-text-heading',
-    variables.inkStrong || defaults.inkStrong || '#ffffff');
+    variables.textStrong || defaults.textStrong || variables.inkStrong || defaults.inkStrong || '#ffffff');
   previewRoot.style.setProperty('--preview-text-muted',
-    variables.inkMuted || defaults.inkMuted || '#d9b2c4');
+    variables.textMuted || defaults.textMuted || variables.inkMuted || defaults.inkMuted || '#d9b2c4');
   previewRoot.style.setProperty('--preview-link',
     variables.linkColor || defaults.linkColor || '#e0c07d');
 
