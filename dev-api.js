@@ -329,68 +329,82 @@ function parseDataUrl(value) {
 }
 
 async function listPostsForHero() {
-  const postsDir = resolvePrimaryPostsDir();
-  let entries = [];
-  try {
-    entries = await fsp.readdir(postsDir, { withFileTypes: true });
-  } catch {
-    entries = [];
-  }
-  const items = [];
-  for (const entry of entries) {
-    if (!entry.isFile()) continue;
-    if (!entry.name.toLowerCase().endsWith('.md')) continue;
-    const file = path.join(postsDir, entry.name);
-    const fileSlug = path.basename(entry.name, path.extname(entry.name));
-    let slug = fileSlug;
-    let title = fileSlug;
+  const directories = resolvePostsDirectories({ root: CWD });
+  const itemsBySlug = new Map();
+
+  for (const postsDir of directories) {
+    let entries = [];
     try {
-      const raw = await fsp.readFile(file, 'utf8');
-      const parsed = parseFrontmatter(raw);
-      const fmSlug = frontmatterString(parsed.data, 'slug');
-      if (fmSlug && isValidSlug(fmSlug)) slug = fmSlug;
-      const fmTitle = frontmatterString(parsed.data, 'title');
-      if (fmTitle) title = fmTitle;
-      const fmPrompt = frontmatterString(parsed.data, 'heroImagePrompt');
-      const fmHeroAlt = frontmatterString(parsed.data, 'heroAlt');
-      const fmLegacyAlt = frontmatterString(parsed.data, 'heroImageAlt');
-      const fmHeroImage = frontmatterString(parsed.data, 'heroImage');
-      const fmLegacyImage = frontmatterString(parsed.data, 'heroImageSrc');
-      const fmExcerpt = frontmatterString(parsed.data, 'excerpt');
-      const fmMetaDescription = frontmatterString(parsed.data, 'metaDescription');
-      const fmMood = frontmatterString(parsed.data, 'mood');
-      const fmTags = toStringArray(parsed.data?.tags);
+      entries = await fsp.readdir(postsDir, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+
+    for (const entry of entries) {
+      if (!entry.isFile()) continue;
+      if (!entry.name.toLowerCase().endsWith('.md')) continue;
+
+      const file = path.join(postsDir, entry.name);
+      const fileSlug = path.basename(entry.name, path.extname(entry.name));
+      let slug = fileSlug;
+      let title = fileSlug;
+
+      try {
+        const raw = await fsp.readFile(file, 'utf8');
+        const parsed = parseFrontmatter(raw);
+        const fmSlug = frontmatterString(parsed.data, 'slug');
+        if (fmSlug && isValidSlug(fmSlug)) slug = fmSlug;
+        const fmTitle = frontmatterString(parsed.data, 'title');
+        if (fmTitle) title = fmTitle;
+        const fmPrompt = frontmatterString(parsed.data, 'heroImagePrompt');
+        const fmHeroAlt = frontmatterString(parsed.data, 'heroAlt');
+        const fmLegacyAlt = frontmatterString(parsed.data, 'heroImageAlt');
+        const fmHeroImage = frontmatterString(parsed.data, 'heroImage');
+        const fmLegacyImage = frontmatterString(parsed.data, 'heroImageSrc');
+        const fmExcerpt = frontmatterString(parsed.data, 'excerpt');
+        const fmMetaDescription = frontmatterString(parsed.data, 'metaDescription');
+        const fmMood = frontmatterString(parsed.data, 'mood');
+        const fmTags = toStringArray(parsed.data?.tags);
+
+        if (!isValidSlug(slug)) continue;
+        if (itemsBySlug.has(slug)) continue;
+
+        itemsBySlug.set(slug, {
+          slug,
+          title,
+          heroImagePrompt: fmPrompt || null,
+          heroAlt: fmHeroAlt || null,
+          heroImageAlt: fmLegacyAlt || null,
+          heroImage: fmHeroImage || fmLegacyImage || null,
+          excerpt: fmExcerpt || fmMetaDescription || '',
+          metaDescription: fmMetaDescription || '',
+          mood: fmMood || '',
+          tags: fmTags,
+        });
+        continue;
+      } catch {
+        continue; // unreadable file
+      }
+
       if (!isValidSlug(slug)) continue;
-      items.push({
+      if (itemsBySlug.has(slug)) continue;
+
+      itemsBySlug.set(slug, {
         slug,
         title,
-        heroImagePrompt: fmPrompt || null,
-        heroAlt: fmHeroAlt || null,
-        heroImageAlt: fmLegacyAlt || null,
-        heroImage: fmHeroImage || fmLegacyImage || null,
-        excerpt: fmExcerpt || fmMetaDescription || '',
-        metaDescription: fmMetaDescription || '',
-        mood: fmMood || '',
-        tags: fmTags,
+        heroImagePrompt: null,
+        heroAlt: null,
+        heroImageAlt: null,
+        heroImage: null,
+        excerpt: '',
+        metaDescription: '',
+        mood: '',
+        tags: [],
       });
-      continue;
-    } catch {
-      /* ignore unreadable file */
     }
-    if (!isValidSlug(slug)) continue;
-    items.push({
-      slug,
-      title,
-      heroImagePrompt: null,
-      heroAlt: null,
-      heroImageAlt: null,
-      heroImage: null,
-      excerpt: '',
-      metaDescription: '',
-      mood: '',
-      tags: [],
-    });
   }
+
+  const items = Array.from(itemsBySlug.values());
   items.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }));
   return items;
 }
