@@ -37,6 +37,10 @@ export interface ThemeVariables {
   textTertiary?: string;
   textHint?: string;
   textDisabled?: string;
+  textBody?: string;
+  textSubtle?: string;
+  textAccent?: string;
+  textAccentStrong?: string;
   inkBody?: string;
   inkStrong?: string;
   inkMuted?: string;
@@ -153,6 +157,11 @@ const DEFAULT_VARIABLES: Record<ThemeMode, ThemeVariables> = {
     textPrimary: 'rgba(244, 241, 255, 0.96)',
     textSecondary: 'rgba(244, 241, 255, 0.85)',
     textTertiary: 'rgba(244, 241, 255, 0.75)',
+    textStrong: 'rgba(249, 245, 255, 0.95)',
+    textBody: 'rgba(249, 245, 255, 0.82)',
+    textSubtle: 'rgba(249, 245, 255, 0.7)',
+    textAccent: 'rgba(212, 175, 55, 0.7)',
+    textAccentStrong: 'rgba(212, 175, 55, 0.92)',
     inkBody: '#f4f1ff',
     inkStrong: '#ffffff',
     inkMuted: '#d9b2c4',
@@ -221,6 +230,11 @@ const DEFAULT_VARIABLES: Record<ThemeMode, ThemeVariables> = {
     textTertiary: '#6b5d70',
     textHint: '#8f77b8',
     textDisabled: '#bfaed9',
+    textStrong: 'rgba(58, 40, 84, 0.95)',
+    textBody: 'rgba(87, 63, 115, 0.82)',
+    textSubtle: 'rgba(87, 63, 115, 0.65)',
+    textAccent: 'rgba(155, 134, 200, 0.7)',
+    textAccentStrong: 'rgba(87, 63, 115, 0.9)',
     inkBody: '#2c1b3d',
     inkStrong: '#120725',
     inkMuted: '#6b5d70',

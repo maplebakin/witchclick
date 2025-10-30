@@ -5,6 +5,7 @@ import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
 import ThemeColorControl from "@/components/ThemeColorControl.astro";
 import { getScopesByCategory } from "@/lib/theme-scopes";
+import { COLOR_TOKEN_FIELDS } from "@/lib/color-token-schema";
 
 const settings = readSettings();
 const canonical = buildCanonicalUrl(settings, { path: "/admin/theme" });
@@ -57,7 +58,28 @@ const fontOptions = [
     <div class="space-y-6" id="themeEditorRoot" data-dev-api={DEV_API}>
       <AdminNav currentPath="/admin/theme" />
 
-      <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      <div
+        class="flex flex-wrap items-center gap-2 rounded-2xl border border-line-neutral bg-surface-base/80 p-2 shadow-sm"
+        data-editor-tabs
+      >
+        <button
+          type="button"
+          class="rounded-xl px-4 py-2 text-sm font-medium transition data-[active='true']:bg-info data-[active='true']:text-white data-[active='true']:shadow"
+          data-editor-tab="presets"
+          data-active="true"
+        >
+          Theme presets
+        </button>
+        <button
+          type="button"
+          class="rounded-xl px-4 py-2 text-sm font-medium transition hover:bg-surface-soft/80"
+          data-editor-tab="tokens"
+        >
+          Color tokens
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-12" data-theme-panel="presets">
         <!-- Sidebar: Theme Library -->
         <section class="lg:col-span-3 space-y-6">
           <div class="rounded-2xl border border-line-neutral bg-surface-base p-5 shadow-sm">
@@ -296,11 +318,16 @@ const fontOptions = [
               <ThemeColorControl label="Text Primary" variableKey="textPrimary" description="Main text" />
               <ThemeColorControl label="Text Secondary" variableKey="textSecondary" description="Secondary text" />
               <ThemeColorControl label="Text Tertiary" variableKey="textTertiary" description="Tertiary text" />
+              <ThemeColorControl label="Text Strong" variableKey="textStrong" description="Highest contrast" />
               <ThemeColorControl label="Text Hint" variableKey="textHint" description="Hint text" />
               <ThemeColorControl label="Text Disabled" variableKey="textDisabled" description="Disabled text" />
+              <ThemeColorControl label="Text Body" variableKey="textBody" description="Paragraph text" />
               <ThemeColorControl label="Ink Body" variableKey="inkBody" description="Body text ink" />
               <ThemeColorControl label="Ink Strong" variableKey="inkStrong" description="Strong emphasis" />
               <ThemeColorControl label="Ink Muted" variableKey="inkMuted" description="Muted text" />
+              <ThemeColorControl label="Text Subtle" variableKey="textSubtle" description="Subtle captions" />
+              <ThemeColorControl label="Text Accent" variableKey="textAccent" description="Accent text" />
+              <ThemeColorControl label="Text Accent Strong" variableKey="textAccentStrong" description="High emphasis accent" />
               <ThemeColorControl label="Link Color" variableKey="linkColor" description="Link text" />
             </div>
           </details>
@@ -661,6 +688,98 @@ const fontOptions = [
           </div>
         </section>
       </div>
+
+      <div class="space-y-6 hidden" data-theme-panel="tokens" hidden>
+        <section class="rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm space-y-5">
+          <header class="space-y-1">
+            <h1 class="text-xl font-semibold text-primary">Global Color Tokens</h1>
+            <p class="text-sm text-body-muted">
+              Edit the typography token palette that powers <code>base.css</code> and <code>tokens.css</code>. Changes apply to all
+              components once saved.
+            </p>
+          </header>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs font-semibold uppercase tracking-wide text-body-muted">Comfort mode:</span>
+            <button
+              type="button"
+              class="rounded-lg border border-line-neutral px-3 py-1.5 text-xs font-medium transition data-[active='true']:bg-info data-[active='true']:text-white"
+              data-token-mode="midnight"
+              data-active="true"
+            >
+              🌙 Midnight (dark)
+            </button>
+            <button
+              type="button"
+              class="rounded-lg border border-line-neutral px-3 py-1.5 text-xs font-medium transition hover:bg-surface-soft"
+              data-token-mode="dawn"
+            >
+              🌅 Dawn (light)
+            </button>
+            <button
+              type="button"
+              class="ml-auto inline-flex items-center gap-2 rounded-lg border border-line-neutral px-3 py-1.5 text-xs font-medium transition hover:bg-surface-soft"
+              id="resetColorTokensBtn"
+            >
+              ↺ Reset from disk
+            </button>
+          </div>
+
+          <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3" data-token-fields>
+            {COLOR_TOKEN_FIELDS.map((field) => (
+              <label class="block text-sm" data-token-field={field.key}>
+                <span class="text-xs font-medium uppercase tracking-wide text-body-muted flex items-center gap-2">
+                  {field.label}
+                  {field.description && (
+                    <span class="text-[10px] normal-case font-normal opacity-75">({field.description})</span>
+                  )}
+                </span>
+                <div class="mt-1 flex items-center gap-2">
+                  <input
+                    type="color"
+                    class="h-9 w-12 rounded border border-line-neutral cursor-pointer"
+                    data-token-picker={field.key}
+                  />
+                  <input
+                    type="text"
+                    class="flex-1 rounded-lg border border-line-neutral px-3 py-2 font-mono text-sm"
+                    data-token-input={field.key}
+                    placeholder={field.placeholder}
+                  />
+                </div>
+              </label>
+            ))}
+          </div>
+
+          <div class="rounded-xl border border-line-subtle bg-surface-soft/60 p-4">
+            <p class="text-xs text-body-muted">Preview</p>
+            <div class="mt-3 space-y-2" data-token-preview>
+              <h2 class="text-xl font-semibold" data-token-preview-heading>Heading Example</h2>
+              <p class="text-sm" data-token-preview-body>
+                This paragraph reflects <code>--text-body</code> and updates live as you edit. Muted captions update below.
+              </p>
+              <p class="text-xs" data-token-preview-muted>
+                Hint text uses <code>--text-muted</code> and <code>--text-subtle</code> tokens.
+              </p>
+              <a href="#" class="text-sm underline" data-token-preview-link>
+                Sample link color
+              </a>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              class="rounded-lg bg-success px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition"
+              id="saveColorTokensBtn"
+              disabled
+            >
+              💾 Save color tokens
+            </button>
+            <p class="text-sm text-body-muted" data-token-status></p>
+          </div>
+        </section>
+      </div>
     </div>
   ) : (
     <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
@@ -672,6 +791,7 @@ const fontOptions = [
   {canUse && (
     <script>
       import '@/lib/theme-editor';
+      import '@/lib/color-token-editor';
     </script>
   )}
 

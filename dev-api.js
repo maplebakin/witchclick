@@ -80,7 +80,24 @@ const ACTIVE_THEME_FILE = path.join(THEMES_DIR, 'active.json');
 const LEGACY_THEME_FILE = path.join(CWD, 'content', 'theme.json');
 
 const THEME_REQUIRED_FIELDS = ['primary', 'accent', 'background', 'fontSerif', 'fontScript'];
-const THEME_OPTIONAL_FIELDS = ['textPrimary', 'textHeading', 'textMuted', 'backgroundImage'];
+const THEME_EXTRA_FIELDS = [
+  'colorMidnight', 'colorNight', 'colorIris', 'colorAmethyst', 'colorDusk', 'colorGold', 'colorRune', 'colorFog', 'colorInk',
+  'colorMuted', 'colorBorder', 'colorBorderStrong', 'colorOverlay', 'colorOverlayStrong',
+  'surfacePlain', 'surfacePlainBorder', 'cardPanelSurface', 'cardPanelSurfaceStrong', 'cardPanelBorder', 'cardPanelBorderStrong', 'cardPanelBorderSoft',
+  'textSecondary', 'textTertiary', 'textStrong', 'textHint', 'textDisabled', 'textBody', 'textSubtle', 'textAccent', 'textAccentStrong',
+  'inkBody', 'inkStrong', 'inkMuted', 'linkColor',
+  'cardBadgeBg', 'cardBadgeBorder', 'cardBadgeText', 'cardTagBg', 'cardTagBorder', 'cardTagText', 'cardSpoonBg', 'cardSpoonBorder', 'cardSpoonText',
+  'focusRingColor', 'cardFocusOutline',
+  'fontHeading', 'fontAccent',
+  'shadowSoft', 'shadowStrong',
+  'success', 'warning', 'error', 'info',
+  'entityCardBorder', 'entityCardGlow', 'entityCardHighlight', 'entityCardSurfaceTop', 'entityCardSurfaceBottom',
+  'entityCardHeading', 'entityCardText', 'entityCardLabel', 'entityCardCta', 'entityCardCtaHover', 'entityCardIcon', 'entityCardIconShadow',
+  'backgroundImage',
+  'textPrimary', 'textHeading', 'textMuted'
+];
+const THEME_OPTIONAL_FIELDS = ['textPrimary', 'textHeading', 'textMuted', 'backgroundImage', 'fontHeading', 'fontAccent', ...THEME_EXTRA_FIELDS];
+const THEME_ALL_FIELDS = Array.from(new Set([...THEME_REQUIRED_FIELDS, ...THEME_OPTIONAL_FIELDS]));
 const DEFAULT_THEME_SETTINGS = {
   midnight: {
     primary: '#6b21a8',
@@ -104,6 +121,53 @@ const DEFAULT_THEME_SETTINGS = {
   }
 };
 
+const COLOR_TOKENS_FILE = path.join(CWD, 'content', 'color-tokens.json');
+const COLOR_TOKEN_CSS_FILE = path.join(CWD, 'src', 'styles', 'color-tokens.generated.css');
+const COLOR_TOKEN_KEYS = [
+  'textPrimary',
+  'textSecondary',
+  'textTertiary',
+  'textHint',
+  'textDisabled',
+  'textBody',
+  'textSubtle',
+  'textAccent',
+  'textAccentStrong',
+  'textStrong',
+  'textMuted',
+  'linkColor'
+];
+const DEFAULT_COLOR_TOKENS = {
+  midnight: {
+    textPrimary: 'rgba(244, 241, 255, 0.96)',
+    textSecondary: 'rgba(244, 241, 255, 0.85)',
+    textTertiary: 'rgba(244, 241, 255, 0.75)',
+    textHint: 'rgba(244, 241, 255, 0.65)',
+    textDisabled: 'rgba(244, 241, 255, 0.45)',
+    textBody: 'rgba(249, 245, 255, 0.82)',
+    textSubtle: 'rgba(249, 245, 255, 0.7)',
+    textAccent: 'rgba(212, 175, 55, 0.7)',
+    textAccentStrong: 'rgba(212, 175, 55, 0.92)',
+    textStrong: 'rgba(249, 245, 255, 0.95)',
+    textMuted: 'rgba(249, 245, 255, 0.72)',
+    linkColor: '#e0c07d'
+  },
+  dawn: {
+    textPrimary: 'rgba(44, 27, 61, 1)',
+    textSecondary: 'rgba(44, 27, 61, 0.9)',
+    textTertiary: 'rgba(44, 27, 61, 0.75)',
+    textHint: 'rgba(44, 27, 61, 0.6)',
+    textDisabled: 'rgba(44, 27, 61, 0.4)',
+    textBody: 'rgba(87, 63, 115, 0.82)',
+    textSubtle: 'rgba(87, 63, 115, 0.65)',
+    textAccent: 'rgba(155, 134, 200, 0.7)',
+    textAccentStrong: 'rgba(87, 63, 115, 0.9)',
+    textStrong: 'rgba(58, 40, 84, 0.95)',
+    textMuted: 'rgba(87, 63, 115, 0.7)',
+    linkColor: '#caa043'
+  }
+};
+
 const MIME_EXTENSION_MAP = {
   'image/jpeg': '.jpg',
   'image/jpg': '.jpg',
@@ -111,6 +175,93 @@ const MIME_EXTENSION_MAP = {
   'image/webp': '.webp',
   'application/pdf': '.pdf',
 };
+
+function cloneDefaultColorTokens() {
+  return {
+    midnight: { ...DEFAULT_COLOR_TOKENS.midnight },
+    dawn: { ...DEFAULT_COLOR_TOKENS.dawn },
+  };
+}
+
+function toCssVarName(key) {
+  return `--${key.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}`;
+}
+
+function normalizeColorTokenState(raw) {
+  const defaults = cloneDefaultColorTokens();
+  const tokens = {
+    midnight: { ...defaults.midnight },
+    dawn: { ...defaults.dawn },
+  };
+
+  if (raw && typeof raw === 'object') {
+    const sourceTokens = raw.tokens && typeof raw.tokens === 'object' ? raw.tokens : {};
+    ['midnight', 'dawn'].forEach((mode) => {
+      const values = sourceTokens[mode];
+      if (!values || typeof values !== 'object') return;
+      COLOR_TOKEN_KEYS.forEach((key) => {
+        const value = values[key];
+        if (typeof value === 'string' && value.trim()) {
+          tokens[mode][key] = value.trim();
+        }
+      });
+    });
+  }
+
+  const updatedAt = typeof raw?.updatedAt === 'string' && raw.updatedAt.trim()
+    ? raw.updatedAt.trim()
+    : new Date().toISOString();
+
+  return {
+    schemaVersion: 1,
+    updatedAt,
+    tokens,
+  };
+}
+
+async function writeColorTokenCss(state) {
+  const defaults = cloneDefaultColorTokens();
+  const tokens = {
+    midnight: { ...defaults.midnight, ...(state?.tokens?.midnight || {}) },
+    dawn: { ...defaults.dawn, ...(state?.tokens?.dawn || {}) },
+  };
+  const timestamp = state?.updatedAt || new Date().toISOString();
+
+  const midnightLines = COLOR_TOKEN_KEYS.map((key) => {
+    const value = tokens.midnight[key] ?? defaults.midnight[key] ?? '';
+    return `  ${toCssVarName(key)}: ${value};`;
+  });
+  const dawnLines = COLOR_TOKEN_KEYS.map((key) => {
+    const value = tokens.dawn[key] ?? defaults.dawn[key] ?? '';
+    return `  ${toCssVarName(key)}: ${value};`;
+  });
+
+  const css = `/**\n * AUTO-GENERATED COLOR TOKENS\n * Generated: ${timestamp}\n * Source: content/color-tokens.json\n */\n\n:root {\n${midnightLines.join('\n')}\n}\n\n:root[data-comfort-theme="dawn"] {\n${dawnLines.join('\n')}\n}\n`;
+
+  ensureDir(path.dirname(COLOR_TOKEN_CSS_FILE));
+  await fsp.writeFile(COLOR_TOKEN_CSS_FILE, css, 'utf8');
+}
+
+async function loadColorTokens() {
+  const raw = readJSON(COLOR_TOKENS_FILE);
+  const state = normalizeColorTokenState(raw);
+  await writeColorTokenCss(state);
+  return state;
+}
+
+async function saveColorTokens(payload) {
+  if (!payload || typeof payload !== 'object' || typeof payload.tokens !== 'object') {
+    throw new Error('tokens object required');
+  }
+
+  const state = normalizeColorTokenState({ tokens: payload.tokens });
+  state.updatedAt = new Date().toISOString();
+
+  ensureDir(path.dirname(COLOR_TOKENS_FILE));
+  await fsp.writeFile(COLOR_TOKENS_FILE, JSON.stringify(state, null, 2), 'utf8');
+  await writeColorTokenCss(state);
+  return state;
+}
 
 function toStringArray(value) {
   if (Array.isArray(value)) {
@@ -1077,7 +1228,7 @@ function readActiveThemeMapping() {
 function extractThemeValues(source) {
   const values = {};
   if (!source || typeof source !== 'object') return values;
-  const allFields = [...THEME_REQUIRED_FIELDS, ...THEME_OPTIONAL_FIELDS];
+  const allFields = THEME_ALL_FIELDS;
   for (const key of allFields) {
     const value = source[key];
     if (typeof value === 'string' && value.trim()) {
@@ -1093,7 +1244,7 @@ function mergeThemeSettings(raw, mode, sourceName) {
     throw new Error(`Unknown theme mode: ${mode}`);
   }
 
-  const allFields = [...THEME_REQUIRED_FIELDS, ...THEME_OPTIONAL_FIELDS];
+  const allFields = THEME_ALL_FIELDS;
   const entries = raw && typeof raw === 'object' ? Object.entries(raw) : [];
   for (const [key, value] of entries) {
     if (!allFields.includes(key)) continue;
@@ -1761,6 +1912,25 @@ const server = http.createServer(async (req, res) => {
      * 3) Static serving:
      *    - Astro serves files from /public. These will be accessible at /downloads/<slug>/... in production.
      */
+
+    if (req.method === 'POST' && req.url === '/color-tokens/get') {
+      try {
+        const data = await loadColorTokens();
+        return send(res, 200, { ok: true, tokens: data.tokens, updatedAt: data.updatedAt });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/color-tokens/save') {
+      try {
+        const body = await parseBody(req);
+        const state = await saveColorTokens(body || {});
+        return send(res, 200, { ok: true, tokens: state.tokens, updatedAt: state.updatedAt });
+      } catch (e) {
+        return send(res, 400, { ok: false, error: e?.message || String(e) });
+      }
+    }
 
     // ---- Themes
     if (req.method === 'POST' && req.url === '/themes/list') {
