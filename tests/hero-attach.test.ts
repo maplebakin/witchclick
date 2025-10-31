@@ -4,10 +4,10 @@ import os from "node:os";
 import { EventEmitter } from "node:events";
 
 import matter from "gray-matter";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 let tempDir: string;
-let cwdSpy: ReturnType<typeof vi.spyOn> | undefined;
+let cwdSpy: MockInstance<() => string> | undefined;
 let attachHeroToPost: (
   payload: { slug: string; heroImage: string; heroAlt?: string | null },
 ) => Promise<{ path: string }>;
@@ -79,7 +79,8 @@ async function prepareTempDir() {
   await fs.mkdir(path.join(tempDir, "content", "posts"), { recursive: true });
   await fs.mkdir(path.join(tempDir, "src", "content", "posts"), { recursive: true });
   await fs.mkdir(path.join(tempDir, "public", "images", "hero"), { recursive: true });
-  cwdSpy = vi.spyOn(process, "cwd").mockReturnValue(tempDir);
+  cwdSpy = vi.spyOn(process, "cwd");
+  cwdSpy.mockReturnValue(tempDir);
 }
 
 async function cleanupTempDir() {

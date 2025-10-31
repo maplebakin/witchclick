@@ -1,15 +1,16 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 let tempDir: string;
-let cwdSpy: ReturnType<typeof vi.spyOn> | undefined;
+let cwdSpy: MockInstance<() => string> | undefined;
 
 async function setupTempContent() {
   tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "wc-search-"));
   await fs.mkdir(path.join(tempDir, "src", "content", "posts"), { recursive: true });
-  cwdSpy = vi.spyOn(process, "cwd").mockReturnValue(tempDir);
+  cwdSpy = vi.spyOn(process, "cwd");
+  cwdSpy.mockReturnValue(tempDir);
 }
 
 async function teardownTempContent() {

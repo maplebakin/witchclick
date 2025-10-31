@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
-import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 import type {
   AdminThemeListing,
@@ -10,7 +10,7 @@ import type {
 } from "../dev-api.js";
 
 let tempDir: string;
-let cwdSpy: ReturnType<typeof vi.spyOn> | undefined;
+let cwdSpy: MockInstance<() => string> | undefined;
 let listThemes: () => Promise<AdminThemeListing>;
 let saveThemeRecord: (payload: Record<string, unknown>) => Promise<AdminThemeRecord>;
 let setActiveThemeRecord: (
@@ -19,7 +19,8 @@ let setActiveThemeRecord: (
 
 async function prepareTempDir() {
   tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "wc-admin-theme-"));
-  cwdSpy = vi.spyOn(process, "cwd").mockReturnValue(tempDir);
+  cwdSpy = vi.spyOn(process, "cwd");
+  cwdSpy.mockReturnValue(tempDir);
 }
 
 async function cleanupTempDir() {

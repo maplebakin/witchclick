@@ -119,7 +119,8 @@ function collectAllEntities(): EntityRef[] {
 
 function findEntityWithRelatedPost(): EntityWithPost | null {
   const references = collectEntityReferences();
-  return references.length > 0 ? references[0] : null;
+  const first = references[0];
+  return first ?? null;
 }
 
 function findEntityWithoutRelatedPost(): EntityRef | null {

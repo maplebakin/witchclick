@@ -738,10 +738,13 @@ function pretty(v: unknown) {
 <script>
   // Entity graph help toggle
   function initGraphHelp() {
-    const trigger = document.querySelector('[data-graph-help-trigger]');
-    const legend = document.querySelector('[data-graph-legend]');
+    const maybeTrigger = document.querySelector('[data-graph-help-trigger]');
+    const maybeLegend = document.querySelector('[data-graph-legend]');
 
-    if (!trigger || !legend) return;
+    if (!(maybeTrigger instanceof HTMLElement) || !(maybeLegend instanceof HTMLElement)) return;
+
+    const trigger = maybeTrigger;
+    const legend = maybeLegend;
 
     let isOpen = false;
 
