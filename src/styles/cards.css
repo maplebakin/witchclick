@@ -9,60 +9,52 @@
 
 :root {
   /* Card Geometry */
-  --card-radius: 1.5rem;
-  --card-hover-translate: -0.35rem;
+  --card-radius: clamp(1.3rem, 3vw, 1.8rem);
+  --card-hover-translate: -0.4rem;
   --card-transition: 220ms ease;
   --card-focus-offset: 5px;
 
   /* Card Surfaces */
-  --card-panel-surface: color-mix(in srgb, var(--color-night) 88%, var(--color-midnight) 12%);
-  --card-panel-surface-strong: color-mix(in srgb, var(--color-night) 78%, var(--color-midnight) 22%);
+  --card-panel-surface: color-mix(in srgb, var(--surface-card) 92%, transparent 8%);
+  --card-panel-surface-strong: color-mix(in srgb, var(--surface-panel-primary) 90%, transparent 10%);
 
   /* Card Borders */
-  --card-panel-border: color-mix(in srgb, var(--color-gold) 32%, transparent 68%);
-  --card-panel-border-strong: color-mix(in srgb, var(--color-gold) 48%, transparent 52%);
-  --card-panel-border-soft: color-mix(in srgb, var(--color-iris) 28%, transparent 72%);
+  --card-panel-border: color-mix(in srgb, var(--border-purple-subtle, rgba(124, 78, 176, 0.28)) 92%, transparent 8%);
+  --card-panel-border-strong: color-mix(in srgb, var(--border-accent-medium, rgba(212, 175, 55, 0.35)) 92%, transparent 8%);
+  --card-panel-border-soft: color-mix(in srgb, var(--border-purple-subtle, rgba(124, 78, 176, 0.28)) 75%, transparent 25%);
 
   /* Focus Ring Styles */
-  --card-focus-outline: color-mix(in srgb, var(--color-gold) 82%, white 18%);
-  --card-focus-ring: 
-    0 0 0 2px color-mix(in srgb, var(--color-night) 72%, transparent 28%),
-    0 0 0 calc(var(--card-focus-offset) + 2px) color-mix(in srgb, var(--card-focus-outline) 35%, transparent 65%);
-  --card-focus-ring-strong: 
-    0 0 0 2px color-mix(in srgb, var(--color-iris) 42%, transparent 58%),
-    0 0 0 calc(var(--card-focus-offset) + 2px) color-mix(in srgb, var(--card-focus-outline) 40%, transparent 60%);
+  --card-focus-outline: var(--focus-ring, rgba(212, 175, 55, 0.6));
+  --card-focus-ring:
+    0 0 0 2px color-mix(in srgb, var(--surface-panel-primary) 72%, transparent 28%),
+    0 0 0 calc(var(--card-focus-offset) + 2px) color-mix(in srgb, var(--card-focus-outline) 45%, transparent 55%);
+  --card-focus-ring-strong:
+    0 0 0 2px color-mix(in srgb, var(--accent-purple-soft) 45%, transparent 55%),
+    0 0 0 calc(var(--card-focus-offset) + 2px) color-mix(in srgb, var(--card-focus-outline) 55%, transparent 45%);
 
   /* Radial Highlights */
-  --card-highlight: radial-gradient(
-    circle at 15% -25%,
-    color-mix(in srgb, var(--color-gold) 32%, transparent 68%),
-    transparent 60%
-  );
-  --card-highlight-alt: radial-gradient(
-    circle at 85% -10%,
-    color-mix(in srgb, var(--color-iris) 36%, transparent 64%),
-    transparent 70%
-  );
+  --card-highlight: var(--gradient-purple-radial);
+  --card-highlight-alt: var(--gradient-gold-radial);
   --card-highlight-soft: radial-gradient(
-    circle at 50% 0%,
-    color-mix(in srgb, var(--color-iris) 26%, transparent 74%),
+    circle at 50% -20%,
+    color-mix(in srgb, var(--accent-purple-soft) 45%, transparent 55%),
     transparent 70%
   );
 
   /* Elevation Tiers */
-  --elevation-tier-1: 0 20px 45px -25px rgba(11, 6, 20, 0.45);
-  --elevation-tier-2: 0 25px 60px -30px rgba(7, 4, 18, 0.55);
-  --elevation-tier-3: 0 35px 75px -32px rgba(5, 3, 14, 0.62);
-  --elevation-tier-ambient: 0 10px 25px -18px rgba(9, 5, 18, 0.35);
+  --elevation-tier-1: var(--shadow-card, 0 20px 45px -25px rgba(11, 6, 20, 0.45));
+  --elevation-tier-2: 0 28px 60px -32px rgba(9, 5, 18, 0.58);
+  --elevation-tier-3: 0 36px 82px -36px rgba(6, 4, 16, 0.62);
+  --elevation-tier-ambient: 0 18px 48px -30px rgba(10, 6, 20, 0.45);
 
   /* Badge & Tag Styles */
-  --card-badge-bg: color-mix(in srgb, var(--color-gold) 30%, transparent 70%);
-  --card-badge-border: color-mix(in srgb, var(--color-gold) 55%, transparent 45%);
-  --card-badge-text: color-mix(in srgb, var(--color-gold) 90%, var(--ink-strong, #f4f1ff) 10%);
-  
-  --card-tag-bg: color-mix(in srgb, var(--color-iris) 26%, transparent 74%);
-  --card-tag-border: color-mix(in srgb, var(--color-iris) 42%, transparent 58%);
-  --card-tag-text: color-mix(in srgb, var(--ink-body, #f4f1ff) 85%, white 15%);
+  --card-badge-bg: color-mix(in srgb, var(--text-accent-strong, rgba(212, 175, 55, 0.92)) 20%, transparent 80%);
+  --card-badge-border: color-mix(in srgb, var(--border-accent-medium, rgba(212, 175, 55, 0.35)) 85%, transparent 15%);
+  --card-badge-text: color-mix(in srgb, var(--text-accent-strong, rgba(212, 175, 55, 0.92)) 88%, var(--text-strong) 12%);
+
+  --card-tag-bg: color-mix(in srgb, var(--chip-background, rgba(212, 175, 55, 0.15)) 88%, transparent 12%);
+  --card-tag-border: color-mix(in srgb, var(--chip-border, rgba(212, 175, 55, 0.32)) 80%, transparent 20%);
+  --card-tag-text: color-mix(in srgb, var(--text-body) 90%, white 10%);
 
   /* Spoon Level Indicator Defaults */
   --card-spoon-bg: rgba(212, 175, 55, 0.18);
@@ -73,58 +65,50 @@
 /* Dawn Theme Variants */
 :root[data-comfort-theme="dawn"] {
   /* Card Surfaces */
-  --card-panel-surface: rgba(255, 252, 247, 0.92);
-  --card-panel-surface-strong: rgba(248, 244, 240, 0.95);
+  --card-panel-surface: color-mix(in srgb, var(--surface-card) 95%, white 5%);
+  --card-panel-surface-strong: color-mix(in srgb, var(--surface-panel-primary) 94%, white 6%);
 
   /* Card Borders */
-  --card-panel-border: color-mix(in srgb, var(--color-iris) 32%, transparent 68%);
-  --card-panel-border-strong: color-mix(in srgb, var(--color-iris) 48%, transparent 52%);
-  --card-panel-border-soft: color-mix(in srgb, var(--color-iris) 28%, transparent 72%);
+  --card-panel-border: color-mix(in srgb, var(--border-purple-subtle, rgba(180, 154, 217, 0.28)) 92%, transparent 8%);
+  --card-panel-border-strong: color-mix(in srgb, var(--border-accent-medium, rgba(155, 134, 200, 0.35)) 92%, transparent 8%);
+  --card-panel-border-soft: color-mix(in srgb, var(--border-purple-subtle, rgba(180, 154, 217, 0.3)) 70%, transparent 30%);
 
   /* Hover & Transitions */
-  --card-hover-translate: -0.3rem;
+  --card-hover-translate: -0.28rem;
 
   /* Focus Ring Styles */
-  --card-focus-outline: color-mix(in srgb, var(--color-iris) 68%, white 32%);
-  --card-focus-ring: 
-    0 0 0 2px color-mix(in srgb, var(--color-iris) 32%, transparent 68%),
-    0 0 0 calc(var(--card-focus-offset) + 2px) color-mix(in srgb, var(--card-focus-outline) 38%, transparent 62%);
-  --card-focus-ring-strong: 
-    0 0 0 2px color-mix(in srgb, var(--color-iris) 46%, transparent 54%),
-    0 0 0 calc(var(--card-focus-offset) + 2px) color-mix(in srgb, var(--card-focus-outline) 44%, transparent 56%);
+  --card-focus-outline: var(--focus-ring, rgba(155, 134, 200, 0.6));
+  --card-focus-ring:
+    0 0 0 2px color-mix(in srgb, rgba(155, 134, 200, 0.45) 85%, transparent 15%),
+    0 0 0 calc(var(--card-focus-offset) + 2px) color-mix(in srgb, var(--card-focus-outline) 55%, transparent 45%);
+  --card-focus-ring-strong:
+    0 0 0 2px color-mix(in srgb, rgba(155, 134, 200, 0.5) 85%, transparent 15%),
+    0 0 0 calc(var(--card-focus-offset) + 2px) color-mix(in srgb, var(--card-focus-outline) 65%, transparent 35%);
 
   /* Radial Highlights */
-  --card-highlight: radial-gradient(
-    circle at 15% -25%,
-    color-mix(in srgb, var(--color-iris) 40%, transparent 60%),
-    transparent 60%
-  );
-  --card-highlight-alt: radial-gradient(
-    circle at 85% -10%,
-    color-mix(in srgb, var(--color-iris) 28%, transparent 72%),
-    transparent 70%
-  );
+  --card-highlight: var(--gradient-purple-radial);
+  --card-highlight-alt: var(--gradient-gold-radial);
   --card-highlight-soft: radial-gradient(
-    circle at 50% 0%,
-    color-mix(in srgb, var(--color-iris) 32%, transparent 68%),
+    circle at 50% -20%,
+    color-mix(in srgb, rgba(180, 154, 217, 0.5) 70%, transparent 30%),
     transparent 70%
   );
 
   /* Elevation Tiers */
-  --elevation-tier-1: 0 18px 45px -28px rgba(74, 58, 104, 0.18);
-  --elevation-tier-2: 0 25px 60px -32px rgba(74, 58, 104, 0.24);
-  --elevation-tier-3: 0 35px 75px -34px rgba(74, 58, 104, 0.28);
-  --elevation-tier-ambient: 0 15px 40px -28px rgba(74, 58, 104, 0.18);
+  --elevation-tier-1: var(--shadow-card, 0 18px 48px -30px rgba(93, 76, 128, 0.32));
+  --elevation-tier-2: 0 24px 58px -34px rgba(93, 76, 128, 0.32);
+  --elevation-tier-3: 0 32px 80px -36px rgba(86, 64, 132, 0.34);
+  --elevation-tier-ambient: 0 18px 48px -32px rgba(100, 82, 140, 0.26);
 
   /* Badge & Tag Styles */
-  --card-badge-bg: color-mix(in srgb, var(--color-iris) 26%, transparent 74%);
-  --card-badge-border: color-mix(in srgb, var(--color-iris) 45%, transparent 55%);
-  --card-badge-text: color-mix(in srgb, var(--color-ink) 85%, var(--color-iris) 15%);
-  
-  --card-tag-bg: color-mix(in srgb, var(--color-iris) 28%, transparent 72%);
-  --card-tag-border: color-mix(in srgb, var(--color-iris) 45%, transparent 55%);
-  --card-tag-text: color-mix(in srgb, var(--color-ink) 88%, var(--color-iris) 12%);
-  --card-pill-shadow: 0 2px 6px rgba(74, 58, 104, 0.14);
+  --card-badge-bg: color-mix(in srgb, var(--text-accent, rgba(155, 134, 200, 0.7)) 28%, transparent 72%);
+  --card-badge-border: color-mix(in srgb, var(--border-accent-medium, rgba(155, 134, 200, 0.35)) 85%, transparent 15%);
+  --card-badge-text: color-mix(in srgb, var(--text-strong) 92%, var(--accent-purple-soft) 8%);
+
+  --card-tag-bg: color-mix(in srgb, var(--chip-background, rgba(186, 166, 220, 0.25)) 92%, transparent 8%);
+  --card-tag-border: color-mix(in srgb, var(--chip-border, rgba(155, 134, 200, 0.45)) 85%, transparent 15%);
+  --card-tag-text: color-mix(in srgb, var(--text-body) 90%, black 10%);
+  --card-pill-shadow: 0 4px 10px -6px rgba(74, 58, 104, 0.18);
 
   /* Spoon Level Indicator Defaults */
   --card-spoon-text: rgba(62, 39, 92, 0.88);
@@ -155,26 +139,33 @@
   border-radius: var(--wc-radius-lg, var(--card-radius));
   padding: 0;
   border: 1px solid var(--card-panel-border);
-  background: var(--card-panel-surface);
-  backdrop-filter: blur(18px);
-  box-shadow: var(--card-elevation-base, var(--wc-shadow-soft, var(--elevation-tier-1)));
-  color: inherit;
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--card-panel-surface) 70%, transparent 30%) 0%, transparent 68%),
+    var(--card-panel-surface);
+  color: var(--text-body);
   overflow: hidden;
-  transition: 
+  isolation: isolate;
+  backdrop-filter: blur(22px);
+  box-shadow: var(--card-elevation-base, var(--wc-shadow-soft, var(--elevation-tier-1)));
+  transition:
     transform var(--card-transition),
     box-shadow var(--card-transition),
-    border-color var(--card-transition);
+    border-color var(--card-transition),
+    background 260ms ease;
 }
 
 .card-panel:hover,
 .card-panel:focus-visible {
   transform: translateY(var(--card-hover-translate));
+  border-color: color-mix(in srgb, var(--card-panel-border-strong) 85%, transparent 15%);
   box-shadow: var(--card-elevation-hover, var(--elevation-tier-2));
-  border-color: var(--card-panel-border-hover, var(--card-panel-border-strong));
+  background:
+    linear-gradient(170deg, color-mix(in srgb, var(--surface-card-hover, var(--card-panel-surface)) 65%, transparent 35%) 0%, transparent 70%),
+    color-mix(in srgb, var(--surface-card-hover, var(--card-panel-surface)) 92%, transparent 8%);
 }
 
 .card-panel:active {
-  transform: translateY(calc(var(--card-hover-translate) * 0.5));
+  transform: translateY(calc(var(--card-hover-translate) * 0.45));
   box-shadow: var(--card-elevation-active, var(--elevation-tier-ambient));
 }
 
@@ -189,7 +180,9 @@
    --------------------------------------------------------------------------- */
 
 .card-panel-strong {
-  background: var(--card-panel-surface-strong);
+  background:
+    linear-gradient(155deg, color-mix(in srgb, var(--card-panel-surface-strong) 72%, transparent 28%) 0%, transparent 65%),
+    var(--card-panel-surface-strong);
   border-color: var(--card-panel-border-strong);
 }
 
@@ -236,26 +229,26 @@
 .card-radial {
   position: absolute;
   pointer-events: none;
-  width: 140%;
-  height: 65%;
+  width: 150%;
+  height: 68%;
   filter: blur(0px);
-  opacity: 0.55;
+  opacity: 0.5;
   transition: transform var(--card-transition), opacity var(--card-transition);
   z-index: 0;
 }
 
 .card-radial-top {
-  top: -40%;
-  left: -20%;
+  top: -45%;
+  left: -25%;
   background: var(--card-highlight);
-  transform: rotate(-6deg);
+  transform: rotate(-8deg);
 }
 
 .card-radial-bottom {
-  bottom: -45%;
-  right: -10%;
+  bottom: -52%;
+  right: -18%;
   background: var(--card-highlight-alt);
-  transform: rotate(12deg);
+  transform: rotate(10deg);
 }
 
 .card-radial-soft {
@@ -288,15 +281,15 @@
   gap: 0.3rem;
   border-radius: 9999px;
   padding: 0.4rem 0.85rem;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   line-height: 1.2;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: none;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   background: var(--card-pill-bg, var(--card-tag-bg));
   border: 1px solid var(--card-pill-border, var(--card-tag-border));
   color: var(--card-pill-text, var(--card-tag-text));
-  box-shadow: var(--card-pill-shadow, 0 2px 6px rgba(15, 23, 42, 0.12));
+  box-shadow: var(--card-pill-shadow, 0 4px 12px -8px rgba(11, 6, 20, 0.35));
 }
 
 .card-badge {
@@ -305,14 +298,14 @@
   --card-pill-text: var(--card-badge-text);
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  font-size: 0.6875rem;
+  font-size: 0.7rem;
 }
 
 .card-tag {
   --card-pill-bg: var(--card-tag-bg);
   --card-pill-border: var(--card-tag-border);
   --card-pill-text: var(--card-tag-text);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: none;
 }
 
@@ -388,6 +381,122 @@
 }
 
 /* ---------------------------------------------------------------------------
+   Ritual Post Card Structure
+   --------------------------------------------------------------------------- */
+
+.ritual-card {
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, auto) 1fr;
+  min-height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.ritual-card .card-figure {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  background: color-mix(in srgb, var(--surface-muted, rgba(14, 6, 26, 0.65)) 88%, transparent 12%);
+  border-bottom: 1px solid color-mix(in srgb, var(--card-panel-border) 65%, transparent 35%);
+  overflow: hidden;
+}
+
+.ritual-card .card-figure[data-has-image="true"] {
+  background: color-mix(in srgb, var(--surface-muted, rgba(14, 6, 26, 0.65)) 55%, transparent 45%);
+}
+
+.ritual-card .card-figure__media {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transform: scale(1);
+  transition: transform 280ms ease;
+}
+
+.ritual-card:hover .card-figure__media,
+.ritual-card:focus-visible .card-figure__media {
+  transform: scale(1.03);
+}
+
+.ritual-card .card-body {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: clamp(0.75rem, 2.5vw, 1.15rem);
+  padding: clamp(1.2rem, 3.5vw, 1.65rem);
+}
+
+.ritual-card .card-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--text-subtle) 94%, transparent 6%);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ritual-card .card-metadata__item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.ritual-card .card-metadata__item + .card-metadata__item::before {
+  content: "•";
+  font-size: 0.65rem;
+  color: currentColor;
+  margin-right: 0.4rem;
+}
+
+.ritual-card .card-text {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.ritual-card .card-heading {
+  margin: 0;
+  font-family: var(--font-heading, var(--font-body));
+  font-size: clamp(1.15rem, 2.6vw, 1.4rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-strong);
+}
+
+.ritual-card .card-subtle {
+  margin: 0;
+  font-size: 0.97rem;
+  line-height: 1.65;
+  color: color-mix(in srgb, var(--text-body) 94%, transparent 6%);
+}
+
+.ritual-card .card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: auto;
+}
+
+.ritual-card .card-tags .card-pill {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  padding: 0.35rem 0.75rem;
+}
+
+:root[data-comfort-theme="dawn"] .ritual-card .card-heading {
+  color: color-mix(in srgb, var(--text-strong) 96%, black 4%);
+}
+
+:root[data-comfort-theme="dawn"] .ritual-card .card-subtle {
+  color: color-mix(in srgb, var(--text-body) 96%, transparent 4%);
+}
+
+/* ---------------------------------------------------------------------------
    Card Typography
    --------------------------------------------------------------------------- */
 
@@ -403,7 +512,10 @@
    --------------------------------------------------------------------------- */
 
 .post-article-unified-card {
-  background-color: var(--surface-card, #f4f1ff);
+  background:
+    var(--gradient-purple-radial),
+    var(--card-panel-surface-strong, var(--surface-panel-primary));
+  border: 1px solid var(--card-panel-border-strong);
   border-radius: var(--card-radius);
   padding: clamp(2rem, 5vw, 3rem);
   max-width: 900px;
@@ -411,5 +523,5 @@
   margin-right: auto;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--elevation-tier-2);
 }

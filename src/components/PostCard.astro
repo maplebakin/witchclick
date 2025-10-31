@@ -85,6 +85,11 @@ const _tldrRaw = typeof (tldr ?? post?.tldr) === 'string' ? String((tldr ?? post
 const _summarySource = _tldrRaw.trim() ? _tldrRaw : _excerpt
 const _summary = truncateSummary(_summarySource)
 
+const metadataItems = [
+  _dateLabel,
+  typeof _mins === 'number' && Number.isFinite(_mins) ? `${_mins} min ritual` : undefined,
+].filter((value): value is string => Boolean(value))
+
 const heroContext = {
   ...(post && typeof post === 'object' ? post : {}),
   heroImage: heroImage ?? (post as any)?.heroImage,
@@ -151,11 +156,12 @@ function truncateSummary(value: string | undefined | null, max = 120): string {
   </div>
   <div class="card-body">
     {_spoon && <SpoonsBadge level={_spoon} />}
-    {_dateLabel && (
-      <div class="card-metadata">
-        <span>{_dateLabel}</span>
-        {_mins && <span>{_mins} min ritual</span>}
-      </div>
+    {metadataItems.length > 0 && (
+      <ul class="card-metadata">
+        {metadataItems.map((item) => (
+          <li class="card-metadata__item">{item}</li>
+        ))}
+      </ul>
     )}
     <div class="card-text">
       <h3 class="card-heading">{_title}</h3>
