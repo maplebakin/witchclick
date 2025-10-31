@@ -42,7 +42,7 @@ describe("posts utilities", () => {
 
     await fs.writeFile(
       path.join(srcDir, "source.md"),
-      `---\ntitle: Source Post\npubDate: 2024-01-01T00:00:00Z\n---\nHello from src`,
+      `---\ntitle: Source Post\npubDate: 2024-01-02T00:00:00Z\n---\nHello from src`,
       "utf8",
     );
 
@@ -57,10 +57,11 @@ describe("posts utilities", () => {
     resetPostCache();
 
     const posts = loadAllPosts();
-    expect(posts).toHaveLength(1);
-    const firstPost = posts[0];
+    expect(posts).toHaveLength(2);
+    const [firstPost, secondPost] = posts;
     expect(firstPost).toBeDefined();
     expect(firstPost?.slug).toBe("source");
+    expect(secondPost?.slug).toBe("legacy");
   });
 
   it("refreshes posts on subsequent reads when caching is disabled", async () => {
