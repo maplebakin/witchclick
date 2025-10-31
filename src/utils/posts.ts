@@ -87,11 +87,18 @@ function resolvePostDirectories(): string[] {
   const modern = path.join(cwd, "src", "content", "posts");
   const legacy = path.join(cwd, "content", "posts");
 
-  if (directoryHasMarkdown(modern)) {
+  const modernHasMarkdown = directoryHasMarkdown(modern);
+  const legacyHasMarkdown = directoryHasMarkdown(legacy);
+
+  if (modernHasMarkdown && legacyHasMarkdown) {
+    return [modern, legacy];
+  }
+
+  if (modernHasMarkdown) {
     return [modern];
   }
 
-  if (directoryHasMarkdown(legacy)) {
+  if (legacyHasMarkdown) {
     return [legacy];
   }
 
