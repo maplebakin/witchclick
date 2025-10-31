@@ -6,7 +6,7 @@ import "@/styles/tailwind.css";
 
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
-import ComfortFab from "@/components/ComfortFab.astro";
+import ComfortTray from "@/components/ComfortTray.astro";
 import {
   primaryNavLinks,
   secondaryNavLinks,
@@ -441,24 +441,28 @@ const observabilityConfig = shouldLoadObservability
       adminSections={adminSections}
       currentPath={currentPath}
     />
-    
-    <main
-      id="main"
-      class:list={mainClassList}
-      data-plain-reading={isPlainReadingRoute ? "true" : undefined}
-    >
-      <div
-        class:list={containerClassList}
+
+    <div class="site-shell__content">
+      <main
+        id="main"
+        class:list={mainClassList}
+        data-plain-reading={isPlainReadingRoute ? "true" : undefined}
       >
-        <div class="site-main__breadcrumbs">
-          <slot name="breadcrumbs" />
+        <div
+          class:list={containerClassList}
+        >
+          <div class="site-main__breadcrumbs">
+            <slot name="breadcrumbs" />
+          </div>
+          <div class:list={contentClassList}>
+            <slot />
+          </div>
         </div>
-        <div class:list={contentClassList}>
-          <slot />
-        </div>
-      </div>
-    </main>
-    
+      </main>
+
+      <ComfortTray />
+    </div>
+
     <Footer
       brandName={brandName}
       navLinks={navLinks}
@@ -466,8 +470,6 @@ const observabilityConfig = shouldLoadObservability
       utilityLinks={footerUtilities}
       disclosure={disclosure}
     />
-    
-    <ComfortFab />
     
     <!-- Analytics -->
     {analytics?.runtime?.inline && (
@@ -488,114 +490,3 @@ const observabilityConfig = shouldLoadObservability
     </script>
   </body>
 </html>
-
-<style is:inline>
-  .skip-link {
-    position: absolute;
-    left: -999px;
-    top: auto;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    padding: 0.75rem 1.5rem;
-    border-radius: 999px;
-    background: var(--color-night, #120725);
-    color: var(--color-muted, #f4f1ff);
-    z-index: 100;
-  }
-
-  .skip-link:focus {
-    left: 1rem;
-    top: 1rem;
-    width: auto;
-    height: auto;
-  }
-
-  .site-shell {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: #1a1325;
-    color: color-mix(in srgb, var(--ink-strong, #f4f1ff) 92%, var(--ambient-highlight, #e9d4ff) 8%);
-  }
-
-  .site-shell--plain {
-    background: #1a1325;
-  }
-
-  .site-main {
-    flex: 1 1 auto;
-    padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(3rem, 7vw, 4.5rem);
-  }
-
-  .site-main--plain {
-    padding: clamp(2rem, 5.5vw, 3.5rem) 0 clamp(2.5rem, 6vw, 4rem);
-  }
-
-  .site-main__container {
-    display: grid;
-    gap: clamp(1.5rem, 4vw, 2.5rem);
-  }
-
-  .site-main__container--plain {
-    position: relative;
-    padding: clamp(1.75rem, 4vw, 2.75rem);
-    border-radius: clamp(1.25rem, 3vw, 2.5rem);
-    border: 1px solid var(--surface-plain-border, rgba(124, 78, 176, 0.32));
-    background: var(--surface-plain, rgba(18, 7, 37, 0.88));
-    box-shadow: var(--surface-plain-shadow, 0 24px 55px -28px rgba(3, 2, 12, 0.72));
-    backdrop-filter: blur(18px);
-    gap: clamp(1.5rem, 3vw, 2.5rem);
-    overflow: hidden;
-  }
-
-  .site-main__container--plain::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--color-overlay-strong, rgba(18, 7, 37, 0.6)) 65%, transparent 35%) 0%,
-      transparent 70%
-    );
-    opacity: 0.5;
-    pointer-events: none;
-  }
-
-  .site-main__container--plain > * {
-    position: relative;
-    z-index: 1;
-  }
-
-  .site-main__breadcrumbs:empty {
-    display: none;
-  }
-
-  .site-main__content {
-    display: grid;
-    gap: clamp(2rem, 5vw, 3rem);
-  }
-
-  .site-main__container--wide {
-    --wc-container-max: 96rem;
-  }
-
-  .site-main__container--desktop-wide {
-    --wc-container-max: 96rem;
-  }
-
-  @media (max-width: 640px) {
-    .site-main__container--plain {
-      padding: clamp(1.25rem, 6vw, 1.75rem);
-      border-radius: clamp(1rem, 6vw, 1.75rem);
-      gap: clamp(1.25rem, 4vw, 1.75rem);
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .site-main__container--desktop-wide {
-      --wc-container-max: 104rem;
-    }
-  }
-</style>

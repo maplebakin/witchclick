@@ -1,0 +1,16 @@
+---
+import ComfortSettings from "./ComfortSettings.astro";
+
+const headingId = "comfort-tray-title";
+const introId = "comfort-tray-intro";
+---
+<aside class="comfort-tray" role="complementary" aria-labelledby={headingId} aria-describedby={introId}>
+  <div class="comfort-tray__inner">
+    <div class="comfort-tray__header">
+      <span class="comfort-tray__icon" aria-hidden="true">✶</span>
+      <h2 id={headingId} class="comfort-tray__title">Comfort</h2>
+    </div>
+    <p id={introId} class="comfort-tray__intro">Tune fonts, contrast, and glow whenever you need a softer read.</p>
+    <ComfortSettings variant="stacked" />
+  </div>
+</aside>

@@ -63,6 +63,76 @@
   --shadow-soft: 0 18px 45px -28px rgba(11, 6, 20, 0.55);
   --shadow-strong: 0 28px 75px -24px rgba(3, 2, 12, 0.72);
 
+  /* Layout Surfaces */
+  --layout-shell-background: color-mix(in srgb, var(--color-night) 78%, black 22%);
+  --layout-shell-background-plain: color-mix(in srgb, var(--color-night) 82%, black 18%);
+  --layout-shell-ink: color-mix(in srgb, var(--ink-strong) 95%, var(--color-night) 5%);
+  --layout-shell-ink-plain: color-mix(in srgb, var(--ink-strong) 90%, var(--color-night) 10%);
+  --layout-shell-gap: clamp(2.25rem, 6vw, 3.75rem);
+  --layout-main-padding-block: clamp(3.75rem, 9vw, 5.75rem);
+  --layout-main-padding-block-end: clamp(4.5rem, 10vw, 7rem);
+  --layout-main-padding-block-plain: clamp(3rem, 7vw, 5rem);
+  --layout-main-gap: clamp(3rem, 8vw, 5rem);
+  --layout-main-plain-gap: clamp(2.5rem, 7vw, 4.5rem);
+  --layout-main-container-gap: clamp(2.25rem, 6vw, 3.5rem);
+  --layout-content-gap: clamp(2.75rem, 7vw, 4.75rem);
+  --layout-main-plain-radius: clamp(2rem, 5vw, 3.25rem);
+  --layout-main-plain-border-color: color-mix(in srgb, var(--color-border) 78%, transparent 22%);
+  --layout-main-plain-overlay:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-overlay-strong) 70%, transparent 30%) 0%, transparent 65%);
+  --layout-main-plain-surface:
+    color-mix(in srgb, var(--surface-plain) 82%, color-mix(in srgb, var(--color-night) 35%, transparent 65%) 18%);
+  --layout-main-plain-shadow: 0 36px 80px -42px color-mix(in srgb, var(--color-night) 70%, transparent 30%);
+
+  /* Header Tokens */
+  --header-background: color-mix(in srgb, var(--color-night) 68%, transparent 32%);
+  --header-border: color-mix(in srgb, var(--color-border) 55%, transparent 45%);
+  --header-shadow: 0 22px 55px -36px color-mix(in srgb, var(--color-night) 68%, transparent 32%);
+  --header-padding-block: clamp(1rem, 2.5vw, 1.5rem);
+  --header-link-padding-block: 0.65rem;
+  --header-link-padding-inline: clamp(0.9rem, 2.4vw, 1.25rem);
+  --header-link-letter-spacing: 0.18em;
+
+  /* Hero Tokens */
+  --hero-padding-block: clamp(5rem, 12vw, 8rem);
+  --hero-padding-inline: clamp(1.75rem, 8vw, 4.5rem);
+  --hero-radius: clamp(2.25rem, 6vw, 3.5rem);
+  --hero-background:
+    linear-gradient(140deg,
+      color-mix(in srgb, var(--ambient-depth, var(--color-night)) 62%, transparent 38%),
+      color-mix(in srgb, var(--color-night) 82%, black 18%)
+    );
+  --hero-border: 1px solid color-mix(in srgb, var(--color-border) 65%, transparent 35%);
+  --hero-shadow: 0 48px 95px -52px color-mix(in srgb, var(--color-night) 70%, transparent 30%);
+  --hero-backdrop:
+    radial-gradient(82% 88% at 14% 18%, color-mix(in srgb, var(--color-gold) 26%, transparent 74%), transparent 68%),
+    radial-gradient(88% 84% at 86% 14%, color-mix(in srgb, var(--color-amethyst) 24%, transparent 76%), transparent 70%);
+  --hero-inner-gap: clamp(1.75rem, 5vw, 3rem);
+  --hero-copy-gap: clamp(1.5rem, 4vw, 2.75rem);
+  --hero-eyebrow-color: color-mix(in srgb, var(--ink-muted) 85%, white 15%);
+  --hero-blurb-color: color-mix(in srgb, var(--ink-body) 92%, white 8%);
+  --hero-note-color: color-mix(in srgb, var(--ink-muted) 75%, white 25%);
+  --hero-media-shadow: 0 32px 70px -40px color-mix(in srgb, var(--color-night) 72%, transparent 28%);
+  --hero-image-border: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent 30%);
+  --hero-image-surface: color-mix(in srgb, var(--color-overlay) 52%, transparent 48%);
+
+  /* Comfort Tokens */
+  --comfort-tray-width: min(22rem, 100%);
+  --comfort-tray-sticky-offset: clamp(2rem, 5vw, 3.5rem);
+  --comfort-chip-bg: color-mix(in srgb, var(--color-overlay) 45%, transparent 55%);
+  --comfort-chip-bg-hover: color-mix(in srgb, var(--comfort-chip-bg) 80%, var(--color-amethyst) 20%);
+  --comfort-chip-border: color-mix(in srgb, var(--color-border) 72%, transparent 28%);
+  --comfort-chip-border-strong: color-mix(in srgb, var(--color-border-strong) 68%, transparent 32%);
+  --comfort-chip-text: color-mix(in srgb, var(--ink-strong) 94%, white 6%);
+  --comfort-chip-text-strong: color-mix(in srgb, var(--ink-strong) 98%, white 2%);
+  --comfort-chip-surface: color-mix(in srgb, var(--color-overlay) 35%, transparent 65%);
+  --comfort-chip-accent: color-mix(in srgb, var(--color-amethyst) 70%, var(--color-gold) 30%);
+  --comfort-tray-surface: color-mix(in srgb, var(--color-overlay-strong) 45%, transparent 55%);
+  --comfort-tray-border: color-mix(in srgb, var(--color-border) 60%, transparent 40%);
+  --comfort-tray-border-strong: color-mix(in srgb, var(--color-border-strong) 65%, transparent 35%);
+  --comfort-tray-shadow: 0 28px 60px -32px color-mix(in srgb, var(--color-night) 70%, transparent 30%);
+  --comfort-tray-hint: color-mix(in srgb, var(--ink-muted) 85%, white 15%);
+
   /* Semantic Colors (derived from core) */
   --ink-body: color-mix(in srgb, var(--color-ink) 70%, var(--color-night) 30%);
   --ink-strong: color-mix(in srgb, var(--color-ink) 85%, var(--color-night) 15%);
@@ -125,6 +195,41 @@
   --focus-ring-color: color-mix(in srgb, var(--color-iris) 58%, var(--color-gold) 42%);
   --focus-ring-base-shadow: color-mix(in srgb, var(--color-iris) 30%, var(--color-night) 70%);
 
+  /* Layout Adjustments */
+  --layout-shell-background: color-mix(in srgb, var(--color-rune) 94%, white 6%);
+  --layout-shell-background-plain: color-mix(in srgb, var(--color-rune) 98%, white 2%);
+  --layout-shell-ink: color-mix(in srgb, var(--ink-body) 95%, black 5%);
+  --layout-shell-ink-plain: color-mix(in srgb, var(--ink-body) 92%, black 8%);
+  --header-background: color-mix(in srgb, var(--color-rune) 92%, transparent 8%);
+  --header-border: color-mix(in srgb, var(--color-border) 50%, transparent 50%);
+  --header-shadow: 0 18px 45px -32px color-mix(in srgb, var(--color-amethyst) 35%, transparent 65%);
+  --hero-background:
+    linear-gradient(140deg,
+      color-mix(in srgb, var(--color-rune) 86%, white 14%),
+      color-mix(in srgb, var(--color-fog) 65%, white 35%)
+    );
+  --hero-backdrop:
+    radial-gradient(82% 88% at 16% 18%, color-mix(in srgb, var(--color-gold) 22%, transparent 78%), transparent 70%),
+    radial-gradient(88% 80% at 84% 16%, color-mix(in srgb, var(--color-amethyst) 26%, transparent 74%), transparent 72%);
+  --hero-image-surface: color-mix(in srgb, var(--color-overlay) 18%, white 82%);
+  --hero-image-border: 1px solid color-mix(in srgb, var(--color-border) 55%, transparent 45%);
+  --hero-media-shadow: 0 26px 60px -36px color-mix(in srgb, var(--color-amethyst) 40%, transparent 60%);
+  --hero-eyebrow-color: color-mix(in srgb, var(--ink-muted) 70%, black 30%);
+  --hero-blurb-color: color-mix(in srgb, var(--ink-body) 88%, black 12%);
+  --hero-note-color: color-mix(in srgb, var(--ink-muted) 70%, black 30%);
+  --comfort-chip-bg: color-mix(in srgb, var(--color-overlay) 18%, white 82%);
+  --comfort-chip-bg-hover: color-mix(in srgb, var(--comfort-chip-bg) 70%, var(--color-amethyst) 30%);
+  --comfort-chip-border: color-mix(in srgb, var(--color-border) 42%, transparent 58%);
+  --comfort-chip-border-strong: color-mix(in srgb, var(--color-border-strong) 48%, transparent 52%);
+  --comfort-chip-text: color-mix(in srgb, var(--ink-strong) 92%, black 8%);
+  --comfort-chip-text-strong: color-mix(in srgb, var(--ink-strong) 96%, black 4%);
+  --comfort-chip-surface: color-mix(in srgb, var(--color-overlay) 12%, white 88%);
+  --comfort-tray-surface: color-mix(in srgb, var(--color-overlay) 16%, white 84%);
+  --comfort-tray-border: color-mix(in srgb, var(--color-border) 36%, transparent 64%);
+  --comfort-tray-border-strong: color-mix(in srgb, var(--color-border-strong) 42%, transparent 58%);
+  --comfort-tray-shadow: 0 24px 55px -32px color-mix(in srgb, var(--color-amethyst) 30%, transparent 70%);
+  --comfort-tray-hint: color-mix(in srgb, var(--ink-muted) 60%, black 40%);
+
 }
 
 /* ---------------------------------------------------------------------------
@@ -177,9 +282,9 @@ body {
   font-family: var(--font-body-ui, var(--font-body));
   line-height: 1.7;
   font-size: 1rem;
-  color: var(--ink-body, #1f1633);
+  color: var(--layout-shell-ink, var(--ink-body));
   letter-spacing: var(--font-body-letter-spacing, normal);
-  background: #0f0820; /* Solid midnight background */
+  background: var(--layout-shell-background, #0f0820);
   background-attachment: fixed;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -187,8 +292,8 @@ body {
 }
 
 :root[data-comfort-theme="dawn"] body {
-  color: var(--ink-body, #2c1b3d);
-  background: #f7f3f8; /* Solid dawn background */
+  color: var(--layout-shell-ink, var(--ink-body));
+  background: var(--layout-shell-background, #f7f3f8);
 }
 
 /* Transparent overlay for solid backgrounds */
@@ -362,6 +467,207 @@ main {
 .site-main__container,
 .site-main__content {
   background-color: transparent !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Site Shell Layout
+   --------------------------------------------------------------------------- */
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  padding: 0.85rem 1.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--header-background, #120725) 85%, transparent 15%);
+  color: var(--comfort-chip-text-strong, var(--ink-strong));
+  z-index: 100;
+  opacity: 0;
+  transform: translateY(-0.5rem);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.skip-link:focus {
+  left: 1.5rem;
+  top: 1.25rem;
+  width: auto;
+  height: auto;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.site-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--layout-shell-background);
+  color: var(--layout-shell-ink);
+  transition: background-color 240ms ease, color 200ms ease;
+}
+
+.site-shell--plain {
+  background: var(--layout-shell-background-plain);
+  color: var(--layout-shell-ink-plain);
+}
+
+.site-shell__content {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--layout-shell-gap);
+  padding-block: var(--layout-main-padding-block) var(--layout-main-padding-block-end);
+  padding-inline: clamp(1.25rem, 6vw, 2.75rem);
+}
+
+@media (min-width: 1024px) {
+  .site-shell__content {
+    grid-template-columns: minmax(0, 1fr) var(--comfort-tray-width);
+    align-items: start;
+  }
+}
+
+.site-main {
+  width: 100%;
+  --site-main-content-gap: var(--layout-content-gap);
+}
+
+.site-main--plain {
+  --site-main-content-gap: var(--layout-main-plain-gap);
+}
+
+.site-main__container {
+  display: grid;
+  gap: var(--layout-main-container-gap);
+}
+
+.site-main__container--plain {
+  position: relative;
+  padding: var(--layout-main-padding-block-plain);
+  border-radius: var(--layout-main-plain-radius);
+  border: 1px solid var(--layout-main-plain-border-color);
+  background: var(--layout-main-plain-surface);
+  box-shadow: var(--layout-main-plain-shadow);
+  backdrop-filter: blur(18px);
+  gap: var(--layout-main-plain-gap);
+  overflow: hidden;
+}
+
+.site-main__container--plain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--layout-main-plain-overlay);
+  pointer-events: none;
+}
+
+.site-main__container--plain > * {
+  position: relative;
+  z-index: 1;
+}
+
+.site-main__breadcrumbs:empty {
+  display: none;
+}
+
+.site-main__content {
+  display: grid;
+  gap: var(--site-main-content-gap);
+}
+
+.site-main__container--wide {
+  --wc-container-max: 96rem;
+}
+
+.site-main__container--desktop-wide {
+  --wc-container-max: 96rem;
+}
+
+@media (max-width: 640px) {
+  .site-main__container--plain {
+    padding: clamp(1.5rem, 7vw, 2rem);
+    border-radius: clamp(1.5rem, 7vw, 2.25rem);
+  }
+}
+
+@media (min-width: 1280px) {
+  .site-main__container--desktop-wide {
+    --wc-container-max: 104rem;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Comfort Tray
+   --------------------------------------------------------------------------- */
+
+.comfort-tray {
+  width: min(var(--comfort-tray-width), 100%);
+  margin-inline: auto;
+}
+
+.comfort-tray__inner {
+  position: relative;
+  display: grid;
+  gap: var(--space-4, 1rem);
+  padding: clamp(1.5rem, 4vw, 2rem);
+  border-radius: 1.75rem;
+  border: 1px solid var(--comfort-tray-border);
+  background: var(--comfort-tray-surface);
+  box-shadow: var(--comfort-tray-shadow);
+  color: var(--comfort-chip-text, var(--ink-body));
+}
+
+.comfort-tray__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+}
+
+.comfort-tray__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--comfort-chip-bg) 85%, transparent 15%);
+  font-size: 1.1rem;
+  color: var(--comfort-chip-text-strong, var(--text-strong));
+}
+
+.comfort-tray__title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.comfort-tray__intro {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--comfort-tray-hint, var(--text-tertiary));
+}
+
+@media (min-width: 1024px) {
+  .comfort-tray {
+    justify-self: end;
+  }
+
+  .comfort-tray__inner {
+    position: sticky;
+    top: var(--comfort-tray-sticky-offset);
+  }
+}
+
+@media (max-width: 720px) {
+  .comfort-tray__inner {
+    padding: clamp(1.25rem, 6vw, 1.75rem);
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -633,22 +939,25 @@ main {
   position: sticky;
   top: 0;
   z-index: 40;
-  backdrop-filter: blur(16px);
-  background: rgba(7, 2, 15, 0.75);
-  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  backdrop-filter: blur(20px);
+  background: var(--header-background);
+  border-bottom: 1px solid var(--header-border);
+  box-shadow: var(--header-shadow);
+  transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
 }
 
 :root[data-comfort-theme="dawn"] .site-header {
-  background: rgba(255, 252, 247, 0.9);
-  border-bottom-color: rgba(122, 94, 154, 0.28);
+  background: var(--header-background);
+  border-bottom-color: var(--header-border);
+  box-shadow: var(--header-shadow);
 }
 
 .site-header__inner {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  padding-block: var(--space-4);
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  padding-block: var(--header-padding-block);
 }
 
 .site-logo {
@@ -656,24 +965,30 @@ main {
   align-items: center;
   gap: var(--space-2);
   font-family: var(--font-accent);
-  font-size: 1.75rem;
-  letter-spacing: 0.2em;
+  font-size: 1.6rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-accent-strong);
+  color: var(--comfort-chip-text-strong, var(--text-accent-strong));
 }
 
 .site-logo::before {
   content: "☾";
-  font-size: 1.25rem;
-  opacity: 0.85;
+  font-size: 1.2rem;
+  opacity: 0.7;
 }
 
 .site-nav {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   row-gap: var(--space-2);
+  column-gap: clamp(1rem, 2.5vw, 1.75rem);
+  align-items: center;
+}
+
+@media (min-width: 921px) {
+  .site-nav {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
 }
 
 .site-nav__item {
@@ -684,8 +999,7 @@ main {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  column-gap: var(--space-3);
-  row-gap: var(--space-2);
+  gap: clamp(0.85rem, 2.2vw, 1.75rem);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -697,74 +1011,51 @@ main {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding: var(--space-1) var(--space-3);
+  padding-block: var(--header-link-padding-block);
+  padding-inline: var(--header-link-padding-inline);
   border-radius: 999px;
-  border: 1px solid transparent;
-  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--header-border) 70%, transparent 30%);
+  background: color-mix(in srgb, var(--header-background) 75%, transparent 25%);
   font-family: var(--font-accent);
-  font-size: 0.75rem;
-  letter-spacing: 0.24em;
+  font-size: 0.78rem;
+  letter-spacing: var(--header-link-letter-spacing);
   text-transform: uppercase;
-  color: var(--text-strong);
-  transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
-}
-
-:root[data-comfort-theme="dawn"] .site-nav__link,
-:root[data-comfort-theme="dawn"] .site-nav__button {
-  background: rgba(242, 236, 231, 0.5);
-  border-color: rgba(122, 94, 154, 0.2);
-  color: var(--text-muted);
+  color: color-mix(in srgb, var(--layout-shell-ink) 88%, white 12%);
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 160ms ease;
 }
 
 .site-nav__link--secondary {
-  color: var(--text-tertiary);
+  color: color-mix(in srgb, var(--layout-shell-ink) 70%, transparent 30%);
 }
 
 .site-nav__link--dev {
   border-style: dashed;
-  color: var(--text-secondary);
+  color: color-mix(in srgb, var(--layout-shell-ink) 75%, transparent 25%);
 }
 
 .site-nav__link--dev:hover,
 .site-nav__link--dev:focus-visible {
-  color: var(--text-accent-strong);
+  color: var(--comfort-chip-text-strong, var(--text-accent-strong));
 }
 
 .site-nav__link--secondary:hover,
 .site-nav__link--secondary:focus-visible {
-  color: var(--text-accent-strong);
+  color: var(--comfort-chip-text-strong, var(--text-accent-strong));
 }
 
 .site-nav__link:hover,
 .site-nav__link:focus-visible,
 .site-nav__button:hover,
 .site-nav__button:focus-visible {
-  color: var(--text-accent-strong);
-  border-color: var(--border-accent-medium);
-  background: rgba(124, 78, 176, 0.25);
-}
-
-:root[data-comfort-theme="dawn"] .site-nav__link:hover,
-:root[data-comfort-theme="dawn"] .site-nav__link:focus-visible,
-:root[data-comfort-theme="dawn"] .site-nav__button:hover,
-:root[data-comfort-theme="dawn"] .site-nav__button:focus-visible {
-  border-color: rgba(122, 94, 154, 0.45);
-  background: rgba(206, 189, 228, 0.45);
-  color: var(--text-strong);
-}
-
-.site-nav__link[aria-current="page"]::after {
-  content: "";
-  position: absolute;
-  inset-inline: var(--space-2);
-  bottom: calc(-1 * var(--space-1));
-  height: 2px;
-  background: linear-gradient(90deg, transparent 0%, var(--text-accent-strong) 50%, transparent 100%);
+  color: var(--comfort-chip-text-strong, var(--text-accent-strong));
+  border-color: color-mix(in srgb, var(--header-border) 40%, var(--color-iris) 60%);
+  background: color-mix(in srgb, var(--header-background) 55%, var(--color-iris) 45%);
+  transform: translateY(-1px);
 }
 
 .site-nav__link[aria-current="page"],
 .site-nav__button[aria-current="page"] {
-  color: var(--text-accent-strong);
+  color: var(--comfort-chip-text-strong, var(--text-accent-strong));
   font-weight: 600;
 }
 
@@ -775,16 +1066,17 @@ main {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 999px;
-  border: 1px solid var(--border-accent-medium);
-  background: rgba(7, 2, 15, 0.6);
-  color: var(--text-accent-strong);
+  border: 1px solid color-mix(in srgb, var(--header-border) 70%, transparent 30%);
+  background: color-mix(in srgb, var(--header-background) 82%, transparent 18%);
+  color: var(--comfort-chip-text-strong, var(--text-accent-strong));
   cursor: pointer;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease;
 }
 
-:root[data-comfort-theme="dawn"] .site-nav__toggle {
-  background: rgba(246, 240, 232, 0.9);
-  border-color: rgba(122, 94, 154, 0.35);
-  color: var(--text-muted);
+.site-nav__toggle:hover,
+.site-nav__toggle:focus-visible {
+  background: color-mix(in srgb, var(--header-background) 55%, var(--color-iris) 45%);
+  border-color: color-mix(in srgb, var(--header-border) 40%, var(--color-iris) 60%);
 }
 
 .site-nav__toggle svg {
@@ -798,9 +1090,9 @@ main {
   margin-top: var(--space-2);
   padding: var(--space-4);
   border-radius: 1rem;
-  border: 1px solid var(--border-accent-subtle);
-  background: rgba(18, 7, 37, 0.9);
-  box-shadow: var(--shadow-soft);
+  border: 1px solid color-mix(in srgb, var(--header-border) 65%, transparent 35%);
+  background: color-mix(in srgb, var(--header-background) 92%, transparent 8%);
+  box-shadow: 0 24px 60px -32px color-mix(in srgb, var(--color-night) 65%, transparent 35%);
   min-width: 16rem;
   transform-origin: top right;
   opacity: 0;
@@ -810,8 +1102,8 @@ main {
 }
 
 :root[data-comfort-theme="dawn"] .site-nav__submenu {
-  background: rgba(255, 252, 247, 0.95);
-  border-color: rgba(122, 94, 154, 0.28);
+  background: color-mix(in srgb, var(--header-background) 96%, white 4%);
+  border-color: color-mix(in srgb, var(--header-border) 55%, transparent 45%);
 }
 
 .site-nav__submenu.is-open {
@@ -833,30 +1125,30 @@ main {
   padding: var(--space-2) var(--space-3);
   border-radius: 0.75rem;
   border: 1px solid transparent;
-  background: rgba(124, 78, 176, 0.1);
-  color: var(--text-muted);
+  background: color-mix(in srgb, var(--header-background) 65%, transparent 35%);
+  color: color-mix(in srgb, var(--layout-shell-ink) 85%, white 15%);
   font-family: var(--font-body);
   text-transform: none;
   letter-spacing: normal;
 }
 
 :root[data-comfort-theme="dawn"] .site-nav__submenu-link {
-  background: rgba(210, 196, 229, 0.35);
-  color: var(--text-muted);
+  background: color-mix(in srgb, var(--header-background) 92%, white 8%);
+  color: color-mix(in srgb, var(--layout-shell-ink) 78%, black 22%);
 }
 
 .site-nav__submenu-link:hover,
 .site-nav__submenu-link:focus-visible {
-  border-color: var(--border-accent-strong);
-  background: rgba(124, 78, 176, 0.25);
-  color: var(--text-accent-strong);
+  border-color: color-mix(in srgb, var(--header-border) 40%, var(--color-iris) 60%);
+  background: color-mix(in srgb, var(--header-background) 55%, var(--color-iris) 45%);
+  color: var(--comfort-chip-text-strong, var(--text-accent-strong));
 }
 
 :root[data-comfort-theme="dawn"] .site-nav__submenu-link:hover,
 :root[data-comfort-theme="dawn"] .site-nav__submenu-link:focus-visible {
-  border-color: rgba(122, 94, 154, 0.45);
-  background: rgba(206, 189, 228, 0.55);
-  color: var(--text-strong);
+  border-color: color-mix(in srgb, var(--header-border) 45%, var(--color-iris) 55%);
+  background: color-mix(in srgb, var(--header-background) 70%, var(--color-iris) 30%);
+  color: var(--layout-shell-ink);
 }
 
 .site-nav__submenu-icon {
@@ -883,8 +1175,8 @@ main {
 .site-nav__actions {
   display: none;
   align-items: center;
-  gap: var(--space-3);
-  margin-inline-start: auto;
+  gap: var(--space-2);
+  justify-content: flex-end;
 }
 
 .search-control {
