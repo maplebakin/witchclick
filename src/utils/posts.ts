@@ -86,16 +86,19 @@ function resolvePostDirectories(): string[] {
   const cwd = process.cwd();
   const modern = path.join(cwd, "src", "content", "posts");
   const legacy = path.join(cwd, "content", "posts");
+
+  if (directoryHasMarkdown(modern)) {
+    return [modern];
+  }
+
+  if (directoryHasMarkdown(legacy)) {
+    return [legacy];
+  }
+
   const dirs: string[] = [];
 
-  if (directoryHasMarkdown(modern)) dirs.push(modern);
-  if (directoryHasMarkdown(legacy)) dirs.push(legacy);
-
-  // Fallback: if no markdown found but dirs exist, include them
-  if (dirs.length === 0) {
-    if (isDirectory(modern)) dirs.push(modern);
-    if (isDirectory(legacy)) dirs.push(legacy);
-  }
+  if (isDirectory(modern)) dirs.push(modern);
+  if (isDirectory(legacy)) dirs.push(legacy);
 
   return dirs;
 }
