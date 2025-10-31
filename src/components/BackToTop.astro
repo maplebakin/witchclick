@@ -116,8 +116,10 @@
 <script>
   // Back to top button functionality
   function initBackToTop() {
-    const button = document.querySelector<HTMLButtonElement>('[data-back-to-top]');
-    if (!button) return;
+    const maybeButton = document.querySelector('[data-back-to-top]');
+    if (!(maybeButton instanceof HTMLButtonElement)) return;
+
+    const button = maybeButton;
 
     // Show button after scrolling down 400px
     const SCROLL_THRESHOLD = 400;

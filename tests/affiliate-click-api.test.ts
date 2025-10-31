@@ -1,15 +1,17 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { APIContext } from "astro";
+import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 let tempDir: string;
-let cwdSpy: ReturnType<typeof vi.spyOn> | undefined;
+let cwdSpy: MockInstance<() => string> | undefined;
 
 async function setupTempSettings() {
   tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "wc-aff-click-"));
   await fs.mkdir(path.join(tempDir, "content"), { recursive: true });
-  cwdSpy = vi.spyOn(process, "cwd").mockReturnValue(tempDir);
+  cwdSpy = vi.spyOn(process, "cwd");
+  cwdSpy.mockReturnValue(tempDir);
   vi.resetModules();
 }
 
@@ -45,6 +47,50 @@ function makeRequest(body: unknown) {
   });
 }
 
+function createContext(request: Request): APIContext {
+  const url = new URL(request.url);
+
+  return {
+    request,
+    url,
+    originPathname: url.pathname,
+    params: {},
+    routePattern: url.pathname,
+    props: {} as APIContext["props"],
+    site: undefined,
+    generator: "tests",
+    redirect: () => {
+      throw new Error("redirect not implemented in tests");
+    },
+    rewrite: async () => new Response(null, { status: 501 }),
+    locals: {} as APIContext["locals"],
+    preferredLocale: undefined,
+    preferredLocaleList: undefined,
+    currentLocale: undefined,
+    isPrerendered: false,
+    clientAddress: "127.0.0.1",
+    csp: {
+      insertDirective: () => {},
+      insertStyleResource: () => {},
+      insertStyleHash: () => {},
+      insertScriptResource: () => {},
+      insertScriptHash: () => {},
+    },
+    cookies: {
+      get: () => undefined,
+      has: () => false,
+      set: () => {},
+      delete: () => {},
+      merge: () => {},
+      headers: () => ([] as string[])[Symbol.iterator]() as Generator<string, void, unknown>,
+    } as unknown as APIContext["cookies"],
+    getActionResult: () => undefined,
+    callAction: async () => {
+      throw new Error("actions not implemented in tests");
+    },
+  };
+}
+
 describe("affiliate click API", () => {
   beforeEach(async () => {
     await setupTempSettings();
@@ -66,7 +112,9 @@ describe("affiliate click API", () => {
 
     const { POST } = await import("../src/pages/api/affiliate-click.json.ts");
 
-    const response = await POST({ request: makeRequest({ url: "https://merchant.example/item", ts: "2024-01-01T00:00:00Z" }) });
+    const response = await POST(
+      createContext(makeRequest({ url: "https://merchant.example/item", ts: "2024-01-01T00:00:00Z" })),
+    );
 
     expect(response.status).toBe(202);
     const payload = await response.json();
@@ -74,7 +122,9 @@ describe("affiliate click API", () => {
     expect(payload.forwarded).toBe(true);
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
-    const [endpoint, init] = fetchSpy.mock.calls[0];
+    const firstCall = fetchSpy.mock.calls[0];
+    expect(firstCall).toBeDefined();
+    const [endpoint, init] = firstCall!;
     expect(endpoint).toBe("https://example.test/collect");
     expect(init).toMatchObject({ method: "POST" });
     expect(JSON.parse(String((init as any).body))).toMatchObject({ url: "https://merchant.example/item" });
@@ -88,7 +138,9 @@ describe("affiliate click API", () => {
     });
 
     const { POST } = await import("../src/pages/api/affiliate-click.json.ts");
-    const response = await POST({ request: makeRequest({ url: "https://merchant.example/item", ts: "not-a-date" }) });
+    const response = await POST(
+      createContext(makeRequest({ url: "https://merchant.example/item", ts: "not-a-date" })),
+    );
 
     expect(response.status).toBe(422);
     const payload = await response.json();
@@ -100,7 +152,9 @@ describe("affiliate click API", () => {
     await writeSettings({ analytics: { enabled: false } });
 
     const { POST } = await import("../src/pages/api/affiliate-click.json.ts");
-    const response = await POST({ request: makeRequest({ url: "https://merchant.example/item", ts: "2024-01-01T00:00:00Z" }) });
+    const response = await POST(
+      createContext(makeRequest({ url: "https://merchant.example/item", ts: "2024-01-01T00:00:00Z" })),
+    );
 
     expect(response.status).toBe(202);
     const payload = await response.json();

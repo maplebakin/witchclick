@@ -1,18 +1,19 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
-import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 import { createPostSpec } from "./postSpecTestUtils";
 
 let tempDir: string;
-let cwdSpy: ReturnType<typeof vi.spyOn>;
+let cwdSpy: MockInstance<() => string> | undefined;
 
 async function prepareTempDir() {
   tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "wc-posts-"));
   await fs.mkdir(path.join(tempDir, "src", "content"), { recursive: true });
   await fs.mkdir(path.join(tempDir, "content"), { recursive: true });
-  cwdSpy = vi.spyOn(process, "cwd").mockReturnValue(tempDir);
+  cwdSpy = vi.spyOn(process, "cwd");
+  cwdSpy.mockReturnValue(tempDir);
 }
 
 async function cleanupTempDir() {

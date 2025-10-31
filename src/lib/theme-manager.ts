@@ -559,7 +559,9 @@ export class ThemeManager {
     }
 
     if (data.theme) {
-      const merged = this.mergePresetFromRecord(data.theme, this.state.presets[mode].find((p) => p.slug === data.theme.slug));
+      const record = data.theme;
+      const existing = this.state.presets[mode].find((p) => p.slug === record.slug);
+      const merged = this.mergePresetFromRecord(record, existing);
       this.upsertPreset(merged, false);
     }
 
