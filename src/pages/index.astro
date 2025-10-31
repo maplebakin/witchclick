@@ -502,82 +502,62 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
 </Base>
 
 <style>
-  /* Consistent gradient system for all card backgrounds */
-  .home-intro,
-  .home-section__header,
-  .home-cta__inner {
-    --gradient-accent-1: radial-gradient(85% 130% at 12% 8%, rgba(212, 175, 55, 0.16), transparent 68%);
-    --gradient-accent-2: radial-gradient(80% 110% at 88% 5%, rgba(124, 78, 176, 0.18), transparent 70%);
-    --card-bg-midnight: rgba(18, 7, 37, 0.72);
-    --card-border-midnight: color-mix(in srgb, rgba(124, 58, 237, 0.3) 75%, transparent 25%);
-    --card-shadow: 0 20px 52px -30px rgba(11, 6, 20, 0.45);
-  }
-
-  /* Dawn theme gradient overrides */
-  :root[data-comfort-theme="dawn"] .home-intro,
-  :root[data-comfort-theme="dawn"] .home-section__header,
-  :root[data-comfort-theme="dawn"] .home-cta__inner {
-    --gradient-accent-1: radial-gradient(85% 130% at 12% 8%, rgba(155, 134, 200, 0.13), transparent 68%);
-    --gradient-accent-2: radial-gradient(80% 110% at 88% 5%, rgba(180, 154, 217, 0.15), transparent 70%);
-    --card-bg-midnight: rgba(252, 248, 242, 0.88);
-    --card-border-midnight: color-mix(in srgb, rgba(122, 94, 154, 0.32) 75%, transparent 25%);
-    --card-shadow: 0 20px 52px -30px rgba(71, 54, 96, 0.28);
-  }
-
   .home-eyebrow {
     margin: 0;
-    font-size: 0.75rem;
-    letter-spacing: 0.32em;
+    font-size: 0.7rem;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: rgba(212, 175, 55, 0.85);
+    color: var(--text-accent);
   }
 
   .home-intro {
-    margin-top: clamp(2.5rem, 6vw, 4rem);
-    margin-bottom: clamp(2.5rem, 6vw, 4rem);
-    border-radius: clamp(1.75rem, 4vw, 2.5rem);
-    border: 1px solid rgba(124, 58, 237, 0.35);
-    background: #0f0820;
-    color: #f4f1ff;
-    padding: clamp(1.75rem, 4vw, 2.75rem);
-    box-shadow: 0 20px 52px -30px rgba(0, 0, 0, 0.6);
+    margin-block: clamp(3rem, 7vw, 5rem);
+    border-radius: clamp(1.9rem, 4vw, 2.8rem);
+    border: 1px solid color-mix(in srgb, var(--border-purple-medium, rgba(124, 78, 176, 0.32)) 85%, transparent 15%);
+    padding: clamp(2.2rem, 5vw, 3.1rem);
+    background:
+      var(--gradient-purple-radial),
+      linear-gradient(140deg, color-mix(in srgb, var(--surface-panel-primary) 82%, transparent 18%) 0%, transparent 62%),
+      var(--surface-panel-primary);
+    box-shadow: var(--elevation-tier-2);
+    color: var(--text-body);
   }
 
   .home-intro__grid {
     display: grid;
-    gap: clamp(1.5rem, 4vw, 2.5rem);
+    gap: clamp(1.6rem, 4vw, 2.8rem);
+    align-items: start;
   }
 
   .home-intro__title {
     margin: 0;
-    font-family: var(--font-heading);
-    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    font-family: var(--font-heading, var(--font-body));
+    font-size: clamp(2.05rem, 5vw, 2.7rem);
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #f4f1ff;
+    color: var(--text-strong);
   }
 
   .home-intro__text {
-    margin-top: 0.85rem;
-    margin-bottom: 0;
+    margin: 0.95rem 0 0;
     font-size: 1.05rem;
     line-height: 1.8;
     max-width: 64ch;
-    color: rgba(244, 241, 255, 0.88);
+    color: color-mix(in srgb, var(--text-body) 96%, transparent 4%);
   }
 
   .home-intro__list {
     display: grid;
-    gap: 0.85rem;
+    gap: 0.95rem;
   }
 
   .home-intro__list-title {
     margin: 0;
     font-size: 1rem;
     font-weight: 600;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #f4f1ff;
+    color: var(--text-strong);
   }
 
   .home-intro__bullets {
@@ -585,14 +565,14 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
     padding: 0;
     list-style: none;
     display: grid;
-    gap: 0.75rem;
+    gap: 0.85rem;
   }
 
   .home-intro__bullets li {
     position: relative;
     padding-left: 1.8rem;
     line-height: 1.7;
-    color: rgba(244, 241, 255, 0.88);
+    color: color-mix(in srgb, var(--text-body) 94%, transparent 6%);
   }
 
   .home-intro__bullets li::before {
@@ -600,73 +580,83 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
     position: absolute;
     left: 0;
     top: 0.1rem;
-    color: rgba(124, 58, 237, 0.65);
+    color: color-mix(in srgb, var(--text-accent) 80%, transparent 20%);
     font-size: 1rem;
   }
 
   .home-section {
-    margin-top: clamp(3rem, 6vw, 4.5rem);
-    margin-bottom: clamp(3rem, 6vw, 4.5rem);
+    margin-block: clamp(3.2rem, 6vw, 4.8rem);
   }
 
   .home-section__header {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: clamp(1.8rem, 4vw, 2.4rem);
-    padding: clamp(1.5rem, 3.5vw, 2.25rem);
-    border-radius: clamp(1.5rem, 3.5vw, 2.25rem);
-    border: 1px solid var(--card-border-midnight);
-    background: var(--gradient-accent-1), var(--gradient-accent-2), var(--card-bg-midnight);
-    box-shadow: var(--card-shadow);
+    display: grid;
+    gap: clamp(0.85rem, 3vw, 1.25rem);
+    margin-bottom: clamp(1.9rem, 4vw, 2.6rem);
+    padding: clamp(1.6rem, 4vw, 2.4rem);
+    border-radius: clamp(1.6rem, 3.8vw, 2.5rem);
+    border: 1px solid color-mix(in srgb, var(--card-panel-border, rgba(124, 78, 176, 0.28)) 85%, transparent 15%);
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--card-panel-surface) 80%, transparent 20%) 0%, transparent 65%),
+      var(--card-panel-surface);
+    box-shadow: var(--elevation-tier-1);
+  }
+
+  .home-section__header > div {
+    display: grid;
+    gap: 0.65rem;
   }
 
   .home-section__title {
-    margin: 0.25rem 0 0;
-    font-family: var(--font-heading);
-    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    margin: 0;
+    font-family: var(--font-heading, var(--font-body));
+    font-size: clamp(1.9rem, 4vw, 2.45rem);
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--ink-heading, #f4f1ff) 92%, white 8%);
+    color: var(--text-strong);
   }
 
   .home-section__description {
-    margin: 0.5rem 0 0;
-    max-width: 68ch;
+    margin: 0;
+    max-width: 66ch;
     font-size: 1rem;
-    line-height: 1.8;
-    color: color-mix(in srgb, var(--ink-body, rgba(244, 241, 255, 0.85)) 90%, white 10%);
+    line-height: 1.75;
+    color: color-mix(in srgb, var(--text-body) 94%, transparent 6%);
   }
 
   .home-section__link {
-    align-self: flex-start;
-    font-size: 0.95rem;
+    justify-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     text-decoration: none;
-    padding: 0.6rem 1.2rem;
+    padding: 0.55rem 1.2rem;
     border-radius: 999px;
-    border: 1px solid rgba(244, 241, 255, 0.4);
-    background: color-mix(in srgb, rgba(244, 241, 255, 0.1) 70%, transparent 30%);
-    color: color-mix(in srgb, rgba(244, 241, 255, 0.94) 95%, white 5%);
-    transition: transform 160ms ease, background 160ms ease, border 160ms ease;
+    border: 1px solid color-mix(in srgb, var(--border-accent-medium, rgba(212, 175, 55, 0.35)) 82%, transparent 18%);
+    background: color-mix(in srgb, var(--surface-card) 85%, transparent 15%);
+    color: color-mix(in srgb, var(--text-strong) 90%, white 10%);
+    transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, color 180ms ease;
   }
 
   .home-section__link:hover,
   .home-section__link:focus-visible {
-    transform: translateY(-1px);
-    background: color-mix(in srgb, rgba(244, 241, 255, 0.2) 85%, transparent 15%);
-    border-color: rgba(244, 241, 255, 0.55);
+    transform: translateY(-2px);
+    background: color-mix(in srgb, var(--surface-card-hover, var(--surface-card)) 90%, transparent 10%);
+    border-color: color-mix(in srgb, var(--border-accent-hover, rgba(212, 175, 55, 0.58)) 85%, transparent 15%);
+    color: var(--text-strong);
   }
 
   .home-section__grid {
     display: grid;
-    gap: clamp(1.25rem, 3vw, 1.85rem);
+    gap: clamp(1.5rem, 3vw, 2.25rem);
   }
 
   .home-section__grid--cards {
-    grid-template-columns: repeat(auto-fit, minmax(16.5rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    align-items: stretch;
   }
 
   .home-section--tone {
@@ -676,24 +666,34 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
   .home-section--tone::before {
     content: "";
     position: absolute;
-    inset: -12% 5% auto;
-    height: 60%;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 20%, rgba(124, 78, 176, 0.2), transparent 70%);
-    filter: blur(30px);
-    opacity: 0.8;
+    inset: -14% 6% auto;
+    height: 58%;
+    border-radius: 999px;
+    background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--accent-purple-soft) 55%, transparent 45%), transparent 75%);
+    opacity: 0.85;
+    filter: blur(32px);
     pointer-events: none;
   }
 
+  .home-section--tone .home-section__header {
+    background:
+      linear-gradient(140deg, color-mix(in srgb, var(--card-panel-surface) 82%, transparent 18%) 0%, transparent 60%),
+      color-mix(in srgb, var(--card-panel-surface) 95%, transparent 5%);
+    border-color: color-mix(in srgb, var(--card-panel-border, rgba(124, 78, 176, 0.28)) 75%, transparent 25%);
+  }
+
   .home-evergreen {
-    margin: clamp(2.5rem, 6vw, 3.5rem) 0;
+    margin-block: clamp(2.8rem, 6vw, 4rem);
   }
 
   .home-testimonials {
-    gap: clamp(1.5rem, 4vw, 2.5rem);
+    display: grid;
+    gap: clamp(1.6rem, 5vw, 2.8rem);
   }
 
   .home-testimonials__header {
+    display: grid;
+    gap: 0.7rem;
     justify-content: center;
     text-align: center;
     align-items: center;
@@ -702,34 +702,36 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
   .home-testimonials__description {
     max-width: 42rem;
     margin-inline: auto;
+    color: color-mix(in srgb, var(--text-body) 95%, transparent 5%);
   }
 
   .home-testimonials :global(.testimonials) {
-    margin-top: clamp(1.5rem, 4vw, 2.5rem);
+    margin-top: clamp(1.6rem, 4vw, 2.6rem);
   }
 
   .home-cta {
-    margin-top: clamp(3rem, 7vw, 5rem);
-    margin-bottom: clamp(3rem, 7vw, 5rem);
+    margin-block: clamp(3.4rem, 7vw, 5.4rem);
   }
 
   .home-cta__inner {
     display: grid;
-    gap: clamp(1.5rem, 4vw, 2.5rem);
-    padding: clamp(1.8rem, 4vw, 2.8rem);
-    border-radius: clamp(1.85rem, 4vw, 2.6rem);
-    border: 1px solid var(--card-border-midnight);
-    background: var(--gradient-accent-1), var(--gradient-accent-2), var(--card-bg-midnight);
-    box-shadow: var(--card-shadow);
+    gap: clamp(1.5rem, 4vw, 2.6rem);
+    padding: clamp(2rem, 5vw, 3rem);
+    border-radius: clamp(1.9rem, 4vw, 2.8rem);
+    border: 1px solid color-mix(in srgb, var(--card-panel-border-strong, rgba(212, 175, 55, 0.45)) 82%, transparent 18%);
+    background:
+      linear-gradient(140deg, color-mix(in srgb, var(--card-panel-surface-strong) 80%, transparent 20%) 0%, transparent 65%),
+      var(--card-panel-surface-strong);
+    box-shadow: var(--elevation-tier-2);
   }
 
   .home-cta__copy {
     display: grid;
-    gap: 0.65rem;
+    gap: 0.75rem;
   }
 
   .home-cta__description {
-    color: color-mix(in srgb, rgba(244, 241, 255, 0.88) 95%, white 5%);
+    color: color-mix(in srgb, var(--text-body) 95%, transparent 5%);
   }
 
   .home-cta__actions {
@@ -745,21 +747,21 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
 
   @media (min-width: 720px) {
     .home-intro__grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
     }
 
     .home-section__header {
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: flex-end;
+      grid-template-columns: minmax(0, 2fr) auto;
+      align-items: end;
     }
 
     .home-section__link {
+      justify-self: flex-end;
       align-self: center;
     }
 
     .home-cta__inner {
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
       align-items: center;
     }
 
@@ -773,54 +775,59 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
     }
   }
 
-  @media (min-width: 1024px) {
+  @media (min-width: 1120px) {
     .home-section__grid--cards {
-      grid-template-columns: repeat(3, minmax(18rem, 1fr));
+      grid-template-columns: repeat(3, minmax(19rem, 1fr));
     }
   }
 
-  /* Dawn theme text color overrides */
   :root[data-comfort-theme="dawn"] .home-intro {
-    background: #f8f5f0;
-    border-color: rgba(122, 94, 154, 0.35);
-    box-shadow: 0 20px 52px -30px rgba(71, 54, 96, 0.28);
+    background:
+      var(--gradient-purple-radial),
+      linear-gradient(135deg, color-mix(in srgb, var(--surface-panel-primary) 96%, white 4%) 0%, transparent 60%),
+      color-mix(in srgb, var(--surface-panel-primary) 98%, white 2%);
+    box-shadow: var(--elevation-tier-1);
   }
 
   :root[data-comfort-theme="dawn"] .home-intro__title,
   :root[data-comfort-theme="dawn"] .home-intro__list-title {
-    color: #321056;
+    color: color-mix(in srgb, var(--text-strong) 96%, black 4%);
   }
 
   :root[data-comfort-theme="dawn"] .home-intro__text,
   :root[data-comfort-theme="dawn"] .home-intro__bullets li {
-    color: #2a1a3f;
+    color: color-mix(in srgb, var(--text-body) 96%, transparent 4%);
   }
 
   :root[data-comfort-theme="dawn"] .home-eyebrow {
-    color: rgba(122, 94, 154, 0.85);
+    color: color-mix(in srgb, var(--text-accent) 92%, transparent 8%);
   }
 
-  :root[data-comfort-theme="dawn"] .home-section__header .home-eyebrow {
-    color: color-mix(in srgb, rgba(44, 27, 61, 0.75) 90%, transparent 10%);
+  :root[data-comfort-theme="dawn"] .home-section__header {
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--card-panel-surface) 88%, transparent 12%) 0%, transparent 60%),
+      var(--card-panel-surface);
+    box-shadow: var(--elevation-tier-1);
   }
 
-  :root[data-comfort-theme="dawn"] .home-section__header .home-section__title {
-    color: color-mix(in srgb, var(--ink-heading, #321056) 92%, white 8%);
-  }
-
-  :root[data-comfort-theme="dawn"] .home-section__header .home-section__description {
-    color: color-mix(in srgb, var(--ink-body, #2a1a3f) 90%, white 10%);
+  :root[data-comfort-theme="dawn"] .home-section__description {
+    color: color-mix(in srgb, var(--text-body) 94%, transparent 6%);
   }
 
   :root[data-comfort-theme="dawn"] .home-section__link {
-    border-color: rgba(122, 94, 154, 0.35);
-    background: color-mix(in srgb, rgba(122, 94, 154, 0.1) 70%, transparent 30%);
-    color: color-mix(in srgb, rgba(44, 27, 61, 0.92) 95%, white 5%);
+    border-color: color-mix(in srgb, var(--border-accent-medium) 82%, transparent 18%);
+    background: color-mix(in srgb, var(--surface-card) 95%, white 5%);
+    color: color-mix(in srgb, var(--text-strong) 92%, black 8%);
   }
 
   :root[data-comfort-theme="dawn"] .home-section__link:hover,
   :root[data-comfort-theme="dawn"] .home-section__link:focus-visible {
-    background: color-mix(in srgb, rgba(122, 94, 154, 0.18) 85%, transparent 15%);
-    border-color: rgba(122, 94, 154, 0.45);
+    background: color-mix(in srgb, var(--surface-card-hover, var(--surface-card)) 96%, white 4%);
+  }
+
+  :root[data-comfort-theme="dawn"] .home-cta__inner {
+    background:
+      linear-gradient(130deg, color-mix(in srgb, var(--card-panel-surface-strong) 92%, white 8%) 0%, transparent 65%),
+      var(--card-panel-surface-strong);
   }
 </style>
