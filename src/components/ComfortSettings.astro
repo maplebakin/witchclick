@@ -6,11 +6,15 @@ interface Props {
 }
 
 const { variant = 'inline' } = Astro.props as Props;
+const isStacked = variant === 'stacked';
 const summaryId = `comfort-summary-${variant}`;
 const fontToggleId = `comfort-font-${variant}`;
 const themeToggleId = `comfort-theme-${variant}`;
 ---
-<details class:list={["comfort-settings", variant === "stacked" && "comfort-settings--stacked"].filter(Boolean)}>
+<details
+  class:list={["comfort-settings", isStacked && "comfort-settings--stacked"].filter(Boolean)}
+  open={isStacked ? true : undefined}
+>
   <summary id={summaryId} class="comfort-settings__summary">
     <span class="comfort-settings__sparkle" aria-hidden="true">✶</span>
     <span>
@@ -112,45 +116,51 @@ const themeToggleId = `comfort-theme-${variant}`;
 <style is:inline>
   .comfort-settings {
     position: relative;
+    width: 100%;
   }
 
   .comfort-settings__summary {
     display: inline-flex;
     align-items: center;
+    justify-content: space-between;
     gap: var(--space-2, 0.5rem);
-    padding: var(--space-1, 0.25rem) var(--space-3, 0.75rem);
+    padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
     border-radius: 999px;
-    border: 1px solid var(--border-accent-medium);
-    background: rgba(12, 5, 23, 0.45);
+    border: 1px solid var(--comfort-chip-border, rgba(124, 78, 176, 0.28));
+    background: var(--comfort-chip-bg, rgba(12, 5, 23, 0.45));
+    color: var(--comfort-chip-text, var(--ink-strong));
     font-family: var(--font-accent);
-    font-size: 0.75rem;
-    letter-spacing: 0.22em;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     cursor: pointer;
     list-style: none;
+    transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
   }
 
   .comfort-settings__summary::-webkit-details-marker {
     display: none;
   }
 
+  .comfort-settings__summary:hover,
   .comfort-settings__summary:focus-visible {
-    outline: 2px solid var(--focus-ring);
-    outline-offset: 3px;
+    background: var(--comfort-chip-bg-hover, color-mix(in srgb, var(--comfort-chip-bg) 85%, white 15%));
+    border-color: var(--comfort-chip-border-strong, rgba(124, 78, 176, 0.45));
+    color: var(--comfort-chip-text-strong, var(--text-strong));
   }
 
   .comfort-settings__sparkle {
     font-size: 1rem;
-    opacity: 0.85;
+    opacity: 0.8;
   }
 
   .comfort-settings__subtitle {
     display: block;
     font-family: var(--font-body);
-    font-size: 0.6rem;
+    font-size: 0.62rem;
     letter-spacing: 0.08em;
     text-transform: none;
-    opacity: 0.75;
+    opacity: 0.7;
   }
 
   .comfort-settings__panel {
@@ -158,25 +168,25 @@ const themeToggleId = `comfort-theme-${variant}`;
     right: 0;
     z-index: 35;
     margin-top: var(--space-2, 0.5rem);
-    padding: var(--space-4, 1rem);
-    border-radius: 1rem;
-    border: 1px solid var(--border-accent-subtle);
-    background: var(--surface-panel-primary);
-    box-shadow: var(--shadow-soft, 0 18px 45px -28px rgba(11, 6, 20, 0.55));
+    padding: var(--space-5, 1.5rem);
+    border-radius: 1.5rem;
+    border: 1px solid var(--comfort-tray-border, rgba(124, 78, 176, 0.25));
+    background: var(--comfort-tray-surface, rgba(18, 7, 37, 0.78));
+    box-shadow: var(--comfort-tray-shadow, 0 28px 60px -32px rgba(3, 2, 12, 0.65));
     min-width: 18rem;
     display: grid;
-    gap: var(--space-3, 0.75rem);
+    gap: var(--space-4, 1rem);
   }
 
   .comfort-settings--stacked .comfort-settings__panel {
     position: static;
-    margin-top: var(--space-3, 0.75rem);
+    margin-top: var(--space-4, 1rem);
     min-width: 0;
   }
 
   .comfort-settings__hint {
-    font-size: 0.85rem;
-    color: var(--text-tertiary);
+    font-size: 0.9rem;
+    color: var(--comfort-tray-hint, var(--text-tertiary));
     margin: 0;
   }
 
@@ -184,70 +194,47 @@ const themeToggleId = `comfort-theme-${variant}`;
     display: grid;
     grid-template-columns: auto 1fr;
     align-items: start;
-    gap: var(--space-2, 0.5rem);
+    gap: var(--space-3, 0.75rem);
   }
 
   .comfort-settings__control {
-    width: 1.15rem;
-    height: 1.15rem;
+    width: 1.1rem;
+    height: 1.1rem;
     border-radius: 0.35rem;
-    border: 1px solid var(--border-accent-strong);
-    background: var(--surface-muted);
-    accent-color: var(--text-accent-strong);
+    border: 1px solid var(--comfort-tray-border-strong, rgba(124, 78, 176, 0.38));
+    background: var(--comfort-chip-surface, rgba(24, 14, 34, 0.65));
+    accent-color: var(--comfort-chip-accent, var(--color-amethyst));
   }
 
   .comfort-settings__label {
     display: grid;
-    gap: 0.2rem;
+    gap: var(--space-1, 0.25rem);
     cursor: pointer;
   }
 
   .comfort-settings__label-text {
     font-family: var(--font-accent);
-    font-size: 0.8rem;
-    letter-spacing: 0.18em;
+    font-size: 0.82rem;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
   }
 
   .comfort-settings__description {
-    font-size: 0.8rem;
-    line-height: 1.5;
-    color: var(--text-tertiary);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: var(--comfort-tray-hint, var(--text-tertiary));
   }
 
   @media (max-width: 920px) {
-    .comfort-settings {
-      width: 100%;
-    }
-
-    .comfort-settings__summary {
-      width: 100%;
-      justify-content: space-between;
-    }
-
     .comfort-settings__panel {
       position: static;
-      margin-top: var(--space-3, 0.75rem);
+      margin-top: var(--space-4, 1rem);
     }
   }
 
-  :root[data-comfort-theme='dawn'] .comfort-settings__summary {
-    border-color: var(--border-purple-medium);
-    background: var(--surface-panel-secondary);
-    color: var(--text-strong);
+  @media (prefers-reduced-motion: reduce) {
+    .comfort-settings__summary {
+      transition: none;
+    }
   }
-
-  :root[data-comfort-theme='dawn'] .comfort-settings__panel {
-    background: var(--surface-panel-primary);
-    border-color: var(--border-purple-subtle);
-    color: var(--text-strong);
-    box-shadow: 0 18px 45px -28px rgba(71, 54, 96, 0.25);
-  }
-
-  :root[data-comfort-theme='dawn'] .comfort-settings__control {
-    background: var(--surface-card);
-    border-color: var(--border-purple-medium);
-  }
-
-  /* Dawn theme text colors are handled by CSS variables */
 </style>
