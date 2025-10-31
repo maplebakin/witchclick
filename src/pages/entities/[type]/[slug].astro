@@ -175,6 +175,12 @@ function pretty(v: unknown) {
 <Base title={`${ent.name} — ${typeLabel} — WitchClick`} wide ambientColor={accentHex}>
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <article class="entity-page" style={themeVarString ? `${themeVarString};` : undefined}>
+    <a href={`/entities/${ent.type}/`} class="entity-back-link">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+      Back to All {typeLabel}s
+    </a>
     <header class="entity-hero">
       <div class="entity-hero-sheen" aria-hidden="true" />
       <div class="entity-hero-inner">
@@ -269,7 +275,46 @@ function pretty(v: unknown) {
     )}
 
     {graphNeighbors.length > 0 && (
-      <EntityRelationshipGraph center={centerNode} neighbors={graphNeighbors} />
+      <section class="entity-graph-section" aria-labelledby="relationship-graph-heading">
+        <div class="entity-graph-header">
+          <div class="entity-graph-heading-group">
+            <h2 id="relationship-graph-heading" class="entity-graph-title">Connection Web</h2>
+            <p class="entity-graph-description">
+              Visual map of how this {typeLabel.toLowerCase()} connects to other allies and rituals in our collection.
+              <button
+                type="button"
+                class="entity-graph-help"
+                aria-label="Learn how to read this graph"
+                data-graph-help-trigger
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+              </button>
+            </p>
+          </div>
+          <div class="entity-graph-legend" data-graph-legend style="display: none;">
+            <p class="entity-graph-legend-title">How to read this graph:</p>
+            <ul class="entity-graph-legend-list">
+              <li>
+                <span class="entity-graph-legend-dot entity-graph-legend-dot--outbound"></span>
+                <strong>Outbound:</strong> This {typeLabel.toLowerCase()} references these allies
+              </li>
+              <li>
+                <span class="entity-graph-legend-dot entity-graph-legend-dot--inbound"></span>
+                <strong>Inbound:</strong> These allies or rituals reference this {typeLabel.toLowerCase()}
+              </li>
+              <li>
+                <span class="entity-graph-legend-dot entity-graph-legend-dot--center"></span>
+                <strong>Center:</strong> You are here
+              </li>
+            </ul>
+          </div>
+        </div>
+        <EntityRelationshipGraph center={centerNode} neighbors={graphNeighbors} />
+      </section>
     )}
 
     <section class="card-panel card-tier-1 card-panel-soft entity-related">
@@ -316,6 +361,44 @@ function pretty(v: unknown) {
     margin-top: 2rem;
     margin-bottom: 4rem;
     color: var(--ink-body, #111827);
+  }
+
+  .entity-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--entity-accent, #7c4eb0);
+    background: color-mix(in srgb, var(--entity-accent-surface, rgba(124, 78, 176, 0.08)) 80%, transparent 20%);
+    border: 1px solid var(--entity-accent-border, rgba(124, 78, 176, 0.25));
+    border-radius: 0.75rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    width: fit-content;
+    min-height: 44px; /* Ensure minimum touch target */
+  }
+
+  .entity-back-link:hover {
+    color: var(--entity-accent-heading, #4c1d95);
+    background: color-mix(in srgb, var(--entity-accent-surface, rgba(124, 78, 176, 0.08)) 100%, white 0%);
+    border-color: var(--entity-accent, #7c4eb0);
+    transform: translateX(-2px);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--entity-accent-shadow, rgba(124, 78, 176, 0.2)) 60%, transparent 40%);
+  }
+
+  .entity-back-link:focus-visible {
+    outline: 2px solid var(--entity-accent, #7c4eb0);
+    outline-offset: 3px;
+  }
+
+  .entity-back-link:active {
+    transform: translateX(-1px);
+  }
+
+  .entity-back-link svg {
+    flex-shrink: 0;
   }
 
   .entity-hero {
@@ -502,6 +585,126 @@ function pretty(v: unknown) {
     color: var(--ink-muted, #4b5563);
   }
 
+  /* Entity Graph Section */
+  .entity-graph-section {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .entity-graph-header {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .entity-graph-heading-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .entity-graph-title {
+    margin: 0;
+    font-size: clamp(1.5rem, 3vw, 1.875rem);
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-strong, #1a102c);
+  }
+
+  .entity-graph-description {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--ink-muted, #4b5563);
+    margin: 0;
+  }
+
+  .entity-graph-help {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    border: 1px solid color-mix(in srgb, var(--entity-accent, #7c4eb0) 30%, transparent 70%);
+    background: color-mix(in srgb, var(--entity-accent-surface, rgba(124, 78, 176, 0.08)) 60%, transparent 40%);
+    color: var(--entity-accent, #7c4eb0);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .entity-graph-help:hover {
+    border-color: var(--entity-accent, #7c4eb0);
+    background: color-mix(in srgb, var(--entity-accent-surface, rgba(124, 78, 176, 0.08)) 100%, transparent 0%);
+    transform: scale(1.1);
+  }
+
+  .entity-graph-help:focus-visible {
+    outline: 2px solid var(--entity-accent, #7c4eb0);
+    outline-offset: 2px;
+  }
+
+  .entity-graph-legend {
+    padding: 1.25rem 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid color-mix(in srgb, var(--entity-accent-border, rgba(124, 78, 176, 0.25)) 70%, transparent 30%);
+    background: color-mix(in srgb, var(--entity-accent-surface, rgba(124, 78, 176, 0.08)) 40%, var(--card-panel-surface, rgba(255, 255, 255, 0.9)) 60%);
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .entity-graph-legend.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .entity-graph-legend-title {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--ink-strong, #1a102c);
+  }
+
+  .entity-graph-legend-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.625rem;
+    font-size: 0.875rem;
+  }
+
+  .entity-graph-legend-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .entity-graph-legend-dot {
+    flex-shrink: 0;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+  }
+
+  .entity-graph-legend-dot--outbound {
+    background: color-mix(in srgb, var(--entity-accent, #7c4eb0) 70%, transparent 30%);
+    border: 2px solid var(--entity-accent, #7c4eb0);
+  }
+
+  .entity-graph-legend-dot--inbound {
+    background: color-mix(in srgb, var(--color-gold, #d4af37) 70%, transparent 30%);
+    border: 2px solid var(--color-gold, #d4af37);
+  }
+
+  .entity-graph-legend-dot--center {
+    background: var(--ink-strong, #1a102c);
+    border: 2px solid var(--ink-strong, #1a102c);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--entity-accent, #7c4eb0) 30%, transparent 70%);
+  }
+
   @media (max-width: 768px) {
     .entity-page {
       gap: 2.5rem;
@@ -524,5 +727,61 @@ function pretty(v: unknown) {
     .entity-related {
       padding: clamp(1.5rem, 6vw, 2.5rem);
     }
+
+    .entity-graph-description {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
 </style>
+
+<script>
+  // Entity graph help toggle
+  function initGraphHelp() {
+    const trigger = document.querySelector('[data-graph-help-trigger]');
+    const legend = document.querySelector('[data-graph-legend]');
+
+    if (!trigger || !legend) return;
+
+    let isOpen = false;
+
+    trigger.addEventListener('click', () => {
+      isOpen = !isOpen;
+
+      if (isOpen) {
+        legend.style.display = 'block';
+        requestAnimationFrame(() => {
+          legend.classList.add('is-visible');
+        });
+      } else {
+        legend.classList.remove('is-visible');
+        setTimeout(() => {
+          if (!isOpen) {
+            legend.style.display = 'none';
+          }
+        }, 250);
+      }
+    });
+
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        isOpen = false;
+        legend.classList.remove('is-visible');
+        setTimeout(() => {
+          if (!isOpen && legend) {
+            legend.style.display = 'none';
+          }
+        }, 250);
+        trigger.focus();
+      }
+    });
+  }
+
+  // Init on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGraphHelp);
+  } else {
+    initGraphHelp();
+  }
+</script>

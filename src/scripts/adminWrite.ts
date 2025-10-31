@@ -22,6 +22,8 @@ function initWriteAdmin() {
   const searchPreviewTitle = $<HTMLParagraphElement>('searchPreviewTitle');
   const searchPreviewUrl = $<HTMLParagraphElement>('searchPreviewUrl');
   const searchPreviewDescription = $<HTMLParagraphElement>('searchPreviewDescription');
+  const entitiesInput = $<HTMLInputElement>('entities');
+  const entityValidation = $<HTMLParagraphElement>('entityValidation');
   const siteOriginAttr = root?.getAttribute('data-site-origin') ?? '';
   let previewHost = '';
   if (siteOriginAttr) {
@@ -36,8 +38,9 @@ function initWriteAdmin() {
   }
 
   let slugTouched = false;
+  let entityValidationTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  function setStatus(msg: string, ok = true, warnings?: string[]) {
+  function setStatus(msg: string, ok = true, warnings?: string[], actions?: { slug: string; path: string }) {
     if (!statusEl) return;
     statusEl.innerHTML = '';
     statusEl.style.color = ok ? '#065f46' : '#7f1d1d';
@@ -56,6 +59,35 @@ function initWriteAdmin() {
       });
       statusEl.appendChild(list);
     }
+    if (ok && actions) {
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'mt-3 flex flex-wrap gap-2';
+
+      // View Post button
+      const viewBtn = document.createElement('a');
+      viewBtn.href = `/post/${actions.slug}`;
+      viewBtn.target = '_blank';
+      viewBtn.rel = 'noopener';
+      viewBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-base px-3 py-1.5 text-sm font-medium text-primary hover:bg-surface-soft';
+      viewBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>View Post`;
+
+      // Upload Hero button
+      const heroBtn = document.createElement('a');
+      heroBtn.href = `/admin/hero?post=${encodeURIComponent(actions.slug)}`;
+      heroBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-base px-3 py-1.5 text-sm font-medium text-primary hover:bg-surface-soft';
+      heroBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>Upload Hero Image`;
+
+      // Edit in Posts button
+      const editBtn = document.createElement('a');
+      editBtn.href = `/admin/posts?slug=${encodeURIComponent(actions.slug)}`;
+      editBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-base px-3 py-1.5 text-sm font-medium text-primary hover:bg-surface-soft';
+      editBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>Edit in Post Editor`;
+
+      actionsDiv.appendChild(viewBtn);
+      actionsDiv.appendChild(heroBtn);
+      actionsDiv.appendChild(editBtn);
+      statusEl.appendChild(actionsDiv);
+    }
   }
 
   function summarizeEntities(list: { type?: string; slug?: string }[] | undefined) {
@@ -67,6 +99,77 @@ function initWriteAdmin() {
         return `${type}:${slug}`;
       })
       .join(', ');
+  }
+
+  function parseEntities(input: string): Array<{ type: string; slug: string }> {
+    if (!input || !input.trim()) return [];
+    const parts = input.split(/[,\n]/);
+    const entities: Array<{ type: string; slug: string }> = [];
+    for (const part of parts) {
+      const trimmed = part.trim();
+      if (!trimmed) continue;
+      const match = trimmed.match(/^([a-zA-Z]+):([a-z0-9-]+)$/);
+      if (match && match[1] && match[2]) {
+        entities.push({ type: match[1], slug: match[2] });
+      }
+    }
+    return entities;
+  }
+
+  async function validateEntities() {
+    if (!entitiesInput || !entityValidation) return;
+
+    const input = entitiesInput.value.trim();
+    if (!input) {
+      entityValidation.innerHTML = '';
+      entityValidation.className = 'mt-2 text-xs';
+      return;
+    }
+
+    const entities = parseEntities(input);
+    if (entities.length === 0) {
+      entityValidation.innerHTML = '<span class="text-warning">Invalid format. Use type:slug (e.g., herb:peppermint, crystal:fluorite)</span>';
+      entityValidation.className = 'mt-2 text-xs';
+      return;
+    }
+
+    try {
+      // Check each entity
+      const checks = await Promise.all(
+        entities.map(async (entity) => {
+          try {
+            const res = await fetch(`${DEV_API}/entities/get`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ type: entity.type, slug: entity.slug }),
+            });
+            const data = await res.json();
+            return { ...entity, exists: data.ok };
+          } catch {
+            return { ...entity, exists: false };
+          }
+        })
+      );
+
+      const missing = checks.filter((c) => !c.exists);
+
+      if (missing.length === 0) {
+        entityValidation.innerHTML = `<span class="text-emerald-600">✓ All ${entities.length} ${entities.length === 1 ? 'entity' : 'entities'} exist</span>`;
+        entityValidation.className = 'mt-2 text-xs';
+      } else {
+        const missingHtml = missing
+          .map(
+            (m) =>
+              `<span class="inline-flex items-center gap-1">${m.type}:${m.slug} <a href="/admin/entities?type=${m.type}&slug=${m.slug}" class="text-purple-600 hover:underline" title="Create entity">[create]</a></span>`
+          )
+          .join(', ');
+        entityValidation.innerHTML = `<span class="text-warning">Missing ${missing.length} ${missing.length === 1 ? 'entity' : 'entities'}: ${missingHtml}</span>`;
+        entityValidation.className = 'mt-2 text-xs';
+      }
+    } catch (err) {
+      entityValidation.innerHTML = '<span class="text-body-muted">Could not validate entities</span>';
+      entityValidation.className = 'mt-2 text-xs';
+    }
   }
 
   type SlugState = {
@@ -242,6 +345,24 @@ function initWriteAdmin() {
   updateMetaHint();
   updateSearchPreview();
 
+  // Entity validation with debounce
+  entitiesInput?.addEventListener('input', () => {
+    if (entityValidationTimeout) {
+      clearTimeout(entityValidationTimeout);
+    }
+    if (entityValidation) {
+      entityValidation.innerHTML = '<span class="text-body-muted">Validating...</span>';
+    }
+    entityValidationTimeout = setTimeout(() => {
+      void validateEntities();
+    }, 500);
+  });
+
+  // Run initial validation if entities field has content
+  if (entitiesInput?.value.trim()) {
+    void validateEntities();
+  }
+
   async function savePost() {
     if (slugInput) {
       normalizeManualSlug();
@@ -285,8 +406,8 @@ function initWriteAdmin() {
       setStatus('Saving...');
       const data = await savePost();
       const summary = summarizeEntities(data.entities);
-      const message = `Saved → ${data.path}${summary ? ` · Entities: ${summary}` : ''}`;
-      setStatus(message, true, data.warnings);
+      const message = `✓ Saved → ${data.path}${summary ? ` · Entities: ${summary}` : ''}`;
+      setStatus(message, true, data.warnings, { slug: data.slug, path: data.path });
     } catch (e: any) {
       setStatus(`Save error: ${e?.message || String(e)}`, false);
     }
@@ -306,8 +427,8 @@ function initWriteAdmin() {
           : bundle.error;
         throw new Error(errors || 'bundle failed');
       }
-      const publishMsg = `Published ✓  Open post: /post/${data.slug}${summary ? ` · Entities: ${summary}` : ''}`;
-      setStatus(publishMsg, true, data.warnings);
+      const publishMsg = `✓ Published${summary ? ` · Entities: ${summary}` : ''}`;
+      setStatus(publishMsg, true, data.warnings, { slug: data.slug, path: data.path });
     } catch (e: any) {
       setStatus(`Publish error: ${e?.message || String(e)}`, false);
     }

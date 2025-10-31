@@ -331,7 +331,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         });
 
         showPanel('posts');
-        function setStatus(msg, ok, warnings, notes, errors, postStubs){
+        function setStatus(msg, ok, warnings, notes, errors, postStubs, slug){
           var el=$('status');
           if (!el) return;
           var base='rounded-lg border px-3 py-2 text-sm';
@@ -384,6 +384,37 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               stubsList.appendChild(li);
             });
             el.appendChild(stubsList);
+          }
+
+          // Add action buttons after successful ingest
+          if (ok === true && slug) {
+            var actionsDiv = document.createElement('div');
+            actionsDiv.className = 'mt-3 flex flex-wrap gap-2';
+
+            // View Post button
+            var viewBtn = document.createElement('a');
+            viewBtn.href = '/post/' + encodeURIComponent(slug);
+            viewBtn.target = '_blank';
+            viewBtn.rel = 'noopener';
+            viewBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-base px-3 py-1.5 text-sm font-medium text-primary hover:bg-surface-soft';
+            viewBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>View Post';
+
+            // Upload Hero button
+            var heroBtn = document.createElement('a');
+            heroBtn.href = '/admin/hero?post=' + encodeURIComponent(slug);
+            heroBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-base px-3 py-1.5 text-sm font-medium text-primary hover:bg-surface-soft';
+            heroBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>Upload Hero Image';
+
+            // Edit Post button
+            var editBtn = document.createElement('a');
+            editBtn.href = '/admin/posts?slug=' + encodeURIComponent(slug);
+            editBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-base px-3 py-1.5 text-sm font-medium text-primary hover:bg-surface-soft';
+            editBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>Edit Post';
+
+            actionsDiv.appendChild(viewBtn);
+            actionsDiv.appendChild(heroBtn);
+            actionsDiv.appendChild(editBtn);
+            el.appendChild(actionsDiv);
           }
 
           if (!msg && !(Array.isArray(warnings) && warnings.length) && !(Array.isArray(notes) && notes.length)) {
@@ -1098,11 +1129,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             var createdPosts = extractArray(data.createdPosts);
             var location = data.path || ('content/posts/' + (data.slug || finalSpec.slug || 'post') + '.md');
             var slug = data.slug || (finalSpec && finalSpec.slug) || '';
-            var msg = (data.saved === false ? 'Ingested (dry run)' : 'Ingested ✓') + ' → ' + location + (slug ? ' • Preview: /post/' + slug : '');
+            var msg = (data.saved === false ? 'Ingested (dry run)' : 'Ingested ✓') + ' → ' + location;
             if (createdPosts.length) {
               msg += ' • Created ' + createdPosts.length + ' stub post' + (createdPosts.length === 1 ? '' : 's');
             }
-            setStatus(msg, true, mergedWarnings, mergedNotes, extractArray(data.errors), createdPosts.map(function(p){ return {path: p}; }));
+            setStatus(msg, true, mergedWarnings, mergedNotes, extractArray(data.errors), createdPosts.map(function(p){ return {path: p}; }), slug);
           }catch(e){ handleSpecError(e); }
           finally{ busy(false); }
         });
@@ -1137,11 +1168,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             var b = await r.json();
             if (!b.ok) throw new Error((b.steps && b.steps.map(function(s){return s.err;}).filter(Boolean).join('\n')) || b.error || 'bundle failed');
             var slug = data.slug || (finalSpec && finalSpec.slug) || '';
-            var publishMsg = 'Published ✓' + (slug ? ' • Open post: /post/' + slug : '');
+            var publishMsg = 'Published ✓';
             if (createdPosts.length) {
               publishMsg += ' • Created ' + createdPosts.length + ' stub post' + (createdPosts.length === 1 ? '' : 's');
             }
-            setStatus(publishMsg, true, ingestWarnings.length ? ingestWarnings : warnings, ingestNotes.length ? ingestNotes : notes, extractArray(data.errors), createdPosts.map(function(p){ return {path: p}; }));
+            setStatus(publishMsg, true, ingestWarnings.length ? ingestWarnings : warnings, ingestNotes.length ? ingestNotes : notes, extractArray(data.errors), createdPosts.map(function(p){ return {path: p}; }), slug);
           }catch(e){ handleSpecError(e); }
           finally{ busy(false); }
         });

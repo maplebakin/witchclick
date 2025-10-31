@@ -179,6 +179,7 @@ const releaseSection = {
   schemaName: "Shadow work & release rituals",
   url: "/#release-rituals",
   tone: true,
+  link: { href: "/page/1", label: "Explore more rituals ↗" },
   posts: releasePosts,
 };
 
@@ -189,6 +190,7 @@ const planningSection = {
   description: "Work with your rhythms using tiny accountability rituals, tarot prompts, and gentle productivity spells.",
   schemaName: "Planning and focus rituals",
   url: "/#planning-rituals",
+  link: { href: "/page/1", label: "See all planning rituals ↗" },
   posts: planningPosts,
 };
 
@@ -200,6 +202,7 @@ const calmSection = {
   schemaName: "Rest and restoration rituals",
   url: "/#calm-rituals",
   tone: true,
+  link: { href: "/page/1", label: "Discover more calm rituals ↗" },
   posts: calmPosts,
 };
 
@@ -323,6 +326,9 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
           <h2 id={releaseSection.id} class="home-section__title">{releaseSection.heading}</h2>
           <p class="home-section__description">{releaseSection.description}</p>
         </div>
+        {releaseSection.link && (
+          <a class="home-section__link" href={releaseSection.link.href}>{releaseSection.link.label}</a>
+        )}
       </div>
       <div class="home-section__grid home-section__grid--cards">
         {releaseSection.posts.map((post) => (
@@ -356,6 +362,9 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
           <h2 id={planningSection.id} class="home-section__title">{planningSection.heading}</h2>
           <p class="home-section__description">{planningSection.description}</p>
         </div>
+        {planningSection.link && (
+          <a class="home-section__link" href={planningSection.link.href}>{planningSection.link.label}</a>
+        )}
       </div>
       <div class="home-section__grid home-section__grid--cards">
         {planningSection.posts.map((post) => (
@@ -389,6 +398,9 @@ const collectionSchemas = [latestSection, releaseSection, planningSection, calmS
           <h2 id={calmSection.id} class="home-section__title">{calmSection.heading}</h2>
           <p class="home-section__description">{calmSection.description}</p>
         </div>
+        {calmSection.link && (
+          <a class="home-section__link" href={calmSection.link.href}>{calmSection.link.label}</a>
+        )}
       </div>
       <div class="home-section__grid home-section__grid--cards">
         {calmSection.posts.map((post) => (

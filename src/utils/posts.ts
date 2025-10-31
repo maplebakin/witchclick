@@ -82,6 +82,24 @@ function resolvePostDirectory(): string | null {
   return null;
 }
 
+function resolvePostDirectories(): string[] {
+  const cwd = process.cwd();
+  const modern = path.join(cwd, "src", "content", "posts");
+  const legacy = path.join(cwd, "content", "posts");
+  const dirs: string[] = [];
+
+  if (directoryHasMarkdown(modern)) dirs.push(modern);
+  if (directoryHasMarkdown(legacy)) dirs.push(legacy);
+
+  // Fallback: if no markdown found but dirs exist, include them
+  if (dirs.length === 0) {
+    if (isDirectory(modern)) dirs.push(modern);
+    if (isDirectory(legacy)) dirs.push(legacy);
+  }
+
+  return dirs;
+}
+
 function deriveSlug(file: string, data: Record<string, any>): string {
   const fmSlug = data?.slug ? String(data.slug) : "";
   return (fmSlug || file.replace(/\.md$/, "")).toLowerCase();
@@ -117,40 +135,46 @@ function deriveDate(
 export function loadAllPosts(): LoadedPost[] {
   if (shouldCache && cachedPosts) return cachedPosts;
 
-  const dir = resolvePostDirectory();
-  if (!dir) {
+  const dirs = resolvePostDirectories();
+  if (dirs.length === 0) {
     if (shouldCache) cachedPosts = [];
     return [];
   }
 
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  const files = entries
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
-    .map((entry) => entry.name);
+  const posts: LoadedPost[] = [];
 
-  const posts = files
-    .map((file) => {
-      const fullPath = path.join(dir, file);
-      const raw = fs.readFileSync(fullPath, "utf8");
-      const { data, content } = matter(raw);
-      const slug = deriveSlug(file, data ?? {});
-      const date = deriveDate(fullPath, data ?? {});
-      const augmented = augmentPost(data ?? {}, content);
-      const postData = augmented.data;
-      const tldr = typeof postData.tldr === "string" ? postData.tldr : augmented.tldr;
-      const spoons = normalizeSpoonLevel(postData.spoons ?? postData.spoonLevel ?? augmented.spoons);
+  for (const dir of dirs) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    const files = entries
+      .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
+      .map((entry) => entry.name);
 
-      return {
-        slug,
-        title: String(postData?.title ?? data?.title ?? "Untitled"),
-        data: postData,
-        content,
-        date,
-        tldr: tldr || undefined,
-        spoons: spoons || undefined,
-      } satisfies LoadedPost;
-    })
-    .filter((post) => !isDraft(post.data));
+    const dirPosts = files
+      .map((file) => {
+        const fullPath = path.join(dir, file);
+        const raw = fs.readFileSync(fullPath, "utf8");
+        const { data, content } = matter(raw);
+        const slug = deriveSlug(file, data ?? {});
+        const date = deriveDate(fullPath, data ?? {});
+        const augmented = augmentPost(data ?? {}, content);
+        const postData = augmented.data;
+        const tldr = typeof postData.tldr === "string" ? postData.tldr : augmented.tldr;
+        const spoons = normalizeSpoonLevel(postData.spoons ?? postData.spoonLevel ?? augmented.spoons);
+
+        return {
+          slug,
+          title: String(postData?.title ?? data?.title ?? "Untitled"),
+          data: postData,
+          content,
+          date,
+          tldr: tldr || undefined,
+          spoons: spoons || undefined,
+        } satisfies LoadedPost;
+      })
+      .filter((post) => !isDraft(post.data));
+
+    posts.push(...dirPosts);
+  }
 
   posts.sort((a, b) => +b.date - +a.date);
   if (shouldCache) {

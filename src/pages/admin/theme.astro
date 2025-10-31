@@ -150,6 +150,36 @@ const fontOptions = [
 
         <!-- Main Editor -->
         <section class="lg:col-span-9 space-y-6">
+          <!-- Workflow Guidance -->
+          <div class="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-indigo-50 p-5 shadow-sm">
+            <div class="flex items-start gap-3">
+              <div class="flex-shrink-0 rounded-full bg-purple-600 p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-sm font-bold text-purple-900 mb-2">Quick Start Guide</h3>
+                <ol class="space-y-2 text-xs text-gray-700">
+                  <li class="flex items-start gap-2">
+                    <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-purple-600 text-white font-bold text-[10px]">1</span>
+                    <span>Select a theme from the left sidebar or create a new one</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-purple-600 text-white font-bold text-[10px]">2</span>
+                    <span>Adjust colors below — changes appear instantly in the Live Preview</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-purple-600 text-white font-bold text-[10px]">3</span>
+                    <span>Click "💾 Save Theme" and use the action buttons to preview or activate</span>
+                  </li>
+                </ol>
+              </div>
+            </div>
+          </div>
+
           <!-- Editor Header -->
           <div class="rounded-2xl border border-line-neutral bg-surface-base p-5 shadow-sm">
             <header class="mb-5">
@@ -483,10 +513,18 @@ const fontOptions = [
           </details>
 
           <!-- Live Preview -->
-          <div class="rounded-2xl border-2 border-dashed border-line-neutral bg-surface-soft/60 p-6" data-theme-preview>
+          <div class="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-indigo-50 p-6 shadow-lg" data-theme-preview>
             <div class="mb-4 flex items-center justify-between">
-              <p class="text-xs font-semibold uppercase tracking-wide text-body-muted">Live Preview</p>
-              <p class="text-xs text-body-muted" data-preview-scope-label>Global Theme</p>
+              <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-600">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <p class="text-sm font-bold uppercase tracking-wide text-purple-900">✨ Live Preview</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-bold text-purple-700" data-preview-scope-label>Global Theme</span>
+              </div>
             </div>
 
             <!-- Global Preview -->
@@ -620,12 +658,16 @@ const fontOptions = [
           </div>
 
           <!-- Action Buttons -->
-          <div class="rounded-2xl border border-line-neutral bg-surface-base p-5 shadow-sm">
+          <div class="rounded-2xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-5 shadow-lg">
+            <div class="mb-4">
+              <h3 class="text-sm font-bold text-emerald-900 mb-1">💾 Save & Apply</h3>
+              <p class="text-xs text-gray-700">Save your changes and activate or preview the theme</p>
+            </div>
             <div class="flex flex-wrap gap-2 mb-3">
               <button
                 type="button"
                 id="saveThemeBtn"
-                class="rounded-lg bg-success px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition"
+                class="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 transition shadow-sm"
                 title="Save (Ctrl+S)"
               >
                 💾 Save Theme
@@ -633,21 +675,21 @@ const fontOptions = [
               <button
                 type="button"
                 id="setActiveThemeBtn"
-                class="rounded-lg bg-info px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition"
+                class="rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700 transition shadow-sm"
               >
                 ⭐ Set as Active
               </button>
               <button
                 type="button"
                 id="duplicateThemeBtn"
-                class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft transition"
+                class="rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-50 transition"
               >
                 📋 Duplicate
               </button>
               <button
                 type="button"
                 id="deleteThemeBtn"
-                class="rounded-lg border border-danger px-4 py-2 text-sm font-medium text-danger hover:bg-danger hover:text-white transition"
+                class="rounded-lg border-2 border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition"
               >
                 🗑️ Delete
               </button>
@@ -655,21 +697,21 @@ const fontOptions = [
               <button
                 type="button"
                 id="exportBtn"
-                class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft transition"
+                class="rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-50 transition"
               >
                 ⬇️ Export
               </button>
               <button
                 type="button"
                 id="exportAllBtn"
-                class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft transition"
+                class="rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-50 transition"
               >
                 ⬇️ Export All
               </button>
               <button
                 type="button"
                 id="importBtn"
-                class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft transition"
+                class="rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-50 transition"
               >
                 ⬆️ Import
               </button>

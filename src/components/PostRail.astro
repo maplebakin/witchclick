@@ -42,14 +42,35 @@ const hasEntities = entities.length > 0;
 const hasCta = ctaType !== "none";
 const hasToc = toc.length > 0;
 const showRail = hasRecommendations || hasEntities || hasCta || hasToc;
+
+// Calculate content counts for mobile trigger badge
+const contentCount = recommendations.length + entities.length + (hasToc ? 1 : 0);
+const contentItems: string[] = [];
+if (hasRecommendations) contentItems.push(`${recommendations.length} related ${recommendations.length === 1 ? 'post' : 'posts'}`);
+if (hasEntities) contentItems.push(`${entities.length} ${entities.length === 1 ? 'entity' : 'entities'}`);
+if (hasToc) contentItems.push('table of contents');
+const contentSummary = contentItems.join(' • ');
 ---
 {showRail && (
-  <aside class="post-rail" aria-label="Article navigation">
-    <details class="post-rail__mobile-trigger">
-      <summary class="post-rail__summary">Keep exploring</summary>
-    </details>
+  <aside class="post-rail" aria-label="Article navigation" data-post-rail>
+    <button
+      type="button"
+      class="post-rail__mobile-trigger"
+      data-rail-trigger
+      aria-expanded="false"
+      aria-controls="post-rail-panel"
+      aria-label={`Explore ${contentCount} related ${contentCount === 1 ? 'item' : 'items'}`}
+    >
+      <span class="post-rail__trigger-content">
+        <span class="post-rail__trigger-label">Keep exploring</span>
+        <span class="post-rail__trigger-badge">{contentSummary}</span>
+      </span>
+      <svg class="post-rail__trigger-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </button>
 
-    <div class="post-rail__panel">
+    <div class="post-rail__panel" id="post-rail-panel" data-rail-panel>
       {hasRecommendations && (
         <section class="post-rail__section" aria-label="Recommended posts">
           <h2 class="post-rail__title">Recommended</h2>
@@ -116,29 +137,73 @@ const showRail = hasRecommendations || hasEntities || hasCta || hasToc;
 
   /* Mobile trigger */
   .post-rail__mobile-trigger {
-    display: block;
-  }
-
-  .post-rail__mobile-trigger[open] ~ .post-rail__panel {
-    display: grid;
-  }
-
-  .post-rail__summary {
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.5rem;
-    padding: 0.85rem 1.1rem;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 1rem 1.25rem;
     border-radius: 1rem;
-    border: 1px solid rgba(212, 175, 55, 0.35);
-    background: rgba(18, 7, 37, 0.8);
-    font-size: 0.85rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    background: rgba(18, 7, 37, 0.88);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgba(249, 245, 255, 0.95);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 44px; /* Ensure minimum touch target */
   }
 
-  /* Content panel - hidden on mobile by default, shown when trigger open */
+  .post-rail__mobile-trigger:hover {
+    border-color: rgba(212, 175, 55, 0.6);
+    background: rgba(18, 7, 37, 0.95);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .post-rail__mobile-trigger:focus-visible {
+    outline: 2px solid rgba(212, 175, 55, 0.8);
+    outline-offset: 3px;
+  }
+
+  .post-rail__mobile-trigger[aria-expanded="true"] {
+    border-color: rgba(124, 78, 176, 0.5);
+    background: rgba(18, 7, 37, 1);
+  }
+
+  .post-rail__trigger-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: left;
+  }
+
+  .post-rail__trigger-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(249, 245, 255, 0.95);
+  }
+
+  .post-rail__trigger-badge {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: rgba(212, 175, 55, 0.85);
+  }
+
+  .post-rail__trigger-chevron {
+    flex-shrink: 0;
+    color: rgba(212, 175, 55, 0.7);
+    transition: transform 0.2s ease;
+  }
+
+  .post-rail__mobile-trigger[aria-expanded="true"] .post-rail__trigger-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Content panel - hidden on mobile by default, shown when trigger active */
   .post-rail__panel {
     display: none;
     gap: 1.5rem;
@@ -148,6 +213,18 @@ const showRail = hasRecommendations || hasEntities || hasCta || hasToc;
       rgba(12, 5, 23, 0.82);
     border: 1px solid rgba(124, 78, 176, 0.28);
     padding: clamp(1.1rem, 2.5vw, 1.5rem);
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .post-rail__panel.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .post-rail.is-open .post-rail__panel {
+    display: grid;
   }
 
   .post-rail__section {
@@ -312,10 +389,29 @@ const showRail = hasRecommendations || hasEntities || hasCta || hasToc;
     background: rgba(124, 78, 176, 0.45);
   }
 
-  :root[data-comfort-theme="dawn"] .post-rail__summary {
-    background: rgba(253, 247, 238, 0.92);
-    border-color: rgba(155, 134, 200, 0.4);
-    color: rgba(87, 63, 115, 0.85);
+  :root[data-comfort-theme="dawn"] .post-rail__mobile-trigger {
+    background: rgba(253, 247, 238, 0.95);
+    border-color: rgba(155, 134, 200, 0.45);
+    color: rgba(87, 63, 115, 0.95);
+  }
+
+  :root[data-comfort-theme="dawn"] .post-rail__mobile-trigger:hover {
+    border-color: rgba(155, 134, 200, 0.65);
+    background: rgba(253, 247, 238, 1);
+    box-shadow: 0 4px 12px rgba(71, 54, 96, 0.15);
+  }
+
+  :root[data-comfort-theme="dawn"] .post-rail__mobile-trigger[aria-expanded="true"] {
+    border-color: rgba(180, 154, 217, 0.6);
+    background: rgba(252, 248, 242, 1);
+  }
+
+  :root[data-comfort-theme="dawn"] .post-rail__trigger-badge {
+    color: rgba(122, 94, 154, 0.85);
+  }
+
+  :root[data-comfort-theme="dawn"] .post-rail__trigger-chevron {
+    color: rgba(122, 94, 154, 0.7);
   }
 
   :root[data-comfort-theme="dawn"] .post-rail__panel {
@@ -376,6 +472,62 @@ const showRail = hasRecommendations || hasEntities || hasCta || hasToc;
       display: grid;
       position: sticky;
       top: 7rem;
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 </style>
+
+<script>
+  // PostRail mobile toggle functionality
+  function initPostRail() {
+    const rail = document.querySelector<HTMLElement>('[data-post-rail]');
+    const trigger = document.querySelector<HTMLButtonElement>('[data-rail-trigger]');
+    const panel = document.querySelector<HTMLDivElement>('[data-rail-panel]');
+
+    if (!rail || !trigger || !panel) return;
+
+    let isOpen = false;
+
+    function toggle() {
+      isOpen = !isOpen;
+
+      if (isOpen) {
+        rail!.classList.add('is-open');
+        trigger!.setAttribute('aria-expanded', 'true');
+        panel!.style.display = 'grid';
+        // Use requestAnimationFrame to ensure display:grid is applied before animation
+        requestAnimationFrame(() => {
+          panel!.classList.add('is-visible');
+        });
+      } else {
+        rail!.classList.remove('is-open');
+        trigger!.setAttribute('aria-expanded', 'false');
+        panel!.classList.remove('is-visible');
+        // Wait for transition to complete before hiding
+        setTimeout(() => {
+          if (!isOpen && panel) {
+            panel.style.display = 'none';
+          }
+        }, 250);
+      }
+    }
+
+    trigger.addEventListener('click', toggle);
+
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        toggle();
+        trigger!.focus();
+      }
+    });
+  }
+
+  // Init on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPostRail);
+  } else {
+    initPostRail();
+  }
+</script>

@@ -69,13 +69,15 @@
   --ink-muted: color-mix(in srgb, var(--color-ink) 55%, white 45%);
   --link-color: color-mix(in srgb, var(--color-fog) 55%, var(--color-gold) 45%);
   
-  /* Focus Ring Styles */
+  /* Focus Ring Styles - Enhanced for accessibility */
   --focus-ring-color: color-mix(in srgb, var(--color-gold) 72%, white 28%);
-  --focus-ring-offset: 4px;
+  --focus-ring-offset: 3px;
+  --focus-ring-width: 3px;
   --focus-ring-base-shadow: color-mix(in srgb, var(--color-night) 70%, transparent 30%);
-  --focus-ring-shadow: 
+  --focus-ring-shadow:
     0 0 0 2px var(--focus-ring-base-shadow),
-    0 0 0 calc(var(--focus-ring-offset) + 2px) color-mix(in srgb, var(--focus-ring-color) 85%, white 15%);
+    0 0 0 calc(var(--focus-ring-offset) + var(--focus-ring-width)) color-mix(in srgb, var(--focus-ring-color) 90%, white 10%),
+    0 0 12px 0 color-mix(in srgb, var(--focus-ring-color) 40%, transparent 60%);
 
   color-scheme: dark light;
 }
@@ -304,28 +306,32 @@ main {
 }
 
 /* ---------------------------------------------------------------------------
-   Focus States
+   Focus States - Enhanced for Accessibility
    --------------------------------------------------------------------------- */
 
-:where(a, button, input, select, textarea, summary, [role="button"]):focus-visible {
-  outline: 2px solid var(--focus-ring-color);
-  outline-offset: var(--focus-ring-offset);
+/* Default focus style for all interactive elements */
+:where(a, button, input, select, textarea, summary, [role="button"], [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: var(--focus-ring-width, 3px) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset, 3px);
   box-shadow: var(--focus-ring-shadow);
+  transition: outline-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* Focus ring utility class */
 .focus-ring {
   outline: none;
 }
 
 .focus-ring:focus-visible {
-  outline: 2px solid var(--focus-ring-color);
-  outline-offset: var(--focus-ring-offset);
+  outline: var(--focus-ring-width, 3px) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset, 3px);
   box-shadow: var(--focus-ring-shadow);
 }
 
+/* Fallback for older browsers or general focus-visible */
 :focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 4px;
+  outline: var(--focus-ring-width, 3px) solid var(--focus-ring-color, #d4af37);
+  outline-offset: var(--focus-ring-offset, 3px);
 }
 
 /* ---------------------------------------------------------------------------

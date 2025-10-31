@@ -1,7 +1,10 @@
 {
-  "primary": "#8b7e8f",
-  "accent": "#d9b2c4",
-  "background": "#faf7f5",
+  "primary": "#d97642",
+  "accent": "#e5a82e",
+  "background": "#1a0f0d",
   "fontSerif": "Literata",
-  "fontScript": "Parisienne"
+  "fontScript": "Parisienne",
+  "textPrimary": "#f4e8dc",
+  "textHeading": "#fef3e7",
+  "textMuted": "#d9a882"
 }

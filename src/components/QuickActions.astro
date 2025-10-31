@@ -1,0 +1,386 @@
+---
+/**
+ * QuickActions - Floating quick action panel for admin pages
+ * Provides shortcuts to common admin tasks
+ */
+---
+
+<div class="quick-actions" data-quick-actions>
+  <button
+    type="button"
+    class="quick-actions__trigger"
+    data-quick-actions-trigger
+    aria-label="Quick actions menu"
+    aria-expanded="false"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="1"></circle>
+      <circle cx="12" cy="5" r="1"></circle>
+      <circle cx="12" cy="19" r="1"></circle>
+    </svg>
+  </button>
+
+  <div class="quick-actions__panel" data-quick-actions-panel>
+    <div class="quick-actions__header">
+      <h3 class="quick-actions__title">Quick Actions</h3>
+      <button
+        type="button"
+        class="quick-actions__close"
+        data-quick-actions-close
+        aria-label="Close quick actions"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="quick-actions__nav">
+      <div class="quick-actions__section">
+        <h4 class="quick-actions__section-title">Content</h4>
+        <a href="/admin" class="quick-actions__link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+          </svg>
+          <span>Generate Post</span>
+        </a>
+        <a href="/admin/write" class="quick-actions__link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+          <span>Write Post</span>
+        </a>
+        <a href="/admin/posts" class="quick-actions__link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span>Edit Posts</span>
+        </a>
+      </div>
+
+      <div class="quick-actions__section">
+        <h4 class="quick-actions__section-title">Media & Content</h4>
+        <a href="/admin/hero" class="quick-actions__link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          <span>Upload Hero</span>
+        </a>
+        <a href="/admin/entities" class="quick-actions__link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+          </svg>
+          <span>New Entity</span>
+        </a>
+        <a href="/admin/authors" class="quick-actions__link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>Authors</span>
+        </a>
+      </div>
+
+      <div class="quick-actions__section">
+        <h4 class="quick-actions__section-title">Settings</h4>
+        <a href="/admin/theme" class="quick-actions__link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 1v6m0 6v6m5.2-13.2l-4.2 4.2m0 6l4.2 4.2M23 12h-6m-6 0H1m18.2 5.2l-4.2-4.2m0-6l4.2-4.2"></path>
+          </svg>
+          <span>Theme</span>
+        </a>
+        <a href="/admin/settings" class="quick-actions__link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Settings</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="quick-actions__footer">
+      <a href="/" class="quick-actions__site-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>View Site</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  function initQuickActions() {
+    const container = document.querySelector('[data-quick-actions]');
+    if (!container) return;
+
+    const trigger = container.querySelector('[data-quick-actions-trigger]') as HTMLButtonElement | null;
+    const panel = container.querySelector('[data-quick-actions-panel]') as HTMLElement | null;
+    const closeBtn = container.querySelector('[data-quick-actions-close]') as HTMLButtonElement | null;
+
+    if (!trigger || !panel) return;
+
+    let isOpen = false;
+
+    function open() {
+      if (!container || !panel) return;
+      isOpen = true;
+      container.classList.add('is-open');
+      trigger?.setAttribute('aria-expanded', 'true');
+      panel.style.display = 'block';
+      requestAnimationFrame(() => {
+        panel?.classList.add('is-visible');
+      });
+      // Focus first link
+      const firstLink = panel.querySelector('a');
+      if (firstLink) {
+        setTimeout(() => firstLink.focus(), 100);
+      }
+    }
+
+    function close() {
+      if (!container || !panel) return;
+      isOpen = false;
+      container.classList.remove('is-open');
+      trigger?.setAttribute('aria-expanded', 'false');
+      panel.classList.remove('is-visible');
+      setTimeout(() => {
+        if (!isOpen && panel) panel.style.display = 'none';
+      }, 200);
+    }
+
+    function toggle() {
+      if (isOpen) close();
+      else open();
+    }
+
+    trigger.addEventListener('click', toggle);
+    closeBtn?.addEventListener('click', close);
+
+    // Close on escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        close();
+        trigger.focus();
+      }
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!isOpen) return;
+      const target = e.target as Node;
+      if (!container.contains(target)) {
+        close();
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initQuickActions);
+  } else {
+    initQuickActions();
+  }
+</script>
+
+<style>
+  .quick-actions {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+  }
+
+  .quick-actions__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6b21a8 0%, #7c3aed 100%);
+    border: none;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(107, 33, 168, 0.4);
+    transition: all 0.2s ease;
+  }
+
+  .quick-actions__trigger:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(107, 33, 168, 0.5);
+  }
+
+  .quick-actions__trigger:active {
+    transform: scale(0.95);
+  }
+
+  .quick-actions__trigger:focus-visible {
+    outline: 2px solid #a78bfa;
+    outline-offset: 2px;
+  }
+
+  .quick-actions.is-open .quick-actions__trigger {
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+  }
+
+  .quick-actions__panel {
+    display: none;
+    position: absolute;
+    bottom: 4.5rem;
+    right: 0;
+    width: 18rem;
+    background: var(--admin-surface-base, #ffffff);
+    border: 1px solid var(--admin-border-subtle, #e5e7eb);
+    border-radius: 1rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .quick-actions__panel.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .quick-actions__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1rem 0.75rem;
+    border-bottom: 1px solid var(--admin-border-subtle, #e5e7eb);
+  }
+
+  .quick-actions__title {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--admin-text-primary, #111827);
+  }
+
+  .quick-actions__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    background: none;
+    border: none;
+    color: var(--admin-text-muted, #6b7280);
+    cursor: pointer;
+    border-radius: 0.25rem;
+    transition: all 0.15s ease;
+  }
+
+  .quick-actions__close:hover {
+    background: var(--admin-surface-soft, #f3f4f6);
+    color: var(--admin-text-primary, #111827);
+  }
+
+  .quick-actions__nav {
+    padding: 0.5rem;
+    max-height: 24rem;
+    overflow-y: auto;
+  }
+
+  .quick-actions__section {
+    padding: 0.5rem 0;
+  }
+
+  .quick-actions__section:not(:last-child) {
+    border-bottom: 1px solid var(--admin-border-subtle, #e5e7eb);
+  }
+
+  .quick-actions__section-title {
+    margin: 0 0 0.25rem;
+    padding: 0 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--admin-text-muted, #6b7280);
+  }
+
+  .quick-actions__link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    color: var(--admin-text-primary, #111827);
+    font-size: 0.875rem;
+    transition: all 0.15s ease;
+  }
+
+  .quick-actions__link:hover {
+    background: var(--admin-surface-soft, #f3f4f6);
+    color: #6b21a8;
+  }
+
+  .quick-actions__link:focus-visible {
+    outline: 2px solid #a78bfa;
+    outline-offset: -2px;
+  }
+
+  .quick-actions__link svg {
+    flex-shrink: 0;
+    color: var(--admin-icon-muted, #9ca3af);
+  }
+
+  .quick-actions__link:hover svg {
+    color: #6b21a8;
+  }
+
+  .quick-actions__footer {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--admin-border-subtle, #e5e7eb);
+  }
+
+  .quick-actions__site-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    color: var(--admin-text-muted, #6b7280);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    transition: all 0.15s ease;
+  }
+
+  .quick-actions__site-link:hover {
+    background: var(--admin-surface-soft, #f3f4f6);
+    color: var(--admin-text-primary, #111827);
+  }
+
+  @media (max-width: 768px) {
+    .quick-actions {
+      bottom: 1rem;
+      right: 1rem;
+    }
+
+    .quick-actions__trigger {
+      width: 3rem;
+      height: 3rem;
+    }
+
+    .quick-actions__panel {
+      width: calc(100vw - 2rem);
+      right: -1rem;
+    }
+  }
+</style>

@@ -679,7 +679,11 @@ export class ThemeEditor {
       }
 
       this.pushState({ ...this.state, mode: result.mode, currentPreset: result });
-      this.setStatus(`${isUpdate ? 'Updated' : 'Created'} "${result.name}"`, 'success');
+      this.setStatus(
+        `✓ ${isUpdate ? 'Updated' : 'Created'} "${result.name}"`,
+        'success',
+        { theme: result.slug, mode: result.mode }
+      );
     } catch (error) {
       this.setStatus(error instanceof Error ? error.message : 'Failed to save', 'error');
     }
@@ -695,7 +699,11 @@ export class ThemeEditor {
     try {
       this.setStatus('Setting active theme…', 'info');
       await this.manager.setActive(preset.mode, preset.slug);
-      this.setStatus(`Set "${preset.name}" as active ${preset.mode} theme`, 'success');
+      this.setStatus(
+        `✓ Set "${preset.name}" as active ${preset.mode} theme`,
+        'success',
+        { theme: preset.slug, mode: preset.mode }
+      );
       this.render();
     } catch (error) {
       this.setStatus(error instanceof Error ? error.message : 'Failed to set active', 'error');
@@ -803,23 +811,73 @@ export class ThemeEditor {
     URL.revokeObjectURL(url);
   }
 
-  private setStatus(message: string, type: 'success' | 'error' | 'info'): void {
+  private setStatus(message: string, type: 'success' | 'error' | 'info', actions?: { theme?: string; mode?: string }): void {
     if (!this.elements.statusEl) return;
 
     const el = this.elements.statusEl as HTMLElement;
-    el.textContent = message;
+    el.innerHTML = '';
+
+    // Create message text
+    const messageSpan = document.createElement('span');
+    messageSpan.textContent = message;
+    el.appendChild(messageSpan);
+
+    // Add action buttons for success states
+    if (type === 'success' && actions?.theme && actions?.mode) {
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'mt-3 flex flex-wrap gap-2';
+
+      // Preview Theme button
+      const previewBtn = document.createElement('a');
+      previewBtn.href = `/?theme=${encodeURIComponent(actions.theme)}&mode=${encodeURIComponent(actions.mode)}`;
+      previewBtn.target = '_blank';
+      previewBtn.rel = 'noopener';
+      previewBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-base px-3 py-1.5 text-sm font-medium text-primary hover:bg-surface-soft transition';
+      previewBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Preview Theme`;
+
+      // Set as Active button (if not already active)
+      const activePreset = this.manager.getActivePreset(actions.mode as ThemeMode);
+      const isActive = this.state.currentPreset?.slug === activePreset?.slug;
+      if (!isActive) {
+        const activateBtn = document.createElement('button');
+        activateBtn.type = 'button';
+        activateBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-purple-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-purple-700 transition shadow-sm';
+        activateBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Set as Active`;
+        activateBtn.addEventListener('click', () => {
+          void this.setActive();
+        });
+        actionsDiv.appendChild(activateBtn);
+      }
+
+      // View Site button
+      const siteBtn = document.createElement('a');
+      siteBtn.href = '/';
+      siteBtn.target = '_blank';
+      siteBtn.rel = 'noopener';
+      siteBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-base px-3 py-1.5 text-sm font-medium text-primary hover:bg-surface-soft transition';
+      siteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>View Site`;
+
+      actionsDiv.appendChild(previewBtn);
+      actionsDiv.appendChild(siteBtn);
+      el.appendChild(actionsDiv);
+
+      // Don't auto-clear success messages with actions
+      return;
+    }
 
     el.className = 'text-sm mt-2 ';
-    if (type === 'success') el.className += 'text-success';
+    if (type === 'success') el.className += 'text-success font-medium';
     else if (type === 'error') el.className += 'text-danger';
     else el.className += 'text-body-muted';
 
-    // Clear after 5 seconds
-    setTimeout(() => {
-      if (el.textContent === message) {
-        el.textContent = '';
-      }
-    }, 5000);
+    // Clear after 5 seconds (except for success with actions)
+    if (type !== 'success' || !actions) {
+      setTimeout(() => {
+        if (el.textContent?.includes(message)) {
+          el.innerHTML = '';
+        }
+      }, 5000);
+    }
   }
 
   private normalizeHex(value: string): string {
