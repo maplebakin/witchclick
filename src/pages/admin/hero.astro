@@ -647,6 +647,15 @@ const site = Astro.url?.origin ?? "";
           }
         }
 
+        function updatePageTitle(post) {
+          const baseTitle = 'WitchClick — Hero Image Uploader';
+          if (post && post.title) {
+            document.title = `${post.title} — ${baseTitle}`;
+          } else {
+            document.title = baseTitle;
+          }
+        }
+
         function updateExistingHeroNote(post) {
           if (!existingHeroNote) return;
           existingHeroNote.classList.remove('text-success', 'text-secondary');
@@ -676,6 +685,7 @@ const site = Astro.url?.origin ?? "";
             updateExistingHeroNote(null);
             applyAltSuggestion(null, { force: true });
             clearFileSelection();
+            updatePageTitle(null);
             refreshFormAvailability();
             return;
           }
@@ -687,12 +697,14 @@ const site = Astro.url?.origin ?? "";
             updateExistingHeroNote(null);
             applyAltSuggestion(null, { force: true });
             clearFileSelection();
+            updatePageTitle(null);
             refreshFormAvailability();
             return;
           }
           const current = posts.find((post) => post.slug === select.value);
           const description = extractHeroDescription(current);
           const promptText = buildHeroPrompt(current);
+          updatePageTitle(current || null);
           updateExistingHeroNote(current || null);
           applyAltSuggestion(current || null);
           if (!selectedFile && !previewUrl) {
