@@ -143,13 +143,6 @@ const customColors = {
   'gradient-ritual-end': colors.orange[600], // Ritual gradient end
   'gradient-tarot-start': colors.violet[500], // Tarot gradient start
   'gradient-tarot-end': colors.rose[500], // Tarot gradient end
-
-  // Ritual palette additions
-  ink: '#1f1a24',
-  moss: '#4d5d48',
-  ember: '#c25b3c',
-  moon: '#f3f0e8',
-  stone: '#d3cdc2',
 };
 
 /** @type {import('tailwindcss').Config} */
