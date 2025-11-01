@@ -8,7 +8,13 @@ interface Props {
 
 const { page = 1, totalPages = 1, baseHref = "/journal/page" } = Astro.props as Props;
 const current = Number(page);
-const prevHref = current > 1 ? `${baseHref}/${current - 1}` : null;
+const firstPageHref = baseHref.replace(/\/page$/, "") || "/";
+const prevHref =
+  current > 1
+    ? current - 1 === 1
+      ? firstPageHref
+      : `${baseHref}/${current - 1}`
+    : null;
 const nextHref = current < totalPages ? `${baseHref}/${current + 1}` : null;
 ---
 <nav aria-label="Pagination" class="mt-12 border-t border-line-muted/40 pt-6">
