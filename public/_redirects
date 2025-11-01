@@ -1,5 +1,17 @@
-/admin      /404  404
-/admin/*    /404  404
+/post/:slug    /journal/:slug    301
+/page/:page    /journal/page/:page    301
+/start    /journal    301
+/hub/*    /journal    301
+/salon    /journal    301
+/account    /journal    301
+/curses/*    /journal    301
+/lab/*    /journal    301
+/partners    /journal    301
+/tools    /spreads    301
+/author/*    /journal    301
+/admin    /journal    301
+/admin/*    /journal    301
+
 /go/sustainable-incense    https://www.amazon.com/s?k=sustainable+incense+sticks&tag=witchclickspa-20&utm_source=witchclick&utm_medium=affiliate&utm_campaign=sustainable_incense   302
 /go/altar-kit    https://www.amazon.com/s?k=altar+tools+chalice+altar+cloth+ritual+candles&tag=witchclickspa-20&utm_source=witchclick&utm_medium=affiliate&utm_campaign=altar_kit   302
 /go/gemstone-candle    https://www.amazon.com/s?k=gemstone+infused+candle&tag=witchclickspa-20&utm_source=witchclick&utm_medium=affiliate&utm_campaign=gemstone_candle   302

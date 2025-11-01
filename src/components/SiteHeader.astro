@@ -1,0 +1,54 @@
+---
+import ThemeToggle from "./ThemeToggle.astro";
+import type { NavLink } from "@/data/navigation";
+
+interface Props {
+  brandName: string;
+  navLinks?: NavLink[];
+  currentPath?: string;
+}
+
+const { brandName, navLinks = [], currentPath = "/" } = Astro.props as Props;
+
+const normalizedPath = currentPath.endsWith("/") && currentPath !== "/"
+  ? currentPath.slice(0, -1)
+  : currentPath;
+
+function isActive(href: string): boolean {
+  if (!href) return false;
+  const target = href.endsWith("/") && href !== "/" ? href.slice(0, -1) : href;
+  if (target === "/") return normalizedPath === "/";
+  return normalizedPath.startsWith(target);
+}
+---
+<header class="sticky top-0 z-40 border-b border-line-muted/40 bg-surface-base/80 backdrop-blur supports-[backdrop-filter]:bg-surface-base/60 dark:bg-surface-backdrop/70">
+  <div class="container-prose flex flex-wrap items-center justify-between gap-4 py-4 md:flex-nowrap md:py-5">
+    <a href="/" class="font-serif text-lg font-semibold tracking-wide text-ink no-underline transition hover:text-accent">
+      {brandName}
+    </a>
+    <nav aria-label="Primary" class="flex-1">
+      <ul class="flex flex-wrap items-center justify-start gap-x-4 gap-y-2 text-sm font-medium text-body-muted md:justify-center md:gap-x-6">
+        {navLinks.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class:list={[
+                "rounded-full px-3 py-1.5 transition-colors",
+                isActive(item.href)
+                  ? "bg-ink text-inverse"
+                  : "hover:bg-line-muted/30 hover:text-body-strong",
+              ]}
+              aria-current={isActive(item.href) ? "page" : undefined}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <div class="flex items-center gap-3 text-sm text-body-muted">
+      <ThemeToggle class="hidden rounded-full border border-line-muted/60 px-3 py-1.5 transition hover:border-line-bold hover:text-body-strong sm:inline-flex" />
+      {/** Placeholder for search/admin controls in future milestones */}
+    </div>
+  </div>
+</header>

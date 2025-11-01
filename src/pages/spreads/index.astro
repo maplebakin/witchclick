@@ -1,0 +1,110 @@
+---
+import fs from "node:fs";
+import path from "node:path";
+
+import Base from "@/layouts/Base.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+
+const title = "Spreads — WitchClick";
+const description = "Download cozy tarot spreads and planning templates without any marketing fluff.";
+const downloadsDirectory = "./content/downloads";
+
+const downloadFiles = fs.existsSync(downloadsDirectory)
+  ? fs
+      .readdirSync(downloadsDirectory)
+      .filter((file) => file.endsWith(".json"))
+      .map((file) => {
+        try {
+          const raw = fs.readFileSync(path.join(downloadsDirectory, file), "utf8");
+          return JSON.parse(raw) as {
+            slug?: string;
+            name?: string;
+            summary?: string;
+            price?: string | number;
+            currency?: string;
+            file?: string;
+            url?: string;
+          };
+        } catch (error) {
+          console.warn(`Unable to parse download file ${file}:`, error);
+          return null;
+        }
+      })
+      .filter(Boolean)
+  : [];
+
+const parsedDownloads = downloadFiles as Array<{
+  slug?: string;
+  name?: string;
+  summary?: string;
+  price?: string | number;
+  currency?: string;
+  file?: string;
+  url?: string;
+}>;
+
+const downloads = parsedDownloads
+  .map((entry) => {
+    const priceRaw = entry?.price;
+    const priceNumber = typeof priceRaw === "number" ? priceRaw : typeof priceRaw === "string" ? Number(priceRaw) : NaN;
+    const isFree = Number.isFinite(priceNumber) ? priceNumber === 0 : true;
+    const fileTarget = typeof entry?.file === "string" ? entry.file.trim() : "";
+    const urlTarget = typeof entry?.url === "string" ? entry.url.trim() : "";
+    const usableFile = fileTarget && !fileTarget.startsWith("/home/") ? fileTarget : "";
+    const href = urlTarget || usableFile;
+    return {
+      slug: entry?.slug ?? entry?.name ?? "download",
+      name: entry?.name ?? "Download",
+      summary: entry?.summary ?? "",
+      href,
+      isFree,
+      price: Number.isFinite(priceNumber) ? priceNumber : null,
+      currency: entry?.currency ?? "USD",
+    };
+  })
+  .filter((item) => item.href.length > 0);
+
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Spreads" },
+];
+---
+<Base {title} {description}>
+  <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
+  <section class="space-y-8">
+    <header class="space-y-3">
+      <h1 class="font-serif text-3xl text-ink">Spreads & Printables</h1>
+      <p class="text-base text-body">
+        Quick tarot spreads and ritual planners you can open in your browser or download for later. No funnels, just cozy tools.
+      </p>
+    </header>
+
+    {downloads.length === 0 ? (
+      <p class="rounded-3xl border border-line-muted/40 bg-surface-base/70 p-6 text-sm text-body-muted">
+        No downloads are available yet. Check back soon for fresh spreads.
+      </p>
+    ) : (
+      <div class="space-y-6">
+        {downloads.map((item) => (
+          <article class="space-y-4 rounded-3xl border border-line-muted/50 bg-surface-base/80 p-6 shadow-soft" id={item.slug}>
+            <header class="space-y-2">
+              <h2 class="font-serif text-2xl text-ink">{item.name}</h2>
+              {item.summary && <p class="text-base text-body">{item.summary}</p>}
+            </header>
+            <div class="flex flex-wrap items-center justify-between gap-3 text-sm text-body-muted">
+              <span class="rounded-full border border-line-muted/60 px-3 py-1 uppercase tracking-wide">
+                {item.isFree ? "Free download" : `Paid resource${item.price ? ` — ${item.currency} ${item.price}` : ""}`}
+              </span>
+              <a
+                href={item.href}
+                class="inline-flex items-center gap-2 rounded-full border border-line-muted/60 px-4 py-2 font-medium text-body transition hover:border-line-bold hover:text-body-strong"
+              >
+                Open spread →
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+    )}
+  </section>
+</Base>
