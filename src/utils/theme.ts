@@ -50,27 +50,64 @@ const THEMES_DIR = path.join(process.cwd(), "content", "themes");
 const ACTIVE_FILE = path.join(THEMES_DIR, "active.json");
 const LEGACY_FILE = path.join(process.cwd(), "content", "theme.json");
 
-let cachedThemes: ActiveThemes | null = null;
+interface ThemeCacheState {
+  themes: ActiveThemes;
+  fingerprint: string;
+}
+
+let cacheState: ThemeCacheState | null = null;
+
+const SHOULD_BYPASS_CACHE = process.env.NODE_ENV !== "production" || process.env.VITEST === "true";
 
 export function getTheme(mode: ThemeMode = "midnight"): ThemeDefinition {
   const themes = getActiveThemes();
   return themes[mode];
 }
 
+/**
+ * Resolve the currently active dawn and midnight themes.
+ *
+ * In production we memoize the response until one of the source files changes:
+ * - `content/themes/active.json`
+ * - Any theme JSON referenced by `active.json`
+ * - `content/theme.json` (legacy fallback)
+ *
+ * Admin tooling that writes to these files can either rely on the automatic
+ * mtime detection or call {@link resetThemeCache} after persisting updates to
+ * guarantee the next read pulls fresh data.
+ */
 export function getActiveThemes(): ActiveThemes {
-  if (cachedThemes) return cachedThemes;
-
   const mapping = readActiveMapping();
 
+  if (SHOULD_BYPASS_CACHE) {
+    return buildActiveThemes(mapping);
+  }
+
+  const fingerprint = createThemeFingerprint(mapping);
+
+  if (cacheState && cacheState.fingerprint === fingerprint) {
+    return cacheState.themes;
+  }
+
+  const themes = buildActiveThemes(mapping);
+  cacheState = { themes, fingerprint };
+  return themes;
+}
+
+/**
+ * Clears the cached theme payload so the next {@link getActiveThemes} call
+ * re-reads everything from disk. Handy for admin endpoints that update the
+ * theme library out-of-band.
+ */
+export function resetThemeCache() {
+  cacheState = null;
+}
+
+function buildActiveThemes(mapping: Partial<Record<ThemeMode, string>>): ActiveThemes {
   const midnight = readThemeDefinition(mapping.midnight ?? null, "midnight") ?? fallbackTheme("midnight");
   const dawn = readThemeDefinition(mapping.dawn ?? null, "dawn") ?? fallbackTheme("dawn");
 
-  cachedThemes = { midnight, dawn };
-  return cachedThemes;
-}
-
-export function resetThemeCache() {
-  cachedThemes = null;
+  return { midnight, dawn };
 }
 
 function readThemeDefinition(slug: string | null, expectedMode: ThemeMode): ThemeDefinition | null {
@@ -185,6 +222,38 @@ function readThemeFile(filePath: string): Partial<ThemeSettings> {
     }
     const message = error instanceof Error ? error.message : String(error);
     throw new Error(`[theme] Failed to read theme.json: ${message}`);
+  }
+}
+
+function createThemeFingerprint(mapping: Partial<Record<ThemeMode, string>>): string {
+  const segments: string[] = [];
+
+  segments.push(`active:${readFileStamp(ACTIVE_FILE)}`);
+  segments.push(`legacy:${readFileStamp(LEGACY_FILE)}`);
+
+  for (const mode of ["midnight", "dawn"] as const) {
+    const slug = mapping[mode];
+    if (!slug) {
+      segments.push(`${mode}:none:0`);
+      continue;
+    }
+
+    const themePath = path.join(THEMES_DIR, `${slug}.json`);
+    const stamp = readFileStamp(themePath);
+    segments.push(`${mode}:${slug}:${stamp}`);
+  }
+
+  return segments.join("|");
+}
+
+function readFileStamp(filePath: string): number {
+  try {
+    return fs.statSync(filePath).mtimeMs;
+  } catch (error) {
+    if (isNotFoundError(error)) {
+      return 0;
+    }
+    throw error;
   }
 }
 
