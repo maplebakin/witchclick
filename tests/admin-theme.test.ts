@@ -65,12 +65,22 @@ describe("admin theme dashboard", () => {
         background: "#120725",
         fontSerif: "Literata",
         fontScript: "Parisienne",
+        textPrimary: "#ede7ff",
+        linkColor: "#c084fc",
+        cardFocusOutline: "0 0 0 3px rgba(208, 163, 115, 0.42)",
+        fontHeading: "Cinzel",
+        backgroundImage: "url(/images/theme/test-midnight.png)",
       },
     });
 
     expect(midnightTheme.slug).toBe("test-midnight");
     expect(midnightTheme.mode).toBe("midnight");
     expectThemeHasAllSettings(midnightTheme.settings);
+    expect(midnightTheme.settings.textPrimary).toBe("#ede7ff");
+    expect(midnightTheme.settings.linkColor).toBe("#c084fc");
+    expect(midnightTheme.settings.cardFocusOutline).toBe("0 0 0 3px rgba(208, 163, 115, 0.42)");
+    expect(midnightTheme.settings.fontHeading).toBe("Cinzel");
+    expect(midnightTheme.settings.backgroundImage).toBe("url(/images/theme/test-midnight.png)");
 
     const dawnTheme = await saveThemeRecord({
       mode: "dawn",
@@ -81,12 +91,16 @@ describe("admin theme dashboard", () => {
         background: "#f7f1e5",
         fontSerif: "Literata",
         fontScript: "Parisienne",
+        textPrimary: "#2f1f3f",
+        linkColor: "#d97706",
       },
     });
 
     expect(dawnTheme.slug).toBe("test-dawn");
     expect(dawnTheme.mode).toBe("dawn");
     expectThemeHasAllSettings(dawnTheme.settings);
+    expect(dawnTheme.settings.textPrimary).toBe("#2f1f3f");
+    expect(dawnTheme.settings.linkColor).toBe("#d97706");
 
     const themeDir = path.join(tempDir, "content", "themes");
     const midnightFile = JSON.parse(
