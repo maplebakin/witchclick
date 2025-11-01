@@ -1,0 +1,43 @@
+---
+interface Props {
+  slug: string;
+  title: string;
+  excerpt?: string;
+  publishedAt?: string;
+  tags?: string[];
+}
+
+const { slug, title, excerpt, publishedAt, tags = [] } = Astro.props as Props;
+
+function formatDate(value?: string): string {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(+date)) return "";
+  return new Intl.DateTimeFormat("en", { month: "long", day: "numeric", year: "numeric" }).format(date);
+}
+
+const formattedDate = formatDate(publishedAt);
+const safeExcerpt = typeof excerpt === "string" ? excerpt.trim() : "";
+const visibleTags = tags.filter((tag) => typeof tag === "string" && tag.trim().length > 0).slice(0, 6);
+const href = `/journal/${slug}`;
+---
+<article class="space-y-4 rounded-3xl border border-line-muted/50 bg-surface-base/80 p-6 shadow-soft">
+  <header class="space-y-2">
+    {formattedDate && <p class="text-xs uppercase tracking-[0.18em] text-body-muted">{formattedDate}</p>}
+    <h2 class="font-serif text-2xl text-ink">
+      <a href={href} class="no-underline transition hover:text-accent">
+        {title}
+      </a>
+    </h2>
+  </header>
+  {safeExcerpt && <p class="text-base leading-relaxed text-body">{safeExcerpt}</p>}
+  {visibleTags.length > 0 && (
+    <ul class="flex flex-wrap gap-2 text-xs text-body-muted">
+      {visibleTags.map((tag) => (
+        <li class="rounded-full border border-line-muted/50 px-3 py-1 uppercase tracking-wide">
+          #{tag.toLowerCase()}
+        </li>
+      ))}
+    </ul>
+  )}
+</article>

@@ -2,353 +2,41 @@
 interface Props {
   page: number;
   totalPages: number;
-  /** base href without trailing slash, e.g. '/page' or '/tag/some-tag' */
+  /** base href without trailing slash, e.g. '/journal/page' */
   baseHref?: string;
 }
 
-const { page = 1, totalPages = 1, baseHref = "/page" } = Astro.props as Props;
-const p = Number(page);
-const prevHref = p > 1 ? `${baseHref}/${p - 1}` : null;
-const nextHref = p < totalPages ? `${baseHref}/${p + 1}` : null;
-const statusLabel = `Page ${p} of ${totalPages}`;
-const prevLabel = p > 1 ? "Turn back a page" : "At the beginning";
-const nextLabel = p < totalPages ? "Turn the page" : "Story complete";
+const { page = 1, totalPages = 1, baseHref = "/journal/page" } = Astro.props as Props;
+const current = Number(page);
+const prevHref = current > 1 ? `${baseHref}/${current - 1}` : null;
+const nextHref = current < totalPages ? `${baseHref}/${current + 1}` : null;
 ---
-<nav class="pagination" aria-label="Pagination">
-  <div class="pagination__inner">
-    {prevHref ? (
-      <a class="pagination__link" href={prevHref} rel="prev">
-        <span class="pagination__icon" aria-hidden="true">
-          <svg class="pagination__icon-svg" viewBox="0 0 36 36" focusable="false">
-            <path
-              d="M22.1 5.4c-6.4 3-11.4 7.9-14.5 13.3 3.3 5.3 8.2 10.2 14.5 13.3"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-width="1.8"
-            ></path>
-            <path
-              d="M19.2 10.2l-8 8 8 8"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2.1"
-            ></path>
-          </svg>
+<nav aria-label="Pagination" class="mt-12 border-t border-line-muted/40 pt-6">
+  <ul class="flex flex-col items-start gap-4 text-sm text-body-muted sm:flex-row sm:items-center sm:justify-between">
+    <li>
+      {prevHref ? (
+        <a href={prevHref} rel="prev" class="inline-flex items-center gap-2 rounded-full border border-line-muted/60 px-4 py-2 transition hover:border-line-bold hover:text-body">
+          ← Newer entries
+        </a>
+      ) : (
+        <span class="inline-flex items-center gap-2 rounded-full border border-transparent px-4 py-2 text-body-subtle">
+          ← Newer entries
         </span>
-        <span class="pagination__copy">
-          <span class="pagination__eyebrow">Previous chapter</span>
-          <span class="pagination__label">{prevLabel}</span>
+      )}
+    </li>
+    <li class="text-xs uppercase tracking-[0.3em] text-body-subtle">
+      Page {current} of {totalPages}
+    </li>
+    <li>
+      {nextHref ? (
+        <a href={nextHref} rel="next" class="inline-flex items-center gap-2 rounded-full border border-line-muted/60 px-4 py-2 transition hover:border-line-bold hover:text-body">
+          Older entries →
+        </a>
+      ) : (
+        <span class="inline-flex items-center gap-2 rounded-full border border-transparent px-4 py-2 text-body-subtle">
+          Older entries →
         </span>
-      </a>
-    ) : (
-      <span class="pagination__link pagination__link--disabled" aria-disabled="true">
-        <span class="pagination__icon" aria-hidden="true">
-          <svg class="pagination__icon-svg" viewBox="0 0 36 36" focusable="false">
-            <path
-              d="M22.1 5.4c-6.4 3-11.4 7.9-14.5 13.3 3.3 5.3 8.2 10.2 14.5 13.3"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-width="1.8"
-            ></path>
-            <path
-              d="M19.2 10.2l-8 8 8 8"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2.1"
-            ></path>
-          </svg>
-        </span>
-        <span class="pagination__copy">
-          <span class="pagination__eyebrow">Previous chapter</span>
-          <span class="pagination__label">{prevLabel}</span>
-        </span>
-      </span>
-    )}
-
-    <div class="pagination__status">
-      <span class="pagination__status-glyph" aria-hidden="true">
-        <svg class="pagination__status-svg" viewBox="0 0 48 32" focusable="false">
-          <path
-            d="M22.4 6.2c-6.2-2-11.6-2-16.8.3v16.8c5.2-2.1 10.6-2.1 16.8 0V6.2Z"
-            fill="currentColor"
-            opacity="0.22"
-          ></path>
-          <path
-            d="M25.6 6.2c6.2-2 11.6-2 16.8.3v16.8c-5.2-2.1-10.6-2.1-16.8 0V6.2Z"
-            fill="currentColor"
-            opacity="0.22"
-          ></path>
-          <path
-            d="M22.4 6.2c-6.2-2-11.6-2-16.8.3v16.8c5.2-2.1 10.6-2.1 16.8 0V6.2Zm3.2 0c6.2-2 11.6-2 16.8.3v16.8c-5.2-2.1-10.6-2.1-16.8 0V6.2Zm0 0v18.2"
-            fill="none"
-            stroke="currentColor"
-            stroke-linejoin="round"
-            stroke-width="1.6"
-          ></path>
-          <path
-            d="m15.2 3.6 1.3-2.1 1.3 2.1 2.3.36-1.8 1.5.6 2.2-2.4-1.3-2.4 1.3.6-2.2-1.8-1.5z"
-            fill="currentColor"
-          ></path>
-          <path
-            d="m33.2 3.8 1-1.6 1 1.6 1.8.28-1.4 1.2.5 1.9-1.9-1-1.9 1 .5-1.9-1.4-1.2z"
-            fill="currentColor"
-            opacity="0.9"
-          ></path>
-        </svg>
-      </span>
-      <div class="pagination__status-copy">
-        <span class="pagination__status-eyebrow">Story progress</span>
-        <span class="pagination__status-label">{statusLabel}</span>
-      </div>
-    </div>
-
-    {nextHref ? (
-      <a class="pagination__link pagination__link--next" href={nextHref} rel="next">
-        <span class="pagination__copy">
-          <span class="pagination__eyebrow">Next chapter</span>
-          <span class="pagination__label">{nextLabel}</span>
-        </span>
-        <span class="pagination__icon" aria-hidden="true">
-          <svg class="pagination__icon-svg" viewBox="0 0 36 36" focusable="false">
-            <path
-              d="M13.9 5.4c6.4 3 11.4 7.9 14.5 13.3-3.3 5.3-8.2 10.2-14.5 13.3"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-width="1.8"
-            ></path>
-            <path
-              d="M16.8 10.2l8 8-8 8"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2.1"
-            ></path>
-          </svg>
-        </span>
-      </a>
-    ) : (
-      <span class="pagination__link pagination__link--disabled pagination__link--next" aria-disabled="true">
-        <span class="pagination__copy">
-          <span class="pagination__eyebrow">Next chapter</span>
-          <span class="pagination__label">{nextLabel}</span>
-        </span>
-        <span class="pagination__icon" aria-hidden="true">
-          <svg class="pagination__icon-svg" viewBox="0 0 36 36" focusable="false">
-            <path
-              d="M13.9 5.4c6.4 3 11.4 7.9 14.5 13.3-3.3 5.3-8.2 10.2-14.5 13.3"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-width="1.8"
-            ></path>
-            <path
-              d="M16.8 10.2l8 8-8 8"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2.1"
-            ></path>
-          </svg>
-        </span>
-      </span>
-    )}
-  </div>
+      )}
+    </li>
+  </ul>
 </nav>
-
-<style>
-  .pagination {
-    margin-top: clamp(3rem, 6vw, 4.75rem);
-  }
-
-  .pagination__inner {
-    position: relative;
-    display: grid;
-    gap: clamp(1.25rem, 3vw, 2.25rem);
-    justify-items: center;
-  }
-
-  @media (min-width: 640px) {
-    .pagination__inner {
-      grid-template-columns: repeat(3, minmax(0, auto));
-      align-items: stretch;
-    }
-  }
-
-  .pagination__link {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: 1rem;
-    min-width: min(100%, 15.5rem);
-    padding: 1rem 1.75rem;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 32%, transparent 68%);
-    background:
-      radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--ambient-highlight, var(--accent-purple-soft)) 28%, transparent 72%), transparent 68%),
-      linear-gradient(135deg, color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 54%, rgba(8, 2, 16, 0.65) 46%) 0%, color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 42%, rgba(13, 5, 24, 0.92) 58%) 100%);
-    color: color-mix(in srgb, var(--ink-strong, #f4f1ff) 94%, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 6%);
-    box-shadow: 0 18px 45px -26px color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 38%, black 62%);
-    text-decoration: none;
-    transition:
-      transform 220ms ease,
-      box-shadow 220ms ease,
-      border-color 220ms ease,
-      background 220ms ease;
-  }
-
-  .pagination__link::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 18%, transparent 82%), transparent 70%);
-    opacity: 0;
-    transition: opacity 200ms ease;
-  }
-
-  .pagination__link:hover::after,
-  .pagination__link:focus-visible::after {
-    opacity: 1;
-  }
-
-  .pagination__link:hover,
-  .pagination__link:focus-visible {
-    transform: translateY(-4px);
-    box-shadow: 0 28px 60px -24px color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 46%, black 54%);
-    border-color: color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 48%, transparent 52%);
-  }
-
-  .pagination__link:focus-visible {
-    outline: none;
-    box-shadow:
-      0 0 0 3px color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 32%, transparent 68%),
-      0 28px 60px -24px color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 46%, black 54%);
-  }
-
-  .pagination__link--next {
-    justify-content: flex-end;
-  }
-
-  .pagination__link--disabled {
-    pointer-events: none;
-    background: linear-gradient(135deg, color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 22%, transparent 78%) 0%, color-mix(in srgb, var(--surface-panel-primary) 86%, transparent 14%) 100%);
-    border-color: color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 20%, transparent 80%);
-    color: color-mix(in srgb, var(--ink-muted, #d6cffa) 85%, white 15%);
-    box-shadow: none;
-    transform: none;
-  }
-
-  .pagination__copy {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    text-align: left;
-  }
-
-  .pagination__eyebrow {
-    font-size: 0.65rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 75%, var(--ink-body, #f4f1ff) 25%);
-  }
-
-  .pagination__label {
-    font-size: 1rem;
-    font-weight: 600;
-    color: inherit;
-  }
-
-  .pagination__icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.2rem;
-    height: 2.2rem;
-    color: color-mix(in srgb, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 68%, white 32%);
-    filter: drop-shadow(0 8px 18px color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 35%, transparent 65%));
-  }
-
-  .pagination__icon-svg {
-    width: 100%;
-    height: 100%;
-  }
-
-  .pagination__status {
-    position: relative;
-    display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: center;
-    gap: 1.1rem;
-    padding: 1.2rem 1.75rem;
-    border-radius: clamp(1.6rem, 4vw, 2.4rem);
-    border: 1px solid color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 26%, transparent 74%);
-    background:
-      radial-gradient(circle at 20% 0%, color-mix(in srgb, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 18%, transparent 82%), transparent 70%),
-      linear-gradient(180deg, color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 24%, rgba(8, 2, 18, 0.78)) 0%, color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 18%, rgba(6, 1, 14, 0.92)) 100%);
-    box-shadow: 0 20px 50px -26px color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 40%, black 60%);
-  }
-
-  .pagination__status::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    border-radius: inherit;
-    border: 1px solid color-mix(in srgb, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 28%, transparent 72%);
-    opacity: 0.5;
-  }
-
-  .pagination__status-glyph {
-    display: inline-flex;
-    width: 2.6rem;
-    height: 2.6rem;
-    color: color-mix(in srgb, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 78%, white 22%);
-    filter: drop-shadow(0 10px 18px color-mix(in srgb, var(--ambient-color, var(--accent-purple-strong)) 38%, transparent 62%));
-  }
-
-  .pagination__status-svg {
-    width: 100%;
-    height: 100%;
-  }
-
-  .pagination__status-copy {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    color: color-mix(in srgb, var(--ink-strong, #f4f1ff) 95%, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 5%);
-  }
-
-  .pagination__status-eyebrow {
-    font-size: 0.68rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 62%, var(--ink-body, #f4f1ff) 38%);
-  }
-
-  .pagination__status-label {
-    font-size: 1.05rem;
-    font-weight: 600;
-  }
-
-  @media (max-width: 639px) {
-    .pagination__link,
-    .pagination__link--next,
-    .pagination__status {
-      width: min(100%, 22rem);
-    }
-
-    .pagination__link--next,
-    .pagination__link {
-      justify-content: space-between;
-    }
-  }
-</style>

@@ -143,6 +143,13 @@ const customColors = {
   'gradient-ritual-end': colors.orange[600], // Ritual gradient end
   'gradient-tarot-start': colors.violet[500], // Tarot gradient start
   'gradient-tarot-end': colors.rose[500], // Tarot gradient end
+
+  // Ritual palette additions
+  ink: '#1f1a24',
+  moss: '#4d5d48',
+  ember: '#c25b3c',
+  moon: '#f3f0e8',
+  stone: '#d3cdc2',
 };
 
 /** @type {import('tailwindcss').Config} */
@@ -154,6 +161,12 @@ module.exports = {
       fontFamily: {
         serif: ['Literata', 'ui-serif', 'Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif'],
         script: ['Parisienne', 'cursive'],
+      },
+      boxShadow: {
+        soft: '0 20px 45px -28px rgba(23, 16, 32, 0.35)',
+      },
+      borderRadius: {
+        xl: '1.25rem',
       },
       typography: ({ theme }) => ({
         DEFAULT: {

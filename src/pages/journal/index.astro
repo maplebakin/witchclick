@@ -1,14 +1,23 @@
 ---
 import Base from "@/layouts/Base.astro";
-import AltarHero from "@/components/AltarHero.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import JournalListItem from "@/components/JournalListItem.astro";
-import { loadAllPosts, firstParagraph } from "@/utils/posts";
+import Pagination from "@/components/Pagination.astro";
+import { paginatePosts, firstParagraph } from "@/utils/posts";
+import type { LoadedPost } from "@/utils/posts";
 
-const title = "WitchClick — Cozy secular ritual notes";
-const description = "A secular altar for neurodivergent magic-makers. Browse the newest essays, rituals, and tools.";
+const PAGE_SIZE = 10;
+const title = "Journal — WitchClick";
+const description = "Browse the newest WitchClick rituals, essays, and practical spellwork.";
 
-const posts = loadAllPosts();
-const latestPosts = posts.slice(0, 5).map((post) => {
+const { totalPages, items } = paginatePosts(1, PAGE_SIZE);
+const posts = items.map(mapToListEntry);
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Journal" },
+];
+
+function mapToListEntry(post: LoadedPost) {
   const data = post.data ?? {};
   const postTitle = typeof data.title === "string" && data.title.trim().length ? data.title.trim() : post.title;
   const excerptCandidate = [
@@ -45,35 +54,24 @@ const latestPosts = posts.slice(0, 5).map((post) => {
     tags,
     publishedAt,
   };
-});
+}
 ---
 <Base {title} {description}>
-  <div class="space-y-16">
-    <AltarHero />
+  <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
+  <section class="space-y-8">
+    <header class="space-y-3">
+      <h1 class="font-serif text-3xl text-ink">Journal</h1>
+      <p class="text-base text-body">
+        Practical ritual notes, cozy planning frameworks, and secular spellcraft for tired brains.
+      </p>
+    </header>
 
-    <section class="space-y-6">
-      <header class="space-y-2">
-        <p class="text-xs uppercase tracking-[0.3em] text-body-muted">Latest dispatches</p>
-        <h2 class="font-serif text-3xl text-ink">Latest from the Journal</h2>
-        <p class="text-base text-body">
-          Five fresh entries to help you reclaim time, soothe your nervous system, and build practical magic.
-        </p>
-      </header>
+    <div class="space-y-6">
+      {posts.map((post) => (
+        <JournalListItem {...post} />
+      ))}
+    </div>
 
-      <div class="space-y-6">
-        {latestPosts.map((post) => (
-          <JournalListItem {...post} />
-        ))}
-      </div>
-
-      <div>
-        <a
-          href="/journal"
-          class="inline-flex items-center gap-2 rounded-full border border-line-muted/60 px-4 py-2 text-sm font-medium text-body transition hover:border-line-bold hover:text-body-strong"
-        >
-          Browse all entries →
-        </a>
-      </div>
-    </section>
-  </div>
+    <Pagination page={1} {totalPages} />
+  </section>
 </Base>

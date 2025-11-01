@@ -1,0 +1,21 @@
+---
+interface Props {
+  brandName: string;
+}
+
+const { brandName } = Astro.props as Props;
+const year = new Date().getFullYear();
+---
+<footer class="border-t border-line-muted/40 bg-surface-base/80 py-8 text-sm text-body-muted">
+  <div class="container-prose flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <p class="max-w-xl text-base text-body">
+      Cozy, secular ritual notes for tired brains who still want to build kind futures.
+    </p>
+    <div class="flex items-center gap-4 text-xs uppercase tracking-wide text-body-subtle">
+      <span>© {year} {brandName}</span>
+      <a href="/rss.xml" class="rounded-full border border-transparent px-3 py-1 transition hover:border-line-muted hover:text-body">
+        RSS
+      </a>
+    </div>
+  </div>
+</footer>

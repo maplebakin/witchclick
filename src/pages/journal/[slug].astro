@@ -1,0 +1,163 @@
+---
+import Base from "@/layouts/Base.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import { loadAllPosts, firstParagraph, estimateReadingMinutes } from "@/utils/posts";
+import { readSettings, buildCanonicalUrl } from "@/utils/settings";
+import { marked } from "marked";
+import createDOMPurify from "dompurify";
+import { JSDOM } from "jsdom";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const posts = loadAllPosts();
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+  }));
+}
+
+const slug = Astro.params.slug as string;
+const posts = loadAllPosts();
+const post = posts.find((entry) => entry.slug === slug);
+
+if (!post) {
+  throw Astro.redirect("/journal", 302);
+}
+
+const data = post.data ?? {};
+const title = typeof data.title === "string" && data.title.trim().length ? data.title.trim() : post.title;
+const rawDescription = data.metaDescription ?? data.description ?? data.excerpt ?? firstParagraph(post.content);
+const description = typeof rawDescription === "string" ? rawDescription.trim() : "";
+
+const publishedAtCandidate = [data.publishedAt, data.pubDate, data.date].find(
+  (value) => typeof value === "string" && value.trim().length > 0,
+);
+const publishedAt = publishedAtCandidate
+  ? String(publishedAtCandidate)
+  : post.date instanceof Date
+    ? post.date.toISOString()
+    : undefined;
+
+function parseDate(value?: string) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(+date) ? null : date;
+}
+
+const publishedDate = parseDate(publishedAt ?? undefined);
+const publishedLabel = publishedDate
+  ? new Intl.DateTimeFormat("en", { month: "long", day: "numeric", year: "numeric" }).format(publishedDate)
+  : "";
+const publishedIso = publishedDate ? publishedDate.toISOString() : undefined;
+
+const readingMinutes = data.readingMinutes ?? estimateReadingMinutes(post.content);
+const readingLabel = typeof readingMinutes === "number" && Number.isFinite(readingMinutes)
+  ? `${Math.max(1, Math.round(readingMinutes))} min read`
+  : "";
+
+const tagsRaw = Array.isArray(data.tags)
+  ? data.tags
+  : typeof data.tags === "string"
+    ? data.tags.split(",")
+    : [];
+const tags = Array.from(
+  new Set(
+    tagsRaw
+      .map((tag) => (typeof tag === "string" ? tag.trim() : ""))
+      .filter((tag) => tag.length > 0),
+  ),
+);
+
+const dom = new JSDOM("<body></body>");
+const DOMPurify = createDOMPurify(dom.window);
+const rawHtml = marked.parse(post.content ?? "");
+const sanitized = DOMPurify.sanitize(String(rawHtml), { USE_PROFILES: { html: true } });
+const wrapper = dom.window.document.createElement("div");
+wrapper.innerHTML = sanitized;
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+const headingIds = new Map<string, number>();
+wrapper.querySelectorAll("h2, h3, h4, h5, h6").forEach((node) => {
+  const text = node.textContent?.trim();
+  if (!text) return;
+  const base = slugify(text);
+  if (!base) return;
+  const count = headingIds.get(base) ?? 0;
+  const id = count === 0 ? base : `${base}-${count}`;
+  headingIds.set(base, count + 1);
+  node.setAttribute("id", id);
+});
+
+const html = wrapper.innerHTML;
+
+const currentIndex = posts.findIndex((entry) => entry.slug === post.slug);
+const newerPost = currentIndex > 0 ? posts[currentIndex - 1] : null;
+const olderPost = currentIndex < posts.length - 1 ? posts[currentIndex + 1] : null;
+
+const settings = readSettings();
+const canon = buildCanonicalUrl(settings, { path: `/journal/${post.slug}` });
+
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Journal", href: "/journal" },
+  { label: title },
+];
+---
+<Base title={`${title} — WitchClick`} description={description} canon={canon}>
+  <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
+  <article class="space-y-10">
+    <header class="space-y-4">
+      {(publishedLabel || readingLabel) && (
+        <p class="text-xs uppercase tracking-[0.28em] text-body-muted">
+          {publishedLabel && publishedIso ? (
+            <time datetime={publishedIso}>{publishedLabel}</time>
+          ) : (
+            publishedLabel
+          )}
+          {publishedLabel && readingLabel && <span class="mx-2 text-body-subtle">•</span>}
+          {readingLabel}
+        </p>
+      )}
+      <h1 class="font-serif text-4xl text-ink">{title}</h1>
+      {tags.length > 0 && (
+        <ul class="flex flex-wrap gap-2 text-xs text-body-muted">
+          {tags.map((tag) => (
+            <li class="rounded-full border border-line-muted/50 px-3 py-1 uppercase tracking-wide">
+              #{tag.toLowerCase()}
+            </li>
+          ))}
+        </ul>
+      )}
+    </header>
+
+    <div class="prose prose-invert max-w-none" set:html={html}></div>
+
+    <nav
+      class="flex flex-col gap-4 border-t border-line-muted/40 pt-6 text-sm text-body-muted sm:flex-row sm:justify-between"
+      aria-label="Post navigation"
+    >
+      {newerPost ? (
+        <a href={`/journal/${newerPost.slug}`} class="inline-flex items-center gap-2 hover:text-body">
+          ← Newer: {newerPost.title}
+        </a>
+      ) : (
+        <span class="inline-flex items-center gap-2 text-body-subtle">← Newer: None</span>
+      )}
+      {olderPost ? (
+        <a href={`/journal/${olderPost.slug}`} class="inline-flex items-center gap-2 hover:text-body">
+          Older: {olderPost.title} →
+        </a>
+      ) : (
+        <span class="inline-flex items-center gap-2 text-body-subtle">Older: None →</span>
+      )}
+    </nav>
+  </article>
+</Base>

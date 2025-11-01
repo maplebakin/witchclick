@@ -1,7 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
-import PrimaryButton from "../components/buttons/PrimaryButton.astro";
 import { readSettings, buildCanonicalUrl } from "../utils/settings";
 
 const settings = readSettings();
@@ -10,99 +9,42 @@ const breadcrumbs = [
   { label: "Home", href: "/" },
   { label: "About" },
 ];
+
+const quickLinks = [
+  { label: "Journal", href: "/journal" },
+  { label: "Entities", href: "/entities" },
+  { label: "Spreads", href: "/spreads" },
+  { label: "Contact", href: "/contact" },
+];
 ---
-<Base
-  title="About"
-  description="About the WitchClick project."
-  canon={canonical}
->
+<Base title="About WitchClick" description="Why WitchClick exists and where to explore next." canon={canonical}>
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
-  <article class="prose prose-neutral max-w-none space-y-8">
+  <article class="space-y-8">
     <header class="space-y-4">
-      <h1>About WitchClick</h1>
-      <p>
-        WitchClick is a secular sanctuary for people who crave ritual without rigidity. We blend cozy aesthetics, trauma-aware
-        planning, and small acts of wonder so you can reclaim momentum—even on a low-spoon day.
+      <h1 class="font-serif text-3xl text-ink">About WitchClick</h1>
+      <p class="text-base text-body">
+        WitchClick began as a simple altar for friends who wanted ritual support without dogma. We blend secular research, tarot prompts, cozy design, and neurodivergent-friendly pacing so you can build tiny spells that fit into real life.
       </p>
-      <p>
-        Nothing here is medical, legal, or therapeutic advice. Take what resonates, adapt every ritual to your bodymind, and
-        leave the rest at the altar.
+      <p class="text-base text-body">
+        Every guide is written with transparency and consent in mind. Adapt what you find, ignore what doesn’t resonate, and treat rest as part of the work.
       </p>
     </header>
 
-    <section>
-      <h2>Brand manifesto</h2>
-      <p>
-        We believe magic lives in the tiny choices you can actually make. WitchClick celebrates rituals that are slow, consent-
-        filled, and accessible. Every guide is an invitation—not a commandment.
-      </p>
-      <ul>
-        <li>Build comfort-first systems that honor neurodivergent rhythms and chronic-illness realities.</li>
-        <li>Offer evidence-aware insights while leaving room for wonder, intuition, and play.</li>
-        <li>Design with accessibility at the forefront: adjustable themes, friendly fonts, and short summaries.</li>
-        <li>Champion rest as productive, boundaries as sacred, and softness as a strategic advantage.</li>
+    <section class="space-y-3">
+      <h2 class="font-serif text-2xl text-ink">Continue exploring</h2>
+      <ul class="grid gap-3 sm:grid-cols-2">
+        {quickLinks.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="flex items-center justify-between rounded-2xl border border-line-muted/50 bg-surface-base/80 px-4 py-3 text-sm font-medium text-body transition hover:border-line-bold hover:text-body-strong"
+            >
+              <span>{link.label}</span>
+              <span aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))}
       </ul>
-    </section>
-
-    <section>
-      <h2>Values we nurture</h2>
-      <ul>
-        <li>
-          <strong>Gentle agency.</strong> Your autonomy matters more than any spell. Every ritual comes with choose-your-own-
-          pace variations and plain-language safety notes.
-        </li>
-        <li>
-          <strong>Inclusive coziness.</strong> We write for queer, neurodivergent, disabled, and multi-faith practitioners who
-          want practical enchantment without gatekeeping.
-        </li>
-        <li>
-          <strong>Evidence & intuition in dialogue.</strong> Research citations, lived experience, and creative prompts sit
-          side-by-side so you can blend head and heart.
-        </li>
-        <li>
-          <strong>Transparency.</strong> Affiliate disclosures, data practices, and pricing are plain to find and easy to opt out
-          of.
-        </li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>Boundaries we honor</h2>
-      <ul>
-        <li>
-          <strong>No spiritual supremacy.</strong> We do not appropriate closed practices or claim a single “correct” path to
-          healing.
-        </li>
-        <li>
-          <strong>No productivity shame.</strong> We reject hustle dogma. Rest, collapse, and grief get as much space here as
-          glow-up moments.
-        </li>
-        <li>
-          <strong>No purity tests.</strong> You can be skeptical, witchy-curious, or full-on occult nerd—everyone deserves tools
-          that meet them where they are.
-        </li>
-        <li>
-          <strong>No exploitation.</strong> Partnerships and recommendations must align with our ethics: fair labor, inclusive
-          design, and joyful usefulness.
-        </li>
-      </ul>
-      <p>If a collaboration or request crosses these lines, we lovingly decline.</p>
-    </section>
-
-    <section id="membership" class="space-y-4">
-      <h2>Membership &amp; account roadmap</h2>
-      <p>
-        A dedicated member portal is on the horizon. It will hold bookmarking, ritual tracking, and printable libraries for
-        subscribers who want everything in one midnight-bright dashboard. Until the infrastructure is ready, account links point
-        you here so expectations stay clear.
-      </p>
-      <p>
-        Want to help shape the rollout? We’re gathering cozy testers who can share accessibility needs, pricing feedback, and
-        the rituals you want prioritized.
-      </p>
-      <PrimaryButton href="/contact/" iconAfter="↗">
-        Tell us what you need
-      </PrimaryButton>
     </section>
   </article>
 </Base>
