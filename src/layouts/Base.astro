@@ -16,7 +16,8 @@ import {
 } from "@/data/navigation";
 import { readSettings, buildCanonicalUrl, toAbsoluteUrl } from "@/utils/settings";
 import { buildAnalyticsInjection } from "@/utils/analytics";
-import { getActiveThemes } from "@/utils/theme";
+import { ALL_FIELDS, getActiveThemes } from "@/utils/theme";
+import type { ThemeMode } from "@/utils/theme";
 import { mixColors } from "@/utils/color";
 
 interface LayoutProps {
@@ -67,8 +68,71 @@ const FALLBACK_COLORS = {
   },
 } as const;
 
+const FALLBACK_TEXT = {
+  midnight: {
+    textPrimary: "#f4f1ff",
+    textHeading: "#f8f3ff",
+    textSecondary: "#f4f1ff",
+    textTertiary: "#f4f1ff",
+    textHint: "#f4f1ff",
+    textDisabled: "#f4f1ff",
+    textBody: "#f9f5ff",
+    textSubtle: "#f9f5ff",
+    textAccent: "#d4af37",
+    textAccentStrong: "#d4af37",
+    textStrong: "#f9f5ff",
+    textMuted: "#f9f5ff",
+    linkColor: "#e0c07d",
+  },
+  dawn: {
+    textPrimary: "#2c1b3d",
+    textHeading: "#3a2854",
+    textSecondary: "#2c1b3d",
+    textTertiary: "#2c1b3d",
+    textHint: "#2c1b3d",
+    textDisabled: "#2c1b3d",
+    textBody: "#573f73",
+    textSubtle: "#573f73",
+    textAccent: "#9b86c8",
+    textAccentStrong: "#573f73",
+    textStrong: "#3a2854",
+    textMuted: "#573f73",
+    linkColor: "#caa043",
+  },
+} as const;
+
+const FALLBACK_STATUS_COLORS = {
+  midnight: {
+    success: "#4ade80",
+    warning: "#facc15",
+    error: "#f87171",
+    info: "#60a5fa",
+  },
+  dawn: {
+    success: "#15803d",
+    warning: "#b45309",
+    error: "#b91c1c",
+    info: "#1d4ed8",
+  },
+} as const;
+
+const FALLBACK_SHADOWS = {
+  midnight: {
+    shadowSoft: "0 18px 45px -28px rgba(11, 6, 20, 0.55)",
+    shadowStrong: "0 28px 75px -24px rgba(3, 2, 12, 0.72)",
+  },
+  dawn: {
+    shadowSoft: "0 18px 45px -28px rgba(63, 49, 86, 0.22)",
+    shadowStrong: "0 32px 85px -36px rgba(99, 80, 128, 0.28)",
+  },
+} as const;
+
 const FALLBACK_SERIF = '"Lora", "Crimson Text", Georgia, serif';
 const FALLBACK_SCRIPT = '"Cormorant Garamond", "Cinzel", serif';
+const FALLBACK_HEADING = '"Cinzel", "Cormorant Garamond", "Times New Roman", serif';
+const FALLBACK_ACCENT = '"Cormorant Garamond", "Cinzel", serif';
+
+const THEME_FIELD_SET = new Set<string>(ALL_FIELDS);
 
 const PLAIN_READING_ROUTE_PATTERNS = [
   /^\/post\//,
@@ -79,74 +143,203 @@ const PLAIN_READING_ROUTE_PATTERNS = [
   /^\/privacy(\/|$)/,
 ];
 
-type ModeFallback = (typeof FALLBACK_COLORS)[keyof typeof FALLBACK_COLORS];
-
 // Utility Functions
 const sanitizeColor = (value: string | null | undefined, fallback: string): string => {
   const trimmed = typeof value === "string" ? value.trim() : "";
   return /^#[0-9a-fA-F]{3,8}$/.test(trimmed) ? trimmed : fallback;
 };
 
+const sanitizeToken = (value: string | null | undefined, fallback: string): string => {
+  const trimmed = typeof value === "string" ? value.trim() : "";
+  return trimmed || fallback;
+};
+
 const formatFontStack = (value: string | null | undefined, fallback: string): string => {
   const trimmed = typeof value === "string" ? value.trim() : "";
   if (!trimmed) return fallback;
-  
+
   const sanitized = trimmed.replace(/[<>]/g, "");
   const escaped = sanitized.replace(/["\\]/g, "\\$&");
   const needsQuotes = /[\s,]/.test(escaped);
   const primary = needsQuotes ? `"${escaped}"` : escaped;
-  
+
   return `${primary}, ${fallback}`;
 };
+
+const toKebabCase = (value: string): string => value.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
 
 const buildThemeCss = (
   theme: typeof midnightTheme,
   selector: string,
-  fallbacks: ModeFallback,
+  mode: ThemeMode,
 ): string => {
+  const fallbacks = FALLBACK_COLORS[mode];
+  const textFallback = FALLBACK_TEXT[mode];
+  const statusFallback = FALLBACK_STATUS_COLORS[mode];
+  const shadowFallback = FALLBACK_SHADOWS[mode];
+
   const primary = sanitizeColor(theme?.primary, fallbacks.primary);
   const accent = sanitizeColor(theme?.accent, fallbacks.accent);
   const background = sanitizeColor(theme?.background, fallbacks.background);
+
   const serifStack = formatFontStack(theme?.fontSerif, FALLBACK_SERIF);
   const scriptStack = formatFontStack(theme?.fontScript, FALLBACK_SCRIPT);
-  
-  // Color mixins
+  const headingStack = formatFontStack(theme?.fontHeading ?? theme?.fontSerif, FALLBACK_HEADING);
+  const accentStack = formatFontStack(theme?.fontAccent ?? theme?.fontScript, FALLBACK_ACCENT);
+
+  const colorNightBase = sanitizeToken(theme?.colorNight, `color-mix(in srgb, ${background} 85%, black 15%)`);
+  const colorInkBase = sanitizeToken(theme?.colorInk, `color-mix(in srgb, ${background} 18%, black 82%)`);
   const overlay = `color-mix(in srgb, ${background} 45%, transparent 55%)`;
   const overlayStrong = `color-mix(in srgb, ${background} 68%, transparent 32%)`;
   const plainSurface = `color-mix(in srgb, ${background} 92%, black 8%)`;
   const plainBorder = `color-mix(in srgb, ${primary} 28%, transparent 72%)`;
   const plainShadow = `0 28px 60px -30px color-mix(in srgb, ${primary} 18%, black 82%)`;
+  const inkBody = `color-mix(in srgb, ${colorInkBase} 70%, ${colorNightBase} 30%)`;
+  const inkStrong = `color-mix(in srgb, ${colorInkBase} 85%, ${colorNightBase} 15%)`;
+  const inkMuted = `color-mix(in srgb, ${colorInkBase} 55%, white 45%)`;
+  const focusRingColor = sanitizeToken(
+    theme?.focusRingColor,
+    `color-mix(in srgb, ${primary} 60%, ${accent} 40%)`,
+  );
+  const focusRingShadow = sanitizeToken(
+    theme?.cardFocusOutline,
+    `0 0 0 2px color-mix(in srgb, ${background} 65%, transparent 35%), 0 0 0 4px color-mix(in srgb, ${focusRingColor} 80%, white 20%)`,
+  );
 
-  return `${selector} {
-  --color-midnight: ${background};
-  --color-night: color-mix(in srgb, ${background} 85%, black 15%);
-  --color-dusk: color-mix(in srgb, ${background} 65%, white 35%);
-  --color-iris: ${primary};
-  --color-amethyst: color-mix(in srgb, ${primary} 70%, white 30%);
-  --color-fog: color-mix(in srgb, ${primary} 30%, white 70%);
-  --color-gold: ${accent};
-  --color-rune: color-mix(in srgb, ${background} 12%, white 88%);
-  --color-ink: color-mix(in srgb, ${background} 18%, black 82%);
-  --color-muted: color-mix(in srgb, ${primary} 18%, transparent 82%);
-  --color-border: color-mix(in srgb, ${primary} 28%, transparent 72%);
-  --color-border-strong: color-mix(in srgb, ${primary} 42%, transparent 58%);
-  --color-overlay: ${overlay};
-  --color-overlay-strong: ${overlayStrong};
-  --surface-plain: ${plainSurface};
-  --surface-plain-border: ${plainBorder};
-  --surface-plain-shadow: ${plainShadow};
-  --ink-body: color-mix(in srgb, var(--color-ink) 70%, var(--color-night) 30%);
-  --ink-strong: color-mix(in srgb, var(--color-ink) 85%, var(--color-night) 15%);
-  --ink-muted: color-mix(in srgb, var(--color-ink) 55%, white 45%);
-  --link-color: color-mix(in srgb, var(--color-iris) 55%, var(--color-gold) 45%);
-  --focus-ring-color: color-mix(in srgb, var(--color-iris) 60%, var(--color-gold) 40%);
-  --focus-ring-shadow: 0 0 0 2px color-mix(in srgb, var(--color-night) 65%, transparent 35%),
-    0 0 0 4px color-mix(in srgb, var(--focus-ring-color) 80%, white 20%);
-  --font-body-serif: ${serifStack};
-  --font-body: ${serifStack};
-  --font-heading: ${serifStack};
-  --font-accent: ${scriptStack};
-}`;
+  const defaults: Record<string, string> = {
+    primary,
+    accent,
+    background,
+    colorMidnight: sanitizeToken(theme?.colorMidnight, background),
+    colorNight: colorNightBase,
+    colorDusk: sanitizeToken(theme?.colorDusk, `color-mix(in srgb, ${background} 65%, white 35%)`),
+    colorIris: sanitizeToken(theme?.colorIris, primary),
+    colorAmethyst: sanitizeToken(theme?.colorAmethyst, `color-mix(in srgb, ${primary} 70%, white 30%)`),
+    colorFog: sanitizeToken(theme?.colorFog, `color-mix(in srgb, ${primary} 30%, white 70%)`),
+    colorGold: sanitizeToken(theme?.colorGold, accent),
+    colorRune: sanitizeToken(theme?.colorRune, `color-mix(in srgb, ${background} 12%, white 88%)`),
+    colorInk: colorInkBase,
+    colorMuted: sanitizeToken(theme?.colorMuted, `color-mix(in srgb, ${primary} 18%, transparent 82%)`),
+    colorBorder: sanitizeToken(theme?.colorBorder, `color-mix(in srgb, ${primary} 28%, transparent 72%)`),
+    colorBorderStrong: sanitizeToken(theme?.colorBorderStrong, `color-mix(in srgb, ${primary} 42%, transparent 58%)`),
+    colorOverlay: sanitizeToken(theme?.colorOverlay, overlay),
+    colorOverlayStrong: sanitizeToken(theme?.colorOverlayStrong, overlayStrong),
+    surfacePlain: sanitizeToken(theme?.surfacePlain, plainSurface),
+    surfacePlainBorder: sanitizeToken(theme?.surfacePlainBorder, plainBorder),
+    surfacePlainShadow: sanitizeToken(theme?.surfacePlainShadow, plainShadow),
+    inkBody,
+    inkStrong,
+    inkMuted,
+    linkColor: sanitizeToken(theme?.linkColor, textFallback.linkColor),
+    textPrimary: sanitizeToken(theme?.textPrimary, textFallback.textPrimary),
+    textHeading: sanitizeToken(theme?.textHeading, textFallback.textHeading),
+    textSecondary: sanitizeToken(theme?.textSecondary, textFallback.textSecondary),
+    textTertiary: sanitizeToken(theme?.textTertiary, textFallback.textTertiary),
+    textHint: sanitizeToken(theme?.textHint, textFallback.textHint),
+    textDisabled: sanitizeToken(theme?.textDisabled, textFallback.textDisabled),
+    textBody: sanitizeToken(theme?.textBody, textFallback.textBody),
+    textSubtle: sanitizeToken(theme?.textSubtle, textFallback.textSubtle),
+    textAccent: sanitizeToken(theme?.textAccent, textFallback.textAccent),
+    textAccentStrong: sanitizeToken(theme?.textAccentStrong, textFallback.textAccentStrong),
+    textStrong: sanitizeToken(theme?.textStrong, textFallback.textStrong),
+    textMuted: sanitizeToken(theme?.textMuted, textFallback.textMuted),
+    focusRingColor,
+    focusRingShadow,
+    success: sanitizeToken(theme?.success, statusFallback.success),
+    warning: sanitizeToken(theme?.warning, statusFallback.warning),
+    error: sanitizeToken(theme?.error, statusFallback.error),
+    info: sanitizeToken(theme?.info, statusFallback.info),
+    shadowSoft: sanitizeToken(theme?.shadowSoft, shadowFallback.shadowSoft),
+    shadowStrong: sanitizeToken(theme?.shadowStrong, shadowFallback.shadowStrong),
+    cardFocusOutline: focusRingShadow,
+  };
+
+  const tokens = new Map<string, string>();
+  for (const [key, value] of Object.entries(defaults)) {
+    tokens.set(`--${toKebabCase(key)}`, value);
+  }
+
+  tokens.set("--color-amethyst", defaults.colorAmethyst);
+  tokens.set("--color-fog", defaults.colorFog);
+  tokens.set("--focus-ring-shadow", focusRingShadow);
+  tokens.set("--focus-ring-color", focusRingColor);
+  tokens.set("--primary", primary);
+  tokens.set("--accent", accent);
+  tokens.set("--background", background);
+
+  const fontSerifStack = serifStack;
+  const fontScriptStack = scriptStack;
+  tokens.set("--font-serif", fontSerifStack);
+  tokens.set("--font-body-serif", fontSerifStack);
+  tokens.set("--font-body", fontSerifStack);
+  tokens.set("--font-heading", headingStack);
+  tokens.set("--font-accent", accentStack);
+  tokens.set("--font-script", fontScriptStack);
+
+  const themeEntries = Object.entries(theme ?? {});
+  for (const [rawKey, rawValue] of themeEntries) {
+    if (!THEME_FIELD_SET.has(rawKey)) continue;
+    if (typeof rawValue !== "string") continue;
+    const trimmed = rawValue.trim();
+    if (!trimmed) continue;
+
+    switch (rawKey) {
+      case "primary":
+        tokens.set("--primary", sanitizeColor(trimmed, primary));
+        break;
+      case "accent":
+        tokens.set("--accent", sanitizeColor(trimmed, accent));
+        break;
+      case "background":
+        tokens.set("--background", sanitizeColor(trimmed, background));
+        tokens.set("--color-midnight", sanitizeColor(trimmed, background));
+        break;
+      case "fontSerif": {
+        const stack = formatFontStack(trimmed, FALLBACK_SERIF);
+        tokens.set("--font-serif", stack);
+        tokens.set("--font-body-serif", stack);
+        tokens.set("--font-body", stack);
+        break;
+      }
+      case "fontScript": {
+        const stack = formatFontStack(trimmed, FALLBACK_SCRIPT);
+        tokens.set("--font-script", stack);
+        tokens.set("--font-accent", stack);
+        break;
+      }
+      case "fontHeading":
+        tokens.set("--font-heading", formatFontStack(trimmed, headingStack));
+        break;
+      case "fontAccent":
+        tokens.set("--font-accent", formatFontStack(trimmed, accentStack));
+        break;
+      case "backgroundImage":
+        tokens.set("--background-image", trimmed);
+        break;
+      case "cardFocusOutline":
+        tokens.set("--card-focus-outline", sanitizeToken(trimmed, tokens.get("--card-focus-outline") ?? focusRingShadow));
+        tokens.set("--focus-ring-shadow", sanitizeToken(trimmed, focusRingShadow));
+        break;
+      case "focusRingColor":
+        tokens.set("--focus-ring-color", sanitizeToken(trimmed, focusRingColor));
+        break;
+      case "focusRingShadow":
+        tokens.set("--focus-ring-shadow", sanitizeToken(trimmed, focusRingShadow));
+        break;
+      default: {
+        const cssVar = `--${toKebabCase(rawKey)}`;
+        const fallback = tokens.get(cssVar) ?? "";
+        tokens.set(cssVar, sanitizeToken(trimmed, fallback || trimmed));
+        break;
+      }
+    }
+  }
+
+  const declarations = Array.from(tokens.entries())
+    .map(([key, value]) => `  ${key}: ${value};`)
+    .join("\n");
+
+  return `${selector} {\n${declarations}\n}`;
 };
 
 const normalizeClassList = (value: string | string[] | null | undefined): string[] => {
@@ -179,8 +372,8 @@ const showAccountLink = settings.showAccountLink ?? false;
 // getActiveThemes memoizes in production but automatically re-reads when
 // the admin saves new presets. See src/utils/theme.ts for cache details.
 const { midnight: midnightTheme, dawn: dawnTheme } = getActiveThemes();
-const midnightCss = buildThemeCss(midnightTheme, ":root", FALLBACK_COLORS.midnight);
-const dawnCss = buildThemeCss(dawnTheme, ':root[data-comfort-theme="dawn"]', FALLBACK_COLORS.dawn);
+const midnightCss = buildThemeCss(midnightTheme, ":root", "midnight");
+const dawnCss = buildThemeCss(dawnTheme, ':root[data-comfort-theme="dawn"]', "dawn");
 const themeStyle = `${midnightCss}\n\n${dawnCss}`;
 const themeMetaColor = sanitizeColor(midnightTheme?.primary, FALLBACK_COLORS.midnight.primary);
 

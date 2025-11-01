@@ -1,13 +1,94 @@
 import fs from "node:fs";
 import path from "node:path";
 
-export interface ThemeSettings {
-  primary: string;
-  accent: string;
-  background: string;
-  fontSerif: string;
-  fontScript: string;
-}
+export const REQUIRED_FIELDS = [
+  "primary",
+  "accent",
+  "background",
+  "fontSerif",
+  "fontScript",
+] as const;
+
+export const OPTIONAL_FIELDS = [
+  "textPrimary",
+  "textHeading",
+  "textMuted",
+  "textSecondary",
+  "textTertiary",
+  "textStrong",
+  "textHint",
+  "textDisabled",
+  "textBody",
+  "textSubtle",
+  "textAccent",
+  "textAccentStrong",
+  "inkBody",
+  "inkStrong",
+  "inkMuted",
+  "linkColor",
+  "colorMidnight",
+  "colorNight",
+  "colorIris",
+  "colorAmethyst",
+  "colorDusk",
+  "colorGold",
+  "colorRune",
+  "colorFog",
+  "colorInk",
+  "colorMuted",
+  "colorBorder",
+  "colorBorderStrong",
+  "colorOverlay",
+  "colorOverlayStrong",
+  "surfacePlain",
+  "surfacePlainBorder",
+  "cardPanelSurface",
+  "cardPanelSurfaceStrong",
+  "cardPanelBorder",
+  "cardPanelBorderStrong",
+  "cardPanelBorderSoft",
+  "cardBadgeBg",
+  "cardBadgeBorder",
+  "cardBadgeText",
+  "cardTagBg",
+  "cardTagBorder",
+  "cardTagText",
+  "cardSpoonBg",
+  "cardSpoonBorder",
+  "cardSpoonText",
+  "focusRingColor",
+  "cardFocusOutline",
+  "fontHeading",
+  "fontAccent",
+  "shadowSoft",
+  "shadowStrong",
+  "success",
+  "warning",
+  "error",
+  "info",
+  "entityCardBorder",
+  "entityCardGlow",
+  "entityCardHighlight",
+  "entityCardSurfaceTop",
+  "entityCardSurfaceBottom",
+  "entityCardHeading",
+  "entityCardText",
+  "entityCardLabel",
+  "entityCardCta",
+  "entityCardCtaHover",
+  "entityCardIcon",
+  "entityCardIconShadow",
+  "backgroundImage",
+] as const;
+
+export const ALL_FIELDS = [...new Set([...REQUIRED_FIELDS, ...OPTIONAL_FIELDS])] as const;
+
+export type ThemeRequiredField = (typeof REQUIRED_FIELDS)[number];
+export type ThemeOptionalField = (typeof OPTIONAL_FIELDS)[number];
+export type ThemeField = (typeof ALL_FIELDS)[number];
+
+export type ThemeSettings = Record<ThemeRequiredField, string> &
+  Partial<Record<ThemeOptionalField, string>>;
 
 export type ThemeMode = "midnight" | "dawn";
 
@@ -28,6 +109,10 @@ const DEFAULT_THEME: ThemeSettings = {
   background: "#faf7f5",
   fontSerif: "Literata",
   fontScript: "Parisienne",
+  textPrimary: "#f4f1ff",
+  textHeading: "#f8f3ff",
+  textMuted: "#d9b2c4",
+  linkColor: "#d9b2c4",
 };
 
 const DEFAULT_DAWN_THEME: ThemeSettings = {
@@ -36,15 +121,11 @@ const DEFAULT_DAWN_THEME: ThemeSettings = {
   background: "#f6f0e8",
   fontSerif: "Literata",
   fontScript: "Parisienne",
+  textPrimary: "#2c1b3d",
+  textHeading: "#3a2854",
+  textMuted: "#573f73",
+  linkColor: "#caa043",
 };
-
-const REQUIRED_FIELDS: (keyof ThemeSettings)[] = [
-  "primary",
-  "accent",
-  "background",
-  "fontSerif",
-  "fontScript",
-];
 
 const THEMES_DIR = path.join(process.cwd(), "content", "themes");
 const ACTIVE_FILE = path.join(THEMES_DIR, "active.json");
@@ -185,22 +266,21 @@ function fallbackTheme(mode: ThemeMode): ThemeDefinition {
 function normalizeSettingsSource(raw: unknown, fallback?: Record<string, unknown>): Partial<ThemeSettings> {
   const source: Partial<ThemeSettings> = {};
 
-  if (fallback && typeof fallback === "object") {
-    for (const key of REQUIRED_FIELDS) {
-      const candidate = (fallback as Record<string, unknown>)[key];
+  const copyValues = (target: Record<string, unknown>) => {
+    for (const key of ALL_FIELDS) {
+      const candidate = target[key];
       if (typeof candidate === "string" && candidate.trim()) {
         source[key] = candidate;
       }
     }
+  };
+
+  if (fallback && typeof fallback === "object") {
+    copyValues(fallback as Record<string, unknown>);
   }
 
   if (raw && typeof raw === "object") {
-    for (const key of REQUIRED_FIELDS) {
-      const candidate = (raw as Record<string, unknown>)[key];
-      if (typeof candidate === "string" && candidate.trim()) {
-        source[key] = candidate;
-      }
-    }
+    copyValues(raw as Record<string, unknown>);
   }
 
   return source;
@@ -262,19 +342,22 @@ function mergeTheme(
   filePath: string,
   base: ThemeSettings = DEFAULT_THEME,
 ): ThemeSettings {
-  const theme: Record<keyof ThemeSettings, string> = { ...base };
+  const theme: Partial<Record<ThemeField, string>> = { ...base };
 
-  for (const [key, value] of Object.entries(overrides) as [keyof ThemeSettings, unknown][]) {
+  for (const [rawKey, value] of Object.entries(overrides) as [ThemeField, unknown][]) {
+    if (!ALL_FIELDS.includes(rawKey)) continue;
     if (value === undefined || value === null) continue;
     if (typeof value !== "string") {
-      throw new Error(`[theme] ${key} in ${filePath} must be a string.`);
+      throw new Error(`[theme] ${rawKey} in ${filePath} must be a string.`);
     }
     const trimmed = value.trim();
     if (!trimmed) {
-      throw new Error(`[theme] ${key} in ${filePath} cannot be empty.`);
+      if (REQUIRED_FIELDS.includes(rawKey as ThemeRequiredField)) {
+        throw new Error(`[theme] ${rawKey} in ${filePath} cannot be empty.`);
+      }
+      continue;
     }
-    if (!REQUIRED_FIELDS.includes(key)) continue;
-    theme[key] = trimmed;
+    theme[rawKey] = trimmed;
   }
 
   const missing = REQUIRED_FIELDS.filter((key) => {
@@ -288,13 +371,15 @@ function mergeTheme(
     );
   }
 
-  return {
-    primary: theme.primary,
-    accent: theme.accent,
-    background: theme.background,
-    fontSerif: theme.fontSerif,
-    fontScript: theme.fontScript,
-  };
+  const result: Partial<Record<ThemeField, string>> = {};
+  for (const key of ALL_FIELDS) {
+    const value = theme[key];
+    if (typeof value === "string") {
+      result[key] = value;
+    }
+  }
+
+  return result as ThemeSettings;
 }
 
 function toTitleCase(value: string): string {

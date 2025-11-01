@@ -58,13 +58,81 @@ export interface AdminPipelineHelpers {
 
 export declare const adminPipelineHelpers: AdminPipelineHelpers;
 
-export interface AdminThemeSettings {
-  primary: string;
-  accent: string;
-  background: string;
-  fontSerif: string;
-  fontScript: string;
-}
+export type AdminThemeRequiredField = "primary" | "accent" | "background" | "fontSerif" | "fontScript";
+
+export type AdminThemeOptionalField =
+  | "textPrimary"
+  | "textHeading"
+  | "textMuted"
+  | "textSecondary"
+  | "textTertiary"
+  | "textStrong"
+  | "textHint"
+  | "textDisabled"
+  | "textBody"
+  | "textSubtle"
+  | "textAccent"
+  | "textAccentStrong"
+  | "inkBody"
+  | "inkStrong"
+  | "inkMuted"
+  | "linkColor"
+  | "colorMidnight"
+  | "colorNight"
+  | "colorIris"
+  | "colorAmethyst"
+  | "colorDusk"
+  | "colorGold"
+  | "colorRune"
+  | "colorFog"
+  | "colorInk"
+  | "colorMuted"
+  | "colorBorder"
+  | "colorBorderStrong"
+  | "colorOverlay"
+  | "colorOverlayStrong"
+  | "surfacePlain"
+  | "surfacePlainBorder"
+  | "cardPanelSurface"
+  | "cardPanelSurfaceStrong"
+  | "cardPanelBorder"
+  | "cardPanelBorderStrong"
+  | "cardPanelBorderSoft"
+  | "cardBadgeBg"
+  | "cardBadgeBorder"
+  | "cardBadgeText"
+  | "cardTagBg"
+  | "cardTagBorder"
+  | "cardTagText"
+  | "cardSpoonBg"
+  | "cardSpoonBorder"
+  | "cardSpoonText"
+  | "focusRingColor"
+  | "cardFocusOutline"
+  | "fontHeading"
+  | "fontAccent"
+  | "shadowSoft"
+  | "shadowStrong"
+  | "success"
+  | "warning"
+  | "error"
+  | "info"
+  | "entityCardBorder"
+  | "entityCardGlow"
+  | "entityCardHighlight"
+  | "entityCardSurfaceTop"
+  | "entityCardSurfaceBottom"
+  | "entityCardHeading"
+  | "entityCardText"
+  | "entityCardLabel"
+  | "entityCardCta"
+  | "entityCardCtaHover"
+  | "entityCardIcon"
+  | "entityCardIconShadow"
+  | "backgroundImage";
+
+export type AdminThemeSettings = Record<AdminThemeRequiredField, string> &
+  Partial<Record<AdminThemeOptionalField, string>>;
 
 export type AdminThemeMode = "midnight" | "dawn";
 
