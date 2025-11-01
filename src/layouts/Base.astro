@@ -176,6 +176,8 @@ const disclosure = settings.disclosure ?? "";
 const showAccountLink = settings.showAccountLink ?? false;
 
 // Theme Setup
+// getActiveThemes memoizes in production but automatically re-reads when
+// the admin saves new presets. See src/utils/theme.ts for cache details.
 const { midnight: midnightTheme, dawn: dawnTheme } = getActiveThemes();
 const midnightCss = buildThemeCss(midnightTheme, ":root", FALLBACK_COLORS.midnight);
 const dawnCss = buildThemeCss(dawnTheme, ':root[data-comfort-theme="dawn"]', FALLBACK_COLORS.dawn);
