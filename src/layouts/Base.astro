@@ -350,6 +350,7 @@ const normalizeClassList = (value: string | string[] | null | undefined): string
 const settings = readSettings();
 const analytics = buildAnalyticsInjection(settings);
 const brandName = settings.brandName ?? "WitchClick";
+const disclosure = settings.disclosure ?? "";
 
 // Theme Setup
 // getActiveThemes memoizes in production but automatically re-reads when
@@ -635,7 +636,7 @@ const observabilityConfig = shouldLoadObservability
       <ComfortTray />
     </div>
 
-    <SiteFooter brandName={brandName} />
+    <SiteFooter brandName={brandName} disclosure={disclosure} />
     
     <!-- Analytics -->
     {analytics?.runtime?.inline && (

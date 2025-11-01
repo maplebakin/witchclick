@@ -7,7 +7,67 @@ import Breadcrumbs from "@/components/Breadcrumbs.astro";
 
 const title = "Spreads — WitchClick";
 const description = "Download cozy tarot spreads and planning templates without any marketing fluff.";
-const downloadsDirectory = "./content/downloads";
+const downloadsDirectory = path.join(process.cwd(), "content", "downloads");
+const publicDownloadsDirectory = path.join(process.cwd(), "public", "downloads");
+
+const ensureDirectory = (dir: string) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+};
+
+const slugify = (value: string): string =>
+  value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase();
+
+const toSlug = (value: string | null | undefined): string => {
+  const trimmed = typeof value === "string" ? value.trim() : "";
+  return trimmed ? slugify(trimmed) : "";
+};
+
+const isFile = (filePath: string): boolean => {
+  try {
+    return fs.statSync(filePath).isFile();
+  } catch {
+    return false;
+  }
+};
+
+ensureDirectory(publicDownloadsDirectory);
+
+const assetLookup = new Map<string, string>();
+
+const copyAssetToPublic = (sourcePath: string, ...keys: Array<string | null | undefined>): string => {
+  if (!isFile(sourcePath)) return "";
+
+  const ext = path.extname(sourcePath) || "";
+  const base = path.basename(sourcePath, ext);
+  const primarySlug = toSlug(base) || toSlug(keys[0]) || "download";
+  const normalizedExt = ext.toLowerCase();
+  const fileName = `${primarySlug}${normalizedExt}`;
+  const targetPath = path.join(publicDownloadsDirectory, fileName);
+
+  try {
+    const shouldCopy = !fs.existsSync(targetPath) || fs.statSync(sourcePath).mtimeMs > fs.statSync(targetPath).mtimeMs;
+    if (shouldCopy) {
+      fs.copyFileSync(sourcePath, targetPath);
+    }
+
+    const lookupKeys = [primarySlug, ...keys.map(toSlug)].filter(Boolean);
+    for (const key of lookupKeys) {
+      assetLookup.set(key, fileName);
+    }
+
+    return `/downloads/${fileName}`;
+  } catch (error) {
+    console.warn(`Unable to prepare download asset ${sourcePath}:`, error);
+    return "";
+  }
+};
 
 const downloadFiles = fs.existsSync(downloadsDirectory)
   ? fs
@@ -33,6 +93,15 @@ const downloadFiles = fs.existsSync(downloadsDirectory)
       .filter(Boolean)
   : [];
 
+if (fs.existsSync(downloadsDirectory)) {
+  fs.readdirSync(downloadsDirectory)
+    .filter((file) => !file.endsWith(".json"))
+    .forEach((file) => {
+      const sourcePath = path.join(downloadsDirectory, file);
+      copyAssetToPublic(sourcePath, path.basename(file, path.extname(file)));
+    });
+}
+
 const parsedDownloads = downloadFiles as Array<{
   slug?: string;
   name?: string;
@@ -45,15 +114,48 @@ const parsedDownloads = downloadFiles as Array<{
 
 const downloads = parsedDownloads
   .map((entry) => {
+    const slug = entry?.slug ?? entry?.name ?? "download";
     const priceRaw = entry?.price;
     const priceNumber = typeof priceRaw === "number" ? priceRaw : typeof priceRaw === "string" ? Number(priceRaw) : NaN;
     const isFree = Number.isFinite(priceNumber) ? priceNumber === 0 : true;
     const fileTarget = typeof entry?.file === "string" ? entry.file.trim() : "";
     const urlTarget = typeof entry?.url === "string" ? entry.url.trim() : "";
-    const usableFile = fileTarget && !fileTarget.startsWith("/home/") ? fileTarget : "";
-    const href = urlTarget || usableFile;
+
+    let href = "";
+
+    if (urlTarget) {
+      href = urlTarget;
+    } else if (fileTarget) {
+      const candidates = new Set<string>();
+
+      if (path.isAbsolute(fileTarget)) {
+        candidates.add(fileTarget);
+      }
+
+      const relativeFromDownloads = path.join(downloadsDirectory, fileTarget);
+      candidates.add(relativeFromDownloads);
+
+      if (fileTarget.startsWith("/")) {
+        const trimmed = fileTarget.replace(/^\/+/, "");
+        candidates.add(path.join(process.cwd(), trimmed));
+      }
+
+      const existingPath = Array.from(candidates).find(isFile);
+      if (existingPath) {
+        href = copyAssetToPublic(existingPath, slug, entry?.name ?? null);
+      }
+    }
+
+    if (!href) {
+      const lookupKey = toSlug(slug) || toSlug(entry?.name);
+      const knownAsset = lookupKey ? assetLookup.get(lookupKey) : undefined;
+      if (knownAsset) {
+        href = `/downloads/${knownAsset}`;
+      }
+    }
+
     return {
-      slug: entry?.slug ?? entry?.name ?? "download",
+      slug,
       name: entry?.name ?? "Download",
       summary: entry?.summary ?? "",
       href,
