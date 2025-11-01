@@ -4,16 +4,10 @@ import "@/styles/base.css";
 import "@/styles/cards.css";
 import "@/styles/tailwind.css";
 
-import Header from "@/components/Header.astro";
-import Footer from "@/components/Footer.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import SiteFooter from "@/components/SiteFooter.astro";
 import ComfortTray from "@/components/ComfortTray.astro";
-import {
-  primaryNavLinks,
-  secondaryNavLinks,
-  headerUtilityLinks,
-  footerUtilityLinks,
-  adminNavSections,
-} from "@/data/navigation";
+import { primaryNavLinks } from "@/data/navigation";
 import { readSettings, buildCanonicalUrl, toAbsoluteUrl } from "@/utils/settings";
 import { buildAnalyticsInjection } from "@/utils/analytics";
 import { ALL_FIELDS, getActiveThemes } from "@/utils/theme";
@@ -352,21 +346,10 @@ const normalizeClassList = (value: string | string[] | null | undefined): string
     .flatMap((item) => item.split(/\s+/g).filter(Boolean));
 };
 
-const normalizeAccountLink = (
-  link: { href: string; label: string; rel?: string },
-  showAccountLink: boolean,
-) => {
-  if (link.href !== "/account/") return link;
-  if (!showAccountLink) return null;
-  return { ...link, href: "/about/#membership" };
-};
-
 // Settings and Theme Configuration
 const settings = readSettings();
 const analytics = buildAnalyticsInjection(settings);
 const brandName = settings.brandName ?? "WitchClick";
-const disclosure = settings.disclosure ?? "";
-const showAccountLink = settings.showAccountLink ?? false;
 
 // Theme Setup
 // getActiveThemes memoizes in production but automatically re-reads when
@@ -416,34 +399,35 @@ const canonicalUrl = buildCanonicalUrl(settings, { canonical: canon, astroUrl: A
 const currentPath = Astro.url?.pathname ?? "/";
 const isPlainReadingRoute = PLAIN_READING_ROUTE_PATTERNS.some((pattern) => pattern.test(currentPath));
 
+const isDev = import.meta.env.DEV;
+
+const mainWidthClass = wide ? "mx-auto w-full max-w-6xl px-4" : "container-prose";
+const desktopWidthClass = wide
+  ? desktopWide && "md:max-w-7xl"
+  : desktopWide && "md:max-w-5xl";
+
 const mainClassList = [
   "site-main",
+  "space-y-12",
   isPlainReadingRoute && "site-main--plain",
+  mainWidthClass,
+  desktopWidthClass,
   ...normalizeClassList(mainClassProp),
 ].filter(Boolean);
 
 const containerClassList = [
   "site-main__container",
-  "wc-container",
-  wide && "site-main__container--wide",
-  desktopWide && "site-main__container--desktop-wide",
-  isPlainReadingRoute && "site-main__container--plain",
+  "space-y-8",
   ...normalizeClassList(containerClassProp),
 ].filter(Boolean);
 
-const contentClassList = ["site-main__content", ...normalizeClassList(contentClassProp)].filter(Boolean);
+const contentClassList = [
+  "site-main__content",
+  "space-y-8",
+  ...normalizeClassList(contentClassProp),
+].filter(Boolean);
 
 const navLinks = primaryNavLinks;
-const secondaryLinks = secondaryNavLinks;
-const headerUtility = headerUtilityLinks
-  .map((link) => normalizeAccountLink(link, showAccountLink))
-  .filter((link): link is typeof headerUtilityLinks[number] => Boolean(link));
-const footerUtilities = footerUtilityLinks
-  .map((link) => normalizeAccountLink(link, showAccountLink))
-  .filter((link): link is typeof footerUtilityLinks[number] => Boolean(link));
-
-const isDev = import.meta.env.DEV;
-const adminSections = isDev ? adminNavSections : [];
 
 // Observability Configuration
 const observabilitySettings = settings.observability ?? { enabled: false };
@@ -626,20 +610,13 @@ const observabilityConfig = shouldLoadObservability
     style={bodyStyle}
     data-entity-type={bodyDataType || undefined}
   >
-    <a class="skip-link" href="#main">Skip to content</a>
-    
-    <Header
-      brandName={brandName}
-      navLinks={navLinks}
-      secondaryLinks={secondaryLinks}
-      utilityLinks={headerUtility}
-      adminSections={adminSections}
-      currentPath={currentPath}
-    />
+    <a class="skip-link" href="#content">Skip to content</a>
+
+    <SiteHeader brandName={brandName} navLinks={navLinks} currentPath={currentPath} />
 
     <div class="site-shell__content">
       <main
-        id="main"
+        id="content"
         class:list={mainClassList}
         data-plain-reading={isPlainReadingRoute ? "true" : undefined}
       >
@@ -658,13 +635,7 @@ const observabilityConfig = shouldLoadObservability
       <ComfortTray />
     </div>
 
-    <Footer
-      brandName={brandName}
-      navLinks={navLinks}
-      secondaryNavLinks={secondaryLinks}
-      utilityLinks={footerUtilities}
-      disclosure={disclosure}
-    />
+    <SiteFooter brandName={brandName} />
     
     <!-- Analytics -->
     {analytics?.runtime?.inline && (

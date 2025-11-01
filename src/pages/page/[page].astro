@@ -1,155 +1,19 @@
 ---
-import Base from "../../layouts/Base.astro";
-import PostCard from "../../components/PostCard.astro";
-import Pagination from "../../components/Pagination.astro";
-import { loadAllPosts, paginatePosts, estimateReadingMinutes, firstParagraph, extractHeroImage } from "../../utils/posts";
-import { readSettings } from "../../utils/settings";
-import { createCollectionPageSchema } from "../../utils/structuredData";
-import HeadSlot from "@/components/HeadSlot.astro";
+import { loadAllPosts } from "@/utils/posts";
 
 export const prerender = true;
 
 export async function getStaticPaths() {
-  const PAGE_SIZE = 12;
+  const PAGE_SIZE = 10;
   const posts = loadAllPosts();
   const totalPages = Math.max(1, Math.ceil(posts.length / PAGE_SIZE));
-
-  return Array.from({ length: totalPages }, (_, i) => {
-    const page = i + 1;
-    const { items } = paginatePosts(page, PAGE_SIZE);
-    return {
-      params: { page: String(page) },
-      props: { page, totalPages, pagePosts: items },
-    };
-  });
+  return Array.from({ length: totalPages }, (_, index) => ({
+    params: { page: String(index + 1) },
+  }));
 }
 
-const { page, totalPages, pagePosts } = Astro.props as {
-  page: number;
-  totalPages: number;
-  pagePosts: ReturnType<typeof loadAllPosts>;
-};
+const pageParam = Astro.params.page ?? "1";
+const pageNumber = Number(pageParam);
 
-type LoadedPost = ReturnType<typeof loadAllPosts>[number];
-
-const settings = readSettings();
-const pageUrl = page > 1 ? `/page/${page}` : "/";
-const pageItemList = createCollectionPageSchema(
-  settings,
-  {
-    name: `Archive — Page ${page}`,
-    url: pageUrl,
-    description: `Latest rituals and guides — page ${page}`,
-    itemType: "Article",
-  },
-  pagePosts.map((post) => {
-    const card = toCard(post);
-    return {
-      name: card.title,
-      url: `/post/${card.slug}`,
-      description: card.tldr ?? card.excerpt,
-    };
-  }),
-);
-
-function toCard(post: LoadedPost) {
-  const fm = post.data ?? {};
-  const hero = extractHeroImage(fm);
-  const heroSrc = typeof hero.src === "string" && hero.src.trim() ? hero.src.trim() : undefined;
-  const heroAlt = typeof hero.alt === "string" && hero.alt.trim() ? hero.alt.trim() : undefined;
-  return {
-    slug: post.slug,
-    title: fm.title ?? post.title,
-    excerpt: fm.excerpt ?? fm.description ?? fm.metaDescription ?? firstParagraph(post.content),
-    tags: Array.isArray(fm.tags) ? fm.tags : [],
-    readingMinutes: fm.readingMinutes ?? estimateReadingMinutes(post.content),
-    publishedAt: fm.publishedAt ?? fm.pubDate ?? fm.date ?? undefined,
-    spoonLevel: typeof fm.spoonLevel === "string" ? fm.spoonLevel : undefined,
-    spoons:
-      typeof fm.spoons === "string"
-        ? fm.spoons
-        : typeof post.spoons === "string"
-          ? post.spoons
-          : undefined,
-    tldr:
-      typeof post.tldr === "string"
-        ? post.tldr
-        : typeof fm.tldr === "string"
-          ? fm.tldr
-          : undefined,
-    heroImage: heroSrc,
-    heroImageSrc: heroSrc,
-    heroImageAlt: heroAlt,
-    heroAlt: heroAlt,
-  };
-}
----
-<Base title={`WitchClick — Page ${page}`}>
-  <HeadSlot slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(pageItemList)} />
-  </HeadSlot>
-
-  <section class="archive-section wc-section-shell">
-    <h1 class="archive-title">Latest posts — page {page}</h1>
-    <div class="archive-grid">
-      {pagePosts.map((post) => {
-        const card = toCard(post);
-        return (
-            <PostCard
-              post={{
-                slug: card.slug,
-                title: card.title,
-                excerpt: card.excerpt,
-                tldr: card.tldr,
-                tags: card.tags,
-              readingMinutes: card.readingMinutes,
-              publishedAt: card.publishedAt,
-              spoonLevel: card.spoonLevel,
-              spoons: card.spoons,
-              heroImage: card.heroImage,
-              heroImageSrc: card.heroImageSrc,
-              heroImageAlt: card.heroImageAlt,
-              heroAlt: card.heroAlt,
-            }}
-            href={`/post/${card.slug}`}
-          />
-        );
-      })}
-    </div>
-
-    <Pagination page={page} totalPages={totalPages} baseHref="/page" />
-  </section>
-</Base>
-
-<style>
-  .archive-section {
-    width: min(100%, 72rem);
-    margin-inline: auto;
-    display: grid;
-    gap: clamp(2rem, 5vw, 2.75rem);
-  }
-
-  .archive-title {
-    margin: 0;
-    font-family: var(--font-heading);
-    font-size: clamp(2.1rem, 5vw, 2.85rem);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, var(--section-heading, rgba(67, 33, 122, 0.96)) 92%, black 8%);
-  }
-
-  .archive-grid {
-    display: grid;
-    gap: clamp(1.5rem, 3vw, 2rem);
-  }
-
-  @media (min-width: 640px) {
-    .archive-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  .archive-section :global(nav[aria-label="Pagination"]) {
-    margin-top: clamp(2.25rem, 5vw, 3rem);
-  }
-</style>
+const target = pageNumber === 1 ? "/journal" : `/journal/page/${pageParam}`;
+return Astro.redirect(target, 301);

@@ -1,0 +1,18 @@
+---
+const manifesto = [
+  "WitchClick is a cozy digital altar for skeptics, neurodivergent brains, and anyone who wants ritual without dogma.",
+  "We favor practical spellcraft, gentle accountability, and community care over spectacle.",
+  "Bring your notebooks, your tarot deck, and your boundaries—we'll keep the kettle warm while you rebuild your focus.",
+];
+---
+<section class="rounded-3xl border border-line-muted/50 bg-surface-base/80 p-8 shadow-soft">
+  <header class="space-y-3">
+    <p class="text-xs uppercase tracking-[0.3em] text-body-muted">Manifesto</p>
+    <h1 class="font-serif text-4xl text-ink">WitchClick</h1>
+  </header>
+  <div class="mt-6 space-y-4 text-lg leading-relaxed text-body">
+    {manifesto.map((line) => (
+      <p>{line}</p>
+    ))}
+  </div>
+</section>
