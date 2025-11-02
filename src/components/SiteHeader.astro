@@ -1,6 +1,7 @@
 ---
 import ThemeToggle from "./ThemeToggle.astro";
 import type { NavLink } from "@/data/navigation";
+import { primaryNavLinks, devOnlyNavLinks } from "@/data/navigation";
 
 interface Props {
   brandName: string;
@@ -8,7 +9,22 @@ interface Props {
   currentPath?: string;
 }
 
-const { brandName, navLinks = [], currentPath = "/" } = Astro.props as Props;
+const {
+  brandName,
+  navLinks: navLinksProp = [],
+  currentPath = "/",
+} = Astro.props as Props;
+
+const fallbackLinks = [...primaryNavLinks, ...devOnlyNavLinks];
+
+const navLinks = navLinksProp.length
+  ? [
+      ...navLinksProp,
+      ...devOnlyNavLinks.filter(
+        (devLink) => !navLinksProp.some((item) => item.href === devLink.href),
+      ),
+    ]
+  : fallbackLinks;
 
 const normalizedPath = currentPath.endsWith("/") && currentPath !== "/"
   ? currentPath.slice(0, -1)

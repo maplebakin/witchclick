@@ -1,4 +1,12 @@
 ---
+// Dev-only guard
+if (import.meta.env.PROD) {
+  // Never render admin in production builds/hosting
+  return Astro.redirect("/journal", 301);
+}
+
+export const prerender = import.meta.env.PROD ? true : false; // Pre-render redirect only in prod builds
+
 import Base from "../../layouts/Base.astro";
 import { readSettings, buildCanonicalUrl } from "../../utils/settings";
 import HeadSlot from "@/components/HeadSlot.astro";

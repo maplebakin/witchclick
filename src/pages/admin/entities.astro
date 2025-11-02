@@ -1,5 +1,13 @@
 ---
-/* Admin: Entities CRUD */
+// Dev-only guard
+if (import.meta.env.PROD) {
+  // Never render admin in production builds/hosting
+  return Astro.redirect("/journal", 301);
+}
+
+export const prerender = import.meta.env.PROD ? true : false; // Pre-render redirect only in prod builds
+
+// Admin: Entities CRUD 
 import Base from "../../layouts/Base.astro";
 import { readSettings, buildCanonicalUrl } from "../../utils/settings";
 import adminEntitiesScript from "../../scripts/adminEntities.js?url";
