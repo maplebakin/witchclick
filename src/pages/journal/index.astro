@@ -3,58 +3,18 @@ import Base from "@/layouts/Base.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import JournalListItem from "@/components/JournalListItem.astro";
 import Pagination from "@/components/Pagination.astro";
-import { paginatePosts, firstParagraph } from "@/utils/posts";
-import type { LoadedPost } from "@/utils/posts";
+import LoadMoreButton from "@/components/LoadMoreButton";
+import { getPaginatedPosts, toJournalListEntry, JOURNAL_PAGE_SIZE } from "@/utils/posts";
 
-const PAGE_SIZE = 10;
 const title = "Journal — WitchClick";
 const description = "Browse the newest WitchClick rituals, essays, and practical spellwork.";
 
-const { totalPages, items } = paginatePosts(1, PAGE_SIZE);
-const posts = items.map(mapToListEntry);
+const { totalPages, items } = getPaginatedPosts(1, JOURNAL_PAGE_SIZE);
+const entries = items.map(toJournalListEntry);
 const breadcrumbs = [
   { label: "Home", href: "/" },
   { label: "Journal" },
 ];
-
-function mapToListEntry(post: LoadedPost) {
-  const data = post.data ?? {};
-  const postTitle = typeof data.title === "string" && data.title.trim().length ? data.title.trim() : post.title;
-  const excerptCandidate = [
-    data.excerpt,
-    data.description,
-    data.metaDescription,
-    firstParagraph(post.content),
-  ].find((value) => typeof value === "string" && value.trim().length > 0);
-  const tagsRaw = Array.isArray(data.tags)
-    ? data.tags
-    : typeof data.tags === "string"
-      ? data.tags.split(",")
-      : [];
-  const tags = Array.from(
-    new Set(
-      tagsRaw
-        .map((tag) => (typeof tag === "string" ? tag.trim() : ""))
-        .filter((tag) => tag.length > 0),
-    ),
-  );
-  const publishedAtCandidate = [data.publishedAt, data.pubDate, data.date].find(
-    (value) => typeof value === "string" && value.trim().length > 0,
-  );
-  const publishedAt = publishedAtCandidate
-    ? String(publishedAtCandidate)
-    : post.date instanceof Date
-      ? post.date.toISOString()
-      : undefined;
-
-  return {
-    slug: post.slug,
-    title: postTitle,
-    excerpt: typeof excerptCandidate === "string" ? excerptCandidate.trim() : "",
-    tags,
-    publishedAt,
-  };
-}
 ---
 <Base {title} {description}>
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
@@ -66,12 +26,33 @@ function mapToListEntry(post: LoadedPost) {
       </p>
     </header>
 
-    <div class="space-y-6">
-      {posts.map((post) => (
-        <JournalListItem {...post} />
+    <div id="journal-list" class="journal-list space-y-6">
+      {entries.map((entry) => (
+        <JournalListItem
+          slug={entry.slug}
+          title={entry.title}
+          excerpt={entry.summary}
+          publishedAt={entry.date}
+          tags={entry.tags}
+        />
       ))}
     </div>
 
-    <Pagination page={1} {totalPages} />
+    {totalPages > 1 && (
+      <>
+        <LoadMoreButton
+          currentPage={1}
+          totalPages={totalPages}
+          pageSize={JOURNAL_PAGE_SIZE}
+          basePath="/journal/page"
+          initialCount={entries.length}
+        />
+        <div data-journal-pagination>
+          <Pagination page={1} {totalPages} />
+        </div>
+      </>
+    )}
+
+    {totalPages === 1 && <Pagination page={1} {totalPages} />}
   </section>
 </Base>

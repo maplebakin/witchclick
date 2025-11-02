@@ -3,30 +3,29 @@ import Base from "@/layouts/Base.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import JournalListItem from "@/components/JournalListItem.astro";
 import Pagination from "@/components/Pagination.astro";
-import { loadAllPosts, paginatePosts, firstParagraph } from "@/utils/posts";
-import type { LoadedPost } from "@/utils/posts";
+import { loadAllPosts, getPaginatedPosts, toJournalListEntry, JOURNAL_PAGE_SIZE } from "@/utils/posts";
+
 export const prerender = true;
 
 export async function getStaticPaths() {
   const posts = loadAllPosts();
-  const pageSize = 10;
-  const totalPages = Math.max(1, Math.ceil(posts.length / pageSize));
+  const totalPages = Math.max(1, Math.ceil(posts.length / JOURNAL_PAGE_SIZE));
   return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => {
     const pageNumber = index + 2;
     return {
       params: { page: String(pageNumber) },
-      props: { page: pageNumber, totalPages, pageSize },
+      props: { page: pageNumber, totalPages, pageSize: JOURNAL_PAGE_SIZE },
     };
   });
 }
 
-const { page = 2, totalPages = 1, pageSize = 10 } = Astro.props as {
+const { page = 2, totalPages = 1, pageSize = JOURNAL_PAGE_SIZE } = Astro.props as {
   page: number;
   totalPages: number;
   pageSize?: number;
 };
-const { items } = paginatePosts(page, pageSize);
-const posts = items.map(mapToListEntry);
+const { items } = getPaginatedPosts(page, pageSize);
+const entries = items.map(toJournalListEntry);
 
 const title = `Journal — Page ${page}`;
 const description = `Archive page ${page} of WitchClick journal entries.`;
@@ -36,43 +35,22 @@ const breadcrumbs = [
   { label: `Page ${page}` },
 ];
 
-function mapToListEntry(post: LoadedPost) {
-  const data = post.data ?? {};
-  const postTitle = typeof data.title === "string" && data.title.trim().length ? data.title.trim() : post.title;
-  const excerptCandidate = [
-    data.excerpt,
-    data.description,
-    data.metaDescription,
-    firstParagraph(post.content),
-  ].find((value) => typeof value === "string" && value.trim().length > 0);
-  const tagsRaw = Array.isArray(data.tags)
-    ? data.tags
-    : typeof data.tags === "string"
-      ? data.tags.split(",")
-      : [];
-  const tags = Array.from(
-    new Set(
-      tagsRaw
-        .map((tag) => (typeof tag === "string" ? tag.trim() : ""))
-        .filter((tag) => tag.length > 0),
-    ),
-  );
-  const publishedAtCandidate = [data.publishedAt, data.pubDate, data.date].find(
-    (value) => typeof value === "string" && value.trim().length > 0,
-  );
-  const publishedAt = publishedAtCandidate
-    ? String(publishedAtCandidate)
-    : post.date instanceof Date
-      ? post.date.toISOString()
-      : undefined;
+const isPartial = Astro.url.searchParams.get("partial") === "1";
 
-  return {
-    slug: post.slug,
-    title: postTitle,
-    excerpt: typeof excerptCandidate === "string" ? excerptCandidate.trim() : "",
-    tags,
-    publishedAt,
-  };
+if (isPartial) {
+  return (
+    <div id="journal-list" class="journal-list space-y-6">
+      {entries.map((entry) => (
+        <JournalListItem
+          slug={entry.slug}
+          title={entry.title}
+          excerpt={entry.summary}
+          publishedAt={entry.date}
+          tags={entry.tags}
+        />
+      ))}
+    </div>
+  );
 }
 ---
 <Base {title} {description}>
@@ -83,9 +61,15 @@ function mapToListEntry(post: LoadedPost) {
       <p class="text-base text-body">Archive page {page} of the WitchClick journal.</p>
     </header>
 
-    <div class="space-y-6">
-      {posts.map((post) => (
-        <JournalListItem {...post} />
+    <div class="journal-list space-y-6">
+      {entries.map((entry) => (
+        <JournalListItem
+          slug={entry.slug}
+          title={entry.title}
+          excerpt={entry.summary}
+          publishedAt={entry.date}
+          tags={entry.tags}
+        />
       ))}
     </div>
 

@@ -159,8 +159,30 @@ function main() {
     .filter(url => !shouldExclude(url))
     .map(url => ({ url, pathname: new URL(url).pathname }))
     .filter(({ pathname }) => shouldIncludePathname(pathname))
-    .map(({ url }) => url)
-    .sort();
+    .map(({ url }) => url);
+
+  const journalIndexUrl = `${baseUrl}/journal`;
+  if (!urls.includes(journalIndexUrl)) {
+    urls.push(journalIndexUrl);
+  }
+
+  const journalPageDir = path.join(distDir, 'journal', 'page');
+  if (fs.existsSync(journalPageDir)) {
+    const pages = fs
+      .readdirSync(journalPageDir, { withFileTypes: true })
+      .filter(entry => entry.isDirectory())
+      .map(entry => entry.name)
+      .filter(name => /^\d+$/.test(name));
+
+    for (const page of pages) {
+      const url = `${baseUrl}/journal/page/${page}`;
+      if (!urls.includes(url)) {
+        urls.push(url);
+      }
+    }
+  }
+
+  urls.sort();
 
   console.log(`✅ Including ${urls.length} URLs in sitemap`);
 
