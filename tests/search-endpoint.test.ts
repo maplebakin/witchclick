@@ -63,7 +63,7 @@ describe("search endpoint", () => {
     expect(body[0]).toMatchObject({
       slug: "second",
       title: "Crystal Grids",
-      excerpt: "Arrange stones for focus",
+      summary: "Arrange stones for focus",
     });
 
     expect(body[1]).toMatchObject({
@@ -71,7 +71,8 @@ describe("search endpoint", () => {
       title: "Moon Mapping",
     });
 
-    expect(body[1].excerpt).toContain("First paragraph about the moon.");
+    expect(body[1].summary).toContain("First paragraph about the moon.");
     expect(body[1].tags).toEqual(["Moon", "Rituals"]);
+    expect(body[1]).toHaveProperty("date");
   });
 });

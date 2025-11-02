@@ -6,6 +6,8 @@ import { marked } from "marked";
 import { normalizeAuthorSlug } from "./authors";
 import { augmentPost, normalizeSpoonLevel, type SpoonLevel } from "./augment";
 
+export const JOURNAL_PAGE_SIZE = 10;
+
 // Simple Slugger class to replace marked.Slugger (removed in marked v16)
 class Slugger {
   private seen: Record<string, number> = {};
@@ -332,6 +334,60 @@ export function firstParagraph(md: string): string {
   return first.length > 200 ? `${first.slice(0, 197)}…` : first;
 }
 
+export interface JournalListEntry {
+  slug: string;
+  title: string;
+  summary: string;
+  tags: string[];
+  date?: string;
+}
+
+export function toJournalListEntry(post: LoadedPost): JournalListEntry {
+  const data = post.data ?? {};
+  const titleCandidate =
+    typeof data.title === "string" && data.title.trim().length > 0 ? data.title.trim() : post.title;
+
+  const summaryCandidate = [
+    data.excerpt,
+    data.description,
+    data.metaDescription,
+    firstParagraph(post.content),
+  ].find((value) => typeof value === "string" && value.trim().length > 0);
+
+  const tagsRaw = Array.isArray(data.tags)
+    ? data.tags
+    : typeof data.tags === "string"
+      ? data.tags.split(",")
+      : [];
+
+  const tags = Array.from(
+    new Set(
+      tagsRaw
+        .map((tag) => (typeof tag === "string" ? tag.trim() : ""))
+        .filter((tag) => tag.length > 0),
+    ),
+  );
+
+  const dateCandidate = [data.publishedAt, data.pubDate, data.date].find(
+    (value) => typeof value === "string" && value.trim().length > 0,
+  );
+
+  const parsedDate = dateCandidate ? new Date(String(dateCandidate)) : undefined;
+  const date = parsedDate && !Number.isNaN(+parsedDate)
+    ? parsedDate.toISOString()
+    : post.date instanceof Date
+      ? post.date.toISOString()
+      : undefined;
+
+  return {
+    slug: post.slug,
+    title: titleCandidate,
+    summary: typeof summaryCandidate === "string" ? summaryCandidate.trim() : "",
+    tags,
+    date,
+  };
+}
+
 export function paginatePosts(page: number, pageSize: number): {
   totalPages: number;
   items: LoadedPost[];
@@ -343,6 +399,10 @@ export function paginatePosts(page: number, pageSize: number): {
     totalPages,
     items: posts.slice(start, start + pageSize),
   };
+}
+
+export function getPaginatedPosts(page: number, pageSize: number = JOURNAL_PAGE_SIZE) {
+  return paginatePosts(page, pageSize);
 }
 
 function extractImageSource(value: unknown): string {
