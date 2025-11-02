@@ -502,7 +502,7 @@ const shareGift = {
       const shareText = highlight
         ? `Join me for the "${highlight.name}" ritual on WitchClick.`
         : "Join me for a WitchClick ritual I adore.";
-      const shareUrl = `${window.location.origin}/entities/ritual/`;
+      const shareUrl = `${window.location.origin}/entities?type=ritual`;
       let shared = false;
       try {
         if (navigator.share) {

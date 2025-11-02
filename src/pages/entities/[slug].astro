@@ -1,0 +1,489 @@
+---
+import Base from "../../layouts/Base.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import PostCard from "../../components/PostCard.astro";
+import { getTypeMetadata } from "../../data/typeMetadata";
+import { resolveTailwindColor, mixColors, toRgba } from "../../utils/color";
+import { toCssVariables } from "../../utils/style";
+import { getPostsForEntity } from "../../utils/entityPosts";
+import EntityRelationshipGraph from "../../components/EntityRelationshipGraph.astro";
+import {
+  resolveEntityRefs,
+  findInboundRelations,
+  combineRelations,
+} from "../../utils/entityRelations";
+import {
+  readAllEntities,
+  resolveEntityByFlatSlug,
+  flattenEntitySlug,
+} from "../../utils/entities.js";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const all = readAllEntities();
+  const paths: Array<{ params: { slug: string } }> = [];
+
+  for (const entries of Object.values(all)) {
+    if (!Array.isArray(entries)) continue;
+    for (const entity of entries) {
+      const flatSlug = flattenEntitySlug(entity);
+      if (!flatSlug) continue;
+      paths.push({ params: { slug: flatSlug } });
+    }
+  }
+
+  return paths;
+}
+
+const { slug: requestedSlug = "" } = Astro.params as { slug?: string };
+const entity = resolveEntityByFlatSlug(requestedSlug);
+
+if (!entity) {
+  return Astro.redirect("/entities", 302);
+}
+
+const flatSlug = flattenEntitySlug(entity);
+const metadata = getTypeMetadata(entity.type);
+const accentHex = resolveTailwindColor(metadata.themeColor);
+const accentSoft = toRgba(accentHex, 0.18);
+const accentSurface = toRgba(accentHex, 0.08);
+const accentBorder = toRgba(accentHex, 0.25);
+const accentHeading = mixColors(accentHex, "#1f2937", 0.42);
+const accentSummary = mixColors(accentHex, "#1f2937", 0.55);
+const accentLabel = toRgba(accentHex, 0.6);
+const accentShadow = toRgba(accentHex, 0.2);
+
+const themeVarString = toCssVariables({
+  "entity-accent": accentHex,
+  "entity-accent-soft": accentSoft,
+  "entity-accent-surface": accentSurface,
+  "entity-accent-border": accentBorder,
+  "entity-accent-heading": accentHeading,
+  "entity-accent-summary": accentSummary,
+  "entity-accent-label": accentLabel,
+  "entity-accent-shadow": accentShadow,
+});
+
+const summaryText = typeof entity.summary === "string" ? entity.summary.trim() : "";
+const isStub = summaryText ? /stub/i.test(summaryText) : false;
+
+function startCase(value: string): string {
+  return value
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function formatRelationType(value: string): string {
+  return startCase(value);
+}
+
+const entityDisplayName = startCase(
+  typeof entity.name === "string" && entity.name.trim() ? entity.name.trim() : entity.slug,
+);
+
+const typeLabel = startCase(entity.type);
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Entities", href: "/entities/" },
+  { label: typeLabel, href: `/entities?type=${encodeURIComponent(entity.type)}` },
+  { label: entityDisplayName },
+];
+
+const outboundHeading = entity.type === "ritual"
+  ? "Tools woven into this ritual"
+  : "Allies woven into this lore";
+
+const inboundHeading = entity.type === "ritual"
+  ? "Companion rituals & lore"
+  : "Rituals that call on this ally";
+
+const propertyEntries = entity.properties && typeof entity.properties === "object"
+  ? Object.entries(entity.properties)
+  : [];
+
+const outboundRelations = resolveEntityRefs(entity.related ?? []);
+const inboundRelations = findInboundRelations(entity.type, entity.slug);
+const relationNeighbors = combineRelations(outboundRelations, inboundRelations);
+const graphNeighbors = relationNeighbors.map((relation) => ({
+  type: relation.type,
+  slug: relation.slug,
+  name: relation.name,
+  summary: relation.summary,
+  direction: relation.direction,
+}));
+const centerNode = {
+  type: entity.type,
+  slug: entity.slug,
+  name: entityDisplayName,
+  summary: summaryText || metadata.stubLine,
+};
+const hasRelations = outboundRelations.length > 0 || inboundRelations.length > 0;
+
+let relatedPosts: Array<{
+  title: string;
+  href: string;
+  slug: string;
+  excerpt?: string;
+  publishedAt?: string;
+}> = [];
+try {
+  const maybePosts = await getPostsForEntity?.(entity.type, entity.slug);
+  if (Array.isArray(maybePosts)) {
+    relatedPosts = maybePosts;
+  }
+} catch {
+  relatedPosts = [];
+}
+
+function pretty(v: unknown) {
+  try {
+    return JSON.stringify(v, null, 2);
+  } catch {
+    return String(v);
+  }
+}
+
+const canonicalPath = `/entities/${flatSlug}`;
+const filterHref = `/entities?type=${encodeURIComponent(entity.type)}`;
+---
+<Base title={`${entity.name} — ${typeLabel} — WitchClick`} wide ambientColor={accentHex} canon={canonicalPath}>
+  <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
+  <article class="entity-page" style={themeVarString ? `${themeVarString};` : undefined}>
+    <a href={filterHref} class="entity-back-link">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+      Back to {typeLabel} results
+    </a>
+    <header class="entity-hero">
+      <div class="entity-hero-sheen" aria-hidden="true" />
+      <div class="entity-hero-inner">
+        <span class="entity-hero-icon" aria-hidden="true">{metadata.icon}</span>
+        <div class="entity-hero-heading">
+          <p class="entity-hero-type" data-label={typeLabel}>{typeLabel}</p>
+          <h1 class="entity-hero-title">{entityDisplayName}</h1>
+        </div>
+        {summaryText && !isStub && (
+          <p class="entity-hero-summary">{summaryText}</p>
+        )}
+      </div>
+    </header>
+
+    {isStub ? (
+      <section class="card-panel card-tier-2 card-panel-soft entity-stub-card" aria-live="polite">
+        <h2 class="entity-stub-heading">Lore in Progress</h2>
+        <p class="entity-stub-text">{metadata.stubLine}</p>
+      </section>
+    ) : null}
+
+    {propertyEntries.length > 0 && (
+      <section class="entity-properties card-panel card-tier-1">
+        <h2 class="entity-section-heading">Core correspondences</h2>
+        <dl class="entity-properties-grid">
+          {propertyEntries.map(([key, value]) => (
+            <div>
+              <dt>{startCase(key)}</dt>
+              <dd>{Array.isArray(value) ? value.join(", ") : String(value)}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    )}
+
+    {hasRelations && (
+      <section class="entity-relations card-panel card-tier-2 card-panel-soft">
+        <div class="entity-relations-header">
+          <h2 class="entity-section-heading">{outboundHeading}</h2>
+          <p class="entity-section-subheading">
+            These allies are frequently woven together in WitchClick rituals and references.
+          </p>
+        </div>
+        <div class="entity-relations-grid">
+          {relationNeighbors.map((relation) => {
+            const relationSlug = flattenEntitySlug({
+              type: relation.type,
+              slug: relation.slug,
+              name: relation.name,
+              summary: relation.summary,
+              properties: {},
+              related: [],
+            });
+            return (
+              <a href={`/entities/${relationSlug}`} class="entity-relation-card">
+                <span class="entity-relations-type">{formatRelationType(relation.type)}</span>
+                <span class="entity-relations-name">{relation.name}</span>
+                <p class="entity-relations-summary">{relation.summary}</p>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+    )}
+
+    {relatedPosts.length > 0 && (
+      <section class="entity-posts card-panel card-tier-1">
+        <h2 class="entity-section-heading">Related journal entries</h2>
+        <div class="entity-posts-grid">
+          {relatedPosts.map((post) => (
+            <PostCard {...post} />
+          ))}
+        </div>
+      </section>
+    )}
+
+    {hasRelations && (
+      <section class="entity-graph-panel card-panel card-tier-2 card-panel-soft">
+        <h2 class="entity-section-heading">Relationship map</h2>
+        <EntityRelationshipGraph center={centerNode} neighbors={graphNeighbors} />
+      </section>
+    )}
+
+    <details class="entity-raw card-panel card-tier-3">
+      <summary class="entity-section-heading">Raw data</summary>
+      <pre>{pretty(entity)}</pre>
+    </details>
+  </article>
+</Base>
+
+<style>
+  .entity-page {
+    display: grid;
+    gap: clamp(1.75rem, 3vw, 2.5rem);
+  }
+
+  .entity-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--entity-accent-heading, #4338ca);
+    text-decoration: none;
+  }
+
+  .entity-back-link svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .entity-back-link:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+    border-radius: 999px;
+  }
+
+  .entity-hero {
+    position: relative;
+    border-radius: 1.75rem;
+    padding: clamp(2rem, 4vw, 2.75rem);
+    background: radial-gradient(
+        circle at top,
+        var(--entity-accent-soft, rgba(124, 58, 237, 0.2)),
+        transparent 70%
+      ),
+      linear-gradient(
+        160deg,
+        var(--entity-accent-surface, rgba(124, 58, 237, 0.12)),
+        rgba(255, 255, 255, 0.9)
+      );
+    border: 1px solid var(--entity-accent-border, rgba(124, 58, 237, 0.25));
+    box-shadow: 0 22px 55px -32px var(--entity-accent-shadow, rgba(124, 58, 237, 0.2));
+  }
+
+  .entity-hero-sheen {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.9), transparent 55%);
+    opacity: 0.45;
+  }
+
+  .entity-hero-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .entity-hero-icon {
+    font-size: clamp(2.25rem, 5vw, 3rem);
+  }
+
+  .entity-hero-heading {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .entity-hero-type {
+    text-transform: uppercase;
+    letter-spacing: 0.35em;
+    font-size: 0.75rem;
+    color: var(--entity-accent-label, rgba(124, 58, 237, 0.6));
+  }
+
+  .entity-hero-title {
+    font-family: var(--font-serif, "Cormorant Garamond", serif);
+    font-size: clamp(2.25rem, 4vw, 3.25rem);
+    color: var(--entity-accent-heading, #312e81);
+  }
+
+  .entity-hero-summary {
+    max-width: 60ch;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--entity-accent-summary, rgba(55, 48, 163, 0.8));
+  }
+
+  .entity-stub-card {
+    border: 1px dashed var(--entity-accent-border, rgba(124, 58, 237, 0.25));
+    background: color-mix(in srgb, var(--entity-accent-soft, rgba(124, 58, 237, 0.18)) 70%, white 30%);
+  }
+
+  .entity-stub-heading {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--entity-accent-heading, #312e81);
+  }
+
+  .entity-stub-text {
+    margin-top: 0.5rem;
+    color: var(--entity-accent-summary, rgba(55, 48, 163, 0.8));
+  }
+
+  .entity-section-heading {
+    font-family: var(--font-serif, "Cormorant Garamond", serif);
+    font-size: 1.5rem;
+    color: var(--entity-accent-heading, #312e81);
+  }
+
+  .entity-section-subheading {
+    color: var(--entity-accent-summary, rgba(55, 48, 163, 0.7));
+    font-size: 0.95rem;
+  }
+
+  .entity-properties {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .entity-properties-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .entity-properties-grid dt {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--entity-accent-label, rgba(124, 58, 237, 0.6));
+  }
+
+  .entity-properties-grid dd {
+    font-size: 1rem;
+    color: var(--entity-accent-summary, rgba(55, 48, 163, 0.75));
+  }
+
+  .entity-relations {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .entity-relations-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .entity-relation-card {
+    display: grid;
+    gap: 0.35rem;
+    padding: 1rem;
+    border-radius: 1.5rem;
+    border: 1px solid var(--entity-accent-border, rgba(124, 58, 237, 0.25));
+    background: rgba(255, 255, 255, 0.82);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  .entity-relation-card:hover,
+  .entity-relation-card:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 32px -24px rgba(30, 64, 175, 0.4);
+    outline: none;
+  }
+
+  .entity-relations-type {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--entity-accent-label, rgba(124, 58, 237, 0.6));
+  }
+
+  .entity-relations-name {
+    font-family: var(--font-serif, "Cormorant Garamond", serif);
+    font-size: 1.15rem;
+    color: var(--entity-accent-heading, #312e81);
+  }
+
+  .entity-relations-summary {
+    font-size: 0.95rem;
+    color: var(--entity-accent-summary, rgba(55, 48, 163, 0.7));
+  }
+
+  .entity-posts-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .entity-graph-panel {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .entity-raw {
+    background: rgba(17, 24, 39, 0.04);
+    border: 1px solid rgba(17, 24, 39, 0.08);
+    border-radius: 1.5rem;
+  }
+
+  .entity-raw summary {
+    cursor: pointer;
+  }
+
+  .entity-raw pre {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    background: rgba(17, 24, 39, 0.05);
+    padding: 1rem;
+    border-radius: 1rem;
+    max-height: 24rem;
+    overflow: auto;
+  }
+
+  @media (min-width: 640px) {
+    .entity-properties-grid {
+      grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    }
+
+    .entity-relations-grid {
+      grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    }
+
+    .entity-posts-grid {
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    }
+  }
+</style>

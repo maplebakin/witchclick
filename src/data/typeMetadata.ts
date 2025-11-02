@@ -83,6 +83,6 @@ export const sections = Object.entries(typeMetadata).map(([type, metadata]) => (
   title: metadata.title,
   subtitle: metadata.subtitle,
   icon: metadata.icon,
-  href: `/entities/${type}/`,
+  href: `/entities?type=${type}`,
   themeColor: metadata.themeColor,
 }));

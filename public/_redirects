@@ -1,3 +1,4 @@
+/entities/:type/:slug   /entities/:slug  301
 /post/:slug    /journal/:slug    301
 /page/:page    /journal/page/:page    301
 /start    /journal    301

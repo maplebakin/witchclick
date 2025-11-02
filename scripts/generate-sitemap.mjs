@@ -18,6 +18,7 @@ const EXCLUDE_EXACT = new Set(['/author', '/account']);
 function shouldIncludePathname(pathname) {
   if (!pathname) return true;
   if (EXCLUDE_EXACT.has(pathname)) return false;
+  if (/^\/entities\/[^/]+\/[^/]+$/.test(pathname)) return false;
   return !EXCLUDE_PREFIXES.some(prefix => pathname.startsWith(prefix));
 }
 

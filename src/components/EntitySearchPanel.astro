@@ -1,0 +1,210 @@
+---
+interface FacetMap {
+  [key: string]: number;
+}
+
+interface Facets {
+  types: FacetMap;
+  tags: FacetMap;
+}
+
+interface SearchState {
+  q: string;
+  type: string;
+  tag: string;
+}
+
+interface Props {
+  facets: Facets;
+  state: SearchState;
+  popularLimit?: number;
+}
+
+const { facets, state, popularLimit = 10 } = Astro.props as Props;
+
+function formatTypeLabel(value: string): string {
+  return value
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+const typeEntries = Object.entries(facets.types ?? {}).sort(([a], [b]) => {
+  return formatTypeLabel(a).localeCompare(formatTypeLabel(b));
+});
+
+const tagEntries = Object.entries(facets.tags ?? {})
+  .sort((a, b) => {
+    if (b[1] === a[1]) {
+      return a[0].localeCompare(b[0]);
+    }
+    return b[1] - a[1];
+  })
+  .slice(0, popularLimit);
+
+const activeTag = state.tag.trim();
+---
+<form method="get" class="entity-search" data-entity-search-form>
+  <div class="entity-search__field">
+    <label class="entity-search__label" for="entity-search-input">Search entities</label>
+    <input
+      id="entity-search-input"
+      class="entity-search__input"
+      type="search"
+      name="q"
+      value={state.q}
+      placeholder="Try rosemary, focus, or waning moon"
+      aria-describedby="entity-search-hint"
+      data-entity-search-input
+    />
+    <p id="entity-search-hint" class="entity-search__hint">Search by name, purpose, or vibe.</p>
+  </div>
+
+  <div class="entity-search__field">
+    <label class="entity-search__label" for="entity-type-select">Filter by type</label>
+    <select
+      id="entity-type-select"
+      class="entity-search__select"
+      name="type"
+      value={state.type}
+      data-entity-type-select
+    >
+      <option value="">All types</option>
+      {typeEntries.map(([type, count]) => (
+        <option value={type}>{formatTypeLabel(type)} ({count})</option>
+      ))}
+    </select>
+  </div>
+
+  {state.tag && <input type="hidden" name="tag" value={state.tag} data-entity-tag-field />}
+
+  <fieldset class="entity-search__tags">
+    <legend class="entity-search__tags-label">Popular tags</legend>
+    <div class="entity-search__chips">
+      <button
+        type="submit"
+        name="tag"
+        value=""
+        class:list={["entity-chip", !activeTag ? "entity-chip--active" : ""]}
+        aria-pressed={!activeTag}
+        data-entity-tag=""
+      >
+        All tags
+      </button>
+      {tagEntries.map(([tag, count]) => {
+        const isActive = activeTag.toLowerCase() === tag.toLowerCase();
+        return (
+          <button
+            type="submit"
+            name="tag"
+            value={tag}
+            class:list={["entity-chip", isActive ? "entity-chip--active" : ""]}
+            aria-pressed={isActive}
+            data-entity-tag={tag}
+          >
+            <span>{tag}</span>
+            <span class="entity-chip__count">{count}</span>
+          </button>
+        );
+      })}
+    </div>
+  </fieldset>
+</form>
+
+<style>
+  .entity-search {
+    display: grid;
+    gap: clamp(1rem, 2vw, 1.5rem);
+    padding: clamp(1.5rem, 3vw, 2rem);
+    border-radius: 1.75rem;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    box-shadow: 0 18px 40px -28px rgba(15, 23, 42, 0.2);
+  }
+
+  .entity-search__field {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .entity-search__label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-body-strong, #334155);
+  }
+
+  .entity-search__input,
+  .entity-search__select {
+    width: 100%;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    padding: 0.75rem 1.1rem;
+    font-size: 1rem;
+    color: var(--text-body, #1f2937);
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  .entity-search__input:focus-visible,
+  .entity-search__select:focus-visible {
+    outline: 2px solid var(--accent, #7c3aed);
+    outline-offset: 2px;
+  }
+
+  .entity-search__hint {
+    font-size: 0.75rem;
+    color: var(--text-body-muted, #64748b);
+  }
+
+  .entity-search__tags {
+    border: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .entity-search__tags-label {
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    color: var(--text-body-muted, #64748b);
+  }
+
+  .entity-search__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .entity-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    padding: 0.4rem 0.9rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--text-body-muted, #475569);
+    cursor: pointer;
+  }
+
+  .entity-chip:focus-visible {
+    outline: 2px solid var(--accent, #7c3aed);
+    outline-offset: 2px;
+  }
+
+  .entity-chip--active {
+    background: var(--text-ink, #111827);
+    color: var(--text-inverse, #f8fafc);
+    border-color: var(--text-ink, #111827);
+  }
+
+  .entity-chip__count {
+    font-size: 0.7rem;
+    letter-spacing: normal;
+  }
+</style>
