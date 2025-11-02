@@ -627,7 +627,46 @@ const observabilityConfig = shouldLoadObservability
     data-entity-type={bodyDataType || undefined}
   >
     <a class="skip-link" href="#main">Skip to content</a>
-    
+    <!-- Base.astro: persistent theme loader (runtime site-wide) -->
+<script is:inline>
+  (function () {
+    try {
+      const saved = localStorage.getItem("wc-active-theme");
+      if (!saved) return;
+      const t = JSON.parse(saved);
+      const root = document.documentElement;
+
+      // set mode attributes
+      const modeAttr = t.id && t.id.includes("dawn") || t.mode === "light" ? "dawn" : "midnight";
+      root.setAttribute("data-theme", modeAttr === "dawn" ? "cozy-dawn" : "cozy-midnight");
+      root.setAttribute("data-comfort-theme", modeAttr);
+
+      // apply tokens
+      const map = {
+        "--accent-1": "accent1","--accent-2": "accent2","--accent-3": "accent3",
+        "--surface-base": "surfaceBase","--surface-panel": "surfacePanel","--surface-card": "surfaceCard",
+        "--surface-elevated": "surfaceElevated","--surface-hover": "surfaceHover",
+        "--text-strong": "textStrong","--text-body": "textBody","--text-muted": "textMuted",
+        "--border-subtle": "borderSubtle","--border-strong": "borderStrong"
+      };
+      const tokens = t.tokens || {};
+      Object.entries(map).forEach(([cssVar, key]) => {
+        const val = tokens[key];
+        if (typeof val === "string" && val.startsWith("hsl(")) {
+          root.style.setProperty(cssVar, val.replace(/^hsl\\(|\\)$/g, ""));
+        }
+      });
+
+      // derive accent-linked globals
+      const get = (v) => getComputedStyle(root).getPropertyValue(v).trim();
+      const accent1 = `hsl(${get("--accent-1")})`;
+      root.style.setProperty("--text-accent", accent1.replace(/^hsl\\(|\\)$/g, ""));
+      root.style.setProperty("--ring-focus", `0 0 0 3px ${accent1}`);
+      root.style.setProperty("--link-color", accent1);
+    } catch {}
+  })();
+</script>
+
     <Header
       brandName={brandName}
       navLinks={navLinks}

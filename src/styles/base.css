@@ -1254,8 +1254,9 @@ main {
 .site-nav__actions {
   display: none;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
   justify-content: flex-end;
+  flex-wrap: nowrap;
 }
 
 .search-control {

@@ -138,6 +138,9 @@ function isActive(href: string): boolean {
         )}
         <ComfortSettings />
         {hasAdminLinks && (
+          <div class="site-nav__divider" aria-hidden="true"></div>
+        )}
+        {hasAdminLinks && (
           <details class="site-nav__admin" data-admin-menu>
             <summary class="site-nav__button site-nav__button--admin focus-ring">
               Admin
@@ -435,7 +438,7 @@ function isActive(href: string): boolean {
 
 <style is:global>
   .site-nav__actions {
-    gap: clamp(var(--space-2), 1.5vw, var(--space-3));
+    gap: clamp(var(--space-3), 2vw, var(--space-4));
     align-items: center;
   }
 
@@ -505,8 +508,16 @@ function isActive(href: string): boolean {
     transform: rotate(180deg);
   }
 
+  .site-nav__divider {
+    width: 1px;
+    height: 1.5rem;
+    background: color-mix(in srgb, var(--header-border) 40%, transparent 60%);
+    margin-inline: var(--space-1);
+  }
+
   .site-nav__admin {
     position: relative;
+    margin-inline: var(--space-2);
   }
 
   .site-nav__admin > summary {
