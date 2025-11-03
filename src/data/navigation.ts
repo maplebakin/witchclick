@@ -12,26 +12,30 @@ export interface AdminNavSection {
 
 export const primaryNavLinks: NavLink[] = [
   { href: "/start", label: "Start Here" },
-  { href: "/hub/", label: "Hubs" },
-  { href: "/tools/", label: "Tools" },
-  { href: "/curses/", label: "Curses", variant: "pill" },
+  { href: "/entities", label: "Entities" },
+  { href: "/tools", label: "Tools" },
+  {
+    href: "/meanderings",
+    label: "Meanderings",
+    variant: "pill", // keeps your “special” highlight on this slot
+  },
 ];
 
 export const secondaryNavLinks: NavLink[] = [
   { href: "/", label: "Home" },
-  { href: "/entities/", label: "Entities" },
-  { href: "/partners/", label: "Partners" },
-  { href: "/about/", label: "About" },
-  { href: "/salon/", label: "Salon" },
+  { href: "/hub", label: "Hubs" },
+  { href: "/partners", label: "Partners" },
+  { href: "/about", label: "About" },
+  // Salon removed
 ];
 
 export const headerUtilityLinks: NavLink[] = [
-  { href: "/contact/", label: "Contact" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export const footerUtilityLinks: NavLink[] = [
-  { href: "/contact/", label: "Contact" },
-  { href: "/partners/", label: "Partners" },
+  { href: "/contact", label: "Contact" },
+  { href: "/partners", label: "Partners" },
   { href: "/privacy", label: "Privacy" },
   { href: "/rss.xml", label: "RSS", rel: "alternate" },
   { href: "/feed.json", label: "JSON Feed", rel: "alternate" },
@@ -41,7 +45,7 @@ export const adminNavSections: AdminNavSection[] = [
   {
     label: "Content",
     items: [
-      { href: "/admin/", label: "Generator" },
+      { href: "/admin", label: "Generator" },
       { href: "/admin/write", label: "Write" },
       { href: "/admin/posts", label: "Posts" },
     ]

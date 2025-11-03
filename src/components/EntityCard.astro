@@ -107,15 +107,16 @@ const typeLabel =
     />
     <span aria-hidden class="entity-card-star pointer-events-none absolute top-5 right-6 text-4xl">✶</span>
 
-    <div class="relative z-10 flex h-full flex-col gap-4">
-      <div class="flex items-start justify-between gap-3">
-        <span class="entity-card-label text-xs uppercase tracking-[0.35em]">{typeLabel}</span>
-        {showStubBadge && (
-          <span class="entity-card-badge rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wide shadow-sm">
-            Lore in progress
-          </span>
-        )}
-      </div>
+    <div class="relative z-10 flex flex-col gap-4">
+      <div class="flex items-start justify-start gap-3 flex-wrap">
+  <span class="entity-card-label text-xs uppercase">{typeLabel}</span>
+  {showStubBadge && (
+    <span class="entity-card-badge rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wide shadow-sm">
+      Lore in progress
+    </span>
+  )}
+</div>
+
 
       <div class="space-y-3">
         <h3 class="entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]">
@@ -151,6 +152,8 @@ const typeLabel =
   .entity-card {
     background-color: var(--entity-surface, rgba(255, 255, 255, 0.85));
     border-color: var(--entity-border, rgba(124, 58, 237, 0.28));
+    overflow: hidden; /* <-- stop clipping */
+    height: auto; /* <-- let content determine height */
   }
 
   .entity-card-overlay {
@@ -171,9 +174,14 @@ const typeLabel =
     color: var(--entity-star, rgba(124, 58, 237, 0.4));
   }
 
-  .entity-card-label {
+    .entity-card-label {
     color: var(--entity-label, rgba(124, 58, 237, 0.65));
-    letter-spacing: 0.35em;
+    letter-spacing: 0.18em;   /* gentle, still “label-y” but not absurd */
+    font-size: 0.7rem;        /* slightly small to keep it compact */
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    max-width: 100%;
+    display: inline-block;
   }
 
   .entity-card-badge {
@@ -188,6 +196,12 @@ const typeLabel =
 
   .entity-card-summary {
     color: var(--entity-summary, rgba(88, 28, 135, 0.85));
+    line-height: 1.5;
+    overflow: visible;
+    text-overflow: clip;
+    display: block;
+    -webkit-line-clamp: unset;
+    -webkit-box-orient: unset;
   }
 
   .entity-card-placeholder {

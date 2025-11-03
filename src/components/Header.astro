@@ -125,18 +125,37 @@ function isActive(href: string): boolean {
           </li>
         )}
       </ul>
-      <div class="site-nav__actions">
+            <div class="site-nav__actions">
+        {/* Theme is a visual/global toggle, goes first */}
         <ThemeToggle class="site-nav__theme" />
+
+        {/* Search is a primary action, keep it near the front */}
+        <button
+          type="button"
+          class="site-nav__button focus-ring"
+          data-search-toggle
+          aria-expanded="false"
+          aria-controls="site-search-panel"
+        >
+          Search
+        </button>
+
+        {/* Utility links like Contact, etc. */}
         {visibleUtility.length > 0 && (
           <div class="site-nav__utility">
             {visibleUtility.map((item) => (
-              <a class="site-nav__button site-nav__button--utility focus-ring" href={item.href} rel={item.rel}>
+              <a
+                class="site-nav__button site-nav__button--utility focus-ring"
+                href={item.href}
+                rel={item.rel}
+              >
                 {item.label}
               </a>
             ))}
           </div>
         )}
-        <ComfortSettings />
+
+        {/* Admin panel is its own little island */}
         {hasAdminLinks && (
           <div class="site-nav__divider" aria-hidden="true"></div>
         )}
@@ -171,19 +190,17 @@ function isActive(href: string): boolean {
             </div>
           </details>
         )}
-        <button
-          type="button"
-          class="site-nav__button focus-ring"
-          data-search-toggle
-          aria-expanded="false"
-          aria-controls="site-search-panel"
+
+        {/* RSS is “meta” – last in the row */}
+        <a
+          class="site-nav__button site-nav__link--secondary focus-ring"
+          href="/feed.json"
+          rel="alternate"
         >
-          Search
-        </button>
-        <a class="site-nav__button site-nav__link--secondary focus-ring" href="/feed.json" rel="alternate">
           RSS
         </a>
       </div>
+
     </nav>
   </div>
   <div
@@ -276,9 +293,7 @@ function isActive(href: string): boolean {
         </ul>
       </div>
     )}
-    <div class="site-nav__mobile-comfort">
-      <ComfortSettings variant="stacked" />
-    </div>
+    
   </div>
   <div
     id="site-search-panel"
@@ -728,4 +743,30 @@ function isActive(href: string): boolean {
     letter-spacing: 0.08em;
     text-transform: none;
   }
+    /* === Simple navbar size controls === */
+
+  /* Overall strip thickness */
+  .site-header {
+    padding-block: 0.4rem; /* smaller = thinner bar, bigger = taller bar */
+  }
+
+  /* Inner layout min height */
+  .site-header__inner {
+    min-height: 3.1rem; /* nudge up/down until it feels right */
+  }
+
+  /* Main desktop link padding (vertical) */
+  .site-nav__link {
+    padding-block: 0.3rem;
+  }
+
+  /* Optional: shrink logo text a bit if it feels huge */
+  .site-logo {
+    font-size: 1rem;
+  }
+   /* Tighten action cluster spacing a bit */
+  .site-nav__actions {
+    gap: clamp(var(--space-2), 1.5vw, var(--space-3));
+  }
+
 </style>

@@ -150,12 +150,16 @@ const breadcrumbs = [
     text-decoration: underline;
   }
 
-  .entity-grid {
-    display: grid;
-    position: relative;
-    gap: clamp(1.75rem, 3vw, 2.35rem);
-    margin-top: clamp(2rem, 4vw, 2.5rem);
-  }
+ .entity-grid {
+  display: grid;
+  position: relative;
+  gap: clamp(1.75rem, 3vw, 2.35rem);
+  margin-top: clamp(2rem, 4vw, 2.5rem);
+
+  /* 👇 new rules for flexible rows */
+  grid-auto-rows: auto;
+  align-items: start;
+}
 
   @media (min-width: 640px) {
     .entity-heading {
