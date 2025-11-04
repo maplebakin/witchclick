@@ -16,6 +16,9 @@ internalLinkHints: ["self-compassion","brain fog","rest and survival","regulatin
 internalLinks: []
 publishedAt: "2025-10-30T13:59:36.445Z"
 canonicalUrl: "https://witchclick.space/post/sick-parent-sick-child-reflection"
+heroImage: "/images/hero/sick-parent-sick-child-reflection/sick-with-kiddo-4.png"
+heroImageSrc: "/images/hero/sick-parent-sick-child-reflection/sick-with-kiddo-4.png"
+heroAlt: ""
 specVersion: 2
 promptMetadata: {"topic":"When You're Sick and Home with a Sick Kiddo","requestedWords":1200,"deliveredWords":889,"toggles":{"ads":"on","kofi":"off"},"generatedAt":"2025-10-30T13:59:36.444Z"}
 ---

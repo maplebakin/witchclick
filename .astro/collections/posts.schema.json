@@ -119,20 +119,40 @@
         "internalLinks": {
           "type": "array",
           "items": {
-            "type": "object",
-            "properties": {
-              "slug": {
-                "type": "string"
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "slug": {
+                    "type": "string"
+                  },
+                  "anchor": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "slug",
+                  "anchor"
+                ],
+                "additionalProperties": false
               },
-              "anchor": {
-                "type": "string"
+              {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "href": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "text",
+                  "href"
+                ],
+                "additionalProperties": false
               }
-            },
-            "required": [
-              "slug",
-              "anchor"
-            ],
-            "additionalProperties": false
+            ]
           },
           "default": []
         },

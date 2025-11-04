@@ -13,17 +13,19 @@ const recommendations = getRelatedPosts({ currentSlug, currentData: data, limit 
 ---
 {recommendations.length > 0 ? (
   <section class="related-posts" aria-label="Recommended posts">
-    <h2 class="related-posts__title">Recommended</h2>
+    <h2 class="card-eyebrow">Recommended</h2>
     <ul class="related-posts__list">
       {recommendations.map((item) => (
         <li>
-          <a class="related-posts__card" href={item.href}>
-            <span class="related-posts__headline">{item.title}</span>
-            {item.excerpt && <span class="related-posts__excerpt">{item.excerpt}</span>}
-            <span class="related-posts__meta">
-              {item.readingMinutes && <span>{item.readingMinutes} min</span>}
-              {item.spoonLevel && <span>{item.spoonLevel} spoons</span>}
-            </span>
+          <a class="card-panel card-tier-1 card-panel-soft related-posts__card" href={item.href}>
+            <div class="card-body">
+              <span class="card-heading">{item.title}</span>
+              {item.excerpt && <span class="card-subtle">{item.excerpt}</span>}
+              <span class="card-metadata">
+                {item.readingMinutes && <span class="card-metadata__item">{item.readingMinutes} min</span>}
+                {item.spoonLevel && <span class="card-metadata__item">{item.spoonLevel} spoons</span>}
+              </span>
+            </div>
           </a>
         </li>
       ))}
@@ -31,18 +33,10 @@ const recommendations = getRelatedPosts({ currentSlug, currentData: data, limit 
   </section>
 ) : null}
 
-<style is:inline>
+<style>
   .related-posts {
     display: grid;
     gap: 1rem;
-  }
-
-  .related-posts__title {
-    margin: 0;
-    font-size: 0.85rem;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: rgba(249, 245, 255, 0.75);
   }
 
   .related-posts__list {
@@ -53,63 +47,16 @@ const recommendations = getRelatedPosts({ currentSlug, currentData: data, limit 
     gap: 0.75rem;
   }
 
-  .related-posts__card {
-    display: grid;
-    gap: 0.35rem;
-    padding: 0.85rem 1rem;
-    border-radius: 1rem;
-    border: 1px solid rgba(212, 175, 55, 0.28);
-    background: rgba(18, 7, 37, 0.78);
-    text-decoration: none;
-    color: inherit;
-    transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+  .related-posts__card .card-body {
+    gap: 0.5rem;
   }
 
-  .related-posts__card:hover,
-  .related-posts__card:focus-visible {
-    transform: translateY(-2px);
-    border-color: rgba(212, 175, 55, 0.48);
-    background: rgba(28, 12, 47, 0.85);
-  }
-
-  .related-posts__headline {
-    font-weight: 600;
+  .related-posts__card .card-heading {
     font-size: 0.98rem;
   }
 
-  .related-posts__excerpt {
+  .related-posts__card .card-subtle {
     font-size: 0.85rem;
     line-height: 1.5;
-    color: rgba(249, 245, 255, 0.72);
-  }
-
-  .related-posts__meta {
-    display: inline-flex;
-    gap: 0.65rem;
-    flex-wrap: wrap;
-    font-size: 0.7rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: rgba(212, 175, 55, 0.7);
-  }
-
-  :root[data-comfort-theme="dawn"] .related-posts__card {
-    background: rgba(255, 255, 255, 0.92);
-    border-color: rgba(180, 154, 217, 0.28);
-    color: rgba(58, 40, 84, 0.92);
-  }
-
-  :root[data-comfort-theme="dawn"] .related-posts__card:hover,
-  :root[data-comfort-theme="dawn"] .related-posts__card:focus-visible {
-    background: rgba(255, 255, 255, 0.98);
-    border-color: rgba(212, 175, 55, 0.42);
-  }
-
-  :root[data-comfort-theme="dawn"] .related-posts__excerpt {
-    color: rgba(87, 63, 115, 0.7);
-  }
-
-  :root[data-comfort-theme="dawn"] .related-posts__meta {
-    color: rgba(155, 134, 200, 0.72);
   }
 </style>

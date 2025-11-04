@@ -1,17 +1,12 @@
 ---
 import Base from "@/layouts/Base.astro";
-import Hero from "@/components/Hero.astro";
 import PostCard from "@/components/PostCard.astro";
 import HeadSlot from "@/components/HeadSlot.astro";
-import EvergreenCta from "@/components/blocks/EvergreenCta.astro";
-import StartHerePanel from "@/components/blocks/StartHerePanel.astro";
-import Testimonials from "@/components/blocks/Testimonials.astro";
 import { loadAllPosts, firstParagraph, estimateReadingMinutes, extractHeroImage } from "@/utils/posts";
 import { readSettings } from "@/utils/settings";
 import { createCollectionPageSchema } from "@/utils/structuredData";
-import { readEvergreenBlocks } from "@/utils/blocks";
 
-const title = "WitchClick — Cozy secular rituals & tools";
+const title = "WitchClick — Cozy secular rituals for everyday magic";
 
 type CardPost = {
   slug: string;
@@ -32,10 +27,6 @@ type CardPost = {
 
 const posts = loadAllPosts();
 const settings = readSettings();
-const evergreenBlocks = readEvergreenBlocks();
-const evergreenCta = evergreenBlocks.cta ?? null;
-const testimonialSection = evergreenBlocks.testimonialSection ?? null;
-const testimonials = evergreenBlocks.testimonials ?? [];
 
 const cardPosts: CardPost[] = posts.map((post) => {
   const fm = post.data ?? {};
@@ -105,729 +96,345 @@ const cardPosts: CardPost[] = posts.map((post) => {
   } satisfies CardPost;
 });
 
-const heroPost = cardPosts[0] ?? null;
-const heroKicker = heroPost ? "Newest ritual" : "Fresh from the coven";
-const heroTitle = heroPost?.title ?? "Cozy Cursing Ritual: Release Anger Through Banishment";
-const heroBlurb = heroPost?.tldr ?? heroPost?.excerpt ??
-  "Sometimes anger is the only honest response to betrayal or systemic harm. This ritual gives it a safe container and releases the residue.";
-const heroPrimaryHref = heroPost ? `/post/${heroPost.slug}` : "/page/1";
-const heroPrimaryLabel = heroPost ? "Read this ritual →" : "Browse the latest rituals →";
-const heroImageSrc = heroPost?.heroImageSrc ?? "";
-const heroImageAlt = heroPost?.heroImageAlt ?? heroTitle;
-const heroActionNote = heroPost
-  ? "Read this ritual now or download printable tools if you prefer hands-on support."
-  : undefined;
+// Show featured post at the top
+const featuredPost = cardPosts[0] ?? null;
 
-const usedSlugs = new Set(heroPost ? [heroPost.slug] : []);
+// Show recent posts (12 total, excluding the featured one)
+const recentPosts = cardPosts.slice(1, 13);
 
-function takePosts(candidates: CardPost[], limit: number): CardPost[] {
-  if (limit <= 0) return [];
-  const result: CardPost[] = [];
-  for (const candidate of candidates) {
-    if (usedSlugs.has(candidate.slug)) continue;
-    result.push(candidate);
-    usedSlugs.add(candidate.slug);
-    if (result.length >= limit) break;
-  }
-  return result;
-}
-
-function matchesKeywords(post: CardPost, keywords: string[]): boolean {
-  return post.normalizedTags.some((tag) =>
-    keywords.some((keyword) => tag.includes(keyword))
-  );
-}
-
-const latestRituals = takePosts(cardPosts, 4);
-
-const releaseKeywords = ["curse", "banish", "shadow", "justice", "anger", "boundary"];
-let releasePosts = takePosts(cardPosts.filter((post) => matchesKeywords(post, releaseKeywords)), 3);
-if (releasePosts.length < 3) {
-  releasePosts = releasePosts.concat(takePosts(cardPosts, 3 - releasePosts.length));
-}
-
-const planningKeywords = ["plan", "productivity", "adhd", "schedule", "focus", "checklist", "organize"];
-let planningPosts = takePosts(cardPosts.filter((post) => matchesKeywords(post, planningKeywords)), 3);
-if (planningPosts.length < 3) {
-  planningPosts = planningPosts.concat(takePosts(cardPosts, 3 - planningPosts.length));
-}
-
-const calmKeywords = ["calm", "rest", "restore", "ground", "anxiety", "burnout", "recovery", "soothe"];
-let calmPosts = takePosts(cardPosts.filter((post) => matchesKeywords(post, calmKeywords)), 3);
-if (calmPosts.length < 3) {
-  calmPosts = calmPosts.concat(takePosts(cardPosts, 3 - calmPosts.length));
-}
-
-const encorePosts = takePosts(cardPosts, 3);
-
-const latestSection = {
-  id: "latest-rituals",
-  eyebrow: "Latest rituals",
-  heading: "Fresh guidance from the altar",
-  description: "Recent spells and essays to help you reclaim energy, soften resistance, and make practical magic in daily life.",
-  schemaName: "Latest rituals",
-  url: "/",
-  link: { href: "/page/1", label: "Browse the ritual archive ↗" },
-  posts: latestRituals,
-};
-
-const releaseSection = {
-  id: "release-rituals",
-  eyebrow: "Shadow work & release",
-  heading: "Rituals when you need to move heavy feelings",
-  description: "Name what hurt you, set boundaries, and send the residue back without causing harm.",
-  schemaName: "Shadow work & release rituals",
-  url: "/#release-rituals",
-  tone: true,
-  link: { href: "/page/1", label: "Explore more rituals ↗" },
-  posts: releasePosts,
-};
-
-const planningSection = {
-  id: "planning-rituals",
-  eyebrow: "Planning & focus",
-  heading: "Soft structure for neurodivergent days",
-  description: "Work with your rhythms using tiny accountability rituals, tarot prompts, and gentle productivity spells.",
-  schemaName: "Planning and focus rituals",
-  url: "/#planning-rituals",
-  link: { href: "/page/1", label: "See all planning rituals ↗" },
-  posts: planningPosts,
-};
-
-const calmSection = {
-  id: "calm-rituals",
-  eyebrow: "Rest & restoration",
-  heading: "Ground your nervous system with cozy care",
-  description: "Take a breath with soft resets, sensory grounding, and rituals that remind your body it's safe to unclench.",
-  schemaName: "Rest and restoration rituals",
-  url: "/#calm-rituals",
-  tone: true,
-  link: { href: "/page/1", label: "Discover more calm rituals ↗" },
-  posts: calmPosts,
-};
-
-const encoreSection = {
-  id: "more-to-explore",
-  eyebrow: "More to explore",
-  heading: "In case you missed these spells",
-  description: "A few extra articles the coven keeps returning to when they need a gentle reset.",
-  schemaName: "More to explore",
-  url: "/#more-to-explore",
-  posts: encorePosts,
-};
-
-const hasEncore = encoreSection.posts.length > 0;
-
-const collectionSchemas = [latestSection, releaseSection, planningSection, calmSection, encoreSection]
-  .filter((section) => section.posts.length > 0)
-  .map((section) =>
-    createCollectionPageSchema(
-      settings,
-      {
-        name: section.schemaName,
-        url: section.url,
-        description: section.description,
-        itemType: "Article",
-      },
-      section.posts.map((post) => ({
-        name: post.title,
-        url: `/post/${post.slug}`,
-        description: post.tldr ?? post.excerpt,
-        image: post.heroImage,
-      })),
-    ),
-  );
+// Create schema for the post collection
+const collectionSchema = featuredPost ? createCollectionPageSchema(
+  settings,
+  {
+    name: "Recent Rituals & Essays",
+    url: "/",
+    description: "Gentle rituals, cozy tools, and reflections for when life feels loud.",
+    itemType: "Article",
+  },
+  [featuredPost, ...recentPosts].map((post) => ({
+    name: post.title,
+    url: `/post/${post.slug}`,
+    description: post.tldr ?? post.excerpt,
+    image: post.heroImage,
+  })),
+) : null;
 ---
 <Base {title}>
-  {collectionSchemas.length > 0 && (
+  {collectionSchema && (
     <HeadSlot slot="head">
-      {collectionSchemas.map((schema) => (
-        <script type="application/ld+json" set:html={JSON.stringify(schema)} />
-      ))}
+      <script type="application/ld+json" set:html={JSON.stringify(collectionSchema)} />
     </HeadSlot>
   )}
-  <Hero
-    kicker={heroKicker}
-    title={heroTitle}
-    blurb={heroBlurb}
-    primaryHref={heroPrimaryHref}
-    primaryLabel={heroPrimaryLabel}
-    secondaryHref="/tools/"
-    secondaryLabel="Explore printable tools"
-    heroImageSrc={heroImageSrc}
-    heroImageAlt={heroImageAlt}
-    actionNote={heroActionNote}
-  />
 
-  <section class="home-intro" aria-labelledby="home-intro-title">
-    <div class="home-intro__grid">
-      <div class="home-intro__lead">
-        <p class="home-eyebrow">Cozy secular support</p>
-        <h2 id="home-intro-title" class="home-intro__title">Small rituals for when life feels loud</h2>
-        <p class="home-intro__text">
-          WitchClick gathers gentle banishments, practical tarot spreads, and printable planning magic so you have a soft place to land when energy is low.
-          Every ritual is trauma-informed, choice-centered, and kind to neurodivergent brains.
-        </p>
+  <header class="blog-header">
+    <div class="blog-header__content">
+      <h1 class="blog-header__title">WitchClick</h1>
+      <p class="blog-header__tagline">
+        Gentle rituals, cozy tools, and reflections for when life feels loud.
+      </p>
+      <p class="blog-header__description">
+        Small practices for shadow work, rest, and everyday magic—designed with neurodivergent brains in mind.
+      </p>
+    </div>
+  </header>
+
+  {featuredPost && (
+    <article class="featured-post">
+      <a href={`/post/${featuredPost.slug}`} class="featured-post__link">
+        <div class="featured-post__content">
+          <span class="featured-post__label">Latest</span>
+          <h2 class="featured-post__title">{featuredPost.title}</h2>
+          <p class="featured-post__excerpt">{featuredPost.tldr || featuredPost.excerpt}</p>
+          <div class="featured-post__meta">
+            {featuredPost.tags.slice(0, 3).map((tag) => (
+              <span class="featured-post__tag">{tag}</span>
+            ))}
+            <span class="featured-post__read-time">{featuredPost.readingMinutes} min read</span>
+          </div>
+        </div>
+      </a>
+    </article>
+  )}
+
+  {recentPosts.length > 0 && (
+    <section class="posts-section" aria-labelledby="recent-posts-heading">
+      <div class="posts-section__header">
+        <h2 id="recent-posts-heading" class="posts-section__title">Recent Posts</h2>
+        <a href="/page/1" class="posts-section__view-all">View all →</a>
       </div>
-      <div class="home-intro__list">
-        <h3 class="home-intro__list-title">Inside the circle you&rsquo;ll find:</h3>
-        <ul class="home-intro__bullets">
-          <li>Step-by-step rituals for shadow work, release, and grounding.</li>
-          <li>Printable planners, checklists, and tarot prompts to make follow-through gentle.</li>
-          <li>Self-care and cozy game recommendations drawn from my own personal research.</li>
-        </ul>
+      <div class="posts-grid">
+        {recentPosts.map((post) => (
+          <PostCard
+            post={{
+              slug: post.slug,
+              title: post.title,
+              excerpt: post.excerpt,
+              tldr: post.tldr,
+              tags: post.tags,
+              readingMinutes: post.readingMinutes,
+              publishedAt: post.publishedAt,
+              spoonLevel: post.spoonLevel,
+              spoons: post.spoons,
+              heroImage: post.heroImage,
+              heroImageSrc: post.heroImageSrc,
+              heroImageAlt: post.heroImageAlt,
+              heroAlt: post.heroAlt,
+            }}
+          />
+        ))}
+      </div>
+    </section>
+  )}
+
+  <aside class="sidebar-cta">
+    <div class="sidebar-cta__content">
+      <h3 class="sidebar-cta__title">Looking for more?</h3>
+      <p class="sidebar-cta__text">
+        Explore printable tools, browse by topic, or reach out if you need something specific.
+      </p>
+      <div class="sidebar-cta__links">
+        <a href="/tools" class="sidebar-cta__link">Printable Tools</a>
+        <a href="/entities" class="sidebar-cta__link">Browse Topics</a>
+        <a href="/contact" class="sidebar-cta__link">Get in Touch</a>
       </div>
     </div>
-  </section>
-
-  <StartHerePanel />
-
-  {latestSection.posts.length > 0 && (
-    <section class="home-section" aria-labelledby={latestSection.id}>
-      <div class="home-section__header">
-        <div>
-          <p class="home-eyebrow">{latestSection.eyebrow}</p>
-          <h2 id={latestSection.id} class="home-section__title">{latestSection.heading}</h2>
-          <p class="home-section__description">{latestSection.description}</p>
-        </div>
-        {latestSection.link && (
-          <a class="home-section__link" href={latestSection.link.href}>{latestSection.link.label}</a>
-        )}
-      </div>
-      <div class="home-section__grid home-section__grid--cards">
-        {latestSection.posts.map((post) => (
-          <PostCard
-            post={{
-              slug: post.slug,
-              title: post.title,
-              excerpt: post.excerpt,
-              tldr: post.tldr,
-              tags: post.tags,
-              readingMinutes: post.readingMinutes,
-              publishedAt: post.publishedAt,
-              spoonLevel: post.spoonLevel,
-              spoons: post.spoons,
-              heroImage: post.heroImage,
-              heroImageSrc: post.heroImageSrc,
-              heroImageAlt: post.heroImageAlt,
-              heroAlt: post.heroAlt,
-            }}
-          />
-        ))}
-      </div>
-    </section>
-  )}
-
-  {releaseSection.posts.length > 0 && (
-    <section class={`home-section${releaseSection.tone ? " home-section--tone" : ""}`} aria-labelledby={releaseSection.id}>
-      <div class="home-section__header">
-        <div>
-          <p class="home-eyebrow">{releaseSection.eyebrow}</p>
-          <h2 id={releaseSection.id} class="home-section__title">{releaseSection.heading}</h2>
-          <p class="home-section__description">{releaseSection.description}</p>
-        </div>
-        {releaseSection.link && (
-          <a class="home-section__link" href={releaseSection.link.href}>{releaseSection.link.label}</a>
-        )}
-      </div>
-      <div class="home-section__grid home-section__grid--cards">
-        {releaseSection.posts.map((post) => (
-          <PostCard
-            post={{
-              slug: post.slug,
-              title: post.title,
-              excerpt: post.excerpt,
-              tldr: post.tldr,
-              tags: post.tags,
-              readingMinutes: post.readingMinutes,
-              publishedAt: post.publishedAt,
-              spoonLevel: post.spoonLevel,
-              spoons: post.spoons,
-              heroImage: post.heroImage,
-              heroImageSrc: post.heroImageSrc,
-              heroImageAlt: post.heroImageAlt,
-              heroAlt: post.heroAlt,
-            }}
-          />
-        ))}
-      </div>
-    </section>
-  )}
-
-  {planningSection.posts.length > 0 && (
-    <section class="home-section" aria-labelledby={planningSection.id}>
-      <div class="home-section__header">
-        <div>
-          <p class="home-eyebrow">{planningSection.eyebrow}</p>
-          <h2 id={planningSection.id} class="home-section__title">{planningSection.heading}</h2>
-          <p class="home-section__description">{planningSection.description}</p>
-        </div>
-        {planningSection.link && (
-          <a class="home-section__link" href={planningSection.link.href}>{planningSection.link.label}</a>
-        )}
-      </div>
-      <div class="home-section__grid home-section__grid--cards">
-        {planningSection.posts.map((post) => (
-          <PostCard
-            post={{
-              slug: post.slug,
-              title: post.title,
-              excerpt: post.excerpt,
-              tldr: post.tldr,
-              tags: post.tags,
-              readingMinutes: post.readingMinutes,
-              publishedAt: post.publishedAt,
-              spoonLevel: post.spoonLevel,
-              spoons: post.spoons,
-              heroImage: post.heroImage,
-              heroImageSrc: post.heroImageSrc,
-              heroImageAlt: post.heroImageAlt,
-              heroAlt: post.heroAlt,
-            }}
-          />
-        ))}
-      </div>
-    </section>
-  )}
-
-  {calmSection.posts.length > 0 && (
-    <section class={`home-section${calmSection.tone ? " home-section--tone" : ""}`} aria-labelledby={calmSection.id}>
-      <div class="home-section__header">
-        <div>
-          <p class="home-eyebrow">{calmSection.eyebrow}</p>
-          <h2 id={calmSection.id} class="home-section__title">{calmSection.heading}</h2>
-          <p class="home-section__description">{calmSection.description}</p>
-        </div>
-        {calmSection.link && (
-          <a class="home-section__link" href={calmSection.link.href}>{calmSection.link.label}</a>
-        )}
-      </div>
-      <div class="home-section__grid home-section__grid--cards">
-        {calmSection.posts.map((post) => (
-          <PostCard
-            post={{
-              slug: post.slug,
-              title: post.title,
-              excerpt: post.excerpt,
-              tldr: post.tldr,
-              tags: post.tags,
-              readingMinutes: post.readingMinutes,
-              publishedAt: post.publishedAt,
-              spoonLevel: post.spoonLevel,
-              spoons: post.spoons,
-              heroImage: post.heroImage,
-              heroImageSrc: post.heroImageSrc,
-              heroImageAlt: post.heroImageAlt,
-              heroAlt: post.heroAlt,
-            }}
-          />
-        ))}
-      </div>
-    </section>
-  )}
-
-  <section class="home-cta" aria-labelledby="home-tools">
-    <div class="home-cta__inner">
-      <div class="home-cta__copy">
-        <p class="home-eyebrow">Printable tools</p>
-        <h2 id="home-tools" class="home-section__title">Keep a ritual companion within reach</h2>
-        <p class="home-section__description home-cta__description">
-          Download checklists, spreads, and planners designed for kitchen witches and cozy occultists.
-          Print them, tuck them into your altar, and let them hold the structure so you can rest.
-        </p>
-      </div>
-      <div class="home-cta__actions">
-        <a class="hero-cta hero-cta--primary" href="/tools/">Browse the tool cabinet</a>
-        <a class="hero-cta hero-cta--secondary" href="/contact/">Request a custom ritual</a>
-      </div>
-    </div>
-  </section>
-
-  {evergreenCta && (
-    <div class="home-evergreen">
-      <EvergreenCta {...evergreenCta} />
-    </div>
-  )}
-
-  {testimonials.length > 0 && (
-    <section class="home-section home-testimonials" aria-labelledby="home-testimonials-heading">
-      <div class="home-section__header home-testimonials__header">
-        <div>
-          {testimonialSection?.eyebrow && <p class="home-eyebrow">{testimonialSection.eyebrow}</p>}
-          <h2 id="home-testimonials-heading" class="home-section__title">
-            {testimonialSection?.title ?? "Community notes"}
-          </h2>
-          {testimonialSection?.description && (
-            <p class="home-section__description home-testimonials__description">
-              {testimonialSection.description}
-            </p>
-          )}
-        </div>
-      </div>
-      <Testimonials testimonials={testimonials} />
-    </section>
-  )}
-
-  {hasEncore && (
-    <section class="home-section" aria-labelledby={encoreSection.id}>
-      <div class="home-section__header">
-        <div>
-          <p class="home-eyebrow">{encoreSection.eyebrow}</p>
-          <h2 id={encoreSection.id} class="home-section__title">{encoreSection.heading}</h2>
-          <p class="home-section__description">{encoreSection.description}</p>
-        </div>
-      </div>
-      <div class="home-section__grid home-section__grid--cards">
-        {encoreSection.posts.map((post) => (
-          <PostCard
-            post={{
-              slug: post.slug,
-              title: post.title,
-              excerpt: post.excerpt,
-              tldr: post.tldr,
-              tags: post.tags,
-              readingMinutes: post.readingMinutes,
-              publishedAt: post.publishedAt,
-              spoons: post.spoons,
-              heroImage: post.heroImage,
-              heroImageSrc: post.heroImageSrc,
-              heroImageAlt: post.heroImageAlt,
-              heroAlt: post.heroAlt,
-            }}
-          />
-        ))}
-      </div>
-    </section>
-  )}
+  </aside>
 </Base>
 
 <style>
-  .home-eyebrow {
-    margin: 0;
-    font-size: 0.7rem;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
+  /* Blog Header */
+  .blog-header {
+    padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(2rem, 5vw, 3rem);
+    text-align: center;
+  }
+
+  .blog-header__content {
+    max-width: 42rem;
+    margin: 0 auto;
+  }
+
+  .blog-header__title {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-heading, var(--font-body));
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--text-strong);
+  }
+
+  .blog-header__tagline {
+    margin: 0 0 1rem;
+    font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+    line-height: 1.5;
     color: var(--text-accent);
   }
 
-  .home-intro {
-    margin-block: clamp(3rem, 7vw, 5rem);
-    border-radius: clamp(1.9rem, 4vw, 2.8rem);
-    border: 1px solid color-mix(in srgb, var(--border-purple-medium, rgba(124, 78, 176, 0.32)) 85%, transparent 15%);
-    padding: clamp(2.2rem, 5vw, 3.1rem);
+  .blog-header__description {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--text-body);
+    opacity: 0.9;
+  }
+
+  /* Featured Post */
+  .featured-post {
+    margin: clamp(2rem, 5vw, 3rem) 0;
+  }
+
+  .featured-post__link {
+    display: block;
+    padding: clamp(2rem, 5vw, 3rem);
+    border-radius: clamp(1.2rem, 3vw, 2rem);
+    border: 1px solid color-mix(in srgb, var(--border-purple-medium, rgba(124, 78, 176, 0.3)) 90%, transparent 10%);
     background:
-      var(--gradient-purple-radial),
-      linear-gradient(140deg, color-mix(in srgb, var(--surface-panel-primary) 82%, transparent 18%) 0%, transparent 62%),
+      linear-gradient(135deg, color-mix(in srgb, var(--surface-panel-primary) 85%, transparent 15%) 0%, transparent 60%),
       var(--surface-panel-primary);
     box-shadow: var(--elevation-tier-2);
-    color: var(--text-body);
-  }
-
-  .home-intro__grid {
-    display: grid;
-    gap: clamp(1.6rem, 4vw, 2.8rem);
-    align-items: start;
-  }
-
-  .home-intro__title {
-    margin: 0;
-    font-family: var(--font-heading, var(--font-body));
-    font-size: clamp(2.05rem, 5vw, 2.7rem);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-strong);
-  }
-
-  .home-intro__text {
-    margin: 0.95rem 0 0;
-    font-size: 1.05rem;
-    line-height: 1.8;
-    max-width: 64ch;
-    color: color-mix(in srgb, var(--text-body) 96%, transparent 4%);
-  }
-
-  .home-intro__list {
-    display: grid;
-    gap: 0.95rem;
-  }
-
-  .home-intro__list-title {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-strong);
-  }
-
-  .home-intro__bullets {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: grid;
-    gap: 0.85rem;
-  }
-
-  .home-intro__bullets li {
-    position: relative;
-    padding-left: 1.8rem;
-    line-height: 1.7;
-    color: color-mix(in srgb, var(--text-body) 94%, transparent 6%);
-  }
-
-  .home-intro__bullets li::before {
-    content: "✶";
-    position: absolute;
-    left: 0;
-    top: 0.1rem;
-    color: color-mix(in srgb, var(--text-accent) 80%, transparent 20%);
-    font-size: 1rem;
-  }
-
-  .home-section {
-    margin-block: clamp(3.2rem, 6vw, 4.8rem);
-  }
-
-  .home-section__header {
-    display: grid;
-    gap: clamp(0.85rem, 3vw, 1.25rem);
-    margin-bottom: clamp(1.9rem, 4vw, 2.6rem);
-    padding: clamp(1.6rem, 4vw, 2.4rem);
-    border-radius: clamp(1.6rem, 3.8vw, 2.5rem);
-    border: 1px solid color-mix(in srgb, var(--card-panel-border, rgba(124, 78, 176, 0.28)) 85%, transparent 15%);
-    background:
-      linear-gradient(135deg, color-mix(in srgb, var(--card-panel-surface) 80%, transparent 20%) 0%, transparent 65%),
-      var(--card-panel-surface);
-    box-shadow: var(--elevation-tier-1);
-  }
-
-  .home-section__header > div {
-    display: grid;
-    gap: 0.65rem;
-  }
-
-  .home-section__title {
-    margin: 0;
-    font-family: var(--font-heading, var(--font-body));
-    font-size: clamp(1.9rem, 4vw, 2.45rem);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--text-strong);
-  }
-
-  .home-section__description {
-    margin: 0;
-    max-width: 66ch;
-    font-size: 1rem;
-    line-height: 1.75;
-    color: color-mix(in srgb, var(--text-body) 94%, transparent 6%);
-  }
-
-  .home-section__link {
-    justify-self: flex-start;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
     text-decoration: none;
-    padding: 0.55rem 1.2rem;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--border-accent-medium, rgba(212, 175, 55, 0.35)) 82%, transparent 18%);
-    background: color-mix(in srgb, var(--surface-card) 85%, transparent 15%);
-    color: color-mix(in srgb, var(--text-strong) 90%, white 10%);
-    transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, color 180ms ease;
+    transition: transform 200ms ease, box-shadow 200ms ease;
   }
 
-  .home-section__link:hover,
-  .home-section__link:focus-visible {
+  .featured-post__link:hover,
+  .featured-post__link:focus-visible {
     transform: translateY(-2px);
-    background: color-mix(in srgb, var(--surface-card-hover, var(--surface-card)) 90%, transparent 10%);
-    border-color: color-mix(in srgb, var(--border-accent-hover, rgba(212, 175, 55, 0.58)) 85%, transparent 15%);
+    box-shadow: var(--elevation-tier-3);
+  }
+
+  .featured-post__content {
+    max-width: 48rem;
+  }
+
+  .featured-post__label {
+    display: inline-block;
+    margin-bottom: 0.75rem;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-accent);
+    background: color-mix(in srgb, var(--accent-purple-soft) 20%, transparent 80%);
+    border-radius: 999px;
+  }
+
+  .featured-post__title {
+    margin: 0 0 0.85rem;
+    font-family: var(--font-heading, var(--font-body));
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    line-height: 1.3;
     color: var(--text-strong);
   }
 
-  .home-section__grid {
+  .featured-post__excerpt {
+    margin: 0 0 1.25rem;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--text-body);
+    opacity: 0.95;
+  }
+
+  .featured-post__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .featured-post__tag {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent-purple-soft) 15%, transparent 85%);
+    color: var(--text-accent);
+  }
+
+  .featured-post__read-time {
+    font-size: 0.85rem;
+    color: var(--text-body);
+    opacity: 0.7;
+  }
+
+  /* Posts Section */
+  .posts-section {
+    margin: clamp(3rem, 6vw, 5rem) 0;
+  }
+
+  .posts-section__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .posts-section__title {
+    margin: 0;
+    font-family: var(--font-heading, var(--font-body));
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .posts-section__view-all {
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--text-accent);
+    transition: color 150ms ease;
+  }
+
+  .posts-section__view-all:hover,
+  .posts-section__view-all:focus-visible {
+    color: var(--text-strong);
+    text-decoration: underline;
+  }
+
+  .posts-grid {
     display: grid;
     gap: clamp(1.5rem, 3vw, 2.25rem);
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
   }
 
-  .home-section__grid--cards {
-    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
-    align-items: stretch;
+  /* Sidebar CTA */
+  .sidebar-cta {
+    margin: clamp(3rem, 6vw, 5rem) 0;
+    padding: clamp(2rem, 5vw, 2.5rem);
+    border-radius: clamp(1.2rem, 3vw, 1.75rem);
+    border: 1px solid color-mix(in srgb, var(--border-accent-medium, rgba(212, 175, 55, 0.3)) 85%, transparent 15%);
+    background: color-mix(in srgb, var(--surface-card) 95%, transparent 5%);
+    box-shadow: var(--elevation-tier-1);
   }
 
-  .home-section--tone {
-    position: relative;
-  }
-
-  .home-section--tone::before {
-    content: "";
-    position: absolute;
-    inset: -14% 6% auto;
-    height: 58%;
-    border-radius: 999px;
-    background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--accent-purple-soft) 55%, transparent 45%), transparent 75%);
-    opacity: 0.85;
-    filter: blur(32px);
-    pointer-events: none;
-  }
-
-  .home-section--tone .home-section__header {
-    background:
-      linear-gradient(140deg, color-mix(in srgb, var(--card-panel-surface) 82%, transparent 18%) 0%, transparent 60%),
-      color-mix(in srgb, var(--card-panel-surface) 95%, transparent 5%);
-    border-color: color-mix(in srgb, var(--card-panel-border, rgba(124, 78, 176, 0.28)) 75%, transparent 25%);
-  }
-
-  .home-evergreen {
-    margin-block: clamp(2.8rem, 6vw, 4rem);
-  }
-
-  .home-testimonials {
-    display: grid;
-    gap: clamp(1.6rem, 5vw, 2.8rem);
-  }
-
-  .home-testimonials__header {
-    display: grid;
-    gap: 0.7rem;
-    justify-content: center;
+  .sidebar-cta__content {
+    max-width: 32rem;
+    margin: 0 auto;
     text-align: center;
-    align-items: center;
   }
 
-  .home-testimonials__description {
-    max-width: 42rem;
-    margin-inline: auto;
-    color: color-mix(in srgb, var(--text-body) 95%, transparent 5%);
+  .sidebar-cta__title {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-heading, var(--font-body));
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+    font-weight: 600;
+    color: var(--text-strong);
   }
 
-  .home-testimonials :global(.testimonials) {
-    margin-top: clamp(1.6rem, 4vw, 2.6rem);
+  .sidebar-cta__text {
+    margin: 0 0 1.5rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-body);
+    opacity: 0.9;
   }
 
-  .home-cta {
-    margin-block: clamp(3.4rem, 7vw, 5.4rem);
-  }
-
-  .home-cta__inner {
-    display: grid;
-    gap: clamp(1.5rem, 4vw, 2.6rem);
-    padding: clamp(2rem, 5vw, 3rem);
-    border-radius: clamp(1.9rem, 4vw, 2.8rem);
-    border: 1px solid color-mix(in srgb, var(--card-panel-border-strong, rgba(212, 175, 55, 0.45)) 82%, transparent 18%);
-    background:
-      linear-gradient(140deg, color-mix(in srgb, var(--card-panel-surface-strong) 80%, transparent 20%) 0%, transparent 65%),
-      var(--card-panel-surface-strong);
-    box-shadow: var(--elevation-tier-2);
-  }
-
-  .home-cta__copy {
-    display: grid;
-    gap: 0.75rem;
-  }
-
-  .home-cta__description {
-    color: color-mix(in srgb, var(--text-body) 95%, transparent 5%);
-  }
-
-  .home-cta__actions {
+  .sidebar-cta__links {
     display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-  }
-
-  .home-cta__actions .hero-cta {
-    width: 100%;
+    flex-wrap: wrap;
+    gap: 0.75rem;
     justify-content: center;
   }
 
+  .sidebar-cta__link {
+    display: inline-block;
+    padding: 0.65rem 1.35rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--text-strong);
+    background: color-mix(in srgb, var(--surface-card-hover) 90%, transparent 10%);
+    border: 1px solid color-mix(in srgb, var(--border-accent-medium) 70%, transparent 30%);
+    border-radius: 999px;
+    transition: all 150ms ease;
+  }
+
+  .sidebar-cta__link:hover,
+  .sidebar-cta__link:focus-visible {
+    background: var(--surface-card-hover);
+    border-color: var(--border-accent-hover);
+    transform: translateY(-1px);
+  }
+
+  /* Responsive adjustments */
   @media (min-width: 720px) {
-    .home-intro__grid {
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-    }
-
-    .home-section__header {
-      grid-template-columns: minmax(0, 2fr) auto;
-      align-items: end;
-    }
-
-    .home-section__link {
-      justify-self: flex-end;
-      align-self: center;
-    }
-
-    .home-cta__inner {
-      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
-      align-items: center;
-    }
-
-    .home-cta__actions {
-      align-items: flex-end;
-    }
-
-    .home-cta__actions .hero-cta {
-      width: auto;
-      min-width: 14rem;
+    .posts-grid {
+      grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
     }
   }
 
-  @media (min-width: 1120px) {
-    .home-section__grid--cards {
-      grid-template-columns: repeat(3, minmax(19rem, 1fr));
+  @media (min-width: 1024px) {
+    .posts-grid {
+      grid-template-columns: repeat(3, 1fr);
     }
   }
 
-  :root[data-comfort-theme="dawn"] .home-intro {
+  /* Dawn theme adjustments */
+  :root[data-comfort-theme="dawn"] .featured-post__link {
     background:
-      var(--gradient-purple-radial),
-      linear-gradient(135deg, color-mix(in srgb, var(--surface-panel-primary) 96%, white 4%) 0%, transparent 60%),
-      color-mix(in srgb, var(--surface-panel-primary) 98%, white 2%);
-    box-shadow: var(--elevation-tier-1);
+      linear-gradient(135deg, color-mix(in srgb, var(--surface-panel-primary) 95%, white 5%) 0%, transparent 60%),
+      var(--surface-panel-primary);
   }
 
-  :root[data-comfort-theme="dawn"] .home-intro__title,
-  :root[data-comfort-theme="dawn"] .home-intro__list-title {
-    color: color-mix(in srgb, var(--text-strong) 96%, black 4%);
-  }
-
-  :root[data-comfort-theme="dawn"] .home-intro__text,
-  :root[data-comfort-theme="dawn"] .home-intro__bullets li {
-    color: color-mix(in srgb, var(--text-body) 96%, transparent 4%);
-  }
-
-  :root[data-comfort-theme="dawn"] .home-eyebrow {
-    color: color-mix(in srgb, var(--text-accent) 92%, transparent 8%);
-  }
-
-  :root[data-comfort-theme="dawn"] .home-section__header {
-    background:
-      linear-gradient(135deg, color-mix(in srgb, var(--card-panel-surface) 88%, transparent 12%) 0%, transparent 60%),
-      var(--card-panel-surface);
-    box-shadow: var(--elevation-tier-1);
-  }
-
-  :root[data-comfort-theme="dawn"] .home-section__description {
-    color: color-mix(in srgb, var(--text-body) 94%, transparent 6%);
-  }
-
-  :root[data-comfort-theme="dawn"] .home-section__link {
-    border-color: color-mix(in srgb, var(--border-accent-medium) 82%, transparent 18%);
-    background: color-mix(in srgb, var(--surface-card) 95%, white 5%);
-    color: color-mix(in srgb, var(--text-strong) 92%, black 8%);
-  }
-
-  :root[data-comfort-theme="dawn"] .home-section__link:hover,
-  :root[data-comfort-theme="dawn"] .home-section__link:focus-visible {
-    background: color-mix(in srgb, var(--surface-card-hover, var(--surface-card)) 96%, white 4%);
-  }
-
-  :root[data-comfort-theme="dawn"] .home-cta__inner {
-    background:
-      linear-gradient(130deg, color-mix(in srgb, var(--card-panel-surface-strong) 92%, white 8%) 0%, transparent 65%),
-      var(--card-panel-surface-strong);
+  :root[data-comfort-theme="dawn"] .sidebar-cta {
+    background: color-mix(in srgb, var(--surface-card) 98%, white 2%);
   }
 </style>

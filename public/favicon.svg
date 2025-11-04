@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <style>
+      @media (prefers-color-scheme: dark) {
+        .icon { fill: #e5d5c5; }
+      }
+      @media (prefers-color-scheme: light) {
+        .icon { fill: #2d1810; }
+      }
+    </style>
+  </defs>
+  <!-- Crescent moon -->
+  <path class="icon" d="M18 4c-5.5 0-10 4.5-10 10s4.5 10 10 10c1.4 0 2.7-.3 3.9-.8-2.4-1.4-4-4-4-7 0-3 1.6-5.6 4-7C20.7 4.3 19.4 4 18 4z"/>
+  <!-- Star -->
+  <path class="icon" d="M25 8l-1.5 3-3 .5 2.2 2-0.5 3 2.8-1.5 2.8 1.5-0.5-3 2.2-2-3-0.5z" transform="scale(0.7) translate(8, -2)"/>
+</svg>

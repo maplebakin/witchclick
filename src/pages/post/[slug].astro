@@ -10,7 +10,6 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import PostRail from "../../components/PostRail.astro";
 import ReadingProgress from "../../components/ReadingProgress.astro";
 import TldrCallout from "../../components/TldrCallout.astro";
-import WitchClickBlurb from "../../components/WitchClickBlurb.astro";
 import BackToTop from "../../components/BackToTop.astro";
 import { readEntity } from "../../utils/entities";
 import HeadSlot from "@/components/HeadSlot.astro";
@@ -495,8 +494,6 @@ const jsonLd = {
             {Array.isArray(data.downloadId) ? null : data.downloadId ? (
               <DownloadCard id={String(data.downloadId)} />
             ) : null}
-
-            <WitchClickBlurb class="mt-2" />
           </div>
       </article>
 
@@ -509,9 +506,7 @@ const jsonLd = {
       />
     </div>
 
-      <div class="card-panel card-panel-strong card-panel-static flex flex-col gap-6 p-6 text-inverse sm:p-8 lg:p-10">
-        <CommentsSection slug={effectiveSlug} title={title} />
-      </div>
+      <CommentsSection slug={effectiveSlug} title={title} />
 
       {productRecommendations.length > 0 && (
         <div class="card-panel card-panel-strong card-panel-static p-6 text-inverse sm:p-8 lg:p-10">

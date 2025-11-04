@@ -48,10 +48,7 @@ const breadcrumbs = [
 
 <Base title="The Grimoire — WitchClick" desktopWide={true}>
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
-  <section
-    class="entity-hub wc-section-shell"
-    style="--section-border: rgba(124, 58, 237, 0.22); --section-glow: rgba(124, 58, 237, 0.18); --section-highlight: rgba(212, 175, 55, 0.12); --section-veil: rgba(255, 255, 255, 0.3); --section-heading: #3b1b70; --section-text: color-mix(in srgb, #2a1a3f 92%, black 8%);"
-  >
+  
     <header class="entity-hub__header">
       <h1 class="entity-hub__title">The Grimoire</h1>
       <p class="entity-hub__intro">
@@ -59,7 +56,7 @@ const breadcrumbs = [
       </p>
     </header>
 
-    <div class="entity-grid">
+    <div class="entity-hub-grid">
       {themedSections.map((section) => (
         <a
           href={section.href}
@@ -116,20 +113,20 @@ const breadcrumbs = [
     color: rgba(244, 241, 255, 0.88);
   }
 
-  .entity-grid {
+  .entity-hub-grid {
     display: grid;
     gap: clamp(1.5rem, 3vw, 2.5rem);
     margin-top: clamp(1.5rem, 4vw, 2.5rem);
   }
 
   @media (min-width: 640px) {
-    .entity-grid {
+    .entity-hub-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   @media (min-width: 1024px) {
-    .entity-grid {
+    .entity-hub-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
@@ -138,14 +135,20 @@ const breadcrumbs = [
     --card-hover-translate: -0.4rem;
     display: grid;
     gap: clamp(1.5rem, 3vw, 2.25rem);
-    padding: clamp(1.85rem, 4vw, 2.5rem);
+
+    /* tighter on the left, a bit more air on the right */
+    padding-top: clamp(1.85rem, 4vw, 2.5rem);
+    padding-bottom: clamp(1.85rem, 4vw, 2.5rem);
+    padding-right: clamp(1.6rem, 3.5vw, 2.5rem);
+    padding-left: clamp(0.25rem, 1vw, 0.75rem);
+
     border: 1px solid rgba(124, 58, 237, 0.35);
     background: #0f0820;
     color: #f4f1ff;
     box-shadow: 0 20px 52px -30px rgba(0, 0, 0, 0.6);
     min-height: 100%;
-    transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
     border-radius: clamp(1.5rem, 4vw, 2rem);
+    transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
   }
 
   .entity-hub-card:hover,
@@ -160,24 +163,28 @@ const breadcrumbs = [
     outline-offset: 2px;
   }
 
+  /* === CARD LAYOUT ===================================================== */
+
   .entity-card {
     display: grid;
-    gap: clamp(1.25rem, 3vw, 2rem);
-    align-items: start;
+    gap: clamp(1rem, 2.5vw, 1.75rem);
+    align-items: flex-start;
   }
 
-  @media (min-width: 1024px) {
+  /* On larger screens, put ribbon + body side-by-side,
+     but keep everything left-aligned and simple. */
+  @media (min-width: 900px) {
     .entity-card {
       grid-template-columns: minmax(0, 0.4fr) minmax(0, 1fr);
-      gap: clamp(1.5rem, 3vw, 2.25rem);
-      align-items: stretch;
+      gap: 0.5rem;
     }
   }
 
   .entity-card-ribbon {
     display: flex;
-    align-items: center;
-    gap: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
     color: rgba(212, 175, 55, 0.85);
   }
 
@@ -189,20 +196,12 @@ const breadcrumbs = [
 
   .entity-card-label {
     font-size: 0.75rem;
-    letter-spacing: 0.32em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-  }
-
-  @media (min-width: 1024px) {
-    .entity-card-ribbon {
-      flex-direction: column;
-      justify-content: space-between;
-      border-right: 1px solid color-mix(in srgb, var(--ambient-color, var(--color-primary)) 28%, transparent);
-      padding-right: rem;
-      margin-right: clamp(1rem, 2vw, 1.5rem);
-    }
-
-    
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    display: inline-block;
   }
 
   .entity-card-body h2 {

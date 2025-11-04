@@ -32,8 +32,14 @@ const posts = defineCollection({
     affiliateAnchors: z
       .array(z.object({ key: z.string(), text: z.string() }))
       .default([]),
+    // Accept both legacy format (text, href) and new format (slug, anchor)
     internalLinks: z
-      .array(z.object({ slug: z.string(), anchor: z.string() }))
+      .array(
+        z.union([
+          z.object({ slug: z.string(), anchor: z.string() }), // New format
+          z.object({ text: z.string(), href: z.string() }),    // Legacy format
+        ])
+      )
       .default([]),
 
     // CTA toggles
