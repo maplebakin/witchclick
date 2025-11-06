@@ -647,9 +647,9 @@ const observabilityConfig = shouldLoadObservability
             "--surface-elevated": "surfaceElevated","--surface-hover": "surfaceHover",
             "--text-strong": "textStrong","--text-body": "textBody","--text-muted": "textMuted",
             "--border-subtle": "borderSubtle","--border-strong": "borderStrong",
-            "--layout-shell-background": "pageBackground",
-            "--header-background": "headerBackground","--header-border": "headerBorder",
-            "--footer-background": "footerBackground","--footer-border": "footerBorder"
+            "--page-bg-base": "pageBackground",
+            "--header-bg-base": "headerBackground","--header-border-base": "headerBorder",
+            "--footer-bg-base": "footerBackground","--footer-border-base": "footerBorder"
           };
           const tokens = t.tokens || {};
           Object.entries(map).forEach(([cssVar, key]) => {
