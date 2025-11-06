@@ -6,6 +6,9 @@ export interface GeneratorPreset {
   strictOutputContract: string[];
 }
 
+export declare const BASE_FIELDS: string[];
+export declare const STRUCTURE_REQUIREMENTS: Record<string, string[]>;
+
 export declare const generatorPresetOptions: Array<{
   key: string;
   label: string;

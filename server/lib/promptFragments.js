@@ -1,6 +1,8 @@
 // server/lib/promptFragments.js
 // Shared prompt fragments for buildMasterPrompt.
 
+import { BASE_FIELDS, STRUCTURE_REQUIREMENTS, generatorPresetOptions } from './generatorPresets.js';
+
 function formatScore(score) {
   if (typeof score !== 'number' || Number.isNaN(score)) return null;
   const fixed = score.toFixed(2);
@@ -93,19 +95,37 @@ export const NON_NEGOTIABLES_FRAGMENT = [
   '',
 ];
 
-export const STRUCTURE_FRAGMENT = [
-  'STRUCTURE (must-follow)',
-  '1) Opening Reflection (first section): 1–2 short paragraphs setting a relatable, human scene and inviting consent to engage.',
-  '2) Main Ritual/Spread: provide TWO variants with crystal-clear headings and matching outlines:',
-  '   - Quick/Low-Energy Variant: 3–5 numbered steps, 10–12 sentences total, acknowledges low-spoon readers.',
-  '   - Deep Variant: 4–7 numbered steps, allows layering optional add-ons, and names mindful pauses.',
-  '   - Headings MUST explicitly include "Quick" (or "Low-Energy") and "Deep" respectively.',
-  '3) Reflection Prompt: finish the experience with a heading containing "Reflection Prompt" that asks one expansive journaling question.',
-  '4) Checklist / Summary Box: one scannable list under a heading containing "Checklist" (or "Summary") summarizing supplies/steps/outcomes.',
-  '5) Safety Note (conditional): only include if the ritual references heat, blades, sensitive health topics, or anything that could be misread as medical/therapeutic. Heading MUST contain "Gentle Safety Note" or "Safety Note".',
-  '6) Outline ↔ Sections lockstep: every outline item must map 1:1 with a section sharing the exact heading text and order. Do not invent extra sections.',
+export const BASE_VALIDATION_FRAGMENT = [
+  'BASE VALIDATION (applies to every PostSpec):',
+  ...BASE_FIELDS,
+  '- heroImagePrompt may be null; altTexts only required when images appear in markdown.',
   '',
 ];
+
+function buildTypeStructureFragment() {
+  const sections = [];
+  sections.push('TYPE-SPECIFIC STRUCTURE CONTRACTS (apply the block that matches your chosen contentType):');
+  for (const { key, label } of generatorPresetOptions) {
+    const requirements = STRUCTURE_REQUIREMENTS[key] || [];
+    sections.push('');
+    sections.push(`${label.toUpperCase()} — set contentType: "${key}"`);
+    if (!requirements.length) {
+      sections.push('  • No additional structure requirements beyond the base validation.');
+      continue;
+    }
+    for (const line of requirements) {
+      if (!line) {
+        sections.push('');
+        continue;
+      }
+      sections.push(`  ${line}`);
+    }
+  }
+  sections.push('');
+  return sections;
+}
+
+export const TYPE_STRUCTURE_FRAGMENT = buildTypeStructureFragment();
 
 export const RETURN_FORMAT_FRAGMENT = [
   'RETURN FORMAT',
@@ -170,18 +190,18 @@ export function buildProcessFragment(words) {
     '   • Draft a slug in kebab-case reflecting the primary intent; avoid collisions with existingPostTitles and existingPostSlugs.',
     '2) Title, contentType & meta',
     '   • Title 50–60 chars with primary keyword.',
-    '   • Set contentType to match the content structure you will generate. Default to "ritual" unless the topic clearly calls for a different type (reflection, story, tarotSpread, spellwork, crystals).',
+    '   • Set contentType to match the content structure you will generate. Choose from ritual, guide, reflection, story, tarotSpread, spellwork, or crystals.',
     '   • Meta 150–160 chars; cozy, non-clickbait.',
     '3) Tags & excerpt',
     '   • 4–7 tags. Excerpt 1–2 sentences that entice the click without hype.',
     '4) Outline',
-    '   • H2/H3 flow MUST follow: Opening Reflection (id: opening-reflection) → Quick/Low-Energy Variant → Deep Variant → Reflection Prompt → Checklist/Summary → (optional) Gentle Safety Note when required.',
     '   • The FIRST outline item must be exactly {"heading":"Opening Reflection","id":"opening-reflection"}.',
     '   • Outline headings must match section headings character-for-character.',
-    '   • Include exactly one short checklist section with a heading containing "Checklist" or "Summary".',
+    '   • After the Opening Reflection, follow the TYPE-SPECIFIC STRUCTURE CONTRACT for your chosen contentType (see above).',
     '5) Sections',
-    `   • Write ~${words} words total. Distribute words intentionally: Opening Reflection ≈10–12%, Quick/Low-Energy variant ≈18–22%, Deep variant ≈28–32%, Reflection Prompt ≈6–8%, Checklist ≈8–10%, remaining sections share the rest. Allow ±2% tolerance per bucket while keeping total words within ±5% of wordCount.`,
-    '   • Keep paragraphs short, use numbered steps for both variants, and include a single gentle disclaimer when safety note criteria trigger.',
+    `   • Write ~${words} words total (±5%).`,
+    '   • Keep paragraphs short, enforce numbered steps or narrative flow as required by the type-specific contract (e.g., numbered Quick/Deep steps for rituals, journaling prompts for reflections).',
+    '   • Include a gentle safety note whenever the TYPE-SPECIFIC contract or safety triggers apply.',
     '   • The FIRST section object must have "heading":"Opening Reflection" and match the outline entry exactly.',
     '5b) Entities extraction',
     '   • Identify crystals, herbs, tarot cards, moon phases, planetary days, and rituals named in the markdown; add them once with correct type/slug.',
@@ -220,7 +240,8 @@ export default {
   VOICE_EXAMPLES_FRAGMENT,
   SECULAR_TAROT_FRAGMENT,
   NON_NEGOTIABLES_FRAGMENT,
-  STRUCTURE_FRAGMENT,
+  BASE_VALIDATION_FRAGMENT,
+  TYPE_STRUCTURE_FRAGMENT,
   RETURN_FORMAT_FRAGMENT,
   SCHEMA_HEADING_FRAGMENT,
   buildInputsFragment,
