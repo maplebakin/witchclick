@@ -610,46 +610,19 @@ function seedHexInputs() {
     if (alphaEl) alphaEl.value = parseAlpha(computedVal);
   });
 
-  // Site chrome colors need special handling due to color-mix dependencies
-  // Try to read from base tokens or use reasonable defaults
-  const getBaseColor = (v, fallback) => {
-    const val = getVar(v);
-    // If it looks invalid (starts with rgb and has green), use fallback
-    if (val.includes("rgb") && val.includes("169")) return fallback; // Green detection
-    return val || fallback;
+  const loadBase = (cssVar, fallback, pickerEl, hexEl, alphaEl) => {
+    const raw = getVar(cssVar) || fallback;
+    const hex = anyColorToHex(raw);
+    if (pickerEl) pickerEl.value = hex;
+    if (hexEl) { hexEl.value = hex; setHexVisual(hexEl, hex); }
+    if (alphaEl) alphaEl.value = parseAlpha(raw || fallback);
   };
 
-  const pageBgVal = getBaseColor("--background", "#07020f");
-  const pageBgHex = anyColorToHex(pageBgVal);
-  nodes.pageBgPicker.value = pageBgHex;
-  nodes.pageBgHex.value = pageBgHex;
-  setHexVisual(nodes.pageBgHex, pageBgHex);
-  nodes.pageBgAlpha.value = 100;
-
-  const headerBgHex = anyColorToHex(getBaseColor("--color-night", "#1a0f1f"));
-  nodes.headerBgPicker.value = headerBgHex;
-  nodes.headerBgHex.value = headerBgHex;
-  setHexVisual(nodes.headerBgHex, headerBgHex);
-  nodes.headerBgAlpha.value = 58;
-
-  const headerBorderHex = anyColorToHex(getBaseColor("--color-border", "#3d2a52"));
-  nodes.headerBorderPicker.value = headerBorderHex;
-  nodes.headerBorderHex.value = headerBorderHex;
-  setHexVisual(nodes.headerBorderHex, headerBorderHex);
-  nodes.headerBorderAlpha.value = 42;
-
-  const footerBgHex = anyColorToHex(pageBgVal);
-  nodes.footerBgPicker.value = footerBgHex;
-  nodes.footerBgHex.value = footerBgHex;
-  setHexVisual(nodes.footerBgHex, footerBgHex);
-  nodes.footerBgAlpha.value = 85;
-
-  const footerBorderVal = getBaseColor("--border-accent-subtle", "#7a5e9a");
-  const footerBorderHex = anyColorToHex(footerBorderVal);
-  nodes.footerBorderPicker.value = footerBorderHex;
-  nodes.footerBorderHex.value = footerBorderHex;
-  setHexVisual(nodes.footerBorderHex, footerBorderHex);
-  nodes.footerBorderAlpha.value = 30;
+  loadBase("--page-bg-base", "263 76% 3% / 1", nodes.pageBgPicker, nodes.pageBgHex, nodes.pageBgAlpha);
+  loadBase("--header-bg-base", "281 35% 9% / 1", nodes.headerBgPicker, nodes.headerBgHex, nodes.headerBgAlpha);
+  loadBase("--header-border-base", "268 32% 24% / 1", nodes.headerBorderPicker, nodes.headerBorderHex, nodes.headerBorderAlpha);
+  loadBase("--footer-bg-base", "263 76% 3% / 0.85", nodes.footerBgPicker, nodes.footerBgHex, nodes.footerBgAlpha);
+  loadBase("--footer-border-base", "268 24% 49% / 0.3", nodes.footerBorderPicker, nodes.footerBorderHex, nodes.footerBorderAlpha);
 
   paintAccentSwatches();
   updateDerivedAccentVars();
@@ -721,11 +694,11 @@ function applyThemeTokens(t) {
     "--text-muted": "textMuted",
     "--border-subtle": "borderSubtle",
     "--border-strong": "borderStrong",
-    "--layout-shell-background": "pageBackground",
-    "--header-background": "headerBackground",
-    "--header-border": "headerBorder",
-    "--footer-background": "footerBackground",
-    "--footer-border": "footerBorder"
+    "--page-bg-base": "pageBackground",
+    "--header-bg-base": "headerBackground",
+    "--header-border-base": "headerBorder",
+    "--footer-bg-base": "footerBackground",
+    "--footer-border-base": "footerBorder"
   };
   Object.entries(map).forEach(([cssVar, key]) => {
     const val = k[key];
@@ -793,11 +766,11 @@ function collectCurrentTokens() {
     textMuted: grab("--text-muted"),
     borderSubtle: grab("--border-subtle"),
     borderStrong: grab("--border-strong"),
-    pageBackground: grab("--layout-shell-background"),
-    headerBackground: grab("--header-background"),
-    headerBorder: grab("--header-border"),
-    footerBackground: grab("--footer-background"),
-    footerBorder: grab("--footer-border"),
+    pageBackground: grab("--page-bg-base"),
+    headerBackground: grab("--header-bg-base"),
+    headerBorder: grab("--header-border-base"),
+    footerBackground: grab("--footer-bg-base"),
+    footerBorder: grab("--footer-border-base"),
     success: grabPlain("--success"),
     warning: grabPlain("--warning"),
     error: grabPlain("--error"),
@@ -919,16 +892,16 @@ nodes.borderSubtleAlpha.addEventListener("input", () => applyCore(nodes.borderSu
 bindHexPair(nodes.borderStrongPicker, nodes.borderStrongHex, () => applyCore(nodes.borderStrongHex, nodes.borderStrongAlpha, "--border-strong"));
 nodes.borderStrongAlpha.addEventListener("input", () => applyCore(nodes.borderStrongHex, nodes.borderStrongAlpha, "--border-strong"));
 // site chrome (page/header/footer)
-bindHexPair(nodes.pageBgPicker, nodes.pageBgHex, () => applyCore(nodes.pageBgHex, nodes.pageBgAlpha, "--layout-shell-background"));
-nodes.pageBgAlpha.addEventListener("input", () => applyCore(nodes.pageBgHex, nodes.pageBgAlpha, "--layout-shell-background"));
-bindHexPair(nodes.headerBgPicker, nodes.headerBgHex, () => applyCore(nodes.headerBgHex, nodes.headerBgAlpha, "--header-background"));
-nodes.headerBgAlpha.addEventListener("input", () => applyCore(nodes.headerBgHex, nodes.headerBgAlpha, "--header-background"));
-bindHexPair(nodes.headerBorderPicker, nodes.headerBorderHex, () => applyCore(nodes.headerBorderHex, nodes.headerBorderAlpha, "--header-border"));
-nodes.headerBorderAlpha.addEventListener("input", () => applyCore(nodes.headerBorderHex, nodes.headerBorderAlpha, "--header-border"));
-bindHexPair(nodes.footerBgPicker, nodes.footerBgHex, () => applyCore(nodes.footerBgHex, nodes.footerBgAlpha, "--footer-background"));
-nodes.footerBgAlpha.addEventListener("input", () => applyCore(nodes.footerBgHex, nodes.footerBgAlpha, "--footer-background"));
-bindHexPair(nodes.footerBorderPicker, nodes.footerBorderHex, () => applyCore(nodes.footerBorderHex, nodes.footerBorderAlpha, "--footer-border"));
-nodes.footerBorderAlpha.addEventListener("input", () => applyCore(nodes.footerBorderHex, nodes.footerBorderAlpha, "--footer-border"));
+bindHexPair(nodes.pageBgPicker, nodes.pageBgHex, () => applyCore(nodes.pageBgHex, nodes.pageBgAlpha, "--page-bg-base"));
+nodes.pageBgAlpha.addEventListener("input", () => applyCore(nodes.pageBgHex, nodes.pageBgAlpha, "--page-bg-base"));
+bindHexPair(nodes.headerBgPicker, nodes.headerBgHex, () => applyCore(nodes.headerBgHex, nodes.headerBgAlpha, "--header-bg-base"));
+nodes.headerBgAlpha.addEventListener("input", () => applyCore(nodes.headerBgHex, nodes.headerBgAlpha, "--header-bg-base"));
+bindHexPair(nodes.headerBorderPicker, nodes.headerBorderHex, () => applyCore(nodes.headerBorderHex, nodes.headerBorderAlpha, "--header-border-base"));
+nodes.headerBorderAlpha.addEventListener("input", () => applyCore(nodes.headerBorderHex, nodes.headerBorderAlpha, "--header-border-base"));
+bindHexPair(nodes.footerBgPicker, nodes.footerBgHex, () => applyCore(nodes.footerBgHex, nodes.footerBgAlpha, "--footer-bg-base"));
+nodes.footerBgAlpha.addEventListener("input", () => applyCore(nodes.footerBgHex, nodes.footerBgAlpha, "--footer-bg-base"));
+bindHexPair(nodes.footerBorderPicker, nodes.footerBorderHex, () => applyCore(nodes.footerBorderHex, nodes.footerBorderAlpha, "--footer-border-base"));
+nodes.footerBorderAlpha.addEventListener("input", () => applyCore(nodes.footerBorderHex, nodes.footerBorderAlpha, "--footer-border-base"));
 // status colors
 bindHexPair(nodes.successPicker, nodes.successHex, () => applyStatusColor(nodes.successHex, "--success"));
 bindHexPair(nodes.warningPicker, nodes.warningHex, () => applyStatusColor(nodes.warningHex, "--warning"));
