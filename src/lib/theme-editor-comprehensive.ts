@@ -129,8 +129,7 @@ export function setupAllColorListeners(
 export function populateAllFormInputs(
   elements: Record<string, HTMLElement | null>,
   presetVariables: Record<string, string | undefined>,
-  defaults: Record<string, string | undefined>,
-  normalizeHex: (value: string) => string | null
+  defaults: Record<string, string | undefined>
 ) {
   // Colors
   ALL_COLOR_VARIABLES.forEach((key) => {

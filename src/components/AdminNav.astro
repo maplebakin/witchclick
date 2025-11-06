@@ -255,7 +255,7 @@ for (const section of navSections) {
     outline-offset: 2px;
   }
 
-  .admin-nav.is-open .admin-nav-trigger {
+  :global(.admin-nav.is-open .admin-nav-trigger) {
     background: var(--admin-surface-hover);
     border-color: var(--admin-accent);
     box-shadow: 0 1px 3px 0 rgb(107 33 168 / 0.1);
@@ -305,7 +305,7 @@ for (const section of navSections) {
     transition: transform 0.2s ease;
   }
 
-  .admin-nav.is-open .admin-nav-trigger-chevron {
+  :global(.admin-nav.is-open .admin-nav-trigger-chevron) {
     transform: rotate(180deg);
   }
 
@@ -343,7 +343,7 @@ for (const section of navSections) {
     transition: opacity 0.2s ease, transform 0.2s ease;
   }
 
-  .admin-nav-dropdown.is-visible {
+  :global(.admin-nav-dropdown.is-visible) {
     opacity: 1;
     transform: translateY(0);
   }

@@ -475,20 +475,20 @@ const configId = `${sectionId}-config`;
     color: var(--card-badge-text);
   }
 
-  .comments__pending-title {
+  :global(.comments__pending-title) {
     margin: 0;
     font-weight: 600;
     font-size: 0.9rem;
   }
 
-  .comments__pending-list {
+  :global(.comments__pending-list) {
     margin: 0;
     padding-left: 1rem;
     display: grid;
     gap: 0.4rem;
   }
 
-  .comments__pending-list li {
+  :global(.comments__pending-list li) {
     list-style: disc;
   }
 
@@ -500,7 +500,7 @@ const configId = `${sectionId}-config`;
     gap: 1.2rem;
   }
 
-  .comments__item {
+  :global(.comments__item) {
     border-radius: 1.1rem;
     border: 1px solid var(--card-panel-border-soft);
     background: var(--card-panel-surface);
@@ -510,24 +510,24 @@ const configId = `${sectionId}-config`;
     box-shadow: var(--elevation-tier-ambient);
   }
 
-  .comments__meta {
+  :global(.comments__meta) {
     display: flex;
     gap: 0.75rem;
     align-items: baseline;
     font-size: 0.9rem;
   }
 
-  .comments__author {
+  :global(.comments__author) {
     font-weight: 600;
     color: var(--text-strong);
   }
 
-  .comments__time {
+  :global(.comments__time) {
     font-size: 0.8rem;
     color: var(--text-muted);
   }
 
-  .comments__text {
+  :global(.comments__text) {
     margin: 0;
     line-height: 1.6;
     color: var(--text-body);

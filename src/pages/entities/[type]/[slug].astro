@@ -656,7 +656,7 @@ function pretty(v: unknown) {
     transition: opacity 0.25s ease, transform 0.25s ease;
   }
 
-  .entity-graph-legend.is-visible {
+  :global(.entity-graph-legend.is-visible) {
     opacity: 1;
     transform: translateY(0);
   }

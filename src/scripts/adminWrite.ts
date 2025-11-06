@@ -29,7 +29,7 @@ function initWriteAdmin() {
   if (siteOriginAttr) {
     try {
       previewHost = new URL(siteOriginAttr).host;
-    } catch (_err) {
+    } catch {
       previewHost = siteOriginAttr.replace(/^https?:\/\//, '');
     }
   }
@@ -166,7 +166,7 @@ function initWriteAdmin() {
         entityValidation.innerHTML = `<span class="text-warning">Missing ${missing.length} ${missing.length === 1 ? 'entity' : 'entities'}: ${missingHtml}</span>`;
         entityValidation.className = 'mt-2 text-xs';
       }
-    } catch (err) {
+    } catch {
       entityValidation.innerHTML = '<span class="text-body-muted">Could not validate entities</span>';
       entityValidation.className = 'mt-2 text-xs';
     }

@@ -333,8 +333,7 @@ export class ThemeEditor {
     populateAllFormInputs(
       this.elements,
       preset?.variables || {},
-      defaults,
-      (value) => this.normalizeHex(value)
+      defaults
     );
 
     // Legacy colors

@@ -294,14 +294,14 @@ const breadcrumbs = [
     gap: 1.25rem;
   }
 
-  .hub-card__actions .wc-button {
+  :global(.hub-card__actions .wc-button) {
     justify-self: start;
     --btn-bg: color-mix(in srgb, var(--hub-accent, #a855f7) 60%, var(--color-night, #120725) 40%);
     --btn-bg-hover: color-mix(in srgb, var(--hub-accent, #a855f7) 68%, var(--color-night, #120725) 32%);
     --btn-border: color-mix(in srgb, var(--hub-accent, #a855f7) 45%, transparent 55%);
   }
 
-  .hub-card__post {
+  :global(.hub-card__post) {
     display: block;
   }
 
