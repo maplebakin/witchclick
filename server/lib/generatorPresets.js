@@ -1,7 +1,7 @@
 import { STRICT_JSON_RULES } from './strictJsonRules.js';
 
 // Base contract fields that all presets share
-const BASE_FIELDS = [
+export const BASE_FIELDS = [
   'Return a single JSON object that can be normalized into PostSpec v2 using relaxed keys and aliases.',
   '',
   'Required fields (aliases allowed):',
@@ -31,7 +31,7 @@ const BASE_FIELDS = [
 ];
 
 // Preset-specific structure requirements
-const STRUCTURE_REQUIREMENTS = {
+export const STRUCTURE_REQUIREMENTS = {
   reflection: [
     '',
     'Content Structure for Reflection Essays:',

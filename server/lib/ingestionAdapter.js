@@ -126,6 +126,19 @@ function sanitizeAdPlacements(value) {
   return placements;
 }
 
+function normalizeContentTypeValue(value) {
+  const trimmed = toTrimmedString(value);
+  if (!trimmed) return undefined;
+  const normalized = trimmed.toLowerCase().replace(/[^a-z]/g, '');
+  for (const allowed of CONTENT_TYPES) {
+    const canonicalNormalized = allowed.toLowerCase().replace(/[^a-z]/g, '');
+    if (normalized === canonicalNormalized) {
+      return allowed;
+    }
+  }
+  return undefined;
+}
+
 function isOpeningHeading(value) {
   return toTrimmedString(value).toLowerCase() === OPENING_HEADING.toLowerCase();
 }
@@ -268,9 +281,9 @@ export function normalizePostSpec(raw, options = {}) {
   metaDescription = metaDescription || '';
 
   // content type
-  const rawContentType = toTrimmedString(input.contentType).toLowerCase();
-  const contentType = CONTENT_TYPES.includes(rawContentType) ? rawContentType : undefined;
-  if (contentType && rawContentType !== input.contentType) {
+  const rawContentType = toTrimmedString(input.contentType);
+  const contentType = normalizeContentTypeValue(rawContentType);
+  if (contentType && rawContentType !== contentType) {
     report.push('normalized contentType');
   }
 

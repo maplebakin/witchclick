@@ -83,40 +83,108 @@ export function validateStructure(spec, contentWords) {
     headings.some((heading) => /^opening/.test(heading) && /(reflection|scene|note)/.test(heading));
   if (!hasOpening) errors.push('Missing section: Opening Reflection');
 
-  // Content-type specific validations
-  const hasQuick =
-    headings.some((heading) => /quick|low[- ]?energy|5[- ]?minute/.test(heading)) ||
-    /quick|low[- ]?energy/.test(body);
-  const hasDeep =
-    headings.some((heading) => /deep( dive)?|long(er)?/.test(heading)) || /deep( dive)?/.test(body);
+  const headingMatches = (patterns) =>
+    headings.some((heading) => patterns.some((pattern) => pattern.test ? pattern.test(heading) : heading.includes(pattern)));
+  const bodyMatches = (patterns) =>
+    patterns.some((pattern) => (pattern.test ? pattern.test(body) : body.includes(pattern)));
 
-  // Ritual and spellwork require Quick/Deep variants
-  if ((contentType === 'ritual' || contentType === 'spellwork') && !(hasQuick && hasDeep)) {
-    errors.push(`${contentType === 'ritual' ? 'Ritual' : 'Spellwork'} posts require both Quick/Low-Energy and Deep variants.`);
-  }
+  const normalizedType = (() => {
+    if (contentType === 'guide') return 'ritual';
+    if (contentType === 'spread') return 'tarotSpread';
+    return contentType;
+  })();
 
-  const hasChecklist = headings.some((heading) => /checklist|summary|at a glance/.test(heading));
-  // Only ritual, guide, and spellwork require checklists
-  if ((contentType === 'ritual' || contentType === 'guide' || contentType === 'spellwork') && !hasChecklist) {
-    errors.push('Missing section: Checklist/Summary');
-  }
-
-  const hasReflection =
-    headings.some((heading) => /reflection prompt|journal|reflection/.test(heading)) ||
-    /prompt|question/.test(body);
-  // Reflection essays and rituals benefit from reflection prompts, but stories/crystals don't need them
-  if ((contentType === 'ritual' || contentType === 'reflection' || contentType === 'guide') && !hasReflection) {
-    warnings.push('Consider adding a Reflection Prompt section for deeper engagement.');
-  }
-
-  // Tarot spreads should have position descriptions
-  if ((contentType === 'tarotSpread' || contentType === 'spread') && !headings.some((heading) => /position|layout|spread/.test(heading))) {
-    warnings.push('Tarot spreads should include a section describing card positions or spread layout.');
-  }
-
-  // Crystal profiles should have geological/care info
-  if (contentType === 'crystals' && !headings.some((heading) => /geolog|properties|care|cleansing/.test(heading))) {
-    warnings.push('Crystal profiles should include geological properties and care instructions.');
+  switch (normalizedType) {
+    case 'ritual': {
+      const hasQuick = headingMatches([/quick/, /low[- ]?energy/, /5[- ]?minute/]) || bodyMatches([/quick/, /low[- ]?energy/]);
+      const hasDeep = headingMatches([/deep( dive)?/, /long(er)?/, /extended/]) || bodyMatches([/deep( dive)?/]);
+      if (!hasQuick) errors.push('Ritual posts require a Quick/Low-Energy variant section.');
+      if (!hasDeep) errors.push('Ritual posts require a Deep variant section.');
+      if (!headingMatches([/reflection prompt/, /journal/, /reflection/])) {
+        errors.push('Ritual posts require a Reflection Prompt section.');
+      }
+      if (!headingMatches([/checklist/, /summary/, /at a glance/])) {
+        errors.push('Ritual posts require a Checklist/Summary section.');
+      }
+      break;
+    }
+    case 'reflection': {
+      if (!headingMatches([/journal/, /prompt/])) {
+        errors.push('Reflection essays require a Journaling Prompts section.');
+      }
+      if (!headingMatches([/gentle closing/, /closing/, /integration/, /takeaway/, /aftercare/])) {
+        errors.push('Reflection essays require a Gentle Closing section.');
+      }
+      break;
+    }
+    case 'story': {
+      if (!headingMatches([/takeaway/, /closing/, /reflection/, /gentle closing/, /soft landing/])) {
+        warnings.push('Story posts benefit from a gentle closing reflection section.');
+      }
+      if (headingMatches([/checklist/, /prompt/, /step-by-step/, /instructions/])) {
+        warnings.push('Story posts should avoid checklists or instructional sections.');
+      }
+      break;
+    }
+    case 'tarotSpread': {
+      if (!headingMatches([/layout/, /spread/])) {
+        errors.push('Tarot spreads require a Spread Layout section.');
+      }
+      if (!headingMatches([/position/, /meaning/])) {
+        errors.push('Tarot spreads require a Position Meanings section.');
+      }
+      if (!headingMatches([/reading tips/, /reading guidance/, /interpreting/])) {
+        errors.push('Tarot spreads require a Reading Tips section.');
+      }
+      if (!headingMatches([/reflection/, /question/])) {
+        errors.push('Tarot spreads require a Reflection Questions section.');
+      }
+      break;
+    }
+    case 'spellwork': {
+      if (!headingMatches([/ingredient/, /correspondence/])) {
+        errors.push('Spellwork posts require an Ingredients & Correspondences section.');
+      }
+      if (!headingMatches([/step/, /instruction/, /working/])) {
+        errors.push('Spellwork posts require a Step-by-Step Instructions section.');
+      }
+      if (!headingMatches([/variation/, /substitution/, /options/])) {
+        errors.push('Spellwork posts require a Variations & Substitutions section.');
+      }
+      if (!headingMatches([/closing/, /grounding/, /aftercare/])) {
+        errors.push('Spellwork posts require a Closing & Grounding section.');
+      }
+      if (!headingMatches([/safety/, /disclaimer/, /note/])) {
+        warnings.push('Spellwork posts should include a safety note that highlights consent and physical safety.');
+      }
+      if (!headingMatches([/checklist/, /summary/])) {
+        errors.push('Spellwork posts require a Checklist/Summary section.');
+      }
+      break;
+    }
+    case 'crystals': {
+      if (!headingMatches([/geolog/, /formation/, /properties/])) {
+        errors.push('Crystal profiles require a Geological Properties section.');
+      }
+      if (!headingMatches([/mindful/, /use/, /application/])) {
+        errors.push('Crystal profiles require a Mindful Uses section.');
+      }
+      if (!headingMatches([/care/, /cleansing/, /maintenance/])) {
+        errors.push('Crystal profiles require a Care & Cleansing section.');
+      }
+      if (!headingMatches([/pairing/, /combine/, /companions/])) {
+        errors.push('Crystal profiles require a Pairing Ideas section.');
+      }
+      break;
+    }
+    default: {
+      if (contentType === 'guide') {
+        if (!headingMatches([/checklist/, /summary/, /at a glance/])) {
+          errors.push('Guide posts require a Checklist/Summary section.');
+        }
+      }
+      break;
+    }
   }
 
   if (!(typeof spec.heroImagePrompt === 'string' || spec.heroImagePrompt === null)) {
