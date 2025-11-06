@@ -1,7 +1,6 @@
-// src/pages/feed.json.ts — JSON Feed v1 (drop‑in replacement)
-// Refactored to use loadAllPosts() and include category metadata
-import { loadAllPosts, getPostCategory } from '../utils/posts';
-import { readSettings } from '../utils/settings';
+// src/pages/feed/meandering.json.ts — JSON Feed v1 for meandering posts only
+import { loadAllPosts, filterPostsByCategory, POST_CATEGORY_MEANDERING, getPostCategory } from '../../utils/posts';
+import { readSettings } from '../../utils/settings';
 
 function normalizeSite(u: string) {
   try {
@@ -16,9 +15,10 @@ export async function GET() {
   const settings = readSettings();
   const site = normalizeSite(settings.siteUrl);
 
-  const posts = loadAllPosts();
+  const allPosts = loadAllPosts();
+  const meanderingPosts = filterPostsByCategory(allPosts, POST_CATEGORY_MEANDERING);
 
-  const items = posts.map((post) => {
+  const items = meanderingPosts.map((post) => {
     const data = post.data ?? {};
     const slug = post.slug;
     const url = `${site}/post/${slug}`;
@@ -40,17 +40,17 @@ export async function GET() {
       tags,
       date_published: post.date.toISOString(),
       _witchclick: {
-        category, // Custom extension field for category
+        category,
       },
     };
   });
 
   const feed = {
     version: 'https://jsonfeed.org/version/1',
-    title: settings.brandName || 'WitchClick',
-    home_page_url: site,
-    feed_url: `${site}/feed.json`,
-    description: 'All posts from WitchClick. For category-specific feeds, see /feed/ritual.json or /feed/meandering.json',
+    title: `${settings.brandName || 'WitchClick'} — Meanderings`,
+    home_page_url: `${site}/meanderings`,
+    feed_url: `${site}/feed/meandering.json`,
+    description: 'Non-magickal rambles: life updates, half-baked theories, and whatever I\'m currently fixated on.',
     items,
   };
 

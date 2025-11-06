@@ -1,4 +1,4 @@
-import { loadAllPosts, firstParagraph } from "../utils/posts";
+import { loadAllPosts, firstParagraph, getPostCategory } from "../utils/posts";
 
 export const prerender = true;
 
@@ -7,6 +7,7 @@ export async function GET() {
   const items = posts.map((post) => {
     const data = post.data ?? {};
     const slug = post.slug;
+    const category = getPostCategory(post);
     const rawExcerpt =
       data.excerpt ?? data.description ?? data.metaDescription ?? firstParagraph(post.content ?? "");
 
@@ -15,6 +16,7 @@ export async function GET() {
       title: String(data.title ?? post.title ?? slug),
       excerpt: String(rawExcerpt ?? ""),
       tags: Array.isArray(data.tags) ? data.tags : [],
+      category, // Include category for client-side filtering
     };
   });
 

@@ -16,6 +16,7 @@ const posts = defineCollection({
     publishedAt: z.coerce.date().optional(),   // accepted alias
     updatedAt: z.coerce.date().optional(),
     tags: z.array(z.string()).default([]),
+    category: z.enum(["ritual", "meandering"]).default("ritual"),
     draft: z.boolean().default(false),
 
     // SEO & social

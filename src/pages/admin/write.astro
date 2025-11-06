@@ -98,6 +98,19 @@ const site = Astro.url?.origin ?? "";
             <span class="text-xs font-medium">Tags (comma or newline separated, 4–7 ideal)</span>
             <input id="tags" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="tea, ritual, focus, study" />
           </label>
+          <fieldset class="block md:col-span-2">
+            <legend class="text-xs font-medium">Category</legend>
+            <div class="mt-2 flex gap-4">
+              <label class="inline-flex items-center gap-2 text-sm">
+                <input type="radio" id="categoryMeandering" name="category" value="meandering" checked />
+                <span>Meandering (non-magickal rambles)</span>
+              </label>
+              <label class="inline-flex items-center gap-2 text-sm">
+                <input type="radio" id="categoryRitual" name="category" value="ritual" />
+                <span>Ritual (magickal content)</span>
+              </label>
+            </div>
+          </fieldset>
           <label class="block md:col-span-1">
             <span class="text-xs font-medium">Spoons (optional)</span>
             <select id="spoons" class="mt-1 w-full rounded-lg border px-3 py-2">

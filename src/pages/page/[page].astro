@@ -2,7 +2,8 @@
 import Base from "../../layouts/Base.astro";
 import PostCard from "../../components/PostCard.astro";
 import Pagination from "../../components/Pagination.astro";
-import { loadAllPosts, paginatePosts, estimateReadingMinutes, firstParagraph, extractHeroImage } from "../../utils/posts";
+import { loadAllPosts, filterPostsByCategory, POST_CATEGORY_RITUAL } from "../../utils/posts";
+import { postToCardData } from "../../utils/postTransforms";
 import { readSettings } from "../../utils/settings";
 import { createCollectionPageSchema } from "../../utils/structuredData";
 import HeadSlot from "@/components/HeadSlot.astro";
@@ -11,15 +12,19 @@ export const prerender = true;
 
 export async function getStaticPaths() {
   const PAGE_SIZE = 12;
-  const posts = loadAllPosts();
-  const totalPages = Math.max(1, Math.ceil(posts.length / PAGE_SIZE));
+  const allPosts = loadAllPosts();
+  // Only include ritual posts in pagination
+  const ritualPosts = filterPostsByCategory(allPosts, POST_CATEGORY_RITUAL);
+  const totalPages = Math.max(1, Math.ceil(ritualPosts.length / PAGE_SIZE));
 
   return Array.from({ length: totalPages }, (_, i) => {
     const page = i + 1;
-    const { items } = paginatePosts(page, PAGE_SIZE);
+    const start = (page - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    const pagePosts = ritualPosts.slice(start, end);
     return {
       params: { page: String(page) },
-      props: { page, totalPages, pagePosts: items },
+      props: { page, totalPages, pagePosts },
     };
   });
 }
@@ -30,10 +35,12 @@ const { page, totalPages, pagePosts } = Astro.props as {
   pagePosts: ReturnType<typeof loadAllPosts>;
 };
 
-type LoadedPost = ReturnType<typeof loadAllPosts>[number];
-
 const settings = readSettings();
 const pageUrl = page > 1 ? `/page/${page}` : "/";
+
+// Transform posts to card data
+const cardPosts = pagePosts.map(postToCardData);
+
 const pageItemList = createCollectionPageSchema(
   settings,
   {
@@ -42,47 +49,12 @@ const pageItemList = createCollectionPageSchema(
     description: `Latest rituals and guides — page ${page}`,
     itemType: "Article",
   },
-  pagePosts.map((post) => {
-    const card = toCard(post);
-    return {
-      name: card.title,
-      url: `/post/${card.slug}`,
-      description: card.tldr ?? card.excerpt,
-    };
-  }),
+  cardPosts.map((card) => ({
+    name: card.title,
+    url: `/post/${card.slug}`,
+    description: card.tldr ?? card.excerpt,
+  })),
 );
-
-function toCard(post: LoadedPost) {
-  const fm = post.data ?? {};
-  const hero = extractHeroImage(fm);
-  const heroSrc = typeof hero.src === "string" && hero.src.trim() ? hero.src.trim() : undefined;
-  const heroAlt = typeof hero.alt === "string" && hero.alt.trim() ? hero.alt.trim() : undefined;
-  return {
-    slug: post.slug,
-    title: fm.title ?? post.title,
-    excerpt: fm.excerpt ?? fm.description ?? fm.metaDescription ?? firstParagraph(post.content),
-    tags: Array.isArray(fm.tags) ? fm.tags : [],
-    readingMinutes: fm.readingMinutes ?? estimateReadingMinutes(post.content),
-    publishedAt: fm.publishedAt ?? fm.pubDate ?? fm.date ?? undefined,
-    spoonLevel: typeof fm.spoonLevel === "string" ? fm.spoonLevel : undefined,
-    spoons:
-      typeof fm.spoons === "string"
-        ? fm.spoons
-        : typeof post.spoons === "string"
-          ? post.spoons
-          : undefined,
-    tldr:
-      typeof post.tldr === "string"
-        ? post.tldr
-        : typeof fm.tldr === "string"
-          ? fm.tldr
-          : undefined,
-    heroImage: heroSrc,
-    heroImageSrc: heroSrc,
-    heroImageAlt: heroAlt,
-    heroAlt: heroAlt,
-  };
-}
 ---
 <Base title={`WitchClick — Page ${page}`}>
   <HeadSlot slot="head">
@@ -92,29 +64,27 @@ function toCard(post: LoadedPost) {
   <section class="archive-section wc-section-shell">
     <h1 class="archive-title">Latest posts — page {page}</h1>
     <div class="archive-grid">
-      {pagePosts.map((post) => {
-        const card = toCard(post);
-        return (
-            <PostCard
-              post={{
-                slug: card.slug,
-                title: card.title,
-                excerpt: card.excerpt,
-                tldr: card.tldr,
-                tags: card.tags,
-              readingMinutes: card.readingMinutes,
-              publishedAt: card.publishedAt,
-              spoonLevel: card.spoonLevel,
-              spoons: card.spoons,
-              heroImage: card.heroImage,
-              heroImageSrc: card.heroImageSrc,
-              heroImageAlt: card.heroImageAlt,
-              heroAlt: card.heroAlt,
-            }}
-            href={`/post/${card.slug}`}
-          />
-        );
-      })}
+      {cardPosts.map((card) => (
+        <PostCard
+          href={`/post/${card.slug}`}
+          post={{
+            slug: card.slug,
+            title: card.title,
+            excerpt: card.excerpt,
+            tldr: card.tldr,
+            tags: card.tags,
+            readingMinutes: card.readingMinutes,
+            publishedAt: card.publishedAt,
+            spoonLevel: card.spoonLevel,
+            spoons: card.spoons,
+            heroImage: card.heroImage,
+            heroImageSrc: card.heroImageSrc,
+            heroImageAlt: card.heroImageAlt,
+            heroAlt: card.heroAlt,
+            category: card.category,
+          }}
+        />
+      ))}
     </div>
 
     <Pagination page={page} totalPages={totalPages} baseHref="/page" />

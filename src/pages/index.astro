@@ -2,99 +2,22 @@
 import Base from "@/layouts/Base.astro";
 import PostCard from "@/components/PostCard.astro";
 import HeadSlot from "@/components/HeadSlot.astro";
-import { loadAllPosts, firstParagraph, estimateReadingMinutes, extractHeroImage } from "@/utils/posts";
+import { loadAllPosts, filterPostsByCategory, POST_CATEGORY_RITUAL } from "@/utils/posts";
+import { postsToCardData } from "@/utils/postTransforms";
 import { readSettings } from "@/utils/settings";
 import { createCollectionPageSchema } from "@/utils/structuredData";
+import type { CardPost } from "@/types/post";
 
 const title = "WitchClick — Cozy secular rituals for everyday magic";
 
-type CardPost = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  tldr?: string;
-  tags: string[];
-  normalizedTags: string[];
-  readingMinutes: number;
-  publishedAt?: string;
-  spoonLevel?: string;
-  spoons?: string;
-  heroImage?: string;
-  heroImageSrc?: string;
-  heroImageAlt?: string;
-  heroAlt?: string;
-};
-
-const posts = loadAllPosts();
+const allPosts = loadAllPosts();
 const settings = readSettings();
 
-const cardPosts: CardPost[] = posts.map((post) => {
-  const fm = post.data ?? {};
-  const title = typeof fm.title === "string" && fm.title.trim() ? fm.title : post.title;
-  const excerptCandidate =
-    typeof fm.excerpt === "string" && fm.excerpt.trim()
-      ? fm.excerpt
-      : typeof fm.description === "string" && fm.description.trim()
-        ? fm.description
-        : typeof fm.metaDescription === "string" && fm.metaDescription.trim()
-          ? fm.metaDescription
-          : firstParagraph(post.content);
+// Filter for ritual posts only (default category for existing posts)
+const ritualPosts = filterPostsByCategory(allPosts, POST_CATEGORY_RITUAL);
 
-  const tagsRaw = Array.isArray(fm.tags)
-    ? fm.tags
-    : typeof fm.tags === "string"
-      ? fm.tags.split(",")
-      : [];
-  const tags = Array.from(
-    new Map(
-      tagsRaw
-        .map((tag) => (typeof tag === "string" ? tag.trim() : ""))
-        .filter(Boolean)
-        .map((tag) => [tag.toLowerCase(), tag])
-    ).values()
-  );
-  const normalizedTags = tags.map((tag) => tag.toLowerCase());
-
-  const publishedAtCandidate =
-    fm.publishedAt ?? fm.pubDate ?? fm.date ?? (post.date ? post.date.toISOString() : undefined);
-
-  const spoonsValue =
-    typeof fm.spoons === "string"
-      ? fm.spoons
-      : typeof post.spoons === "string"
-        ? post.spoons
-        : typeof fm.spoonLevel === "string"
-          ? fm.spoonLevel
-          : undefined;
-
-  const tldrValue =
-    typeof post.tldr === "string"
-      ? post.tldr
-      : typeof fm.tldr === "string"
-        ? fm.tldr
-        : undefined;
-
-  const hero = extractHeroImage(fm);
-  const heroSrc = typeof hero.src === "string" && hero.src.trim() ? hero.src.trim() : undefined;
-  const heroAlt = typeof hero.alt === "string" && hero.alt.trim() ? hero.alt.trim() : undefined;
-
-  return {
-    slug: post.slug,
-    title,
-    excerpt: excerptCandidate,
-    tldr: tldrValue,
-    tags,
-    normalizedTags,
-    readingMinutes: fm.readingMinutes ?? estimateReadingMinutes(post.content),
-    publishedAt: typeof publishedAtCandidate === "string" ? publishedAtCandidate : undefined,
-    spoonLevel: typeof fm.spoonLevel === "string" ? fm.spoonLevel : undefined,
-    spoons: spoonsValue,
-    heroImage: heroSrc,
-    heroImageSrc: heroSrc,
-    heroImageAlt: heroAlt,
-    heroAlt: heroAlt,
-  } satisfies CardPost;
-});
+// Transform to card data
+const cardPosts: CardPost[] = postsToCardData(ritualPosts);
 
 // Show featured post at the top
 const featuredPost = cardPosts[0] ?? null;
@@ -165,6 +88,7 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
       <div class="posts-grid">
         {recentPosts.map((post) => (
           <PostCard
+            href={`/post/${post.slug}`}
             post={{
               slug: post.slug,
               title: post.title,
@@ -179,6 +103,7 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
               heroImageSrc: post.heroImageSrc,
               heroImageAlt: post.heroImageAlt,
               heroAlt: post.heroAlt,
+              category: post.category,
             }}
           />
         ))}
@@ -190,9 +115,10 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
     <div class="sidebar-cta__content">
       <h3 class="sidebar-cta__title">Looking for more?</h3>
       <p class="sidebar-cta__text">
-        Explore printable tools, browse by topic, or reach out if you need something specific.
+        Explore printable tools, browse by topic, check out non-magickal rambles, or reach out if you need something specific.
       </p>
       <div class="sidebar-cta__links">
+        <a href="/meanderings" class="sidebar-cta__link">Meanderings</a>
         <a href="/tools" class="sidebar-cta__link">Printable Tools</a>
         <a href="/entities" class="sidebar-cta__link">Browse Topics</a>
         <a href="/contact" class="sidebar-cta__link">Get in Touch</a>

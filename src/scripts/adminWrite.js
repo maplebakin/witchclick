@@ -332,6 +332,7 @@ function initWriteAdmin() {
     const tldrValue = ($("tldr")?.value ?? "").trim();
     const spoonsValueRaw = ($("spoons")?.value ?? "").trim().toLowerCase();
     const spoonsValue = ["low", "medium", "high"].includes(spoonsValueRaw) ? spoonsValueRaw : "";
+    const categoryInput = document.querySelector('input[name="category"]:checked');
     const payload = {
       title: titleInput?.value ?? "",
       slug: state.manualProvided && state.slug ? state.slug : "",
@@ -339,6 +340,7 @@ function initWriteAdmin() {
       metaDescription: $("meta")?.value ?? "",
       tldr: tldrValue || void 0,
       tags: $("tags")?.value ?? "",
+      category: categoryInput?.value ?? "meandering",
       includeAds: Boolean($("ads")?.checked),
       includeKofi: Boolean($("kofi")?.checked),
       spoons: spoonsValue || void 0,

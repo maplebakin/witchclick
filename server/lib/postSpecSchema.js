@@ -5,9 +5,11 @@ import { z } from 'zod';
 
 export const ENTITY_TYPES = ['crystal', 'herb', 'moonPhase', 'tarot', 'planetaryDay', 'ritual'];
 export const CONTENT_TYPES = ['ritual', 'guide', 'spread', 'reflection', 'story', 'tarotSpread', 'spellwork', 'crystals'];
+export const POST_CATEGORIES = ['ritual', 'meandering'];
 
 export const EntityTypeSchema = z.enum(ENTITY_TYPES);
 export const PostContentTypeSchema = z.enum(CONTENT_TYPES);
+export const PostCategorySchema = z.enum(POST_CATEGORIES);
 
 const OutlineItemSchema = z.object({
   heading: z.string().min(1),
@@ -46,6 +48,7 @@ export const PostSpecV2Schema = z.object({
   specVersion: z.literal(2),
   title: z.string().min(1),
   slug: z.string().min(1),
+  category: PostCategorySchema.optional(),
   contentType: PostContentTypeSchema.optional(),
   metaDescription: z.string().min(1),
   tags: z.array(z.string()).min(4).max(7),
@@ -66,6 +69,7 @@ const DOC_LINES = [
   '  "specVersion": 2,',
   '  "title": string (50-60 chars),',
   '  "slug": string (kebab-case),',
+  '  "category": "ritual"|"meandering" (optional, defaults to "ritual" - use "ritual" for magickal content, "meandering" for non-magickal rambles),',
   '  "contentType": "ritual"|"guide"|"spread"|"reflection"|"story"|"tarotSpread"|"spellwork"|"crystals" (optional, defaults to "ritual"),',
   '  "metaDescription": string (150-160 chars),',
   '  "tags": string[4-7],',

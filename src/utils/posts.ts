@@ -38,6 +38,7 @@ export interface LoadedPost {
   date: Date;
   tldr?: string;
   spoons?: SpoonLevel;
+  category?: 'ritual' | 'meandering';
 }
 
 let cachedPosts: LoadedPost[] | null = null;
@@ -244,6 +245,40 @@ export function getPostsByAuthor(slug: string): LoadedPost[] {
     const authors = extractAuthorSlugs(post.data ?? {});
     return authors.includes(target);
   });
+}
+
+/**
+ * Category constants
+ */
+export const POST_CATEGORY_RITUAL = 'ritual' as const;
+export const POST_CATEGORY_MEANDERING = 'meandering' as const;
+
+export type PostCategory = typeof POST_CATEGORY_RITUAL | typeof POST_CATEGORY_MEANDERING;
+
+/**
+ * Get the category from a post with fallback to 'ritual'
+ */
+export function getPostCategory(post: LoadedPost): PostCategory {
+  const fm = post.data ?? {};
+  const category = typeof fm.category === "string" ? fm.category : POST_CATEGORY_RITUAL;
+  return category as PostCategory;
+}
+
+/**
+ * Filter posts by category
+ */
+export function filterPostsByCategory(posts: LoadedPost[], category: PostCategory): LoadedPost[] {
+  return posts.filter((post) => getPostCategory(post) === category);
+}
+
+/**
+ * Group posts by category
+ */
+export function groupPostsByCategory(posts: LoadedPost[]): Record<PostCategory, LoadedPost[]> {
+  return {
+    ritual: filterPostsByCategory(posts, POST_CATEGORY_RITUAL),
+    meandering: filterPostsByCategory(posts, POST_CATEGORY_MEANDERING),
+  };
 }
 
 export function getPrevNext(slug: string): {

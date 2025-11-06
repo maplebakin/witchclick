@@ -1017,6 +1017,9 @@ async function savePostFromWrite(payload) {
   if (tags.length < 4 || tags.length > 7) warnings.push(`Tags ideal range is 4–7 (currently ${tags.length}).`);
 
   const readingMinutes = Math.max(1, Math.round(wordCount(markdown)/200));
+  const category = String(payload.category || 'meandering').trim();
+  const tldr = payload.tldr ? String(payload.tldr).trim() : '';
+  const spoons = payload.spoons ? String(payload.spoons).trim() : '';
 
   const fm = [
     '---',
@@ -1026,7 +1029,10 @@ async function savePostFromWrite(payload) {
     `metaTitle: ${yq(title)}`,
     `metaDescription: ${yq(metaDescription)}`,
     `tags: ${ya(tags)}`,
+    `category: ${category}`,
     `readingMinutes: ${readingMinutes}`,
+    tldr ? `tldr: ${yq(tldr)}` : null,
+    spoons ? `spoons: ${spoons}` : null,
     serializeEntities(entities),
     `includeAds: ${includeAds ? 'true' : 'false'}`,
     `includeKofi: ${includeKofi ? 'true' : 'false'}`,
@@ -1036,7 +1042,7 @@ async function savePostFromWrite(payload) {
     `canonicalUrl: ${yq(canonical)}`,
     'specVersion: 2',
     '---'
-  ].join('\n');
+  ].filter(line => line !== null).join('\n');
 
   const filePath = path.join(postsDir, `${slug}.md`);
   await fsp.writeFile(filePath, fm + '\n' + markdown + '\n', 'utf8');

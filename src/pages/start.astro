@@ -28,22 +28,23 @@ const jsonLd = {
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </HeadSlot>
 
-  <article class="container mx-auto px-4 py-8 max-w-4xl">
-    <Breadcrumbs items={breadcrumbs} />
+  <div class="wc-section-shell">
+    <article class="start-page-container">
+      <Breadcrumbs items={breadcrumbs} />
 
-    <header class="mt-8 mb-12">
-      <p class="text-sm uppercase tracking-wide text-orange-600 dark:text-orange-400 mb-2">
-        Welcome
-      </p>
-      <h1 class="text-4xl md:text-5xl font-bold mb-4">
-        Start Here: Your Guide to WitchClick
-      </h1>
-      <p class="text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
-        Cozy, secular rituals and tools for everyday magic. No dogma, no gatekeeping, just practical prompts that meet you where you are.
-      </p>
-    </header>
+      <header class="start-page-header">
+        <p class="start-page-label">
+          Welcome
+        </p>
+        <h1 class="start-page-title">
+          Start Here: Your Guide to WitchClick
+        </h1>
+        <p class="start-page-intro">
+          Cozy, secular rituals and tools for everyday magic. No dogma, no gatekeeping, just practical prompts that meet you where you are.
+        </p>
+      </header>
 
-    <div class="prose prose-lg dark:prose-invert max-w-none">
+      <div class="prose prose-lg dark:prose-invert max-w-none">
       <section class="mb-12">
         <h2>What is WitchClick?</h2>
         <p>
@@ -199,6 +200,42 @@ const jsonLd = {
           <a href="/privacy">Learn more</a>.
         </p>
       </section>
-    </div>
-  </article>
+      </div>
+    </article>
+  </div>
 </Base>
+
+<style>
+  .start-page-container {
+    max-width: 48rem;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 4vw, 2rem);
+  }
+
+  .start-page-header {
+    margin-top: clamp(1.5rem, 4vw, 2rem);
+    margin-bottom: clamp(2.5rem, 6vw, 3.5rem);
+  }
+
+  .start-page-label {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-accent, #ea580c);
+    margin-bottom: 0.5rem;
+  }
+
+  .start-page-title {
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    color: var(--text-strong, #111827);
+  }
+
+  .start-page-intro {
+    font-size: clamp(1.125rem, 2.5vw, 1.25rem);
+    line-height: 1.6;
+    color: var(--text-body, #4b5563);
+  }
+</style>

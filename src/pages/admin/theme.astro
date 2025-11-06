@@ -122,6 +122,51 @@ const title = "Theme";
     </section>
 
     <!-- =========================
+         SITE CHROME (Headers & Footers)
+    ========================== -->
+    <section class="panel card-panel">
+      <h2>Site Chrome</h2>
+
+      <h3>Page Background</h3>
+      <div class="controls-grid">
+        <label><span>Page Background</span><input type="color" id="pageBgPicker" /><input type="text" id="pageBgHex" placeholder="#07020f" /><input type="range" id="pageBgAlpha" min="0" max="100" value="100" /><small>Alpha</small></label>
+      </div>
+
+      <h3>Header</h3>
+      <div class="controls-grid">
+        <label><span>Header Background</span><input type="color" id="headerBgPicker" /><input type="text" id="headerBgHex" placeholder="#1a0f1f" /><input type="range" id="headerBgAlpha" min="0" max="100" value="58" /><small>Alpha</small></label>
+        <label><span>Header Border</span><input type="color" id="headerBorderPicker" /><input type="text" id="headerBorderHex" placeholder="#3d2a52" /><input type="range" id="headerBorderAlpha" min="0" max="100" value="42" /><small>Alpha</small></label>
+      </div>
+
+      <h3>Footer</h3>
+      <div class="controls-grid">
+        <label><span>Footer Background</span><input type="color" id="footerBgPicker" /><input type="text" id="footerBgHex" placeholder="#07020f" /><input type="range" id="footerBgAlpha" min="0" max="100" value="85" /><small>Alpha</small></label>
+        <label><span>Footer Border</span><input type="color" id="footerBorderPicker" /><input type="text" id="footerBorderHex" placeholder="#7a5e9a" /><input type="range" id="footerBorderAlpha" min="0" max="100" value="30" /><small>Alpha</small></label>
+      </div>
+      <p class="hint">These control the appearance of the site background, header, and footer across all pages.</p>
+    </section>
+
+    <!-- =========================
+         STATUS COLORS
+    ========================== -->
+    <section class="panel card-panel">
+      <h2>Status Colors</h2>
+      <div class="controls-grid">
+        <label><span>Success</span><input type="color" id="successPicker" /><input type="text" id="successHex" placeholder="#4ade80" /></label>
+        <label><span>Warning</span><input type="color" id="warningPicker" /><input type="text" id="warningHex" placeholder="#facc15" /></label>
+        <label><span>Error</span><input type="color" id="errorPicker" /><input type="text" id="errorHex" placeholder="#f87171" /></label>
+        <label><span>Info</span><input type="color" id="infoPicker" /><input type="text" id="infoHex" placeholder="#60a5fa" /></label>
+      </div>
+      <div class="status-row" style="margin-top: var(--space-3);">
+        <span class="dot success"></span> Success
+        <span class="dot warn"></span> Warning
+        <span class="dot error"></span> Error
+        <span class="dot info"></span> Info
+      </div>
+      <p class="hint">These colors are used for status indicators, alerts, and feedback messages.</p>
+    </section>
+
+    <!-- =========================
          PREVIEW CONTROLS (optional)
     ========================== -->
     <section class="panel card-panel">
@@ -297,6 +342,22 @@ function hslStrToHex(hslStr) {
     return hslToHex(h, s, l);
   } catch { return "#000000"; }
 }
+function rgbStrToHex(rgbStr) {
+  try {
+    const nums = rgbStr.replace(/[^\d\s.]/g, " ").trim().split(/\s+/).map(Number);
+    const [r, g, b] = nums;
+    return rgbToHex(Math.round(r), Math.round(g), Math.round(b));
+  } catch { return "#000000"; }
+}
+function anyColorToHex(colorStr) {
+  if (!colorStr) return "#000000";
+  const str = colorStr.trim();
+  if (str.startsWith("rgb")) return rgbStrToHex(str);
+  if (str.startsWith("hsl")) return hslStrToHex(str);
+  if (str.startsWith("#")) return hexNormalize(str) || "#000000";
+  // Try as hsl without prefix
+  return hslStrToHex(`hsl(${str})`);
+}
 
 function setVar(name, value) {
   if (!name || value == null || value === "") return;
@@ -362,6 +423,19 @@ const nodes = {
   borderSubtlePicker: $("#borderSubtlePicker"), borderSubtleHex: $("#borderSubtleHex"), borderSubtleAlpha: $("#borderSubtleAlpha"),
   borderStrongPicker: $("#borderStrongPicker"), borderStrongHex: $("#borderStrongHex"), borderStrongAlpha: $("#borderStrongAlpha"),
 
+  // site chrome (page/header/footer)
+  pageBgPicker: $("#pageBgPicker"), pageBgHex: $("#pageBgHex"), pageBgAlpha: $("#pageBgAlpha"),
+  headerBgPicker: $("#headerBgPicker"), headerBgHex: $("#headerBgHex"), headerBgAlpha: $("#headerBgAlpha"),
+  headerBorderPicker: $("#headerBorderPicker"), headerBorderHex: $("#headerBorderHex"), headerBorderAlpha: $("#headerBorderAlpha"),
+  footerBgPicker: $("#footerBgPicker"), footerBgHex: $("#footerBgHex"), footerBgAlpha: $("#footerBgAlpha"),
+  footerBorderPicker: $("#footerBorderPicker"), footerBorderHex: $("#footerBorderHex"), footerBorderAlpha: $("#footerBorderAlpha"),
+
+  // status colors
+  successPicker: $("#successPicker"), successHex: $("#successHex"),
+  warningPicker: $("#warningPicker"), warningHex: $("#warningHex"),
+  errorPicker: $("#errorPicker"), errorHex: $("#errorHex"),
+  infoPicker: $("#infoPicker"), infoHex: $("#infoHex"),
+
   // preview controls
   cardTextRadios: document.getElementsByName("cardText"),
   customCardTextBlock: $("#customCardTextBlock"),
@@ -396,6 +470,14 @@ function applyAccent(hexId, varName) {
     const just = hsl.replace(/^hsl\(|\)$/g, "");
     setVar(varName, just);
     refreshPreviewAll(); // <- centralize
+  }
+}
+
+function applyStatusColor(hexNode, varName) {
+  const hex = hexNode.value;
+  if (hex && /^#[0-9a-fA-F]{6}$/.test(hex)) {
+    setVar(varName, hex);
+    refreshPreviewAll();
   }
 }
 
@@ -491,6 +573,22 @@ function seedHexInputs() {
     pick.value = hex; txt.value = hex; setHexVisual(txt, hex);
   });
 
+  // Status colors (these are plain color values, not HSL)
+  [
+    ["--success","success"],
+    ["--warning","warning"],
+    ["--error","error"],
+    ["--info","info"]
+  ].forEach(([v, key]) => {
+    const computedVal = getVar(v);
+    const hex = anyColorToHex(computedVal);
+    const pick = nodes[`${key}Picker`];
+    const txt  = nodes[`${key}Hex`];
+    if (pick && txt) {
+      pick.value = hex; txt.value = hex; setHexVisual(txt, hex);
+    }
+  });
+
   [
     ["--surface-base","surfaceBase"],
     ["--surface-panel","surfacePanel"],
@@ -503,14 +601,55 @@ function seedHexInputs() {
     ["--border-subtle","borderSubtle"],
     ["--border-strong","borderStrong"]
   ].forEach(([v, key]) => {
-    const hsl = getVar(v);
-    const hex = hslStrToHex(`hsl(${hsl})`);
+    const computedVal = getVar(v);
+    const hex = anyColorToHex(computedVal);
     const pick = nodes[`${key}Picker`];
     const txt  = nodes[`${key}Hex`];
     pick.value = hex; txt.value = hex; setHexVisual(txt, hex);
     const alphaEl = nodes[`${key}Alpha`];
-    if (alphaEl) alphaEl.value = parseAlpha(hsl);
+    if (alphaEl) alphaEl.value = parseAlpha(computedVal);
   });
+
+  // Site chrome colors need special handling due to color-mix dependencies
+  // Try to read from base tokens or use reasonable defaults
+  const getBaseColor = (v, fallback) => {
+    const val = getVar(v);
+    // If it looks invalid (starts with rgb and has green), use fallback
+    if (val.includes("rgb") && val.includes("169")) return fallback; // Green detection
+    return val || fallback;
+  };
+
+  const pageBgVal = getBaseColor("--background", "#07020f");
+  const pageBgHex = anyColorToHex(pageBgVal);
+  nodes.pageBgPicker.value = pageBgHex;
+  nodes.pageBgHex.value = pageBgHex;
+  setHexVisual(nodes.pageBgHex, pageBgHex);
+  nodes.pageBgAlpha.value = 100;
+
+  const headerBgHex = anyColorToHex(getBaseColor("--color-night", "#1a0f1f"));
+  nodes.headerBgPicker.value = headerBgHex;
+  nodes.headerBgHex.value = headerBgHex;
+  setHexVisual(nodes.headerBgHex, headerBgHex);
+  nodes.headerBgAlpha.value = 58;
+
+  const headerBorderHex = anyColorToHex(getBaseColor("--color-border", "#3d2a52"));
+  nodes.headerBorderPicker.value = headerBorderHex;
+  nodes.headerBorderHex.value = headerBorderHex;
+  setHexVisual(nodes.headerBorderHex, headerBorderHex);
+  nodes.headerBorderAlpha.value = 42;
+
+  const footerBgHex = anyColorToHex(pageBgVal);
+  nodes.footerBgPicker.value = footerBgHex;
+  nodes.footerBgHex.value = footerBgHex;
+  setHexVisual(nodes.footerBgHex, footerBgHex);
+  nodes.footerBgAlpha.value = 85;
+
+  const footerBorderVal = getBaseColor("--border-accent-subtle", "#7a5e9a");
+  const footerBorderHex = anyColorToHex(footerBorderVal);
+  nodes.footerBorderPicker.value = footerBorderHex;
+  nodes.footerBorderHex.value = footerBorderHex;
+  setHexVisual(nodes.footerBorderHex, footerBorderHex);
+  nodes.footerBorderAlpha.value = 30;
 
   paintAccentSwatches();
   updateDerivedAccentVars();
@@ -581,12 +720,31 @@ function applyThemeTokens(t) {
     "--text-body": "textBody",
     "--text-muted": "textMuted",
     "--border-subtle": "borderSubtle",
-    "--border-strong": "borderStrong"
+    "--border-strong": "borderStrong",
+    "--layout-shell-background": "pageBackground",
+    "--header-background": "headerBackground",
+    "--header-border": "headerBorder",
+    "--footer-background": "footerBackground",
+    "--footer-border": "footerBorder"
   };
   Object.entries(map).forEach(([cssVar, key]) => {
     const val = k[key];
     if (typeof val === "string" && val.startsWith("hsl(")) {
       setVar(cssVar, val.replace(/^hsl\(|\)$/g, ""));
+    }
+  });
+
+  // Status colors (plain hex values)
+  const statusMap = {
+    "--success": "success",
+    "--warning": "warning",
+    "--error": "error",
+    "--info": "info"
+  };
+  Object.entries(statusMap).forEach(([cssVar, key]) => {
+    const val = k[key];
+    if (typeof val === "string" && val.startsWith("#")) {
+      setVar(cssVar, val);
     }
   });
 
@@ -619,6 +777,7 @@ nodes.themeRows?.addEventListener("click", (e) => {
 
 function collectCurrentTokens() {
   const grab = (v) => `hsl(${getVar(v)})`;
+  const grabPlain = (v) => getVar(v); // for plain hex colors
   return {
     accent1: grab("--accent-1"),
     accent2: grab("--accent-2"),
@@ -633,7 +792,16 @@ function collectCurrentTokens() {
     textBody: grab("--text-body"),
     textMuted: grab("--text-muted"),
     borderSubtle: grab("--border-subtle"),
-    borderStrong: grab("--border-strong")
+    borderStrong: grab("--border-strong"),
+    pageBackground: grab("--layout-shell-background"),
+    headerBackground: grab("--header-background"),
+    headerBorder: grab("--header-border"),
+    footerBackground: grab("--footer-background"),
+    footerBorder: grab("--footer-border"),
+    success: grabPlain("--success"),
+    warning: grabPlain("--warning"),
+    error: grabPlain("--error"),
+    info: grabPlain("--info")
   };
 }
 
@@ -750,6 +918,22 @@ bindHexPair(nodes.borderSubtlePicker, nodes.borderSubtleHex, () => applyCore(nod
 nodes.borderSubtleAlpha.addEventListener("input", () => applyCore(nodes.borderSubtleHex, nodes.borderSubtleAlpha, "--border-subtle"));
 bindHexPair(nodes.borderStrongPicker, nodes.borderStrongHex, () => applyCore(nodes.borderStrongHex, nodes.borderStrongAlpha, "--border-strong"));
 nodes.borderStrongAlpha.addEventListener("input", () => applyCore(nodes.borderStrongHex, nodes.borderStrongAlpha, "--border-strong"));
+// site chrome (page/header/footer)
+bindHexPair(nodes.pageBgPicker, nodes.pageBgHex, () => applyCore(nodes.pageBgHex, nodes.pageBgAlpha, "--layout-shell-background"));
+nodes.pageBgAlpha.addEventListener("input", () => applyCore(nodes.pageBgHex, nodes.pageBgAlpha, "--layout-shell-background"));
+bindHexPair(nodes.headerBgPicker, nodes.headerBgHex, () => applyCore(nodes.headerBgHex, nodes.headerBgAlpha, "--header-background"));
+nodes.headerBgAlpha.addEventListener("input", () => applyCore(nodes.headerBgHex, nodes.headerBgAlpha, "--header-background"));
+bindHexPair(nodes.headerBorderPicker, nodes.headerBorderHex, () => applyCore(nodes.headerBorderHex, nodes.headerBorderAlpha, "--header-border"));
+nodes.headerBorderAlpha.addEventListener("input", () => applyCore(nodes.headerBorderHex, nodes.headerBorderAlpha, "--header-border"));
+bindHexPair(nodes.footerBgPicker, nodes.footerBgHex, () => applyCore(nodes.footerBgHex, nodes.footerBgAlpha, "--footer-background"));
+nodes.footerBgAlpha.addEventListener("input", () => applyCore(nodes.footerBgHex, nodes.footerBgAlpha, "--footer-background"));
+bindHexPair(nodes.footerBorderPicker, nodes.footerBorderHex, () => applyCore(nodes.footerBorderHex, nodes.footerBorderAlpha, "--footer-border"));
+nodes.footerBorderAlpha.addEventListener("input", () => applyCore(nodes.footerBorderHex, nodes.footerBorderAlpha, "--footer-border"));
+// status colors
+bindHexPair(nodes.successPicker, nodes.successHex, () => applyStatusColor(nodes.successHex, "--success"));
+bindHexPair(nodes.warningPicker, nodes.warningHex, () => applyStatusColor(nodes.warningHex, "--warning"));
+bindHexPair(nodes.errorPicker, nodes.errorHex, () => applyStatusColor(nodes.errorHex, "--error"));
+bindHexPair(nodes.infoPicker, nodes.infoHex, () => applyStatusColor(nodes.infoHex, "--info"));
 
 // ===== Preview toggles wiring =====
 function show(el, yes) { el.style.display = yes ? "" : "none"; }
@@ -816,14 +1000,14 @@ refreshPreviewAll();
 
     /* ===== Swatches ===== */
     .swatch-row { display: grid; gap: var(--space-3); grid-template-columns: repeat(3, minmax(0,1fr)); margin-top: var(--space-3); }
-    .swatch { position: relative; border-radius: var(--radius-2); height: 56px; background: var(--bg, transparent); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-1); }
+    .swatch { position: relative; border-radius: var(--radius-2); height: 56px; background: var(--bg, transparent); border: 1px solid hsl(var(--border-subtle)); box-shadow: var(--shadow-1); }
     .swatch span { position: absolute; bottom: 8px; left: 8px; background: color-mix(in srgb, black 20%, transparent); color: white; font-size: var(--fs-0); padding: 2px 6px; border-radius: var(--radius-pill); }
 
     /* ===== Page-like Preview ===== */
-    .page-preview { border: 1px dashed var(--border-subtle); border-radius: var(--radius-2); overflow: clip; }
-    .page-bg { background: var(--surface-base); padding: var(--space-6); }
+    .page-preview { border: 1px dashed hsl(var(--border-subtle)); border-radius: var(--radius-2); overflow: clip; }
+    .page-bg { background: hsl(var(--surface-base)); padding: var(--space-6); }
     .page-container {
-      background: var(--surface-panel); border: 1px solid var(--border-subtle);
+      background: hsl(var(--surface-panel)); border: 1px solid hsl(var(--border-subtle));
       border-radius: var(--radius-2); padding: var(--space-5);
       max-width: 820px; margin: 0 auto;
       color: hsl(var(--text-body));
@@ -833,13 +1017,13 @@ refreshPreviewAll();
     /* ===== Cards in Preview ===== */
     .cards { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top: var(--space-3); }
     .demo-card {
-      background: var(--surface-card); border: 1px solid var(--border-subtle);
+      background: hsl(var(--surface-card)); border: 1px solid hsl(var(--border-subtle));
       border-radius: var(--radius-2); padding: var(--space-4); box-shadow: var(--shadow-1);
       transition: transform var(--dur-med) var(--ease-out-curve), box-shadow var(--dur-med) var(--ease-out-curve);
       color: hsl(var(--preview-card-text, var(--text-body)));
     }
     .demo-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-2); }
-    .demo-card.elevated { background: var(--surface-elevated); }
+    .demo-card.elevated { background: hsl(var(--surface-elevated)); }
     .focusable:focus { outline: var(--ring-focus); outline-offset: 2px; }
     .demo-card h4 { margin: 0 0 .4rem; color: hsl(var(--preview-heading-text, var(--text-strong))); }
     .demo-card p { margin: 0 0 .8rem; }
@@ -864,7 +1048,7 @@ refreshPreviewAll();
 
     .status-row { display: flex; gap: var(--space-4); align-items: center; color: var(--text-muted); margin-top: var(--space-4); }
     .dot { display: inline-block; width: .75rem; height: .75rem; border-radius: 50%; vertical-align: middle; margin-right: .35rem; border: 1px solid var(--border-subtle); }
-    .dot.success { background: hsl(var(--green-3)); } .dot.warn { background: hsl(var(--amber-3)); } .dot.error { background: hsl(var(--red-3)); } .dot.info { background: color-mix(in srgb, hsl(var(--accent-1)) 55%, white 45%); }
+    .dot.success { background: var(--success, hsl(var(--green-3))); } .dot.warn { background: var(--warning, hsl(var(--amber-3))); } .dot.error { background: var(--error, hsl(var(--red-3))); } .dot.info { background: var(--info, color-mix(in srgb, hsl(var(--accent-1)) 55%, white 45%)); }
 
     .tags { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: var(--space-3); }
     .tag { padding: .25rem .5rem; border-radius: var(--radius-pill); background: color-mix(in srgb, hsl(var(--accent-2)) 26%, transparent); border: 1px solid color-mix(in srgb, hsl(var(--accent-2)) 42%, transparent); color: var(--text-body); font-size: .8rem; }

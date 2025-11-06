@@ -17,6 +17,7 @@ export interface Props {
     spoonLevel?: string
     spoons?: string
     tldr?: string
+    category?: string
     heroImage?: unknown
     heroImageSrc?: unknown
     heroImageAlt?: unknown
@@ -37,6 +38,7 @@ export interface Props {
   publishedAt?: string
   spoonLevel?: string
   spoons?: string
+  category?: string
   class?: string
   heroImage?: unknown
   heroImageSrc?: unknown
@@ -60,6 +62,7 @@ const {
   publishedAt,
   spoonLevel,
   spoons,
+  category,
   class: className,
   heroImage,
   heroImageSrc,
@@ -81,6 +84,8 @@ const _publishedAt = (publishedAt ?? post?.publishedAt ?? post?.date) as string 
 const _dateLabel = formatDate(_publishedAt)
 const _spoonRaw = (spoons ?? spoonLevel ?? post?.spoons ?? post?.spoonLevel) as string | undefined
 const _spoon = typeof _spoonRaw === 'string' ? normalizeSpoon(_spoonRaw) : ''
+const _category = (category ?? post?.category ?? 'ritual') as string
+const _showCategoryBadge = _category === 'meandering' // Only show badge for meanderings
 const _tldrRaw = typeof (tldr ?? post?.tldr) === 'string' ? String((tldr ?? post?.tldr) ?? '') : ''
 const _summarySource = _tldrRaw.trim() ? _tldrRaw : _excerpt
 const _summary = truncateSummary(_summarySource)
@@ -155,7 +160,14 @@ function truncateSummary(value: string | undefined | null, max = 120): string {
     )}
   </div>
   <div class="card-body">
-    {_spoon && <SpoonsBadge level={_spoon} />}
+    <div class="card-badges">
+      {_spoon && <SpoonsBadge level={_spoon} />}
+      {_showCategoryBadge && (
+        <span class="category-badge category-badge--meandering">
+          meandering
+        </span>
+      )}
+    </div>
     {metadataItems.length > 0 && (
       <ul class="card-metadata">
         {metadataItems.map((item) => (

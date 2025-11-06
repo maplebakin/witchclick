@@ -6,7 +6,7 @@ import PostCard from "@/components/PostCard.astro";
 import { readEditorialCalendar } from "@/utils/editorialCalendar";
 import { createCollectionPageSchema } from "@/utils/structuredData";
 import { readSettings } from "@/utils/settings";
-import { getPostBySlug, extractHeroImage } from "@/utils/posts";
+import { getPostBySlug, extractHeroImage, getPostCategory } from "@/utils/posts";
 import HeadSlot from "@/components/HeadSlot.astro";
 
 const HUBS = [
@@ -59,6 +59,7 @@ function resolveIntro(hub: HubConfig) {
     heroImageSrc: heroSrc,
     heroImageAlt: heroAlt,
     heroAlt: heroAlt,
+    category: getPostCategory(post),
   };
 }
 
@@ -130,6 +131,7 @@ const breadcrumbs = [
             {hub.intro && (
               <PostCard
                 class="hub-card__post"
+                href={`/post/${hub.intro.slug}`}
                 post={{
                   slug: hub.intro.slug,
                   title: hub.intro.title,
@@ -143,6 +145,7 @@ const breadcrumbs = [
                   heroImageSrc: hub.intro.heroImageSrc,
                   heroImageAlt: hub.intro.heroImageAlt,
                   heroAlt: hub.intro.heroAlt,
+                  category: hub.intro.category,
                 }}
               />
             )}

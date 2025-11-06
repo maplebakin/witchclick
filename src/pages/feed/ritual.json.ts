@@ -1,7 +1,6 @@
-// src/pages/feed.json.ts — JSON Feed v1 (drop‑in replacement)
-// Refactored to use loadAllPosts() and include category metadata
-import { loadAllPosts, getPostCategory } from '../utils/posts';
-import { readSettings } from '../utils/settings';
+// src/pages/feed/ritual.json.ts — JSON Feed v1 for ritual posts only
+import { loadAllPosts, filterPostsByCategory, POST_CATEGORY_RITUAL, getPostCategory } from '../../utils/posts';
+import { readSettings } from '../../utils/settings';
 
 function normalizeSite(u: string) {
   try {
@@ -16,9 +15,10 @@ export async function GET() {
   const settings = readSettings();
   const site = normalizeSite(settings.siteUrl);
 
-  const posts = loadAllPosts();
+  const allPosts = loadAllPosts();
+  const ritualPosts = filterPostsByCategory(allPosts, POST_CATEGORY_RITUAL);
 
-  const items = posts.map((post) => {
+  const items = ritualPosts.map((post) => {
     const data = post.data ?? {};
     const slug = post.slug;
     const url = `${site}/post/${slug}`;
@@ -40,17 +40,17 @@ export async function GET() {
       tags,
       date_published: post.date.toISOString(),
       _witchclick: {
-        category, // Custom extension field for category
+        category,
       },
     };
   });
 
   const feed = {
     version: 'https://jsonfeed.org/version/1',
-    title: settings.brandName || 'WitchClick',
+    title: `${settings.brandName || 'WitchClick'} — Rituals & Magic`,
     home_page_url: site,
-    feed_url: `${site}/feed.json`,
-    description: 'All posts from WitchClick. For category-specific feeds, see /feed/ritual.json or /feed/meandering.json',
+    feed_url: `${site}/feed/ritual.json`,
+    description: 'Gentle rituals, cozy tools, and reflections for when life feels loud.',
     items,
   };
 

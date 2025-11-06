@@ -1,7 +1,8 @@
 ---
 import Base from "../../layouts/Base.astro";
 import PostCard from "../../components/PostCard.astro";
-import { loadAllPosts, estimateReadingMinutes, firstParagraph, extractHeroImage } from "../../utils/posts";
+import { loadAllPosts } from "../../utils/posts";
+import { postsToCardData } from "../../utils/postTransforms";
 import { readSettings } from "../../utils/settings";
 import { createCollectionPageSchema } from "../../utils/structuredData";
 import HeadSlot from "@/components/HeadSlot.astro";
@@ -40,38 +41,8 @@ const taggedPosts = allPosts
     return dateB - dateA;
   });
 
-const cards = taggedPosts.map((post) => {
-  const fm = post.data ?? {};
-  const excerpt = fm.excerpt ?? fm.description ?? fm.metaDescription ?? firstParagraph(post.content);
-  const hero = extractHeroImage(fm);
-  const heroSrc = typeof hero.src === "string" && hero.src.trim() ? hero.src.trim() : undefined;
-  const heroAlt = typeof hero.alt === "string" && hero.alt.trim() ? hero.alt.trim() : undefined;
-  return {
-    slug: post.slug,
-    title: fm.title ?? post.title,
-    excerpt,
-    tags: Array.isArray(fm.tags) ? fm.tags : [],
-    readingMinutes: fm.readingMinutes ?? estimateReadingMinutes(post.content),
-    publishedAt: fm.publishedAt ?? fm.pubDate ?? fm.date ?? undefined,
-    spoonLevel: typeof fm.spoonLevel === "string" ? fm.spoonLevel : undefined,
-    spoons:
-      typeof fm.spoons === "string"
-        ? fm.spoons
-        : typeof post.spoons === "string"
-          ? post.spoons
-          : undefined,
-    tldr:
-      typeof post.tldr === "string"
-        ? post.tldr
-        : typeof fm.tldr === "string"
-          ? fm.tldr
-          : undefined,
-    heroImage: heroSrc,
-    heroImageSrc: heroSrc,
-    heroImageAlt: heroAlt,
-    heroAlt: heroAlt,
-  };
-});
+// Transform to card data
+const cards = postsToCardData(taggedPosts);
 
 const collectionSchema = createCollectionPageSchema(
   settings,
@@ -102,6 +73,7 @@ const collectionSchema = createCollectionPageSchema(
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {cards.map((card) => (
         <PostCard
+          href={`/post/${card.slug}`}
           post={{
             slug: card.slug,
             title: card.title,
@@ -116,8 +88,8 @@ const collectionSchema = createCollectionPageSchema(
             heroImageSrc: card.heroImageSrc,
             heroImageAlt: card.heroImageAlt,
             heroAlt: card.heroAlt,
+            category: card.category,
           }}
-          href={`/post/${card.slug}`}
         />
       ))}
     </div>

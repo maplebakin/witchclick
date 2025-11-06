@@ -3,7 +3,8 @@ import Base from "@/layouts/Base.astro";
 import PostCard from "@/components/PostCard.astro";
 import AuthorSpotlight from "@/components/AuthorSpotlight.astro";
 import { loadAuthors, getAuthorBySlug } from "@/utils/authors";
-import { getPostsByAuthor, extractHeroImage } from "@/utils/posts";
+import { getPostsByAuthor } from "@/utils/posts";
+import { postsToCardData } from "@/utils/postTransforms";
 import { createCollectionPageSchema } from "@/utils/structuredData";
 import { readSettings } from "@/utils/settings";
 import HeadSlot from "@/components/HeadSlot.astro";
@@ -24,6 +25,7 @@ if (!author) {
 }
 
 const posts = getPostsByAuthor(author.slug);
+const cards = postsToCardData(posts);
 const settings = readSettings();
 const jsonLd = createCollectionPageSchema(
   settings,
@@ -33,10 +35,10 @@ const jsonLd = createCollectionPageSchema(
     description: author.bio ?? `${author.name} on WitchClick`,
     collectionType: "ProfilePage",
   },
-  posts.map((post) => ({
-    name: post.title,
-    url: `/post/${post.slug}`,
-    description: post.data?.excerpt ?? post.data?.metaDescription ?? "",
+  cards.map((card) => ({
+    name: card.title,
+    url: `/post/${card.slug}`,
+    description: card.excerpt,
   })),
 );
 ---
@@ -66,35 +68,29 @@ const jsonLd = createCollectionPageSchema(
       <h2>Recent stories</h2>
       <p>{posts.length === 0 ? `${author.name} is preparing their first piece.` : `Browse ${posts.length} ${posts.length === 1 ? "story" : "stories"} from ${author.name}.`}</p>
     </header>
-    {posts.length > 0 ? (
+    {cards.length > 0 ? (
       <div class="author-page-posts__grid">
-        {posts.map((post) => {
-          const hero = extractHeroImage(post.data ?? {});
-          return (
-            <PostCard
-              post={{
-                slug: post.slug,
-                title: post.title,
-                excerpt: post.data?.excerpt ?? post.data?.metaDescription ?? "",
-                tldr: typeof post.tldr === "string" ? post.tldr : post.data?.tldr,
-                tags: post.data?.tags ?? [],
-                readingMinutes: post.data?.readingMinutes,
-                publishedAt: post.data?.publishedAt ?? post.data?.pubDate ?? post.data?.date,
-                spoonLevel: post.data?.spoonLevel,
-                spoons:
-                  typeof post.spoons === "string"
-                    ? post.spoons
-                    : typeof post.data?.spoons === "string"
-                      ? post.data.spoons
-                      : undefined,
-                heroImage: hero?.src,
-                heroImageSrc: hero?.src,
-                heroImageAlt: hero?.alt,
-                heroAlt: hero?.alt,
-              }}
-            />
-          );
-        })}
+        {cards.map((card) => (
+          <PostCard
+            href={`/post/${card.slug}`}
+            post={{
+              slug: card.slug,
+              title: card.title,
+              excerpt: card.excerpt,
+              tldr: card.tldr,
+              tags: card.tags,
+              readingMinutes: card.readingMinutes,
+              publishedAt: card.publishedAt,
+              spoonLevel: card.spoonLevel,
+              spoons: card.spoons,
+              heroImage: card.heroImage,
+              heroImageSrc: card.heroImageSrc,
+              heroImageAlt: card.heroImageAlt,
+              heroAlt: card.heroAlt,
+              category: card.category,
+            }}
+          />
+        ))}
       </div>
     ) : (
       <p class="author-page-posts__empty">Circle back soon—new work is on the way.</p>

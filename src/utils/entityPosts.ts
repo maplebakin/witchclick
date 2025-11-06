@@ -1,4 +1,5 @@
-import { firstParagraph, loadAllPosts } from "./posts";
+import { firstParagraph, loadAllPosts, getPostCategory } from "./posts";
+import type { PostCategory } from "@/types/post";
 
 export type RelatedPost = {
   title: string;
@@ -6,6 +7,7 @@ export type RelatedPost = {
   slug: string;
   publishedAt: string;
   excerpt?: string;
+  category?: PostCategory;
 };
 
 type EntityRef = { type: string; slug: string };
@@ -79,6 +81,7 @@ export async function getPostsForEntity(
       slug: post.slug,
       publishedAt: derivePublishedAt(post),
       excerpt: excerpt || undefined,
+      category: getPostCategory(post),
     } satisfies RelatedPost;
   });
 }

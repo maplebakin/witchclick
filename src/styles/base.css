@@ -1,6 +1,6 @@
 /* ===========================================================================
-   BASE STYLES - WitchClick
-   Core design tokens, resets, and foundational styles
+   BASE STYLES - WitchClick (Enhanced)
+   Core design tokens, resets, and foundational styles with refined animations
    =========================================================================== */
 
 /* Import color tokens */
@@ -90,6 +90,15 @@
   --header-divider: color-mix(in srgb, var(--header-border) 65%, transparent 35%);
   --header-shadow: 0 18px 42px -28px color-mix(in srgb, var(--color-night) 60%, transparent 40%);
   --header-padding-block: clamp(0.7rem, 2vw, 1rem);
+
+  /* Footer tokens */
+  --footer-background: 263 76% 3% / 0.85;
+  --footer-border: 268 24% 49% / 0.3;
+
+  /* Header tokens - ensure they have fallback hex values for editing */
+  --header-bg-base: #1a0f1f;
+  --header-border-base: #3d2a52;
+  --page-bg-base: #07020f;
   --header-link-padding-block: clamp(0.4rem, 1.4vw, 0.65rem);
   --header-link-padding-inline: clamp(.085rem, 2vw, 1.2rem);
   --header-link-letter-spacing: 0.05em;
@@ -213,6 +222,10 @@
   --header-background: color-mix(in srgb, var(--color-rune) 92%, transparent 8%);
   --header-border: color-mix(in srgb, var(--color-border) 50%, transparent 50%);
   --header-shadow: 0 18px 45px -32px color-mix(in srgb, var(--color-amethyst) 35%, transparent 65%);
+
+  /* Footer tokens (dawn) */
+  --footer-background: 30 47% 94% / 0.9;
+  --footer-border: 268 24% 49% / 0.3;
   --hero-background:
     linear-gradient(140deg,
       color-mix(in srgb, var(--color-rune) 86%, white 14%),
@@ -239,7 +252,40 @@
   --comfort-tray-border-strong: color-mix(in srgb, var(--color-border-strong) 42%, transparent 58%);
   --comfort-tray-shadow: 0 24px 55px -32px color-mix(in srgb, var(--color-amethyst) 30%, transparent 70%);
   --comfort-tray-hint: color-mix(in srgb, var(--ink-muted) 60%, black 40%);
+}
 
+/* ---------------------------------------------------------------------------
+   Enhanced Animations - Subtle & Personal
+   --------------------------------------------------------------------------- */
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { 
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+  }
+  50% { 
+    text-shadow: 0 0 18px rgba(212, 175, 55, 0.4);
+  }
+}
+
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes page-turn {
+  0% { opacity: 0; transform: rotateY(-5deg); }
+  100% { opacity: 1; transform: rotateY(0deg); }
 }
 
 /* ---------------------------------------------------------------------------
@@ -284,13 +330,13 @@ html:focus-within {
 }
 
 /* ---------------------------------------------------------------------------
-   Base Element Styles
+   Base Element Styles (Enhanced)
    --------------------------------------------------------------------------- */
 
 body {
   min-height: 100vh;
   font-family: var(--font-body-ui, var(--font-body));
-  line-height: 1.7;
+  line-height: 1.75;
   font-size: 1rem;
   color: var(--layout-shell-ink, var(--ink-body));
   letter-spacing: var(--font-body-letter-spacing, normal);
@@ -301,23 +347,38 @@ body {
   transition: background-color 220ms ease, color 180ms ease;
 }
 
+/* Dawn body */
 :root[data-comfort-theme="dawn"] body {
   color: var(--layout-shell-ink, var(--ink-body));
   background: var(--layout-shell-background, #f7f3f8);
 }
 
-/* Transparent overlay for solid backgrounds */
+/* Subtle paper texture overlay - pushed behind content */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background: transparent;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.02) 0px,
+    transparent 1px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.02) 3px
+  );
+  opacity: 0.18;
   z-index: -1;
 }
 
 :root[data-comfort-theme="dawn"] body::before {
-  background: transparent;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.015) 0px,
+    transparent 1px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.015) 3px
+  );
+  opacity: 0.22;
 }
 
 body[data-menu-open="true"] {
@@ -381,13 +442,13 @@ blockquote {
   color: var(--text-primary);
 }
 
-/* Links */
+/* Links (Enhanced) */
 a {
   color: var(--link-color);
   text-decoration-line: underline;
   text-decoration-thickness: max(2px, 0.1em);
   text-underline-offset: 0.2em;
-  transition: color 160ms ease;
+  transition: color 220ms ease, text-decoration-color 220ms ease;
 }
 
 a:hover,
@@ -556,6 +617,17 @@ main {
   backdrop-filter: blur(18px);
   gap: var(--layout-main-plain-gap);
   overflow: hidden;
+  transition: transform 320ms ease, box-shadow 320ms ease, border-color 320ms ease;
+}
+
+/* Enhanced hover states for cards – no big lift for whole shell */
+.site-main__container--plain:hover {
+  transform: none;
+  box-shadow: 
+    0 24px 60px -20px color-mix(in srgb, var(--color-night) 70%, transparent 30%),
+    0 0 30px rgba(124, 78, 176, 0.15),
+    inset 0 1px 0 rgba(244, 241, 255, 0.08);
+  border-color: color-mix(in srgb, var(--color-border) 55%, transparent 45%);
 }
 
 .site-main__container--plain::before {
@@ -603,7 +675,7 @@ main {
 }
 
 /* ---------------------------------------------------------------------------
-   Page-Specific Backgrounds
+   Page-Specific Backgrounds (Preserved)
    --------------------------------------------------------------------------- */
 
 /* 1. Homepage - Welcoming & Grounding */
@@ -864,24 +936,23 @@ main {
 }
 
 /* ---------------------------------------------------------------------------
-   Header & Navigation Styles
+   Header & Navigation Styles (Enhanced)
    --------------------------------------------------------------------------- */
-
 
 .site-header {
   position: sticky;
   top: 0;
   z-index: 40;
   isolation: isolate;
-  backdrop-filter: blur(18px);
+  backdrop-filter: blur(20px) saturate(180%);
   background: var(--header-background);
   border-bottom: 1px solid transparent;
   box-shadow: var(--header-shadow);
   transition:
-    background-color 220ms ease,
-    border-color 220ms ease,
-    box-shadow 220ms ease,
-    backdrop-filter 220ms ease;
+    background-color 280ms ease,
+    border-color 280ms ease,
+    box-shadow 280ms ease,
+    backdrop-filter 280ms ease;
 }
 
 .site-header::after {
@@ -922,6 +993,11 @@ main {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--comfort-chip-text-strong, var(--text-accent-strong));
+  transition: transform 280ms ease;
+}
+
+.site-logo:hover {
+  transform: scale(1.02);
 }
 
 .site-logo::before {
@@ -982,10 +1058,10 @@ main {
   color: color-mix(in srgb, var(--layout-shell-ink) 90%, white 10%);
   text-decoration: none;
   transition:
-    color 180ms ease,
-    background-color 200ms ease,
-    border-color 200ms ease,
-    transform 160ms ease;
+    color 220ms ease,
+    background-color 240ms ease,
+    border-color 240ms ease,
+    transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .site-nav__link::after,
@@ -1001,7 +1077,7 @@ main {
   opacity: 0;
   transform: scaleX(0.55);
   transform-origin: center;
-  transition: opacity 160ms ease, transform 160ms ease;
+  transition: opacity 240ms ease, transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .site-nav__link--secondary {
@@ -1030,7 +1106,7 @@ main {
   color: var(--comfort-chip-text-strong, var(--text-accent-strong));
   border-color: color-mix(in srgb, var(--header-border) 35%, var(--color-iris) 65%);
   background: color-mix(in srgb, var(--header-background) 45%, var(--color-iris) 55%);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 .site-nav__link:hover::after,
@@ -1066,10 +1142,10 @@ main {
   color: color-mix(in srgb, var(--layout-shell-ink) 90%, white 10%);
   cursor: pointer;
   transition:
-    color 180ms ease,
-    background-color 200ms ease,
-    border-color 200ms ease,
-    transform 160ms ease;
+    color 220ms ease,
+    background-color 240ms ease,
+    border-color 240ms ease,
+    transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .site-nav__toggle:hover,
@@ -1077,7 +1153,7 @@ main {
   background: color-mix(in srgb, var(--header-background) 40%, var(--color-iris) 60%);
   border-color: color-mix(in srgb, var(--header-border) 38%, var(--color-iris) 62%);
   color: var(--comfort-chip-text-strong, var(--text-accent-strong));
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 .site-nav__toggle svg {
@@ -1093,13 +1169,14 @@ main {
   border-radius: 1rem;
   border: 1px solid color-mix(in srgb, var(--header-border) 65%, transparent 35%);
   background: color-mix(in srgb, var(--header-background) 92%, transparent 8%);
+  backdrop-filter: blur(16px);
   box-shadow: 0 24px 60px -32px color-mix(in srgb, var(--color-night) 65%, transparent 35%);
   min-width: 16rem;
   transform-origin: top right;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-0.5rem);
-  transition: opacity 160ms ease, transform 160ms ease;
+  transition: opacity 240ms ease, transform 280ms cubic-bezier(0.4, 0, 0.2, 1), visibility 240ms;
 }
 
 :root[data-comfort-theme="dawn"] .site-nav__submenu {
@@ -1131,6 +1208,7 @@ main {
   font-family: var(--font-body);
   text-transform: none;
   letter-spacing: normal;
+  transition: all 240ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 :root[data-comfort-theme="dawn"] .site-nav__submenu-link {
@@ -1143,6 +1221,7 @@ main {
   border-color: color-mix(in srgb, var(--header-border) 40%, var(--color-iris) 60%);
   background: color-mix(in srgb, var(--header-background) 55%, var(--color-iris) 45%);
   color: var(--comfort-chip-text-strong, var(--text-accent-strong));
+  transform: translateX(4px);
 }
 
 :root[data-comfort-theme="dawn"] .site-nav__submenu-link:hover,
@@ -1193,16 +1272,28 @@ main {
   border-radius: 999px;
   border: 1px solid rgba(212, 175, 55, 0.2);
   background: rgba(12, 5, 23, 0.65);
+  backdrop-filter: blur(8px);
   padding: var(--space-2) var(--space-4);
   color: var(--text-secondary);
   font-size: 0.9rem;
   letter-spacing: 0.08em;
+  transition: all 240ms ease;
+}
+
+.search-input:focus {
+  border-color: rgba(212, 175, 55, 0.4);
+  background: rgba(12, 5, 23, 0.8);
 }
 
 :root[data-comfort-theme="dawn"] .search-input {
   background: rgba(244, 239, 232, 0.9);
   border-color: rgba(122, 94, 154, 0.28);
   color: var(--text-secondary);
+}
+
+:root[data-comfort-theme="dawn"] .search-input:focus {
+  border-color: rgba(122, 94, 154, 0.45);
+  background: rgba(244, 239, 232, 0.98);
 }
 
 .search-input::placeholder {
@@ -1222,6 +1313,7 @@ main {
   border-radius: 1rem;
   border: 1px solid var(--border-accent-subtle);
   background: rgba(7, 2, 15, 0.95);
+  backdrop-filter: blur(16px);
   box-shadow: var(--shadow-soft);
   overflow: hidden;
 }
@@ -1237,6 +1329,7 @@ main {
   color: var(--text-secondary);
   font-size: 0.875rem;
   border-bottom: 1px solid rgba(212, 175, 55, 0.08);
+  transition: all 220ms ease;
 }
 
 .search-result:last-child {
@@ -1261,6 +1354,7 @@ main {
 .search-result:focus-visible {
   background: rgba(124, 78, 176, 0.35);
   color: var(--text-accent-strong);
+  transform: translateX(4px);
 }
 
 .site-nav__mobile {
@@ -1273,7 +1367,7 @@ main {
   color: color-mix(in srgb, var(--layout-shell-ink) 92%, white 8%);
   transform: translateY(-100%);
   opacity: 0;
-  transition: transform 240ms ease, opacity 240ms ease;
+  transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1), opacity 280ms ease;
   overflow-y: auto;
 }
 
@@ -1321,7 +1415,7 @@ main {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
-  transition: color 200ms ease, border-color 200ms ease;
+  transition: color 240ms ease, border-color 240ms ease, transform 220ms ease;
 }
 
 :root[data-comfort-theme="dawn"] .site-nav__mobile-link {
@@ -1333,27 +1427,28 @@ main {
 .site-nav__mobile-link:focus-visible {
   color: var(--comfort-chip-text-strong, var(--text-accent-strong));
   border-bottom-color: color-mix(in srgb, var(--header-border) 35%, var(--color-iris) 65%);
+  transform: translateX(4px);
 }
 
 .site-nav__mobile-link[aria-current="page"] {
   color: var(--comfort-chip-text-strong, var(--text-accent-strong));
 }
 
-
 /* ---------------------------------------------------------------------------
-   Footer Styles
+   Footer Styles (Enhanced)
    --------------------------------------------------------------------------- */
 
 .site-footer {
   margin-top: var(--space-9);
   padding-block: var(--space-8);
-  border-top: 1px solid var(--border-accent-subtle);
-  background: rgba(7, 2, 15, 0.85);
+  border-top: 1px solid hsl(var(--footer-border));
+  background: hsl(var(--footer-background));
+  backdrop-filter: blur(12px);
 }
 
 :root[data-comfort-theme="dawn"] .site-footer {
-  background: rgba(247, 240, 233, 0.9);
-  border-top-color: rgba(122, 94, 154, 0.3);
+  background: hsl(var(--footer-background));
+  border-top-color: hsl(var(--footer-border));
   color: var(--text-strong);
 }
 
@@ -1390,7 +1485,8 @@ main {
 
 .site-footer__link {
   color: var(--text-secondary);
-  transition: color 160ms ease;
+  transition: color 220ms ease, transform 200ms ease;
+  display: inline-block;
 }
 
 :root[data-comfort-theme="dawn"] .site-footer__link {
@@ -1400,6 +1496,7 @@ main {
 .site-footer__link:hover,
 .site-footer__link:focus-visible {
   color: var(--text-accent-strong);
+  transform: translateX(3px);
 }
 
 :root[data-comfort-theme="dawn"] .site-footer__link:hover,
@@ -1468,7 +1565,7 @@ main {
   font-size: 0.75rem;
   font-weight: 600;
   color: color-mix(in srgb, var(--text-secondary) 92%, transparent 8%);
-  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+  transition: border-color 220ms ease, background-color 220ms ease, color 220ms ease, transform 200ms ease;
 }
 
 .site-footer__feed:hover,
@@ -1476,6 +1573,7 @@ main {
   border-color: color-mix(in srgb, var(--color-iris) 55%, transparent 45%);
   background: color-mix(in srgb, var(--surface-plain) 94%, transparent 6%);
   color: color-mix(in srgb, var(--link-color) 65%, var(--text-secondary) 35%);
+  transform: translateY(-2px);
 }
 
 :root[data-comfort-theme="dawn"] .site-footer__feed {
@@ -1568,4 +1666,70 @@ main {
   .site-nav__actions {
     display: flex;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Enhanced Utility Classes - Personal Blog Style
+   --------------------------------------------------------------------------- */
+
+/* Fade-in animation utility */
+.fade-in {
+  animation: fade-in-up 500ms ease-out backwards;
+}
+
+.fade-in-delay-1 { animation-delay: 100ms; }
+.fade-in-delay-2 { animation-delay: 200ms; }
+.fade-in-delay-3 { animation-delay: 300ms; }
+.fade-in-delay-4 { animation-delay: 400ms; }
+
+/* Gentle hover lift */
+.hover-lift {
+  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 300ms ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+}
+
+/* Side-scroll card effect for blog posts/rituals */
+.hover-slide {
+  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1), border-color 300ms ease, background-color 300ms ease;
+}
+
+.hover-slide:hover {
+  transform: translateX(6px);
+}
+
+/* Prose styling for blog content */
+.prose {
+  max-width: 65ch;
+  line-height: 1.75;
+}
+
+.prose p {
+  margin-bottom: 1.5rem;
+}
+
+/* Drop cap for first letter */
+.prose p:first-of-type::first-letter {
+  font-size: 3.5em;
+  line-height: 0.8;
+  float: left;
+  margin: 0.1em 0.1em 0 0;
+  font-family: var(--font-heading);
+  color: var(--color-gold);
+  text-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+}
+
+/* Enhanced link styles in prose */
+.prose a {
+  color: color-mix(in srgb, var(--color-fog) 60%, var(--color-gold) 40%);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-gold) 30%, transparent 70%);
+  transition: all 220ms ease;
+}
+
+.prose a:hover {
+  color: var(--color-gold);
+  border-bottom-color: var(--color-gold);
 }
