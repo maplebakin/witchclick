@@ -154,6 +154,8 @@ const ritualData = entries.map((entry) => ({
   materials: entry.materials,
   steps: entry.steps,
 }));
+
+const _ritualDataJson = JSON.stringify({ entries: ritualData });
 ---
 <Base {title} {description}>
   {downloadCollectionSchema && (
@@ -372,7 +374,7 @@ const ritualData = entries.map((entry) => ({
     </a>
   </section>
 
-  <script type="application/json" id="ritual-lab-data">{JSON.stringify({ entries: ritualData })}</script>
+  <script type="application/json" id="ritual-lab-data">{_ritualDataJson}</script>
   <script type="module">
     const dataEl = document.getElementById("ritual-lab-data");
     const form = document.getElementById("lab-form");

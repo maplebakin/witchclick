@@ -52,7 +52,7 @@ const {
         color: var(--accent);
       }
 
-      h2 {
+      :global(h2) {
         font-family: "Crimson Pro", "Georgia", serif;
         font-size: 1.75rem;
         margin-top: 2.5rem;
@@ -60,21 +60,22 @@ const {
         color: var(--text);
       }
 
-      p, li {
+      :global(p),
+      :global(li) {
         font-size: 1rem;
         line-height: 1.6;
       }
 
-      .grid {
+      :global(.grid) {
         display: grid;
         gap: 1.5rem;
       }
 
-      .three-columns {
+      :global(.three-columns) {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
-      .card {
+      :global(.card) {
         border: 2px solid rgba(124, 58, 237, 0.25);
         border-radius: 16px;
         padding: 1.25rem;
@@ -85,14 +86,14 @@ const {
         gap: 0.75rem;
       }
 
-      .card h3 {
+      :global(.card h3) {
         margin: 0;
         font-size: 1.25rem;
         font-weight: 600;
         color: var(--accent);
       }
 
-      .card ul {
+      :global(.card ul) {
         list-style: none;
         padding: 0;
         margin: 0;
@@ -100,14 +101,14 @@ const {
         gap: 0.5rem;
       }
 
-      .checkbox-row {
+      :global(.checkbox-row) {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         align-items: center;
         gap: 0.75rem;
       }
 
-      .checkbox {
+      :global(.checkbox) {
         height: 20px;
         width: 20px;
         border: 2px solid var(--accent);

@@ -70,19 +70,6 @@ function directoryHasMarkdown(candidate: string): boolean {
   }
 }
 
-function resolvePostDirectory(): string | null {
-  const cwd = process.cwd();
-  const modern = path.join(cwd, "src", "content", "posts");
-  const legacy = path.join(cwd, "content", "posts");
-
-  if (directoryHasMarkdown(modern)) return modern;
-  if (directoryHasMarkdown(legacy)) return legacy;
-  if (isDirectory(modern)) return modern;
-  if (isDirectory(legacy)) return legacy;
-
-  return null;
-}
-
 function resolvePostDirectories(): string[] {
   const cwd = process.cwd();
   const modern = path.join(cwd, "src", "content", "posts");

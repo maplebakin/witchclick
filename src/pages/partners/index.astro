@@ -317,7 +317,7 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
     color: color-mix(in srgb, var(--ink-muted, currentColor) 75%, white 25%);
   }
 
-  .partner-card__actions .wc-button {
+  :global(.partner-card__actions .wc-button) {
     --btn-bg: color-mix(in srgb, rgba(99, 102, 241, 0.85) 55%, var(--color-night) 45%);
     --btn-bg-hover: color-mix(in srgb, rgba(99, 102, 241, 0.9) 65%, var(--color-night) 35%);
   }

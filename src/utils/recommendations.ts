@@ -182,5 +182,5 @@ export function getRelatedPosts({ currentSlug, currentData, limit = 4 }: Recomme
   const filtered = recommendations.filter((item) => item.score > 0);
   const baseline = filtered.length > 0 ? filtered : recommendations;
 
-  return baseline.slice(0, limit).map(({ date, ...item }) => item);
+  return baseline.slice(0, limit).map(({ date: _unused, ...item }) => item);
 }

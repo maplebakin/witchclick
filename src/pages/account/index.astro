@@ -627,7 +627,7 @@ const shareGift = {
       gap: 1.5rem;
     }
 
-    .account-card {
+    :global(.account-card) {
       --card-hover-translate: -0.2rem;
       --card-elevation-base: var(--elevation-tier-2);
       --card-elevation-hover: var(--elevation-tier-3);
@@ -640,20 +640,20 @@ const shareGift = {
         var(--card-panel-surface);
     }
 
-    .account-card__header {
+    :global(.account-card__header) {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
       gap: 1rem;
     }
 
-    .account-card__header h3 {
+    :global(.account-card__header h3) {
       margin: 0;
       font-size: 1.2rem;
       color: color-mix(in srgb, var(--ambient-color, #7c3aed) 65%, #1f2937 35%);
     }
 
-    .account-card__remove {
+    :global(.account-card__remove) {
       border: 0;
       background: none;
       color: rgba(220, 38, 38, 0.75);
@@ -664,13 +664,13 @@ const shareGift = {
       text-underline-offset: 3px;
     }
 
-    .account-card__summary {
+    :global(.account-card__summary) {
       margin: 0;
       color: color-mix(in srgb, var(--ink-body, #1f2937) 78%, white 22%);
       line-height: 1.6;
     }
 
-    .account-card__status {
+    :global(.account-card__status) {
       border-radius: calc(var(--card-radius, 1.5rem) - 0.5rem);
       background:
         radial-gradient(circle at top left, color-mix(in srgb, rgba(236, 233, 254, 0.7) 60%, transparent 40%), transparent),
@@ -681,23 +681,23 @@ const shareGift = {
       color: rgba(79, 70, 229, 0.95);
     }
 
-    .account-card__status-time {
+    :global(.account-card__status-time) {
       font-size: 0.9rem;
       color: rgba(79, 70, 229, 0.8);
     }
 
-    .account-card__status-note {
+    :global(.account-card__status-note) {
       margin: 0;
       font-size: 0.95rem;
       color: rgba(55, 65, 81, 0.95);
     }
 
-    .account-card__form {
+    :global(.account-card__form) {
       display: grid;
       gap: 0.75rem;
     }
 
-    .account-card__label {
+    :global(.account-card__label) {
       font-size: 0.85rem;
       font-weight: 600;
       color: rgba(71, 85, 105, 0.9);
@@ -705,8 +705,8 @@ const shareGift = {
       gap: 0.4rem;
     }
 
-    .account-card__select,
-    .account-card__textarea {
+    :global(.account-card__select),
+    :global(.account-card__textarea) {
       width: 100%;
       border-radius: 0.85rem;
       border: 1px solid rgba(148, 163, 184, 0.45);
@@ -716,12 +716,12 @@ const shareGift = {
       background: rgba(255, 255, 255, 0.96);
     }
 
-    .account-card__textarea {
+    :global(.account-card__textarea) {
       resize: vertical;
       min-height: 90px;
     }
 
-    .account-card__log-button {
+    :global(.account-card__log-button) {
       justify-self: start;
       border-radius: 999px;
       border: 0;
@@ -732,12 +732,12 @@ const shareGift = {
       cursor: pointer;
     }
 
-    .account-card__log-button:hover,
-    .account-card__log-button:focus-visible {
+    :global(.account-card__log-button:hover),
+    :global(.account-card__log-button:focus-visible) {
       box-shadow: 0 10px 24px -18px rgba(79, 70, 229, 0.85);
     }
 
-    .account-history {
+    :global(.account-history) {
       margin: 0;
       padding: 0;
       list-style: none;
@@ -745,24 +745,24 @@ const shareGift = {
       gap: 0.75rem;
     }
 
-    .account-history__header {
+    :global(.account-history__header) {
       display: flex;
       justify-content: space-between;
       gap: 0.75rem;
       align-items: baseline;
     }
 
-    .account-history__status {
+    :global(.account-history__status) {
       font-weight: 600;
       color: rgba(79, 70, 229, 0.9);
     }
 
-    .account-history__time {
+    :global(.account-history__time) {
       font-size: 0.8rem;
       color: rgba(107, 114, 128, 0.85);
     }
 
-    .account-history__note {
+    :global(.account-history__note) {
       margin: 0;
       font-size: 0.9rem;
       color: rgba(71, 85, 105, 0.95);
@@ -861,7 +861,7 @@ const shareGift = {
       color: rgba(79, 70, 229, 0.75);
     }
 
-    .catalog-card.is-saved {
+    :global(.catalog-card.is-saved) {
       opacity: 0.75;
       transform: translateY(2px);
     }
@@ -933,7 +933,7 @@ const shareGift = {
         align-items: flex-start;
       }
 
-      .account-card__header {
+      :global(.account-card__header) {
         flex-direction: column;
         align-items: flex-start;
       }

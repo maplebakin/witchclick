@@ -99,18 +99,18 @@ const { title, open = false } = Astro.props as Props;
     color: color-mix(in srgb, var(--action-primary-text, #f6f2ff) 94%, white 6%);
   }
 
-  .wc-accordion__lead {
+  :global(.wc-accordion__lead) {
     margin: 0;
   }
 
-  .wc-accordion__list {
+  :global(.wc-accordion__list) {
     margin: 0;
     padding-left: 1.1rem;
     display: grid;
     gap: 0.45rem;
   }
 
-  .wc-accordion__list li::marker {
+  :global(.wc-accordion__list li::marker) {
     color: color-mix(in srgb, var(--action-primary-text, #f6f2ff) 65%, white 35%);
   }
 
@@ -136,7 +136,7 @@ const { title, open = false } = Astro.props as Props;
         color-mix(in oklab, var(--panel-surface-strong, #e2d5fa) 82%, white 18%) 100%);
   }
 
-  :root[data-comfort-theme="dawn"] .wc-accordion__summary {
+  :global(:root[data-comfort-theme="dawn"] .wc-accordion__summary) {
     color: var(--ink-strong, #1a102c);
   }
 
@@ -144,7 +144,7 @@ const { title, open = false } = Astro.props as Props;
     color: var(--ink-body, #2c1b3d);
   }
 
-  :root[data-comfort-theme="dawn"] .wc-accordion__list li::marker {
+  :global(:root[data-comfort-theme="dawn"] .wc-accordion__list li::marker) {
     color: color-mix(in srgb, var(--action-primary, hsl(270 55% 50%)) 45%, transparent 55%);
   }
 </style>

@@ -232,7 +232,7 @@
     outline-offset: 2px;
   }
 
-  .quick-actions.is-open .quick-actions__trigger {
+  :global(.quick-actions.is-open .quick-actions__trigger) {
     background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
   }
 
@@ -251,7 +251,7 @@
     transition: opacity 0.2s ease, transform 0.2s ease;
   }
 
-  .quick-actions__panel.is-visible {
+  :global(.quick-actions__panel.is-visible) {
     opacity: 1;
     transform: translateY(0);
   }

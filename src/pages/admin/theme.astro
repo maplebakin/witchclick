@@ -4,12 +4,14 @@
 
 import Base from "@/layouts/Base.astro";
 import themesSeed from "@/data/themes.generated.json";
+
 const title = "Theme";
+const _themesSeedJson = JSON.stringify(themesSeed);
 ---
 
 <Base title={`Admin · ${title}`}>
   <!-- Seed themes JSON so client script can read it -->
-  <script type="application/json" id="themesSeed">{JSON.stringify(themesSeed)}</script>
+  <script type="application/json" id="themesSeed">{_themesSeedJson}</script>
 
   <main class="wc-container wc-narrow" data-theme-preview>
     <header class="page-head">
@@ -949,10 +951,10 @@ refreshPreviewAll();
     /* ===== Library ===== */
     .library { display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-4); margin-top: var(--space-3); }
     .lib-actions { display: flex; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-3); }
-    .theme-table { width: 100%; border-collapse: collapse; }
-    .theme-table th, .theme-table td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--border-subtle); }
-    .theme-table th { color: var(--text-muted); font-weight: 600; }
-    .row-actions { display: flex; gap: .4rem; }
+    :global(.theme-table) { width: 100%; border-collapse: collapse; }
+    :global(.theme-table th), :global(.theme-table td) { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--border-subtle); }
+    :global(.theme-table th) { color: var(--text-muted); font-weight: 600; }
+    :global(.row-actions) { display: flex; gap: .4rem; }
     .library-detail .stack { display: grid; gap: .4rem; margin-bottom: .8rem; }
     .library-detail input, .library-detail select {
       background: var(--surface-panel); color: var(--text-body); border: 1px solid var(--border-subtle);
@@ -1029,7 +1031,7 @@ refreshPreviewAll();
     .export-row { display: flex; gap: var(--space-3); flex-wrap: wrap; }
 
     /* tiny toast */
-    .toast { position: fixed; inset: auto 16px 16px auto; background: var(--surface-elevated); border: 1px solid var(--border-subtle); color: hsl(var(--text-strong)); padding: .6rem .9rem; border-radius: var(--radius-1); box-shadow: var(--shadow-2); opacity: 0; transform: translateY(8px); transition: 180ms ease; z-index: 999; }
-    .toast.show { opacity: 1; transform: translateY(0); }
+    :global(.toast) { position: fixed; inset: auto 16px 16px auto; background: var(--surface-elevated); border: 1px solid var(--border-subtle); color: hsl(var(--text-strong)); padding: .6rem .9rem; border-radius: var(--radius-1); box-shadow: var(--shadow-2); opacity: 0; transform: translateY(8px); transition: 180ms ease; z-index: 999; }
+    :global(.toast.show) { opacity: 1; transform: translateY(0); }
   </style>
 </Base>
