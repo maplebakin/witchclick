@@ -1,9 +1,10 @@
 // astro.config.mjs — drop‑in with '@' alias preserved around your existing config
 import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
+import node from "@astrojs/node";
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from "node:url";
 
 /** -------- Read settings with safe fallback -------- */
 function readSettings() {
@@ -34,15 +35,16 @@ function normalizeSite(u) {
   }
 }
 
-// Static site generation for zero-server deployment
-// Admin pages work as static HTML calling dev-api.js (port 8787)
-// Note: Sitemap generation handled by scripts/generate-sitemap.mjs post-build
+// Server output so API routes with `prerender = false` deploy correctly.
+// Admin pages still work locally against dev-api.js (port 8787).
+// Note: Sitemap generation handled by scripts/generate-sitemap.mjs post-build.
 
 const site = normalizeSite(settings.siteUrl);
 
 export default defineConfig({
   site,
-  output: "static",
+  output: "server",
+  adapter: node({ mode: "standalone" }),
   trailingSlash: "never",
   compressHTML: true,
 
