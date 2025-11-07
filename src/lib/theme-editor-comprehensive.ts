@@ -36,6 +36,60 @@ export function colorToHex(value: string | undefined): string | null {
   return null;
 }
 
+type DebouncedFunction<T extends (...args: any[]) => void> = ((
+  ...args: Parameters<T>
+) => void) & {
+  flush: () => void;
+  cancel: () => void;
+};
+
+/**
+ * Lightweight debounce helper with flush/cancel controls
+ */
+export function debounce<T extends (...args: any[]) => void>(
+  fn: T,
+  delay: number
+): DebouncedFunction<T> {
+  let timeoutId: number | undefined;
+  let lastArgs: Parameters<T> | undefined;
+  let lastThis: ThisParameterType<T> | undefined;
+
+  const invoke = () => {
+    timeoutId = undefined;
+    fn.apply(lastThis, (lastArgs ?? []) as Parameters<T>);
+  };
+
+  const debounced = function (this: ThisParameterType<T>, ...args: Parameters<T>) {
+    lastArgs = args;
+    lastThis = this;
+    if (timeoutId !== undefined) {
+      window.clearTimeout(timeoutId);
+    }
+    timeoutId = window.setTimeout(invoke, delay);
+  } as DebouncedFunction<T>;
+
+  debounced.flush = () => {
+    if (timeoutId !== undefined) {
+      window.clearTimeout(timeoutId);
+      invoke();
+      return;
+    }
+
+    if (lastArgs !== undefined || fn.length === 0) {
+      fn.apply(lastThis, (lastArgs ?? []) as Parameters<T>);
+    }
+  };
+
+  debounced.cancel = () => {
+    if (timeoutId !== undefined) {
+      window.clearTimeout(timeoutId);
+      timeoutId = undefined;
+    }
+  };
+
+  return debounced;
+}
+
 export const ALL_COLOR_VARIABLES = [
   // Core Brand Colors
   'colorMidnight', 'colorNight', 'colorIris', 'colorAmethyst', 'colorDusk',
@@ -94,17 +148,19 @@ export function setupAllColorListeners(
   onUpdate: () => void,
   normalizeHex: (value: string) => string | null
 ) {
+  const debouncedUpdate = debounce(onUpdate, 120);
+
   ALL_COLOR_VARIABLES.forEach((key) => {
     const picker = elements[`${key}Picker`] as HTMLInputElement;
     const input = elements[`${key}Input`] as HTMLInputElement;
 
     picker?.addEventListener('input', () => {
       if (input) input.value = picker.value;
-      onUpdate();
+      debouncedUpdate();
     });
 
     input?.addEventListener('input', () => {
-      onUpdate();
+      debouncedUpdate();
     });
 
     input?.addEventListener('blur', () => {
@@ -113,13 +169,17 @@ export function setupAllColorListeners(
         picker.value = normalized;
         input.value = normalized;
       }
-      onUpdate();
+      debouncedUpdate();
+      debouncedUpdate.flush();
     });
   });
 
   ALL_FONT_VARIABLES.forEach((key) => {
     const select = elements[`${key}Select`];
-    select?.addEventListener('change', () => onUpdate());
+    select?.addEventListener('change', () => {
+      debouncedUpdate();
+      debouncedUpdate.flush();
+    });
   });
 }
 
