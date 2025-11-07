@@ -280,6 +280,7 @@ export class ThemeEditor {
         this.setStatus('Ready to create a new theme', 'info');
       }
     } catch (error) {
+      console.error('Failed to load themes', error);
       this.setStatus(error instanceof Error ? error.message : 'Failed to load themes', 'error');
     }
   }
@@ -696,6 +697,7 @@ export class ThemeEditor {
         { theme: result.slug, mode: result.mode }
       );
     } catch (error) {
+      console.error('Failed to save theme', error);
       this.setStatus(error instanceof Error ? error.message : 'Failed to save', 'error');
     }
   }
@@ -717,6 +719,7 @@ export class ThemeEditor {
       );
       this.render();
     } catch (error) {
+      console.error('Failed to set active theme', error);
       this.setStatus(error instanceof Error ? error.message : 'Failed to set active', 'error');
     }
   }
@@ -735,6 +738,7 @@ export class ThemeEditor {
       this.newTheme(preset.mode);
       this.setStatus(`Deleted "${preset.name}"`, 'success');
     } catch (error) {
+      console.error('Failed to delete theme', error);
       this.setStatus(error instanceof Error ? error.message : 'Failed to delete', 'error');
     }
   }
@@ -749,6 +753,7 @@ export class ThemeEditor {
       this.loadPreset(duplicated, true);
       this.setStatus(`Duplicated as "${duplicated.name}"`, 'success');
     } catch (error) {
+      console.error('Failed to duplicate theme', error);
       this.setStatus(error instanceof Error ? error.message : 'Failed to duplicate', 'error');
     }
   }
@@ -777,6 +782,7 @@ export class ThemeEditor {
       this.downloadJson(json, `${preset.slug}.json`);
       this.setStatus(`Exported "${preset.name}"`, 'success');
     } catch (error) {
+      console.error('Failed to export current theme', error);
       this.setStatus(error instanceof Error ? error.message : 'Failed to export', 'error');
     }
   }
@@ -787,6 +793,7 @@ export class ThemeEditor {
       this.downloadJson(json, 'witchclick-themes.json');
       this.setStatus('Exported all themes', 'success');
     } catch (error) {
+      console.error('Failed to export all themes', error);
       this.setStatus(error instanceof Error ? error.message : 'Failed to export', 'error');
     }
   }
@@ -808,6 +815,7 @@ export class ThemeEditor {
         this.setStatus(`Imported "${imported.name}"`, 'success');
       }
     } catch (error) {
+      console.error('Failed to import theme data', error);
       this.setStatus(error instanceof Error ? error.message : 'Failed to import', 'error');
     }
   }

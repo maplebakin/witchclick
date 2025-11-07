@@ -821,27 +821,40 @@ export class ThemeManager {
   private async request<T>(path: string, payload?: unknown): Promise<T> {
     const url = `${this.baseUrl}${path}`;
 
+    let response: Response;
     try {
-      const response = await fetch(url, {
+      response = await fetch(url, {
         method: 'POST',
         headers: payload ? { 'Content-Type': 'application/json' } : undefined,
         body: payload ? JSON.stringify(payload) : undefined,
       });
-
-      const data = await response.json().catch(() => null);
-
-      if (!response.ok || !data?.ok) {
-        const message = data?.error || `Request to ${path} failed with status ${response.status}`;
-        throw new Error(message);
-      }
-
-      return data as T;
     } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error(`Request to ${path} failed`);
+      const networkError = new Error(`Could not reach the theme API at ${url}`);
+      (networkError as Error & { cause?: unknown }).cause = error;
+      throw networkError;
     }
+
+    let data: unknown;
+    try {
+      data = await response.json();
+    } catch (error) {
+      const parseError = new Error(`Received invalid JSON from ${url}`);
+      (parseError as Error & { cause?: unknown }).cause = error;
+      throw parseError;
+    }
+
+    if (typeof data !== 'object' || data === null) {
+      throw new Error(`Received invalid JSON from ${url}`);
+    }
+
+    const body = data as { ok?: boolean; error?: string };
+
+    if (!response.ok || !body.ok) {
+      const message = body.error || `Request to ${path} failed with status ${response.status}`;
+      throw new Error(message);
+    }
+
+    return data as T;
   }
 
   private notifyListeners(): void {
