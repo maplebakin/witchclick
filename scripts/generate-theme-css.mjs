@@ -9,7 +9,7 @@
  *   npm run themes:build
  */
 
-import { readFileSync, writeFileSync, readdirSync } from 'fs';
+import { readFileSync, writeFileSync, readdirSync, watch } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -208,38 +208,89 @@ function generateMetadata(themes) {
 /**
  * Main execution
  */
-function main() {
+function runGeneration() {
   console.log('🎨 Generating theme CSS...\n');
 
-  // Load themes
-  const themes = loadThemes();
-  console.log(`📦 Loaded ${themes.length} themes:`);
-  themes.forEach(t => {
-    console.log(`   • ${t.label} (${t.slug}) - ${t.mode} mode`);
+  try {
+    // Load themes
+    const themes = loadThemes();
+    console.log(`📦 Loaded ${themes.length} themes:`);
+    themes.forEach(t => {
+      console.log(`   • ${t.label} (${t.slug}) - ${t.mode} mode`);
+    });
+
+    // Generate CSS
+    const css = generateCSS(themes);
+    writeFileSync(OUTPUT_FILE, css, 'utf-8');
+    console.log(`\n✅ Generated CSS: ${OUTPUT_FILE}`);
+
+    // Generate metadata
+    const metadataFile = generateMetadata(themes);
+    console.log(`✅ Generated metadata: ${metadataFile}`);
+
+    // Summary
+    console.log(`\n📊 Summary:`);
+    console.log(`   • Total themes: ${themes.length}`);
+    console.log(`   • Midnight themes: ${themes.filter(t => t.mode === 'midnight').length}`);
+    console.log(`   • Dawn themes: ${themes.filter(t => t.mode === 'dawn').length}`);
+    console.log(`   • CSS properties per theme: ${Object.keys(themes[0]?.settings || {}).length}`);
+
+    console.log(`\n✨ Theme CSS generation complete!\n`);
+  } catch (error) {
+    console.error('❌ Theme CSS generation failed:', error);
+  }
+}
+
+function parseFlags(argv) {
+  const flags = new Set(argv);
+  return {
+    watch: flags.has('--watch') || flags.has('-w')
+  };
+}
+
+function startWatcher() {
+  console.log(`👀 Watching ${THEMES_DIR} for changes. Press Ctrl+C to exit.`);
+
+  let rebuildTimer = null;
+
+  const scheduleRebuild = (eventType, filename) => {
+    const detail = [eventType, filename].filter(Boolean).join(': ');
+    if (rebuildTimer) {
+      clearTimeout(rebuildTimer);
+    }
+    rebuildTimer = setTimeout(() => {
+      console.log(`\n🔁 Change detected${detail ? ` (${detail})` : ''}. Rebuilding...`);
+      runGeneration();
+      console.log('✅ Rebuild complete. Continuing to watch for changes.');
+      rebuildTimer = null;
+    }, 100);
+  };
+
+  const watcher = watch(THEMES_DIR, (eventType, filename) => {
+    scheduleRebuild(eventType, filename);
   });
 
-  // Generate CSS
-  const css = generateCSS(themes);
-  writeFileSync(OUTPUT_FILE, css, 'utf-8');
-  console.log(`\n✅ Generated CSS: ${OUTPUT_FILE}`);
+  watcher.on('error', error => {
+    console.error('❌ Theme watcher error:', error);
+  });
 
-  // Generate metadata
-  const metadataFile = generateMetadata(themes);
-  console.log(`✅ Generated metadata: ${metadataFile}`);
+  const handleExit = () => {
+    console.log('\n👋 Received SIGINT. Stopping theme watcher.');
+    watcher.close();
+    process.exit(0);
+  };
 
-  // Summary
-  console.log(`\n📊 Summary:`);
-  console.log(`   • Total themes: ${themes.length}`);
-  console.log(`   • Midnight themes: ${themes.filter(t => t.mode === 'midnight').length}`);
-  console.log(`   • Dawn themes: ${themes.filter(t => t.mode === 'dawn').length}`);
-  console.log(`   • CSS properties per theme: ${Object.keys(themes[0]?.settings || {}).length}`);
-
-  console.log(`\n✨ Theme CSS generation complete!\n`);
+  process.on('SIGINT', handleExit);
 }
 
 // Run if called directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main();
+  const flags = parseFlags(process.argv.slice(2));
+  runGeneration();
+
+  if (flags.watch) {
+    startWatcher();
+  }
 }
 
-export { loadThemes, generateCSS, generateThemeCSS };
+export { loadThemes, generateCSS, generateThemeCSS, runGeneration };
