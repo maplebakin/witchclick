@@ -2,7 +2,15 @@ const JSON_HEADERS = {
   'Content-Type': 'application/json',
 } as const;
 
-export function json(body: unknown, status = 200, extraHeaders: Record<string, string> = {}) {
+const DEV_ONLY_STATUS = 404;
+const DEV_ONLY_MESSAGE =
+  'Theme admin API endpoints are only available during local development sessions.';
+
+export function json(
+  body: unknown,
+  status = 200,
+  extraHeaders: Record<string, string> = {},
+) {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
@@ -10,6 +18,36 @@ export function json(body: unknown, status = 200, extraHeaders: Record<string, s
       ...extraHeaders,
     },
   });
+}
+
+export function ensureDevOnly(): Response | null {
+  if (import.meta.env.DEV) {
+    return null;
+  }
+  return json({ ok: false, error: DEV_ONLY_MESSAGE }, DEV_ONLY_STATUS);
+}
+
+type ThemeAdminModule = typeof import('../../../../dev-api.js');
+
+let cachedDevModule: Promise<ThemeAdminModule> | null = null;
+
+export async function loadThemeAdminModule(): Promise<ThemeAdminModule> {
+  if (!import.meta.env.DEV) {
+    throw new Error('Theme admin module should never load outside development.');
+  }
+
+  if (!cachedDevModule) {
+    cachedDevModule = import('../../../../dev-api.js');
+  }
+
+  return cachedDevModule;
+}
+
+export function toErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  return fallback;
 }
 
 type ParsedBodyResult =
