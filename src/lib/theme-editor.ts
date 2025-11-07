@@ -15,6 +15,18 @@ import {
   colorToHex,
 } from './theme-editor-comprehensive';
 
+export interface ThemeEditorOptions {
+  /**
+   * Optional API base URL override. Falls back to the root element's
+   * `data-dev-api` attribute and finally to the localhost default.
+   */
+  devApi?: string;
+  /**
+   * Optional explicit root element. Defaults to `#themeEditorRoot`.
+   */
+  root?: HTMLElement | null;
+}
+
 interface EditorState {
   mode: ThemeMode;
   currentPreset: ThemePreset | null;
@@ -28,9 +40,9 @@ export class ThemeEditor {
   private state: EditorState;
   private elements: Record<string, HTMLElement | null> = {};
 
-  constructor() {
-    const root = document.getElementById('themeEditorRoot');
-    const devApi = root?.getAttribute('data-dev-api') || 'http://localhost:8787';
+  constructor(options: ThemeEditorOptions = {}) {
+    const root = options.root ?? document.getElementById('themeEditorRoot');
+    const devApi = options.devApi ?? root?.getAttribute('data-dev-api') ?? 'http://localhost:8787';
 
     this.manager = new ThemeManager({ baseUrl: devApi });
 
@@ -1041,13 +1053,3 @@ export class ThemeEditor {
   }
 }
 
-// Initialize when DOM is ready
-if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      (window as any).themeEditor = new ThemeEditor();
-    });
-  } else {
-    (window as any).themeEditor = new ThemeEditor();
-  }
-}
