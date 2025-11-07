@@ -53,9 +53,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
 
   {authorized && (
     <script type="module" is:inline>
-      if (!(window as any).__themeEditorLoaded) {
-        (window as any).__themeEditorLoaded = true;
-        import("./theme-editor-entry.ts");
+      const globalWindow = window;
+      if (!globalWindow.__themeEditorLoaded) {
+        globalWindow.__themeEditorLoaded = true;
+        import("/src/pages/admin/theme-editor-entry.ts");
       }
     </script>
   )}
