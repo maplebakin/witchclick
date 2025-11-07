@@ -285,6 +285,21 @@ function buildPreviewSection(container: HTMLElement): void {
         `).join("")}
       </div>
     </div>
+    <div class="space-y-3 rounded-xl border border-line-subtle bg-surface-base/80 p-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h3 class="text-sm font-semibold">Token Swatches</h3>
+        <span class="text-[11px] uppercase tracking-wide text-body-muted">Every editable color token</span>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+        ${ALL_COLOR_VARIABLES.map((key) => `
+          <div class="space-y-2 rounded-xl border border-line-subtle bg-surface-base/90 p-3 shadow-sm" data-preview-swatch="${key}">
+            <div class="h-10 w-full rounded-lg border border-line-subtle" style="background: var(--preview-${key})"></div>
+            <div class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">${toLabel(key)}</div>
+            <code class="block text-[10px] font-mono text-body-muted" data-preview-swatch-value="${key}">—</code>
+          </div>
+        `).join("")}
+      </div>
+    </div>
   `;
   previewCard.appendChild(preview);
 
@@ -298,32 +313,6 @@ function buildPreviewSection(container: HTMLElement): void {
       focusInput.style.boxShadow = '0 0 0 0 transparent';
     });
   }
-
-  const swatchSection = document.createElement("div");
-  swatchSection.className = "space-y-3 rounded-xl border border-line-subtle bg-surface-base/80 p-4";
-  swatchSection.innerHTML = `
-    <div class="flex flex-wrap items-center justify-between gap-2">
-      <h3 class="text-sm font-semibold">Token Swatches</h3>
-      <span class="text-[11px] uppercase tracking-wide text-body-muted">Every editable color token</span>
-    </div>
-  `;
-
-  const swatchGrid = document.createElement("div");
-  swatchGrid.className = "grid gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4";
-  ALL_COLOR_VARIABLES.forEach((key) => {
-    const swatch = document.createElement("div");
-    swatch.dataset.previewSwatch = key;
-    swatch.className = "space-y-2 rounded-xl border border-line-subtle bg-surface-base/90 p-3 shadow-sm";
-    swatch.innerHTML = `
-      <div class="h-10 w-full rounded-lg border border-line-subtle" style="background: var(--preview-${key})"></div>
-      <div class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">${toLabel(key)}</div>
-      <code class="block text-[10px] font-mono text-body-muted" data-preview-swatch-value="${key}">—</code>
-    `;
-    swatchGrid.appendChild(swatch);
-  });
-
-  swatchSection.appendChild(swatchGrid);
-  previewCard.appendChild(swatchSection);
 
   const contrast = document.createElement("div");
   contrast.dataset.contrastDisplay = "";
