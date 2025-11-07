@@ -16,6 +16,9 @@ let saveThemeRecord: (payload: Record<string, unknown>) => Promise<AdminThemeRec
 let setActiveThemeRecord: (
   payload: Record<string, unknown>,
 ) => Promise<{ active: AdminThemeListing["active"]; theme: AdminThemeRecord }>;
+let deleteThemeRecord: (
+  payload: Record<string, unknown>,
+) => Promise<{ slug: string; mode: AdminThemeRecord["mode"]; active: AdminThemeListing["active"] }>;
 
 async function prepareTempDir() {
   tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "wc-admin-theme-"));
@@ -47,6 +50,7 @@ describe("admin theme dashboard", () => {
       listThemes,
       saveThemeRecord,
       setActiveThemeRecord,
+      deleteThemeRecord,
     } = await import("../dev-api.js"));
   });
 
@@ -157,5 +161,72 @@ describe("admin theme dashboard", () => {
 
     expect(theme.settings.fontSerif).toBe("Literata");
     expect(theme.settings.fontScript).toBe("Parisienne");
+  });
+
+  it("resets the theme cache after save, update, and delete operations", async () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    const originalVitest = process.env.VITEST;
+    process.env.NODE_ENV = "production";
+    delete process.env.VITEST;
+
+    vi.resetModules();
+
+    const themeCacheModule = await import("../shared/theme-cache.js");
+    const resetSpy = vi.spyOn(themeCacheModule, "resetThemeCache");
+
+    const {
+      saveThemeRecord: save,
+      setActiveThemeRecord: activate,
+      deleteThemeRecord: remove,
+    } = await import("../dev-api.js");
+    const { getActiveThemes } = await import("../src/utils/theme.ts");
+
+    try {
+      const basePayload = {
+        mode: "midnight",
+        label: "Cache Test",
+        settings: {
+          primary: "#112233",
+          accent: "#d4a373",
+          background: "#120725",
+          fontSerif: "Literata",
+          fontScript: "Parisienne",
+        },
+      } as const;
+
+      await save(basePayload);
+      await activate({ mode: "midnight", slug: "cache-test" });
+
+      const initial = getActiveThemes();
+      expect(initial.midnight.slug).toBe("cache-test");
+      expect(initial.midnight.primary).toBe("#112233");
+
+      await save({
+        ...basePayload,
+        settings: {
+          ...basePayload.settings,
+          primary: "#334455",
+          background: "#1a1324",
+        },
+      });
+
+      const refreshed = getActiveThemes();
+      expect(refreshed.midnight.primary).toBe("#334455");
+
+      await remove({ slug: "cache-test" });
+
+      const afterDelete = getActiveThemes();
+      expect(afterDelete.midnight.slug).toBe("legacy-midnight");
+
+      expect(resetSpy).toHaveBeenCalledTimes(4);
+    } finally {
+      resetSpy.mockRestore();
+      process.env.NODE_ENV = originalNodeEnv;
+      if (typeof originalVitest === "undefined") {
+        delete process.env.VITEST;
+      } else {
+        process.env.VITEST = originalVitest;
+      }
+    }
   });
 });

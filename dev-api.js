@@ -40,6 +40,7 @@ import { loadPromptContext } from './server/lib/promptContext.js';
 import { resolvePostsDirectories } from './scripts/lib/contentPaths.js';
 import { frontmatterString, parseFrontmatter, readFrontmatter } from './scripts/lib/frontmatter.js';
 import { isValidSlug, slugify } from './shared/slugify.js';
+import { resetThemeCache } from './shared/theme-cache.js';
 import {
   prepareSpecForPersistence,
   persistPreparedSpec,
@@ -1143,6 +1144,7 @@ async function saveThemeRecord(payload) {
     await fsp.writeFile(LEGACY_THEME_FILE, JSON.stringify(record.settings, null, 2), 'utf8');
   }
 
+  resetThemeCache();
   return record;
 }
 
@@ -1174,6 +1176,7 @@ async function setActiveThemeRecord(payload) {
     await fsp.writeFile(LEGACY_THEME_FILE, JSON.stringify(theme.settings, null, 2), 'utf8');
   }
 
+  resetThemeCache();
   return { active: next, theme };
 }
 
@@ -1205,6 +1208,7 @@ async function deleteThemeRecord(payload) {
     await fsp.writeFile(ACTIVE_THEME_FILE, JSON.stringify(next, null, 2), 'utf8');
   }
 
+  resetThemeCache();
   return { slug, mode: theme.mode, active: next };
 }
 
@@ -2424,5 +2428,6 @@ export {
   listThemes,
   saveThemeRecord,
   setActiveThemeRecord,
+  deleteThemeRecord,
   attachHeroToPost,
 };

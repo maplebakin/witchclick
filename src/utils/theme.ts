@@ -1,6 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import {
+  getThemeCacheState,
+  resetThemeCache as resetSharedThemeCache,
+  setThemeCacheState,
+} from "../../shared/theme-cache.js";
+
 export const REQUIRED_FIELDS = [
   "primary",
   "accent",
@@ -131,13 +137,6 @@ const THEMES_DIR = path.join(process.cwd(), "content", "themes");
 const ACTIVE_FILE = path.join(THEMES_DIR, "active.json");
 const LEGACY_FILE = path.join(process.cwd(), "content", "theme.json");
 
-interface ThemeCacheState {
-  themes: ActiveThemes;
-  fingerprint: string;
-}
-
-let cacheState: ThemeCacheState | null = null;
-
 const SHOULD_BYPASS_CACHE = process.env.NODE_ENV !== "production" || process.env.VITEST === "true";
 
 export function getTheme(mode: ThemeMode = "midnight"): ThemeDefinition {
@@ -165,13 +164,14 @@ export function getActiveThemes(): ActiveThemes {
   }
 
   const fingerprint = createThemeFingerprint(mapping);
+  const cacheState = getThemeCacheState<ActiveThemes>();
 
   if (cacheState && cacheState.fingerprint === fingerprint) {
     return cacheState.themes;
   }
 
   const themes = buildActiveThemes(mapping);
-  cacheState = { themes, fingerprint };
+  setThemeCacheState<ActiveThemes>({ themes, fingerprint });
   return themes;
 }
 
@@ -181,7 +181,7 @@ export function getActiveThemes(): ActiveThemes {
  * theme library out-of-band.
  */
 export function resetThemeCache() {
-  cacheState = null;
+  resetSharedThemeCache();
 }
 
 function buildActiveThemes(mapping: Partial<Record<ThemeMode, string>>): ActiveThemes {
