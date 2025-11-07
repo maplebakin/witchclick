@@ -530,6 +530,39 @@ Ensure themes are generated in CI pipelines:
 
 ---
 
+## Admin API Endpoints
+
+The admin dashboard now proxies to Astro serverless functions so you can manage
+themes without running the local `dev-api.js` server in production. All routes
+mirror the JSON contracts used by the legacy dev API.
+
+| Method | URL                      | Auth | Description |
+|--------|--------------------------|------|-------------|
+| POST   | `/api/themes/list`       | No   | Returns `{ ok, items, active }` describing available midnight/dawn themes. |
+| POST   | `/api/themes/save`       | Yes  | Persists or updates a theme JSON file and returns `{ ok, theme }`. |
+| POST   | `/api/themes/set-active` | Yes  | Sets the active theme for `midnight` or `dawn`, returning `{ ok, active, theme }`. |
+| POST   | `/api/themes/delete`     | Yes  | Removes a theme file and returns `{ ok, slug, mode, active }`. |
+
+### Authentication
+
+Mutating endpoints (`save`, `set-active`, `delete`) require a shared secret. Set
+`THEME_ADMIN_TOKEN` in your deployment environment, then provide either of the
+following headers when calling the API:
+
+- `Authorization: Bearer <THEME_ADMIN_TOKEN>`
+- `X-Witchclick-Admin-Secret: <THEME_ADMIN_TOKEN>`
+
+Requests missing a token, or using the wrong value, receive `{ ok: false,
+error: 'Unauthorized' }` with a `401` status. The `list` endpoint remains
+unauthenticated so the admin UI can load available themes before prompting for
+credentials.
+
+> **Tip:** rotate `THEME_ADMIN_TOKEN` whenever you roll credentials or deploy to
+> a new environment. The functions return consistent `{ ok, … }` payloads that
+> match the admin UI's expectations, so no further frontend changes are needed.
+
+---
+
 ## Future Enhancements
 
 - [ ] Watch mode for development (`themes:watch`)
