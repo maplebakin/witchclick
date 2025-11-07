@@ -31,7 +31,7 @@ export const BASE_FIELDS = [
 ];
 
 // Preset-specific structure requirements
-export const STRUCTURE_REQUIREMENTS = {
+const BASE_STRUCTURE_REQUIREMENTS = {
   reflection: [
     '',
     'Content Structure for Reflection Essays:',
@@ -105,6 +105,33 @@ export const STRUCTURE_REQUIREMENTS = {
     '- NO ritual checklists',
     '- Avoid medical claims; focus on mindful intention-setting'
   ]
+};
+
+function cloneStructureRequirements(sourceLines, { heading, contentType }) {
+  if (!Array.isArray(sourceLines)) return [];
+  return sourceLines.map((line, index) => {
+    if (typeof line !== 'string') return line;
+    if (!line) return line;
+    if (index === 1 && heading) {
+      return heading;
+    }
+    if (contentType && /contentType:\s*Set to\s*"[^"]+"/i.test(line)) {
+      return line.replace(/contentType:\s*Set to\s*"[^"]+"/i, `contentType: Set to "${contentType}"`);
+    }
+    return line;
+  });
+}
+
+export const STRUCTURE_REQUIREMENTS = {
+  ...BASE_STRUCTURE_REQUIREMENTS,
+  guide: cloneStructureRequirements(BASE_STRUCTURE_REQUIREMENTS.ritual, {
+    heading: 'Content Structure for Ritual Guides (alias contentType "guide"):',
+    contentType: 'guide',
+  }),
+  spread: cloneStructureRequirements(BASE_STRUCTURE_REQUIREMENTS.tarotSpread, {
+    heading: 'Content Structure for Tarot Spreads (alias contentType "spread"):',
+    contentType: 'spread',
+  }),
 };
 
 const makeLooseContract = (structureKey) => [
