@@ -12,6 +12,8 @@ import { validatePostSpec } from '../../lib/postSpecValidator';
 import { slugify } from '../../../shared/slugify.js';
 import type { ZodIssue } from 'zod';
 
+export const prerender = false;
+
 /* ---------- helpers ---------- */
 
 function safeReadJSON<T=any>(p:string, fallback:T): T {

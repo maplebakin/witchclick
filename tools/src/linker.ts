@@ -1,13 +1,16 @@
 // tools/src/linker.ts
-// Robust, DOM-free auto-linker for affiliate + internal links.
+// Robust, DOM-free auto-linker for affiliate + internal links and a CLI to
+// populate `internalLinks` frontmatter from `internalLinkHints`.
 // - First occurrence only per anchor text (configurable)
 // - Skips <a>, <code>, <pre>, and headings by default (configurable)
 // - Adds rel="sponsored nofollow noopener noreferrer" + target for affiliate anchors
 // - Optional UTM handling for affiliate URLs
 // - Supports internal post links
 // - Returns stats so pages can decide whether to show disclosures, etc.
-//
-// No external dependencies.
+
+import fs from 'node:fs';
+import path from 'node:path';
+import matter from 'gray-matter';
 
 export type AffiliateAnchor = {
   key: string;     // product key in products[]
@@ -370,14 +373,317 @@ const { html, stats } = autoLink(inputHtml, {
   matchWhole: false,
 });
 ------------------------------------------------------------------ */
-export async function linkerCmd(argv: string[] = []): Promise<number> {
-  console.log('[linker] running with args', argv);
+type FrontmatterLink = { slug: string; anchor: string; title?: string };
 
-  // … your linker logic here …
-  // For now you can just succeed:
+type PostRecord = {
+  file: string;
+  slug: string;
+  title: string;
+  href: string;
+  slugNorm: string;
+  titleNorm: string;
+};
+
+type PostIndex = {
+  bySlug: Map<string, PostRecord>;
+  byTitle: Map<string, PostRecord>;
+  all: PostRecord[];
+};
+
+type LinkerFlags = {
+  apply: boolean;
+  debug: boolean;
+  dir?: string;
+};
+
+export async function linkerCmd(argv: string[] = []): Promise<number> {
+  const effectiveArgv = resolveCliArgv(argv);
+  const flags = parseLinkerArgv(effectiveArgv);
+  const debugLog = (...args: any[]) => {
+    if (flags.debug) console.log('[linker]', ...args);
+  };
+
+  const candidateDirs = flags.dir
+    ? [path.resolve(flags.dir)]
+    : [
+        path.join(process.cwd(), 'content', 'posts'),
+        path.join(process.cwd(), 'src', 'content', 'posts'),
+      ];
+
+  const postsDir = candidateDirs.find((dir) => fs.existsSync(dir));
+  if (!postsDir) {
+    console.error('[linker] Posts directory not found. Checked:', candidateDirs.join(', '));
+    return 1;
+  }
+
+  const files = readDirRecursive(postsDir);
+  if (!files.length) {
+    console.log(`[linker] No posts found in ${postsDir}`);
+    return 0;
+  }
+
+  const index = buildIndex(files);
+  let touched = 0;
+
+  for (const file of files) {
+    const raw = fs.readFileSync(file, 'utf8');
+    const parsed = matter(raw);
+    const slug = sanitizeSlug(parsed.data?.slug ?? slugFromFile(file));
+    const hintsRaw = Array.isArray(parsed.data?.internalLinkHints)
+      ? parsed.data.internalLinkHints
+      : [];
+
+    if (!hintsRaw.length) {
+      debugLog('skip (no hints):', slug || path.basename(file));
+      continue;
+    }
+
+    const desiredLinks: FrontmatterLink[] = [];
+    for (const hint of hintsRaw) {
+      const anchor = anchorFromHint(hint);
+      if (!anchor) continue;
+      const match = bestMatch(anchor, index, slug);
+      if (!match || match.slug === slug) {
+        debugLog(`no match for "${anchor}" from ${slug || path.basename(file)}`);
+        continue;
+      }
+      desiredLinks.push({ slug: match.slug, anchor, title: match.title });
+    }
+
+    const uniqueDesired = uniqueLinks(desiredLinks);
+    const currentLinks = normalizeExistingLinks(parsed.data?.internalLinks);
+
+    if (linksEqual(currentLinks, uniqueDesired)) {
+      debugLog('no change:', slug || path.basename(file));
+      continue;
+    }
+
+    parsed.data.internalLinks = uniqueDesired.map((link) =>
+      link.title
+        ? { slug: link.slug, anchor: link.anchor, title: link.title }
+        : { slug: link.slug, anchor: link.anchor },
+    );
+
+    if (flags.apply) {
+      const output = matter.stringify(parsed.content, parsed.data);
+      fs.writeFileSync(file, output, 'utf8');
+      console.log(
+        `[linker] ${slug || path.basename(file)} — wrote ${uniqueDesired.length} links (${path.relative(
+          process.cwd(),
+          file,
+        )})`,
+      );
+      touched++;
+    } else {
+      console.log(
+        `[linker][dry] ${slug || path.basename(file)} → would write ${uniqueDesired.length} links (${path.relative(
+          process.cwd(),
+          file,
+        )})`,
+      );
+    }
+  }
+
+  console.log(
+    flags.apply
+      ? `[linker] Done. Updated ${touched} file(s).`
+      : '[linker] Done. Rerun with --apply to write changes.',
+  );
   return 0;
 }
 
 // aliases so wcMain can find one regardless
 export const linker = linkerCmd;
 export default linkerCmd;
+
+function resolveCliArgv(argv: string[]): string[] {
+  if (argv.length > 0) return argv;
+  const raw = process.argv.slice(2);
+  if (raw[0] === 'linker') return raw.slice(1);
+  return raw;
+}
+
+function parseLinkerArgv(argv: string[]): LinkerFlags {
+  const flags: LinkerFlags = { apply: false, debug: false };
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === '--apply') {
+      flags.apply = true;
+      continue;
+    }
+    if (arg === '--debug') {
+      flags.debug = true;
+      continue;
+    }
+    if (arg === '--dir') {
+      const next = argv[i + 1];
+      if (next && !next.startsWith('-')) {
+        flags.dir = next;
+        i++;
+      }
+      continue;
+    }
+  }
+  return flags;
+}
+
+function readDirRecursive(dir: string): string[] {
+  if (!fs.existsSync(dir)) return [];
+  const out: string[] = [];
+  const stack: string[] = [dir];
+  while (stack.length) {
+    const current = stack.pop()!;
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      const full = path.join(current, entry.name);
+      if (entry.isDirectory()) {
+        stack.push(full);
+      } else if (entry.isFile() && /\.(md|mdx)$/i.test(entry.name)) {
+        out.push(full);
+      }
+    }
+  }
+  return out.sort();
+}
+
+function slugFromFile(file: string): string {
+  return path.basename(file).replace(/\.(md|mdx)$/i, '');
+}
+
+function sanitizeSlug(slug: string): string {
+  let out = String(slug || '').trim();
+  if (!out) return '';
+  if (out.startsWith('/post/')) out = out.slice('/post/'.length);
+  out = out.replace(/^\/+/, '').replace(/\/+$/, '');
+  return out;
+}
+
+function normalizeText(value: string): string {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function slugFromHref(href: string): string {
+  let target = String(href || '').trim();
+  if (!target) return '';
+  try {
+    const url = new URL(target, 'https://example.com');
+    target = url.pathname;
+  } catch {
+    // ignore
+  }
+  return sanitizeSlug(target);
+}
+
+function buildIndex(files: string[]): PostIndex {
+  const bySlug = new Map<string, PostRecord>();
+  const byTitle = new Map<string, PostRecord>();
+  const all: PostRecord[] = [];
+
+  for (const file of files) {
+    const raw = fs.readFileSync(file, 'utf8');
+    const parsed = matter(raw);
+    const slug = sanitizeSlug(parsed.data?.slug ?? slugFromFile(file));
+    const title = String(parsed.data?.title ?? slug) || slug;
+    const record: PostRecord = {
+      file,
+      slug,
+      title,
+      href: `/post/${slug}`,
+      slugNorm: normalizeText(slug),
+      titleNorm: normalizeText(title),
+    };
+    if (record.slugNorm) bySlug.set(record.slugNorm, record);
+    if (record.titleNorm) byTitle.set(record.titleNorm, record);
+    all.push(record);
+  }
+
+  return { bySlug, byTitle, all };
+}
+
+function bestMatch(anchor: string, index: PostIndex, currentSlug: string): PostRecord | null {
+  const norm = normalizeText(anchor);
+  if (!norm) return null;
+
+  const slugMatch = index.bySlug.get(norm);
+  if (slugMatch && slugMatch.slug !== currentSlug) return slugMatch;
+
+  const titleMatch = index.byTitle.get(norm);
+  if (titleMatch && titleMatch.slug !== currentSlug) return titleMatch;
+
+  for (const record of index.all) {
+    if (record.slug === currentSlug) continue;
+    if (
+      (record.titleNorm && record.titleNorm.includes(norm)) ||
+      (record.slugNorm && norm.includes(record.slugNorm))
+    ) {
+      return record;
+    }
+  }
+
+  return null;
+}
+
+function anchorFromHint(hint: any): string {
+  if (typeof hint === 'string') return hint.trim();
+  if (!hint || typeof hint !== 'object') return '';
+  if (typeof hint.anchor === 'string') return hint.anchor.trim();
+  if (typeof hint.text === 'string') return hint.text.trim();
+  if (typeof hint.target === 'string') return hint.target.trim();
+  return '';
+}
+
+function uniqueLinks(links: FrontmatterLink[]): FrontmatterLink[] {
+  const seen = new Set<string>();
+  const out: FrontmatterLink[] = [];
+  for (const link of links) {
+    if (!link.slug || !link.anchor) continue;
+    const key = `${link.slug}__${normalizeText(link.anchor)}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(link);
+  }
+  return out;
+}
+
+function normalizeExistingLinks(raw: any): FrontmatterLink[] {
+  if (!Array.isArray(raw)) return [];
+  const out: FrontmatterLink[] = [];
+  for (const entry of raw) {
+    if (!entry || typeof entry !== 'object') continue;
+    const anchor = anchorFromLinkEntry(entry);
+    const slug = slugFromLinkEntry(entry);
+    if (!anchor || !slug) continue;
+    const title = typeof entry.title === 'string' ? entry.title : undefined;
+    out.push({ slug, anchor, title });
+  }
+  return uniqueLinks(out);
+}
+
+function anchorFromLinkEntry(entry: any): string {
+  if (!entry) return '';
+  if (typeof entry === 'string') return entry.trim();
+  if (typeof entry.anchor === 'string') return entry.anchor.trim();
+  if (typeof entry.text === 'string') return entry.text.trim();
+  return '';
+}
+
+function slugFromLinkEntry(entry: any): string {
+  if (!entry || typeof entry !== 'object') return '';
+  if (typeof entry.slug === 'string') return sanitizeSlug(entry.slug);
+  if (typeof entry.href === 'string') return slugFromHref(entry.href);
+  return '';
+}
+
+function linksEqual(a: FrontmatterLink[], b: FrontmatterLink[]): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i].slug !== b[i].slug) return false;
+    if (a[i].anchor !== b[i].anchor) return false;
+    const titleA = a[i].title ?? '';
+    const titleB = b[i].title ?? '';
+    if (titleA !== titleB) return false;
+  }
+  return true;
+}

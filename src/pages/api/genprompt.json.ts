@@ -4,6 +4,8 @@
 import { genprompt } from '../../../tools/src/genprompt';;
 import { resolveGeneratorPresetKey } from '../../../server/lib/generatorPresets.js';
 
+export const prerender = false;
+
 export async function POST({ request }: { request: Request }) {
   try {
     const body = await request.json().catch(() => ({} as any));
