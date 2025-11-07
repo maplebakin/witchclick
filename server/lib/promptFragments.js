@@ -3,6 +3,11 @@
 
 import { BASE_FIELDS, STRUCTURE_REQUIREMENTS, generatorPresetOptions } from './generatorPresets.js';
 
+const TYPE_STRUCTURE_ALIAS_METADATA = [
+  { key: 'guide', baseKey: 'ritual', label: 'Guide' },
+  { key: 'spread', baseKey: 'tarotSpread', label: 'Spread' },
+];
+
 function formatScore(score) {
   if (typeof score !== 'number' || Number.isNaN(score)) return null;
   const fixed = score.toFixed(2);
@@ -105,13 +110,15 @@ export const BASE_VALIDATION_FRAGMENT = [
 function buildTypeStructureFragment() {
   const sections = [];
   sections.push('TYPE-SPECIFIC STRUCTURE CONTRACTS (apply the block that matches your chosen contentType):');
-  for (const { key, label } of generatorPresetOptions) {
+  const presetLabelMap = new Map(generatorPresetOptions.map(({ key, label }) => [key, label]));
+
+  const appendContract = (key, label, note = '') => {
     const requirements = STRUCTURE_REQUIREMENTS[key] || [];
     sections.push('');
-    sections.push(`${label.toUpperCase()} — set contentType: "${key}"`);
+    sections.push(`${label.toUpperCase()} — set contentType: "${key}"${note}`);
     if (!requirements.length) {
       sections.push('  • No additional structure requirements beyond the base validation.');
-      continue;
+      return;
     }
     for (const line of requirements) {
       if (!line) {
@@ -120,7 +127,22 @@ function buildTypeStructureFragment() {
       }
       sections.push(`  ${line}`);
     }
+  };
+
+  for (const { key, label } of generatorPresetOptions) {
+    appendContract(key, label);
   }
+
+  for (const alias of TYPE_STRUCTURE_ALIAS_METADATA) {
+    if (!STRUCTURE_REQUIREMENTS[alias.key]) continue;
+    const baseLabel = alias.baseKey ? presetLabelMap.get(alias.baseKey) : null;
+    const note = baseLabel
+      ? ` (alias of ${baseLabel} — follow the same structure requirements)`
+      : '';
+    const displayLabel = alias.label || presetLabelMap.get(alias.key) || alias.key;
+    appendContract(alias.key, displayLabel, note);
+  }
+
   sections.push('');
   return sections;
 }
