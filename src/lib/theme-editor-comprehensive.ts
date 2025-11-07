@@ -51,17 +51,19 @@ export function debounce<T extends (...args: any[]) => void>(
   delay: number
 ): DebouncedFunction<T> {
   let timeoutId: number | undefined;
-  let lastArgs: Parameters<T> | undefined;
-  let lastThis: ThisParameterType<T> | undefined;
+  let lastCall: { args: Parameters<T>; context: ThisParameterType<T> } | undefined;
 
   const invoke = () => {
     timeoutId = undefined;
-    fn.apply(lastThis, (lastArgs ?? []) as Parameters<T>);
+    if (lastCall) {
+      fn.apply(lastCall.context, lastCall.args);
+    } else if (fn.length === 0) {
+      fn.call(undefined as ThisParameterType<T>);
+    }
   };
 
   const debounced = function (this: ThisParameterType<T>, ...args: Parameters<T>) {
-    lastArgs = args;
-    lastThis = this;
+    lastCall = { args, context: this };
     if (timeoutId !== undefined) {
       window.clearTimeout(timeoutId);
     }
@@ -75,8 +77,10 @@ export function debounce<T extends (...args: any[]) => void>(
       return;
     }
 
-    if (lastArgs !== undefined || fn.length === 0) {
-      fn.apply(lastThis, (lastArgs ?? []) as Parameters<T>);
+    if (lastCall) {
+      fn.apply(lastCall.context, lastCall.args);
+    } else if (fn.length === 0) {
+      fn.call(undefined as ThisParameterType<T>);
     }
   };
 
@@ -246,73 +250,169 @@ export function updateAllPreviewVariables(
   variables: Record<string, string | undefined>,
   defaults: Record<string, string | undefined>
 ) {
-  // Card surface colors
-  previewRoot.style.setProperty('--preview-card-surface',
-    variables.cardPanelSurface || defaults.cardPanelSurface || '#1a0d2e');
-  previewRoot.style.setProperty('--preview-card-border',
-    variables.cardPanelBorder || defaults.cardPanelBorder || '#d4af37');
+  const resolved: Record<string, string> = {};
 
-  // Text colors
-  previewRoot.style.setProperty('--preview-text-primary',
-    variables.textBody || defaults.textBody || variables.textPrimary || defaults.textPrimary || '#f4f1ff');
-  previewRoot.style.setProperty('--preview-text-secondary',
-    variables.textSecondary || defaults.textSecondary || '#f4f1ff');
-  previewRoot.style.setProperty('--preview-text-heading',
-    variables.textHeading || defaults.textHeading || variables.textStrong || defaults.textStrong || variables.inkStrong || defaults.inkStrong || '#ffffff');
-  previewRoot.style.setProperty('--preview-text-muted',
-    variables.textMuted || defaults.textMuted || variables.inkMuted || defaults.inkMuted || '#d9b2c4');
-  previewRoot.style.setProperty('--preview-link',
-    variables.linkColor || defaults.linkColor || '#e0c07d');
+  ALL_COLOR_VARIABLES.forEach((key) => {
+    const resolvedValue = variables[key] || defaults[key] || '';
+    resolved[key] = resolvedValue;
 
-  // Badge colors
-  previewRoot.style.setProperty('--preview-badge-bg',
-    variables.cardBadgeBg || defaults.cardBadgeBg || '#d4af37');
-  previewRoot.style.setProperty('--preview-badge-border',
-    variables.cardBadgeBorder || defaults.cardBadgeBorder || '#d4af37');
-  previewRoot.style.setProperty('--preview-badge-text',
-    variables.cardBadgeText || defaults.cardBadgeText || '#f8f3ff');
+    if (resolvedValue) {
+      previewRoot.style.setProperty(`--preview-${key}`, resolvedValue);
+    } else {
+      previewRoot.style.removeProperty(`--preview-${key}`);
+    }
 
-  // Tag colors
-  previewRoot.style.setProperty('--preview-tag-bg',
-    variables.cardTagBg || defaults.cardTagBg || '#4b2a63');
-  previewRoot.style.setProperty('--preview-tag-border',
-    variables.cardTagBorder || defaults.cardTagBorder || '#4b2a63');
-  previewRoot.style.setProperty('--preview-tag-text',
-    variables.cardTagText || defaults.cardTagText || '#f4f1ff');
+    const swatchValue = previewRoot.querySelector<HTMLElement>(`[data-preview-swatch-value="${key}"]`);
+    if (swatchValue) {
+      swatchValue.textContent = resolvedValue || '—';
+    }
 
-  // Semantic status colors
-  previewRoot.style.setProperty('--preview-success',
-    variables.success || defaults.success || '#4ade80');
-  previewRoot.style.setProperty('--preview-warning',
-    variables.warning || defaults.warning || '#fbbf24');
-  previewRoot.style.setProperty('--preview-error',
-    variables.error || defaults.error || '#f87171');
-  previewRoot.style.setProperty('--preview-info',
-    variables.info || defaults.info || '#60a5fa');
+    const swatchContainer = previewRoot.querySelector<HTMLElement>(`[data-preview-swatch="${key}"]`);
+    if (swatchContainer) {
+      swatchContainer.setAttribute('title', resolvedValue || 'Not set');
+    }
+  });
 
-  // Entity Grimoire specific colors
-  previewRoot.style.setProperty('--preview-entity-border',
-    variables.entityCardBorder || defaults.entityCardBorder || '#d4af37');
-  previewRoot.style.setProperty('--preview-entity-glow',
-    variables.entityCardGlow || defaults.entityCardGlow || '#d4af37');
-  previewRoot.style.setProperty('--preview-entity-highlight',
-    variables.entityCardHighlight || defaults.entityCardHighlight || '#d4af37');
-  previewRoot.style.setProperty('--preview-entity-surface-top',
-    variables.entityCardSurfaceTop || defaults.entityCardSurfaceTop || '#1a0d2e');
-  previewRoot.style.setProperty('--preview-entity-surface-bottom',
-    variables.entityCardSurfaceBottom || defaults.entityCardSurfaceBottom || '#120725');
-  previewRoot.style.setProperty('--preview-entity-heading',
-    variables.entityCardHeading || defaults.entityCardHeading || '#ffffff');
-  previewRoot.style.setProperty('--preview-entity-text',
-    variables.entityCardText || defaults.entityCardText || '#f4f1ff');
-  previewRoot.style.setProperty('--preview-entity-label',
-    variables.entityCardLabel || defaults.entityCardLabel || '#d4af37');
-  previewRoot.style.setProperty('--preview-entity-cta',
-    variables.entityCardCta || defaults.entityCardCta || '#7c4eb0');
-  previewRoot.style.setProperty('--preview-entity-cta-hover',
-    variables.entityCardCtaHover || defaults.entityCardCtaHover || '#9b6fd0');
-  previewRoot.style.setProperty('--preview-entity-icon',
-    variables.entityCardIcon || defaults.entityCardIcon || '#d4af37');
-  previewRoot.style.setProperty('--preview-entity-icon-shadow',
-    variables.entityCardIconShadow || defaults.entityCardIconShadow || '#d4af37');
+  ALL_FONT_VARIABLES.forEach((key) => {
+    const resolvedValue = variables[key] || defaults[key] || '';
+
+    if (resolvedValue) {
+      previewRoot.style.setProperty(`--preview-${key}`, resolvedValue);
+    } else {
+      previewRoot.style.removeProperty(`--preview-${key}`);
+    }
+
+    previewRoot
+      .querySelectorAll<HTMLElement>(`[data-preview-font="${key}"]`)
+      .forEach((element) => {
+        element.style.fontFamily = resolvedValue || '';
+      });
+
+    previewRoot
+      .querySelectorAll<HTMLElement>(`[data-preview-font-value="${key}"]`)
+      .forEach((element) => {
+        element.textContent = resolvedValue || 'System default';
+      });
+  });
+
+  // Maintain legacy preview variables so older markup still renders gracefully
+  previewRoot.style.setProperty(
+    '--preview-card-surface',
+    resolved.cardPanelSurface || defaults.cardPanelSurface || '#1a0d2e'
+  );
+  previewRoot.style.setProperty(
+    '--preview-card-border',
+    resolved.cardPanelBorder || defaults.cardPanelBorder || '#d4af37'
+  );
+  previewRoot.style.setProperty(
+    '--preview-text-primary',
+    resolved.textBody || defaults.textBody || resolved.textPrimary || defaults.textPrimary || '#f4f1ff'
+  );
+  previewRoot.style.setProperty(
+    '--preview-text-secondary',
+    resolved.textSecondary || defaults.textSecondary || '#f4f1ff'
+  );
+  previewRoot.style.setProperty(
+    '--preview-text-heading',
+    resolved.textHeading || defaults.textHeading || resolved.textStrong || defaults.textStrong || resolved.inkStrong || defaults.inkStrong || '#ffffff'
+  );
+  previewRoot.style.setProperty(
+    '--preview-text-muted',
+    resolved.textMuted || defaults.textMuted || resolved.inkMuted || defaults.inkMuted || '#d9b2c4'
+  );
+  previewRoot.style.setProperty(
+    '--preview-link',
+    resolved.linkColor || defaults.linkColor || '#e0c07d'
+  );
+
+  previewRoot.style.setProperty(
+    '--preview-cardBadgeBg',
+    resolved.cardBadgeBg || defaults.cardBadgeBg || '#d4af37'
+  );
+  previewRoot.style.setProperty(
+    '--preview-cardBadgeBorder',
+    resolved.cardBadgeBorder || defaults.cardBadgeBorder || '#d4af37'
+  );
+  previewRoot.style.setProperty(
+    '--preview-cardBadgeText',
+    resolved.cardBadgeText || defaults.cardBadgeText || '#f8f3ff'
+  );
+  previewRoot.style.setProperty(
+    '--preview-cardTagBg',
+    resolved.cardTagBg || defaults.cardTagBg || '#4b2a63'
+  );
+  previewRoot.style.setProperty(
+    '--preview-cardTagBorder',
+    resolved.cardTagBorder || defaults.cardTagBorder || '#4b2a63'
+  );
+  previewRoot.style.setProperty(
+    '--preview-cardTagText',
+    resolved.cardTagText || defaults.cardTagText || '#f4f1ff'
+  );
+
+  previewRoot.style.setProperty(
+    '--preview-success',
+    resolved.success || defaults.success || '#4ade80'
+  );
+  previewRoot.style.setProperty(
+    '--preview-warning',
+    resolved.warning || defaults.warning || '#fbbf24'
+  );
+  previewRoot.style.setProperty(
+    '--preview-error',
+    resolved.error || defaults.error || '#f87171'
+  );
+  previewRoot.style.setProperty(
+    '--preview-info',
+    resolved.info || defaults.info || '#60a5fa'
+  );
+
+  previewRoot.style.setProperty(
+    '--preview-entityCardBorder',
+    resolved.entityCardBorder || defaults.entityCardBorder || '#d4af37'
+  );
+  previewRoot.style.setProperty(
+    '--preview-entityCardGlow',
+    resolved.entityCardGlow || defaults.entityCardGlow || '#d4af37'
+  );
+  previewRoot.style.setProperty(
+    '--preview-entityCardHighlight',
+    resolved.entityCardHighlight || defaults.entityCardHighlight || '#d4af37'
+  );
+  previewRoot.style.setProperty(
+    '--preview-entityCardSurfaceTop',
+    resolved.entityCardSurfaceTop || defaults.entityCardSurfaceTop || '#1a0d2e'
+  );
+  previewRoot.style.setProperty(
+    '--preview-entityCardSurfaceBottom',
+    resolved.entityCardSurfaceBottom || defaults.entityCardSurfaceBottom || '#120725'
+  );
+  previewRoot.style.setProperty(
+    '--preview-entityCardHeading',
+    resolved.entityCardHeading || defaults.entityCardHeading || '#ffffff'
+  );
+  previewRoot.style.setProperty(
+    '--preview-entityCardText',
+    resolved.entityCardText || defaults.entityCardText || '#f4f1ff'
+  );
+  previewRoot.style.setProperty(
+    '--preview-entityCardLabel',
+    resolved.entityCardLabel || defaults.entityCardLabel || '#d4af37'
+  );
+  previewRoot.style.setProperty(
+    '--preview-entityCardCta',
+    resolved.entityCardCta || defaults.entityCardCta || '#7c4eb0'
+  );
+  previewRoot.style.setProperty(
+    '--preview-entityCardCtaHover',
+    resolved.entityCardCtaHover || defaults.entityCardCtaHover || '#9b6fd0'
+  );
+  previewRoot.style.setProperty(
+    '--preview-entityCardIcon',
+    resolved.entityCardIcon || defaults.entityCardIcon || '#d4af37'
+  );
+  previewRoot.style.setProperty(
+    '--preview-entityCardIconShadow',
+    resolved.entityCardIconShadow || defaults.entityCardIconShadow || '#d4af37'
+  );
 }

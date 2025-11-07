@@ -1,6 +1,6 @@
 import { ThemeEditor } from "@/lib/theme-editor";
 import { THEME_SCOPES } from "@/lib/theme-scopes";
-import { ALL_COLOR_VARIABLES } from "@/lib/theme-editor-comprehensive";
+import { ALL_COLOR_VARIABLES, ALL_FONT_VARIABLES } from "@/lib/theme-editor-comprehensive";
 
 type FontOption = {
   id: string;
@@ -208,44 +208,122 @@ function buildComprehensiveControls(container: HTMLElement): void {
 
 function buildPreviewSection(container: HTMLElement): void {
   const previewCard = document.createElement("section");
-  previewCard.className = "space-y-4 rounded-2xl border border-line-subtle bg-surface-base p-4 shadow-sm";
+  previewCard.className = "space-y-5 rounded-2xl border border-line-subtle bg-surface-base p-4 shadow-sm";
 
   const heading = document.createElement("div");
-  heading.className = "flex items-center justify-between";
+  heading.className = "flex flex-wrap items-center justify-between gap-2";
   heading.innerHTML = `
     <h2 class="text-lg font-semibold">Live Preview</h2>
-    <span class="text-xs text-body-muted">Updates as you edit colors and fonts</span>
+    <span class="text-xs text-body-muted">Updates with every token, color, and font change</span>
   `;
   previewCard.appendChild(heading);
 
   const preview = document.createElement("div");
   preview.dataset.themePreview = "";
-  preview.className = "space-y-4 rounded-xl border border-line-neutral bg-surface-muted p-4";
+  preview.className = "space-y-5 rounded-xl border border-line-neutral bg-surface-muted p-4";
+  preview.style.background = "var(--preview-background)";
+  preview.style.color = "var(--preview-text)";
+  preview.style.setProperty("border-color", "var(--preview-border)");
   preview.innerHTML = `
-    <div class="space-y-2" style="color: var(--preview-text)">
-      <h3 class="text-lg font-semibold" style="color: var(--preview-text-heading)">Preview Heading</h3>
-      <p class="text-sm">Colors, typography, and surfaces refresh in real-time.</p>
+    <div class="space-y-3 rounded-xl border border-line-subtle bg-surface-base/80 p-4 shadow-sm" style="background: var(--preview-surfacePlain); border-color: var(--preview-surfacePlainBorder)">
+      <span class="text-[11px] font-semibold uppercase tracking-wide" style="color: var(--preview-text-muted)">Hero Preview</span>
+      <h3 class="text-2xl font-semibold" data-preview-font="fontHeading" style="color: var(--preview-text-heading)">WitchClick Theme Preview</h3>
+      <p class="text-sm" data-preview-font="fontSerif" style="color: var(--preview-text-primary)">See surfaces, typography, cards, and entity treatments all update as you tweak tokens.</p>
+      <a class="inline-flex items-center gap-2 text-sm font-semibold" data-preview-font="fontAccent" style="color: var(--preview-link)" href="#">
+        Explore rituals
+        <span class="inline-flex h-7 w-7 items-center justify-center rounded-full border" style="background: var(--preview-cardBadgeBg); border-color: var(--preview-cardBadgeBorder); color: var(--preview-cardBadgeText)">→</span>
+      </a>
     </div>
-    <div class="grid gap-3 md:grid-cols-3">
-      <div class="space-y-2 rounded-xl border p-3" style="background: var(--preview-surface); border-color: var(--preview-border)">
-        <span class="text-xs font-semibold uppercase tracking-wide" style="color: var(--preview-muted)">Card</span>
-        <p class="text-sm" style="color: var(--preview-text)">Surface tokens drive cards, alerts, and chrome.</p>
-      </div>
-      <div class="space-y-2 rounded-xl border p-3" style="background: var(--preview-surface); border-color: var(--preview-border)">
-        <span class="text-xs font-semibold uppercase tracking-wide" style="color: var(--preview-muted)">Buttons</span>
-        <button class="rounded-lg px-3 py-2 text-sm font-semibold text-white" style="background: var(--preview-primary)">Primary</button>
-        <button class="rounded-lg border px-3 py-2 text-sm" style="border-color: var(--preview-accent); color: var(--preview-accent)">Ghost</button>
-      </div>
-      <div class="space-y-2 rounded-xl border p-3" style="background: var(--preview-surface); border-color: var(--preview-border)">
-        <span class="text-xs font-semibold uppercase tracking-wide" style="color: var(--preview-muted)">Tags</span>
-        <div class="flex flex-wrap gap-2">
-          <span class="rounded-full border px-3 py-1 text-xs" style="border-color: var(--preview-accent); color: var(--preview-accent)">Focus</span>
-          <span class="rounded-full border px-3 py-1 text-xs" style="border-color: var(--preview-primary); color: var(--preview-primary)">Cozy</span>
+    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div class="space-y-3 rounded-xl border p-4 shadow-sm" style="background: var(--preview-cardPanelSurface); border-color: var(--preview-cardPanelBorder)">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-semibold uppercase tracking-wide" style="color: var(--preview-text-muted)">Card Panel</span>
+          <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" style="background: var(--preview-cardTagBg); border: 1px solid var(--preview-cardTagBorder); color: var(--preview-cardTagText)">Tag</span>
         </div>
+        <h4 class="text-lg font-semibold" data-preview-font="fontHeading" style="color: var(--preview-text-heading)">Surface strong</h4>
+        <p class="text-sm" data-preview-font="fontSerif" style="color: var(--preview-text-primary)">Uses <code class="rounded bg-black/20 px-1 py-0.5 text-[10px]">cardPanelSurface</code> and border tokens.</p>
+        <button class="w-full rounded-lg px-3 py-2 text-sm font-semibold" data-preview-font="fontAccent" style="background: var(--preview-primary); color: var(--preview-text-heading); box-shadow: 0 0 0 2px var(--preview-focusRingColor)">Primary CTA</button>
+      </div>
+      <div class="space-y-3 rounded-xl border p-4 shadow-sm" style="background: var(--preview-cardPanelSurfaceStrong); border-color: var(--preview-cardPanelBorderStrong)">
+        <span class="text-[11px] font-semibold uppercase tracking-wide" style="color: var(--preview-text-muted)">Status chips</span>
+        <div class="flex flex-wrap gap-2">
+          <span class="rounded-full px-3 py-1 text-xs font-semibold text-white" style="background: var(--preview-success)">Success</span>
+          <span class="rounded-full px-3 py-1 text-xs font-semibold text-black" style="background: var(--preview-warning)">Warning</span>
+          <span class="rounded-full px-3 py-1 text-xs font-semibold text-white" style="background: var(--preview-error)">Error</span>
+          <span class="rounded-full px-3 py-1 text-xs font-semibold text-white" style="background: var(--preview-info)">Info</span>
+        </div>
+        <div class="rounded-lg border bg-surface-base/50 p-3 text-xs" style="border-color: var(--preview-cardFocusOutline); color: var(--preview-text-secondary)">
+          Focus outlines and semantic palettes update live.
+        </div>
+        <label class="block text-xs font-medium uppercase tracking-wide" style="color: var(--preview-text-secondary)">
+          <span>Interactive field</span>
+          <input class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Focus me" style="border-color: var(--preview-cardPanelBorderSoft); box-shadow: 0 0 0 0 var(--preview-focusRingColor)" data-preview-focus-input />
+        </label>
+      </div>
+      <div class="space-y-3 rounded-xl border p-4 shadow-sm" style="background: linear-gradient(135deg, var(--preview-entityCardSurfaceTop), var(--preview-entityCardSurfaceBottom)); border-color: var(--preview-entityCardBorder); box-shadow: 0 0 20px var(--preview-entityCardGlow)">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-semibold uppercase tracking-wide" style="color: var(--preview-entityCardLabel)">Entity Card</span>
+          <span class="inline-flex h-8 w-8 items-center justify-center rounded-full" style="background: var(--preview-entityCardIcon); box-shadow: 0 0 12px var(--preview-entityCardIconShadow); color: var(--preview-entityCardText)">★</span>
+        </div>
+        <h4 class="text-lg font-semibold" data-preview-font="fontHeading" style="color: var(--preview-entityCardHeading)">Moonlit Focus</h4>
+        <p class="text-sm" data-preview-font="fontSerif" style="color: var(--preview-entityCardText)">Showcases entity-specific tokens including highlights and CTAs.</p>
+        <button class="rounded-lg px-3 py-2 text-sm font-semibold" data-preview-font="fontAccent" style="background: var(--preview-entityCardCta); color: var(--preview-entityCardText); box-shadow: inset 0 0 0 1px var(--preview-entityCardBorder)">View Entity</button>
+      </div>
+    </div>
+    <div class="space-y-3 rounded-xl border border-dashed border-line-subtle bg-surface-base/70 p-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h3 class="text-sm font-semibold">Typography Samples</h3>
+        <span class="text-[11px] uppercase tracking-wide text-body-muted">Fonts update in real time</span>
+      </div>
+      <div class="space-y-3">
+        ${ALL_FONT_VARIABLES.map((key) => `
+          <div class="rounded-lg border border-line-subtle bg-surface-base/80 p-3 shadow-sm" data-preview-font-section="${key}">
+            <div class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">${toLabel(key)}</div>
+            <p class="mt-1 text-lg" data-preview-font="${key}">The quick brown fox dances softly.</p>
+            <code class="mt-1 block text-[10px] font-mono text-body-muted" data-preview-font-value="${key}">—</code>
+          </div>
+        `).join("")}
       </div>
     </div>
   `;
   previewCard.appendChild(preview);
+
+  const focusInput = preview.querySelector<HTMLInputElement>('[data-preview-focus-input]');
+  if (focusInput) {
+    focusInput.addEventListener('focus', () => {
+      const color = getComputedStyle(preview).getPropertyValue('--preview-focusRingColor').trim() || 'transparent';
+      focusInput.style.boxShadow = `0 0 0 3px ${color}`;
+    });
+    focusInput.addEventListener('blur', () => {
+      focusInput.style.boxShadow = '0 0 0 0 transparent';
+    });
+  }
+
+  const swatchSection = document.createElement("div");
+  swatchSection.className = "space-y-3 rounded-xl border border-line-subtle bg-surface-base/80 p-4";
+  swatchSection.innerHTML = `
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <h3 class="text-sm font-semibold">Token Swatches</h3>
+      <span class="text-[11px] uppercase tracking-wide text-body-muted">Every editable color token</span>
+    </div>
+  `;
+
+  const swatchGrid = document.createElement("div");
+  swatchGrid.className = "grid gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4";
+  ALL_COLOR_VARIABLES.forEach((key) => {
+    const swatch = document.createElement("div");
+    swatch.dataset.previewSwatch = key;
+    swatch.className = "space-y-2 rounded-xl border border-line-subtle bg-surface-base/90 p-3 shadow-sm";
+    swatch.innerHTML = `
+      <div class="h-10 w-full rounded-lg border border-line-subtle" style="background: var(--preview-${key})"></div>
+      <div class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">${toLabel(key)}</div>
+      <code class="block text-[10px] font-mono text-body-muted" data-preview-swatch-value="${key}">—</code>
+    `;
+    swatchGrid.appendChild(swatch);
+  });
+
+  swatchSection.appendChild(swatchGrid);
+  previewCard.appendChild(swatchSection);
 
   const contrast = document.createElement("div");
   contrast.dataset.contrastDisplay = "";
