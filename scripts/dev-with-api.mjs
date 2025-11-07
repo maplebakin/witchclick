@@ -22,6 +22,8 @@ const apiEnv = {
   DEV_API_PORT: devApiPort,
 };
 
+const cliArgs = process.argv.slice(2);
+
 const apiProcess = spawn("node", ["./dev-api.js"], {
   cwd: process.cwd(),
   env: apiEnv,
@@ -57,7 +59,7 @@ function startAstro() {
     return;
   }
 
-  astroProcess = spawn("astro", ["dev"], {
+  astroProcess = spawn("astro", ["dev", ...cliArgs], {
     cwd: process.cwd(),
     env: {
       ...process.env,
