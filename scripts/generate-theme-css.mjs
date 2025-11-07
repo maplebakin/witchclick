@@ -70,7 +70,7 @@ function loadThemes() {
 
       themes.push(theme);
     } catch (error) {
-      console.error(`❌ Error reading ${file}:`, error.message);
+      throw new Error(`Failed to load theme file ${file}: ${error.message}`, { cause: error });
     }
   }
 
@@ -261,6 +261,7 @@ function startWatcher() {
         console.log('✅ Rebuild complete. Continuing to watch for changes.');
       } catch (error) {
         console.error('❌ Rebuild failed:', error);
+        process.exitCode = process.exitCode || 1;
         console.log('⚠️ Watcher will continue running.');
       } finally {
         rebuildTimer = null;
