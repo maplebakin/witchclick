@@ -211,34 +211,30 @@ function generateMetadata(themes) {
 function runGeneration() {
   console.log('🎨 Generating theme CSS...\n');
 
-  try {
-    // Load themes
-    const themes = loadThemes();
-    console.log(`📦 Loaded ${themes.length} themes:`);
-    themes.forEach(t => {
-      console.log(`   • ${t.label} (${t.slug}) - ${t.mode} mode`);
-    });
+  // Load themes
+  const themes = loadThemes();
+  console.log(`📦 Loaded ${themes.length} themes:`);
+  themes.forEach(t => {
+    console.log(`   • ${t.label} (${t.slug}) - ${t.mode} mode`);
+  });
 
-    // Generate CSS
-    const css = generateCSS(themes);
-    writeFileSync(OUTPUT_FILE, css, 'utf-8');
-    console.log(`\n✅ Generated CSS: ${OUTPUT_FILE}`);
+  // Generate CSS
+  const css = generateCSS(themes);
+  writeFileSync(OUTPUT_FILE, css, 'utf-8');
+  console.log(`\n✅ Generated CSS: ${OUTPUT_FILE}`);
 
-    // Generate metadata
-    const metadataFile = generateMetadata(themes);
-    console.log(`✅ Generated metadata: ${metadataFile}`);
+  // Generate metadata
+  const metadataFile = generateMetadata(themes);
+  console.log(`✅ Generated metadata: ${metadataFile}`);
 
-    // Summary
-    console.log(`\n📊 Summary:`);
-    console.log(`   • Total themes: ${themes.length}`);
-    console.log(`   • Midnight themes: ${themes.filter(t => t.mode === 'midnight').length}`);
-    console.log(`   • Dawn themes: ${themes.filter(t => t.mode === 'dawn').length}`);
-    console.log(`   • CSS properties per theme: ${Object.keys(themes[0]?.settings || {}).length}`);
+  // Summary
+  console.log(`\n📊 Summary:`);
+  console.log(`   • Total themes: ${themes.length}`);
+  console.log(`   • Midnight themes: ${themes.filter(t => t.mode === 'midnight').length}`);
+  console.log(`   • Dawn themes: ${themes.filter(t => t.mode === 'dawn').length}`);
+  console.log(`   • CSS properties per theme: ${Object.keys(themes[0]?.settings || {}).length}`);
 
-    console.log(`\n✨ Theme CSS generation complete!\n`);
-  } catch (error) {
-    console.error('❌ Theme CSS generation failed:', error);
-  }
+  console.log(`\n✨ Theme CSS generation complete!\n`);
 }
 
 function parseFlags(argv) {
@@ -260,9 +256,15 @@ function startWatcher() {
     }
     rebuildTimer = setTimeout(() => {
       console.log(`\n🔁 Change detected${detail ? ` (${detail})` : ''}. Rebuilding...`);
-      runGeneration();
-      console.log('✅ Rebuild complete. Continuing to watch for changes.');
-      rebuildTimer = null;
+      try {
+        runGeneration();
+        console.log('✅ Rebuild complete. Continuing to watch for changes.');
+      } catch (error) {
+        console.error('❌ Rebuild failed:', error);
+        console.log('⚠️ Watcher will continue running.');
+      } finally {
+        rebuildTimer = null;
+      }
     }, 100);
   };
 
@@ -286,9 +288,25 @@ function startWatcher() {
 // Run if called directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   const flags = parseFlags(process.argv.slice(2));
-  runGeneration();
+  let initialRunFailed = false;
+
+  try {
+    runGeneration();
+  } catch (error) {
+    initialRunFailed = true;
+    console.error('❌ Theme CSS generation failed:', error);
+    if (!flags.watch) {
+      process.exit(1);
+    } else {
+      process.exitCode = 1;
+      console.log('⚠️ Watch mode will continue despite the failure.');
+    }
+  }
 
   if (flags.watch) {
+    if (initialRunFailed) {
+      console.log('🔁 Waiting for changes before attempting to rebuild again.');
+    }
     startWatcher();
   }
 }
