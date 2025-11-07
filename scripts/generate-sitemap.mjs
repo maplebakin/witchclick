@@ -10,6 +10,9 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distDir = path.join(__dirname, '..', 'dist');
+const clientDir = path.join(distDir, 'client');
+const htmlRootDir = fs.existsSync(clientDir) ? clientDir : distDir;
+const sitemapOutputDir = fs.existsSync(clientDir) ? clientDir : distDir;
 const siteUrl = 'https://witchclick.space';
 
 const EXCLUDE_PREFIXES = ['/author', '/account', '/admin', '/api'];
@@ -149,8 +152,12 @@ function main() {
   const baseUrl = getSiteUrl().replace(/\/$/, ''); // Remove trailing slash
   console.log('🗺️  Generating sitemap for:', baseUrl);
 
+  if (htmlRootDir !== distDir) {
+    console.log('📦 Detected server build output — scanning dist/client for HTML.');
+  }
+
   // Find all HTML files
-  const htmlFiles = findHtmlFiles(distDir);
+  const htmlFiles = findHtmlFiles(htmlRootDir);
   console.log(`📄 Found ${htmlFiles.length} HTML files`);
 
   // Convert to URLs and filter
@@ -176,7 +183,7 @@ function main() {
   chunks.forEach((chunk, index) => {
     const filename = chunks.length === 1 ? 'sitemap-0.xml' : `sitemap-${index}.xml`;
     const sitemap = generateSitemap(chunk, baseUrl);
-    const filepath = path.join(distDir, filename);
+    const filepath = path.join(sitemapOutputDir, filename);
 
     fs.writeFileSync(filepath, sitemap, 'utf8');
     sitemapFiles.push(filename);
@@ -186,7 +193,7 @@ function main() {
   // Generate sitemap index
   const sitemapUrls = sitemapFiles.map(file => `${baseUrl}/${file}`);
   const sitemapIndex = generateSitemapIndex(sitemapUrls);
-  const indexPath = path.join(distDir, 'sitemap-index.xml');
+  const indexPath = path.join(sitemapOutputDir, 'sitemap-index.xml');
 
   fs.writeFileSync(indexPath, sitemapIndex, 'utf8');
   console.log(`✓ Generated sitemap-index.xml`);
