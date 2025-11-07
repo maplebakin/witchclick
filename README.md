@@ -2,6 +2,11 @@
 
 A production-focused, static site platform for cozy metaphysical content. Prompt → JSON → CLI ingest → site. SEO-forward, internal linking, and affiliate routing with zero server.
 
+## Local development
+
+- `npm run dev` starts the Astro dev server and the local admin API together via `scripts/dev-with-api.mjs`.
+- Set `DEV_API_HOST` (default: `localhost`) and `DEV_API_PORT` (default: `8787`) to customize where the admin API listens during development.
+
 ## Affiliate catalog
 
 Editors can reference the following affiliate keys in post specs and frontmatter. Each key maps to an entry in `content/products.json` and resolves through `/go/<key>` redirects with baked-in tracking parameters.

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "node ./scripts/dev-with-api.mjs",
     "prebuild": "node ./scripts/ensure-npm-proxy.mjs && node ./scripts/generate-theme-css.mjs",
     "build": "node ./scripts/build-clean.mjs && node ./scripts/generate-sitemap.mjs",
     "postbuild": "echo '✅ Build complete with sitemap'",

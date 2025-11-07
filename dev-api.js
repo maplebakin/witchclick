@@ -49,7 +49,9 @@ import {
   persistPreparedCurse,
 } from './server/lib/cursePreparation.js';
 
-const PORT = process.env.PORT ? Number(process.env.PORT) : 8787;
+const rawPort = process.env.DEV_API_PORT ?? process.env.PORT;
+const PORT = rawPort && Number.parseInt(rawPort, 10) > 0 ? Number.parseInt(rawPort, 10) : 8787;
+const HOST = process.env.HOST ?? process.env.DEV_API_HOST ?? 'localhost';
 const CWD = process.cwd();
 
 function listPostDirsForCollisions() {
@@ -2388,8 +2390,8 @@ const server = http.createServer(async (req, res) => {
 });
 
 if (process.env.VITEST !== 'true') {
-  server.listen(PORT, () => {
-    console.log(`[dev-api] listening on http://localhost:${PORT}`);
+  server.listen(PORT, HOST, () => {
+    console.log(`[dev-api] listening on http://${HOST}:${PORT}`);
   });
 }
 
