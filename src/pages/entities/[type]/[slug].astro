@@ -153,6 +153,7 @@ let relatedPosts: Array<{
   slug: string;
   excerpt?: string;
   publishedAt?: string;
+  category?: import('../../../utils/entityPosts').RelatedPost['category'];
 }> = [];
 try {
   // This helper will be wired to real content soon; we fall back quietly for now.

@@ -74,6 +74,19 @@
           ],
           "default": "ritual"
         },
+        "contentType": {
+          "type": "string",
+          "enum": [
+            "ritual",
+            "guide",
+            "spread",
+            "reflection",
+            "story",
+            "tarotSpread",
+            "spellwork",
+            "crystals"
+          ]
+        },
         "draft": {
           "type": "boolean",
           "default": false

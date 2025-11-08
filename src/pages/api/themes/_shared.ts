@@ -85,7 +85,7 @@ export function requireAdminAuth(request: Request): Response | null {
 
   const authHeader = request.headers.get(AUTH_HEADER) || '';
   const match = authHeader.match(/^Bearer\s+(.+)$/i);
-  const providedToken = match ? match[1].trim() : '';
+  const providedToken = match?.[1]?.trim() ?? '';
 
   if (providedToken === token) {
     return null;

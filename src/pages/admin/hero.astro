@@ -60,16 +60,46 @@ const site = Astro.url?.origin ?? "";
                   Choose an existing post that should receive a fresh hero image.
                 </p>
               </div>
-              <label class="block">
-                <span class="text-xs font-medium uppercase tracking-wide text-body-subtle">Post</span>
-                <select
-                  class="mt-1 w-full rounded-lg border border-line-neutral-strong bg-surface-base px-3 py-2 text-sm focus:border-line-bold focus:outline-none"
-                  data-post-select
-                  disabled
-                >
-                  <option>Loading posts…</option>
-                </select>
-              </label>
+              <div class="grid gap-4 lg:grid-cols-2">
+                <!-- Recently Added Posts Column -->
+                <div class="space-y-2">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-semibold uppercase tracking-wide text-body-strong">Recently Added</span>
+                    <span class="text-[10px] font-medium uppercase tracking-wide rounded-full bg-surface-accent-soft px-2 py-0.5 text-accent" data-recent-count>0</span>
+                  </div>
+                  <div class="space-y-1 rounded-lg border border-line-neutral bg-surface-base p-2 max-h-64 overflow-y-auto" data-recent-posts>
+                    <div class="flex items-center justify-center py-8 text-xs text-body-muted">Loading posts…</div>
+                  </div>
+                </div>
+
+                <!-- Posts Without Hero Image Column -->
+                <div class="space-y-2">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-semibold uppercase tracking-wide text-body-strong">Needs Hero Image</span>
+                    <span class="text-[10px] font-medium uppercase tracking-wide rounded-full bg-surface-success-soft px-2 py-0.5 text-success" data-missing-count>0</span>
+                  </div>
+                  <div class="space-y-1 rounded-lg border border-line-neutral bg-surface-base p-2 max-h-64 overflow-y-auto" data-missing-hero-posts>
+                    <div class="flex items-center justify-center py-8 text-xs text-body-muted">Loading posts…</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Hidden select for backward compatibility -->
+              <select class="hidden" data-post-select disabled>
+                <option>Loading posts…</option>
+              </select>
+
+              <!-- Selected post display -->
+              <div class="hidden rounded-lg border-2 border-primary bg-surface-soft px-4 py-3" data-selected-post-display>
+                <div class="flex items-center justify-between gap-3">
+                  <div class="flex-1">
+                    <div class="text-[10px] font-semibold uppercase tracking-wide text-body-muted mb-1">Selected Post</div>
+                    <div class="font-semibold text-body" data-selected-title></div>
+                    <div class="text-xs text-body-muted" data-selected-slug></div>
+                  </div>
+                  <button type="button" class="text-xs font-semibold text-danger hover:underline" data-clear-selection>Clear</button>
+                </div>
+              </div>
             </div>
           </div>
         </li>
@@ -252,6 +282,14 @@ const site = Astro.url?.origin ?? "";
         const DEV_API = root.getAttribute('data-dev-api') || 'http://localhost:8787';
         const SITE_ORIGIN = root.getAttribute('data-site-origin') || 'https://example.com';
         const select = root.querySelector('[data-post-select]');
+        const recentPostsList = root.querySelector('[data-recent-posts]');
+        const missingHeroPostsList = root.querySelector('[data-missing-hero-posts]');
+        const recentCount = root.querySelector('[data-recent-count]');
+        const missingCount = root.querySelector('[data-missing-count]');
+        const selectedPostDisplay = root.querySelector('[data-selected-post-display]');
+        const selectedTitleEl = root.querySelector('[data-selected-title]');
+        const selectedSlugEl = root.querySelector('[data-selected-slug]');
+        const clearSelectionBtn = root.querySelector('[data-clear-selection]');
         const dropZone = root.querySelector('[data-drop-zone]');
         const fileInput = root.querySelector('[data-file-input]');
         const fileInfo = root.querySelector('[data-file-info]');
@@ -757,10 +795,73 @@ const site = Astro.url?.origin ?? "";
           refreshFormAvailability();
         }
 
-        function renderOptions() {
+        function createPostCard(post) {
+          const card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'w-full text-left px-3 py-2 rounded-lg border border-line-neutral bg-surface-base hover:border-primary hover:bg-surface-soft transition text-sm';
+          card.dataset.postSlug = post.slug;
+
+          const title = document.createElement('div');
+          title.className = 'font-semibold text-body truncate';
+          title.textContent = post.title || post.slug;
+
+          const slug = document.createElement('div');
+          slug.className = 'text-xs text-body-muted truncate mt-0.5';
+          slug.textContent = post.slug;
+
+          card.appendChild(title);
+          card.appendChild(slug);
+
+          if (post.heroImage) {
+            const badge = document.createElement('div');
+            badge.className = 'text-[10px] font-medium text-success mt-1';
+            badge.textContent = '✓ Has hero image';
+            card.appendChild(badge);
+          }
+
+          card.addEventListener('click', () => {
+            selectPost(post.slug);
+          });
+
+          return card;
+        }
+
+        function selectPost(slug) {
           if (!select) return;
+          select.value = slug;
+
+          // Update selected post display
+          const post = posts.find(p => p.slug === slug);
+          if (post && selectedPostDisplay && selectedTitleEl && selectedSlugEl) {
+            selectedTitleEl.textContent = post.title || slug;
+            selectedSlugEl.textContent = slug;
+            selectedPostDisplay.classList.remove('hidden');
+          }
+
+          // Trigger change event for compatibility
+          const changeEvent = new Event('change', { bubbles: true });
+          select.dispatchEvent(changeEvent);
+        }
+
+        function clearSelection() {
+          if (!select) return;
+          select.value = '';
+
+          if (selectedPostDisplay) {
+            selectedPostDisplay.classList.add('hidden');
+          }
+
+          // Trigger change event
+          const changeEvent = new Event('change', { bubbles: true });
+          select.dispatchEvent(changeEvent);
+        }
+
+        function renderOptions() {
+          if (!select || !recentPostsList || !missingHeroPostsList) return;
+
           const current = select.value;
           select.innerHTML = '';
+
           if (!posts.length) {
             const option = document.createElement('option');
             option.textContent = 'No posts available';
@@ -769,10 +870,17 @@ const site = Astro.url?.origin ?? "";
             select.appendChild(option);
             select.disabled = true;
             if (submitButton) submitButton.disabled = true;
+
+            // Clear both lists
+            recentPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-xs text-body-muted">No posts found</div>';
+            missingHeroPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-xs text-body-muted">No posts found</div>';
+
             updateHeroPromptUI();
             refreshFormAvailability();
             return;
           }
+
+          // Keep hidden select in sync for compatibility
           const placeholder = document.createElement('option');
           placeholder.value = '';
           placeholder.textContent = 'Select a post…';
@@ -788,6 +896,44 @@ const site = Astro.url?.origin ?? "";
           });
           select.disabled = false;
           if (submitButton) submitButton.disabled = false;
+
+          // Sort posts by publishedAt (most recent first)
+          const sortedByDate = [...posts].sort((a, b) => {
+            const dateA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+            const dateB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+            return dateB - dateA;
+          });
+
+          // Filter posts without hero images
+          const postsWithoutHero = posts.filter(p => !p.heroImage);
+
+          // Populate recently added column (top 20)
+          recentPostsList.innerHTML = '';
+          const recentPosts = sortedByDate.slice(0, 20);
+          if (recentPosts.length === 0) {
+            recentPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-xs text-body-muted">No posts yet</div>';
+          } else {
+            recentPosts.forEach(post => {
+              recentPostsList.appendChild(createPostCard(post));
+            });
+          }
+          if (recentCount) {
+            recentCount.textContent = recentPosts.length.toString();
+          }
+
+          // Populate posts without hero image column
+          missingHeroPostsList.innerHTML = '';
+          if (postsWithoutHero.length === 0) {
+            missingHeroPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-xs text-success">All posts have hero images! 🎉</div>';
+          } else {
+            postsWithoutHero.forEach(post => {
+              missingHeroPostsList.appendChild(createPostCard(post));
+            });
+          }
+          if (missingCount) {
+            missingCount.textContent = postsWithoutHero.length.toString();
+          }
+
           updateHeroPromptUI();
         }
 
@@ -966,6 +1112,7 @@ const site = Astro.url?.origin ?? "";
               ? data.items.map((item) => ({
                   slug: item?.slug,
                   title: item?.title,
+                  publishedAt: item?.publishedAt || item?.pubDate || '',
                   heroImagePrompt: typeof item?.heroImagePrompt === 'string' ? item.heroImagePrompt : '',
                   heroAlt: typeof item?.heroAlt === 'string' ? item.heroAlt : '',
                   heroImageAlt: typeof item?.heroImageAlt === 'string' ? item.heroImageAlt : '',
@@ -1035,6 +1182,12 @@ const site = Astro.url?.origin ?? "";
             clearFileSelection();
             updateHeroPromptUI();
             refreshFormAvailability();
+          });
+        }
+
+        if (clearSelectionBtn) {
+          clearSelectionBtn.addEventListener('click', () => {
+            clearSelection();
           });
         }
 

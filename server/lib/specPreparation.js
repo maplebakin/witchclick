@@ -506,6 +506,13 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
     specVersion: 2,
   };
 
+  if (spec.category) {
+    frontmatter.category = spec.category;
+  }
+  if (spec.contentType) {
+    frontmatter.contentType = spec.contentType;
+  }
+
   if (promptMetadata) {
     frontmatter.promptMetadata = promptMetadata;
   }

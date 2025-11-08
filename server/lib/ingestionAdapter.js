@@ -2,7 +2,7 @@
 // @ts-check
 
 import { slugify, slugifyId } from '../../scripts/lib/slug.js';
-import { CONTENT_TYPES } from './postSpecSchema.js';
+import { CONTENT_TYPES, POST_CATEGORIES } from './postSpecSchema.js';
 
 /**
  * @typedef {import('./postSpecSchema.js').PostSpecV2} PostSpecV2
@@ -133,6 +133,18 @@ function normalizeContentTypeValue(value) {
   for (const allowed of CONTENT_TYPES) {
     const canonicalNormalized = allowed.toLowerCase().replace(/[^a-z]/g, '');
     if (normalized === canonicalNormalized) {
+      return allowed;
+    }
+  }
+  return undefined;
+}
+
+function normalizeCategoryValue(value) {
+  const trimmed = toTrimmedString(value);
+  if (!trimmed) return undefined;
+  const normalized = trimmed.toLowerCase();
+  for (const allowed of POST_CATEGORIES) {
+    if (normalized === allowed.toLowerCase()) {
       return allowed;
     }
   }
@@ -285,6 +297,13 @@ export function normalizePostSpec(raw, options = {}) {
   const contentType = normalizeContentTypeValue(rawContentType);
   if (contentType && rawContentType !== contentType) {
     report.push('normalized contentType');
+  }
+
+  // category
+  const rawCategory = toTrimmedString(input.category);
+  const category = normalizeCategoryValue(rawCategory);
+  if (category && rawCategory !== category) {
+    report.push('normalized category');
   }
 
   // tags & aliases
@@ -452,6 +471,7 @@ export function normalizePostSpec(raw, options = {}) {
     specVersion: 2,
     title,
     slug,
+    ...(category ? { category } : {}),
     ...(contentType ? { contentType } : {}),
     metaDescription,
     tags,

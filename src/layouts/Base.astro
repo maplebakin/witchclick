@@ -192,7 +192,7 @@ const buildThemeCss = (
   const overlayStrong = `color-mix(in srgb, ${background} 68%, transparent 32%)`;
   const plainSurface = `color-mix(in srgb, ${background} 92%, black 8%)`;
   const plainBorder = `color-mix(in srgb, ${primary} 28%, transparent 72%)`;
-  const plainShadow = `0 28px 60px -30px color-mix(in srgb, ${primary} 18%, black 82%)`;
+  const _plainShadow = `0 28px 60px -30px color-mix(in srgb, ${primary} 18%, black 82%)`;
   const inkBody = `color-mix(in srgb, ${colorInkBase} 70%, ${colorNightBase} 30%)`;
   const inkStrong = `color-mix(in srgb, ${colorInkBase} 85%, ${colorNightBase} 15%)`;
   const inkMuted = `color-mix(in srgb, ${colorInkBase} 55%, white 45%)`;
@@ -225,7 +225,6 @@ const buildThemeCss = (
     colorOverlayStrong: sanitizeToken(theme?.colorOverlayStrong, overlayStrong),
     surfacePlain: sanitizeToken(theme?.surfacePlain, plainSurface),
     surfacePlainBorder: sanitizeToken(theme?.surfacePlainBorder, plainBorder),
-    surfacePlainShadow: sanitizeToken(theme?.surfacePlainShadow, plainShadow),
     inkBody,
     inkStrong,
     inkMuted,
@@ -258,8 +257,8 @@ const buildThemeCss = (
     tokens.set(`--${toKebabCase(key)}`, value);
   }
 
-  tokens.set("--color-amethyst", defaults.colorAmethyst);
-  tokens.set("--color-fog", defaults.colorFog);
+  tokens.set("--color-amethyst", defaults.colorAmethyst!);
+  tokens.set("--color-fog", defaults.colorFog!);
   tokens.set("--focus-ring-shadow", focusRingShadow);
   tokens.set("--focus-ring-color", focusRingColor);
   tokens.set("--primary", primary);

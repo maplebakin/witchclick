@@ -101,8 +101,15 @@ export class ThemeEditor {
     this.elements.setActiveBtn = document.getElementById('setActiveThemeBtn');
     this.elements.deleteBtn = document.getElementById('deleteThemeBtn');
     this.elements.duplicateBtn = document.getElementById('duplicateThemeBtn');
+    this.elements.newThemeBtn = document.getElementById('newThemeBtn');
     this.elements.newMidnightBtn = document.querySelector('[data-new-theme="midnight"]');
     this.elements.newDawnBtn = document.querySelector('[data-new-theme="dawn"]');
+
+    // New theme modal
+    this.elements.newThemeModal = document.getElementById('newThemeModal');
+    this.elements.cancelNewTheme = document.getElementById('cancelNewTheme');
+    this.elements.createMidnightBtn = document.querySelector('[data-create-theme="midnight"]');
+    this.elements.createDawnBtn = document.querySelector('[data-create-theme="dawn"]');
 
     // Undo/Redo
     this.elements.undoBtn = document.getElementById('undoBtn');
@@ -225,7 +232,34 @@ export class ThemeEditor {
       void this.duplicate();
     });
 
-    // New theme buttons
+    // New theme button (opens modal)
+    this.elements.newThemeBtn?.addEventListener('click', () => {
+      this.openNewThemeModal();
+    });
+
+    // New theme modal buttons
+    this.elements.cancelNewTheme?.addEventListener('click', () => {
+      this.closeNewThemeModal();
+    });
+
+    this.elements.createMidnightBtn?.addEventListener('click', () => {
+      this.closeNewThemeModal();
+      this.newTheme('midnight');
+    });
+
+    this.elements.createDawnBtn?.addEventListener('click', () => {
+      this.closeNewThemeModal();
+      this.newTheme('dawn');
+    });
+
+    // Close modal when clicking backdrop
+    this.elements.newThemeModal?.addEventListener('click', (e) => {
+      if (e.target === this.elements.newThemeModal) {
+        this.closeNewThemeModal();
+      }
+    });
+
+    // New theme buttons in library (legacy)
     this.elements.newMidnightBtn?.addEventListener('click', () => this.newTheme('midnight'));
     this.elements.newDawnBtn?.addEventListener('click', () => this.newTheme('dawn'));
 
@@ -247,6 +281,15 @@ export class ThemeEditor {
 
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        // Close modal if open
+        const modal = this.elements.newThemeModal as HTMLElement;
+        if (modal && !modal.classList.contains('hidden')) {
+          this.closeNewThemeModal();
+          return;
+        }
+      }
+
       if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
         e.preventDefault();
         this.undo();
@@ -342,10 +385,13 @@ export class ThemeEditor {
       (this.elements.categorySelect as HTMLSelectElement).value = preset?.category || 'custom';
     }
 
-    // Populate all comprehensive color and font inputs
+    // Get scope-specific variables (will return global variables if scope is 'global')
+    const scopeVariables = this.getScopeVariables();
+
+    // Populate all comprehensive color and font inputs with scope-specific variables
     populateAllFormInputs(
       this.elements,
-      preset?.variables || {},
+      scopeVariables,
       defaults
     );
 
@@ -608,11 +654,13 @@ export class ThemeEditor {
   private collectFormData(): Partial<ThemePreset> {
     const mode = this.state.mode;
     const defaults = this.manager.getDefaultVariables(mode);
+    const preset = this.state.currentPreset;
+    const scope = this.state.editingScope;
 
-    // Collect all comprehensive variables
+    // Collect all comprehensive variables (for scope-specific editing)
     const comprehensiveVariables = collectAllFormValues(this.elements);
 
-    // Legacy variables for backwards compatibility
+    // Legacy variables for backwards compatibility (always global)
     const legacyVariables = {
       primary: this.getInputValue('primaryInput') || defaults.primary,
       accent: this.getInputValue('accentInput') || defaults.accent,
@@ -624,15 +672,45 @@ export class ThemeEditor {
       fontScript: (this.elements.fontScriptSelect as HTMLSelectElement)?.value || defaults.fontScript,
     };
 
+    let variables: ThemeVariables;
+    let overrides = preset?.overrides ? [...preset.overrides] : [];
+
+    if (scope === 'global') {
+      // When editing global scope, save comprehensive variables to global
+      variables = {
+        ...comprehensiveVariables,
+        ...legacyVariables, // Legacy overrides comprehensive
+      };
+    } else {
+      // When editing a specific scope, keep global variables unchanged
+      // and update/create the scope override with comprehensive variables
+      variables = {
+        ...(preset?.variables || {}), // Keep existing global variables
+        ...legacyVariables, // Update legacy variables globally
+      };
+
+      // Update or create scope override
+      const existingIndex = overrides.findIndex((o) => o.scope === scope);
+      if (existingIndex >= 0 && overrides[existingIndex]) {
+        overrides[existingIndex] = {
+          scope,
+          variables: comprehensiveVariables,
+        };
+      } else {
+        overrides.push({
+          scope,
+          variables: comprehensiveVariables,
+        });
+      }
+    }
+
     return {
       name: this.getInputValue('nameInput'),
       slug: this.getInputValue('slugInput'),
       mode,
       category: (this.elements.categorySelect as HTMLSelectElement)?.value || 'custom',
-      variables: {
-        ...comprehensiveVariables,
-        ...legacyVariables, // Legacy overrides comprehensive
-      },
+      variables,
+      overrides: overrides.length > 0 ? overrides : undefined,
     };
   }
 
@@ -654,6 +732,20 @@ export class ThemeEditor {
       currentPreset: null,
     });
     this.setStatus(`Ready to create a new ${mode} theme`, 'info');
+  }
+
+  private openNewThemeModal(): void {
+    const modal = this.elements.newThemeModal as HTMLElement;
+    if (modal) {
+      modal.classList.remove('hidden');
+    }
+  }
+
+  private closeNewThemeModal(): void {
+    const modal = this.elements.newThemeModal as HTMLElement;
+    if (modal) {
+      modal.classList.add('hidden');
+    }
   }
 
   private async save(): Promise<void> {

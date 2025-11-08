@@ -172,21 +172,97 @@ function buildComprehensiveControls(container: HTMLElement): void {
   details.setAttribute("open", "");
 
   const summary = document.createElement("summary");
-  summary.className = "cursor-pointer text-sm font-semibold";
-  summary.textContent = "Advanced Theme Variables";
+  summary.className = "cursor-pointer text-sm font-semibold flex items-center gap-2";
+  summary.innerHTML = `
+    <span>Advanced Theme Variables</span>
+    <span class="text-[10px] font-semibold uppercase tracking-wide rounded-full bg-surface-accent px-2 py-0.5 text-inverse">Scope-specific</span>
+  `;
   details.appendChild(summary);
 
-  const description = document.createElement("p");
-  description.className = "text-xs text-body-muted";
-  description.textContent = "Fine tune surfaces, accents, and component-specific tokens.";
-  details.appendChild(description);
+  const descriptionBox = document.createElement("div");
+  descriptionBox.className = "space-y-2 rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-3";
+  descriptionBox.innerHTML = `
+    <p class="text-xs text-body-muted"><strong>⚠️ Important:</strong> These variables are <strong>scope-specific</strong>—changes apply only to the scope selected above (e.g., Global, Grimoire, Header).</p>
+    <div class="text-xs text-body-muted">
+      <div class="font-semibold mb-2">🎨 When to use these:</div>
+      <ul class="space-y-1.5 ml-4">
+        <li><strong>Surface colors:</strong> Card backgrounds, panels, and containers</li>
+        <li><strong>Border colors:</strong> Dividers, outlines, and card edges</li>
+        <li><strong>Text variants:</strong> Secondary, tertiary, disabled states</li>
+        <li><strong>Interactive:</strong> Focus rings, hover states, active elements</li>
+        <li><strong>Entity cards:</strong> Special styling for grimoire entries (when scope = Grimoire)</li>
+        <li><strong>Semantic:</strong> Success, warning, error, info colors</li>
+      </ul>
+      <p class="mt-3 text-xs italic">💡 Tip: Start with the Quick Palette above, then use these for fine-tuning specific areas.</p>
+    </div>
+  `;
+  details.appendChild(descriptionBox);
 
-  const grid = document.createElement("div");
-  grid.className = "grid gap-3 sm:grid-cols-2 lg:grid-cols-3";
-  ALL_COLOR_VARIABLES.forEach((key) => {
-    grid.appendChild(createColorControl(key));
+  // Organize variables into categorized sections
+  const variableGroups = [
+    {
+      title: "Core Brand Colors",
+      description: "Foundation palette - adjust these first for major theme changes",
+      variables: ['colorMidnight', 'colorNight', 'colorIris', 'colorAmethyst', 'colorDusk', 'colorGold', 'colorRune', 'colorFog', 'colorInk']
+    },
+    {
+      title: "Surface Colors",
+      description: "Backgrounds for cards, panels, and containers",
+      variables: ['surfacePlain', 'surfacePlainBorder', 'cardPanelSurface', 'cardPanelSurfaceStrong', 'cardPanelBorder', 'cardPanelBorderStrong', 'cardPanelBorderSoft']
+    },
+    {
+      title: "Text Colors",
+      description: "Text variations for different emphasis levels",
+      variables: ['textPrimary', 'textSecondary', 'textTertiary', 'textStrong', 'textHint', 'textDisabled', 'textBody', 'textSubtle', 'textAccent', 'textAccentStrong', 'textHeading', 'inkBody', 'inkStrong', 'inkMuted', 'linkColor']
+    },
+    {
+      title: "Card Components",
+      description: "Badges, tags, and spoon indicators on post cards",
+      variables: ['cardBadgeBg', 'cardBadgeBorder', 'cardBadgeText', 'cardTagBg', 'cardTagBorder', 'cardTagText', 'cardSpoonBg', 'cardSpoonBorder', 'cardSpoonText']
+    },
+    {
+      title: "Interactive Elements",
+      description: "Focus rings and interactive state colors",
+      variables: ['focusRingColor', 'cardFocusOutline']
+    },
+    {
+      title: "Semantic Status",
+      description: "System feedback colors for success, warnings, and errors",
+      variables: ['success', 'warning', 'error', 'info']
+    },
+    {
+      title: "Entity Grimoire Cards",
+      description: "Special styling for entity cards (most useful when scope = Grimoire)",
+      variables: ['entityCardBorder', 'entityCardGlow', 'entityCardHighlight', 'entityCardSurfaceTop', 'entityCardSurfaceBottom', 'entityCardHeading', 'entityCardText', 'entityCardLabel', 'entityCardCta', 'entityCardCtaHover', 'entityCardIcon', 'entityCardIconShadow']
+    }
+  ];
+
+  const groupsContainer = document.createElement("div");
+  groupsContainer.className = "space-y-6";
+
+  variableGroups.forEach(group => {
+    const groupSection = document.createElement("div");
+    groupSection.className = "space-y-3";
+
+    const groupHeader = document.createElement("div");
+    groupHeader.className = "border-b border-line-subtle pb-2";
+    groupHeader.innerHTML = `
+      <h4 class="text-sm font-semibold">${group.title}</h4>
+      <p class="text-xs text-body-muted mt-0.5">${group.description}</p>
+    `;
+    groupSection.appendChild(groupHeader);
+
+    const grid = document.createElement("div");
+    grid.className = "grid gap-3 sm:grid-cols-2 lg:grid-cols-3";
+    group.variables.forEach((key) => {
+      grid.appendChild(createColorControl(key));
+    });
+    groupSection.appendChild(grid);
+
+    groupsContainer.appendChild(groupSection);
   });
-  details.appendChild(grid);
+
+  details.appendChild(groupsContainer);
 
   const scopeDetails = document.createElement("details");
   scopeDetails.className = "rounded-xl border border-dashed border-line-subtle bg-surface-base/60 p-4";
@@ -285,6 +361,21 @@ function buildPreviewSection(container: HTMLElement): void {
         `).join("")}
       </div>
     </div>
+    <div class="space-y-3 rounded-xl border border-line-subtle bg-surface-base/80 p-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h3 class="text-sm font-semibold">Token Swatches</h3>
+        <span class="text-[11px] uppercase tracking-wide text-body-muted">Every editable color token</span>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+        ${ALL_COLOR_VARIABLES.map((key) => `
+          <div class="space-y-2 rounded-xl border border-line-subtle bg-surface-base/90 p-3 shadow-sm" data-preview-swatch="${key}">
+            <div class="h-10 w-full rounded-lg border border-line-subtle" style="background: var(--preview-${key})"></div>
+            <div class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">${toLabel(key)}</div>
+            <code class="block text-[10px] font-mono text-body-muted" data-preview-swatch-value="${key}">—</code>
+          </div>
+        `).join("")}
+      </div>
+    </div>
   `;
   previewCard.appendChild(preview);
 
@@ -298,32 +389,6 @@ function buildPreviewSection(container: HTMLElement): void {
       focusInput.style.boxShadow = '0 0 0 0 transparent';
     });
   }
-
-  const swatchSection = document.createElement("div");
-  swatchSection.className = "space-y-3 rounded-xl border border-line-subtle bg-surface-base/80 p-4";
-  swatchSection.innerHTML = `
-    <div class="flex flex-wrap items-center justify-between gap-2">
-      <h3 class="text-sm font-semibold">Token Swatches</h3>
-      <span class="text-[11px] uppercase tracking-wide text-body-muted">Every editable color token</span>
-    </div>
-  `;
-
-  const swatchGrid = document.createElement("div");
-  swatchGrid.className = "grid gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4";
-  ALL_COLOR_VARIABLES.forEach((key) => {
-    const swatch = document.createElement("div");
-    swatch.dataset.previewSwatch = key;
-    swatch.className = "space-y-2 rounded-xl border border-line-subtle bg-surface-base/90 p-3 shadow-sm";
-    swatch.innerHTML = `
-      <div class="h-10 w-full rounded-lg border border-line-subtle" style="background: var(--preview-${key})"></div>
-      <div class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">${toLabel(key)}</div>
-      <code class="block text-[10px] font-mono text-body-muted" data-preview-swatch-value="${key}">—</code>
-    `;
-    swatchGrid.appendChild(swatch);
-  });
-
-  swatchSection.appendChild(swatchGrid);
-  previewCard.appendChild(swatchSection);
 
   const contrast = document.createElement("div");
   contrast.dataset.contrastDisplay = "";
@@ -350,6 +415,7 @@ function buildEditorShell(root: HTMLElement): void {
         <div data-breadcrumbs class="text-[11px] uppercase tracking-wide text-body-muted">Theme</div>
       </div>
       <div class="flex flex-wrap items-center gap-2">
+        <button id="newThemeBtn" type="button" class="rounded-lg bg-primary px-4 py-1.5 text-sm font-semibold text-white hover:opacity-90">+ New Theme</button>
         <button id="undoBtn" type="button" class="rounded-lg border border-line-neutral px-3 py-1.5 text-sm">Undo</button>
         <button id="redoBtn" type="button" class="rounded-lg border border-line-neutral px-3 py-1.5 text-sm">Redo</button>
         <button id="exportBtn" type="button" class="rounded-lg border border-line-neutral px-3 py-1.5 text-sm">Export</button>
@@ -361,6 +427,43 @@ function buildEditorShell(root: HTMLElement): void {
     <div data-status class="text-sm text-body-muted"></div>
   `;
   container.appendChild(header);
+
+  // Create New Theme Modal
+  const modal = document.createElement("div");
+  modal.id = "newThemeModal";
+  modal.className = "hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4";
+  modal.innerHTML = `
+    <div class="w-full max-w-md space-y-4 rounded-2xl border border-line-subtle bg-surface-base p-6 shadow-xl">
+      <div class="space-y-2">
+        <h2 class="text-xl font-semibold">Create New Theme</h2>
+        <p class="text-sm text-body-muted">Choose which theme mode to create</p>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <button type="button" data-create-theme="midnight" class="group space-y-3 rounded-xl border-2 border-line-neutral bg-surface-base p-4 text-left transition hover:border-primary hover:bg-surface-soft">
+          <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-purple-900 to-indigo-950 text-white shadow-lg">🌙</div>
+            <div class="flex-1">
+              <div class="font-semibold">Midnight</div>
+              <div class="text-xs text-body-muted">Dark theme</div>
+            </div>
+          </div>
+        </button>
+        <button type="button" data-create-theme="dawn" class="group space-y-3 rounded-xl border-2 border-line-neutral bg-surface-base p-4 text-left transition hover:border-primary hover:bg-surface-soft">
+          <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-orange-200 text-gray-800 shadow-lg">🌅</div>
+            <div class="flex-1">
+              <div class="font-semibold">Dawn</div>
+              <div class="text-xs text-body-muted">Light theme</div>
+            </div>
+          </div>
+        </button>
+      </div>
+      <div class="flex justify-end gap-2 border-t border-line-subtle pt-4">
+        <button type="button" id="cancelNewTheme" class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft">Cancel</button>
+      </div>
+    </div>
+  `;
+  container.appendChild(modal);
 
   const layout = document.createElement("div");
   layout.className = "grid gap-6 lg:grid-cols-12";
@@ -453,6 +556,13 @@ function buildEditorShell(root: HTMLElement): void {
       </label>
     </div>
     <div class="space-y-3">
+      <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-3">
+        <div class="text-xs text-body-muted space-y-1.5">
+          <div class="font-semibold">🎯 What are scopes?</div>
+          <p>Scopes let you customize specific pages or components independently. For example, make your Entity Grimoire page have different colors than the rest of your site!</p>
+          <p class="italic">💡 Tip: Start with "Global Theme" to set your base colors, then create overrides for specific scopes as needed.</p>
+        </div>
+      </div>
       <label class="block text-xs font-medium uppercase tracking-wide text-body-muted">
         <span>Editing scope</span>
         <select id="scopeSelector" class="mt-1 w-full rounded-lg border border-line-neutral bg-surface-base px-3 py-2 text-sm"></select>
@@ -463,7 +573,7 @@ function buildEditorShell(root: HTMLElement): void {
           <button type="button" data-clear-scope class="text-xs font-semibold text-danger hover:underline">Clear overrides</button>
         </div>
         <p data-scope-description class="text-xs text-body-muted">Default colors applied site-wide.</p>
-        <p data-scope-has-override class="hidden text-xs font-medium text-success">Overrides saved for this scope.</p>
+        <p data-scope-has-override class="hidden text-xs font-medium text-success">✓ Overrides saved for this scope.</p>
         <p data-scope-no-override class="text-xs text-body-muted">Using global defaults.</p>
       </div>
     </div>
@@ -473,9 +583,20 @@ function buildEditorShell(root: HTMLElement): void {
   const paletteCard = document.createElement("section");
   paletteCard.className = "space-y-4 rounded-2xl border border-line-subtle bg-surface-base p-4 shadow-sm";
   paletteCard.innerHTML = `
-    <div>
-      <h2 class="text-lg font-semibold">Quick palette</h2>
-      <p class="text-xs text-body-muted">Rapidly adjust hero colors, text, and backgrounds.</p>
+    <div class="space-y-2">
+      <h2 class="text-lg font-semibold">Quick Palette</h2>
+      <p class="text-xs text-body-muted">Start here! These are your global theme colors that apply site-wide.</p>
+      <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-3 text-xs text-body-muted">
+        <div class="font-semibold mb-2">💡 Quick guide:</div>
+        <ul class="space-y-1.5 ml-4">
+          <li><strong>Primary:</strong> Buttons, links, and key actions</li>
+          <li><strong>Accent:</strong> Highlights, badges, and decorative elements</li>
+          <li><strong>Background:</strong> Main page background color</li>
+          <li><strong>Body Text:</strong> Regular paragraph text</li>
+          <li><strong>Heading:</strong> Titles and section headers</li>
+          <li><strong>Muted:</strong> Subtle text like captions and labels</li>
+        </ul>
+      </div>
     </div>
   `;
   const paletteBody = document.createElement("div");
@@ -483,11 +604,17 @@ function buildEditorShell(root: HTMLElement): void {
   buildLegacyPalette(paletteBody);
 
   const fontSection = document.createElement("div");
-  fontSection.className = "space-y-2";
+  fontSection.className = "space-y-2 border-t border-line-subtle pt-4";
   const fontHeading = document.createElement("h3");
   fontHeading.className = "text-sm font-semibold";
-  fontHeading.textContent = "Fonts";
+  fontHeading.textContent = "Typography";
   fontSection.appendChild(fontHeading);
+
+  const fontDescription = document.createElement("p");
+  fontDescription.className = "text-xs text-body-muted mb-3";
+  fontDescription.textContent = "Choose fonts that match your theme's personality. Changes apply globally.";
+  fontSection.appendChild(fontDescription);
+
   buildFontSelects(fontSection);
   paletteCard.appendChild(fontSection);
 

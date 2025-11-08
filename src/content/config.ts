@@ -17,6 +17,7 @@ const posts = defineCollection({
     updatedAt: z.coerce.date().optional(),
     tags: z.array(z.string()).default([]),
     category: z.enum(["ritual", "meandering"]).default("ritual"),
+    contentType: z.enum(["ritual", "guide", "spread", "reflection", "story", "tarotSpread", "spellwork", "crystals"]).optional(),
     draft: z.boolean().default(false),
 
     // SEO & social

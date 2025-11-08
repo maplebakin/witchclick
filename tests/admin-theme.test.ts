@@ -16,7 +16,7 @@ let saveThemeRecord: (payload: Record<string, unknown>) => Promise<AdminThemeRec
 let setActiveThemeRecord: (
   payload: Record<string, unknown>,
 ) => Promise<{ active: AdminThemeListing["active"]; theme: AdminThemeRecord }>;
-let deleteThemeRecord: (
+let _deleteThemeRecord: (
   payload: Record<string, unknown>,
 ) => Promise<{ slug: string; mode: AdminThemeRecord["mode"]; active: AdminThemeListing["active"] }>;
 
@@ -50,7 +50,7 @@ describe("admin theme dashboard", () => {
       listThemes,
       saveThemeRecord,
       setActiveThemeRecord,
-      deleteThemeRecord,
+      deleteThemeRecord: _deleteThemeRecord,
     } = await import("../dev-api.js"));
   });
 

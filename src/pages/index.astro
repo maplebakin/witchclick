@@ -64,6 +64,17 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
   {featuredPost && (
     <article class="featured-post">
       <a href={`/post/${featuredPost.slug}`} class="featured-post__link">
+        {(featuredPost.heroImage || featuredPost.heroImageSrc) && (
+          <div class="featured-post__image-wrapper">
+            <img
+              src={featuredPost.heroImageSrc || featuredPost.heroImage}
+              alt={featuredPost.heroAlt || featuredPost.heroImageAlt || `Hero image for ${featuredPost.title}`}
+              class="featured-post__image"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+        )}
         <div class="featured-post__content">
           <span class="featured-post__label">Latest</span>
           <h2 class="featured-post__title">{featuredPost.title}</h2>
@@ -170,7 +181,6 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
 
   .featured-post__link {
     display: block;
-    padding: clamp(2rem, 5vw, 3rem);
     border-radius: clamp(1.2rem, 3vw, 2rem);
     border: 1px solid color-mix(in srgb, var(--border-purple-medium, rgba(124, 78, 176, 0.3)) 90%, transparent 10%);
     background:
@@ -179,6 +189,7 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
     box-shadow: var(--elevation-tier-2);
     text-decoration: none;
     transition: transform 200ms ease, box-shadow 200ms ease;
+    overflow: hidden;
   }
 
   .featured-post__link:hover,
@@ -187,8 +198,28 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
     box-shadow: var(--elevation-tier-3);
   }
 
+  .featured-post__image-wrapper {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--surface-panel-primary) 90%, transparent 10%);
+  }
+
+  .featured-post__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 300ms ease;
+  }
+
+  .featured-post__link:hover .featured-post__image,
+  .featured-post__link:focus-visible .featured-post__image {
+    transform: scale(1.03);
+  }
+
   .featured-post__content {
     max-width: 48rem;
+    padding: clamp(2rem, 5vw, 3rem);
   }
 
   .featured-post__label {
@@ -345,11 +376,32 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
     .posts-grid {
       grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
     }
+
+    .featured-post__link {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+
+    .featured-post__image-wrapper {
+      aspect-ratio: auto;
+      height: 100%;
+    }
+
+    .featured-post__content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
   }
 
   @media (min-width: 1024px) {
     .posts-grid {
       grid-template-columns: repeat(3, 1fr);
+    }
+
+    .featured-post__link {
+      grid-template-columns: 5fr 7fr;
     }
   }
 

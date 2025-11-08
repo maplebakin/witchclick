@@ -16,6 +16,9 @@ internalLinkHints: []
 internalLinks: []
 publishedAt: "2025-11-06T16:32:26.802Z"
 canonicalUrl: "https://witchclick.space/post/ancestral-fiber-craft-connection-tarot-spread"
+heroImage: "/images/hero/ancestral-fiber-craft-connection-tarot-spread/ancestral-fiber-art.jpg"
+heroImageSrc: "/images/hero/ancestral-fiber-craft-connection-tarot-spread/ancestral-fiber-art.jpg"
+heroAlt: ""
 specVersion: 2
 promptMetadata: {"topic":"Ancestral Fiber Craft Connection Tarot Spread","requestedWords":1200,"deliveredWords":682,"toggles":{"ads":"on","kofi":"off"},"generatedAt":"2025-11-06T16:32:26.802Z"}
 ---

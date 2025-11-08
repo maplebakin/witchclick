@@ -33,54 +33,75 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
       <AdminNav currentPath="/admin/posts" />
 
       <div data-post-editor data-dev-api={DEV_API} class="space-y-6">
-      <header class="rounded-2xl border border-line-subtle bg-surface-muted px-4 py-3 text-sm text-primary">
-        <h1 class="text-lg font-semibold">Post Editor Dashboard</h1>
-        <p class="mt-1 text-body-muted">
-          Select an existing post to update frontmatter, tweak markdown, or remove it entirely. Changes save directly to the
-          Markdown files under <code>content/posts</code>.
-        </p>
+      <header class="rounded-2xl border border-line-subtle bg-surface-base p-6 shadow-sm">
+        <div class="space-y-3">
+          <div>
+            <h1 class="text-2xl font-semibold text-body-strong">Post Editor</h1>
+            <p class="mt-1 text-sm text-body-muted">
+              Edit existing posts: update frontmatter, tweak markdown, or archive posts. Changes save directly to markdown files.
+            </p>
+          </div>
+          <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-4 text-xs text-body-muted">
+            <div class="font-semibold mb-2">💡 Quick guide:</div>
+            <ul class="space-y-1.5 ml-4">
+              <li><strong>Search:</strong> Find posts by title or slug in the left panel</li>
+              <li><strong>Frontmatter:</strong> Edit YAML metadata (title, tags, dates, etc.)</li>
+              <li><strong>Markdown:</strong> Update the post content directly</li>
+              <li><strong>Save:</strong> Changes write immediately to the file system</li>
+              <li><strong>Delete:</strong> Permanently removes the post file (use with caution!)</li>
+            </ul>
+          </div>
+        </div>
       </header>
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
         <aside class="lg:col-span-4 space-y-4 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
-          <div class="flex items-center justify-between gap-3">
-            <label class="flex-1 text-xs font-medium" for="postSearch">Search posts</label>
-            <button
-              type="button"
-              data-refresh
-              class="rounded-lg border border-line-neutral px-3 py-1 text-xs font-medium hover:bg-surface-soft"
-            >
-              Refresh
-            </button>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="text-base font-semibold">Post Library</h3>
+              <button
+                type="button"
+                data-refresh
+                class="rounded-lg border border-line-neutral px-3 py-1.5 text-xs font-medium hover:bg-surface-soft"
+              >
+                🔄 Refresh
+              </button>
+            </div>
+            <p class="text-xs text-body-muted">Search and select a post to edit</p>
           </div>
           <input
             id="postSearch"
             type="search"
-            placeholder="Start typing title or slug…"
+            placeholder="Search by title or slug…"
             data-search
-            class="w-full rounded-lg border border-line-subtle px-3 py-2 text-sm"
+            class="w-full rounded-lg border border-line-subtle px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
-          <p data-list-status class="text-xs text-body-muted">Loading…</p>
-          <select
-            data-post-list
-            size="14"
-            class="h-[28rem] w-full rounded-xl border border-line-subtle bg-surface-muted px-3 py-2 text-left text-sm font-medium text-primary focus:outline-none focus:ring-2 focus:ring-surface-accent"
-          ></select>
+          <div class="space-y-2">
+            <p data-list-status class="text-xs font-medium text-body-muted flex items-center gap-2">
+              <span class="inline-block h-2 w-2 rounded-full bg-info animate-pulse"></span>
+              Loading…
+            </p>
+            <select
+              data-post-list
+              size="14"
+              class="h-[28rem] w-full rounded-xl border border-line-subtle bg-surface-muted px-3 py-2 text-left text-sm font-medium text-primary focus:outline-none focus:ring-2 focus:ring-primary"
+            ></select>
+          </div>
         </aside>
 
         <section class="lg:col-span-8 space-y-4 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
           <div class="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h2 class="text-xl font-semibold">Editor</h2>
-              <p data-meta class="text-xs text-body-muted">Select a post to view its metadata.</p>
+            <div class="flex-1">
+              <h2 class="text-xl font-semibold">Editor Workspace</h2>
+              <p data-meta class="text-xs text-body-muted mt-1">Select a post from the library to begin editing</p>
             </div>
             <button
               type="button"
               data-delete
-              class="rounded-lg border border-line-danger px-3 py-2 text-sm font-medium text-danger hover:bg-surface-danger"
+              class="rounded-lg border-2 border-danger px-4 py-2 text-sm font-semibold text-danger hover:bg-danger hover:text-white transition"
               disabled
             >
-              Delete post
+              🗑 Delete Post
             </button>
           </div>
 
