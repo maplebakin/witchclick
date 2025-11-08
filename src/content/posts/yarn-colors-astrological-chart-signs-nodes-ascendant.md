@@ -16,6 +16,9 @@ internalLinkHints: ["birth chart","north node","ascendant","sun sign","your char
 internalLinks: []
 publishedAt: "2025-11-08T15:27:00.842Z"
 canonicalUrl: "https://witchclick.space/post/yarn-colors-astrological-chart-signs-nodes-ascendant"
+heroImage: "/images/hero/yarn-colors-astrological-chart-signs-nodes-ascendant/yarn-chart.jpg"
+heroImageSrc: "/images/hero/yarn-colors-astrological-chart-signs-nodes-ascendant/yarn-chart.jpg"
+heroAlt: ""
 specVersion: 2
 promptMetadata: {"topic":"Yarn Colors for Your Astrological Chart: A Soft Mapping","requestedWords":1200,"deliveredWords":1180,"toggles":{"ads":"on","kofi":"on"},"generatedAt":"2025-11-08T15:27:00.841Z"}
 ---
