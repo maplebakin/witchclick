@@ -43,6 +43,9 @@ internalLinkHints:
 internalLinks: []
 publishedAt: '2025-10-02T12:12:49.439Z'
 canonicalUrl: 'https://witchclick.space/post/colours-emotional-spiritual-inquiry'
+heroImage: "/images/hero/colours-emotional-spiritual-inquiry/hero-image-prompt-for-witchclick-article-_colours-as-doorways_-emotional-and-spiritual-inquiry_-_scene-focus_-colour-speaks-in-whispers-each-hue-a-doorway-to-feeling-memory-and-meaning-this-reflective-practice-invites-you-to-meet-colour-as-a-comp.jpg"
+heroImageSrc: "/images/hero/colours-emotional-spiritual-inquiry/hero-image-prompt-for-witchclick-article-_colours-as-doorways_-emotional-and-spiritual-inquiry_-_scene-focus_-colour-speaks-in-whispers-each-hue-a-doorway-to-feeling-memory-and-meaning-this-reflective-practice-invites-you-to-meet-colour-as-a-comp.jpg"
+heroAlt: ""
 specVersion: 2
 spoonLevel: low
 ---

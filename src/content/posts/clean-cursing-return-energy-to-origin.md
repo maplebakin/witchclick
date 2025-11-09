@@ -51,6 +51,9 @@ internalLinkHints:
 internalLinks: []
 publishedAt: '2025-10-10T19:27:20.674Z'
 canonicalUrl: 'https://witchclick.space/post/clean-cursing-return-energy-to-origin'
+heroImage: "/images/hero/clean-cursing-return-energy-to-origin/hero-image-prompt-for-witchclick-article-_clean-cursing-ritual_-return-released-energy-to-origin_-_scene-focus_-this-consent-first-ritual-helps-you-release-what-is-not-yours-and-return-it-to-its-rightful-origin-cleanly-and-without-escalation-a-quic.jpg"
+heroImageSrc: "/images/hero/clean-cursing-return-energy-to-origin/hero-image-prompt-for-witchclick-article-_clean-cursing-ritual_-return-released-energy-to-origin_-_scene-focus_-this-consent-first-ritual-helps-you-release-what-is-not-yours-and-return-it-to-its-rightful-origin-cleanly-and-without-escalation-a-quic.jpg"
+heroAlt: ""
 specVersion: 2
 spoonLevel: high
 ---

@@ -316,6 +316,7 @@ interface ThemeRecord {
   mode: ThemeMode;
   category?: string;
   settings?: Record<string, string>;
+  overrides?: Array<{ scope: string; variables: Record<string, string> }>;
 }
 
 interface ThemeListResponse {
@@ -754,13 +755,39 @@ export class ThemeManager {
       mergedVariables[key] = trimmed;
     }
 
-    return {
+    const payload: {
+      label: string;
+      slug: string;
+      mode: ThemeMode;
+      category: string;
+      settings: Record<string, string>;
+      overrides?: Array<{ scope: string; variables: Record<string, string> }>;
+    } = {
       label: preset.name,
       slug: preset.slug,
       mode: preset.mode,
       category: preset.category,
       settings: mergedVariables,
     };
+
+    // Include overrides if they exist
+    if (preset.overrides && preset.overrides.length > 0) {
+      payload.overrides = preset.overrides.map((override) => {
+        const overrideVariables: Record<string, string> = {};
+        for (const [key, value] of Object.entries(override.variables)) {
+          if (typeof value !== 'string') continue;
+          const trimmed = value.trim();
+          if (!trimmed) continue;
+          overrideVariables[key] = trimmed;
+        }
+        return {
+          scope: override.scope,
+          variables: overrideVariables,
+        };
+      });
+    }
+
+    return payload;
   }
 
   private mergePresetFromRecord(
@@ -777,13 +804,24 @@ export class ThemeManager {
     };
     const now = new Date().toISOString();
 
+    // Restore overrides from the API record, falling back to existing overrides
+    let overrides: ThemeOverride[] | undefined;
+    if (record.overrides && Array.isArray(record.overrides) && record.overrides.length > 0) {
+      overrides = record.overrides.map((override) => ({
+        scope: override.scope,
+        variables: { ...override.variables },
+      }));
+    } else if (existing?.overrides) {
+      overrides = this.cloneOverrides(existing.overrides);
+    }
+
     const merged: ThemePreset = {
       name: record.label || existing?.name || record.slug,
       slug: record.slug,
       mode: record.mode,
       category: record.category || existing?.category || 'custom',
       variables,
-      overrides: existing?.overrides ? this.cloneOverrides(existing.overrides) : undefined,
+      overrides,
       createdAt: existing?.createdAt || now,
       updatedAt: now,
     };

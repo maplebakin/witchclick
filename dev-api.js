@@ -1126,6 +1126,24 @@ async function saveThemeRecord(payload) {
   };
 
   const settings = mergeThemeSettings(settingsSource, mode, `theme payload (${slug})`);
+
+  // Extract and validate overrides if provided
+  let overrides;
+  if (payload?.overrides && Array.isArray(payload.overrides)) {
+    overrides = payload.overrides
+      .filter((override) => override && typeof override.scope === 'string' && override.scope.trim())
+      .map((override) => ({
+        scope: override.scope.trim(),
+        variables: extractThemeValues(override.variables || {}),
+      }))
+      .filter((override) => Object.keys(override.variables).length > 0);
+
+    // Only include overrides if there are any valid ones
+    if (overrides.length === 0) {
+      overrides = undefined;
+    }
+  }
+
   const record = {
     slug,
     label: label || toTitleCase(slug),
@@ -1133,6 +1151,11 @@ async function saveThemeRecord(payload) {
     category,
     settings,
   };
+
+  // Add overrides to record if they exist
+  if (overrides) {
+    record.overrides = overrides;
+  }
 
   ensureDir(THEMES_DIR);
   const filePath = path.join(THEMES_DIR, `${slug}.json`);
@@ -1228,7 +1251,14 @@ function readThemeRecord(filePath) {
   };
   const settings = mergeThemeSettings(settingsSource, mode, filePath);
 
-  return { slug, label, mode, category, settings };
+  const record = { slug, label, mode, category, settings };
+
+  // Include overrides if they exist in the file
+  if (raw.overrides && Array.isArray(raw.overrides) && raw.overrides.length > 0) {
+    record.overrides = raw.overrides;
+  }
+
+  return record;
 }
 
 function readActiveThemeMapping() {
