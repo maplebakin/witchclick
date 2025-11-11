@@ -564,9 +564,217 @@ export class ThemeManager {
       const existing = this.state.presets[mode].find((p) => p.slug === record.slug);
       const merged = this.mergePresetFromRecord(record, existing);
       this.upsertPreset(merged, false);
+
+      // Update localStorage and apply theme immediately
+      this.updateLocalStorageTheme(merged);
+      this.applyThemeToDocument(merged);
     }
 
     this.notifyListeners();
+  }
+
+  /**
+   * Convert theme variables to runtime loader token format
+   */
+  private convertToRuntimeTokens(variables: ThemeVariables): Record<string, string> {
+    const tokens: Record<string, string> = {};
+
+    // Map theme variables to runtime tokens
+    // Note: This is a best-effort mapping. Runtime tokens may need to be
+    // explicitly defined in theme presets for optimal results.
+
+    // Accent scale (fallback to primary/accent if not explicitly set)
+    tokens.accent1 = variables.colorAmethyst || variables.accent || variables.primary || '#d9b2c4';
+    tokens.accent2 = variables.colorIris || variables.accent || variables.primary || '#7c4eb0';
+    tokens.accent3 = variables.colorDusk || variables.primary || '#4b2a63';
+
+    // Surface hierarchy
+    tokens.surfaceBase = variables.surfacePlain || variables.background || '#120a1e';
+    tokens.surfacePanel = variables.cardPanelSurface || variables.background || '#1a0d2e';
+    tokens.surfaceCard = variables.cardPanelSurfaceStrong || variables.background || '#221638';
+    tokens.surfaceElevated = variables.cardPanelSurfaceStrong || variables.background || '#221638';
+    tokens.surfaceHover = variables.colorDusk || variables.background || '#271534';
+
+    // Text hierarchy
+    tokens.textStrong = variables.textPrimary || variables.textHeading || '#f9f5ff';
+    tokens.textBody = variables.textBody || variables.textPrimary || '#f4f1ff';
+    tokens.textMuted = variables.textMuted || variables.textSubtle || '#d9b2c4';
+
+    // Borders
+    tokens.borderSubtle = variables.cardPanelBorderSoft || variables.colorBorder || '#4b2a63';
+    tokens.borderStrong = variables.cardPanelBorder || variables.cardPanelBorderStrong || '#d4af37';
+
+    // Page areas
+    tokens.pageBackground = variables.background || variables.colorMidnight || '#07020f';
+    tokens.headerBackground = variables.colorNight || variables.background || '#120725';
+    tokens.headerBorder = variables.cardPanelBorder || '#d4af37';
+    tokens.footerBackground = variables.colorMidnight || variables.background || '#07020f';
+    tokens.footerBorder = variables.cardPanelBorder || '#d4af37';
+
+    // Status colors
+    tokens.success = variables.success || '#4ade80';
+    tokens.warning = variables.warning || '#fbbf24';
+    tokens.error = variables.error || '#f87171';
+    tokens.info = variables.info || '#60a5fa';
+
+    // Convert hex colors to HSL format where appropriate (excluding status colors)
+    for (const [key, value] of Object.entries(tokens)) {
+      if (key !== 'success' && key !== 'warning' && key !== 'error' && key !== 'info') {
+        if (value.startsWith('#')) {
+          // Convert hex to HSL
+          const hsl = this.hexToHSL(value);
+          tokens[key] = hsl;
+        } else if (!value.startsWith('hsl(')) {
+          // Wrap in hsl() if not already
+          tokens[key] = `hsl(${value})`;
+        }
+      }
+    }
+
+    return tokens;
+  }
+
+  /**
+   * Convert hex color to HSL format
+   */
+  private hexToHSL(hex: string): string {
+    // Remove # if present
+    hex = hex.replace(/^#/, '');
+
+    // Convert to RGB
+    const r = parseInt(hex.substring(0, 2), 16) / 255;
+    const g = parseInt(hex.substring(2, 4), 16) / 255;
+    const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0;
+    let s = 0;
+    const l = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+      switch (max) {
+        case r:
+          h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+          break;
+        case g:
+          h = ((b - r) / d + 2) / 6;
+          break;
+        case b:
+          h = ((r - g) / d + 4) / 6;
+          break;
+      }
+    }
+
+    const hDeg = Math.round(h * 360);
+    const sPercent = Math.round(s * 100);
+    const lPercent = Math.round(l * 100);
+
+    return `hsl(${hDeg} ${sPercent}% ${lPercent}%)`;
+  }
+
+  /**
+   * Update localStorage with theme data following runtime loader structure
+   */
+  private updateLocalStorageTheme(preset: ThemePreset): void {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return; // Skip if not in browser environment
+    }
+
+    const tokens = this.convertToRuntimeTokens(preset.variables);
+
+    const themeData = {
+      id: preset.slug, // Legacy compatibility
+      slug: preset.slug,
+      mode: preset.mode === 'dawn' ? 'light' : preset.mode,
+      tokens,
+    };
+
+    try {
+      localStorage.setItem('wc-active-theme', JSON.stringify(themeData));
+    } catch (error) {
+      console.error('Failed to update localStorage theme:', error);
+    }
+  }
+
+  /**
+   * Apply theme attributes and tokens to document.documentElement
+   */
+  private applyThemeToDocument(preset: ThemePreset): void {
+    if (typeof document === 'undefined') {
+      return; // Skip if not in browser environment
+    }
+
+    const root = document.documentElement;
+    const tokens = this.convertToRuntimeTokens(preset.variables);
+
+    // Set data-theme attribute
+    root.setAttribute('data-theme', preset.slug);
+
+    // Set data-comfort-theme attribute based on mode
+    if (preset.mode === 'dawn') {
+      root.setAttribute('data-comfort-theme', 'dawn');
+    } else {
+      root.removeAttribute('data-comfort-theme');
+    }
+
+    // Apply tokens as CSS custom properties
+    const cssVarMap: Record<string, string> = {
+      '--accent-1': 'accent1',
+      '--accent-2': 'accent2',
+      '--accent-3': 'accent3',
+      '--surface-base': 'surfaceBase',
+      '--surface-panel': 'surfacePanel',
+      '--surface-card': 'surfaceCard',
+      '--surface-elevated': 'surfaceElevated',
+      '--surface-hover': 'surfaceHover',
+      '--text-strong': 'textStrong',
+      '--text-body': 'textBody',
+      '--text-muted': 'textMuted',
+      '--border-subtle': 'borderSubtle',
+      '--border-strong': 'borderStrong',
+      '--page-bg-base': 'pageBackground',
+      '--header-bg-base': 'headerBackground',
+      '--header-border-base': 'headerBorder',
+      '--footer-bg-base': 'footerBackground',
+      '--footer-border-base': 'footerBorder',
+    };
+
+    // Apply HSL tokens (strip hsl() wrapper)
+    Object.entries(cssVarMap).forEach(([cssVar, tokenKey]) => {
+      const value = tokens[tokenKey];
+      if (value && value.startsWith('hsl(')) {
+        const strippedValue = value.replace(/^hsl\(|\)$/g, '');
+        root.style.setProperty(cssVar, strippedValue);
+      }
+    });
+
+    // Apply status colors (plain hex values)
+    const statusMap: Record<string, string> = {
+      '--success': 'success',
+      '--warning': 'warning',
+      '--error': 'error',
+      '--info': 'info',
+    };
+
+    Object.entries(statusMap).forEach(([cssVar, tokenKey]) => {
+      const value = tokens[tokenKey];
+      if (value && value.startsWith('#')) {
+        root.style.setProperty(cssVar, value);
+      }
+    });
+
+    // Derive accent-linked globals
+    const accent1Value = root.style.getPropertyValue('--accent-1').trim();
+    if (accent1Value) {
+      const accent1Full = `hsl(${accent1Value})`;
+      root.style.setProperty('--text-accent', accent1Value);
+      root.style.setProperty('--ring-focus', `0 0 0 3px ${accent1Full}`);
+      root.style.setProperty('--link-color', accent1Full);
+    }
   }
 
   /**
