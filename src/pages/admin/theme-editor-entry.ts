@@ -58,7 +58,28 @@ function toLabel(key: string): string {
     .replace(/^\w/, (char) => char.toUpperCase());
 }
 
-function createColorControl(key: string, label = toLabel(key)): HTMLElement {
+// Custom labels for better clarity
+const CUSTOM_LABELS: Record<string, string> = {
+  colorMidnight: "Page Background (Deepest)",
+  colorNight: "Header/Overlay Background",
+  colorDusk: "Card Surface Background",
+  colorGold: "Primary CTA & Accents",
+  colorAmethyst: "Brand Accent Color",
+  colorIris: "Hover & Interactive States",
+  colorInk: "Body Text Color",
+  colorRune: "Heading Text (Lightest)",
+  colorFog: "Muted/Subtle Text",
+  headerBackground: "Header Background",
+  headerBorder: "Header Border",
+  headerText: "Header Text",
+  headerTextHover: "Header Text (Hover)",
+  footerBackground: "Footer Background",
+  footerBorder: "Footer Border",
+  footerText: "Footer Text",
+  footerTextMuted: "Footer Muted Text",
+};
+
+function createColorControl(key: string, label = CUSTOM_LABELS[key] || toLabel(key)): HTMLElement {
   const wrapper = document.createElement("label");
   wrapper.className = "block text-xs font-medium uppercase tracking-wide text-body-muted";
   wrapper.innerHTML = `
@@ -201,9 +222,24 @@ function buildComprehensiveControls(container: HTMLElement): void {
   // Organize variables into categorized sections
   const variableGroups = [
     {
-      title: "Core Brand Colors",
-      description: "Foundation palette - adjust these first for major theme changes",
-      variables: ['colorMidnight', 'colorNight', 'colorIris', 'colorAmethyst', 'colorDusk', 'colorGold', 'colorRune', 'colorFog', 'colorInk']
+      title: "Page & Background Colors",
+      description: "Main page backgrounds, overlays, and deep color foundations",
+      variables: ['colorMidnight', 'colorNight', 'colorDusk']
+    },
+    {
+      title: "Accent & Interactive Colors",
+      description: "Primary accents, CTA buttons, hover states, and interactive elements",
+      variables: ['colorGold', 'colorAmethyst', 'colorIris']
+    },
+    {
+      title: "Text & Ink Colors",
+      description: "Body text, headings, and muted text variations",
+      variables: ['colorInk', 'colorRune', 'colorFog']
+    },
+    {
+      title: "Header & Footer",
+      description: "Navigation bar and footer area styling - backgrounds, borders, and text colors",
+      variables: ['headerBackground', 'headerBorder', 'headerText', 'headerTextHover', 'footerBackground', 'footerBorder', 'footerText', 'footerTextMuted']
     },
     {
       title: "Surface Colors",

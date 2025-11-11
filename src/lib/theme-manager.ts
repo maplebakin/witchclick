@@ -94,6 +94,16 @@ export interface ThemeVariables {
   // Background
   backgroundImage?: string;
 
+  // Header & Footer Specific
+  headerBackground?: string;
+  headerBorder?: string;
+  headerText?: string;
+  headerTextHover?: string;
+  footerBackground?: string;
+  footerBorder?: string;
+  footerText?: string;
+  footerTextMuted?: string;
+
   // Legacy compatibility
   primary?: string;
   accent?: string;
@@ -191,6 +201,16 @@ const DEFAULT_VARIABLES: Record<ThemeMode, ThemeVariables> = {
     error: '#f87171',
     info: '#60a5fa',
 
+    // Header & Footer
+    headerBackground: '#120725',
+    headerBorder: '#4b2a63',
+    headerText: '#f4f1ff',
+    headerTextHover: '#d4af37',
+    footerBackground: '#07020f',
+    footerBorder: '#4b2a63',
+    footerText: '#f4f1ff',
+    footerTextMuted: '#d9b2c4',
+
     // Legacy compatibility
     primary: '#6b21a8',
     accent: '#d4af37',
@@ -263,6 +283,16 @@ const DEFAULT_VARIABLES: Record<ThemeMode, ThemeVariables> = {
     warning: '#f59e0b',
     error: '#ef4444',
     info: '#3b82f6',
+
+    // Header & Footer
+    headerBackground: '#ede5dc',
+    headerBorder: '#9b86c8',
+    headerText: '#2c1b3d',
+    headerTextHover: '#9b86c8',
+    footerBackground: '#f6f0e8',
+    footerBorder: '#9b86c8',
+    footerText: '#2c1b3d',
+    footerTextMuted: '#6b5d70',
 
     // Legacy compatibility
     primary: '#9b86c8',
@@ -575,63 +605,143 @@ export class ThemeManager {
 
   /**
    * Convert theme variables to runtime loader token format
+   * Strategy: Generate complete token set from base colors, then allow explicit overrides
    */
   private convertToRuntimeTokens(variables: ThemeVariables): Record<string, string> {
-    const tokens: Record<string, string> = {};
+    // First, generate tokens from base colors (background, primary, accent)
+    const generatedTokens = this.generateTokensFromBase(variables);
 
-    // Map theme variables to runtime tokens
-    // Note: This is a best-effort mapping. Runtime tokens may need to be
-    // explicitly defined in theme presets for optimal results.
+    // Get base colors for override comparison
+    const background = variables.background || variables.colorMidnight || '#0f0820';
 
-    // Accent scale (fallback to primary/accent if not explicitly set)
-    tokens.accent1 = variables.colorAmethyst || variables.accent || variables.primary || '#d9b2c4';
-    tokens.accent2 = variables.colorIris || variables.accent || variables.primary || '#7c4eb0';
-    tokens.accent3 = variables.colorDusk || variables.primary || '#4b2a63';
+    // Then apply explicit overrides from theme variables
+    const tokens: Record<string, string> = { ...generatedTokens };
 
-    // Surface hierarchy
-    tokens.surfaceBase = variables.surfacePlain || variables.background || '#120a1e';
-    tokens.surfacePanel = variables.cardPanelSurface || variables.background || '#1a0d2e';
-    tokens.surfaceCard = variables.cardPanelSurfaceStrong || variables.background || '#221638';
-    tokens.surfaceElevated = variables.cardPanelSurfaceStrong || variables.background || '#221638';
-    tokens.surfaceHover = variables.colorDusk || variables.background || '#271534';
-
-    // Text hierarchy
-    tokens.textStrong = variables.textPrimary || variables.textHeading || '#f9f5ff';
-    tokens.textBody = variables.textBody || variables.textPrimary || '#f4f1ff';
-    tokens.textMuted = variables.textMuted || variables.textSubtle || '#d9b2c4';
-
-    // Borders
-    tokens.borderSubtle = variables.cardPanelBorderSoft || variables.colorBorder || '#4b2a63';
-    tokens.borderStrong = variables.cardPanelBorder || variables.cardPanelBorderStrong || '#d4af37';
-
-    // Page areas
-    tokens.pageBackground = variables.background || variables.colorMidnight || '#07020f';
-    tokens.headerBackground = variables.colorNight || variables.background || '#120725';
-    tokens.headerBorder = variables.cardPanelBorder || '#d4af37';
-    tokens.footerBackground = variables.colorMidnight || variables.background || '#07020f';
-    tokens.footerBorder = variables.cardPanelBorder || '#d4af37';
-
-    // Status colors
-    tokens.success = variables.success || '#4ade80';
-    tokens.warning = variables.warning || '#fbbf24';
-    tokens.error = variables.error || '#f87171';
-    tokens.info = variables.info || '#60a5fa';
-
-    // Convert hex colors to HSL format where appropriate (excluding status colors)
-    for (const [key, value] of Object.entries(tokens)) {
-      if (key !== 'success' && key !== 'warning' && key !== 'error' && key !== 'info') {
-        if (value.startsWith('#')) {
-          // Convert hex to HSL
-          const hsl = this.hexToHSL(value);
-          tokens[key] = hsl;
-        } else if (!value.startsWith('hsl(')) {
-          // Wrap in hsl() if not already
-          tokens[key] = `hsl(${value})`;
-        }
-      }
+    // Allow explicit overrides for each token
+    // Accent scale
+    if (variables.colorAmethyst) {
+      tokens.accent1 = this.hexToHSL(variables.colorAmethyst);
+    }
+    if (variables.colorIris || variables.primary) {
+      tokens.accent2 = this.hexToHSL(variables.colorIris || variables.primary!);
+    }
+    if (variables.colorDusk) {
+      tokens.accent3 = this.hexToHSL(variables.colorDusk);
     }
 
+    // Surface hierarchy overrides
+    if (variables.surfacePlain) {
+      tokens.surfaceBase = this.hexToHSL(variables.surfacePlain);
+    }
+    if (variables.cardPanelSurface) {
+      tokens.surfacePanel = this.hexToHSL(variables.cardPanelSurface);
+    }
+    if (variables.cardPanelSurfaceStrong) {
+      tokens.surfaceCard = this.hexToHSL(variables.cardPanelSurfaceStrong);
+      tokens.surfaceElevated = this.hexToHSL(variables.cardPanelSurfaceStrong);
+    }
+    if (variables.colorDusk) {
+      tokens.surfaceHover = this.hexToHSL(variables.colorDusk);
+    }
+
+    // Text hierarchy overrides
+    if (variables.textPrimary || variables.textHeading || variables.colorRune) {
+      const textColor = variables.textPrimary || variables.textHeading || variables.colorRune;
+      if (textColor) tokens.textStrong = this.hexToHSL(textColor);
+    }
+    if (variables.textBody || variables.colorInk) {
+      const bodyColor = variables.textBody || variables.colorInk;
+      if (bodyColor) tokens.textBody = this.hexToHSL(bodyColor);
+    }
+    if (variables.textMuted || variables.colorFog) {
+      const mutedColor = variables.textMuted || variables.colorFog;
+      if (mutedColor) tokens.textMuted = this.hexToHSL(mutedColor);
+    }
+
+    // Border overrides
+    if (variables.cardPanelBorderSoft || variables.colorIris) {
+      const borderColor = variables.cardPanelBorderSoft || variables.colorIris;
+      if (borderColor) tokens.borderSubtle = this.hexToHSL(borderColor);
+    }
+    if (variables.cardPanelBorder || variables.cardPanelBorderStrong || variables.colorGold) {
+      const borderColor = variables.cardPanelBorder || variables.cardPanelBorderStrong || variables.colorGold;
+      if (borderColor) tokens.borderStrong = this.hexToHSL(borderColor);
+    }
+
+    // Page area overrides
+    // Only use colorMidnight if it's explicitly different from background
+    if (variables.colorMidnight && variables.colorMidnight !== background) {
+      tokens.pageBackground = this.hexToHSL(variables.colorMidnight);
+    }
+    // Only use explicit header/footer overrides (not the old brand colors)
+    if (variables.headerBackground) {
+      tokens.headerBackground = this.hexToHSL(variables.headerBackground);
+    }
+    if (variables.headerBorder) {
+      tokens.headerBorder = this.hexToHSL(variables.headerBorder);
+    }
+    if (variables.footerBackground) {
+      tokens.footerBackground = this.hexToHSL(variables.footerBackground);
+    }
+    if (variables.footerBorder) {
+      tokens.footerBorder = this.hexToHSL(variables.footerBorder);
+    }
+
+    // Status colors (always use explicit values if provided)
+    if (variables.success) tokens.success = variables.success;
+    if (variables.warning) tokens.warning = variables.warning;
+    if (variables.error) tokens.error = variables.error;
+    if (variables.info) tokens.info = variables.info;
+
     return tokens;
+  }
+
+  /**
+   * Parse hex color to RGB components
+   */
+  private hexToRGB(hex: string): { r: number; g: number; b: number } {
+    // Remove # if present
+    hex = hex.replace(/^#/, '');
+
+    // Handle 3-digit hex
+    if (hex.length === 3) {
+      const r = hex.charAt(0);
+      const g = hex.charAt(1);
+      const b = hex.charAt(2);
+      hex = r + r + g + g + b + b;
+    }
+
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+
+    return { r, g, b };
+  }
+
+  /**
+   * Convert RGB to hex format
+   */
+  private rgbToHex(r: number, g: number, b: number): string {
+    const toHex = (n: number) => {
+      const hex = Math.round(Math.max(0, Math.min(255, n))).toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    };
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  }
+
+  /**
+   * Mix two colors at a given ratio (0-1)
+   * ratio = 0 means 100% color1, ratio = 1 means 100% color2
+   */
+  private mixColors(color1: string, color2: string, ratio: number): string {
+    const rgb1 = this.hexToRGB(color1);
+    const rgb2 = this.hexToRGB(color2);
+
+    const r = rgb1.r + (rgb2.r - rgb1.r) * ratio;
+    const g = rgb1.g + (rgb2.g - rgb1.g) * ratio;
+    const b = rgb1.b + (rgb2.b - rgb1.b) * ratio;
+
+    return this.rgbToHex(r, g, b);
   }
 
   /**
@@ -677,6 +787,80 @@ export class ThemeManager {
   }
 
   /**
+   * Detect if a color is dark (luminance < 0.5)
+   */
+  private isColorDark(hex: string): boolean {
+    const rgb = this.hexToRGB(hex);
+    // Calculate relative luminance
+    const r = rgb.r / 255;
+    const g = rgb.g / 255;
+    const b = rgb.b / 255;
+    const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    return luminance < 0.5;
+  }
+
+  /**
+   * Generate complete token set from base colors
+   * Creates surface scales, border scales, text scales, etc.
+   */
+  private generateTokensFromBase(variables: ThemeVariables): Record<string, string> {
+    const tokens: Record<string, string> = {};
+
+    // Get base colors (with fallbacks)
+    const background = variables.background || variables.colorMidnight || '#0f0820';
+    const primary = variables.primary || variables.colorAmethyst || '#7c4eb0';
+    const accent = variables.accent || variables.colorGold || '#d4af37';
+
+    const isDark = this.isColorDark(background);
+    const mixLight = '#ffffff';  // Always white to lighten colors
+    const mixDark = '#000000';   // Always black to darken colors
+
+    // Generate surface hierarchy (background mixed with white to lighten)
+    // Creates elevated surfaces that are lighter than the base for both themes
+    tokens.surfaceBase = this.hexToHSL(background);
+    tokens.surfacePanel = this.hexToHSL(this.mixColors(background, mixLight, isDark ? 0.08 : 0.04));
+    tokens.surfaceCard = this.hexToHSL(this.mixColors(background, mixLight, isDark ? 0.12 : 0.06));
+    tokens.surfaceElevated = this.hexToHSL(this.mixColors(background, mixLight, isDark ? 0.16 : 0.08));
+    tokens.surfaceHover = this.hexToHSL(this.mixColors(background, mixLight, isDark ? 0.10 : 0.05));
+
+    // Generate accent scale (primary color at different intensities)
+    tokens.accent1 = this.hexToHSL(this.mixColors(primary, mixLight, isDark ? 0.25 : 0.15));
+    tokens.accent2 = this.hexToHSL(primary);
+    tokens.accent3 = this.hexToHSL(this.mixColors(primary, mixDark, isDark ? 0.25 : 0.15));
+
+    // Generate text hierarchy
+    // For dark themes: white with varying opacity, for light themes: black with varying opacity
+    if (isDark) {
+      tokens.textStrong = this.hexToHSL(this.mixColors(background, '#ffffff', 0.95));
+      tokens.textBody = this.hexToHSL(this.mixColors(background, '#ffffff', 0.85));
+      tokens.textMuted = this.hexToHSL(this.mixColors(background, '#ffffff', 0.60));
+    } else {
+      tokens.textStrong = this.hexToHSL(this.mixColors(background, '#000000', 0.90));
+      tokens.textBody = this.hexToHSL(this.mixColors(background, '#000000', 0.75));
+      tokens.textMuted = this.hexToHSL(this.mixColors(background, '#000000', 0.50));
+    }
+
+    // Generate border colors (mixing primary/accent with background)
+    tokens.borderSubtle = this.hexToHSL(this.mixColors(background, primary, isDark ? 0.25 : 0.20));
+    tokens.borderStrong = this.hexToHSL(this.mixColors(background, accent, isDark ? 0.50 : 0.45));
+
+    // Generate page area colors (always generate, don't check variables here)
+    tokens.pageBackground = this.hexToHSL(background);
+    tokens.headerBackground = this.hexToHSL(this.mixColors(background, mixLight, isDark ? 0.05 : 0.02));
+    tokens.headerBorder = this.hexToHSL(this.mixColors(background, primary, isDark ? 0.30 : 0.25));
+    tokens.footerBackground = this.hexToHSL(this.mixColors(background, mixDark, isDark ? 0.03 : 0.01));
+    tokens.footerBorder = this.hexToHSL(this.mixColors(background, primary, isDark ? 0.25 : 0.20));
+
+    // Status colors (keep as-is or use defaults)
+    tokens.success = variables.success || (isDark ? '#4ade80' : '#22c55e');
+    tokens.warning = variables.warning || (isDark ? '#fbbf24' : '#f59e0b');
+    tokens.error = variables.error || (isDark ? '#f87171' : '#ef4444');
+    tokens.info = variables.info || (isDark ? '#60a5fa' : '#3b82f6');
+
+    return tokens;
+  }
+
+  /**
    * Update localStorage with theme data following runtime loader structure
    */
   private updateLocalStorageTheme(preset: ThemePreset): void {
@@ -695,6 +879,8 @@ export class ThemeManager {
 
     try {
       localStorage.setItem('wc-active-theme', JSON.stringify(themeData));
+      console.log('[ThemeManager] Updated localStorage with theme:', preset.slug, preset.mode);
+      console.log('[ThemeManager] Stored tokens:', Object.keys(tokens).length, 'tokens');
     } catch (error) {
       console.error('Failed to update localStorage theme:', error);
     }

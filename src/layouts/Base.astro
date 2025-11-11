@@ -677,16 +677,26 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
       (function () {
         try {
           const saved = localStorage.getItem("wc-active-theme");
-          if (!saved) return;
+          if (!saved) {
+            console.log("[Theme] No saved theme in localStorage");
+            return;
+          }
           const t = JSON.parse(saved);
+          console.log("[Theme] Loaded theme from localStorage:", t.slug, t.mode);
+          console.log("[Theme] Tokens:", t.tokens);
           const root = document.documentElement;
 
           // set mode attributes
-          const modeAttr = t.id && t.id.includes("dawn") || t.mode === "light" ? "dawn" : "midnight";
+          const modeAttr = t.id && t.id.includes("dawn") || t.mode === "light" || t.mode === "dawn" ? "dawn" : "midnight";
           // Use actual theme slug instead of hardcoded values
           const themeSlug = t.slug || t.id || (modeAttr === "dawn" ? "cozy-dawn" : "cozy-midnight");
           root.setAttribute("data-theme", themeSlug);
-          root.setAttribute("data-comfort-theme", modeAttr);
+          // Only set data-comfort-theme for dawn mode (matches applyThemeToDocument behavior)
+          if (modeAttr === "dawn") {
+            root.setAttribute("data-comfort-theme", "dawn");
+          } else {
+            root.removeAttribute("data-comfort-theme");
+          }
 
           // apply tokens
           const map = {
@@ -700,23 +710,31 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
             "--footer-bg-base": "footerBackground","--footer-border-base": "footerBorder"
           };
           const tokens = t.tokens || {};
+          let appliedCount = 0;
           Object.entries(map).forEach(([cssVar, key]) => {
             const val = tokens[key];
             if (typeof val === "string" && val.startsWith("hsl(")) {
               root.style.setProperty(cssVar, val.replace(/^hsl\\(|\\)$/g, ""));
+              appliedCount++;
+            } else if (val) {
+              console.warn("[Theme] Token", key, "has unexpected format:", val);
             }
           });
+          console.log("[Theme] Applied", appliedCount, "HSL tokens");
 
           // Status colors (plain hex values)
           const statusMap = {
             "--success": "success","--warning": "warning","--error": "error","--info": "info"
           };
+          let statusCount = 0;
           Object.entries(statusMap).forEach(([cssVar, key]) => {
             const val = tokens[key];
             if (typeof val === "string" && val.startsWith("#")) {
               root.style.setProperty(cssVar, val);
+              statusCount++;
             }
           });
+          console.log("[Theme] Applied", statusCount, "status color tokens");
 
           // derive accent-linked globals
           const get = (v) => getComputedStyle(root).getPropertyValue(v).trim();
@@ -724,7 +742,10 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
           root.style.setProperty("--text-accent", accent1.replace(/^hsl\\(|\\)$/g, ""));
           root.style.setProperty("--ring-focus", `0 0 0 3px ${accent1}`);
           root.style.setProperty("--link-color", accent1);
-        } catch {}
+          console.log("[Theme] Theme application complete");
+        } catch (e) {
+          console.error("[Theme] Error applying theme:", e);
+        }
       })();
     </script>
 

@@ -99,6 +99,10 @@ export const ALL_COLOR_VARIABLES = [
   'colorMidnight', 'colorNight', 'colorIris', 'colorAmethyst', 'colorDusk',
   'colorGold', 'colorRune', 'colorFog', 'colorInk',
 
+  // Header & Footer
+  'headerBackground', 'headerBorder', 'headerText', 'headerTextHover',
+  'footerBackground', 'footerBorder', 'footerText', 'footerTextMuted',
+
   // Surface Colors
   'surfacePlain', 'surfacePlainBorder', 'cardPanelSurface', 'cardPanelSurfaceStrong',
   'cardPanelBorder', 'cardPanelBorderStrong', 'cardPanelBorderSoft',

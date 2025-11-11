@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Color Mixing Test</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      background: #111;
+      color: white;
+    }
+    .swatch {
+      display: inline-block;
+      width: 100px;
+      height: 100px;
+      border: 1px solid white;
+      margin: 10px;
+      vertical-align: top;
+    }
+    .label {
+      margin-top: 5px;
+      font-size: 12px;
+    }
+    .section {
+      margin: 20px 0;
+      padding: 20px;
+      border: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>WitchClick Color Mixing Analysis</h1>
+
+  <div class="section">
+    <h2>Problem: Negative Mixing Ratio on Line 823</h2>
+    <p>Line 823: <code>tokens.accent1 = this.hexToHSL(this.mixColors(primary, mixLight, isDark ? 0.25 : -0.15));</code></p>
+    <p>For LIGHT themes, this uses ratio = -0.15, which is INVALID!</p>
+
+    <h3>Dawn Theme (Light) - Background: #f6f0e8</h3>
+    <p>Primary: #9b86c8 (colorIris purple)</p>
+    <p>mixLight should be: #000000 (because isDark = false)</p>
+    <p>But ratio is -0.15 (NEGATIVE!)</p>
+
+    <div id="light-accent1-test"></div>
+  </div>
+
+  <div class="section">
+    <h2>Problem: Wrong Mix Direction on Lines 811-812</h2>
+    <p>Line 811: <code>const mixLight = isDark ? '#ffffff' : '#000000';</code></p>
+    <p>Line 812: <code>const mixDark = isDark ? '#000000' : '#ffffff';</code></p>
+
+    <h3>For DARK themes (isDark = true):</h3>
+    <p>mixLight = #ffffff ✓ (correct - lighten dark backgrounds)</p>
+    <p>mixDark = #000000 ✓ (correct - darken dark backgrounds)</p>
+
+    <h3>For LIGHT themes (isDark = false):</h3>
+    <p>mixLight = #000000 ✗ (WRONG - this darkens light backgrounds!)</p>
+    <p>mixDark = #ffffff ✗ (WRONG - this lightens light backgrounds!)</p>
+    <p><strong>The logic is inverted for light themes!</strong></p>
+  </div>
+
+  <div class="section">
+    <h2>Visual Demonstration</h2>
+
+    <h3>Dawn Theme Background: #f6f0e8 (light beige)</h3>
+    <div>
+      <div class="swatch" style="background: #f6f0e8;">
+        <div class="label">Background</div>
+      </div>
+    </div>
+
+    <h3>Surface Tokens (Lines 817-820)</h3>
+    <p>These mix background with mixLight (#000000 for dawn)</p>
+    <div id="dawn-surfaces"></div>
+
+    <h3>Text Tokens (Lines 834-836)</h3>
+    <p>These mix background with black at high ratios</p>
+    <div id="dawn-text"></div>
+  </div>
+
+  <script>
+    // Reproduce the exact logic from theme-manager.ts
+
+    function hexToRGB(hex) {
+      hex = hex.replace(/^#/, '');
+      if (hex.length === 3) {
+        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+      }
+      return {
+        r: parseInt(hex.substring(0, 2), 16),
+        g: parseInt(hex.substring(2, 4), 16),
+        b: parseInt(hex.substring(4, 6), 16)
+      };
+    }
+
+    function rgbToHex(r, g, b) {
+      const toHex = (n) => {
+        const hex = Math.round(Math.max(0, Math.min(255, n))).toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+      };
+      return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+    }
+
+    function mixColors(color1, color2, ratio) {
+      const rgb1 = hexToRGB(color1);
+      const rgb2 = hexToRGB(color2);
+
+      const r = rgb1.r + (rgb2.r - rgb1.r) * ratio;
+      const g = rgb1.g + (rgb2.g - rgb1.g) * ratio;
+      const b = rgb1.b + (rgb2.b - rgb1.b) * ratio;
+
+      return rgbToHex(r, g, b);
+    }
+
+    function isColorDark(hex) {
+      const rgb = hexToRGB(hex);
+      const r = rgb.r / 255;
+      const g = rgb.g / 255;
+      const b = rgb.b / 255;
+      const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      return luminance < 0.5;
+    }
+
+    // Dawn theme colors
+    const dawnBg = '#f6f0e8';
+    const dawnPrimary = '#9b86c8';
+    const isDark = isColorDark(dawnBg);
+    const mixLight = isDark ? '#ffffff' : '#000000';  // BUG: This is #000000 for dawn!
+    const mixDark = isDark ? '#000000' : '#ffffff';   // BUG: This is #ffffff for dawn!
+
+    console.log('Dawn theme analysis:');
+    console.log('Background:', dawnBg);
+    console.log('isDark:', isDark, '(should be false)');
+    console.log('mixLight:', mixLight, '(SHOULD BE #ffffff, but is #000000!)');
+    console.log('mixDark:', mixDark, '(SHOULD BE #000000, but is #ffffff!)');
+
+    // Test accent1 with negative ratio
+    const accent1 = mixColors(dawnPrimary, mixLight, -0.15);
+    const lightAccent1 = document.getElementById('light-accent1-test');
+    lightAccent1.innerHTML = `
+      <div class="swatch" style="background: ${dawnPrimary};">
+        <div class="label">Primary<br>${dawnPrimary}</div>
+      </div>
+      <div class="swatch" style="background: ${accent1};">
+        <div class="label">accent1<br>${accent1}<br>(ratio: -0.15)</div>
+      </div>
+      <p><strong>Result: ${accent1}</strong></p>
+      <p>This is GRAYER than the original primary because negative ratios move in the wrong direction!</p>
+    `;
+
+    // Test surface tokens
+    const surfacePanel = mixColors(dawnBg, mixLight, 0.04);
+    const surfaceCard = mixColors(dawnBg, mixLight, 0.06);
+    const surfaceElevated = mixColors(dawnBg, mixLight, 0.08);
+
+    const dawnSurfaces = document.getElementById('dawn-surfaces');
+    dawnSurfaces.innerHTML = `
+      <div class="swatch" style="background: ${dawnBg};">
+        <div class="label">surfaceBase<br>${dawnBg}</div>
+      </div>
+      <div class="swatch" style="background: ${surfacePanel};">
+        <div class="label">surfacePanel<br>${surfacePanel}<br>(bg + black 4%)</div>
+      </div>
+      <div class="swatch" style="background: ${surfaceCard};">
+        <div class="label">surfaceCard<br>${surfaceCard}<br>(bg + black 6%)</div>
+      </div>
+      <div class="swatch" style="background: ${surfaceElevated};">
+        <div class="label">surfaceElevated<br>${surfaceElevated}<br>(bg + black 8%)</div>
+      </div>
+      <p><strong>These get DARKER instead of LIGHTER!</strong></p>
+      <p>For a light theme, surfaces should get lighter (whiter) for elevation, not darker!</p>
+    `;
+
+    // Test text tokens
+    const textStrong = mixColors(dawnBg, '#000000', 0.90);
+    const textBody = mixColors(dawnBg, '#000000', 0.75);
+    const textMuted = mixColors(dawnBg, '#000000', 0.50);
+
+    const dawnText = document.getElementById('dawn-text');
+    dawnText.innerHTML = `
+      <div class="swatch" style="background: ${textStrong};">
+        <div class="label">textStrong<br>${textStrong}<br>(bg + black 90%)</div>
+      </div>
+      <div class="swatch" style="background: ${textBody};">
+        <div class="label">textBody<br>${textBody}<br>(bg + black 75%)</div>
+      </div>
+      <div class="swatch" style="background: ${textMuted};">
+        <div class="label">textMuted<br>${textMuted}<br>(bg + black 50%)</div>
+      </div>
+      <p><strong>Text colors are correct-ish but too close to the background!</strong></p>
+      <p>textStrong (${textStrong}) is 90% toward black from the light beige background.</p>
+    `;
+  </script>
+</body>
+</html>
