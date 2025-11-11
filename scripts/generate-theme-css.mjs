@@ -32,7 +32,7 @@ function toKebabCase(str) {
  * Generate CSS custom properties from theme settings
  */
 function generateThemeCSS(theme) {
-  const { slug, label, mode, settings } = theme;
+  const { slug, label, mode, settings, overrides } = theme;
 
   const properties = Object.entries(settings)
     .map(([key, value]) => {
@@ -41,11 +41,43 @@ function generateThemeCSS(theme) {
     })
     .join('\n');
 
-  return `
+  let css = `
 /* ${label} (${mode} mode) */
 :root[data-theme="${slug}"] {
 ${properties}
 }`;
+
+  // Generate scope-specific overrides
+  if (overrides && Array.isArray(overrides) && overrides.length > 0) {
+    const scopeCSS = overrides.map(override => {
+      const { scope, variables } = override;
+
+      if (!variables || typeof variables !== 'object') {
+        return '';
+      }
+
+      const scopeProperties = Object.entries(variables)
+        .map(([key, value]) => {
+          const cssVar = toKebabCase(key);
+          return `  --theme-${cssVar}: ${value};`;
+        })
+        .join('\n');
+
+      if (!scopeProperties) {
+        return '';
+      }
+
+      return `
+/* ${label} - ${scope} scope override */
+:root[data-theme="${slug}"][data-scope="${scope}"] {
+${scopeProperties}
+}`;
+    }).filter(Boolean).join('');
+
+    css += scopeCSS;
+  }
+
+  return css;
 }
 
 /**

@@ -7,7 +7,7 @@
  * To modify themes, edit files in content/themes/
  * Then run: npm run themes:build
  *
- * Generated: 2025-11-09T00:14:41.753Z
+ * Generated: 2025-11-10T21:17:43.242Z
  * Source: scripts/generate-theme-css.mjs
  */
 
@@ -120,6 +120,95 @@
   --theme-warning: #fbbf24;
   --theme-error: #f87171;
   --theme-info: #60a5fa;
+}
+
+/* Blue-Ish (midnight mode) */
+:root[data-theme="blue-ish"] {
+  --theme-primary: #a7aabd;
+  --theme-accent: #d4af37;
+  --theme-background: #0f172a;
+  --theme-font-serif: Literata;
+  --theme-font-script: Parisienne;
+  --theme-text-primary: #f4f1ff;
+  --theme-text-heading: #ffffff;
+  --theme-text-muted: #d9b2c4;
+  --theme-font-heading: Cinzel;
+  --theme-font-accent: Cormorant Garamond;
+  --theme-color-midnight: #07020f;
+  --theme-color-night: #120725;
+  --theme-color-iris: #4b2a63;
+  --theme-color-amethyst: #7c4eb0;
+  --theme-color-dusk: #271534;
+  --theme-color-gold: #d4af37;
+  --theme-color-rune: #f8f3ff;
+  --theme-color-fog: #d7c8f3;
+  --theme-color-ink: #f4f1ff;
+  --theme-surface-plain: #737687;
+  --theme-surface-plain-border: #0f172a;
+  --theme-card-panel-surface: #a7aabd;
+  --theme-card-panel-surface-strong: #b88c7f;
+  --theme-card-panel-border: #d6dcf7;
+  --theme-card-panel-border-strong: #b38b1a;
+  --theme-card-panel-border-soft: #583a3d;
+  --theme-text-secondary: #f4f1ff;
+  --theme-text-tertiary: #f4f1ff;
+  --theme-text-strong: #f9f5ff;
+  --theme-text-body: #f9f5ff;
+  --theme-text-subtle: #f9f5ff;
+  --theme-text-accent: #d4af37;
+  --theme-text-accent-strong: #d4af37;
+  --theme-ink-body: #f4f1ff;
+  --theme-ink-strong: #ffffff;
+  --theme-ink-muted: #d9b2c4;
+  --theme-link-color: #e0c07d;
+  --theme-card-badge-bg: #d4af37;
+  --theme-card-badge-border: #d4af37;
+  --theme-card-badge-text: #f8f3ff;
+  --theme-card-tag-bg: #4b2a63;
+  --theme-card-tag-border: #4b2a63;
+  --theme-card-tag-text: #f4f1ff;
+  --theme-focus-ring-color: #e8d591;
+  --theme-card-focus-outline: #e8d591;
+  --theme-success: #4ade80;
+  --theme-warning: #fbbf24;
+  --theme-error: #f87171;
+  --theme-info: #60a5fa;
+  --theme-entity-card-surface-top: #737687;
+  --theme-entity-card-surface-bottom: #0f172a;
+}
+
+/* Scope Test Theme (midnight mode) */
+:root[data-theme="scope-test"] {
+  --theme-primary: #9333ea;
+  --theme-accent: #fbbf24;
+  --theme-background: #111827;
+  --theme-font-serif: Literata;
+  --theme-font-script: Parisienne;
+  --theme-text-primary: #f9fafb;
+  --theme-text-heading: #ffffff;
+  --theme-text-muted: #d1d5db;
+  --theme-font-heading: Cinzel;
+  --theme-font-accent: Cormorant Garamond;
+}
+/* Scope Test Theme - homepage scope override */
+:root[data-theme="scope-test"][data-scope="homepage"] {
+  --theme-primary: #10b981;
+  --theme-accent: #3b82f6;
+  --theme-background: #064e3b;
+}
+/* Scope Test Theme - grimoire scope override */
+:root[data-theme="scope-test"][data-scope="grimoire"] {
+  --theme-primary: #dc2626;
+  --theme-accent: #f59e0b;
+  --theme-background: #7f1d1d;
+  --theme-entity-card-surface-top: #991b1b;
+  --theme-entity-card-surface-bottom: #450a0a;
+}
+/* Scope Test Theme - post scope override */
+:root[data-theme="scope-test"][data-scope="post"] {
+  --theme-primary: #2563eb;
+  --theme-accent: #8b5cf6;
+  --theme-background: #1e3a8a;
 }
 
 /* ========================================================================

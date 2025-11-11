@@ -1,0 +1,46 @@
+{
+  "slug": "scope-test",
+  "label": "Scope Test Theme",
+  "mode": "midnight",
+  "category": "custom",
+  "settings": {
+    "primary": "#9333ea",
+    "accent": "#fbbf24",
+    "background": "#111827",
+    "fontSerif": "Literata",
+    "fontScript": "Parisienne",
+    "textPrimary": "#f9fafb",
+    "textHeading": "#ffffff",
+    "textMuted": "#d1d5db",
+    "fontHeading": "Cinzel",
+    "fontAccent": "Cormorant Garamond"
+  },
+  "overrides": [
+    {
+      "scope": "homepage",
+      "variables": {
+        "primary": "#10b981",
+        "accent": "#3b82f6",
+        "background": "#064e3b"
+      }
+    },
+    {
+      "scope": "grimoire",
+      "variables": {
+        "primary": "#dc2626",
+        "accent": "#f59e0b",
+        "background": "#7f1d1d",
+        "entityCardSurfaceTop": "#991b1b",
+        "entityCardSurfaceBottom": "#450a0a"
+      }
+    },
+    {
+      "scope": "post",
+      "variables": {
+        "primary": "#2563eb",
+        "accent": "#8b5cf6",
+        "background": "#1e3a8a"
+      }
+    }
+  ]
+}

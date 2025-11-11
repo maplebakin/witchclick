@@ -1,6 +1,6 @@
 {
-  "generated": "2025-11-09T00:14:41.759Z",
-  "count": 4,
+  "generated": "2025-11-10T21:17:43.249Z",
+  "count": 6,
   "themes": [
     {
       "slug": "cozy-dawn",
@@ -25,6 +25,18 @@
       "label": "Autumn Twilight",
       "mode": "midnight",
       "category": "seasonal"
+    },
+    {
+      "slug": "blue-ish",
+      "label": "Blue-Ish",
+      "mode": "midnight",
+      "category": "custom"
+    },
+    {
+      "slug": "scope-test",
+      "label": "Scope Test Theme",
+      "mode": "midnight",
+      "category": "custom"
     }
   ]
 }

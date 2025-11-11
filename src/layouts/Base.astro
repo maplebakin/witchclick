@@ -468,10 +468,49 @@ const observabilityConfig = shouldLoadObservability
       },
     }
   : null;
+
+// Theme Scope Detection
+// Determines which theme scope to apply based on the current route
+function detectThemeScope(pathname: string): string | null {
+  // Homepage
+  if (pathname === "/" || pathname === "") {
+    return "homepage";
+  }
+
+  // Entity Grimoire (main entities directory page)
+  if (pathname === "/entities" || pathname === "/entities/") {
+    return "grimoire";
+  }
+
+  // Individual entity detail pages
+  if (/^\/entities\/[^/]+\/[^/]+\/?$/.test(pathname)) {
+    return "entity-detail";
+  }
+
+  // Post detail pages
+  if (/^\/post\/[^/]+\/?$/.test(pathname)) {
+    return "post";
+  }
+
+  // Start/getting started page
+  if (pathname === "/start" || pathname === "/start/") {
+    return "start";
+  }
+
+  // No specific scope - use global theme
+  return null;
+}
+
+// Detect theme scope for the current page (reusing existing currentPath variable)
+const themeScope = detectThemeScope(currentPath);
+
+// Get active theme slugs for both modes (midnight is default)
+const midnightThemeSlug = midnightTheme?.slug || 'cozy-midnight';
+const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
 ---
 
 <!doctype html>
-<html lang="en" class="h-full">
+<html lang="en" class="h-full" data-scope={themeScope || undefined} data-theme={midnightThemeSlug} data-theme-midnight={midnightThemeSlug} data-theme-dawn={dawnThemeSlug}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -549,10 +588,18 @@ const observabilityConfig = shouldLoadObservability
           if (!root) return;
 
           const applyTheme = (theme) => {
-            if (theme) {
-              root.setAttribute('data-comfort-theme', theme);
+            if (theme === 'dawn') {
+              root.setAttribute('data-comfort-theme', 'dawn');
+              const dawnSlug = root.getAttribute('data-theme-dawn');
+              if (dawnSlug) {
+                root.setAttribute('data-theme', dawnSlug);
+              }
             } else {
               root.removeAttribute('data-comfort-theme');
+              const midnightSlug = root.getAttribute('data-theme-midnight');
+              if (midnightSlug) {
+                root.setAttribute('data-theme', midnightSlug);
+              }
             }
           };
 
@@ -568,8 +615,8 @@ const observabilityConfig = shouldLoadObservability
             const body = document.body;
             if (!body) return;
 
-            if (theme) {
-              body.setAttribute('data-comfort-theme', theme);
+            if (theme === 'dawn') {
+              body.setAttribute('data-comfort-theme', 'dawn');
             } else {
               body.removeAttribute('data-comfort-theme');
             }
@@ -636,7 +683,9 @@ const observabilityConfig = shouldLoadObservability
 
           // set mode attributes
           const modeAttr = t.id && t.id.includes("dawn") || t.mode === "light" ? "dawn" : "midnight";
-          root.setAttribute("data-theme", modeAttr === "dawn" ? "cozy-dawn" : "cozy-midnight");
+          // Use actual theme slug instead of hardcoded values
+          const themeSlug = t.slug || t.id || (modeAttr === "dawn" ? "cozy-dawn" : "cozy-midnight");
+          root.setAttribute("data-theme", themeSlug);
           root.setAttribute("data-comfort-theme", modeAttr);
 
           // apply tokens
@@ -729,8 +778,6 @@ const observabilityConfig = shouldLoadObservability
     )}
     
     <!-- Card Animations -->
-    <script type="module">
-      import "@/scripts/card-animations";
-    </script>
+    <script type="module" src="/src/scripts/card-animations.ts"></script>
   </body>
 </html>
