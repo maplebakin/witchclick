@@ -49,6 +49,14 @@ const LEGACY_FIELDS: Array<{ key: string; label: string; placeholder: string }> 
   { key: "textMuted", label: "Muted", placeholder: "#d9b2c4" },
 ];
 
+const PAGE_LAYOUT_FIELDS: Array<{ key: string; label: string; placeholder: string }> = [
+  { key: "background", label: "Page Background", placeholder: "#0f0820" },
+  { key: "headerBackground", label: "Header Background", placeholder: "#120725" },
+  { key: "headerBorder", label: "Header Border", placeholder: "#4b2a63" },
+  { key: "footerBackground", label: "Footer Background", placeholder: "#07020f" },
+  { key: "footerBorder", label: "Footer Border", placeholder: "#4b2a63" },
+];
+
 function toLabel(key: string): string {
   return key
     .replace(/([A-Z])/g, " $1")
@@ -182,6 +190,15 @@ function buildLegacyPalette(container: HTMLElement): void {
   const grid = document.createElement("div");
   grid.className = "grid gap-3 sm:grid-cols-2";
   LEGACY_FIELDS.forEach((field) => {
+    grid.appendChild(createLegacyControl(field));
+  });
+  container.appendChild(grid);
+}
+
+function buildPageLayoutSection(container: HTMLElement): void {
+  const grid = document.createElement("div");
+  grid.className = "grid gap-3 sm:grid-cols-2";
+  PAGE_LAYOUT_FIELDS.forEach((field) => {
     grid.appendChild(createLegacyControl(field));
   });
   container.appendChild(grid);
@@ -638,6 +655,22 @@ function buildEditorShell(root: HTMLElement): void {
   const paletteBody = document.createElement("div");
   paletteCard.appendChild(paletteBody);
   buildLegacyPalette(paletteBody);
+
+  // Page & Layout section
+  const pageLayoutSection = document.createElement("div");
+  pageLayoutSection.className = "space-y-2 border-t border-line-subtle pt-4";
+  const pageLayoutHeading = document.createElement("h3");
+  pageLayoutHeading.className = "text-sm font-semibold";
+  pageLayoutHeading.textContent = "Page & Layout";
+  pageLayoutSection.appendChild(pageLayoutHeading);
+
+  const pageLayoutDescription = document.createElement("p");
+  pageLayoutDescription.className = "text-xs text-body-muted mb-3";
+  pageLayoutDescription.textContent = "Control the main page background and header/footer areas. Leave empty to auto-generate from your background color.";
+  pageLayoutSection.appendChild(pageLayoutDescription);
+
+  buildPageLayoutSection(pageLayoutSection);
+  paletteCard.appendChild(pageLayoutSection);
 
   const fontSection = document.createElement("div");
   fontSection.className = "space-y-2 border-t border-line-subtle pt-4";
