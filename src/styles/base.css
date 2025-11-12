@@ -74,7 +74,13 @@
   --header-bg-color: hsl(var(--header-bg-base, 281 35% 9% / 1));
   --header-border-color: hsl(var(--header-border-base, 268 32% 24% / 1));
 
-  /* Layout Surfaces */
+  /* Layout Surfaces - ALIGNED WITH RUNTIME TOKEN SYSTEM */
+  /* Token chain for background:
+     Runtime loader sets --page-bg-base → --page-bg-color (hsl wrapper) → --layout-shell-background (darkened) → body background
+     This ensures body background updates when theme changes. */
+  /* Token chain for text:
+     Runtime loader sets --text-strong → --ink-strong (fallback) → --layout-shell-ink (adjusted) → body text
+     This ensures body text and headings match card text colors. */
   --layout-shell-background: color-mix(in srgb, var(--page-bg-color) 78%, black 22%);
   --layout-shell-background-plain: color-mix(in srgb, var(--page-bg-color) 82%, black 18%);
   --layout-shell-ink: color-mix(in srgb, var(--ink-strong) 95%, var(--page-bg-color) 5%);
@@ -158,10 +164,12 @@
   --comfort-tray-shadow: 0 28px 60px -32px color-mix(in srgb, var(--color-night) 70%, transparent 30%);
   --comfort-tray-hint: color-mix(in srgb, var(--ink-muted) 85%, white 15%);
 
-  /* Semantic Colors (derived from core) */
-  --ink-body: color-mix(in srgb, var(--color-ink) 70%, var(--color-night) 30%);
-  --ink-strong: color-mix(in srgb, var(--color-ink) 85%, var(--color-night) 15%);
-  --ink-muted: color-mix(in srgb, var(--color-ink) 55%, white 45%);
+  /* Semantic Colors - ALIGNED WITH RUNTIME TOKENS */
+  /* These now derive from --text-strong/body/muted which are set by the runtime loader.
+     This ensures body text and headings match card text colors. */
+  --ink-body: var(--text-body, color-mix(in srgb, var(--color-ink) 70%, var(--color-night) 30%));
+  --ink-strong: var(--text-strong, color-mix(in srgb, var(--color-ink) 85%, var(--color-night) 15%));
+  --ink-muted: var(--text-muted, color-mix(in srgb, var(--color-ink) 55%, white 45%));
   --link-color: color-mix(in srgb, var(--color-fog) 55%, var(--color-gold) 45%);
   
   /* Focus Ring Styles - Enhanced for accessibility */
@@ -216,10 +224,12 @@
   --shadow-soft: 0 18px 45px -28px rgba(63, 49, 86, 0.22);
   --shadow-strong: 0 28px 75px -24px rgba(63, 49, 86, 0.32);
 
-  /* Semantic Colors - Dawn Variants */
-  --ink-body: color-mix(in srgb, var(--color-ink) 80%, var(--color-night) 20%);
-  --ink-strong: color-mix(in srgb, var(--color-ink) 90%, var(--color-night) 10%);
-  --ink-muted: color-mix(in srgb, var(--color-ink) 60%, white 40%);
+  /* Semantic Colors - Dawn Variants - ALIGNED WITH RUNTIME TOKENS */
+  /* These now derive from --text-strong/body/muted which are set by the runtime loader.
+     This ensures body text and headings match card text colors in dawn mode. */
+  --ink-body: var(--text-body, color-mix(in srgb, var(--color-ink) 80%, var(--color-night) 20%));
+  --ink-strong: var(--text-strong, color-mix(in srgb, var(--color-ink) 90%, var(--color-night) 10%));
+  --ink-muted: var(--text-muted, color-mix(in srgb, var(--color-ink) 60%, white 40%));
   --link-color: color-mix(in srgb, var(--color-iris) 45%, var(--color-gold) 55%);
   
   /* Focus Ring - Dawn Variants */

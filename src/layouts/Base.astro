@@ -672,7 +672,17 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
     data-entity-type={bodyDataType || undefined}
   >
     <a class="skip-link" href="#main">Skip to content</a>
-    <!-- Base.astro: persistent theme loader (runtime site-wide) -->
+    <!-- Base.astro: persistent theme loader (runtime site-wide)
+
+         This script applies custom theme tokens on every page load.
+         Token System Architecture:
+         - localStorage key: "wc-active-theme" (set by theme-manager.ts)
+         - Token format: HSL for colors, hex for status colors
+         - Aligned with: src/styles/tokens.css (fallback defaults)
+         - Aligned with: theme-manager.ts applyThemeToDocument()
+
+         Both admin and public pages use identical token names for consistency.
+    -->
     <script is:inline>
       (function () {
         try {
@@ -714,7 +724,9 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
           Object.entries(map).forEach(([cssVar, key]) => {
             const val = tokens[key];
             if (typeof val === "string" && val.startsWith("hsl(")) {
-              root.style.setProperty(cssVar, val.replace(/^hsl\\(|\\)$/g, ""));
+              // Strip "hsl(" prefix and ")" suffix to get just the HSL components
+              const stripped = val.replace("hsl(", "").replace(")", "");
+              root.style.setProperty(cssVar, stripped);
               appliedCount++;
             } else if (val) {
               console.warn("[Theme] Token", key, "has unexpected format:", val);
@@ -738,10 +750,21 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
 
           // derive accent-linked globals
           const get = (v) => getComputedStyle(root).getPropertyValue(v).trim();
-          const accent1 = `hsl(${get("--accent-1")})`;
-          root.style.setProperty("--text-accent", accent1.replace(/^hsl\\(|\\)$/g, ""));
-          root.style.setProperty("--ring-focus", `0 0 0 3px ${accent1}`);
-          root.style.setProperty("--link-color", accent1);
+          const accent1Value = get("--accent-1");
+          const accent1Full = `hsl(${accent1Value})`;
+          root.style.setProperty("--text-accent", accent1Value);
+          root.style.setProperty("--ring-focus", `0 0 0 3px ${accent1Full}`);
+          root.style.setProperty("--link-color", accent1Full);
+
+          // DEBUG: Check computed values for background/header/footer/cards
+          console.log("[Theme] DEBUG - Runtime token values:");
+          console.log("  --page-bg-base:", get("--page-bg-base"));
+          console.log("  --page-bg-color:", get("--page-bg-color"));
+          console.log("  --layout-shell-background:", get("--layout-shell-background"));
+          console.log("  --header-bg-base:", get("--header-bg-base"));
+          console.log("  --footer-bg-base:", get("--footer-bg-base"));
+          console.log("  --surface-card:", get("--surface-card"));
+
           console.log("[Theme] Theme application complete");
         } catch (e) {
           console.error("[Theme] Error applying theme:", e);

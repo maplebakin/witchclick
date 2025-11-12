@@ -79,7 +79,7 @@ const tooltipId = spoonLevel ? `spoons-tip-${randomUUID().slice(0, 8)}` : "";
     text-transform: none;
     letter-spacing: normal;
     color: var(--text-body);
-    background: color-mix(in srgb, var(--surface-card) 85%, var(--accent-purple-soft) 15%);
+    background: color-mix(in srgb, hsl(var(--surface-card)) 85%, var(--accent-purple-soft) 15%);
     border: 1px solid color-mix(in srgb, var(--accent-purple-soft) 20%, transparent);
     box-shadow: 0 10px 28px -22px rgba(17, 24, 39, 0.55);
     pointer-events: none;

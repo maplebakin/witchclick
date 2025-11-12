@@ -1,17 +1,11 @@
 {
-  "generated": "2025-11-11T16:15:04.028Z",
+  "generated": "2025-11-12T15:57:25.989Z",
   "count": 6,
   "themes": [
     {
       "slug": "cozy-dawn",
       "label": "Cozy Dawn",
       "mode": "dawn",
-      "category": "default"
-    },
-    {
-      "slug": "cozy-midnight",
-      "label": "Cozy Midnight",
-      "mode": "midnight",
       "category": "default"
     },
     {
@@ -29,6 +23,12 @@
     {
       "slug": "blue-ish",
       "label": "Blue-Ish",
+      "mode": "midnight",
+      "category": "custom"
+    },
+    {
+      "slug": "cozy-midnight",
+      "label": "Cozy Midnight",
       "mode": "midnight",
       "category": "custom"
     },

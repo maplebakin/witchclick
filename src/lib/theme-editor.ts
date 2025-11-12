@@ -39,6 +39,7 @@ export class ThemeEditor {
   private undoRedo: UndoRedo<EditorState>;
   private state: EditorState;
   private elements: Record<string, HTMLElement | null> = {};
+  private skipNextSync = false; // Flag to skip sync after explicit preset load
 
   constructor(options: ThemeEditorOptions = {}) {
     const root = options.root ?? document.getElementById('themeEditorRoot');
@@ -355,8 +356,23 @@ export class ThemeEditor {
   private syncCurrentPreset(): void {
     if (!this.state.currentPreset) return;
 
+    // Skip sync if we just explicitly loaded a preset to prevent overwriting
+    if (this.skipNextSync) {
+      console.log('[ThemeEditor.syncCurrentPreset] Skipping sync (just loaded preset):', this.state.currentPreset.slug);
+      this.skipNextSync = false;
+      return;
+    }
+
+    console.log('[ThemeEditor.syncCurrentPreset] Fetching latest version of:', this.state.currentPreset.slug, 'from manager');
     const latest = this.manager.getPreset(this.state.currentPreset.mode, this.state.currentPreset.slug);
+    console.log('[ThemeEditor.syncCurrentPreset] Manager returned:', latest?.slug, latest?.name);
+    console.log('[ThemeEditor.syncCurrentPreset] Manager returned background:', latest?.variables.background);
+
     if (latest && latest.updatedAt !== this.state.currentPreset.updatedAt) {
+      console.log('[ThemeEditor.syncCurrentPreset] Syncing to latest version of:', latest.slug);
+      console.log('[ThemeEditor.syncCurrentPreset] Old background:', this.state.currentPreset.variables.background);
+      console.log('[ThemeEditor.syncCurrentPreset] New background:', latest.variables.background);
+
       this.state = {
         ...this.state,
         currentPreset: latest,
@@ -715,11 +731,20 @@ export class ThemeEditor {
   }
 
   private loadPreset(preset: ThemePreset, silent = false): void {
+    console.log('[ThemeEditor.loadPreset] Loading preset:', preset.slug, preset.name);
+    console.log('[ThemeEditor.loadPreset] preset.variables.background:', preset.variables.background);
+
+    // Set flag to skip sync on next render (we're explicitly loading this preset)
+    this.skipNextSync = true;
+
     this.pushState({
       ...this.state,
       mode: preset.mode,
       currentPreset: preset,
     });
+
+    console.log('[ThemeEditor.loadPreset] After pushState, currentPreset:', this.state.currentPreset?.slug);
+
     if (!silent) {
       this.setStatus(`Loaded "${preset.name}"`, 'success');
     }
@@ -796,6 +821,9 @@ export class ThemeEditor {
 
   private async setActive(): Promise<void> {
     const preset = this.state.currentPreset;
+    console.log('[ThemeEditor.setActive] currentPreset:', preset?.slug, preset?.name);
+    console.log('[ThemeEditor.setActive] currentPreset.variables.background:', preset?.variables.background);
+
     if (!preset) {
       this.setStatus('Please save the theme first', 'error');
       return;
@@ -803,6 +831,7 @@ export class ThemeEditor {
 
     try {
       this.setStatus('Setting active theme…', 'info');
+      console.log('[ThemeEditor.setActive] Calling manager.setActive with:', preset.mode, preset.slug);
       await this.manager.setActive(preset.mode, preset.slug);
       this.setStatus(
         `✓ Set "${preset.name}" as active ${preset.mode} theme`,

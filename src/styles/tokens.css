@@ -32,7 +32,12 @@
   --amber-3: 38 90% 50%;
   --red-3: 352 78% 56%;
 
-  /* === Surfaces & Text (defaults; themed by [data-theme]) === */
+  /* === Surfaces & Text (defaults; overridden by runtime loader) === */
+  /* These tokens are dynamically set by:
+     1. Admin theme system (theme-manager.ts applyThemeToDocument)
+     2. Public runtime loader (Base.astro inline script)
+     Both systems use identical token names and formats for consistency.
+     Values below are fallbacks only - active themes override these. */
   --surface-base: hsl(var(--neutral-9) / 1);
   --surface-panel: hsl(var(--neutral-8) / 0.92);
   --surface-card: hsl(var(--neutral-8) / 0.84);
@@ -114,38 +119,11 @@
   --container-wide: 1440px;
 }
 
-/* === Theme Surfaces by data-theme (cozy/dawn/midnight/harvest) ===
-   These are gentle nudges; the heavy lifting happens in themes.generated.css.
+/* === Theme Surfaces (runtime-dynamic) ===
+   These tokens are set by the runtime loader in Base.astro based on active theme.
+   Default values below provide fallbacks for pages without active themes.
+   The admin theme system and runtime loader override these dynamically.
 */
-:root[data-theme="cozy-midnight"] {
-  --surface-base: hsl(var(--neutral-9) / 1);
-  --surface-panel: hsl(var(--neutral-8) / 0.92);
-  --surface-card: hsl(var(--neutral-8) / 0.84);
-  --surface-elevated: hsl(var(--neutral-7) / 0.9);
-  --surface-hover: hsl(var(--neutral-7) / 0.78);
-
-  --text-strong: hsl(var(--neutral-0) / 0.98);
-  --text-body: hsl(var(--neutral-1) / 0.9);
-  --text-muted: hsl(var(--neutral-2) / 0.75);
-
-  --border-subtle: hsl(var(--neutral-6) / 0.42);
-  --border-strong: hsl(var(--neutral-4) / 0.6);
-}
-
-:root[data-theme="cozy-dawn"] {
-  --surface-base: hsl(var(--neutral-0) / 1);
-  --surface-panel: hsl(260 40% 98% / 1);
-  --surface-card: hsl(260 45% 97% / 1);
-  --surface-elevated: hsl(260 35% 96% / 1);
-  --surface-hover: hsl(260 22% 92% / 1);
-
-  --text-strong: hsl(260 30% 18% / 1);
-  --text-body: hsl(260 28% 24% / 0.92);
-  --text-muted: hsl(260 20% 36% / 0.75);
-
-  --border-subtle: hsl(260 16% 88% / 1);
-  --border-strong: hsl(260 10% 72% / 1);
-}
 
 /* ── Back-compat shim: map legacy tokens to new semantics ─────────────
    This keeps existing components working while you migrate selectors.
@@ -156,7 +134,7 @@
   --surface-panel-primary: var(--surface-panel);
   --surface-panel-secondary: var(--surface-panel);
   --surface-card-hover: var(--surface-hover);
-  --surface-muted: color-mix(in hsl, var(--surface-panel) 80%, transparent);
+  --surface-muted: color-mix(in hsl, hsl(var(--surface-panel)) 80%, transparent);
 
   /* Borders */
   --border-accent-subtle: var(--border-subtle);
@@ -176,8 +154,8 @@
   --accent-purple-soft:   hsl(var(--hc) 55% 70% / 0.65); /* approx accent-1/2 */
 
   /* Overlays */
-  --overlay-panel: color-mix(in hsl, var(--surface-base) 60%, transparent);
-  --overlay-panel-strong: color-mix(in hsl, var(--surface-base) 75%, transparent);
+  --overlay-panel: color-mix(in hsl, hsl(var(--surface-base)) 60%, transparent);
+  --overlay-panel-strong: color-mix(in hsl, hsl(var(--surface-base)) 75%, transparent);
 
   /* Focus/Shadow */
   --focus-ring: hsl(var(--hc) 60% 70% / 0.6);
@@ -185,8 +163,8 @@
   --shadow-card-hover: var(--shadow-3);
 
   /* Chips */
-  --chip-background: color-mix(in hsl, var(--text-accent) 18%, transparent);
-  --chip-border: color-mix(in hsl, var(--text-accent) 45%, transparent);
+  --chip-background: color-mix(in hsl, hsl(var(--text-accent)) 18%, transparent);
+  --chip-border: color-mix(in hsl, hsl(var(--text-accent)) 45%, transparent);
 }
 
 /* Legacy dawn attribute support (old toggle still writes data-comfort-theme) */

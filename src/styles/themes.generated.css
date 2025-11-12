@@ -7,7 +7,7 @@
  * To modify themes, edit files in content/themes/
  * Then run: npm run themes:build
  *
- * Generated: 2025-11-11T16:15:04.022Z
+ * Generated: 2025-11-12T15:57:25.983Z
  * Source: scripts/generate-theme-css.mjs
  */
 
@@ -42,18 +42,6 @@
   --theme-text-primary: #1f1630;
   --theme-text-heading: #120725;
   --theme-text-muted: #6b5d70;
-  --theme-font-serif: Literata;
-  --theme-font-script: Parisienne;
-}
-
-/* Cozy Midnight (midnight mode) */
-:root[data-theme="cozy-midnight"] {
-  --theme-primary: #8b7e8f;
-  --theme-accent: #d9b2c4;
-  --theme-background: #120725;
-  --theme-text-primary: #fdfcfe;
-  --theme-text-heading: #ffffff;
-  --theme-text-muted: #d9b2c4;
   --theme-font-serif: Literata;
   --theme-font-script: Parisienne;
 }
@@ -175,6 +163,58 @@
   --theme-info: #60a5fa;
   --theme-entity-card-surface-top: #737687;
   --theme-entity-card-surface-bottom: #0f172a;
+}
+
+/* Cozy Midnight (midnight mode) */
+:root[data-theme="cozy-midnight"] {
+  --theme-primary: #8b7e8f;
+  --theme-accent: #d9b2c4;
+  --theme-background: #120725;
+  --theme-font-serif: Literata;
+  --theme-font-script: Parisienne;
+  --theme-text-primary: #fdfcfe;
+  --theme-text-heading: #ffffff;
+  --theme-text-muted: #d9b2c4;
+  --theme-font-heading: Cinzel;
+  --theme-font-accent: Cormorant Garamond;
+  --theme-color-midnight: #07020f;
+  --theme-color-night: #120725;
+  --theme-color-iris: #4b2a63;
+  --theme-color-amethyst: #7c4eb0;
+  --theme-color-dusk: #271534;
+  --theme-color-gold: #d4af37;
+  --theme-color-rune: #f8f3ff;
+  --theme-color-fog: #d7c8f3;
+  --theme-color-ink: #f4f1ff;
+  --theme-surface-plain: #120a1e;
+  --theme-card-panel-surface: #1a0d2e;
+  --theme-card-panel-surface-strong: #221638;
+  --theme-card-panel-border: #d4af37;
+  --theme-card-panel-border-strong: #d4af37;
+  --theme-card-panel-border-soft: #4b2a63;
+  --theme-text-secondary: #f4f1ff;
+  --theme-text-tertiary: #f4f1ff;
+  --theme-text-strong: #f9f5ff;
+  --theme-text-body: #f9f5ff;
+  --theme-text-subtle: #f9f5ff;
+  --theme-text-accent: #d4af37;
+  --theme-text-accent-strong: #d4af37;
+  --theme-ink-body: #f4f1ff;
+  --theme-ink-strong: #ffffff;
+  --theme-ink-muted: #d9b2c4;
+  --theme-link-color: #e0c07d;
+  --theme-card-badge-bg: #d4af37;
+  --theme-card-badge-border: #d4af37;
+  --theme-card-badge-text: #f8f3ff;
+  --theme-card-tag-bg: #4b2a63;
+  --theme-card-tag-border: #4b2a63;
+  --theme-card-tag-text: #f4f1ff;
+  --theme-focus-ring-color: #e8d591;
+  --theme-card-focus-outline: #e8d591;
+  --theme-success: #4ade80;
+  --theme-warning: #fbbf24;
+  --theme-error: #f87171;
+  --theme-info: #60a5fa;
 }
 
 /* Scope Test Theme (midnight mode) */

@@ -606,8 +606,31 @@ export class ThemeManager {
   /**
    * Convert theme variables to runtime loader token format
    * Strategy: Generate complete token set from base colors, then allow explicit overrides
+   *
+   * TOKEN SYSTEM ALIGNMENT:
+   * This method generates tokens that are consumed by:
+   * 1. Admin page: applyThemeToDocument() - applies tokens immediately on theme change
+   * 2. Public pages: Base.astro runtime loader - applies tokens on every page load
+   * 3. CSS fallback: src/styles/tokens.css - provides default values
+   *
+   * All three systems use IDENTICAL token names for consistency:
+   * - accent1/2/3 → --accent-1/2/3
+   * - surfaceBase/Panel/Card/Elevated/Hover → --surface-base/panel/card/elevated/hover
+   * - textStrong/Body/Muted → --text-strong/body/muted
+   * - borderSubtle/Strong → --border-subtle/strong
+   * - pageBackground → --page-bg-base
+   * - headerBackground/Border → --header-bg-base/border-base
+   * - footerBackground/Border → --footer-bg-base/border-base
+   * - success/warning/error/info → --success/warning/error/info
    */
   private convertToRuntimeTokens(variables: ThemeVariables): Record<string, string> {
+    console.log('[convertToRuntimeTokens] Starting conversion with variables:', {
+      background: variables.background,
+      colorMidnight: variables.colorMidnight,
+      primary: variables.primary,
+      colorAmethyst: variables.colorAmethyst
+    });
+
     // First, generate tokens from base colors (background, primary, accent)
     const generatedTokens = this.generateTokensFromBase(variables);
 
@@ -616,6 +639,7 @@ export class ThemeManager {
 
     // Then apply explicit overrides from theme variables
     const tokens: Record<string, string> = { ...generatedTokens };
+    console.log('[convertToRuntimeTokens] After base generation, pageBackground:', tokens.pageBackground);
 
     // Allow explicit overrides for each token
     // Accent scale
@@ -630,18 +654,14 @@ export class ThemeManager {
     }
 
     // Surface hierarchy overrides
-    if (variables.surfacePlain) {
-      tokens.surfaceBase = this.hexToHSL(variables.surfacePlain);
-    }
-    if (variables.cardPanelSurface) {
-      tokens.surfacePanel = this.hexToHSL(variables.cardPanelSurface);
-    }
+    // Cards can have explicit colors for visual accent (e.g., warm pinkish cards on cool blue bg)
+    // But other surfaces auto-generate for consistency
     if (variables.cardPanelSurfaceStrong) {
       tokens.surfaceCard = this.hexToHSL(variables.cardPanelSurfaceStrong);
       tokens.surfaceElevated = this.hexToHSL(variables.cardPanelSurfaceStrong);
     }
-    if (variables.colorDusk) {
-      tokens.surfaceHover = this.hexToHSL(variables.colorDusk);
+    if (variables.cardPanelSurface) {
+      tokens.surfacePanel = this.hexToHSL(variables.cardPanelSurface);
     }
 
     // Text hierarchy overrides
@@ -669,19 +689,18 @@ export class ThemeManager {
     }
 
     // Page area overrides
-    // Only use colorMidnight if it's explicitly different from background
-    if (variables.colorMidnight && variables.colorMidnight !== background) {
+    // Only use colorMidnight as fallback if background wasn't explicitly provided
+    // (for backwards compatibility with old themes that only have colorMidnight)
+    if (!background && variables.colorMidnight) {
+      console.log('[convertToRuntimeTokens] Using colorMidnight as fallback pageBackground:', variables.colorMidnight);
       tokens.pageBackground = this.hexToHSL(variables.colorMidnight);
     }
-    // Only use explicit header/footer overrides (not the old brand colors)
-    if (variables.headerBackground) {
-      tokens.headerBackground = this.hexToHSL(variables.headerBackground);
-    }
+
+    // Note: headerBackground and footerBackground are now ALWAYS auto-generated from the base
+    // background color to ensure consistency. Explicit overrides are ignored to prevent stale
+    // values from theme duplication. Borders can still be customized.
     if (variables.headerBorder) {
       tokens.headerBorder = this.hexToHSL(variables.headerBorder);
-    }
-    if (variables.footerBackground) {
-      tokens.footerBackground = this.hexToHSL(variables.footerBackground);
     }
     if (variables.footerBorder) {
       tokens.footerBorder = this.hexToHSL(variables.footerBorder);
@@ -692,6 +711,12 @@ export class ThemeManager {
     if (variables.warning) tokens.warning = variables.warning;
     if (variables.error) tokens.error = variables.error;
     if (variables.info) tokens.info = variables.info;
+
+    console.log('[convertToRuntimeTokens] Final tokens:', {
+      pageBackground: tokens.pageBackground,
+      headerBackground: tokens.headerBackground,
+      footerBackground: tokens.footerBackground
+    });
 
     return tokens;
   }
@@ -811,7 +836,10 @@ export class ThemeManager {
     const primary = variables.primary || variables.colorAmethyst || '#7c4eb0';
     const accent = variables.accent || variables.colorGold || '#d4af37';
 
+    console.log('[generateTokensFromBase] Input colors:', { background, primary, accent });
+
     const isDark = this.isColorDark(background);
+    console.log('[generateTokensFromBase] isDark:', isDark);
     const mixLight = '#ffffff';  // Always white to lighten colors
     const mixDark = '#000000';   // Always black to darken colors
 
@@ -857,6 +885,14 @@ export class ThemeManager {
     tokens.error = variables.error || (isDark ? '#f87171' : '#ef4444');
     tokens.info = variables.info || (isDark ? '#60a5fa' : '#3b82f6');
 
+    console.log('[generateTokensFromBase] Generated tokens:', {
+      pageBackground: tokens.pageBackground,
+      headerBackground: tokens.headerBackground,
+      surfaceBase: tokens.surfaceBase,
+      surfaceCard: tokens.surfaceCard,
+      textStrong: tokens.textStrong
+    });
+
     return tokens;
   }
 
@@ -881,6 +917,14 @@ export class ThemeManager {
       localStorage.setItem('wc-active-theme', JSON.stringify(themeData));
       console.log('[ThemeManager] Updated localStorage with theme:', preset.slug, preset.mode);
       console.log('[ThemeManager] Stored tokens:', Object.keys(tokens).length, 'tokens');
+      console.log('[ThemeManager] DEBUG - Base colors used for generation:');
+      console.log('  background:', preset.variables.background || preset.variables.colorMidnight || '(none)');
+      console.log('  primary:', preset.variables.primary || preset.variables.colorAmethyst || '(none)');
+      console.log('  accent:', preset.variables.accent || preset.variables.colorGold || '(none)');
+      console.log('[ThemeManager] DEBUG - Generated background tokens:');
+      console.log('  pageBackground:', tokens.pageBackground);
+      console.log('  headerBackground:', tokens.headerBackground);
+      console.log('  footerBackground:', tokens.footerBackground);
     } catch (error) {
       console.error('Failed to update localStorage theme:', error);
     }
@@ -929,11 +973,12 @@ export class ThemeManager {
       '--footer-border-base': 'footerBorder',
     };
 
-    // Apply HSL tokens (strip hsl() wrapper)
+    // Apply HSL tokens (strip hsl() wrapper to get just the components)
     Object.entries(cssVarMap).forEach(([cssVar, tokenKey]) => {
       const value = tokens[tokenKey];
       if (value && value.startsWith('hsl(')) {
-        const strippedValue = value.replace(/^hsl\(|\)$/g, '');
+        // Strip "hsl(" prefix and ")" suffix to get just the HSL components
+        const strippedValue = value.replace('hsl(', '').replace(')', '');
         root.style.setProperty(cssVar, strippedValue);
       }
     });
@@ -953,8 +998,9 @@ export class ThemeManager {
       }
     });
 
-    // Derive accent-linked globals
-    const accent1Value = root.style.getPropertyValue('--accent-1').trim();
+    // Derive accent-linked globals (after HSL tokens are set)
+    // Get the computed value which should now be HSL components without wrapper
+    const accent1Value = getComputedStyle(root).getPropertyValue('--accent-1').trim();
     if (accent1Value) {
       const accent1Full = `hsl(${accent1Value})`;
       root.style.setProperty('--text-accent', accent1Value);

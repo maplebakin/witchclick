@@ -15,8 +15,8 @@
   --card-focus-offset: 5px;
 
   /* Card Surfaces */
-  --card-panel-surface: color-mix(in srgb, var(--surface-card) 92%, transparent 8%);
-  --card-panel-surface-strong: color-mix(in srgb, var(--surface-panel-primary) 90%, transparent 10%);
+  --card-panel-surface: color-mix(in srgb, hsl(var(--surface-card)) 92%, transparent 8%);
+  --card-panel-surface-strong: color-mix(in srgb, hsl(var(--surface-panel-primary)) 90%, transparent 10%);
 
   /* Card Borders */
   --card-panel-border: color-mix(in srgb, var(--border-purple-subtle, rgba(124, 78, 176, 0.28)) 92%, transparent 8%);
@@ -65,8 +65,8 @@
 /* Dawn Theme Variants */
 :root[data-comfort-theme="dawn"] {
   /* Card Surfaces */
-  --card-panel-surface: color-mix(in srgb, var(--surface-card) 95%, white 5%);
-  --card-panel-surface-strong: color-mix(in srgb, var(--surface-panel-primary) 94%, white 6%);
+  --card-panel-surface: color-mix(in srgb, hsl(var(--surface-card)) 95%, white 5%);
+  --card-panel-surface-strong: color-mix(in srgb, hsl(var(--surface-panel-primary)) 94%, white 6%);
 
   /* Card Borders */
   --card-panel-border: color-mix(in srgb, var(--border-purple-subtle, rgba(180, 154, 217, 0.28)) 92%, transparent 8%);

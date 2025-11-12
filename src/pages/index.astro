@@ -139,9 +139,14 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
 </Base>
 
 <style>
+  /* Reduce top spacing from layout container */
+  :global(.site-main__content) {
+    margin-top: calc(-1 * clamp(1.5rem, 4vw, 2.5rem));
+  }
+
   /* Blog Header */
   .blog-header {
-    padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(2rem, 5vw, 3rem);
+    padding: clamp(0.75rem, 2vw, 1.25rem) 0 clamp(1rem, 3vw, 1.5rem);
     text-align: center;
   }
 
@@ -151,32 +156,32 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
   }
 
   .blog-header__title {
-    margin: 0 0 0.75rem;
+    margin: 0 0 0.5rem;
     font-family: var(--font-heading, var(--font-body));
-    font-size: clamp(2.5rem, 6vw, 3.5rem);
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
     font-weight: 700;
     letter-spacing: 0.02em;
     color: var(--text-strong);
   }
 
   .blog-header__tagline {
-    margin: 0 0 1rem;
-    font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+    margin: 0 0 0.75rem;
+    font-size: clamp(1rem, 2vw, 1.15rem);
     line-height: 1.5;
     color: var(--text-accent);
   }
 
   .blog-header__description {
     margin: 0;
-    font-size: 1rem;
-    line-height: 1.7;
+    font-size: 0.9rem;
+    line-height: 1.6;
     color: var(--text-body);
-    opacity: 0.9;
+    opacity: 0.85;
   }
 
   /* Featured Post */
   .featured-post {
-    margin: clamp(2rem, 5vw, 3rem) 0;
+    margin: clamp(1.5rem, 4vw, 2.5rem) 0 clamp(2.5rem, 5vw, 4rem);
   }
 
   .featured-post__link {
@@ -184,8 +189,8 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
     border-radius: clamp(1.2rem, 3vw, 2rem);
     border: 1px solid color-mix(in srgb, var(--border-purple-medium, rgba(124, 78, 176, 0.3)) 90%, transparent 10%);
     background:
-      linear-gradient(135deg, color-mix(in srgb, var(--surface-panel-primary) 85%, transparent 15%) 0%, transparent 60%),
-      var(--surface-panel-primary);
+      linear-gradient(135deg, color-mix(in srgb, hsl(var(--surface-panel-primary)) 85%, transparent 15%) 0%, transparent 60%),
+      hsl(var(--surface-panel-primary));
     box-shadow: var(--elevation-tier-2);
     text-decoration: none;
     transition: transform 200ms ease, box-shadow 200ms ease;
@@ -202,7 +207,7 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
     width: 100%;
     aspect-ratio: 3 / 2;
     overflow: hidden;
-    background: color-mix(in srgb, var(--surface-panel-primary) 90%, transparent 10%);
+    background: color-mix(in srgb, hsl(var(--surface-panel-primary)) 90%, transparent 10%);
   }
 
   .featured-post__image {
