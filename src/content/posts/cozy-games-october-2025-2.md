@@ -1,9 +1,15 @@
 ---
 title: Cozy Games to Curl Up With in October 2025 Evenings
 slug: cozy-games-october-2025-2
-excerpt: 'Explore October 2025’s coziest new releases alongside low-spoon nightly rituals, deeper weekend retreats, and gentle check-ins that keep playtime restful.'
+excerpt: >-
+  Explore October 2025’s coziest new releases alongside low-spoon nightly
+  rituals, deeper weekend retreats, and gentle check-ins that keep playtime
+  restful.
 metaTitle: Cozy Games to Curl Up With in October 2025 Evenings
-metaDescription: 'Settle into October 2025 with cozy game-night rituals, new releases, and gentle pacing tips so your backlog feels restful instead of rushed all month long.'
+metaDescription: >-
+  Settle into October 2025 with cozy game-night rituals, new releases, and
+  gentle pacing tips so your backlog feels restful instead of rushed all month
+  long.
 tags:
   - calm
   - cozy gaming
@@ -38,6 +44,7 @@ publishedAt: '2025-10-02T02:59:44.100Z'
 canonicalUrl: 'https://witchclick.space/post/cozy-games-october-2025-2'
 specVersion: 2
 spoonLevel: low
+cluster: cozy-witchcraft
 ---
 
 ## Opening Reflection

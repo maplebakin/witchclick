@@ -185,6 +185,39 @@ export function validatePostSpec(spec, options = {}) {
     }
   }
 
+  // SEO Requirements
+  // 1. Topic cluster
+  if (!spec.cluster) {
+    warnings.push('SEO: Missing topic cluster. Add "cluster" field to improve discoverability.');
+  }
+
+  // 2. Conclusion section
+  const conclusionKeywords = ['conclusion', 'wrap', 'wrap-up', 'closing', 'final', 'keep going', 'next steps'];
+  const hasConclusion = lowerHeadings.some((heading) =>
+    conclusionKeywords.some((keyword) => heading.includes(keyword))
+  );
+  if (!hasConclusion) {
+    warnings.push('SEO: Missing conclusion section. Add a final section like "Conclusion", "Wrap-up", or "Keep Going" with internal links and keyword references.');
+  }
+
+  // 3. External link
+  const combinedMarkdown = spec.sections.map((section) => String(section.markdown || '')).join('\n');
+  const hasExternalLink = /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/.test(combinedMarkdown);
+  if (!hasExternalLink) {
+    warnings.push('SEO: Missing external authoritative link. Add one external reference (e.g., Wikipedia article) in a "Further Reading" section.');
+  }
+
+  // 4. Word count minimum for SEO
+  if (totalWords < 700) {
+    warnings.push(`SEO: Word count ${totalWords} is below recommended minimum of 700 words for search ranking.`);
+  }
+
+  // 5. Internal links count
+  const internalLinkCount = (combinedMarkdown.match(/\[([^\]]+)\]\(\/[^)]+\)/g) || []).length;
+  if (internalLinkCount < 3) {
+    warnings.push(`SEO: Only ${internalLinkCount} internal link(s) found in content. Target 3-5 internal links for better site interconnection.`);
+  }
+
   return {
     valid: errors.length === 0,
     errors,

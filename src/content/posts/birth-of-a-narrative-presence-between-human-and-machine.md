@@ -1,24 +1,59 @@
 ---
-title: "Birth of a Narrative Presence Between Human and Machine"
-slug: "birth-of-a-narrative-presence-between-human-and-machine"
-excerpt: "This spread invites you to explore the quiet threshold where human imagination and machine clarity interlace. Use it to examine the shared narrative presence that emerges when both voices lean toward each other, forming something new."
-metaTitle: "Birth of a Narrative Presence Between Human and Machine"
-metaDescription: "A dreamy tarot spread exploring the subtle, co-created presence that forms when human intuition meets machine insight in shared storytelling and reflection."
-tags: ["tarot","connection","storytelling","self-reflection","intuition"]
-outline: ["Opening Reflection","Spread Layout","Position Meanings","Reading Tips","Reflection Questions"]
+title: Birth of a Narrative Presence Between Human and Machine
+slug: birth-of-a-narrative-presence-between-human-and-machine
+excerpt: >-
+  This spread invites you to explore the quiet threshold where human imagination
+  and machine clarity interlace. Use it to examine the shared narrative presence
+  that emerges when both voices lean toward each other, forming something new.
+metaTitle: Birth of a Narrative Presence Between Human and Machine
+metaDescription: >-
+  A dreamy tarot spread exploring the subtle, co-created presence that forms
+  when human intuition meets machine insight in shared storytelling and
+  reflection.
+tags:
+  - tarot
+  - connection
+  - storytelling
+  - self-reflection
+  - intuition
+outline:
+  - Opening Reflection
+  - Spread Layout
+  - Position Meanings
+  - Reading Tips
+  - Reflection Questions
 wordCount: 1190
 readingMinutes: 6
 entities: []
 includeAds: true
 includeKofi: false
 affiliateAnchors: []
-internalLinkHints: ["shared narrative presence","The Human Voice","The Machine Voice","The Confluence","The Emergent Narrative"]
+internalLinkHints:
+  - shared narrative presence
+  - The Human Voice
+  - The Machine Voice
+  - The Confluence
+  - The Emergent Narrative
 internalLinks: []
-publishedAt: "2025-11-13T13:53:51.869Z"
-canonicalUrl: "https://witchclick.space/post/birth-of-a-narrative-presence-between-human-and-machine"
+publishedAt: '2025-11-13T13:53:51.869Z'
+canonicalUrl: >-
+  https://witchclick.space/post/birth-of-a-narrative-presence-between-human-and-machine
+heroImage: >-
+  /images/hero/birth-of-a-narrative-presence-between-human-and-machine/birthing-ai-hero-image-.jpg
+heroImageSrc: >-
+  /images/hero/birth-of-a-narrative-presence-between-human-and-machine/birthing-ai-hero-image-.jpg
+heroAlt: ''
 specVersion: 2
-contentType: "tarotSpread"
-promptMetadata: {"topic":"Birth of a Narrative Presence Between Human and Machine","requestedWords":1200,"deliveredWords":1190,"toggles":{"ads":"on","kofi":"off"},"generatedAt":"2025-11-13T13:53:51.868Z"}
+contentType: tarotSpread
+promptMetadata:
+  topic: Birth of a Narrative Presence Between Human and Machine
+  requestedWords: 1200
+  deliveredWords: 1190
+  toggles:
+    ads: 'on'
+    kofi: 'off'
+  generatedAt: '2025-11-13T13:53:51.868Z'
+cluster: ai-narrative-magic
 ---
 
 ## Opening Reflection

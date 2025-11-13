@@ -1,26 +1,59 @@
 ---
-title: "Yarn Colors for Your Astrological Chart: A Soft Mapping"
-slug: "yarn-colors-astrological-chart-signs-nodes-ascendant"
-excerpt: "What if your birth chart could become a palette you could hold in your hands? A way to translate the abstract language of planets and signs into skeins of color, texture, and warmth."
-metaTitle: "Yarn Colors for Your Astrological Chart: A Soft Mapping"
-metaDescription: "Explore yarn colors matched to your sun sign, moon, ascendant, and nodes—a gentle way to weave your chart into something you can touch."
-tags: ["astrology","yarn craft","color mapping","creative practice","self-inquiry","fiber arts"]
-outline: ["Opening Reflection","The Zodiac Wheel in Color","Nodes and Ascendants: Your Personal Threads","Journaling Prompts","Gentle Closing"]
+title: 'Yarn Colors for Your Astrological Chart: A Soft Mapping'
+slug: yarn-colors-astrological-chart-signs-nodes-ascendant
+excerpt: >-
+  What if your birth chart could become a palette you could hold in your hands?
+  A way to translate the abstract language of planets and signs into skeins of
+  color, texture, and warmth.
+metaTitle: 'Yarn Colors for Your Astrological Chart: A Soft Mapping'
+metaDescription: >-
+  Explore yarn colors matched to your sun sign, moon, ascendant, and nodes—a
+  gentle way to weave your chart into something you can touch.
+tags:
+  - astrology
+  - yarn craft
+  - color mapping
+  - creative practice
+  - self-inquiry
+  - fiber arts
+outline:
+  - Opening Reflection
+  - The Zodiac Wheel in Color
+  - 'Nodes and Ascendants: Your Personal Threads'
+  - Journaling Prompts
+  - Gentle Closing
 wordCount: 1180
 readingMinutes: 6
 entities: []
 includeAds: true
 includeKofi: true
 affiliateAnchors: []
-internalLinkHints: ["birth chart","north node","ascendant","sun sign","your chart","moon sign"]
+internalLinkHints:
+  - birth chart
+  - north node
+  - ascendant
+  - sun sign
+  - your chart
+  - moon sign
 internalLinks: []
-publishedAt: "2025-11-08T15:27:00.842Z"
-canonicalUrl: "https://witchclick.space/post/yarn-colors-astrological-chart-signs-nodes-ascendant"
-heroImage: "/images/hero/yarn-colors-astrological-chart-signs-nodes-ascendant/yarn-chart.jpg"
-heroImageSrc: "/images/hero/yarn-colors-astrological-chart-signs-nodes-ascendant/yarn-chart.jpg"
-heroAlt: ""
+publishedAt: '2025-11-08T15:27:00.842Z'
+canonicalUrl: >-
+  https://witchclick.space/post/yarn-colors-astrological-chart-signs-nodes-ascendant
+heroImage: >-
+  /images/hero/yarn-colors-astrological-chart-signs-nodes-ascendant/yarn-chart.jpg
+heroImageSrc: >-
+  /images/hero/yarn-colors-astrological-chart-signs-nodes-ascendant/yarn-chart.jpg
+heroAlt: ''
 specVersion: 2
-promptMetadata: {"topic":"Yarn Colors for Your Astrological Chart: A Soft Mapping","requestedWords":1200,"deliveredWords":1180,"toggles":{"ads":"on","kofi":"on"},"generatedAt":"2025-11-08T15:27:00.841Z"}
+promptMetadata:
+  topic: 'Yarn Colors for Your Astrological Chart: A Soft Mapping'
+  requestedWords: 1200
+  deliveredWords: 1180
+  toggles:
+    ads: 'on'
+    kofi: 'on'
+  generatedAt: '2025-11-08T15:27:00.841Z'
+cluster: cozy-witchcraft
 ---
 
 ## Opening Reflection

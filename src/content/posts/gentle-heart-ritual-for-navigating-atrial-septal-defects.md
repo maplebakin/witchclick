@@ -1,23 +1,55 @@
 ---
-title: "Gentle Heart Ritual for Navigating Atrial Septal Defects"
-slug: "gentle-heart-ritual-for-navigating-atrial-septal-defects"
-excerpt: "A gentle ritual for those living with or supporting someone with atrial septal defects. Choose a quick, low-energy option or a deeper, reflective variant—centered on your own comfort, consent, and kindness."
-metaTitle: "Gentle Heart Ritual for Navigating Atrial Septal Defects"
-metaDescription: "A cozy ritual for anyone navigating atrial septal defects—offering quick and deep options, always honoring comfort, consent, and gentle presence."
-tags: ["heart","health","ritual","self-care","gentle","consent","healing"]
-outline: ["Opening Reflection","Quick/Low-Energy Heart Ritual Variant","Deep Heart Ritual Variant","Reflection Prompt","Gentle Heart Ritual Checklist","Safety Notes"]
+title: Gentle Heart Ritual for Navigating Atrial Septal Defects
+slug: gentle-heart-ritual-for-navigating-atrial-septal-defects
+excerpt: >-
+  A gentle ritual for those living with or supporting someone with atrial septal
+  defects. Choose a quick, low-energy option or a deeper, reflective
+  variant—centered on your own comfort, consent, and kindness.
+metaTitle: Gentle Heart Ritual for Navigating Atrial Septal Defects
+metaDescription: >-
+  A cozy ritual for anyone navigating atrial septal defects—offering quick and
+  deep options, always honoring comfort, consent, and gentle presence.
+tags:
+  - heart
+  - health
+  - ritual
+  - self-care
+  - gentle
+  - consent
+  - healing
+outline:
+  - Opening Reflection
+  - Quick/Low-Energy Heart Ritual Variant
+  - Deep Heart Ritual Variant
+  - Reflection Prompt
+  - Gentle Heart Ritual Checklist
+  - Safety Notes
 wordCount: 1270
 readingMinutes: 6
 entities: []
 includeAds: true
 includeKofi: false
 affiliateAnchors: []
-internalLinkHints: ["gentle self care practices","quick, low-energy variant","Deep Heart Ritual Variant","practicing with consent and gentleness","Safety Notes"]
+internalLinkHints:
+  - gentle self care practices
+  - 'quick, low-energy variant'
+  - Deep Heart Ritual Variant
+  - practicing with consent and gentleness
+  - Safety Notes
 internalLinks: []
-publishedAt: "2025-10-28T20:49:36.968Z"
-canonicalUrl: "https://witchclick.space/post/gentle-heart-ritual-for-navigating-atrial-septal-defects"
+publishedAt: '2025-10-28T20:49:36.968Z'
+canonicalUrl: >-
+  https://witchclick.space/post/gentle-heart-ritual-for-navigating-atrial-septal-defects
 specVersion: 2
-promptMetadata: {"topic":"Gentle Heart Ritual for Navigating Atrial Septal Defects","requestedWords":1200,"deliveredWords":1270,"toggles":{"ads":"on","kofi":"off"},"generatedAt":"2025-10-28T20:49:36.967Z"}
+promptMetadata:
+  topic: Gentle Heart Ritual for Navigating Atrial Septal Defects
+  requestedWords: 1200
+  deliveredWords: 1270
+  toggles:
+    ads: 'on'
+    kofi: 'off'
+  generatedAt: '2025-10-28T20:49:36.967Z'
+cluster: cozy-witchcraft
 ---
 
 ## Opening Reflection

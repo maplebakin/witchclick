@@ -1,9 +1,16 @@
 ---
 title: What's the Deal with the Rapture? A Cozy Secular Tour
 slug: whats-the-deal-with-the-rapture-a-cozy-secular-tour
-excerpt: 'Rapture talk pops up like dramatic weather alerts: loud, sticky, and strangely compelling. This lighthearted, secular guide offers a gentle historical timeline, low-spoons perspective tools, and kind prompts so you can sort feelings from facts and choose values-aligned next steps.'
+excerpt: >-
+  Rapture talk pops up like dramatic weather alerts: loud, sticky, and strangely
+  compelling. This lighthearted, secular guide offers a gentle historical
+  timeline, low-spoons perspective tools, and kind prompts so you can sort
+  feelings from facts and choose values-aligned next steps.
 metaTitle: What's the Deal with the Rapture? A Cozy Secular Tour
-metaDescription: 'A whimsical, secular primer on rapture ideas: where they came from, why they go viral, and how to stay grounded. Includes low-energy practices, a gentle historical timeline, and reflective prompts you can journal through.'
+metaDescription: >-
+  A whimsical, secular primer on rapture ideas: where they came from, why they
+  go viral, and how to stay grounded. Includes low-energy practices, a gentle
+  historical timeline, and reflective prompts you can journal through.
 tags:
   - calm
   - rapture
@@ -47,9 +54,11 @@ internalLinkHints:
   - values-aligned decision making
 internalLinks: []
 publishedAt: '2025-10-01T15:01:27.338Z'
-canonicalUrl: 'https://witchclick.space/post/whats-the-deal-with-the-rapture-a-cozy-secular-tour'
+canonicalUrl: >-
+  https://witchclick.space/post/whats-the-deal-with-the-rapture-a-cozy-secular-tour
 specVersion: 2
 spoonLevel: low
+cluster: cozy-witchcraft
 ---
 
 ## Opening Reflection

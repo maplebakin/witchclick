@@ -1,9 +1,15 @@
 ---
 title: 'Pre-Interview Grounding Ritual: Quick and Deep Guide'
 slug: pre-interview-grounding-ritual
-excerpt: 'A simple, secular grounding ritual for the hour before an interview. Includes a 5-minute quick path, a deeper option, a checklist, and one clear reflection prompt.'
+excerpt: >-
+  A simple, secular grounding ritual for the hour before an interview. Includes
+  a 5-minute quick path, a deeper option, a checklist, and one clear reflection
+  prompt.
 metaTitle: 'Pre-Interview Grounding Ritual: Quick and Deep Guide'
-metaDescription: 'Calm nerves and focus fast before your interview. A secular grounding ritual with a 5-minute path and a deeper option, plus a checklist and gentle safety notes to keep things practical.'
+metaDescription: >-
+  Calm nerves and focus fast before your interview. A secular grounding ritual
+  with a 5-minute path and a deeper option, plus a checklist and gentle safety
+  notes to keep things practical.
 tags:
   - planning
   - grounding
@@ -60,6 +66,7 @@ internalLinkHints:
 heroImageSrc: /hero-images/pre-interview-grounding-ritual.png
 heroImageAlt: 'Pre-Interview Grounding Ritual: Quick and Deep Guide — hero image'
 spoonLevel: medium
+cluster: rituals-practices
 ---
 ## Opening Reflection
 

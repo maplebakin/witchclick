@@ -104,6 +104,27 @@ const breadcrumbs = [
 ];
 
 const readingMinutes = data.readingMinutes ?? estimateReadingMinutes(content);
+const topicCluster = data.cluster || data.contentType || null;
+const clusterLabels: Record<string, string> = {
+  'tarot-spreads': 'Tarot Spreads',
+  'rituals-practices': 'Rituals & Practices',
+  'clean-cursing': 'Clean Cursing',
+  'ai-narrative-magic': 'AI & Narrative Magic',
+  'shadow-work': 'Shadow Work',
+  'cozy-witchcraft': 'Cozy Witchcraft',
+  'motherquest': 'Motherquest',
+  'spellcraft-theory': 'Spellcraft & Theory',
+  'magical-productivity': 'Magical Productivity',
+  'ritual': 'Rituals',
+  'guide': 'Guides',
+  'spread': 'Tarot Spreads',
+  'reflection': 'Reflections',
+  'story': 'Stories',
+  'tarotSpread': 'Tarot Spreads',
+  'spellwork': 'Spellwork',
+  'crystals': 'Crystals',
+};
+const clusterLabel = topicCluster ? clusterLabels[topicCluster] || topicCluster : null;
 
 const htmlRaw = marked.parse(content || "");
 let html = DOMPurify.sanitize(String(htmlRaw), { USE_PROFILES: { html: true } });
@@ -419,8 +440,16 @@ const jsonLd = {
                   <img class="h-full w-full object-cover" src={heroImage} alt={heroAlt} loading="eager" />
                 </figure>
               )}
-              <div class="flex flex-1 flex-col gap-6 text-inverse">
-                <p class="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-[0.28em] text-inverse-muted">
+              <div class="flex flex-1 flex-col gap-6">
+                {clusterLabel && (
+                  <div class="inline-flex">
+                    <span class="card-pill card-cluster inline-block bg-accent-soft/10 text-accent-soft border border-accent-soft/20 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
+                      {clusterLabel}
+                    </span>
+                  </div>
+                )}
+
+                <p class="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-[0.28em] text-muted">
                   {publishedAt && (
                     <time datetime={new Date(publishedAt).toISOString()}>
                       {new Date(publishedAt).toLocaleDateString(undefined, {
@@ -434,29 +463,29 @@ const jsonLd = {
                   {readingMinutes && <span>{readingMinutes} minute read</span>}
                 </p>
 
-                <h1 id="post-title" class="font-serif text-3xl leading-tight text-inverse sm:text-4xl lg:text-5xl">
+                <h1 id="post-title" class="font-serif text-3xl leading-tight sm:text-4xl lg:text-5xl">
                   {title}
                 </h1>
 
                 {authorSegments.length > 0 && (
-                  <p class="flex flex-wrap items-center gap-y-2 text-sm text-inverse-soft">
+                  <p class="flex flex-wrap items-center gap-y-2 text-sm text-soft">
                     By
                     {authorSegments.map((author) => (
                       <span class="inline-flex items-center">
-                        {author.separator === "comma" && <span class="px-1 text-inverse-muted">,</span>}
-                        {author.separator === "ampersand" && <span class="px-1 text-inverse-muted">&amp;</span>}
+                        {author.separator === "comma" && <span class="px-1 text-muted">,</span>}
+                        {author.separator === "ampersand" && <span class="px-1 text-muted">&amp;</span>}
                         {author.separator === "commaAmpersand" && (
-                          <span class="px-1 text-inverse-muted">,&nbsp;&amp;&nbsp;</span>
+                          <span class="px-1 text-muted">,&nbsp;&amp;&nbsp;</span>
                         )}
                         {author.href ? (
                           <a
-                            class="font-semibold text-inverse transition-colors hover:text-accent-soft focus-visible:text-accent-soft"
+                            class="font-semibold transition-colors hover:text-accent-soft focus-visible:text-accent-soft"
                             href={author.href}
                           >
                             {author.label}
                           </a>
                         ) : (
-                          <span class="font-semibold text-inverse">{author.label}</span>
+                          <span class="font-semibold">{author.label}</span>
                         )}
                       </span>
                     ))}
@@ -482,9 +511,9 @@ const jsonLd = {
             </div>
           </header>
 
-          <div class="card-panel card-panel-strong card-panel-static flex flex-col gap-8 p-6 text-inverse sm:p-8 lg:p-10">
+          <div class="card-panel card-panel-strong card-panel-static flex flex-col gap-8 p-6 sm:p-8 lg:p-10">
             <div
-              class="prose prose-lg prose-invert max-w-none prose-p:text-inverse prose-headings:font-serif prose-headings:text-inverse prose-a:text-accent-soft prose-a:font-semibold prose-strong:text-inverse prose-em:text-inverse-soft prose-blockquote:border-accent-soft/30 prose-blockquote:text-inverse-soft prose-ul:text-inverse prose-ol:text-inverse prose-li:text-inverse prose-hr:border-line-inverse/30 prose-code:text-accent-soft prose-code:bg-surface-inverse-muted/30 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-surface-inverse-muted prose-pre:text-inverse-soft prose-figcaption:text-inverse-muted"
+              class="prose prose-lg max-w-none prose-headings:font-serif prose-a:text-accent-soft prose-a:font-semibold prose-blockquote:border-accent-soft/30 prose-hr:border-line/30 prose-code:text-accent-soft prose-code:bg-surface-muted/30 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-surface-muted"
               set:html={html}
             />
 
@@ -506,13 +535,13 @@ const jsonLd = {
     </div>
 
       {productRecommendations.length > 0 && (
-        <div class="card-panel card-panel-strong card-panel-static p-6 text-inverse sm:p-8 lg:p-10">
+        <div class="card-panel card-panel-strong card-panel-static p-6 sm:p-8 lg:p-10">
           <ProductRecommendations products={productRecommendations} />
         </div>
       )}
 
       {showEndAd && (
-        <div class="card-panel card-panel-strong card-panel-static p-6 text-inverse sm:p-8 lg:p-10">
+        <div class="card-panel card-panel-strong card-panel-static p-6 sm:p-8 lg:p-10">
           <AdSlot />
         </div>
       )}

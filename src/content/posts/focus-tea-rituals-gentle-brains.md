@@ -1,9 +1,15 @@
 ---
 title: 'Focus Tea Rituals for Gentle, Distracted Brains'
 slug: focus-tea-rituals-gentle-brains
-excerpt: 'Two focus-friendly tea rituals — a five-minute reset and a lingering deep dive — to help you re-enter your work with kindness, cozy structure, and a safety-first mindset.'
+excerpt: >-
+  Two focus-friendly tea rituals — a five-minute reset and a lingering deep dive
+  — to help you re-enter your work with kindness, cozy structure, and a
+  safety-first mindset.
 metaTitle: 'Focus Tea Rituals for Gentle, Distracted Brains'
-metaDescription: 'Brew a cozy focus tea ritual with quick and deep options, accessibility tweaks, and gentle reflection prompts to anchor your attention without harsh hustle.'
+metaDescription: >-
+  Brew a cozy focus tea ritual with quick and deep options, accessibility
+  tweaks, and gentle reflection prompts to anchor your attention without harsh
+  hustle.
 tags:
   - planning
   - ritual
@@ -51,6 +57,7 @@ publishedAt: '2025-09-29T23:57:11.746Z'
 canonicalUrl: 'https://witchclick.space/post/focus-tea-rituals-gentle-brains'
 specVersion: 2
 spoonLevel: medium
+cluster: cozy-witchcraft
 ---
 
 ## Opening Reflection

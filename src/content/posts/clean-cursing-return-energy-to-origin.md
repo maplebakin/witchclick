@@ -1,9 +1,16 @@
 ---
 title: 'Clean Cursing Ritual: Return Released Energy to Origin'
 slug: clean-cursing-return-energy-to-origin
-excerpt: 'This consent-first ritual helps you release what is not yours and return it to its rightful origin, cleanly and without escalation. A quick path supports low-spoons days; a deeper path offers structure. Safety notes keep it ethical, calm, and grounded.'
+excerpt: >-
+  This consent-first ritual helps you release what is not yours and return it to
+  its rightful origin, cleanly and without escalation. A quick path supports
+  low-spoons days; a deeper path offers structure. Safety notes keep it ethical,
+  calm, and grounded.
 metaTitle: 'Clean Cursing Ritual: Return Released Energy to Origin'
-metaDescription: 'A careful, consent-first ritual for returning released energy to its rightful origin without harm or delay. Includes a low-energy option, a deep option, safety notes, and a practical checklist for ethical, grounded practice.'
+metaDescription: >-
+  A careful, consent-first ritual for returning released energy to its rightful
+  origin without harm or delay. Includes a low-energy option, a deep option,
+  safety notes, and a practical checklist for ethical, grounded practice.
 tags:
   - release
   - clean cursing
@@ -51,11 +58,14 @@ internalLinkHints:
 internalLinks: []
 publishedAt: '2025-10-10T19:27:20.674Z'
 canonicalUrl: 'https://witchclick.space/post/clean-cursing-return-energy-to-origin'
-heroImage: "/images/hero/clean-cursing-return-energy-to-origin/hero-image-prompt-for-witchclick-article-_clean-cursing-ritual_-return-released-energy-to-origin_-_scene-focus_-this-consent-first-ritual-helps-you-release-what-is-not-yours-and-return-it-to-its-rightful-origin-cleanly-and-without-escalation-a-quic.jpg"
-heroImageSrc: "/images/hero/clean-cursing-return-energy-to-origin/hero-image-prompt-for-witchclick-article-_clean-cursing-ritual_-return-released-energy-to-origin_-_scene-focus_-this-consent-first-ritual-helps-you-release-what-is-not-yours-and-return-it-to-its-rightful-origin-cleanly-and-without-escalation-a-quic.jpg"
-heroAlt: ""
+heroImage: >-
+  /images/hero/clean-cursing-return-energy-to-origin/hero-image-prompt-for-witchclick-article-_clean-cursing-ritual_-return-released-energy-to-origin_-_scene-focus_-this-consent-first-ritual-helps-you-release-what-is-not-yours-and-return-it-to-its-rightful-origin-cleanly-and-without-escalation-a-quic.jpg
+heroImageSrc: >-
+  /images/hero/clean-cursing-return-energy-to-origin/hero-image-prompt-for-witchclick-article-_clean-cursing-ritual_-return-released-energy-to-origin_-_scene-focus_-this-consent-first-ritual-helps-you-release-what-is-not-yours-and-return-it-to-its-rightful-origin-cleanly-and-without-escalation-a-quic.jpg
+heroAlt: ''
 specVersion: 2
 spoonLevel: high
+cluster: rituals-practices
 ---
 
 ## Opening Reflection

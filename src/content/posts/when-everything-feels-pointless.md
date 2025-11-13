@@ -1,9 +1,15 @@
 ---
 title: 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
 slug: when-everything-feels-pointless
-excerpt: 'When the fog rolls in and your brain whispers what’s the point, shrink the problem. Reset your body, name one thing that still matters, and pick a tiny next step.'
+excerpt: >-
+  When the fog rolls in and your brain whispers what’s the point, shrink the
+  problem. Reset your body, name one thing that still matters, and pick a tiny
+  next step.
 metaTitle: 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
-metaDescription: 'Feeling an overwhelming sense of what’s the point? Use tiny body resets, a meaning-breadcrumb method, and a 3-card secular spread to find one doable next step.'
+metaDescription: >-
+  Feeling an overwhelming sense of what’s the point? Use tiny body resets, a
+  meaning-breadcrumb method, and a 3-card secular spread to find one doable next
+  step.
 tags:
   - calm
   - mental-overwhelm
@@ -62,8 +68,11 @@ internalLinkHints:
   - 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions'
   - 'Secular Tarot in Psychological Practice: A Gentle Guide'
 heroImageSrc: /hero-images/when-everything-feels-pointless.png
-heroImageAlt: 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning — hero image'
+heroImageAlt: >-
+  When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning — hero
+  image
 spoonLevel: low
+cluster: cozy-witchcraft
 ---
 ## Opening Reflection
 

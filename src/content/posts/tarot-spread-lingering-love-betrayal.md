@@ -1,22 +1,57 @@
 ---
-title: "Tarot Spread for Lingering Love After Betrayal"
-slug: "tarot-spread-lingering-love-betrayal"
-excerpt: "Still miss someone who betrayed you? This tarot spread offers two gentle ways to reflect on lingering love, self-worth, and forward movement."
-metaTitle: "Tarot Spread for Lingering Love After Betrayal"
-metaDescription: "A gentle tarot spread for when you still want someone who hurt you. Explore why the cord lingers and how to begin healing on your terms."
-tags: ["tarotSpread","healing","love","self-reflection","grief","emotional-clarity"]
-outline: ["Opening Reflection","Quick Tarot Spread for Lingering Love","Deep Tarot Spread for Lingering Love","Reflection Prompt","Tarot Spread Checklist"]
+title: Tarot Spread for Lingering Love After Betrayal
+slug: tarot-spread-lingering-love-betrayal
+excerpt: >-
+  Still miss someone who betrayed you? This tarot spread offers two gentle ways
+  to reflect on lingering love, self-worth, and forward movement.
+metaTitle: Tarot Spread for Lingering Love After Betrayal
+metaDescription: >-
+  A gentle tarot spread for when you still want someone who hurt you. Explore
+  why the cord lingers and how to begin healing on your terms.
+tags:
+  - tarotSpread
+  - healing
+  - love
+  - self-reflection
+  - grief
+  - emotional-clarity
+outline:
+  - Opening Reflection
+  - Quick Tarot Spread for Lingering Love
+  - Deep Tarot Spread for Lingering Love
+  - Reflection Prompt
+  - Tarot Spread Checklist
 wordCount: 381
 readingMinutes: 2
-entities: [{"type":"crystal","slug":"rose-quartz"},{"type":"tarot","slug":"lingering-love-spread"}]
+entities:
+  - type: crystal
+    slug: rose-quartz
+  - type: tarot
+    slug: lingering-love-spread
 includeAds: false
 includeKofi: true
-affiliateAnchors: [{"key":"mindfulness-journal","text":"journal","insertedCount":0},{"key":"gemstone-candle","text":"candle","insertedCount":0},{"key":"tumbled-stones","text":"rose quartz","insertedCount":0}]
-internalLinkHints: ["secular tarot","cozy cursing ritual","energy return ritual","emotional reflection","journaling","forgiveness and boundaries"]
+affiliateAnchors:
+  - key: mindfulness-journal
+    text: journal
+    insertedCount: 0
+  - key: gemstone-candle
+    text: candle
+    insertedCount: 0
+  - key: tumbled-stones
+    text: rose quartz
+    insertedCount: 0
+internalLinkHints:
+  - secular tarot
+  - cozy cursing ritual
+  - energy return ritual
+  - emotional reflection
+  - journaling
+  - forgiveness and boundaries
 internalLinks: []
-publishedAt: "2025-10-20T15:03:54.818Z"
-canonicalUrl: "https://witchclick.space/post/tarot-spread-lingering-love-betrayal"
+publishedAt: '2025-10-20T15:03:54.818Z'
+canonicalUrl: 'https://witchclick.space/post/tarot-spread-lingering-love-betrayal'
 specVersion: 2
+cluster: tarot-spreads
 ---
 
 ## Opening Reflection

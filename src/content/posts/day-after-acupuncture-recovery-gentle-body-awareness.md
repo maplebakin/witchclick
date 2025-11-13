@@ -1,9 +1,14 @@
 ---
 title: 'Day After Acupuncture Recovery: Gentle Body Awareness'
 slug: day-after-acupuncture-recovery-gentle-body-awareness
-excerpt: 'The day after acupuncture, your body is processing shifts—energy moving, tissues releasing, old patterns softening. This ritual offers two pathways to support your recovery with kindness and attention.'
+excerpt: >-
+  The day after acupuncture, your body is processing shifts—energy moving,
+  tissues releasing, old patterns softening. This ritual offers two pathways to
+  support your recovery with kindness and attention.
 metaTitle: 'Day After Acupuncture Recovery: Gentle Body Awareness'
-metaDescription: Navigate the day after acupuncture with a tender ritual that honors your body's healing process and supports gentle recovery.
+metaDescription: >-
+  Navigate the day after acupuncture with a tender ritual that honors your
+  body's healing process and supports gentle recovery.
 tags:
   - calm
   - acupuncture
@@ -35,9 +40,11 @@ internalLinkHints:
   - emotional release
 internalLinks: []
 publishedAt: '2025-10-07T12:51:08.917Z'
-canonicalUrl: 'https://witchclick.space/post/day-after-acupuncture-recovery-gentle-body-awareness'
+canonicalUrl: >-
+  https://witchclick.space/post/day-after-acupuncture-recovery-gentle-body-awareness
 specVersion: 2
 spoonLevel: low
+cluster: cozy-witchcraft
 ---
 
 ## Opening Reflection

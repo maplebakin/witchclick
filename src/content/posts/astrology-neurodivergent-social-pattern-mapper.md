@@ -1,26 +1,59 @@
 ---
-title: "Astrology as Neurodivergent Social Pattern Mapper"
-slug: "astrology-neurodivergent-social-pattern-mapper"
-excerpt: "Astrology reimagined as a cheat sheet for neurodivergent brains, mapping social patterns in relationships and events. Invite gentle introspection on how ancient symbols aid in understanding human dynamics without dictating destiny."
-metaTitle: "Astrology as Neurodivergent Social Pattern Mapper"
-metaDescription: "Explore astrology not as fate but as an ancient pattern-matching tool designed for neurodivergent minds to navigate people, events, and social possibilities with gentle curiosity and self-inquiry."
-tags: ["astrology","neurodivergence","pattern-recognition","social-navigation","self-reflection","mystical-tools"]
-outline: ["Opening Reflection","The Ancient Cheat Sheet Unveiled","Elements as Emotional Weather Reports","Planets as Personality Archetypes","Journaling Prompts","Gentle Closing"]
+title: Astrology as Neurodivergent Social Pattern Mapper
+slug: astrology-neurodivergent-social-pattern-mapper
+excerpt: >-
+  Astrology reimagined as a cheat sheet for neurodivergent brains, mapping
+  social patterns in relationships and events. Invite gentle introspection on
+  how ancient symbols aid in understanding human dynamics without dictating
+  destiny.
+metaTitle: Astrology as Neurodivergent Social Pattern Mapper
+metaDescription: >-
+  Explore astrology not as fate but as an ancient pattern-matching tool designed
+  for neurodivergent minds to navigate people, events, and social possibilities
+  with gentle curiosity and self-inquiry.
+tags:
+  - astrology
+  - neurodivergence
+  - pattern-recognition
+  - social-navigation
+  - self-reflection
+  - mystical-tools
+outline:
+  - Opening Reflection
+  - The Ancient Cheat Sheet Unveiled
+  - Elements as Emotional Weather Reports
+  - Planets as Personality Archetypes
+  - Journaling Prompts
+  - Gentle Closing
 wordCount: 712
 readingMinutes: 4
 entities: []
 includeAds: true
 includeKofi: false
 affiliateAnchors: []
-internalLinkHints: ["elemental or planetary patterns","social overload","ancient tools meet modern minds","journal"]
+internalLinkHints:
+  - elemental or planetary patterns
+  - social overload
+  - ancient tools meet modern minds
+  - journal
 internalLinks: []
-publishedAt: "2025-11-08T14:55:26.235Z"
-canonicalUrl: "https://witchclick.space/post/astrology-neurodivergent-social-pattern-mapper"
-heroImage: "/images/hero/astrology-neurodivergent-social-pattern-mapper/hero-image-prompt-for-witchclick-article-_astrology-as-neurodivergent-social-pattern-mapper_-_scene-focus_-astrology-reimagined-as-a-cheat-sheet-for-neurodivergent-brains-mapping-social-patterns-in-relationships-and-events-invite-gentle-introspecti.jpg"
-heroImageSrc: "/images/hero/astrology-neurodivergent-social-pattern-mapper/hero-image-prompt-for-witchclick-article-_astrology-as-neurodivergent-social-pattern-mapper_-_scene-focus_-astrology-reimagined-as-a-cheat-sheet-for-neurodivergent-brains-mapping-social-patterns-in-relationships-and-events-invite-gentle-introspecti.jpg"
-heroAlt: ""
+publishedAt: '2025-11-08T14:55:26.235Z'
+canonicalUrl: 'https://witchclick.space/post/astrology-neurodivergent-social-pattern-mapper'
+heroImage: >-
+  /images/hero/astrology-neurodivergent-social-pattern-mapper/hero-image-prompt-for-witchclick-article-_astrology-as-neurodivergent-social-pattern-mapper_-_scene-focus_-astrology-reimagined-as-a-cheat-sheet-for-neurodivergent-brains-mapping-social-patterns-in-relationships-and-events-invite-gentle-introspecti.jpg
+heroImageSrc: >-
+  /images/hero/astrology-neurodivergent-social-pattern-mapper/hero-image-prompt-for-witchclick-article-_astrology-as-neurodivergent-social-pattern-mapper_-_scene-focus_-astrology-reimagined-as-a-cheat-sheet-for-neurodivergent-brains-mapping-social-patterns-in-relationships-and-events-invite-gentle-introspecti.jpg
+heroAlt: ''
 specVersion: 2
-promptMetadata: {"topic":"Astrology as Neurodivergent Social Pattern Mapper","requestedWords":1200,"deliveredWords":712,"toggles":{"ads":"on","kofi":"off"},"generatedAt":"2025-11-08T14:55:26.234Z"}
+promptMetadata:
+  topic: Astrology as Neurodivergent Social Pattern Mapper
+  requestedWords: 1200
+  deliveredWords: 712
+  toggles:
+    ads: 'on'
+    kofi: 'off'
+  generatedAt: '2025-11-08T14:55:26.234Z'
+cluster: ai-narrative-magic
 ---
 
 ## Opening Reflection

@@ -6,10 +6,22 @@ import { z } from 'zod';
 export const ENTITY_TYPES = ['crystal', 'herb', 'moonPhase', 'tarot', 'planetaryDay', 'ritual'];
 export const CONTENT_TYPES = ['ritual', 'guide', 'spread', 'reflection', 'story', 'tarotSpread', 'spellwork', 'crystals'];
 export const POST_CATEGORIES = ['ritual', 'meandering'];
+export const TOPIC_CLUSTERS = [
+  'tarot-spreads',
+  'rituals-practices',
+  'clean-cursing',
+  'ai-narrative-magic',
+  'shadow-work',
+  'cozy-witchcraft',
+  'motherquest',
+  'spellcraft-theory',
+  'magical-productivity'
+];
 
 export const EntityTypeSchema = z.enum(ENTITY_TYPES);
 export const PostContentTypeSchema = z.enum(CONTENT_TYPES);
 export const PostCategorySchema = z.enum(POST_CATEGORIES);
+export const TopicClusterSchema = z.enum(TOPIC_CLUSTERS);
 
 const OutlineItemSchema = z.object({
   heading: z.string().min(1),
@@ -44,12 +56,19 @@ const CtaSchema = z.object({
 
 const AdPlacementSchema = z.enum(['lead', 'mid', 'end']);
 
+const ExternalLinkSchema = z.object({
+  url: z.string().url(),
+  anchor: z.string().min(1),
+  description: z.string().min(1),
+});
+
 export const PostSpecV2Schema = z.object({
   specVersion: z.literal(2),
   title: z.string().min(1),
   slug: z.string().min(1),
   category: PostCategorySchema.optional(),
   contentType: PostContentTypeSchema.optional(),
+  cluster: TopicClusterSchema.optional(),
   metaDescription: z.string().min(1),
   tags: z.array(z.string()).min(4).max(7),
   excerpt: z.string().min(1),
@@ -60,6 +79,7 @@ export const PostSpecV2Schema = z.object({
   altTexts: z.array(z.string()),
   internalLinkHints: z.array(InternalLinkHintSchema),
   affiliateHints: z.array(AffiliateHintSchema),
+  externalLink: ExternalLinkSchema.optional(),
   cta: CtaSchema,
   adPlacements: z.array(AdPlacementSchema),
 });
@@ -71,6 +91,7 @@ const DOC_LINES = [
   '  "slug": string (kebab-case),',
   '  "category": "ritual"|"meandering" (optional, defaults to "ritual" - use "ritual" for magickal content, "meandering" for non-magickal rambles),',
   '  "contentType": "ritual"|"guide"|"spread"|"reflection"|"story"|"tarotSpread"|"spellwork"|"crystals" (optional, defaults to "ritual"),',
+  '  "cluster": "tarot-spreads"|"rituals-practices"|"clean-cursing"|"ai-narrative-magic"|"shadow-work"|"cozy-witchcraft"|"motherquest"|"spellcraft-theory"|"magical-productivity" (optional, topic cluster for SEO),',
   '  "metaDescription": string (150-160 chars),',
   '  "tags": string[4-7],',
   '  "excerpt": string (1-2 sentences),',
@@ -81,6 +102,7 @@ const DOC_LINES = [
   '  "altTexts": string[],',
   '  "internalLinkHints": { "anchor": string, "rationale": string }[],',
   '  "affiliateHints": { "key": string, "anchor": string, "rationale": string }[],',
+  '  "externalLink": { "url": string, "anchor": string, "description": string } (optional, one authoritative external reference),',
   '  "cta": { "type": "kofi"|"download"|"none", "id"?: string },',
   '  "adPlacements": ("lead"|"mid"|"end")[]',
   '}',

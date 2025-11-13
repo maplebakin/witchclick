@@ -1,9 +1,15 @@
 ---
 title: 'Knowing When to Give Up: A Gentle Quitter''s Guide'
 slug: knowing-when-to-give-up
-excerpt: 'When is quitting the kindest, smartest move? This gentle, secular guide offers a 5-minute triage ritual and a deeper closure practice, plus an easy checklist and one clean question.'
+excerpt: >-
+  When is quitting the kindest, smartest move? This gentle, secular guide offers
+  a 5-minute triage ritual and a deeper closure practice, plus an easy checklist
+  and one clean question.
 metaTitle: 'Knowing When to Give Up: A Gentle Quitter''s Guide'
-metaDescription: 'A cozy, secular guide to knowing when to give up. Try a 5-minute triage ritual or a deeper closure practice, with accessibility tweaks, a checklist, and one clean question.'
+metaDescription: >-
+  A cozy, secular guide to knowing when to give up. Try a 5-minute triage ritual
+  or a deeper closure practice, with accessibility tweaks, a checklist, and one
+  clean question.
 tags:
   - release
   - self-kindness
@@ -63,6 +69,7 @@ internalLinkHints:
 heroImageSrc: /hero-images/knowing-when-to-give-up.png
 heroImageAlt: 'Knowing When to Give Up: A Gentle Quitter''s Guide — hero image'
 spoonLevel: high
+cluster: cozy-witchcraft
 ---
 ## Opening Reflection
 

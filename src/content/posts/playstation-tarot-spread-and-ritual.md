@@ -1,9 +1,15 @@
 ---
 title: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
 slug: playstation-tarot-spread-and-ritual
-excerpt: 'Blend controller-in-hand comfort with a simple tarot ritual. This spread tracks energy, obstacles, and reset moments so you can enjoy game night with focus and ease.'
+excerpt: >-
+  Blend controller-in-hand comfort with a simple tarot ritual. This spread
+  tracks energy, obstacles, and reset moments so you can enjoy game night with
+  focus and ease.
 metaTitle: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual'
-metaDescription: 'Turn game night into a gentle ritual with a PlayStation-themed tarot spread. Set the vibe, map momentum, and enjoy mindful breaks. Step-by-step guide plus a short checklist.'
+metaDescription: >-
+  Turn game night into a gentle ritual with a PlayStation-themed tarot spread.
+  Set the vibe, map momentum, and enjoy mindful breaks. Step-by-step guide plus
+  a short checklist.
 tags:
   - calm
   - tarot
@@ -90,6 +96,7 @@ internalLinkHints:
 heroImageSrc: /hero-images/playstation-tarot-spread-and-ritual.png
 heroImageAlt: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual — hero image'
 spoonLevel: low
+cluster: tarot-spreads
 ---
 
 ## Why tarot + PlayStation works
@@ -189,7 +196,11 @@ If shuffling is tough, draw numbers or use a randomizer app. If writing in the m
 
 Play kindly. Mute or block if needed. Protect your bandwidth and remember: fun is the goal.
 
+## Further Reading
+
+To learn more about how ritual frameworks can enhance gaming experiences and mindful play, see the [Wikipedia article on game design](https://en.wikipedia.org/wiki/Game_design), which discusses structured experiences and player engagement.
+
 ## Wrap-up
 
-Game nights become memorable when small rituals mark the start, the reset, and the close. The Controller Spread keeps you curious, steady, and kind to yourself. If this guide added comfort to your weekend, a Ko-fi tip helps keep WitchClick reader-powered and cozy.
+Game nights become memorable when small rituals mark the start, the reset, and the close. The Controller Spread keeps you curious, steady, and kind to yourself through cozy tarot practice. Whether you're exploring [secular tarot](/post/tarot-as-a-secular-tool) for the first time or expanding your [ritual practices](/post/worldbuilding-tarot-spread-and-ritual), this gaming-focused spread offers a gentle entry point. If this guide added comfort to your weekend, a Ko-fi tip helps keep WitchClick reader-powered and cozy.
 

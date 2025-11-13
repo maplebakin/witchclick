@@ -1,26 +1,56 @@
 ---
-title: "Turning Housework into Everyday Spellcraft Ritual"
-slug: "turning-housework-into-everyday-spellcraft-ritual"
-excerpt: "Elevate daily housework into spellcraft that blesses your space. Choose a quick mindful sweep or a layered deep cleanse, always prioritizing consent, safety, and personal substitutions."
-metaTitle: "Turning Housework into Everyday Spellcraft Ritual"
-metaDescription: "Transform mundane chores into magical acts with this flexible ritual. Quick sweeps for low energy or deep cleanses with intention—infuse your home with purpose, safety, and optional substitutions for every practitioner."
-tags: ["household magic","everyday spellcraft","cleaning ritual","intention setting","low energy","home blessing"]
-outline: ["Opening Reflection","Quick Low-Energy Variant","Deep Variant","Reflection Prompt","Housework Spellcraft Checklist","Safety Note"]
+title: Turning Housework into Everyday Spellcraft Ritual
+slug: turning-housework-into-everyday-spellcraft-ritual
+excerpt: >-
+  Elevate daily housework into spellcraft that blesses your space. Choose a
+  quick mindful sweep or a layered deep cleanse, always prioritizing consent,
+  safety, and personal substitutions.
+metaTitle: Turning Housework into Everyday Spellcraft Ritual
+metaDescription: >-
+  Transform mundane chores into magical acts with this flexible ritual. Quick
+  sweeps for low energy or deep cleanses with intention—infuse your home with
+  purpose, safety, and optional substitutions for every practitioner.
+tags:
+  - household magic
+  - everyday spellcraft
+  - cleaning ritual
+  - intention setting
+  - low energy
+  - home blessing
+outline:
+  - Opening Reflection
+  - Quick Low-Energy Variant
+  - Deep Variant
+  - Reflection Prompt
+  - Housework Spellcraft Checklist
+  - Safety Note
 wordCount: 590
 readingMinutes: 3
 entities: []
 includeAds: true
 includeKofi: true
 affiliateAnchors: []
-internalLinkHints: ["waxing moon"]
+internalLinkHints:
+  - waxing moon
 internalLinks: []
-publishedAt: "2025-11-05T15:19:33.202Z"
-canonicalUrl: "https://witchclick.space/post/turning-housework-into-everyday-spellcraft-ritual"
-heroImage: "/images/hero/turning-housework-into-everyday-spellcraft-ritual/turning-housework-to-spellcraft.jpg"
-heroImageSrc: "/images/hero/turning-housework-into-everyday-spellcraft-ritual/turning-housework-to-spellcraft.jpg"
-heroAlt: ""
+publishedAt: '2025-11-05T15:19:33.202Z'
+canonicalUrl: >-
+  https://witchclick.space/post/turning-housework-into-everyday-spellcraft-ritual
+heroImage: >-
+  /images/hero/turning-housework-into-everyday-spellcraft-ritual/turning-housework-to-spellcraft.jpg
+heroImageSrc: >-
+  /images/hero/turning-housework-into-everyday-spellcraft-ritual/turning-housework-to-spellcraft.jpg
+heroAlt: ''
 specVersion: 2
-promptMetadata: {"topic":"Turning Housework into Everyday Spellcraft Ritual","requestedWords":1200,"deliveredWords":590,"toggles":{"ads":"on","kofi":"on"},"generatedAt":"2025-11-05T15:19:33.202Z"}
+promptMetadata:
+  topic: Turning Housework into Everyday Spellcraft Ritual
+  requestedWords: 1200
+  deliveredWords: 590
+  toggles:
+    ads: 'on'
+    kofi: 'on'
+  generatedAt: '2025-11-05T15:19:33.202Z'
+cluster: rituals-practices
 ---
 
 ## Opening Reflection

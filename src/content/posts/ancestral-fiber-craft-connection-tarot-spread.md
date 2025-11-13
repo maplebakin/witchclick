@@ -1,11 +1,30 @@
 ---
-title: "Ancestral Fiber Craft Connection Tarot Spread"
-slug: "ancestral-fiber-craft-connection-tarot-spread"
-excerpt: "Five loom-shaped positions map generational threads in your craft. Secular archetypes reveal tensions, shuttles, and emerging legacy for grounded reflection."
-metaTitle: "Ancestral Fiber Craft Connection Tarot Spread"
-metaDescription: "Unravel ancestral creativity through fiber crafts with this secular tarot spread. Archetypal insights highlight inherited patterns and practical releases for mindful making."
-tags: ["ancestors","fiber arts","tarot spread","self-reflection","heritage","creativity"]
-outline: ["Opening Reflection","Quick Low-Energy Reading","Deep Immersive Reading","Position Meanings","Reading Tips","Journaling Prompts","Spread Summary Checklist"]
+title: Ancestral Fiber Craft Connection Tarot Spread
+slug: ancestral-fiber-craft-connection-tarot-spread
+excerpt: >-
+  Five loom-shaped positions map generational threads in your craft. Secular
+  archetypes reveal tensions, shuttles, and emerging legacy for grounded
+  reflection.
+metaTitle: Ancestral Fiber Craft Connection Tarot Spread
+metaDescription: >-
+  Unravel ancestral creativity through fiber crafts with this secular tarot
+  spread. Archetypal insights highlight inherited patterns and practical
+  releases for mindful making.
+tags:
+  - ancestors
+  - fiber arts
+  - tarot spread
+  - self-reflection
+  - heritage
+  - creativity
+outline:
+  - Opening Reflection
+  - Quick Low-Energy Reading
+  - Deep Immersive Reading
+  - Position Meanings
+  - Reading Tips
+  - Journaling Prompts
+  - Spread Summary Checklist
 wordCount: 682
 readingMinutes: 3
 entities: []
@@ -14,13 +33,23 @@ includeKofi: false
 affiliateAnchors: []
 internalLinkHints: []
 internalLinks: []
-publishedAt: "2025-11-06T16:32:26.802Z"
-canonicalUrl: "https://witchclick.space/post/ancestral-fiber-craft-connection-tarot-spread"
-heroImage: "/images/hero/ancestral-fiber-craft-connection-tarot-spread/ancestral-fiber-art.jpg"
-heroImageSrc: "/images/hero/ancestral-fiber-craft-connection-tarot-spread/ancestral-fiber-art.jpg"
-heroAlt: ""
+publishedAt: '2025-11-06T16:32:26.802Z'
+canonicalUrl: 'https://witchclick.space/post/ancestral-fiber-craft-connection-tarot-spread'
+heroImage: >-
+  /images/hero/ancestral-fiber-craft-connection-tarot-spread/ancestral-fiber-art.jpg
+heroImageSrc: >-
+  /images/hero/ancestral-fiber-craft-connection-tarot-spread/ancestral-fiber-art.jpg
+heroAlt: ''
 specVersion: 2
-promptMetadata: {"topic":"Ancestral Fiber Craft Connection Tarot Spread","requestedWords":1200,"deliveredWords":682,"toggles":{"ads":"on","kofi":"off"},"generatedAt":"2025-11-06T16:32:26.802Z"}
+promptMetadata:
+  topic: Ancestral Fiber Craft Connection Tarot Spread
+  requestedWords: 1200
+  deliveredWords: 682
+  toggles:
+    ads: 'on'
+    kofi: 'off'
+  generatedAt: '2025-11-06T16:32:26.802Z'
+cluster: tarot-spreads
 ---
 
 ## Opening Reflection

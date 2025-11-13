@@ -1,11 +1,28 @@
 ---
-title: "Ancestral Fiber Craft Connection Ritual"
-slug: "ancestral-fiber-craft-connection-ritual"
-excerpt: "Thread ancestral wisdom into present moments with fiber crafts. Quick variant for busy days; deep for immersive unraveling of patterns and legacy."
-metaTitle: "Ancestral Fiber Craft Connection Ritual"
-metaDescription: "Reconnect with ancestral creativity through hands-on fiber crafts. This secular ritual offers quick and deep variants to explore inherited patterns via making, fostering reflection and legacy."
-tags: ["ancestors","fiber arts","ritual","self-reflection","heritage","creativity","hands-on"]
-outline: ["Opening Reflection","Quick Low-Energy Variant","Deep Variant","Reflection Prompts","Ritual Summary Checklist"]
+title: Ancestral Fiber Craft Connection Ritual
+slug: ancestral-fiber-craft-connection-ritual
+excerpt: >-
+  Thread ancestral wisdom into present moments with fiber crafts. Quick variant
+  for busy days; deep for immersive unraveling of patterns and legacy.
+metaTitle: Ancestral Fiber Craft Connection Ritual
+metaDescription: >-
+  Reconnect with ancestral creativity through hands-on fiber crafts. This
+  secular ritual offers quick and deep variants to explore inherited patterns
+  via making, fostering reflection and legacy.
+tags:
+  - ancestors
+  - fiber arts
+  - ritual
+  - self-reflection
+  - heritage
+  - creativity
+  - hands-on
+outline:
+  - Opening Reflection
+  - Quick Low-Energy Variant
+  - Deep Variant
+  - Reflection Prompts
+  - Ritual Summary Checklist
 wordCount: 480
 readingMinutes: 2
 entities: []
@@ -14,13 +31,21 @@ includeKofi: false
 affiliateAnchors: []
 internalLinkHints: []
 internalLinks: []
-publishedAt: "2025-11-06T15:41:49.338Z"
-canonicalUrl: "https://witchclick.space/post/ancestral-fiber-craft-connection-ritual"
-heroImage: "/images/hero/ancestral-fiber-craft-connection-ritual/ancestral-fibrecraft.jpg"
-heroImageSrc: "/images/hero/ancestral-fiber-craft-connection-ritual/ancestral-fibrecraft.jpg"
-heroAlt: ""
+publishedAt: '2025-11-06T15:41:49.338Z'
+canonicalUrl: 'https://witchclick.space/post/ancestral-fiber-craft-connection-ritual'
+heroImage: /images/hero/ancestral-fiber-craft-connection-ritual/ancestral-fibrecraft.jpg
+heroImageSrc: /images/hero/ancestral-fiber-craft-connection-ritual/ancestral-fibrecraft.jpg
+heroAlt: ''
 specVersion: 2
-promptMetadata: {"topic":"Ancestral Fiber Craft Connection Ritual","requestedWords":1200,"deliveredWords":480,"toggles":{"ads":"on","kofi":"off"},"generatedAt":"2025-11-06T15:41:49.337Z"}
+promptMetadata:
+  topic: Ancestral Fiber Craft Connection Ritual
+  requestedWords: 1200
+  deliveredWords: 480
+  toggles:
+    ads: 'on'
+    kofi: 'off'
+  generatedAt: '2025-11-06T15:41:49.337Z'
+cluster: rituals-practices
 ---
 
 ## Opening Reflection

@@ -1,22 +1,61 @@
 ---
-title: "Heart Healing Ritual for Unfinished Love"
-slug: "heart-healing-ritual-unfinished-love"
-excerpt: "A gentle ritual for when you still miss someone who hurt you. Reclaim your voice, soothe your body, and begin to release what isn't yours to carry."
-metaTitle: "Heart Healing Ritual for Unfinished Love"
-metaDescription: "A cozy, self-soothing ritual for when love still lingers after betrayal—helping you process, reclaim, and release what your heart still holds."
-tags: ["ritual","self-healing","forgiveness","grief","love","boundaries"]
-outline: ["Opening Reflection","Quick Heart Healing Variant","Deep Heart Healing Variant","Reflection Prompt","Heart Healing Checklist"]
+title: Heart Healing Ritual for Unfinished Love
+slug: heart-healing-ritual-unfinished-love
+excerpt: >-
+  A gentle ritual for when you still miss someone who hurt you. Reclaim your
+  voice, soothe your body, and begin to release what isn't yours to carry.
+metaTitle: Heart Healing Ritual for Unfinished Love
+metaDescription: >-
+  A cozy, self-soothing ritual for when love still lingers after
+  betrayal—helping you process, reclaim, and release what your heart still
+  holds.
+tags:
+  - ritual
+  - self-healing
+  - forgiveness
+  - grief
+  - love
+  - boundaries
+outline:
+  - Opening Reflection
+  - Quick Heart Healing Variant
+  - Deep Heart Healing Variant
+  - Reflection Prompt
+  - Heart Healing Checklist
 wordCount: 401
 readingMinutes: 2
-entities: [{"type":"crystal","slug":"rose-quartz"},{"type":"crystal","slug":"amethyst"},{"type":"ritual","slug":"heart-healing"}]
+entities:
+  - type: crystal
+    slug: rose-quartz
+  - type: crystal
+    slug: amethyst
+  - type: ritual
+    slug: heart-healing
 includeAds: false
 includeKofi: true
-affiliateAnchors: [{"key":"mindfulness-journal","text":"paper and pen","insertedCount":0},{"key":"tumbled-stones","text":"rose quartz","insertedCount":0},{"key":"gemstone-candle","text":"candle","insertedCount":0}]
-internalLinkHints: ["gentle rituals","energy return ritual","journaling","forgiveness and boundaries","emotional reflection","self-compassion","cozy cursing ritual"]
+affiliateAnchors:
+  - key: mindfulness-journal
+    text: paper and pen
+    insertedCount: 0
+  - key: tumbled-stones
+    text: rose quartz
+    insertedCount: 0
+  - key: gemstone-candle
+    text: candle
+    insertedCount: 0
+internalLinkHints:
+  - gentle rituals
+  - energy return ritual
+  - journaling
+  - forgiveness and boundaries
+  - emotional reflection
+  - self-compassion
+  - cozy cursing ritual
 internalLinks: []
-publishedAt: "2025-10-20T14:59:30.110Z"
-canonicalUrl: "https://witchclick.space/post/heart-healing-ritual-unfinished-love"
+publishedAt: '2025-10-20T14:59:30.110Z'
+canonicalUrl: 'https://witchclick.space/post/heart-healing-ritual-unfinished-love'
 specVersion: 2
+cluster: rituals-practices
 ---
 
 ## Opening Reflection

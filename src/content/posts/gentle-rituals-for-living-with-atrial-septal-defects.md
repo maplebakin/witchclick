@@ -1,23 +1,58 @@
 ---
-title: "Gentle Rituals for Living With Atrial Septal Defects"
-slug: "gentle-rituals-for-living-with-atrial-septal-defects"
-excerpt: "A cozy, consent-first ritual for living with atrial septal defects. Choose a quick or deep path, keep safety at the center, and let small, steady care feel like a hand on your shoulder during wobbly moments."
-metaTitle: "Gentle Rituals for Living With Atrial Septal Defects"
-metaDescription: "A soft, consent-first ritual to support those living with atrial septal defects. Includes quick and deep variants, safety notes, and gentle options for low energy days."
-tags: ["ritual","self-care","consent","heart awareness","mindfulness","health boundaries"]
-outline: ["Opening Reflection","Quick / Low-Energy Variant","Deep Variant","Reflection Prompt","Checklist / Summary","Safety Note"]
+title: Gentle Rituals for Living With Atrial Septal Defects
+slug: gentle-rituals-for-living-with-atrial-septal-defects
+excerpt: >-
+  A cozy, consent-first ritual for living with atrial septal defects. Choose a
+  quick or deep path, keep safety at the center, and let small, steady care feel
+  like a hand on your shoulder during wobbly moments.
+metaTitle: Gentle Rituals for Living With Atrial Septal Defects
+metaDescription: >-
+  A soft, consent-first ritual to support those living with atrial septal
+  defects. Includes quick and deep variants, safety notes, and gentle options
+  for low energy days.
+tags:
+  - ritual
+  - self-care
+  - consent
+  - heart awareness
+  - mindfulness
+  - health boundaries
+outline:
+  - Opening Reflection
+  - Quick / Low-Energy Variant
+  - Deep Variant
+  - Reflection Prompt
+  - Checklist / Summary
+  - Safety Note
 wordCount: 732
 readingMinutes: 4
 entities: []
 includeAds: true
 includeKofi: false
 affiliateAnchors: []
-internalLinkHints: ["gentle heart check-in","consent to continue","low-spoon option","pillow-and-blanket altar","mindful breathing","medical care plan","reflection journal","closing gratitude"]
+internalLinkHints:
+  - gentle heart check-in
+  - consent to continue
+  - low-spoon option
+  - pillow-and-blanket altar
+  - mindful breathing
+  - medical care plan
+  - reflection journal
+  - closing gratitude
 internalLinks: []
-publishedAt: "2025-10-28T20:41:22.772Z"
-canonicalUrl: "https://witchclick.space/post/gentle-rituals-for-living-with-atrial-septal-defects"
+publishedAt: '2025-10-28T20:41:22.772Z'
+canonicalUrl: >-
+  https://witchclick.space/post/gentle-rituals-for-living-with-atrial-septal-defects
 specVersion: 2
-promptMetadata: {"topic":"Gentle Rituals for Living With Atrial Septal Defects","requestedWords":1200,"deliveredWords":732,"toggles":{"ads":"on","kofi":"off"},"generatedAt":"2025-10-28T20:41:22.771Z"}
+promptMetadata:
+  topic: Gentle Rituals for Living With Atrial Septal Defects
+  requestedWords: 1200
+  deliveredWords: 732
+  toggles:
+    ads: 'on'
+    kofi: 'off'
+  generatedAt: '2025-10-28T20:41:22.771Z'
+cluster: cozy-witchcraft
 ---
 
 ## Opening Reflection

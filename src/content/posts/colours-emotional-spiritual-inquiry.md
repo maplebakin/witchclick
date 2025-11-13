@@ -1,9 +1,14 @@
 ---
 title: 'Colours as Doorways: Emotional and Spiritual Inquiry'
 slug: colours-emotional-spiritual-inquiry
-excerpt: 'Colour speaks in whispers—each hue a doorway to feeling, memory, and meaning. This reflective practice invites you to meet colour as a companion in self-inquiry, exploring what surfaces when you pause to listen.'
+excerpt: >-
+  Colour speaks in whispers—each hue a doorway to feeling, memory, and meaning.
+  This reflective practice invites you to meet colour as a companion in
+  self-inquiry, exploring what surfaces when you pause to listen.
 metaTitle: 'Colours as Doorways: Emotional and Spiritual Inquiry'
-metaDescription: 'Explore colour as a mirror for feeling and meaning through gentle, secular journaling practices that invite self-discovery.'
+metaDescription: >-
+  Explore colour as a mirror for feeling and meaning through gentle, secular
+  journaling practices that invite self-discovery.
 tags:
   - calm
   - colour therapy
@@ -43,11 +48,14 @@ internalLinkHints:
 internalLinks: []
 publishedAt: '2025-10-02T12:12:49.439Z'
 canonicalUrl: 'https://witchclick.space/post/colours-emotional-spiritual-inquiry'
-heroImage: "/images/hero/colours-emotional-spiritual-inquiry/hero-image-prompt-for-witchclick-article-_colours-as-doorways_-emotional-and-spiritual-inquiry_-_scene-focus_-colour-speaks-in-whispers-each-hue-a-doorway-to-feeling-memory-and-meaning-this-reflective-practice-invites-you-to-meet-colour-as-a-comp.jpg"
-heroImageSrc: "/images/hero/colours-emotional-spiritual-inquiry/hero-image-prompt-for-witchclick-article-_colours-as-doorways_-emotional-and-spiritual-inquiry_-_scene-focus_-colour-speaks-in-whispers-each-hue-a-doorway-to-feeling-memory-and-meaning-this-reflective-practice-invites-you-to-meet-colour-as-a-comp.jpg"
-heroAlt: ""
+heroImage: >-
+  /images/hero/colours-emotional-spiritual-inquiry/hero-image-prompt-for-witchclick-article-_colours-as-doorways_-emotional-and-spiritual-inquiry_-_scene-focus_-colour-speaks-in-whispers-each-hue-a-doorway-to-feeling-memory-and-meaning-this-reflective-practice-invites-you-to-meet-colour-as-a-comp.jpg
+heroImageSrc: >-
+  /images/hero/colours-emotional-spiritual-inquiry/hero-image-prompt-for-witchclick-article-_colours-as-doorways_-emotional-and-spiritual-inquiry_-_scene-focus_-colour-speaks-in-whispers-each-hue-a-doorway-to-feeling-memory-and-meaning-this-reflective-practice-invites-you-to-meet-colour-as-a-comp.jpg
+heroAlt: ''
 specVersion: 2
 spoonLevel: low
+cluster: rituals-practices
 ---
 
 ## Opening Reflection

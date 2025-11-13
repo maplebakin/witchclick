@@ -1,26 +1,55 @@
 ---
-title: "When You're Sick and Home with a Sick Kiddo"
-slug: "sick-parent-sick-child-reflection"
-excerpt: "When you're both under the weather, the usual rules dissolve. This reflection explores the strange tenderness of being sick together—and what it asks of you when you have nothing left to give."
-metaTitle: "When You're Sick and Home with a Sick Kiddo"
-metaDescription: "A gentle reflection on caring for yourself and a sick child simultaneously—exploring the tender exhaustion and quiet moments of shared rest."
-tags: ["parenting","self-care","illness","rest","compassion"]
-outline: ["Opening Reflection","The Impossible Math of Sick Days","What Gets Dropped (And Why That's Okay)","Journaling Prompts","Gentle Closing"]
+title: When You're Sick and Home with a Sick Kiddo
+slug: sick-parent-sick-child-reflection
+excerpt: >-
+  When you're both under the weather, the usual rules dissolve. This reflection
+  explores the strange tenderness of being sick together—and what it asks of you
+  when you have nothing left to give.
+metaTitle: When You're Sick and Home with a Sick Kiddo
+metaDescription: >-
+  A gentle reflection on caring for yourself and a sick child
+  simultaneously—exploring the tender exhaustion and quiet moments of shared
+  rest.
+tags:
+  - parenting
+  - self-care
+  - illness
+  - rest
+  - compassion
+outline:
+  - Opening Reflection
+  - The Impossible Math of Sick Days
+  - What Gets Dropped (And Why That's Okay)
+  - Journaling Prompts
+  - Gentle Closing
 wordCount: 889
 readingMinutes: 4
 entities: []
 includeAds: true
 includeKofi: false
 affiliateAnchors: []
-internalLinkHints: ["self-compassion","brain fog","rest and survival","regulating two nervous systems","letting things slide"]
+internalLinkHints:
+  - self-compassion
+  - brain fog
+  - rest and survival
+  - regulating two nervous systems
+  - letting things slide
 internalLinks: []
-publishedAt: "2025-10-30T13:59:36.445Z"
-canonicalUrl: "https://witchclick.space/post/sick-parent-sick-child-reflection"
-heroImage: "/images/hero/sick-parent-sick-child-reflection/sick-with-kiddo-4.png"
-heroImageSrc: "/images/hero/sick-parent-sick-child-reflection/sick-with-kiddo-4.png"
-heroAlt: ""
+publishedAt: '2025-10-30T13:59:36.445Z'
+canonicalUrl: 'https://witchclick.space/post/sick-parent-sick-child-reflection'
+heroImage: /images/hero/sick-parent-sick-child-reflection/sick-with-kiddo-4.png
+heroImageSrc: /images/hero/sick-parent-sick-child-reflection/sick-with-kiddo-4.png
+heroAlt: ''
 specVersion: 2
-promptMetadata: {"topic":"When You're Sick and Home with a Sick Kiddo","requestedWords":1200,"deliveredWords":889,"toggles":{"ads":"on","kofi":"off"},"generatedAt":"2025-10-30T13:59:36.444Z"}
+promptMetadata:
+  topic: When You're Sick and Home with a Sick Kiddo
+  requestedWords: 1200
+  deliveredWords: 889
+  toggles:
+    ads: 'on'
+    kofi: 'off'
+  generatedAt: '2025-10-30T13:59:36.444Z'
+cluster: motherquest
 ---
 
 ## Opening Reflection

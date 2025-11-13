@@ -1,9 +1,16 @@
 ---
 title: What's the Deal with the Rapture? A Gentle Inquiry
 slug: whats-the-deal-with-the-rapture-gentle-inquiry
-excerpt: 'The rapture is a fascinating cultural touchstone—part theology, part pop culture phenomenon. Whether you''re curious, skeptical, or just wondering why your neighbor has that bumper sticker, let''s explore this belief with kindness and a bit of whimsy.'
+excerpt: >-
+  The rapture is a fascinating cultural touchstone—part theology, part pop
+  culture phenomenon. Whether you're curious, skeptical, or just wondering why
+  your neighbor has that bumper sticker, let's explore this belief with kindness
+  and a bit of whimsy.
 metaTitle: What's the Deal with the Rapture? A Gentle Inquiry
-metaDescription: 'Explore the rapture concept through a secular, reflective lens. A lighthearted guide to understanding this belief and what it might reveal about hope and fear.'
+metaDescription: >-
+  Explore the rapture concept through a secular, reflective lens. A lighthearted
+  guide to understanding this belief and what it might reveal about hope and
+  fear.
 tags:
   - calm
   - rapture
@@ -58,6 +65,7 @@ publishedAt: '2025-10-01T15:01:48.322Z'
 canonicalUrl: 'https://witchclick.space/post/whats-the-deal-with-the-rapture-gentle-inquiry'
 specVersion: 2
 spoonLevel: low
+cluster: cozy-witchcraft
 ---
 
 ## Opening Reflection

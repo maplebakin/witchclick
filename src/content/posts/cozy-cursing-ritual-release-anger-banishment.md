@@ -1,9 +1,15 @@
 ---
 title: 'Cozy Cursing Ritual: Release Anger Through Banishment'
 slug: cozy-cursing-ritual-release-anger-banishment
-excerpt: 'Sometimes anger is the only honest response to betrayal or systemic harm. This cozy cursing ritual offers a structured way to name what hurt you, release it through symbolic banishment, and reclaim your peace without causing direct harm.'
+excerpt: >-
+  Sometimes anger is the only honest response to betrayal or systemic harm. This
+  cozy cursing ritual offers a structured way to name what hurt you, release it
+  through symbolic banishment, and reclaim your peace without causing direct
+  harm.
 metaTitle: 'Cozy Cursing Ritual: Release Anger Through Banishment'
-metaDescription: A consent-based banishment ritual to release righteous anger and reclaim your peace when betrayal or harm demands a response.
+metaDescription: >-
+  A consent-based banishment ritual to release righteous anger and reclaim your
+  peace when betrayal or harm demands a response.
 tags:
   - release
   - banishment
@@ -37,6 +43,7 @@ publishedAt: '2025-10-14T12:16:04.884Z'
 canonicalUrl: 'https://witchclick.space/post/cozy-cursing-ritual-release-anger-banishment'
 specVersion: 2
 spoonLevel: high
+cluster: clean-cursing
 ---
 
 ## Opening Reflection

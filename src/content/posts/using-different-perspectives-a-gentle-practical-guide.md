@@ -1,9 +1,16 @@
 ---
 title: 'Using Different Perspectives: A Gentle, Practical Guide'
 slug: using-different-perspectives-a-gentle-practical-guide
-excerpt: 'Different perspectives are like windows in the same room: each one changes the light. This piece offers cozy, low-spoons options and deeper practices to help you see more clearly, get unstuck, and choose values-aligned decisions without forcing certainty.'
+excerpt: >-
+  Different perspectives are like windows in the same room: each one changes the
+  light. This piece offers cozy, low-spoons options and deeper practices to help
+  you see more clearly, get unstuck, and choose values-aligned decisions without
+  forcing certainty.
 metaTitle: 'Using Different Perspectives: A Gentle, Practical Guide'
-metaDescription: 'A gentle, practical guide to perspective-taking: widen your view, ease stuckness, and choose values-aligned next steps with low-energy tips, rituals, and clear prompts.'
+metaDescription: >-
+  A gentle, practical guide to perspective-taking: widen your view, ease
+  stuckness, and choose values-aligned next steps with low-energy tips, rituals,
+  and clear prompts.
 tags:
   - planning
   - perspective-taking
@@ -46,9 +53,11 @@ internalLinkHints:
   - journal prompts
 internalLinks: []
 publishedAt: '2025-10-01T14:04:14.799Z'
-canonicalUrl: 'https://witchclick.space/post/using-different-perspectives-a-gentle-practical-guide'
+canonicalUrl: >-
+  https://witchclick.space/post/using-different-perspectives-a-gentle-practical-guide
 specVersion: 2
 spoonLevel: medium
+cluster: cozy-witchcraft
 ---
 
 ## Opening Reflection

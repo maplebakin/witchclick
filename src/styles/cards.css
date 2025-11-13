@@ -15,8 +15,8 @@
   --card-focus-offset: 5px;
 
   /* Card Surfaces */
-  --card-panel-surface: color-mix(in srgb, hsl(var(--surface-card)) 92%, transparent 8%);
-  --card-panel-surface-strong: color-mix(in srgb, hsl(var(--surface-panel-primary)) 90%, transparent 10%);
+  --card-panel-surface: var(--theme-card-panel-surface, color-mix(in srgb, hsl(var(--surface-card)) 92%, transparent 8%));
+  --card-panel-surface-strong: var(--theme-card-panel-surface-strong, color-mix(in srgb, hsl(var(--surface-panel-primary)) 90%, transparent 10%));
 
   /* Card Borders */
   --card-panel-border: color-mix(in srgb, var(--border-purple-subtle, rgba(124, 78, 176, 0.28)) 92%, transparent 8%);
@@ -65,8 +65,8 @@
 /* Dawn Theme Variants */
 :root[data-comfort-theme="dawn"] {
   /* Card Surfaces */
-  --card-panel-surface: color-mix(in srgb, hsl(var(--surface-card)) 95%, white 5%);
-  --card-panel-surface-strong: color-mix(in srgb, hsl(var(--surface-panel-primary)) 94%, white 6%);
+  --card-panel-surface: var(--theme-card-panel-surface, color-mix(in srgb, hsl(var(--surface-card)) 95%, white 5%));
+  --card-panel-surface-strong: var(--theme-card-panel-surface-strong, color-mix(in srgb, hsl(var(--surface-panel-primary)) 94%, white 6%));
 
   /* Card Borders */
   --card-panel-border: color-mix(in srgb, var(--border-purple-subtle, rgba(180, 154, 217, 0.28)) 92%, transparent 8%);
@@ -123,10 +123,6 @@
     opacity: 0;
     transform: translateY(1.5rem);
   }
-
-  .card-panel[data-animate="animating"] {
-    will-change: opacity, transform, filter;
-  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -139,13 +135,11 @@
   border-radius: var(--wc-radius-lg, var(--card-radius));
   padding: 0;
   border: 1px solid var(--card-panel-border);
-  background:
-    linear-gradient(160deg, color-mix(in srgb, var(--card-panel-surface) 70%, transparent 30%) 0%, transparent 68%),
-    var(--card-panel-surface);
+  background: var(--card-panel-surface);
   color: var(--text-body);
   overflow: hidden;
   isolation: isolate;
-  backdrop-filter: blur(22px);
+  transform: translateZ(0);
   box-shadow: var(--card-elevation-base, var(--wc-shadow-soft, var(--elevation-tier-1)));
   transition:
     transform var(--card-transition),
@@ -157,11 +151,8 @@
 .card-panel:hover,
 .card-panel:focus-visible {
   transform: translateY(var(--card-hover-translate));
-  border-color: color-mix(in srgb, var(--card-panel-border-strong) 85%, transparent 15%);
+  border-color: var(--card-panel-border-strong);
   box-shadow: var(--card-elevation-hover, var(--elevation-tier-2));
-  background:
-    linear-gradient(170deg, color-mix(in srgb, var(--surface-card-hover, var(--card-panel-surface)) 65%, transparent 35%) 0%, transparent 70%),
-    color-mix(in srgb, var(--surface-card-hover, var(--card-panel-surface)) 92%, transparent 8%);
 }
 
 .card-panel:active {
@@ -180,9 +171,7 @@
    --------------------------------------------------------------------------- */
 
 .card-panel-strong {
-  background:
-    linear-gradient(155deg, color-mix(in srgb, var(--card-panel-surface-strong) 72%, transparent 28%) 0%, transparent 65%),
-    var(--card-panel-surface-strong);
+  background: var(--card-panel-surface-strong);
   border-color: var(--card-panel-border-strong);
 }
 

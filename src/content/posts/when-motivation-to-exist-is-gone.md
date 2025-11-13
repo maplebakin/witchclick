@@ -1,26 +1,59 @@
 ---
-title: "When the Will to Exist Quietly Slips Away"
-slug: "when-motivation-to-exist-is-gone"
-excerpt: "Some mornings, the weight of simply existing feels unbearable. This is a story about what it's like when motivation disappears, and the tiny threads that sometimes lead us back."
-metaTitle: "When the Will to Exist Quietly Slips Away"
-metaDescription: "A gentle story about those mornings when motivation vanishes and existence feels like too much—and the small acts that sometimes help."
-tags: ["depression","motivation","existence","mental health","hope","self-compassion","story"]
-outline: ["Opening Reflection","The Weight of Morning","The Geography of Nothingness","Small Acts of Defiance","The Thread Back","Gentle Takeaway"]
+title: When the Will to Exist Quietly Slips Away
+slug: when-motivation-to-exist-is-gone
+excerpt: >-
+  Some mornings, the weight of simply existing feels unbearable. This is a story
+  about what it's like when motivation disappears, and the tiny threads that
+  sometimes lead us back.
+metaTitle: When the Will to Exist Quietly Slips Away
+metaDescription: >-
+  A gentle story about those mornings when motivation vanishes and existence
+  feels like too much—and the small acts that sometimes help.
+tags:
+  - depression
+  - motivation
+  - existence
+  - mental health
+  - hope
+  - self-compassion
+  - story
+outline:
+  - Opening Reflection
+  - The Weight of Morning
+  - The Geography of Nothingness
+  - Small Acts of Defiance
+  - The Thread Back
+  - Gentle Takeaway
 wordCount: 1192
 readingMinutes: 6
 entities: []
 includeAds: false
 includeKofi: false
 affiliateAnchors: []
-internalLinkHints: ["self-compassion","depression","mental health","toxic positivity","grounding techniques","smallest acts","self-care"]
+internalLinkHints:
+  - self-compassion
+  - depression
+  - mental health
+  - toxic positivity
+  - grounding techniques
+  - smallest acts
+  - self-care
 internalLinks: []
-publishedAt: "2025-11-04T20:11:39.353Z"
-canonicalUrl: "https://witchclick.space/post/when-motivation-to-exist-is-gone"
-heroImage: "/images/hero/when-motivation-to-exist-is-gone/motivation-gone.png"
-heroImageSrc: "/images/hero/when-motivation-to-exist-is-gone/motivation-gone.png"
-heroAlt: ""
+publishedAt: '2025-11-04T20:11:39.353Z'
+canonicalUrl: 'https://witchclick.space/post/when-motivation-to-exist-is-gone'
+heroImage: /images/hero/when-motivation-to-exist-is-gone/motivation-gone.png
+heroImageSrc: /images/hero/when-motivation-to-exist-is-gone/motivation-gone.png
+heroAlt: ''
 specVersion: 2
-promptMetadata: {"topic":"When the Will to Exist Quietly Slips Away","requestedWords":1200,"deliveredWords":1192,"toggles":{"ads":"off","kofi":"off"},"generatedAt":"2025-11-04T20:11:39.352Z"}
+promptMetadata:
+  topic: When the Will to Exist Quietly Slips Away
+  requestedWords: 1200
+  deliveredWords: 1192
+  toggles:
+    ads: 'off'
+    kofi: 'off'
+  generatedAt: '2025-11-04T20:11:39.352Z'
+cluster: shadow-work
 ---
 
 ## Opening Reflection

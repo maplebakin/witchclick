@@ -1,9 +1,14 @@
 ---
 title: 'When to Let Yourself Rest: A Gentle Ritual & Guide'
 slug: when-to-let-yourself-rest
-excerpt: 'Not sure if you should push through or pause? Use a five-minute check-in or a deeper ritual to decide when to rest—kindly, clearly, and without guilt.'
+excerpt: >-
+  Not sure if you should push through or pause? Use a five-minute check-in or a
+  deeper ritual to decide when to rest—kindly, clearly, and without guilt.
 metaTitle: 'When to Let Yourself Rest: A Gentle Ritual & Guide'
-metaDescription: 'Feeling torn between pushing through and pausing? This cozy, secular guide offers a quick check-in, a deeper ritual, and a simple checklist to decide when to rest—without guilt.'
+metaDescription: >-
+  Feeling torn between pushing through and pausing? This cozy, secular guide
+  offers a quick check-in, a deeper ritual, and a simple checklist to decide
+  when to rest—without guilt.
 tags:
   - calm
   - rest
@@ -30,6 +35,7 @@ publishedAt: '2025-09-29T18:52:04.759Z'
 canonicalUrl: 'https://witchclick.space/post/when-to-let-yourself-rest'
 specVersion: 2
 spoonLevel: low
+cluster: rituals-practices
 ---
 ## Opening Reflection
 

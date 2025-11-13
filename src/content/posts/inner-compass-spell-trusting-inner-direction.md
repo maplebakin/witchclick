@@ -1,11 +1,32 @@
 ---
-title: "Inner Compass Spell: Trusting Your Inner Direction"
-slug: "inner-compass-spell-trusting-inner-direction"
-excerpt: "When external maps vanish, light a candle or take a quiet walk to hear your inner compass. Magical and mundane steps nurture self-trust with kind substitutions and full consent."
-metaTitle: "Inner Compass Spell: Trusting Your Inner Direction"
-metaDescription: "Tune gently into your inner voice when outer guidance fades away. This spell blends candle ritual, journaling, and nature walks with easy swaps, always centering consent and everyday self-trust."
-tags: ["inner guidance","self-trust","intuition building","journaling ritual","moon timing","grounding techniques","low energy option"]
-outline: ["Opening Reflection","Ingredients & Correspondences","Step-by-Step Instructions","Quick Low-Energy Variation","Deep Immersion Variation","Closing & Grounding","Safety Notes","Inner Compass Checklist Summary"]
+title: 'Inner Compass Spell: Trusting Your Inner Direction'
+slug: inner-compass-spell-trusting-inner-direction
+excerpt: >-
+  When external maps vanish, light a candle or take a quiet walk to hear your
+  inner compass. Magical and mundane steps nurture self-trust with kind
+  substitutions and full consent.
+metaTitle: 'Inner Compass Spell: Trusting Your Inner Direction'
+metaDescription: >-
+  Tune gently into your inner voice when outer guidance fades away. This spell
+  blends candle ritual, journaling, and nature walks with easy swaps, always
+  centering consent and everyday self-trust.
+tags:
+  - inner guidance
+  - self-trust
+  - intuition building
+  - journaling ritual
+  - moon timing
+  - grounding techniques
+  - low energy option
+outline:
+  - Opening Reflection
+  - Ingredients & Correspondences
+  - Step-by-Step Instructions
+  - Quick Low-Energy Variation
+  - Deep Immersion Variation
+  - Closing & Grounding
+  - Safety Notes
+  - Inner Compass Checklist Summary
 wordCount: 755
 readingMinutes: 4
 entities: []
@@ -14,13 +35,23 @@ includeKofi: false
 affiliateAnchors: []
 internalLinkHints: []
 internalLinks: []
-publishedAt: "2025-11-07T14:38:07.106Z"
-canonicalUrl: "https://witchclick.space/post/inner-compass-spell-trusting-inner-direction"
-heroImage: "/images/hero/inner-compass-spell-trusting-inner-direction/individual-direction-source.jpg"
-heroImageSrc: "/images/hero/inner-compass-spell-trusting-inner-direction/individual-direction-source.jpg"
-heroAlt: ""
+publishedAt: '2025-11-07T14:38:07.106Z'
+canonicalUrl: 'https://witchclick.space/post/inner-compass-spell-trusting-inner-direction'
+heroImage: >-
+  /images/hero/inner-compass-spell-trusting-inner-direction/individual-direction-source.jpg
+heroImageSrc: >-
+  /images/hero/inner-compass-spell-trusting-inner-direction/individual-direction-source.jpg
+heroAlt: ''
 specVersion: 2
-promptMetadata: {"topic":"Inner Compass Spell: Trusting Your Inner Direction","requestedWords":1200,"deliveredWords":755,"toggles":{"ads":"on","kofi":"off"},"generatedAt":"2025-11-07T14:38:07.105Z"}
+promptMetadata:
+  topic: 'Inner Compass Spell: Trusting Your Inner Direction'
+  requestedWords: 1200
+  deliveredWords: 755
+  toggles:
+    ads: 'on'
+    kofi: 'off'
+  generatedAt: '2025-11-07T14:38:07.105Z'
+cluster: spellcraft-theory
 ---
 
 ## Opening Reflection

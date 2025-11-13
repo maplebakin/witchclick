@@ -7,7 +7,7 @@
  * To modify themes, edit files in content/themes/
  * Then run: npm run themes:build
  *
- * Generated: 2025-11-13T14:11:31.700Z
+ * Generated: 2025-11-13T15:05:03.177Z
  * Source: scripts/generate-theme-css.mjs
  */
 
@@ -187,8 +187,8 @@
   --theme-color-fog: #d7c8f3;
   --theme-color-ink: #f4f1ff;
   --theme-surface-plain: #120a1e;
-  --theme-card-panel-surface: #1a0d2e;
-  --theme-card-panel-surface-strong: #221638;
+  --theme-card-panel-surface: #2a1a3e;
+  --theme-card-panel-surface-strong: #3a2558;
   --theme-card-panel-border: #d4af37;
   --theme-card-panel-border-strong: #d4af37;
   --theme-card-panel-border-soft: #4b2a63;

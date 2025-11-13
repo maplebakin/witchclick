@@ -1,9 +1,15 @@
 ---
 title: First-Day New Job Secular Tarot Spread and Journal
 slug: first-day-new-job-secular-tarot-spread-journal
-excerpt: 'A calm-first, secular tarot and journaling guide for day one. Includes a 5-minute quick ritual, a deeper spread, accessibility tweaks, a summary checklist, and a single reflective prompt.'
+excerpt: >-
+  A calm-first, secular tarot and journaling guide for day one. Includes a
+  5-minute quick ritual, a deeper spread, accessibility tweaks, a summary
+  checklist, and a single reflective prompt.
 metaTitle: First-Day New Job Secular Tarot Spread and Journal
-metaDescription: 'A gentle, secular tarot spread and journal guide for your first day at a new job. Quick and deep versions, accessibility tweaks, checklist, and calm-first tips.'
+metaDescription: >-
+  A gentle, secular tarot spread and journal guide for your first day at a new
+  job. Quick and deep versions, accessibility tweaks, checklist, and calm-first
+  tips.
 tags:
   - planning
   - secular-tarot
@@ -62,6 +68,7 @@ internalLinkHints:
 heroImageSrc: /hero-images/first-day-new-job-secular-tarot-spread-journal.png
 heroImageAlt: First-Day New Job Secular Tarot Spread and Journal — hero image
 spoonLevel: medium
+cluster: tarot-spreads
 ---
 ## Opening Reflection
 

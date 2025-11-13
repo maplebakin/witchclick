@@ -1,9 +1,15 @@
 ---
 title: 'Energy Return Ritual: Restore Balance Without Distortion'
 slug: energy-return-ritual-restore-balance
-excerpt: 'This ritual guides you through releasing energy that doesn''t belong to you—worry, responsibility, or emotional weight borrowed from others—back to its rightful source. Practice honoring your boundaries while maintaining compassion.'
+excerpt: >-
+  This ritual guides you through releasing energy that doesn't belong to
+  you—worry, responsibility, or emotional weight borrowed from others—back to
+  its rightful source. Practice honoring your boundaries while maintaining
+  compassion.
 metaTitle: 'Energy Return Ritual: Restore Balance Without Distortion'
-metaDescription: 'A gentle ritual to release borrowed energy back to its source with clear intention, honoring boundaries and balance in every exchange.'
+metaDescription: >-
+  A gentle ritual to release borrowed energy back to its source with clear
+  intention, honoring boundaries and balance in every exchange.
 tags:
   - release
   - energy work
@@ -34,6 +40,7 @@ publishedAt: '2025-10-10T19:26:33.131Z'
 canonicalUrl: 'https://witchclick.space/post/energy-return-ritual-restore-balance'
 specVersion: 2
 spoonLevel: high
+cluster: rituals-practices
 ---
 
 ## Opening Reflection

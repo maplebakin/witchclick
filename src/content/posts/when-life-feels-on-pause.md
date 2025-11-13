@@ -1,22 +1,57 @@
 ---
-title: "When Life Feels on Pause: A Gentle Ritual & Guide"
-slug: "when-life-feels-on-pause"
-excerpt: "When everything feels paused, this gentle ritual offers two paths—a quick reset for low spoons and a deeper, layered version—to help you notice what matters and re-enter your day with consent."
-metaTitle: "When Life Feels on Pause: A Gentle Ritual & Guide"
-metaDescription: "Feeling stuck, stalled, or on pause? Try a cozy, secular ritual with both quick and deep variants to un-knot tension, notice choices, and re-enter the day with consent and care—no pressure, just presence."
-tags: ["ritual","self-care","tarot","journaling","cozy"]
-outline: ["Opening Reflection","Quick/Low-Energy Variant","Deep Variant","Reflection Prompt","Pause Ritual Checklist"]
+title: 'When Life Feels on Pause: A Gentle Ritual & Guide'
+slug: when-life-feels-on-pause
+excerpt: >-
+  When everything feels paused, this gentle ritual offers two paths—a quick
+  reset for low spoons and a deeper, layered version—to help you notice what
+  matters and re-enter your day with consent.
+metaTitle: 'When Life Feels on Pause: A Gentle Ritual & Guide'
+metaDescription: >-
+  Feeling stuck, stalled, or on pause? Try a cozy, secular ritual with both
+  quick and deep variants to un-knot tension, notice choices, and re-enter the
+  day with consent and care—no pressure, just presence.
+tags:
+  - ritual
+  - self-care
+  - tarot
+  - journaling
+  - cozy
+outline:
+  - Opening Reflection
+  - Quick/Low-Energy Variant
+  - Deep Variant
+  - Reflection Prompt
+  - Pause Ritual Checklist
 wordCount: 851
 readingMinutes: 4
 entities: []
 includeAds: false
 includeKofi: true
-affiliateAnchors: [{"key":"mindfulness-journal","text":"mindfulness journal","insertedCount":0},{"key":"aroma-diffuser","text":"aroma diffuser","insertedCount":0},{"key":"singing-bowl","text":"singing bowl","insertedCount":0},{"key":"tumbled-stones","text":"tumbled stones","insertedCount":0}]
-internalLinkHints: ["gentle quitter's guide","tea ritual for focus","energy return ritual","secular tarot spread","cozy games to curl up","when everything feels pointless"]
+affiliateAnchors:
+  - key: mindfulness-journal
+    text: mindfulness journal
+    insertedCount: 0
+  - key: aroma-diffuser
+    text: aroma diffuser
+    insertedCount: 0
+  - key: singing-bowl
+    text: singing bowl
+    insertedCount: 0
+  - key: tumbled-stones
+    text: tumbled stones
+    insertedCount: 0
+internalLinkHints:
+  - gentle quitter's guide
+  - tea ritual for focus
+  - energy return ritual
+  - secular tarot spread
+  - cozy games to curl up
+  - when everything feels pointless
 internalLinks: []
-publishedAt: "2025-10-19T16:50:11.651Z"
-canonicalUrl: "https://witchclick.space/post/when-life-feels-on-pause"
+publishedAt: '2025-10-19T16:50:11.651Z'
+canonicalUrl: 'https://witchclick.space/post/when-life-feels-on-pause'
 specVersion: 2
+cluster: cozy-witchcraft
 ---
 
 ## Opening Reflection

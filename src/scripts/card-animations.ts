@@ -80,7 +80,7 @@ function setupCardAnimations(): Cleanup {
         animation.finished.then(finalize).catch(finalize);
       });
     },
-    { threshold: 0.25, rootMargin: "0px 0px -10%" },
+    { threshold: 0, rootMargin: "0px" },
   );
 
   cards.forEach((card) => observer.observe(card));
