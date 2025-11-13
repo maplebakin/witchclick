@@ -5,7 +5,6 @@ import AdSlot from "../../components/AdSlot.astro";
 import Disclosure from "../../components/Disclosure.astro";
 import DownloadCard from "../../components/DownloadCard.astro";
 import ProductRecommendations from "../../components/ProductRecommendations.astro";
-import CommentsSection from "../../components/CommentsSection.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import PostRail from "../../components/PostRail.astro";
 import ReadingProgress from "../../components/ReadingProgress.astro";
@@ -505,8 +504,6 @@ const jsonLd = {
         ctaId={ctaId}
       />
     </div>
-
-      <CommentsSection slug={effectiveSlug} title={title} />
 
       {productRecommendations.length > 0 && (
         <div class="card-panel card-panel-strong card-panel-static p-6 text-inverse sm:p-8 lg:p-10">

@@ -205,9 +205,20 @@ module.exports = {
         },
         invert: {
           css: {
+            color: theme('colors.inverse'),
+            'h1,h2,h3,h4,h5,h6': { color: theme('colors.inverse') },
+            p: { color: theme('colors.inverse') },
+            strong: { color: theme('colors.inverse') },
+            li: { color: theme('colors.inverse') },
             a: { color: theme('colors.accent-soft') },
-            blockquote: { borderLeftColor: theme('colors.line-bold') },
-            code: { backgroundColor: theme('colors.inverse/10') },
+            blockquote: {
+              borderLeftColor: theme('colors.line-bold'),
+              color: theme('colors.inverse-soft'),
+            },
+            code: {
+              backgroundColor: theme('colors.surface-inverse-muted'),
+              color: theme('colors.accent-soft'),
+            },
           }
         }
       }),
