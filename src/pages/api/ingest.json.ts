@@ -146,6 +146,10 @@ export async function POST({ request }: { request: Request }) {
       return json({ ok:false, error:'No JSON body provided. Paste a PostSpec v2 object.' }, 400);
     }
 
+    // Check for dry run and draft modes
+    const requestUrl = new URL(request.url);
+    const isDryRun = requestUrl.searchParams.get('dryRun') === 'true';
+
     const CWD = process.cwd();
     const PRODUCTS_PATH = path.join(CWD, 'content', 'products.json');
     const products = safeReadJSON<{ products: { key: string }[] }>(PRODUCTS_PATH, { products: [] });
@@ -223,6 +227,10 @@ export async function POST({ request }: { request: Request }) {
         String(hint?.anchor || "").trim(),
       )
       .filter((anchor: string) => anchor.length > 0);
+    // Check if draft mode is requested (via query param or body)
+    const draftParam = requestUrl.searchParams.get('draft');
+    const isDraftMode = draftParam === 'true' || (input as any)._draft === true;
+
     const fm = {
       title: spec.title,
       slug,
@@ -242,13 +250,11 @@ export async function POST({ request }: { request: Request }) {
       internalLinks: [],
       publishedAt: new Date().toISOString(),
       canonicalUrl: `${String(settings.siteUrl||'').replace(/\/$/,'')}/post/${slug}`,
-      specVersion: 2 as const
+      specVersion: 2 as const,
+      draft: isDraftMode,
     };
 
-    ensureEntityStubs(fm.entities);
-
     const siteUrl = String(settings.siteUrl||'').replace(/\/$/,'');
-    const createdPostStubs = ensurePostStubs(internalLinkHints, POSTS_DIR, siteUrl);
 
     const body = (spec.sections || [])
       .map((section: PostSpecV2["sections"][number]) =>
@@ -259,9 +265,44 @@ export async function POST({ request }: { request: Request }) {
     const file = `---\n${toFrontmatterYAML(fm)}\n---\n\n${body}\n`;
 
     const outPath = path.join(POSTS_DIR, `${slug}.md`);
-    fs.writeFileSync(outPath, file, 'utf8');
-
     const combinedWarnings = [...new Set([...normalizationWarnings, ...enforcement.warnings, ...structureResult.warnings])];
+
+    // In dry run mode, skip writing but return validation results
+    if (isDryRun) {
+      // Calculate potential post stubs without creating them
+      const potentialPostStubs = (internalLinkHints || [])
+        .filter((anchor: string) => {
+          if (!anchor) return false;
+          const candidateSlug = slugify(anchor);
+          if (!candidateSlug) return false;
+          return !fs.existsSync(path.join(POSTS_DIR, `${candidateSlug}.md`));
+        })
+        .map((anchor: string) => {
+          const candidateSlug = slugify(anchor);
+          return {
+            slug: candidateSlug,
+            title: anchor.replace(/\b\w/g, (m) => m.toUpperCase()),
+            path: `content/posts/${candidateSlug}.md`,
+          };
+        });
+
+      return json({
+        ok: true,
+        slug,
+        spec,
+        path: `content/posts/${slug}.md`,
+        words: contentWords,
+        warnings: combinedWarnings,
+        normalizations: normalizationReport,
+        postStubs: potentialPostStubs,
+        saved: false,
+      });
+    }
+
+    // Actually write files
+    ensureEntityStubs(fm.entities);
+    const createdPostStubs = ensurePostStubs(internalLinkHints, POSTS_DIR, siteUrl);
+    fs.writeFileSync(outPath, file, 'utf8');
 
     return json({
       ok:true,
@@ -271,6 +312,8 @@ export async function POST({ request }: { request: Request }) {
       warnings: combinedWarnings,
       normalizations: normalizationReport,
       createdPostStubs,
+      createdPosts: createdPostStubs,
+      saved: true,
     });
   } catch (e: any) {
     return json({ ok:false, error: e?.message || String(e) }, 500);

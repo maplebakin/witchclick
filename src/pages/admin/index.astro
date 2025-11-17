@@ -195,12 +195,13 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               <div class="flex flex-wrap gap-2">
                 <button id="validateBtn" class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft">✓ Validate</button>
                 <button id="previewBtn" class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft">👁 Preview</button>
+                <button id="saveDraftBtn" class="rounded-lg bg-warning px-4 py-2 text-sm font-semibold text-white hover:opacity-90">📝 Save as Draft</button>
                 <button id="ingestBtn" class="rounded-lg bg-success px-4 py-2 text-sm font-semibold text-white hover:opacity-90">⬇ Ingest</button>
                 <button id="ingestPublishBtn" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:opacity-90">🚀 Ingest + Publish</button>
                 <button id="clearBtn" class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft">Clear</button>
               </div>
               <div class="text-xs text-body-muted rounded-lg border border-dashed border-line-subtle bg-surface-base/60 px-3 py-2">
-                <strong>💡 Tip:</strong> Validate first to check for errors, Preview to see how it looks, then Ingest to save. Use "Ingest + Publish" to also set the publishedAt date.
+                <strong>💡 Tip:</strong> Validate first to check for errors, Preview to see how it looks. Use "Save as Draft" to stage the post for review, or "Ingest" to publish immediately. <a href="/admin/staging" class="text-primary hover:underline">View staged drafts →</a>
               </div>
             </div>
             <div class="mt-3 flex flex-col gap-3">
@@ -382,7 +383,12 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           if (msg) {
             var p=document.createElement('p');
             p.className='font-medium';
-            p.textContent=msg;
+            // Support HTML in message (for links)
+            if (msg.indexOf('<a ') !== -1) {
+              p.innerHTML=msg;
+            } else {
+              p.textContent=msg;
+            }
             el.appendChild(p);
           }
 
@@ -493,7 +499,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           }
         }
         function busy(on){
-          ['genPrompt','validateBtn','previewBtn','ingestBtn','ingestPublishBtn','copyPrompt']
+          ['genPrompt','validateBtn','previewBtn','saveDraftBtn','ingestBtn','ingestPublishBtn','copyPrompt']
             .forEach(function(id){ var b=$(id); if(b){ b.disabled=!!on; b.style.opacity = on ? .6 : 1; }});
         }
 
@@ -923,7 +929,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
         async function postSpec(spec, options){
           var dryRun = options && options.dryRun ? 'true' : 'false';
-          var url = DEV_API + '/ingest' + (dryRun === 'true' ? '?dryRun=true' : '');
+          var params = [];
+          if (dryRun === 'true') params.push('dryRun=true');
+          if (spec && spec._draft === true) params.push('draft=true');
+          // Use dev-api.js endpoint - Astro static mode can't handle POST bodies
+          var url = DEV_API + '/ingest' + (params.length ? '?' + params.join('&') : '');
           var res;
           try {
             res = await fetch(url, {
@@ -1132,6 +1142,47 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             }
             renderPreview(finalSpec);
             setStatus('Preview ✓', true, warnings, notes, errors, postStubs);
+          }catch(e){ handleSpecError(e); }
+          finally{ busy(false); }
+        });
+
+        $('saveDraftBtn').addEventListener('click', async function(){
+          try{
+            busy(true); setStatus('Validating…', null);
+            var spec = parseSpec();
+            var dryRun = await postSpec(spec, { dryRun: true });
+            var finalSpec = normalizeResponseSpec(dryRun.spec, spec);
+            renderSpecSummary(finalSpec);
+            var warnings = extractArray(dryRun.warnings);
+            var notes = extractArray(dryRun.normalizationReport);
+            var errors = extractArray(dryRun.errors);
+            var postStubs = extractArray(dryRun.postStubs);
+            if (dryRun.ok === false) {
+              setStatus(dryRun.error || 'Validation errors found.', false, warnings, notes, errors, postStubs);
+              return;
+            }
+            setStatus('Validation passed. Saving as draft…', null, warnings, notes, errors, postStubs);
+
+            // Add draft flag to spec
+            finalSpec._draft = true;
+            var data = await postSpec(finalSpec, { dryRun: false });
+            if (data.ok === false) {
+              setStatus(data.error || 'Save failed.', false, extractArray(data.warnings), extractArray(data.normalizationReport), extractArray(data.errors), extractArray(data.postStubs));
+              return;
+            }
+            var ingestWarnings = extractArray(data.warnings);
+            var ingestNotes = extractArray(data.normalizationReport);
+            var mergedWarnings = ingestWarnings.length ? ingestWarnings : warnings;
+            var mergedNotes = ingestNotes.length ? ingestNotes : notes;
+            var createdPosts = extractArray(data.createdPosts);
+            var location = data.path || ('content/posts/' + (data.slug || finalSpec.slug || 'post') + '.md');
+            var slug = data.slug || (finalSpec && finalSpec.slug) || '';
+            var msg = 'Saved as draft ✓ → ' + location;
+            if (createdPosts.length) {
+              msg += ' • Created ' + createdPosts.length + ' stub post' + (createdPosts.length === 1 ? '' : 's');
+            }
+            msg += ' • <a href="/admin/staging" class="underline">View in staging →</a>';
+            setStatus(msg, true, mergedWarnings, mergedNotes, extractArray(data.errors), createdPosts.map(function(p){ return {path: p}; }), slug);
           }catch(e){ handleSpecError(e); }
           finally{ busy(false); }
         });

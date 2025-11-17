@@ -1639,12 +1639,22 @@ const server = http.createServer(async (req, res) => {
           : false;
         const dryRun = queryDryRun || bodyDryRun;
 
+        const queryDraft = (() => {
+          const flag = parsedUrl.searchParams.get('draft');
+          return flag === 'true' || flag === '1';
+        })();
+        const bodyDraft = typeof payload === 'object' && payload
+          ? payload._draft === true || payload._draft === 'true'
+          : false;
+        const isDraft = queryDraft || bodyDraft;
+
         let rawSpec;
         if (payload && typeof payload === 'object' && payload.spec && typeof payload.spec === 'object') {
           rawSpec = payload.spec;
         } else if (payload && typeof payload === 'object') {
           const clone = { ...payload };
           delete clone.dryRun;
+          delete clone._draft;
           rawSpec = clone;
         } else {
           rawSpec = payload;
@@ -1659,6 +1669,8 @@ const server = http.createServer(async (req, res) => {
           const prepared = prepareSpecForPersistence(rawSpec || {}, {
             cwd: CWD,
             postsDirectories: listPostDirsForCollisions(),
+            draft: isDraft,
+            forceCategory: 'ritual', // Generator posts are always ritual category
           });
           let persistence = null;
           if (!dryRun) {

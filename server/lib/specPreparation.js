@@ -506,7 +506,15 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
     specVersion: 2,
   };
 
-  if (spec.category) {
+  // Add draft field if specified
+  if (options.draft === true) {
+    frontmatter.draft = true;
+  }
+
+  // Force category if specified, otherwise use spec category
+  if (options.forceCategory) {
+    frontmatter.category = options.forceCategory;
+  } else if (spec.category) {
     frontmatter.category = spec.category;
   }
   if (spec.contentType) {
