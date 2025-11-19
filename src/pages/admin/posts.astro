@@ -155,5 +155,5 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
     </section>
   )}
 
-  {canUse && <script type="module" src={adminPostEditorScript}></script>}
+  {canUse && <script type="module" is:inline src={adminPostEditorScript}></script>}
 </Base>

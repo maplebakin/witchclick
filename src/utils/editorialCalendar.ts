@@ -21,7 +21,7 @@ const CalendarSeasonSchema = z
     anchorPosts: z.array(CalendarAnchorSchema).default([]),
     notes: z.string().optional(),
   })
-  .passthrough();
+  .catchall(z.unknown());
 
 const EditorialCalendarSchema = z
   .object({

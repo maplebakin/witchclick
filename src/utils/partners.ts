@@ -16,7 +16,7 @@ const PartnerSchema = z
     contact: z.string().optional(),
     notes: z.string().optional(),
   })
-  .passthrough();
+  .catchall(z.unknown());
 
 const PartnerSectionSchema = z
   .object({
@@ -25,7 +25,7 @@ const PartnerSectionSchema = z
     summary: z.string().optional(),
     partners: z.array(PartnerSchema).default([]),
   })
-  .passthrough();
+  .catchall(z.unknown());
 
 const AffiliateHighlightSchema = z
   .object({
@@ -38,7 +38,7 @@ const AffiliateHighlightSchema = z
     ctaLabel: z.string().optional(),
     image: z.string().optional(),
   })
-  .passthrough();
+  .catchall(z.unknown());
 
 const PartnerBlocksSchema = z
   .object({

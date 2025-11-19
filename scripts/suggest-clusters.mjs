@@ -32,9 +32,17 @@ function suggestCluster(post) {
   const tags = Array.isArray(data.tags) ? data.tags.map(t => String(t).toLowerCase()) : [];
   const excerpt = (data.excerpt || '').toLowerCase();
   const slug = (data.slug || '').toLowerCase();
+  const condensedBody =
+    typeof content === 'string'
+      ? content
+          .toLowerCase()
+          .split(/\s+/)
+          .slice(0, 150)
+          .join(' ')
+      : '';
 
   // Combine searchable text
-  const searchText = `${title} ${tags.join(' ')} ${excerpt} ${slug}`;
+  const searchText = `${title} ${tags.join(' ')} ${excerpt} ${slug} ${condensedBody}`;
 
   // Score each cluster
   const scores = {};

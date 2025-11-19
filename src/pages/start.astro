@@ -25,7 +25,7 @@ const jsonLd = {
 
 <Base {title} description={description}>
   <HeadSlot slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
   </HeadSlot>
 
   <div class="wc-section-shell">

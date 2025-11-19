@@ -101,7 +101,7 @@ const breadcrumbs = [
 >
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <HeadSlot slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
   </HeadSlot>
 
   <section class="hub-index-hero">

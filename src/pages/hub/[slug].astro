@@ -95,9 +95,9 @@ const breadcrumbs = [
   ambientColor={hub.ambient}
 >
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
-  <HeadSlot slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-  </HeadSlot>
+    <HeadSlot slot="head">
+      <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+    </HeadSlot>
 
   <section class="hub-hero">
     <div class="hub-hero__inner">

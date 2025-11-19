@@ -309,7 +309,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
   {canUse && (
     <>
-      <script type="module" src={normalizeDraftSpecScript}></script>
+      <script type="module" is:inline src={normalizeDraftSpecScript}></script>
       <script is:inline>
       (function(){
         var root = document.querySelector('[data-panel-root]');
@@ -688,8 +688,18 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         });
 
         $('copyPrompt').addEventListener('click', async function(){
-          try{ await navigator.clipboard.writeText($('promptOut').value || ''); setStatus('Copied ✓', true); }
-          catch { $('promptOut').select(); document.execCommand('copy'); setStatus('Copied ✓', true); }
+          var field = $('promptOut');
+          try{
+            await navigator.clipboard.writeText(field?.value || '');
+            setStatus('Copied ✓', true);
+          }
+          catch {
+            if (field) {
+              field.focus();
+              field.select();
+            }
+            setStatus('Press ⌘/Ctrl+C to copy', null);
+          }
         });
 
         // --- JSON paste sanitizer helpers ---
@@ -1296,13 +1306,16 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           });
 
           $('curseCopyPrompt').addEventListener('click', async function(){
+            var field = $('cursePromptOut');
             try {
-              await navigator.clipboard.writeText($('cursePromptOut').value || '');
+              await navigator.clipboard.writeText(field?.value || '');
               setCurseStatus('Copied ✓', true);
             } catch {
-              var field = $('cursePromptOut');
-              if (field) { field.select(); document.execCommand('copy'); }
-              setCurseStatus('Copied ✓', true);
+              if (field) {
+                field.focus();
+                field.select();
+              }
+              setCurseStatus('Press ⌘/Ctrl+C to copy', null);
             }
           });
 

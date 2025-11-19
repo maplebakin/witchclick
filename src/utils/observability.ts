@@ -597,28 +597,52 @@ function copyReportToClipboard() {
   if (!bannerReportText) return;
   const attemptClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(bannerReportText);
-      return true;
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        await navigator.clipboard.writeText(bannerReportText);
+        return true;
+      }
+      if (
+        navigator.clipboard &&
+        typeof navigator.clipboard.write === "function" &&
+        typeof ClipboardItem !== "undefined"
+      ) {
+        const blob = new Blob([bannerReportText], { type: "text/plain" });
+        await navigator.clipboard.write([new ClipboardItem({ "text/plain": blob })]);
+        return true;
+      }
     } catch {
-      return false;
+      // fall through to manual copy prompt
     }
+    return false;
+  };
+
+  const showManualCopyPrompt = () => {
+    const textarea = document.createElement("textarea");
+    textarea.value = bannerReportText;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    textarea.style.pointerEvents = "none";
+    textarea.style.top = "0";
+    textarea.style.left = "0";
+    document.body.append(textarea);
+    textarea.focus();
+    textarea.select();
+    if (bannerCopyButton) {
+      bannerCopyButton.textContent = "Press ⌘/Ctrl+C";
+      bannerCopyButton.disabled = false;
+    }
+    window.setTimeout(() => {
+      textarea.remove();
+      if (bannerCopyButton) {
+        bannerCopyButton.textContent = "Copy report";
+      }
+    }, COPY_BUTTON_RESET_MS);
   };
 
   void attemptClipboard().then((copied) => {
     if (!copied) {
-      const textarea = document.createElement("textarea");
-      textarea.value = bannerReportText;
-      textarea.style.position = "fixed";
-      textarea.style.opacity = "0";
-      textarea.style.pointerEvents = "none";
-      document.body.append(textarea);
-      textarea.select();
-      try {
-        document.execCommand("copy");
-      } catch {
-        // ignore copy failures
-      }
-      textarea.remove();
+      showManualCopyPrompt();
+      return;
     }
     if (bannerCopyButton) {
       bannerCopyButton.textContent = "Copied";

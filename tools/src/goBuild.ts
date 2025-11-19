@@ -35,8 +35,13 @@ lines.push(`/go/${key} ${target} 301!`);
 
 
 const redirectsPath = path.join(PUBLIC_DIR, '_redirects');
-const _content = lines.length ? lines.join(String.fromCharCode(10)) + String.fromCharCode(10) : '';
+const content = lines.length ? lines.join(String.fromCharCode(10)) + String.fromCharCode(10) : '';
 
+if (content) {
+fs.writeFileSync(redirectsPath, content, 'utf8');
+} else if (fs.existsSync(redirectsPath)) {
+fs.rmSync(redirectsPath);
+}
 
 process.stdout.write(`Built ${lines.length} redirects -> ${redirectsPath}
 `);

@@ -5,7 +5,16 @@ import { z } from "zod";
 const AuthorLinkSchema = z
   .object({
     title: z.string().min(1, "Link title is required"),
-    url: z.string().url("Link must be a valid URL"),
+    url: z
+      .string()
+      .refine((link) => {
+        try {
+          new URL(link);
+          return true;
+        } catch {
+          return false;
+        }
+      }, { message: "Link must be a valid URL" }),
     rel: z.string().optional(),
   })
   .strict();
@@ -23,7 +32,7 @@ const AuthorSchema = z
     specialties: z.array(z.string()).default([]),
     availability: z.string().optional(),
   })
-  .passthrough();
+  .catchall(z.unknown());
 
 export type AuthorProfile = z.infer<typeof AuthorSchema>;
 

@@ -416,7 +416,7 @@ const jsonLd = {
     {modifiedAt && (
       <meta property="article:modified_time" content={new Date(modifiedAt).toISOString()} />
     )}
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
   </HeadSlot>
 
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
@@ -549,5 +549,4 @@ const jsonLd = {
 
   <BackToTop />
 </Base>
-
 

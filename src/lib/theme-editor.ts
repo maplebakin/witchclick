@@ -689,7 +689,7 @@ export class ThemeEditor {
     };
 
     let variables: ThemeVariables;
-    let overrides = preset?.overrides ? [...preset.overrides] : [];
+    const overrides = preset?.overrides ? [...preset.overrides] : [];
 
     if (scope === 'global') {
       // When editing global scope, save comprehensive variables to global
@@ -1181,4 +1181,3 @@ export class ThemeEditor {
     this.pushState({ ...this.state, currentPreset: preset });
   }
 }
-

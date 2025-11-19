@@ -45,7 +45,7 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
 <Base {title}>
   {collectionSchema && (
     <HeadSlot slot="head">
-      <script type="application/ld+json" set:html={JSON.stringify(collectionSchema)} />
+      <script type="application/ld+json" is:inline set:html={JSON.stringify(collectionSchema)} />
     </HeadSlot>
   )}
 

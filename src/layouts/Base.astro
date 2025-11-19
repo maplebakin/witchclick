@@ -192,7 +192,6 @@ const buildThemeCss = (
   const overlayStrong = `color-mix(in srgb, ${background} 68%, transparent 32%)`;
   const plainSurface = `color-mix(in srgb, ${background} 92%, black 8%)`;
   const plainBorder = `color-mix(in srgb, ${primary} 28%, transparent 72%)`;
-  const _plainShadow = `0 28px 60px -30px color-mix(in srgb, ${primary} 18%, black 82%)`;
   const inkBody = `color-mix(in srgb, ${colorInkBase} 70%, ${colorNightBase} 30%)`;
   const inkStrong = `color-mix(in srgb, ${colorInkBase} 85%, ${colorNightBase} 15%)`;
   const inkMuted = `color-mix(in srgb, ${colorInkBase} 55%, white 45%)`;
@@ -815,13 +814,13 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
     
     <!-- Observability -->
     {observabilityConfig && (
-      <script type="module" define:vars={{ observabilityConfig }}>
+      <script type="module" is:inline define:vars={{ observabilityConfig }}>
         import { initObservability } from "@/utils/observability";
         initObservability(observabilityConfig);
       </script>
     )}
     
     <!-- Card Animations -->
-    <script type="module" src="/src/scripts/card-animations.ts"></script>
+    <script type="module" is:inline src="/src/scripts/card-animations.ts"></script>
   </body>
 </html>

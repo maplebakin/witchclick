@@ -10,25 +10,27 @@ function parseArgv(argv: string[]) {
   const positional: string[] = [];
   const flags: Flags = {};
   for (let i = 0; i < argv.length; i++) {
-    const a = argv[i];
-    if (a.startsWith('--')) {
-      const eq = a.indexOf('=');
+    const arg = argv[i];
+    if (typeof arg !== "string") continue;
+    if (arg.startsWith("--")) {
+      const eq = arg.indexOf("=");
       if (eq !== -1) {
-        flags[a.slice(2, eq)] = a.slice(eq + 1);
-      } else {
-        const key = a.slice(2);
-        const nxt = argv[i + 1];
-        if (nxt && !nxt.startsWith('-')) {
-          flags[key] = nxt;
-          i++;
-        } else {
-          flags[key] = true;
-        }
+        flags[arg.slice(2, eq)] = arg.slice(eq + 1);
+        continue;
       }
-    } else if (a.startsWith('-')) {
-      flags[a.slice(1)] = true;
+      const key = arg.slice(2);
+      const next = argv[i + 1];
+      const nextValue = typeof next === "string" && !next.startsWith("-") ? next : undefined;
+      if (nextValue !== undefined) {
+        flags[key] = nextValue;
+        i++;
+      } else {
+        flags[key] = true;
+      }
+    } else if (arg.startsWith("-") && arg.length > 1) {
+      flags[arg.slice(1)] = true;
     } else {
-      positional.push(a);
+      positional.push(arg);
     }
   }
   return { positional, flags };
@@ -84,14 +86,16 @@ async function cmdLint(positional: string[], flags: Flags) {
   }
 
   const targetValue = flags.target ?? flags.words ?? flags.wordCount;
-  const targetWordCount = typeof targetValue === 'string'
-    ? Number(targetValue)
-    : typeof targetValue === 'number'
+  const numericTarget =
+    typeof targetValue === "number"
       ? targetValue
+      : typeof targetValue === "string" && targetValue.trim()
+        ? Number(targetValue)
+        : undefined;
+  const resolvedTarget =
+    typeof numericTarget === "number" && Number.isFinite(numericTarget) && numericTarget > 0
+      ? numericTarget
       : undefined;
-  const resolvedTarget = Number.isFinite(targetWordCount) && targetWordCount > 0
-    ? Number(targetWordCount)
-    : undefined;
 
   const mod = await import('./lintSpec.js');
 

@@ -4,10 +4,31 @@ const STAGGER_MAX = 6;
 
 type Cleanup = () => void;
 
+type MotionChangeListener = (event: MediaQueryListEvent) => void;
+
 declare global {
   interface Window {
     __wcCardAnimationsInitialized?: boolean;
   }
+}
+
+function bindMotionPreferenceChange(query: MediaQueryList, listener: MotionChangeListener): () => void {
+  if (typeof query.addEventListener === "function") {
+    query.addEventListener("change", listener);
+    return () => query.removeEventListener("change", listener);
+  }
+
+  if ("onchange" in query) {
+    const previous = query.onchange;
+    query.onchange = listener;
+    return () => {
+      if (query.onchange === listener) {
+        query.onchange = previous ?? null;
+      }
+    };
+  }
+
+  return () => {};
 }
 
 function setupCardAnimations(): Cleanup {
@@ -104,19 +125,11 @@ function setupCardAnimations(): Cleanup {
     });
   };
 
-  if (typeof motionPreference.addEventListener === "function") {
-    motionPreference.addEventListener("change", handleMotionChange);
-  } else if (typeof motionPreference.addListener === "function") {
-    motionPreference.addListener(handleMotionChange);
-  }
+  const detachMotionChange = bindMotionPreferenceChange(motionPreference, handleMotionChange);
 
   return () => {
     observer.disconnect();
-    if (typeof motionPreference.removeEventListener === "function") {
-      motionPreference.removeEventListener("change", handleMotionChange);
-    } else if (typeof motionPreference.removeListener === "function") {
-      motionPreference.removeListener(handleMotionChange);
-    }
+    detachMotionChange();
   };
 }
 

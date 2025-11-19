@@ -10,7 +10,6 @@ import { PostSpecV2Schema, type PostSpecV2 } from '../../lib/postSpecSchema';
 import type { EntityType } from '../../lib/postSpecSchema';
 import { validatePostSpec } from '../../lib/postSpecValidator';
 import { slugify } from '../../../shared/slugify.js';
-import type { ZodIssue } from 'zod';
 
 /* ---------- helpers ---------- */
 
@@ -171,8 +170,9 @@ export async function POST({ request }: { request: Request }) {
 
     const parsed = PostSpecV2Schema.safeParse(normalizedSpec);
     if (!parsed.success) {
-      const schemaErrors = parsed.error.issues.map((issue: ZodIssue) => {
-        const path = issue.path.join('.') || 'root';
+      type ParsedIssue = (typeof parsed.error.issues)[number];
+      const schemaErrors = parsed.error.issues.map((issue: ParsedIssue) => {
+        const path = (issue.path ?? []).join('.') || 'root';
         return `${path}: ${issue.message}`;
       });
       return json({ ok:false, error: schemaErrors[0], errors: schemaErrors, warnings: normalizationWarnings, normalizations: normalizationReport }, 400);

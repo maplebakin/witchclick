@@ -109,17 +109,17 @@ const shareGift = {
     </div>
   </section>
 
-  <script type="application/json" id="account-rituals">
+  <script type="application/json" is:inline id="account-rituals">
     {JSON.stringify(ritualEntries)}
   </script>
-  <script type="application/json" id="account-statuses">
+  <script type="application/json" is:inline id="account-statuses">
     {JSON.stringify(progressStatuses)}
   </script>
-  <script type="application/json" id="account-share-gift">
+  <script type="application/json" is:inline id="account-share-gift">
     {JSON.stringify(shareGift)}
   </script>
 
-  <script type="module">
+  <script type="module" is:inline>
     const ritualsSource = document.getElementById("account-rituals");
     const statusesSource = document.getElementById("account-statuses");
     const giftSource = document.getElementById("account-share-gift");

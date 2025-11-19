@@ -58,9 +58,8 @@ const palette: Record<string, string> = {
   </footer>
 </section>
 
-<script type="module">
-  const initGraph = async () => {
-    const container = document.getElementById("{graphId}");
+<script type="module" is:inline>
+  const initGraph = async (container) => {
     if (!container) {
       console.warn("Entity graph container missing");
       return;
@@ -203,7 +202,13 @@ const palette: Record<string, string> = {
     }
   };
 
-  initGraph();
+  const canvases = Array.from(document.querySelectorAll("[data-graph]"));
+  canvases.forEach((container) => {
+    if (container.dataset.graph && !container.dataset.graphLoaded) {
+      initGraph(container);
+      container.dataset.graphLoaded = "true";
+    }
+  });
 </script>
 
 <style>

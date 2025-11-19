@@ -897,19 +897,51 @@ const site = Astro.url?.origin ?? "";
           select.disabled = false;
           if (submitButton) submitButton.disabled = false;
 
-          // Sort posts by publishedAt (most recent first)
-          const sortedByDate = [...posts].sort((a, b) => {
-            const dateA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
-            const dateB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
-            return dateB - dateA;
+          const safeTitle = (post) => {
+            if (post && typeof post.title === 'string' && post.title.trim().length) {
+              return post.title.trim();
+            }
+            return typeof post?.slug === 'string' ? post.slug : '';
+          };
+
+          const alphabeticalSort = (a, b) =>
+            safeTitle(a).localeCompare(safeTitle(b), undefined, { sensitivity: 'base' });
+
+          const parseDateValue = (value) => {
+            if (typeof value !== 'string' || !value.trim()) return null;
+            const parsed = Date.parse(value);
+            return Number.isFinite(parsed) ? parsed : null;
+          };
+
+          const recencyScore = (post) => {
+            return (
+              parseDateValue(post?.createdAt) ??
+              parseDateValue(post?.publishedAt) ??
+              parseDateValue(post?.pubDate) ??
+              null
+            );
+          };
+
+          const sortedByRecency = [...posts];
+          sortedByRecency.sort((a, b) => {
+            const scoreA = recencyScore(a);
+            const scoreB = recencyScore(b);
+            if (scoreA == null && scoreB == null) {
+              return alphabeticalSort(a, b);
+            }
+            if (scoreA == null) return 1;
+            if (scoreB == null) return -1;
+            return scoreB - scoreA;
           });
 
-          // Filter posts without hero images
-          const postsWithoutHero = posts.filter(p => !p.heroImage);
+          // Filter posts without hero images (alphabetical)
+          const postsWithoutHero = posts
+            .filter((p) => !p.heroImage)
+            .sort(alphabeticalSort);
 
           // Populate recently added column (top 20)
           recentPostsList.innerHTML = '';
-          const recentPosts = sortedByDate.slice(0, 20);
+          const recentPosts = sortedByRecency.slice(0, 20);
           if (recentPosts.length === 0) {
             recentPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-xs text-body-muted">No posts yet</div>';
           } else {
@@ -1112,7 +1144,9 @@ const site = Astro.url?.origin ?? "";
               ? data.items.map((item) => ({
                   slug: item?.slug,
                   title: item?.title,
-                  publishedAt: item?.publishedAt || item?.pubDate || '',
+                  publishedAt: typeof item?.publishedAt === 'string' && item.publishedAt ? item.publishedAt : '',
+                  pubDate: typeof item?.pubDate === 'string' && item.pubDate ? item.pubDate : '',
+                  createdAt: typeof item?.createdAt === 'string' && item.createdAt ? item.createdAt : '',
                   heroImagePrompt: typeof item?.heroImagePrompt === 'string' ? item.heroImagePrompt : '',
                   heroAlt: typeof item?.heroAlt === 'string' ? item.heroAlt : '',
                   heroImageAlt: typeof item?.heroImageAlt === 'string' ? item.heroImageAlt : '',

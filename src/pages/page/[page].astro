@@ -58,7 +58,7 @@ const pageItemList = createCollectionPageSchema(
 ---
 <Base title={`WitchClick — Page ${page}`}>
   <HeadSlot slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(pageItemList)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(pageItemList)} />
   </HeadSlot>
 
   <section class="archive-section wc-section-shell">

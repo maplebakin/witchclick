@@ -32,7 +32,7 @@ const { class: className = "" } = Astro.props as Props;
   </span>
 </button>
 
-<script type="module" src={comfortPreferencesUrl} />
+<script type="module" is:inline src={comfortPreferencesUrl} />
 <script is:inline>
   (() => {
     if (typeof window === 'undefined') return;

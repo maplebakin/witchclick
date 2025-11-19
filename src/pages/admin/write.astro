@@ -195,6 +195,6 @@ const site = Astro.url?.origin ?? "";
   )}
 
   {canUse && (
-    <script type="module" src={adminWriteScript}></script>
+    <script type="module" is:inline src={adminWriteScript}></script>
   )}
 </Base>

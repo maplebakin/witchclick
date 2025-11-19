@@ -143,24 +143,11 @@ function toLabel(value: string): string {
     .join(" ");
 }
 
-const ritualData = entries.map((entry) => ({
-  slug: entry.slug,
-  title: entry.title,
-  summary: entry.summary,
-  intents: entry.intents,
-  tools: entry.tools,
-  tags: entry.tags,
-  durationMinutes: entry.durationMinutes,
-  materials: entry.materials,
-  steps: entry.steps,
-}));
-
-const _ritualDataJson = JSON.stringify({ entries: ritualData });
 ---
 <Base {title} {description}>
   {downloadCollectionSchema && (
     <HeadSlot slot="head">
-      <script type="application/ld+json" set:html={JSON.stringify(downloadCollectionSchema)} />
+      <script type="application/ld+json" is:inline set:html={JSON.stringify(downloadCollectionSchema)} />
     </HeadSlot>
   )}
   <section class="mx-auto max-w-6xl space-y-6 py-12">
@@ -374,8 +361,22 @@ const _ritualDataJson = JSON.stringify({ entries: ritualData });
     </a>
   </section>
 
-  <script type="application/json" id="ritual-lab-data">{_ritualDataJson}</script>
-  <script type="module">
+  <script type="application/json" is:inline id="ritual-lab-data">
+    {JSON.stringify({
+      entries: entries.map((entry) => ({
+        slug: entry.slug,
+        title: entry.title,
+        summary: entry.summary,
+        intents: entry.intents,
+        tools: entry.tools,
+        tags: entry.tags,
+        durationMinutes: entry.durationMinutes,
+        materials: entry.materials,
+        steps: entry.steps,
+      })),
+    })}
+  </script>
+  <script type="module" is:inline>
     const dataEl = document.getElementById("ritual-lab-data");
     const form = document.getElementById("lab-form");
     const output = document.getElementById("ritual-output");

@@ -58,7 +58,7 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
 >
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <HeadSlot slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
   </HeadSlot>
 
   <section class="partners-hero">

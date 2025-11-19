@@ -59,7 +59,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
   </div>
 </div>
 
-<script define:vars={{ DEV_API }}>
+<script is:inline define:vars={{ DEV_API }}>
   function initGlobalSearch() {
     const overlay = document.querySelector('[data-global-search-overlay]');
     const modal = document.querySelector('[data-global-search-modal]');
@@ -70,6 +70,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
     const loadingState = document.querySelector('[data-global-search-loading]');
 
     if (!overlay || !input || !resultsContainer) return;
+
+    if (modal instanceof HTMLElement) {
+      modal.setAttribute('role', 'dialog');
+      modal.setAttribute('aria-modal', 'true');
+    }
 
     let isOpen = false;
     let searchTimeout = null;
@@ -84,6 +89,9 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         overlay.classList.add('is-visible');
         setTimeout(() => input.focus(), 100);
       });
+      if (body instanceof HTMLElement) {
+        body.scrollTop = 0;
+      }
     }
 
     function close() {
@@ -97,6 +105,9 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         results = [];
         selectedIndex = -1;
         showEmpty();
+        if (body instanceof HTMLElement) {
+          body.scrollTop = 0;
+        }
       }, 200);
     }
 

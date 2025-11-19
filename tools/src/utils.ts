@@ -54,7 +54,8 @@ export function listPostFiles(dir = path.join(process.cwd(), 'content', 'posts')
 export function parseFrontmatter(raw: string) {
   const m = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
   if (!m) return { data: {}, body: raw };
-  const yaml = m[1], body = m[2];
+  const yaml = m[1] ?? '';
+  const body = m[2] ?? '';
   const data = Object.fromEntries(
     yaml
       .split('\n')

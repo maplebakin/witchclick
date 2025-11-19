@@ -77,7 +77,7 @@ const breadcrumbs = [
 
 <Base title={title} description={description} canon={canonical} wide={true}>
   <HeadSlot slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(ritualJsonLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(ritualJsonLd)} />
   </HeadSlot>
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <article class="mx-auto max-w-3xl space-y-6 py-10">

@@ -187,18 +187,21 @@ async function mapLimit<T, R>(items: T[], limit: number, worker: (t: T) => Promi
   let i = 0;
 
   async function run() {
-    while (i < items.length) {
+    while (true) {
       const idx = i++;
+      if (idx >= items.length) break;
+      const value = items[idx];
+      if (value === undefined) continue;
       try {
-        results[idx] = await worker(items[idx]);
+        results[idx] = await worker(value);
       } catch (e: any) {
         // keep shape stable
         (results as any)[idx] = {
-          url: String((items[idx] as any) || ''),
+          url: String((value as any) || ''),
           ok: false,
           status: 0,
           method: 'HEAD',
-          finalUrl: String((items[idx] as any) || ''),
+          finalUrl: String((value as any) || ''),
           timeMs: 0,
           error: e?.message || String(e),
         };

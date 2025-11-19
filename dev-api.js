@@ -353,6 +353,17 @@ async function listPostsForHero() {
       let title = fileSlug;
 
       try {
+        const stats = await fsp.stat(file).catch(() => null);
+        const createdMs =
+          stats && Number.isFinite(stats.birthtimeMs) && stats.birthtimeMs > 0
+            ? stats.birthtimeMs
+            : stats && Number.isFinite(stats.mtimeMs)
+            ? stats.mtimeMs
+            : null;
+        const createdAt =
+          typeof createdMs === 'number' && Number.isFinite(createdMs)
+            ? new Date(createdMs).toISOString()
+            : null;
         const raw = await fsp.readFile(file, 'utf8');
         const parsed = parseFrontmatter(raw);
         const fmSlug = frontmatterString(parsed.data, 'slug');
@@ -367,6 +378,8 @@ async function listPostsForHero() {
         const fmExcerpt = frontmatterString(parsed.data, 'excerpt');
         const fmMetaDescription = frontmatterString(parsed.data, 'metaDescription');
         const fmMood = frontmatterString(parsed.data, 'mood');
+        const fmPublishedAt = frontmatterString(parsed.data, 'publishedAt');
+        const fmPubDate = frontmatterString(parsed.data, 'pubDate');
         const fmTags = toStringArray(parsed.data?.tags);
 
         if (!isValidSlug(slug)) continue;
@@ -382,6 +395,9 @@ async function listPostsForHero() {
           excerpt: fmExcerpt || fmMetaDescription || '',
           metaDescription: fmMetaDescription || '',
           mood: fmMood || '',
+          publishedAt: fmPublishedAt || fmPubDate || null,
+          pubDate: fmPubDate || fmPublishedAt || null,
+          createdAt,
           tags: fmTags,
         });
       } catch {

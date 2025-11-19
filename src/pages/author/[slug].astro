@@ -48,7 +48,7 @@ const jsonLd = createCollectionPageSchema(
   ambientColor="#c084fc"
 >
   <HeadSlot slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
   </HeadSlot>
 
   <section class="author-page-hero">

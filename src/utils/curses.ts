@@ -29,7 +29,7 @@ const curseFrontmatterSchema = z
     tldr: z.string().optional(),
     spoons: z.enum(["low", "medium", "high"]).optional(),
   })
-  .passthrough();
+  .catchall(z.unknown());
 
 let cachedCurses: LoadedCurse[] | null = null;
 

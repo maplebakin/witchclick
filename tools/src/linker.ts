@@ -236,14 +236,15 @@ function linkAcrossChunks(params: {
   const out = chunks.slice();
 
   for (let i = 0; i < out.length; i++) {
+    const chunk = out[i];
+    if (chunk === undefined) continue;
     // Skip islands: <a>, <code>, <pre>, <hN> etc.
-    if (isSkipIsland(out[i])) continue;
+    if (isSkipIsland(chunk)) continue;
 
     if (firstOnly && linked > 0) break;
     if (remaining <= 0) break;
 
-    const before = out[i];
-    const r = replaceFirstOrLimited(before, re, replacement, firstOnly, remaining);
+    const r = replaceFirstOrLimited(chunk, re, replacement, firstOnly, remaining);
     if (r.linked > 0) {
       out[i] = r.text;
       linked += r.linked;

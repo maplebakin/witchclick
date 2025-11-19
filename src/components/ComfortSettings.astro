@@ -51,7 +51,7 @@ const themeToggleId = `comfort-theme-${variant}`;
   </div>
 </details>
 
-<script type="module" src={comfortPreferencesUrl} />
+<script type="module" is:inline src={comfortPreferencesUrl} />
 <script is:inline>
   (() => {
     if (typeof window === 'undefined') return;
