@@ -9,6 +9,13 @@ const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "..");
 const contentRoot = path.join(repoRoot, "content");
 
+function canonicalPath(pathname: string): string {
+  let value = pathname.trim();
+  if (!value.startsWith("/")) value = `/${value}`;
+  if (value === "/") return "/";
+  return value.replace(/\/+$/, "");
+}
+
 function firstSlugFrom(directory: string): string | null {
   try {
     const entries = fs
@@ -168,9 +175,9 @@ test.describe("site smoke", () => {
     const postSlug = firstSlugFrom(path.join(contentRoot, "posts"));
     const curseSlug = firstSlugFrom(path.join(contentRoot, "white-magic-curses"));
 
-    const routes = ["/", "/entities/", "/curses/", "/hub/", "/tools/"];
-    if (postSlug) routes.push(`/post/${postSlug}/`);
-    if (curseSlug) routes.push(`/curses/${curseSlug}/`);
+    const routes = ["/", "/entities/", "/curses/", "/hub/", "/tools/"].map(canonicalPath);
+    if (postSlug) routes.push(canonicalPath(`/post/${postSlug}/`));
+    if (curseSlug) routes.push(canonicalPath(`/curses/${curseSlug}/`));
 
     for (const route of routes) {
       const response = await page.goto(route, { waitUntil: "networkidle" });
@@ -258,7 +265,8 @@ test.describe("site smoke", () => {
     test.skip(!entity, "No entities with related posts found in content");
     if (!entity) return;
 
-    const response = await page.goto(`/entities/${entity.type}/${entity.slug}/`, {
+    const entityPath = canonicalPath(`/entities/${entity.type}/${entity.slug}/`);
+    const response = await page.goto(entityPath, {
       waitUntil: "networkidle",
     });
     expect(response?.status()).toBe(200);
@@ -277,7 +285,8 @@ test.describe("site smoke", () => {
     test.skip(!entity, "All entities currently referenced by posts");
     if (!entity) return;
 
-    const response = await page.goto(`/entities/${entity.type}/${entity.slug}/`, {
+    const entityPath = canonicalPath(`/entities/${entity.type}/${entity.slug}/`);
+    const response = await page.goto(entityPath, {
       waitUntil: "networkidle",
     });
     expect(response?.status()).toBe(200);
@@ -285,6 +294,6 @@ test.describe("site smoke", () => {
     const placeholder = page.locator(".entity-related-placeholder");
     await expect(placeholder).toBeVisible();
     await expect(placeholder).toContainText("Lore Hub");
-    await expect(placeholder.locator('a[href="/hub/"]')).toBeVisible();
+    await expect(placeholder.locator('a[href="/hub"]')).toBeVisible();
   });
 });

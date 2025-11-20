@@ -2,17 +2,7 @@ const MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const STAGGER_STEP = 80;
 const STAGGER_MAX = 6;
 
-type Cleanup = () => void;
-
-type MotionChangeListener = (event: MediaQueryListEvent) => void;
-
-declare global {
-  interface Window {
-    __wcCardAnimationsInitialized?: boolean;
-  }
-}
-
-function bindMotionPreferenceChange(query: MediaQueryList, listener: MotionChangeListener): () => void {
+function bindMotionPreferenceChange(query, listener) {
   if (typeof query.addEventListener === "function") {
     query.addEventListener("change", listener);
     return () => query.removeEventListener("change", listener);
@@ -31,7 +21,7 @@ function bindMotionPreferenceChange(query: MediaQueryList, listener: MotionChang
   return () => {};
 }
 
-function setupCardAnimations(): Cleanup {
+function setupCardAnimations() {
   if (typeof window === "undefined") {
     return () => {};
   }
@@ -46,7 +36,7 @@ function setupCardAnimations(): Cleanup {
     return () => {};
   }
 
-  const cards = Array.from(document.querySelectorAll<HTMLElement>(".card-panel"));
+  const cards = Array.from(document.querySelectorAll(".card-panel"));
   if (!cards.length) {
     return () => {};
   }
@@ -62,7 +52,7 @@ function setupCardAnimations(): Cleanup {
     (entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
-        const card = entry.target as HTMLElement;
+        const card = entry.target;
         if (card.dataset.animate === "done") {
           observer.unobserve(card);
           return;
@@ -106,7 +96,7 @@ function setupCardAnimations(): Cleanup {
 
   cards.forEach((card) => observer.observe(card));
 
-  const handleMotionChange = (event: MediaQueryListEvent) => {
+  const handleMotionChange = (event) => {
     if (event.matches) {
       observer.disconnect();
       cards.forEach((card) => {
@@ -134,10 +124,12 @@ function setupCardAnimations(): Cleanup {
 }
 
 function runAnimations() {
-  let cleanup: Cleanup | null = null;
+  let cleanup = null;
 
   const trigger = () => {
-    cleanup?.();
+    if (typeof cleanup === "function") {
+      cleanup();
+    }
     cleanup = setupCardAnimations();
   };
 
@@ -157,9 +149,11 @@ function runAnimations() {
   document.addEventListener("astro:page-load", trigger);
 }
 
-if (typeof window !== "undefined" && !window.__wcCardAnimationsInitialized) {
-  window.__wcCardAnimationsInitialized = true;
-  runAnimations();
+if (typeof window !== "undefined") {
+  if (!window.__wcCardAnimationsInitialized) {
+    window.__wcCardAnimationsInitialized = true;
+    runAnimations();
+  }
 }
 
 export {};
