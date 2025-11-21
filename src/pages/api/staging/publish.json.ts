@@ -70,7 +70,7 @@ export async function POST({ request }: { request: Request }) {
       slug,
       title: data.title,
       publishedAt: data.publishedAt,
-      path: `content/posts/${slug}.md`,
+      path: `src/content/posts/${slug}.md`,
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);

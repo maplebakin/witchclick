@@ -1,15 +1,11 @@
 #!/usr/bin/env node
 // scripts/ingest.mjs
-// Turn a JSON spec into a validated Markdown post.
-// Works with either src/content/posts/ (Content Collections) or content/posts/ (legacy).
+// Turn a JSON spec into a validated Markdown post inside src/content/posts/.
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import prompts from "./lib/prompts.js";
-import {
-  prepareSpecForPersistence,
-  persistPreparedSpec,
-} from "../server/lib/specPreparation.js";
+import { executeIngest } from "../server/lib/ingestExecutor.js";
 import { generateSchemaDocumentation } from "../server/lib/postSpecSchema.js";
 import { resolvePostsDirectories, slugify } from "./lib/contentPaths.js";
 
@@ -57,11 +53,12 @@ export async function ingestFromSpec(input, options = {}) {
     resolvePostsDirectories({ root: PROJECT_ROOT, preferred: dir })
   );
 
-  let prepared;
+  let ingestionResult;
   try {
-    prepared = prepareSpecForPersistence(input || {}, {
+    ingestionResult = await executeIngest(input || {}, {
       cwd: PROJECT_ROOT,
       postsDirectories,
+      dryRun: Boolean(dry),
       sourcePath: inputPath || null,
       generatedAt: new Date().toISOString(),
     });
@@ -85,14 +82,9 @@ export async function ingestFromSpec(input, options = {}) {
     throw new IngestValidationError({ message: err?.message, errors, warnings, normalizations });
   }
 
+  const { prepared, persistence, bytesWritten } = ingestionResult;
   const { post, spec, normalizationReport, warnings, entityStubs, postStubs, promptMetadata } = prepared;
   const slug = spec.slug;
-  const bytesWritten = Buffer.byteLength(post.contents, "utf8");
-
-  let persistence = null;
-  if (!dry) {
-    persistence = await persistPreparedSpec(prepared);
-  }
 
   const result = {
     dryRun: Boolean(dry),

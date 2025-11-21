@@ -33,6 +33,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
       <div
         id="themeEditorRoot"
         data-dev-api={DEV_API}
+        data-theme-watch={import.meta.env.DEV ? "auto" : "manual"}
         class="rounded-2xl border border-dashed border-line-subtle bg-surface-base/60 p-6 text-center text-sm text-body-muted"
       >
         <p class="font-medium text-primary">Loading Theme Editor…</p>
@@ -56,7 +57,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
       const globalWindow = window;
       if (!globalWindow.__themeEditorLoaded) {
         globalWindow.__themeEditorLoaded = true;
-        import("/src/pages/admin/theme-editor-entry.ts");
+        import("/src/scripts/theme-editor-entry.ts");
       }
     </script>
   )}

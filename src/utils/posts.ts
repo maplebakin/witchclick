@@ -58,37 +58,13 @@ function isDirectory(candidate: string): boolean {
   }
 }
 
-function directoryHasMarkdown(candidate: string): boolean {
-  if (!isDirectory(candidate)) return false;
-
-  try {
-    return fs
-      .readdirSync(candidate, { withFileTypes: true })
-      .some((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".md"));
-  } catch {
-    return false;
-  }
-}
-
 function resolvePostDirectories(): string[] {
   const cwd = process.cwd();
   const modern = path.join(cwd, "src", "content", "posts");
-  const legacy = path.join(cwd, "content", "posts");
-
-  if (directoryHasMarkdown(modern)) {
+  if (isDirectory(modern)) {
     return [modern];
   }
-
-  if (directoryHasMarkdown(legacy)) {
-    return [legacy];
-  }
-
-  const dirs: string[] = [];
-
-  if (isDirectory(modern)) dirs.push(modern);
-  if (isDirectory(legacy)) dirs.push(legacy);
-
-  return dirs;
+  return [];
 }
 
 function deriveSlug(file: string, data: Record<string, any>): string {

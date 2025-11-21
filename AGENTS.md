@@ -188,6 +188,7 @@ npm run check:affiliates # Check for placeholder affiliate IDs
 npm run ingest -- <spec.json> [--dry]    # Ingest PostSpec v2 JSON
 npm run ingest -- --interactive          # Interactive ingest flow
 npm run genprompt                        # Generate content prompts
+node tools/wc.js stubprompts             # Generate prompts for incomplete entity stubs
 ```
 
 ### Utilities
@@ -279,7 +280,7 @@ WitchClick uses structured JSON for AI-driven content generation:
 2. **Validation:** Zod schema validation (`server/lib/postSpecValidator.js`)
 3. **Preparation:** Normalization (`server/lib/specPreparation.js`)
 4. **Persistence:** `scripts/ingest.mjs` converts JSON → markdown
-5. **Output:** Written to `src/content/posts/` or `content/posts/`
+5. **Output:** Written to `src/content/posts/`
 
 **Key PostSpec Fields:**
 - `specVersion: 2` (required literal)
@@ -426,7 +427,7 @@ ls content/entities/
 ### ⚠️ Current Known Issues
 1. **Placeholder Affiliate IDs** - Must replace before monetization
 2. **Some tests have type mismatches** - Non-blocking (17 errors in test files)
-3. **Legacy content directory** - Dual-path support adds complexity
+3. **Legacy content directory cleanup** - Posts now live in `src/content/posts/` to keep the pipeline predictable
 
 ### 🔧 Technical Debt
 1. **Align ingestion output paths** - Single source of truth for posts

@@ -76,7 +76,6 @@ class MockResponse {
 
 async function prepareTempDir() {
   tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "wc-hero-attach-"));
-  await fs.mkdir(path.join(tempDir, "content", "posts"), { recursive: true });
   await fs.mkdir(path.join(tempDir, "src", "content", "posts"), { recursive: true });
   await fs.mkdir(path.join(tempDir, "public", "images", "hero"), { recursive: true });
   cwdSpy = vi.spyOn(process, "cwd");
@@ -109,7 +108,7 @@ describe("attachHeroToPost", () => {
 
   it("updates frontmatter with hero image metadata", async () => {
     const slug = "cozy-hero";
-    const postPath = path.join(tempDir, "content", "posts", `${slug}.md`);
+    const postPath = path.join(tempDir, "src", "content", "posts", `${slug}.md`);
     const heroDir = path.join(tempDir, "public", "images", "hero", slug);
     await fs.mkdir(heroDir, { recursive: true });
     await fs.writeFile(
@@ -123,7 +122,7 @@ describe("attachHeroToPost", () => {
     const heroPath = `/images/hero/${slug}/hero.png`;
     const result = await attachHeroToPost({ slug, heroImage: heroPath, heroAlt: "Soft glow" });
 
-    expect(result.path).toBe(`content/posts/${slug}.md`);
+    expect(result.path).toBe(`src/content/posts/${slug}.md`);
 
     const updatedRaw = await fs.readFile(postPath, "utf8");
     const parsed = matter(updatedRaw);
@@ -133,17 +132,10 @@ describe("attachHeroToPost", () => {
     expect(parsed.data.heroAlt).toBe("Soft glow");
   });
 
-  it("lists posts from both content directories", async () => {
+  it("lists posts from the canonical posts directory", async () => {
     expect(handleRequest).toBeDefined();
 
-    const legacyPost = path.join(tempDir, "content", "posts", "legacy-post.md");
     const srcPost = path.join(tempDir, "src", "content", "posts", "src-post.md");
-
-    await fs.writeFile(
-      legacyPost,
-      "---\ntitle: Legacy Listing\nslug: legacy-post\n---\nOld world",
-      "utf8",
-    );
 
     await fs.writeFile(
       srcPost,
@@ -165,7 +157,6 @@ describe("attachHeroToPost", () => {
 
     expect(payload.ok).toBe(true);
     const slugs = payload.items.map((item) => item.slug);
-    expect(slugs).toContain("legacy-post");
     expect(slugs).toContain("src-post");
   });
 });

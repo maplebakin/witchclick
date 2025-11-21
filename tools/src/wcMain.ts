@@ -289,6 +289,21 @@ async function cmdHealth() {
   await (mod as any).healthLinks();
 }
 
+async function cmdStubPrompts(flags: Flags) {
+  const cwd = process.cwd();
+  const outArg = typeof flags.out === 'string' ? flags.out : '';
+  const outFile = outArg ? path.resolve(cwd, outArg) : path.join(cwd, 'tmp', 'entity-stub-prompts.md');
+  const mod = await import('./stubPrompts.js');
+  const { generateStubPrompts } = mod as any;
+  const result = generateStubPrompts({ cwd });
+
+  ensureDir(path.dirname(outFile));
+  fs.writeFileSync(outFile, result.output, 'utf8');
+
+  const relPath = path.relative(cwd, outFile) || outFile;
+  console.log(`Generated ${result.total} stub prompt${result.total === 1 ? '' : 's'} → ${relPath}`);
+}
+
 // ---- Main ----
 
 export async function main(argv: string[] = process.argv.slice(2)) {
@@ -319,6 +334,8 @@ export async function main(argv: string[] = process.argv.slice(2)) {
       return cmdGoBuild();
     case 'health':
       return cmdHealth();
+    case 'stubprompts':
+      return cmdStubPrompts(flags);
     case 'help':
     default:
       console.log(
@@ -338,6 +355,7 @@ export async function main(argv: string[] = process.argv.slice(2)) {
           '      (PDF output requires `npm run tools:export:install` once)',
           '  node tools/wc.js go:build',
           '  node tools/wc.js health',
+          '  node tools/wc.js stubprompts [--out tmp/entity-stub-prompts.md]',
           '',
         ].join('\n'),
       );

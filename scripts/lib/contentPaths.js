@@ -12,10 +12,7 @@ import { slugify as sharedSlugify } from "./slug.js";
  */
 export function createPostsDirectoryCandidates(root) {
   const projectRoot = path.resolve(root);
-  return [
-    path.join(projectRoot, "src", "content", "posts"),
-    path.join(projectRoot, "content", "posts"),
-  ];
+  return [path.join(projectRoot, "src", "content", "posts")];
 }
 
 /**
@@ -84,19 +81,10 @@ export function resolvePostsDirectories(options = {}) {
 
   if (preferred) {
     const resolvedPreferred = path.resolve(projectRoot, preferred);
-    const extras = candidates.filter(
-      (candidate) => candidate !== resolvedPreferred && isDirectory(candidate)
-    );
-    return [resolvedPreferred, ...extras];
+    return [resolvedPreferred];
   }
 
-  const primary = resolvePrimaryPostsDir({ root: projectRoot });
-  const dirs = [];
-  for (const candidate of candidates) {
-    if (isDirectory(candidate)) dirs.push(candidate);
-  }
-  if (!dirs.includes(primary)) dirs.unshift(primary);
-  return dirs;
+  return candidates;
 }
 
 /**

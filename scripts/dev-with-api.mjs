@@ -22,6 +22,12 @@ const apiEnv = {
   DEV_API_PORT: devApiPort,
 };
 
+const themeProcess = spawn("node", ["./scripts/generate-theme-css.mjs", "--watch"], {
+  cwd: process.cwd(),
+  env: process.env,
+  stdio: "inherit",
+});
+
 const apiProcess = spawn("node", ["./dev-api.js"], {
   cwd: process.cwd(),
   env: apiEnv,
@@ -37,6 +43,9 @@ function exitProcess(code) {
     return;
   }
   closing = true;
+  if (themeProcess && !themeProcess.killed) {
+    themeProcess.kill();
+  }
   process.exit(code);
 }
 
@@ -121,9 +130,30 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
     if (astroProcess && !astroProcess.killed) {
       astroProcess.kill(signal);
     }
+    if (themeProcess && !themeProcess.killed) {
+      themeProcess.kill(signal);
+    }
     if (!apiProcess.killed) {
       apiProcess.kill(signal);
     }
     process.exit(0);
   });
 }
+
+themeProcess.on("exit", (code) => {
+  if (closing) {
+    return;
+  }
+  console.error(
+    `[dev-with-api] Theme watcher exited unexpectedly with code ${
+      typeof code === "number" ? code : "unknown"
+    }.`,
+  );
+  if (astroProcess && !astroProcess.killed) {
+    astroProcess.kill();
+  }
+  if (apiProcess && !apiProcess.killed) {
+    apiProcess.kill();
+  }
+  exitProcess(typeof code === "number" ? code : 1);
+});

@@ -37,7 +37,7 @@ export async function POST({ request }: { request: Request }) {
       slug,
       frontmatter: data,
       markdown: markdown.trim(),
-      filePath: `content/posts/${slug}.md`,
+      filePath: `src/content/posts/${slug}.md`,
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);

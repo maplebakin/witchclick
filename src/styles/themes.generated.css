@@ -7,7 +7,6 @@
  * To modify themes, edit files in content/themes/
  * Then run: npm run themes:build
  *
- * Generated: 2025-11-19T13:14:16.317Z
  * Source: scripts/generate-theme-css.mjs
  */
 
@@ -215,6 +214,68 @@
   --theme-warning: #fbbf24;
   --theme-error: #f87171;
   --theme-info: #60a5fa;
+}
+
+/* November Burnt Orange (midnight mode) */
+:root[data-theme="november-burnt-orange"] {
+  --theme-primary: #1f140a;
+  --theme-accent: #cc9966;
+  --theme-background: #0f0a05;
+  --theme-font-serif: Literata;
+  --theme-font-script: Parisienne;
+  --theme-text-primary: #ebd9c7;
+  --theme-text-heading: #261a0d;
+  --theme-text-muted: #f2bf8c;
+  --theme-font-heading: Cinzel;
+  --theme-font-accent: Cormorant Garamond;
+  --theme-color-midnight: #070a05;
+  --theme-color-night: #d18c47;
+  --theme-color-iris: #f2bf8c;
+  --theme-color-amethyst: #d18c47;
+  --theme-color-dusk: #22170b;
+  --theme-color-gold: #e4a667;
+  --theme-color-rune: #f8f2ed;
+  --theme-color-fog: #cc9966;
+  --theme-color-ink: #ebd9c7;
+  --theme-surface-plain: #22170b;
+  --theme-surface-plain-border: #452e17;
+  --theme-card-panel-surface: #452e17;
+  --theme-card-panel-surface-strong: #764a1e;
+  --theme-card-panel-border: #764a1e;
+  --theme-card-panel-border-strong: #452e17;
+  --theme-card-panel-border-soft: #362412;
+  --theme-text-secondary: #d18c47;
+  --theme-text-tertiary: #f2bf8c;
+  --theme-text-strong: #f8f2ed;
+  --theme-text-hint: #d18c47;
+  --theme-text-body: #f9f5ff;
+  --theme-text-subtle: #f9f5ff;
+  --theme-text-accent: #f2bf8c;
+  --theme-text-accent-strong: #d18c47;
+  --theme-ink-body: #ebd9c7;
+  --theme-ink-strong: #f8f2ed;
+  --theme-ink-muted: #f2bf8c;
+  --theme-link-color: #f2bf8c;
+  --theme-card-badge-bg: #22170b;
+  --theme-card-badge-border: #362412;
+  --theme-card-badge-text: #f8f3ff;
+  --theme-card-tag-bg: #362412;
+  --theme-card-tag-border: #22170b;
+  --theme-card-tag-text: #f4f1ff;
+  --theme-focus-ring-color: #e8d591;
+  --theme-card-focus-outline: #e8d591;
+  --theme-success: #4ade80;
+  --theme-warning: #fbbf24;
+  --theme-error: #f87171;
+  --theme-info: #60a5fa;
+  --theme-entity-card-border: #3d2914;
+  --theme-entity-card-highlight: #ebd9c7;
+  --theme-entity-card-surface-top: #3d2914;
+  --theme-entity-card-surface-bottom: #7b4f24;
+  --theme-entity-card-heading: #f8f2ed;
+  --theme-entity-card-text: #ebd9c7;
+  --theme-entity-card-cta: #3d2914;
+  --theme-entity-card-cta-hover: #452e17;
 }
 
 /* Scope Test Theme (midnight mode) */

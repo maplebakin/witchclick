@@ -191,31 +191,57 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
             <textarea id="spec" class="h-56 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder='Paste the PostSpec v2 JSON here (get it from your LLM using the generated prompt)'></textarea>
 
-            <div class="mt-3 space-y-3">
-              <div class="flex flex-wrap gap-2">
-                <button id="validateBtn" class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft">✓ Validate</button>
-                <button id="previewBtn" class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft">👁 Preview</button>
-                <button id="saveDraftBtn" class="rounded-lg bg-warning px-4 py-2 text-sm font-semibold text-white hover:opacity-90">📝 Save as Draft</button>
-                <button id="ingestBtn" class="rounded-lg bg-success px-4 py-2 text-sm font-semibold text-white hover:opacity-90">⬇ Ingest</button>
-                <button id="ingestPublishBtn" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:opacity-90">🚀 Ingest + Publish</button>
-                <button id="clearBtn" class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft">Clear</button>
+            <div class="mt-3 space-y-4 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] lg:gap-6">
+              <div class="space-y-3">
+                <div class="flex flex-col gap-2">
+                  <div class="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wide text-body-muted">
+                    <span>Save mode</span>
+                    <div class="inline-flex rounded-full border border-line-neutral bg-surface-neutral-soft p-1" data-save-mode>
+                      <button type="button" data-mode="publish" class="rounded-full px-3 py-1 text-[11px] font-semibold text-body bg-surface-base shadow-sm">Publish</button>
+                      <button type="button" data-mode="draft" class="rounded-full px-3 py-1 text-[11px] font-semibold text-body-muted">Draft</button>
+                    </div>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <button id="validateBtn" class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft">✓ Validate</button>
+                    <button id="previewBtn" class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft">👁 Preview</button>
+                    <button id="ingestBtn" class="rounded-lg bg-success px-4 py-2 text-sm font-semibold text-white hover:opacity-90">💾 Save</button>
+                    <button id="ingestPublishBtn" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:opacity-90">🚀 Publish Now</button>
+                    <button id="clearBtn" class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft">Clear</button>
+                  </div>
+                  <div class="text-xs text-body-muted rounded-lg border border-dashed border-line-subtle bg-surface-base/60 px-3 py-2">
+                    <strong>💡 Tip:</strong> Validate first to check for errors, Preview to see the rendered flow. Use the save mode toggle to store drafts without publishing. <a href="/admin/staging" class="text-primary hover:underline">View staged drafts →</a>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-3">
+                  <div
+                    id="status"
+                    class="rounded-lg border border-line-slate bg-surface-cool-soft px-3 py-2 text-sm text-muted-strong"
+                  ></div>
+                  <div
+                    id="specSummary"
+                    class="rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[11px] text-body-muted"
+                  ></div>
+                </div>
+                <div id="preview" class="prose prose-neutral mt-4 max-w-none border-t pt-4"></div>
               </div>
-              <div class="text-xs text-body-muted rounded-lg border border-dashed border-line-subtle bg-surface-base/60 px-3 py-2">
-                <strong>💡 Tip:</strong> Validate first to check for errors, Preview to see how it looks. Use "Save as Draft" to stage the post for review, or "Ingest" to publish immediately. <a href="/admin/staging" class="text-primary hover:underline">View staged drafts →</a>
-              </div>
+              <aside class="mt-6 space-y-3 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm lg:mt-0" data-recent-panel>
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 class="text-sm font-semibold text-body-strong">Recent Posts</h3>
+                    <p class="text-xs text-body-muted">Quick links to the latest ingestions.</p>
+                  </div>
+                  <button type="button" data-recent-refresh class="rounded-lg border border-line-neutral px-3 py-1 text-xs font-semibold hover:bg-surface-soft">↻ Refresh</button>
+                </div>
+                <label class="flex items-center gap-2 text-xs text-body-muted">
+                  <span class="sr-only">Filter recent posts</span>
+                  <input type="search" data-recent-filter class="w-full rounded-lg border border-line-neutral px-3 py-1.5 text-sm" placeholder="Filter posts…" />
+                </label>
+                <div class="space-y-2" data-recent-list>
+                  <div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-body-muted">Fetching recent posts…</div>
+                </div>
+                <p class="text-[11px] text-body-muted">Select a post to insert a JSON stub or jump to the editor.</p>
+              </aside>
             </div>
-            <div class="mt-3 flex flex-col gap-3">
-              <div
-                id="status"
-                class="rounded-lg border border-line-slate bg-surface-cool-soft px-3 py-2 text-sm text-muted-strong"
-              ></div>
-              <div
-                id="specSummary"
-                class="rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[11px] text-body-muted"
-              ></div>
-            </div>
-
-            <div id="preview" class="prose prose-neutral mt-4 max-w-none border-t pt-4"></div>
           </section>
         </div>
 
@@ -323,6 +349,14 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         var rawCurseTargets = root?.getAttribute('data-curse-targets') || '[]';
         var rawCurseTones = root?.getAttribute('data-curse-tones') || '[]';
         var rawCurseTags = root?.getAttribute('data-curse-tags') || '[]';
+        var saveModeContainer = root?.querySelector('[data-save-mode]');
+        var currentSaveMode = 'publish';
+        var recentPanel = root?.querySelector('[data-recent-panel]');
+        var recentListEl = root?.querySelector('[data-recent-list]');
+        var recentRefreshBtn = root?.querySelector('[data-recent-refresh]');
+        var recentFilterInput = root?.querySelector('[data-recent-filter]');
+        var recentPosts = [];
+        var recentFilterText = '';
         var PRESET_OPTIONS = [];
         var STYLE_OPTIONS = [];
         var CURSE_TYPES = [];
@@ -367,6 +401,15 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         });
 
         showPanel('posts');
+        if (saveModeContainer) {
+          saveModeContainer.addEventListener('click', function(event){
+            var target = event.target.closest('[data-mode]');
+            if (!target) return;
+            var mode = target.getAttribute('data-mode') || 'publish';
+            setSaveMode(mode);
+          });
+          setSaveMode(currentSaveMode);
+        }
         function setStatus(msg, ok, warnings, notes, errors, postStubs, slug){
           var el=$('status');
           if (!el) return;
@@ -499,7 +542,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           }
         }
         function busy(on){
-          ['genPrompt','validateBtn','previewBtn','saveDraftBtn','ingestBtn','ingestPublishBtn','copyPrompt']
+          ['genPrompt','validateBtn','previewBtn','ingestBtn','ingestPublishBtn','copyPrompt']
             .forEach(function(id){ var b=$(id); if(b){ b.disabled=!!on; b.style.opacity = on ? .6 : 1; }});
         }
 
@@ -928,6 +971,132 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           return Array.isArray(value) ? value : [];
         }
 
+        function updateSaveModeUI(){
+          if (!saveModeContainer) return;
+          var buttons = saveModeContainer.querySelectorAll('[data-mode]');
+          buttons.forEach(function(button){
+            var mode = button.getAttribute('data-mode') === 'draft' ? 'draft' : 'publish';
+            var active = mode === currentSaveMode;
+            button.classList.toggle('bg-surface-base', active);
+            button.classList.toggle('text-body', active);
+            button.classList.toggle('text-body-muted', !active);
+            button.classList.toggle('shadow-sm', active);
+          });
+        }
+
+        function setSaveMode(mode){
+          currentSaveMode = mode === 'draft' ? 'draft' : 'publish';
+          updateSaveModeUI();
+        }
+
+        function parseDateValue(value){
+          if (typeof value !== 'string' || !value.trim()) return null;
+          var parsed = Date.parse(value);
+          return Number.isFinite(parsed) ? parsed : null;
+        }
+
+        function matchesRecentFilter(post, term){
+          if (!term) return true;
+          var search = term.toLowerCase();
+          var candidates = [
+            post.title,
+            post.slug,
+            Array.isArray(post.tags) ? post.tags.join(' ') : '',
+            post.metaDescription,
+            post.excerpt
+          ].filter(Boolean);
+          return candidates.some(function(value){
+            return typeof value === 'string' && value.toLowerCase().includes(search);
+          });
+        }
+
+        function insertStubForPost(post){
+          var editor = $('spec');
+          if (!editor) return;
+          var stub = {
+            specVersion: 2,
+            title: post?.title || '',
+            slug: post?.slug || '',
+            excerpt: post?.excerpt || '',
+            metaDescription: post?.metaDescription || post?.excerpt || '',
+            tags: Array.isArray(post?.tags) ? post.tags : [],
+            includeAds: false,
+            includeKofi: true,
+            outline: [],
+            sections: [
+              { heading: 'Introduction', markdown: '' },
+              { heading: 'Practice', markdown: '' },
+              { heading: 'Reflection', markdown: '' }
+            ],
+            entities: [],
+            internalLinkHints: [],
+            affiliateHints: [],
+            heroImagePrompt: post?.heroImagePrompt || ''
+          };
+          editor.value = JSON.stringify(stub, null, 2);
+          editor.focus();
+          editor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          setStatus('Inserted JSON stub for “' + (post?.title || post?.slug || 'post') + '”. Fill in the outline and sections before validating.', null);
+        }
+
+        function renderRecentPosts(){
+          if (!recentListEl) return;
+          if (!recentPosts.length) {
+            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-body-muted">No posts yet.</div>';
+            return;
+          }
+          var term = recentFilterText.trim().toLowerCase();
+          var filtered = recentPosts.filter(function(post){
+            return matchesRecentFilter(post, term);
+          });
+          if (!filtered.length) {
+            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-body-muted">No matches. Try a different search.</div>';
+            return;
+          }
+          recentListEl.innerHTML = '';
+          filtered.forEach(function(post){
+            var displayDate = post?.publishedAt || post?.createdAt || '';
+            var dateLabel = displayDate ? new Date(displayDate).toLocaleDateString() : '—';
+            var safeSlugAttr = (post?.slug || '').replace(/"/g, '&quot;');
+            var card = document.createElement('div');
+            card.className = 'rounded-xl border border-line-neutral bg-surface-neutral-soft p-3 text-sm';
+            card.innerHTML = `
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="font-semibold text-body">${(post.title || '(untitled)').replace(/</g, '&lt;')}</p>
+                  <p class="text-[11px] text-body-muted">${post.slug || ''}</p>
+                </div>
+                <span class="text-[10px] font-semibold uppercase tracking-wide text-body-muted">${dateLabel}</span>
+              </div>
+              <div class="mt-2 flex flex-wrap gap-2">
+                <button type="button" class="rounded-lg border border-line-neutral px-2 py-1 text-[11px] font-semibold hover:bg-surface-base" data-recent-insert data-slug="${safeSlugAttr}">Insert stub</button>
+                <a class="rounded-lg border border-line-neutral px-2 py-1 text-[11px] font-semibold text-primary hover:bg-surface-base" href="/admin/posts?slug=${encodeURIComponent(post.slug || '')}" target="_blank" rel="noopener">Edit</a>
+              </div>
+            `;
+            recentListEl.appendChild(card);
+          });
+        }
+
+        async function loadRecentPosts(){
+          if (!recentListEl) return;
+          recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-body-muted">Loading recent posts…</div>';
+          try{
+            var res = await fetch(DEV_API + '/posts/list', { method: 'POST' });
+            var data = await res.json();
+            if (!data?.ok) throw new Error(data?.error || 'Unable to load posts');
+            var items = Array.isArray(data.items) ? data.items : [];
+            items.sort(function(a, b){
+              var dateA = parseDateValue(a?.createdAt) || parseDateValue(a?.publishedAt) || 0;
+              var dateB = parseDateValue(b?.createdAt) || parseDateValue(b?.publishedAt) || 0;
+              return dateB - dateA;
+            });
+            recentPosts = items.slice(0, 10);
+            renderRecentPosts();
+          }catch(error){
+            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-danger">Failed to load recent posts.</div>';
+          }
+        }
+
         function buildError(message, type, info){
           var err = new Error(message);
           err.type = type;
@@ -1156,53 +1325,14 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           finally{ busy(false); }
         });
 
-        $('saveDraftBtn').addEventListener('click', async function(){
-          try{
-            busy(true); setStatus('Validating…', null);
-            var spec = parseSpec();
-            var dryRun = await postSpec(spec, { dryRun: true });
-            var finalSpec = normalizeResponseSpec(dryRun.spec, spec);
-            renderSpecSummary(finalSpec);
-            var warnings = extractArray(dryRun.warnings);
-            var notes = extractArray(dryRun.normalizationReport);
-            var errors = extractArray(dryRun.errors);
-            var postStubs = extractArray(dryRun.postStubs);
-            if (dryRun.ok === false) {
-              setStatus(dryRun.error || 'Validation errors found.', false, warnings, notes, errors, postStubs);
-              return;
-            }
-            setStatus('Validation passed. Saving as draft…', null, warnings, notes, errors, postStubs);
-
-            // Add draft flag to spec
-            finalSpec._draft = true;
-            var data = await postSpec(finalSpec, { dryRun: false });
-            if (data.ok === false) {
-              setStatus(data.error || 'Save failed.', false, extractArray(data.warnings), extractArray(data.normalizationReport), extractArray(data.errors), extractArray(data.postStubs));
-              return;
-            }
-            var ingestWarnings = extractArray(data.warnings);
-            var ingestNotes = extractArray(data.normalizationReport);
-            var mergedWarnings = ingestWarnings.length ? ingestWarnings : warnings;
-            var mergedNotes = ingestNotes.length ? ingestNotes : notes;
-            var createdPosts = extractArray(data.createdPosts);
-            var location = data.path || ('content/posts/' + (data.slug || finalSpec.slug || 'post') + '.md');
-            var slug = data.slug || (finalSpec && finalSpec.slug) || '';
-            var msg = 'Saved as draft ✓ → ' + location;
-            if (createdPosts.length) {
-              msg += ' • Created ' + createdPosts.length + ' stub post' + (createdPosts.length === 1 ? '' : 's');
-            }
-            msg += ' • <a href="/admin/staging" class="underline">View in staging →</a>';
-            setStatus(msg, true, mergedWarnings, mergedNotes, extractArray(data.errors), createdPosts.map(function(p){ return {path: p}; }), slug);
-          }catch(e){ handleSpecError(e); }
-          finally{ busy(false); }
-        });
-
         $('ingestBtn').addEventListener('click', async function(){
           try{
             busy(true); setStatus('Validating…', null);
             var spec = parseSpec();
             var dryRun = await postSpec(spec, { dryRun: true });
             var finalSpec = normalizeResponseSpec(dryRun.spec, spec);
+            var isDraftMode = currentSaveMode === 'draft';
+            finalSpec._draft = isDraftMode;
             renderSpecSummary(finalSpec);
             var warnings = extractArray(dryRun.warnings);
             var notes = extractArray(dryRun.normalizationReport);
@@ -1212,7 +1342,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               setStatus(dryRun.error || 'Validation errors found.', false, warnings, notes, errors, postStubs);
               return;
             }
-            setStatus('Validation passed. Ingesting…', null, warnings, notes, errors, postStubs);
+            setStatus(finalSpec._draft ? 'Validation passed. Saving draft…' : 'Validation passed. Ingesting…', null, warnings, notes, errors, postStubs);
             var data = await postSpec(finalSpec, { dryRun: false });
             if (data.ok === false) {
               setStatus(data.error || 'Ingest failed.', false, extractArray(data.warnings), extractArray(data.normalizationReport), extractArray(data.errors), extractArray(data.postStubs));
@@ -1223,11 +1353,19 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             var mergedWarnings = ingestWarnings.length ? ingestWarnings : warnings;
             var mergedNotes = ingestNotes.length ? ingestNotes : notes;
             var createdPosts = extractArray(data.createdPosts);
-            var location = data.path || ('content/posts/' + (data.slug || finalSpec.slug || 'post') + '.md');
+            var location = data.path || ('src/content/posts/' + (data.slug || finalSpec.slug || 'post') + '.md');
             var slug = data.slug || (finalSpec && finalSpec.slug) || '';
-            var msg = (data.saved === false ? 'Ingested (dry run)' : 'Ingested ✓') + ' → ' + location;
+            var msg;
+            if (data.saved === false) {
+              msg = finalSpec._draft ? 'Draft validated (dry run) → ' + location : 'Ingested (dry run) → ' + location;
+            } else {
+              msg = (finalSpec._draft ? 'Draft saved ✓' : 'Ingested ✓') + ' → ' + location;
+            }
             if (createdPosts.length) {
               msg += ' • Created ' + createdPosts.length + ' stub post' + (createdPosts.length === 1 ? '' : 's');
+            }
+            if (finalSpec._draft) {
+              msg += ' • <a href="/admin/staging" class="underline">View staging →</a>';
             }
             setStatus(msg, true, mergedWarnings, mergedNotes, extractArray(data.errors), createdPosts.map(function(p){ return {path: p}; }), slug);
           }catch(e){ handleSpecError(e); }
@@ -1236,10 +1374,12 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
         $('ingestPublishBtn').addEventListener('click', async function(){
           try{
+            setSaveMode('publish');
             busy(true); setStatus('Validating…', null);
             var spec = parseSpec();
             var dryRun = await postSpec(spec, { dryRun: true });
             var finalSpec = normalizeResponseSpec(dryRun.spec, spec);
+            finalSpec._draft = false;
             renderSpecSummary(finalSpec);
             var warnings = extractArray(dryRun.warnings);
             var notes = extractArray(dryRun.normalizationReport);
@@ -1276,6 +1416,35 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         $('clearBtn').addEventListener('click', function(){
           $('spec').value=''; $('preview').innerHTML=''; renderSpecSummary(null); setStatus('Cleared. Ready for new JSON.', null);
         });
+
+        if (recentRefreshBtn) {
+          recentRefreshBtn.addEventListener('click', function(){
+            loadRecentPosts();
+          });
+        }
+        if (recentFilterInput) {
+          recentFilterInput.addEventListener('input', function(event){
+            recentFilterText = event.currentTarget.value || '';
+            renderRecentPosts();
+          });
+        }
+        if (recentPanel) {
+          recentPanel.addEventListener('click', function(event){
+            var insertBtn = event.target.closest('[data-recent-insert]');
+            if (insertBtn) {
+              event.preventDefault();
+              var slug = insertBtn.getAttribute('data-slug') || '';
+              var post = recentPosts.find(function(item){ return item.slug === slug; });
+              if (post) {
+                insertStubForPost(post);
+              }
+            }
+          });
+        }
+
+        if (recentListEl) {
+          loadRecentPosts();
+        }
 
         var curseTypeEl = $('curseType');
         if (curseTypeEl) {

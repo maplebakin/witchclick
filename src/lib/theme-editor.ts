@@ -35,6 +35,7 @@ interface EditorState {
 }
 
 export class ThemeEditor {
+  private root: HTMLElement | null;
   private manager: ThemeManager;
   private undoRedo: UndoRedo<EditorState>;
   private state: EditorState;
@@ -45,6 +46,7 @@ export class ThemeEditor {
     const root = options.root ?? document.getElementById('themeEditorRoot');
     const devApi = options.devApi ?? root?.getAttribute('data-dev-api') ?? 'http://localhost:8787';
 
+    this.root = root;
     this.manager = new ThemeManager({ baseUrl: devApi });
 
     // Initialize with default state
@@ -62,6 +64,7 @@ export class ThemeEditor {
     );
 
     this.initializeElements();
+    this.updateWatcherStatus();
     this.setupEventListeners();
     void this.loadInitialState();
     this.render();
@@ -82,6 +85,7 @@ export class ThemeEditor {
     this.elements.scopeDescription = document.querySelector('[data-scope-description]');
     this.elements.scopeHasOverride = document.querySelector('[data-scope-has-override]');
     this.elements.scopeNoOverride = document.querySelector('[data-scope-no-override]');
+    this.elements.scopeOverview = document.querySelector('[data-scope-overview]');
     this.elements.clearScopeBtn = document.querySelector('[data-clear-scope]');
 
     // All color and font inputs (comprehensive)
@@ -127,6 +131,7 @@ export class ThemeEditor {
     this.elements.dawnList = document.querySelector('[data-theme-list="dawn"]');
     this.elements.statusEl = document.querySelector('[data-status]');
     this.elements.breadcrumbs = document.querySelector('[data-breadcrumbs]');
+    this.elements.watcherStatus = document.querySelector('[data-watcher-status]');
 
     // Preview
     this.elements.previewRoot = document.querySelector('[data-theme-preview]');
@@ -348,6 +353,7 @@ export class ThemeEditor {
     this.renderLists();
     this.updateActiveLabels();
     this.updateScopeUI();
+    this.updateScopeOverview();
     this.updateScopeSections();
     this.updatePreview();
     this.updateContrastCheck();
@@ -411,17 +417,34 @@ export class ThemeEditor {
       defaults
     );
 
-    // Legacy colors
-    ['primary', 'accent', 'background', 'textPrimary', 'textHeading', 'textMuted'].forEach((key) => {
-      const value = preset?.variables[key] || defaults[key] || '';
-      // Use colorToHex to handle rgba/rgb values for the color picker
-      const hexValue = colorToHex(value);
+    // Legacy colors (primary/accent/background + quick text fields)
+    const isGlobalScope = this.state.editingScope === 'global';
+    const legacyKeys: Array<keyof ThemeVariables> = [
+      'primary',
+      'accent',
+      'background',
+      'textPrimary',
+      'textHeading',
+      'textMuted',
+    ];
+    legacyKeys.forEach((key) => {
+      const scopeValue = scopeVariables[key];
+      const fallbackValue = preset?.variables[key] || defaults[key] || '';
+      const pickerValue = colorToHex(scopeValue || fallbackValue || '');
 
       const picker = this.elements[`${key}Picker`] as HTMLInputElement;
       const input = this.elements[`${key}Input`] as HTMLInputElement;
 
-      if (picker && hexValue) picker.value = hexValue;
-      if (input) input.value = value;
+      if (picker && pickerValue) {
+        picker.value = pickerValue;
+      }
+
+      if (input) {
+        input.value = isGlobalScope ? fallbackValue : scopeValue || '';
+        if (!isGlobalScope) {
+          input.placeholder = fallbackValue || input.placeholder;
+        }
+      }
     });
 
     // Legacy fonts
@@ -574,6 +597,21 @@ export class ThemeEditor {
     }
   }
 
+  private updateWatcherStatus(): void {
+    const badge = this.elements.watcherStatus as HTMLElement | null;
+    if (!badge) return;
+    const mode = this.root?.getAttribute('data-theme-watch');
+    if (mode === 'auto') {
+      badge.textContent = 'Watcher: auto (dev)';
+      badge.classList.add('text-success');
+      badge.classList.remove('text-body-muted');
+    } else {
+      badge.textContent = 'Watcher: manual run';
+      badge.classList.add('text-body-muted');
+      badge.classList.remove('text-success');
+    }
+  }
+
   private updatePreview(): void {
     if (!this.elements.previewRoot) return;
 
@@ -676,17 +714,43 @@ export class ThemeEditor {
     // Collect all comprehensive variables (for scope-specific editing)
     const comprehensiveVariables = collectAllFormValues(this.elements);
 
-    // Legacy variables for backwards compatibility (always global)
-    const legacyVariables = {
-      primary: this.getInputValue('primaryInput') || defaults.primary,
-      accent: this.getInputValue('accentInput') || defaults.accent,
-      background: this.getInputValue('backgroundInput') || defaults.background,
-      textPrimary: this.getInputValue('textPrimaryInput') || defaults.textPrimary,
-      textHeading: this.getInputValue('textHeadingInput') || defaults.textHeading,
-      textMuted: this.getInputValue('textMutedInput') || defaults.textMuted,
-      fontSerif: (this.elements.fontSerifSelect as HTMLSelectElement)?.value || defaults.fontSerif,
-      fontScript: (this.elements.fontScriptSelect as HTMLSelectElement)?.value || defaults.fontScript,
-    };
+    const quickKeys = ['primary', 'accent', 'background', 'textPrimary', 'textHeading', 'textMuted'] as const;
+    type QuickKey = typeof quickKeys[number];
+    const quickInputValues: Partial<Record<QuickKey, string>> = {};
+    quickKeys.forEach((key) => {
+      const raw = this.getInputValue(`${key}Input`);
+      if (raw) {
+        quickInputValues[key] = raw;
+      }
+    });
+
+    const quickWithDefaults: ThemeVariables = {};
+    quickKeys.forEach((key) => {
+      const value = quickInputValues[key] || defaults[key];
+      if (value) {
+        quickWithDefaults[key] = value;
+      }
+    });
+
+    const scopedQuickValues: ThemeVariables = {};
+    quickKeys.forEach((key) => {
+      const value = quickInputValues[key];
+      if (value) {
+        scopedQuickValues[key] = value;
+      }
+    });
+
+    const fontValues: ThemeVariables = {};
+    const fontSerifValue =
+      (this.elements.fontSerifSelect as HTMLSelectElement)?.value || defaults.fontSerif || 'Literata';
+    const fontScriptValue =
+      (this.elements.fontScriptSelect as HTMLSelectElement)?.value || defaults.fontScript || 'Parisienne';
+    if (fontSerifValue) {
+      fontValues.fontSerif = fontSerifValue;
+    }
+    if (fontScriptValue) {
+      fontValues.fontScript = fontScriptValue;
+    }
 
     let variables: ThemeVariables;
     const overrides = preset?.overrides ? [...preset.overrides] : [];
@@ -695,14 +759,15 @@ export class ThemeEditor {
       // When editing global scope, save comprehensive variables to global
       variables = {
         ...comprehensiveVariables,
-        ...legacyVariables, // Legacy overrides comprehensive
+        ...quickWithDefaults,
+        ...fontValues,
       };
     } else {
       // When editing a specific scope, keep global variables unchanged
       // and update/create the scope override with comprehensive variables
       variables = {
         ...(preset?.variables || {}), // Keep existing global variables
-        ...legacyVariables, // Update legacy variables globally
+        ...fontValues, // Fonts remain global
       };
 
       // Update or create scope override
@@ -710,12 +775,18 @@ export class ThemeEditor {
       if (existingIndex >= 0 && overrides[existingIndex]) {
         overrides[existingIndex] = {
           scope,
-          variables: comprehensiveVariables,
+          variables: {
+            ...comprehensiveVariables,
+            ...scopedQuickValues,
+          },
         };
       } else {
         overrides.push({
           scope,
-          variables: comprehensiveVariables,
+          variables: {
+            ...comprehensiveVariables,
+            ...scopedQuickValues,
+          },
         });
       }
     }
@@ -1052,6 +1123,21 @@ export class ThemeEditor {
   /**
    * Update scope UI elements based on current scope
    */
+  private updateScopeOverview(): void {
+    const overview = this.elements.scopeOverview as HTMLElement | null;
+    if (!overview) return;
+    const overrides = this.state.currentPreset?.overrides || [];
+    if (!overrides.length) {
+      overview.textContent = 'Overrides: Global only';
+      return;
+    }
+    const names = overrides
+      .map((override) => this.getScopeName(override.scope))
+      .filter((value) => typeof value === 'string' && value.trim().length);
+    const unique = Array.from(new Set(names));
+    overview.textContent = `Overrides: ${unique.join(', ')}`;
+  }
+
   private updateScopeUI(): void {
     const scope = this.state.editingScope;
     const preset = this.state.currentPreset;

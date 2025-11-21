@@ -12,6 +12,7 @@ export default [
       "node_modules",
       "playwright-report",
       "coverage",
+      "tools/_compiled/**",
       "**/.astro/**",
       "**/*.d.ts",
     ],

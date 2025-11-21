@@ -37,6 +37,8 @@ import { buildMasterPrompt } from './server/lib/promptBuilder.js';
 import { buildCursePrompt } from './server/lib/cursePromptBuilder.js';
 import { CURSE_TARGETS, CURSE_TONES, CURSE_TYPES } from './server/lib/curseSpecSchema.js';
 import { loadPromptContext } from './server/lib/promptContext.js';
+import { generateStubPrompts, serializeStubEntries } from './server/lib/stubPromptGenerator.js';
+import { executeIngest } from './server/lib/ingestExecutor.js';
 import { resolvePostsDirectories } from './scripts/lib/contentPaths.js';
 import { frontmatterString, parseFrontmatter, readFrontmatter } from './scripts/lib/frontmatter.js';
 import { isValidSlug, slugify } from './shared/slugify.js';
@@ -96,6 +98,8 @@ const THEME_EXTRA_FIELDS = [
   'success', 'warning', 'error', 'info',
   'entityCardBorder', 'entityCardGlow', 'entityCardHighlight', 'entityCardSurfaceTop', 'entityCardSurfaceBottom',
   'entityCardHeading', 'entityCardText', 'entityCardLabel', 'entityCardCta', 'entityCardCtaHover', 'entityCardIcon', 'entityCardIconShadow',
+  'headerBackground', 'headerBorder', 'headerText', 'headerTextHover',
+  'footerBackground', 'footerBorder', 'footerText', 'footerTextMuted',
   'backgroundImage',
   'textPrimary', 'textHeading', 'textMuted'
 ];
@@ -1682,16 +1686,14 @@ const server = http.createServer(async (req, res) => {
         }
 
         try {
-          const prepared = prepareSpecForPersistence(rawSpec || {}, {
+          const ingestion = await executeIngest(rawSpec || {}, {
             cwd: CWD,
             postsDirectories: listPostDirsForCollisions(),
+            dryRun,
             draft: isDraft,
             forceCategory: 'ritual', // Generator posts are always ritual category
           });
-          let persistence = null;
-          if (!dryRun) {
-            persistence = await persistPreparedSpec(prepared);
-          }
+          const { prepared, persistence } = ingestion;
           const relativePath = path.relative(CWD, prepared.post.filePath).replace(/\\/g, '/');
 
           // Format post stubs for response
@@ -2208,6 +2210,23 @@ const server = http.createServer(async (req, res) => {
         return send(res, 200, { ok: true, ...data });
       } catch (e) {
         return send(res, 500, { ok: false, error: e.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/entities/stubs') {
+      try {
+        const result = generateStubPrompts({ cwd: CWD });
+        const stubs = serializeStubEntries(result.entries).map((entry) => ({
+          type: entry.type,
+          slug: entry.slug,
+          name: entry.name,
+          filePath: entry.relativePath,
+          prompt: entry.prompt,
+          references: entry.references,
+        }));
+        return send(res, 200, { ok: true, total: stubs.length, stubs });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e?.message || String(e) });
       }
     }
 

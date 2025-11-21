@@ -89,7 +89,7 @@ function ensurePostStubs(internalLinkHints: string[], postsDir: string, siteUrl:
     const contents = `---\n${toFrontmatterYAML(frontmatter)}\n---\n\n## Placeholder\n\nThis post was automatically created as a stub from an internal link reference. Please replace this content.\n`;
 
     fs.writeFileSync(postPath, contents, 'utf8');
-    createdStubs.push(`content/posts/${candidateSlug}.md`);
+    createdStubs.push(`src/content/posts/${candidateSlug}.md`);
   }
 
   return createdStubs;
@@ -282,7 +282,7 @@ export async function POST({ request }: { request: Request }) {
           return {
             slug: candidateSlug,
             title: anchor.replace(/\b\w/g, (m) => m.toUpperCase()),
-            path: `content/posts/${candidateSlug}.md`,
+            path: `src/content/posts/${candidateSlug}.md`,
           };
         });
 
@@ -290,7 +290,7 @@ export async function POST({ request }: { request: Request }) {
         ok: true,
         slug,
         spec,
-        path: `content/posts/${slug}.md`,
+        path: `src/content/posts/${slug}.md`,
         words: contentWords,
         warnings: combinedWarnings,
         normalizations: normalizationReport,
@@ -307,7 +307,7 @@ export async function POST({ request }: { request: Request }) {
     return json({
       ok:true,
       slug,
-      path:`content/posts/${slug}.md`,
+      path:`src/content/posts/${slug}.md`,
       words: contentWords,
       warnings: combinedWarnings,
       normalizations: normalizationReport,

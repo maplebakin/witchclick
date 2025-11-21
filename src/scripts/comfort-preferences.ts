@@ -88,13 +88,25 @@ function applyToDom(prefs: ComfortPreferences) {
   const root = document.documentElement;
   const body = document.body;
   if (!root) return;
+  const midnightSlug = root.getAttribute('data-theme-midnight');
+  const dawnSlug = root.getAttribute('data-theme-dawn');
+
+  const setThemeSlug = (slug: string | null | undefined) => {
+    if (!slug) return;
+    root.setAttribute('data-theme', slug);
+    if (body) {
+      body.setAttribute('data-theme', slug);
+    }
+  };
 
   if (prefs.theme === 'dawn') {
     root.setAttribute('data-comfort-theme', 'dawn');
     body?.setAttribute('data-comfort-theme', 'dawn');
+    setThemeSlug(dawnSlug);
   } else {
     root.removeAttribute('data-comfort-theme');
     body?.removeAttribute('data-comfort-theme');
+    setThemeSlug(midnightSlug);
   }
 
   if (prefs.font === 'sans') {

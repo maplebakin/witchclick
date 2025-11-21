@@ -38,7 +38,7 @@ Introduce a new helper, e.g. `normalizePostSpec(rawSpec)`, that returns `{ spec:
 
 ### 3. Slug + derived metadata
 - Generate a slug from the input (`slug` or `title`) using the existing `slugify` helper. If generation changes the provided slug, append a report entry.
-- Ensure slug uniqueness by checking `content/posts/<slug>.md` and incrementing (`-2`, `-3`, …) as current logic does. Record collisions resolved in the report.
+- Ensure slug uniqueness by checking `src/content/posts/<slug>.md` and incrementing (`-2`, `-3`, …) as current logic does. Record collisions resolved in the report.
 - Populate derived outline fallback (if needed) and compute canonical PostSpec structure fields.
 - Return additional derived artefacts needed for persistence (frontmatter object, markdown body string, absolute output path) so we can reuse for both dry-run and save flows without recomputation.
 

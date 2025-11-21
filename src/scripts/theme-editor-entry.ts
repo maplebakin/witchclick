@@ -49,6 +49,8 @@ const LEGACY_FIELDS: Array<{ key: string; label: string; placeholder: string }> 
   { key: "textMuted", label: "Muted", placeholder: "#d9b2c4" },
 ];
 
+const QUICK_EDIT_KEYS = new Set(["primary", "accent", "background", "textPrimary", "textHeading", "textMuted"]);
+
 const PAGE_LAYOUT_FIELDS: Array<{ key: string; label: string; placeholder: string }> = [
   { key: "background", label: "Page Background", placeholder: "#0f0820" },
   { key: "headerBackground", label: "Header Background", placeholder: "#120725" },
@@ -212,80 +214,58 @@ function buildComprehensiveControls(container: HTMLElement): void {
   const summary = document.createElement("summary");
   summary.className = "cursor-pointer text-sm font-semibold flex items-center gap-2";
   summary.innerHTML = `
-    <span>Advanced Theme Variables</span>
-    <span class="text-[10px] font-semibold uppercase tracking-wide rounded-full bg-surface-accent px-2 py-0.5 text-inverse">Scope-specific</span>
+    <span>Step 4 · Fine-tune sections</span>
+    <span class="text-[10px] font-semibold uppercase tracking-wide rounded-full bg-surface-accent px-2 py-0.5 text-inverse">Optional detail work</span>
   `;
   details.appendChild(summary);
 
   const descriptionBox = document.createElement("div");
   descriptionBox.className = "space-y-2 rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-3";
   descriptionBox.innerHTML = `
-    <p class="text-xs text-body-muted"><strong>⚠️ Important:</strong> These variables are <strong>scope-specific</strong>—changes apply only to the scope selected above (e.g., Global, Grimoire, Header).</p>
-    <div class="text-xs text-body-muted">
-      <div class="font-semibold mb-2">🎨 When to use these:</div>
-      <ul class="space-y-1.5 ml-4">
-        <li><strong>Surface colors:</strong> Card backgrounds, panels, and containers</li>
-        <li><strong>Border colors:</strong> Dividers, outlines, and card edges</li>
-        <li><strong>Text variants:</strong> Secondary, tertiary, disabled states</li>
-        <li><strong>Interactive:</strong> Focus rings, hover states, active elements</li>
-        <li><strong>Entity cards:</strong> Special styling for grimoire entries (when scope = Grimoire)</li>
-        <li><strong>Semantic:</strong> Success, warning, error, info colors</li>
-      </ul>
-      <p class="mt-3 text-xs italic">💡 Tip: Start with the Quick Palette above, then use these for fine-tuning specific areas.</p>
-    </div>
+    <p class="text-xs text-body-muted"><strong>Plain language:</strong> Everything below maps to a real spot on the site (navigation bars, cards, alerts, etc.). Pick a scope above, then work through the groups until the live preview feels right.</p>
+    <ol class="text-xs text-body-muted list-decimal pl-5 space-y-1">
+      <li><strong>Global</strong> scope updates the entire site. Other scopes only affect that page or component.</li>
+      <li>Leave a field blank if you're unsure—inheritance keeps the previous color.</li>
+      <li>Stop at any time. These are optional details for extra polish.</li>
+    </ol>
   `;
   details.appendChild(descriptionBox);
 
   // Organize variables into categorized sections
   const variableGroups = [
     {
-      title: "Page & Background Colors",
-      description: "Main page backgrounds, overlays, and deep color foundations",
-      variables: ['colorMidnight', 'colorNight', 'colorDusk']
+      title: "Site backdrop & dividers",
+      description: "Background hues, overlays, and the subtle strokes between sections",
+      variables: ['colorMidnight', 'colorNight', 'colorDusk', 'surfacePlain', 'surfacePlainBorder', 'colorBorder', 'colorBorderStrong', 'colorOverlay', 'colorOverlayStrong']
     },
     {
-      title: "Accent & Interactive Colors",
-      description: "Primary accents, CTA buttons, hover states, and interactive elements",
-      variables: ['colorGold', 'colorAmethyst', 'colorIris']
+      title: "Actions & highlights",
+      description: "Buttons, CTA trims, hover colors, and focus outlines",
+      variables: ['colorGold', 'colorAmethyst', 'colorIris', 'focusRingColor', 'cardFocusOutline', 'linkColor']
     },
     {
-      title: "Text & Ink Colors",
-      description: "Body text, headings, and muted text variations",
-      variables: ['colorInk', 'colorRune', 'colorFog']
+      title: "Readable text & accents",
+      description: "Paragraphs, headings, quiet labels, and specialty inks",
+      variables: ['colorInk', 'colorRune', 'colorFog', 'colorMuted', 'textSecondary', 'textTertiary', 'textStrong', 'textHint', 'textDisabled', 'textBody', 'textSubtle', 'textAccent', 'textAccentStrong', 'inkBody', 'inkStrong', 'inkMuted']
     },
     {
-      title: "Header & Footer",
-      description: "Navigation bar and footer area styling - backgrounds, borders, and text colors",
+      title: "Navigation bars",
+      description: "Header and footer backgrounds, borders, and link colors",
       variables: ['headerBackground', 'headerBorder', 'headerText', 'headerTextHover', 'footerBackground', 'footerBorder', 'footerText', 'footerTextMuted']
     },
     {
-      title: "Surface Colors",
-      description: "Backgrounds for cards, panels, and containers",
-      variables: ['surfacePlain', 'surfacePlainBorder', 'cardPanelSurface', 'cardPanelSurfaceStrong', 'cardPanelBorder', 'cardPanelBorderStrong', 'cardPanelBorderSoft']
+      title: "Cards & panels",
+      description: "Content boxes, list cards, spoons, badges, and tags",
+      variables: ['cardPanelSurface', 'cardPanelSurfaceStrong', 'cardPanelBorder', 'cardPanelBorderStrong', 'cardPanelBorderSoft', 'cardBadgeBg', 'cardBadgeBorder', 'cardBadgeText', 'cardTagBg', 'cardTagBorder', 'cardTagText', 'cardSpoonBg', 'cardSpoonBorder', 'cardSpoonText']
     },
     {
-      title: "Text Colors",
-      description: "Text variations for different emphasis levels",
-      variables: ['textPrimary', 'textSecondary', 'textTertiary', 'textStrong', 'textHint', 'textDisabled', 'textBody', 'textSubtle', 'textAccent', 'textAccentStrong', 'textHeading', 'inkBody', 'inkStrong', 'inkMuted', 'linkColor']
-    },
-    {
-      title: "Card Components",
-      description: "Badges, tags, and spoon indicators on post cards",
-      variables: ['cardBadgeBg', 'cardBadgeBorder', 'cardBadgeText', 'cardTagBg', 'cardTagBorder', 'cardTagText', 'cardSpoonBg', 'cardSpoonBorder', 'cardSpoonText']
-    },
-    {
-      title: "Interactive Elements",
-      description: "Focus rings and interactive state colors",
-      variables: ['focusRingColor', 'cardFocusOutline']
-    },
-    {
-      title: "Semantic Status",
-      description: "System feedback colors for success, warnings, and errors",
+      title: "Status & feedback",
+      description: "Toast chips, form hints, and alerts",
       variables: ['success', 'warning', 'error', 'info']
     },
     {
-      title: "Entity Grimoire Cards",
-      description: "Special styling for entity cards (most useful when scope = Grimoire)",
+      title: "Entity spotlight",
+      description: "Special styling for Grimoire cards (only shows when that scope is selected)",
       variables: ['entityCardBorder', 'entityCardGlow', 'entityCardHighlight', 'entityCardSurfaceTop', 'entityCardSurfaceBottom', 'entityCardHeading', 'entityCardText', 'entityCardLabel', 'entityCardCta', 'entityCardCtaHover', 'entityCardIcon', 'entityCardIconShadow']
     }
   ];
@@ -294,6 +274,10 @@ function buildComprehensiveControls(container: HTMLElement): void {
   groupsContainer.className = "space-y-6";
 
   variableGroups.forEach(group => {
+    const visibleVariables = group.variables.filter((key) => !QUICK_EDIT_KEYS.has(key));
+    if (!visibleVariables.length) {
+      return;
+    }
     const groupSection = document.createElement("div");
     groupSection.className = "space-y-3";
 
@@ -307,7 +291,7 @@ function buildComprehensiveControls(container: HTMLElement): void {
 
     const grid = document.createElement("div");
     grid.className = "grid gap-3 sm:grid-cols-2 lg:grid-cols-3";
-    group.variables.forEach((key) => {
+    visibleVariables.forEach((key) => {
       grid.appendChild(createColorControl(key));
     });
     groupSection.appendChild(grid);
@@ -322,12 +306,12 @@ function buildComprehensiveControls(container: HTMLElement): void {
   scopeDetails.dataset.scopeSection = "grimoire";
   const scopeSummary = document.createElement("summary");
   scopeSummary.className = "cursor-pointer text-sm font-semibold";
-  scopeSummary.textContent = "Entity Grimoire overrides";
+  scopeSummary.textContent = "Bonus: Entity Grimoire extras";
   scopeDetails.appendChild(scopeSummary);
 
   const scopeCopy = document.createElement("p");
   scopeCopy.className = "mt-2 text-xs text-body-muted";
-  scopeCopy.textContent = "When editing the grimoire scope, adjust entity card tokens here.";
+  scopeCopy.textContent = "Switch the scope selector to “Entity Grimoire” to reveal these vibrant highlight controls.";
   scopeDetails.appendChild(scopeCopy);
 
   details.appendChild(scopeDetails);
@@ -461,13 +445,31 @@ function buildEditorShell(root: HTMLElement): void {
   const header = document.createElement("section");
   header.className = "space-y-3 rounded-2xl border border-line-subtle bg-surface-base p-4 shadow-sm";
   header.innerHTML = `
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div class="space-y-1">
-        <h1 class="text-xl font-semibold">Theme Editor</h1>
-        <p class="text-xs text-body-muted">Manage midnight and dawn palettes from the dev API.</p>
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div class="space-y-3">
+        <div>
+          <p class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">Theme workshop</p>
+          <h1 class="text-xl font-semibold">Theme Editor</h1>
+          <p class="text-sm text-body-muted">Follow the guided steps below—even if design tokens are brand new.</p>
+        </div>
+        <div class="grid gap-2 text-xs text-body-muted sm:grid-cols-3" role="list">
+          <div class="rounded-xl border border-line-subtle bg-surface-base/70 p-3" role="listitem">
+            <div class="text-[10px] font-semibold uppercase tracking-wide text-primary">Step 1</div>
+            <p class="mt-1">Pick or duplicate a base palette inside the library.</p>
+          </div>
+          <div class="rounded-xl border border-line-subtle bg-surface-base/70 p-3" role="listitem">
+            <div class="text-[10px] font-semibold uppercase tracking-wide text-primary">Step 2</div>
+            <p class="mt-1">Fill in the basics and decide which page or component you are editing.</p>
+          </div>
+          <div class="rounded-xl border border-line-subtle bg-surface-base/70 p-3" role="listitem">
+            <div class="text-[10px] font-semibold uppercase tracking-wide text-primary">Step 3</div>
+            <p class="mt-1">Tweak quick colors + fonts, then explore optional fine-tuning.</p>
+          </div>
+        </div>
         <div data-breadcrumbs class="text-[11px] uppercase tracking-wide text-body-muted">Theme</div>
       </div>
       <div class="flex flex-wrap items-center gap-2">
+        <span data-watcher-status class="rounded-full border border-line-neutral bg-surface-base/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-body-muted">Watcher: --</span>
         <button id="newThemeBtn" type="button" class="rounded-lg bg-primary px-4 py-1.5 text-sm font-semibold text-white hover:opacity-90">+ New Theme</button>
         <button id="undoBtn" type="button" class="rounded-lg border border-line-neutral px-3 py-1.5 text-sm">Undo</button>
         <button id="redoBtn" type="button" class="rounded-lg border border-line-neutral px-3 py-1.5 text-sm">Redo</button>
@@ -525,8 +527,12 @@ function buildEditorShell(root: HTMLElement): void {
   const library = document.createElement("section");
   library.className = "space-y-4 rounded-2xl border border-line-subtle bg-surface-base p-4 shadow-sm lg:col-span-4";
   library.innerHTML = `
-    <div class="flex flex-wrap items-center justify-between gap-2">
-      <h2 class="text-lg font-semibold">Theme Library</h2>
+    <div class="space-y-2">
+      <div>
+        <p class="text-[11px] font-semibold uppercase tracking-wide text-primary">Step 1 · Choose a starting palette</p>
+        <h2 class="text-lg font-semibold">Theme Library</h2>
+        <p class="text-xs text-body-muted">Pick any midnight (dark) or dawn (light) palette that feels close to your desired vibe. Duplicate before editing if you want to keep the original untouched.</p>
+      </div>
       <div class="flex flex-wrap gap-2">
         <button type="button" data-new-theme="midnight" class="rounded-lg border border-line-neutral px-3 py-1 text-xs font-semibold">New Midnight</button>
         <button type="button" data-new-theme="dawn" class="rounded-lg border border-line-neutral px-3 py-1 text-xs font-semibold">New Dawn</button>
@@ -562,6 +568,14 @@ function buildEditorShell(root: HTMLElement): void {
       <button id="duplicateThemeBtn" type="button" class="rounded-lg border border-line-neutral px-3 py-1.5 text-sm">Duplicate</button>
       <button id="deleteThemeBtn" type="button" class="rounded-lg border border-line-neutral px-3 py-1.5 text-sm text-danger">Delete</button>
     </div>
+    <div class="rounded-xl border border-dashed border-line-subtle bg-surface-base/60 p-3 text-xs text-body-muted">
+      <p class="font-semibold">Not sure where to start?</p>
+      <ul class="mt-1 space-y-1.5 list-disc pl-4">
+        <li>Midnight = cozy dark UI. Dawn = soft daylight UI.</li>
+        <li>Duplicate a preset to make experiments without fear.</li>
+        <li>Use categories to group ideas (seasonal, experimental, etc.).</li>
+      </ul>
+    </div>
   `;
   layout.appendChild(library);
 
@@ -573,9 +587,10 @@ function buildEditorShell(root: HTMLElement): void {
   detailsCard.className = "space-y-4 rounded-2xl border border-line-subtle bg-surface-base p-4 shadow-sm";
   detailsCard.innerHTML = `
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <h2 class="text-lg font-semibold">Theme details</h2>
-        <p class="text-xs text-body-muted">Set the basics before fine-tuning tokens.</p>
+      <div class="space-y-1">
+        <p class="text-[11px] font-semibold uppercase tracking-wide text-primary">Step 2 · Theme basics & scope</p>
+        <h2 class="text-lg font-semibold">Tell WitchClick where this palette lives</h2>
+        <p class="text-xs text-body-muted">Name the palette, pick midnight/dawn, then choose the part of the site you're editing.</p>
       </div>
       <div class="flex flex-wrap gap-2">
         <button id="saveThemeBtn" type="button" class="rounded-lg bg-surface-accent-bolder px-4 py-2 text-sm font-semibold text-inverse hover:bg-surface-accent-deep">Save theme</button>
@@ -608,12 +623,20 @@ function buildEditorShell(root: HTMLElement): void {
         <input id="themeSlug" type="text" placeholder="cozy-midnight" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm" />
       </label>
     </div>
+    <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-3 text-xs text-body-muted">
+      <p class="font-semibold mb-1">Mini checklist</p>
+      <ol class="space-y-1 list-decimal pl-4">
+        <li>Midnight = dark UI, Dawn = light UI.</li>
+        <li>Give the theme a descriptive name (season, vibe, or use case).</li>
+        <li>Slug auto-fills, but you can rename it to something memorable.</li>
+      </ol>
+    </div>
     <div class="space-y-3">
       <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-3">
         <div class="text-xs text-body-muted space-y-1.5">
           <div class="font-semibold">🎯 What are scopes?</div>
-          <p>Scopes let you customize specific pages or components independently. For example, make your Entity Grimoire page have different colors than the rest of your site!</p>
-          <p class="italic">💡 Tip: Start with "Global Theme" to set your base colors, then create overrides for specific scopes as needed.</p>
+          <p>Scopes are just "where should this change apply?" options. You can keep the <strong>Global Theme</strong> or pick a specific page (like the Grimoire) to override only that area.</p>
+          <p class="italic">Tip: Start global, then create scope-specific tweaks once the base looks good.</p>
         </div>
       </div>
       <label class="block text-xs font-medium uppercase tracking-wide text-body-muted">
@@ -628,6 +651,7 @@ function buildEditorShell(root: HTMLElement): void {
         <p data-scope-description class="text-xs text-body-muted">Default colors applied site-wide.</p>
         <p data-scope-has-override class="hidden text-xs font-medium text-success">✓ Overrides saved for this scope.</p>
         <p data-scope-no-override class="text-xs text-body-muted">Using global defaults.</p>
+        <p data-scope-overview class="text-[11px] text-body-muted">Overrides: Global only</p>
       </div>
     </div>
   `;
@@ -637,17 +661,20 @@ function buildEditorShell(root: HTMLElement): void {
   paletteCard.className = "space-y-4 rounded-2xl border border-line-subtle bg-surface-base p-4 shadow-sm";
   paletteCard.innerHTML = `
     <div class="space-y-2">
-      <h2 class="text-lg font-semibold">Quick Palette</h2>
-      <p class="text-xs text-body-muted">Start here! These are your global theme colors that apply site-wide.</p>
+      <div>
+        <p class="text-[11px] font-semibold uppercase tracking-wide text-primary">Step 3 · Quick colors & fonts</p>
+        <h2 class="text-lg font-semibold">Quick Palette</h2>
+        <p class="text-xs text-body-muted">Use the plain-language colors below to set the overall vibe. Once this feels right, continue to the optional sections for detail work.</p>
+      </div>
       <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-3 text-xs text-body-muted">
-        <div class="font-semibold mb-2">💡 Quick guide:</div>
+        <div class="font-semibold mb-2">💡 How to read these labels</div>
         <ul class="space-y-1.5 ml-4">
-          <li><strong>Primary:</strong> Buttons, links, and key actions</li>
-          <li><strong>Accent:</strong> Highlights, badges, and decorative elements</li>
-          <li><strong>Background:</strong> Main page background color</li>
-          <li><strong>Body Text:</strong> Regular paragraph text</li>
-          <li><strong>Heading:</strong> Titles and section headers</li>
-          <li><strong>Muted:</strong> Subtle text like captions and labels</li>
+          <li><strong>Primary:</strong> Buttons, important links, CTAs.</li>
+          <li><strong>Accent:</strong> Highlights, badges, decorative sparkles.</li>
+          <li><strong>Background:</strong> The page surface. Midnight themes can stay deep, dawn themes can be airy.</li>
+          <li><strong>Body text:</strong> Default paragraph color.</li>
+          <li><strong>Heading:</strong> Titles and section headers.</li>
+          <li><strong>Muted:</strong> Captions, helper text, quiet labels.</li>
         </ul>
       </div>
     </div>

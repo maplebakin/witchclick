@@ -1,10 +1,8 @@
 // tools/src/ingest.ts
 import fs from 'node:fs';
 import path from 'node:path';
-import {
-  prepareSpecForPersistence,
-  persistPreparedSpec,
-} from '../../server/lib/specPreparation.js';
+// @ts-expect-error: Runtime helper ships as JS only.
+import { executeIngest } from '../../server/lib/ingestExecutor.js';
 import { resolvePostsDirectories } from '../../scripts/lib/contentPaths.js';
 import type { PostSpecV2 } from './types';
 
@@ -36,14 +34,11 @@ export async function ingest(args: string[]) {
       json = JSON.parse(raw);
     }
 
-    const prepared = prepareSpecForPersistence(json, {
+    const { prepared, persistence: _persistence } = await executeIngest(json, {
       cwd: CWD,
       postsDirectories,
+      dryRun,
     });
-
-    if (!dryRun) {
-      await persistPreparedSpec(prepared);
-    }
 
     const relativePath = path.relative(CWD, prepared.post.filePath).replace(/\\/g, '/');
     const response = {

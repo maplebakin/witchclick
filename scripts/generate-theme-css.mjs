@@ -122,7 +122,6 @@ function generateCSS(themes) {
  * To modify themes, edit files in content/themes/
  * Then run: npm run themes:build
  *
- * Generated: ${new Date().toISOString()}
  * Source: scripts/generate-theme-css.mjs
  */
 

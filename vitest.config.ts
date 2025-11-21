@@ -9,5 +9,6 @@ export default defineConfig({
   },
   test: {
     exclude: [...configDefaults.exclude, "tests/smoke.spec.ts"],
+    pool: "forks",
   },
 });

@@ -15,7 +15,7 @@ describe('content pipeline integration', () => {
     originalCwd = process.cwd();
     tempDir = await mkdtemp(TMP_PREFIX);
     process.chdir(tempDir);
-    await mkdir(path.join(tempDir, 'content', 'posts'), { recursive: true });
+    await mkdir(path.join(tempDir, 'src', 'content', 'posts'), { recursive: true });
     process.exitCode = undefined;
     vi.resetModules();
   });
@@ -41,7 +41,7 @@ describe('content pipeline integration', () => {
     );
 
     await writeFile(
-      path.join(tempDir, 'content', 'posts', 'moon-reflection.md'),
+      path.join(tempDir, 'src', 'content', 'posts', 'moon-reflection.md'),
       'title: "Moon Reflection Evening"\n',
       'utf8',
     );
@@ -78,13 +78,13 @@ describe('content pipeline integration', () => {
     expect(payload.ok).toBe(true);
     expect(payload.saved).toBe(true);
     expect(payload.slug).toBe('example-focus-ritual');
-    expect(payload.path).toBe('content/posts/example-focus-ritual.md');
+    expect(payload.path).toBe('src/content/posts/example-focus-ritual.md');
 
     const saved = await readFile(path.join(tempDir, payload.path), 'utf8');
     expect(saved).toContain('title: "Example Focus Ritual"');
     expect(saved).toMatch(/promptMetadata:/);
 
-    const files = await readdir(path.join(tempDir, 'content', 'posts'));
+    const files = await readdir(path.join(tempDir, 'src', 'content', 'posts'));
     expect(files).toContain('example-focus-ritual.md');
   });
 
@@ -111,7 +111,7 @@ describe('content pipeline integration', () => {
     expect(payload.saved).toBe(false);
     expect(payload.slug).toBe('dry-run-ritual');
 
-    const files = await readdir(path.join(tempDir, 'content', 'posts'));
+    const files = await readdir(path.join(tempDir, 'src', 'content', 'posts'));
     expect(files).not.toContain('dry-run-ritual.md');
   });
 });
@@ -128,4 +128,3 @@ describe('linkifyFirst', () => {
     expect(out).toContain('<a>focus ritual</a>');
   });
 });
-

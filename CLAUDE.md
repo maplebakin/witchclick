@@ -47,7 +47,7 @@ WitchClick uses a structured JSON specification called **PostSpec v2** to genera
 2. **Validation:** Schema validation via Zod in `server/lib/postSpecValidator.js`
 3. **Preparation:** `server/lib/specPreparation.js` prepares and normalizes the spec
 4. **Persistence:** `scripts/ingest.mjs` converts JSON → markdown with frontmatter
-5. **Output:** Markdown files written to either `src/content/posts/` (preferred) or `content/posts/` (legacy)
+5. **Output:** Markdown files written to `src/content/posts/`
 
 **Key PostSpec Fields:**
 - `specVersion: 2` (required literal)
@@ -109,8 +109,7 @@ import { loadAllPosts } from '@/utils/posts';
 ### Dual-Directory Content Strategy
 
 Posts can exist in either location (framework detects automatically via `resolvePostDirectory()`):
-- **Preferred:** `src/content/posts/` (Astro Content Collections with schema validation)
-- **Legacy:** `content/posts/` (gray-matter frontmatter only)
+- **Location:** `src/content/posts/` (Astro Content Collections with schema validation)
 
 Helper: `scripts/lib/contentPaths.js` → `resolvePostsDirectories()`
 
@@ -152,7 +151,7 @@ Posts are loaded via `src/utils/posts.ts`:
 loadAllPosts() // Returns LoadedPost[] with caching in production
 ```
 
-- Auto-detects directory (src/content/posts or content/posts)
+- Auto-detects directory (src/content/posts)
 - Handles frontmatter via gray-matter
 - Augments posts with summaries/spoon levels if enabled
 - Filters drafts (unless explicitly requested)

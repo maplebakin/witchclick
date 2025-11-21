@@ -48,7 +48,7 @@ const site = Astro.url?.origin ?? "";
       </header>
 
       <ol class="space-y-6">
-        <li class="rounded-2xl border border-line-neutral bg-surface-base p-5 shadow-sm">
+        <li class="rounded-2xl border border-line-neutral bg-surface-base p-5 shadow-sm hero-upload-card" data-upload-card data-highlight-state="idle">
           <div class="flex items-start gap-4">
             <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-surface-soft text-sm font-semibold text-secondary">
               1
@@ -67,6 +67,15 @@ const site = Astro.url?.origin ?? "";
                     <span class="text-xs font-semibold uppercase tracking-wide text-body-strong">Recently Added</span>
                     <span class="text-[10px] font-medium uppercase tracking-wide rounded-full bg-surface-accent-soft px-2 py-0.5 text-accent" data-recent-count>0</span>
                   </div>
+                  <label class="block">
+                    <span class="sr-only">Filter recently added posts</span>
+                    <input
+                      type="search"
+                      class="w-full rounded-lg border border-line-neutral px-3 py-1.5 text-sm"
+                      placeholder="Filter posts…"
+                      data-recent-filter
+                    />
+                  </label>
                   <div class="space-y-1 rounded-lg border border-line-neutral bg-surface-base p-2 max-h-64 overflow-y-auto" data-recent-posts>
                     <div class="flex items-center justify-center py-8 text-xs text-body-muted">Loading posts…</div>
                   </div>
@@ -78,6 +87,15 @@ const site = Astro.url?.origin ?? "";
                     <span class="text-xs font-semibold uppercase tracking-wide text-body-strong">Needs Hero Image</span>
                     <span class="text-[10px] font-medium uppercase tracking-wide rounded-full bg-surface-success-soft px-2 py-0.5 text-success" data-missing-count>0</span>
                   </div>
+                  <label class="block">
+                    <span class="sr-only">Filter posts that need a hero image</span>
+                    <input
+                      type="search"
+                      class="w-full rounded-lg border border-line-neutral px-3 py-1.5 text-sm"
+                      placeholder="Filter posts…"
+                      data-missing-filter
+                    />
+                  </label>
                   <div class="space-y-1 rounded-lg border border-line-neutral bg-surface-base p-2 max-h-64 overflow-y-auto" data-missing-hero-posts>
                     <div class="flex items-center justify-center py-8 text-xs text-body-muted">Loading posts…</div>
                   </div>
@@ -260,6 +278,7 @@ const site = Astro.url?.origin ?? "";
           </div>
         </li>
       </ol>
+      <div data-upload-card data-highlight-state="active" style="display:none;"></div>
     </section>
     </div>
   ) : (
@@ -284,6 +303,8 @@ const site = Astro.url?.origin ?? "";
         const select = root.querySelector('[data-post-select]');
         const recentPostsList = root.querySelector('[data-recent-posts]');
         const missingHeroPostsList = root.querySelector('[data-missing-hero-posts]');
+        const recentFilterInput = root.querySelector('[data-recent-filter]');
+        const missingFilterInput = root.querySelector('[data-missing-filter]');
         const recentCount = root.querySelector('[data-recent-count]');
         const missingCount = root.querySelector('[data-missing-count]');
         const selectedPostDisplay = root.querySelector('[data-selected-post-display]');
@@ -318,6 +339,10 @@ const site = Astro.url?.origin ?? "";
         };
 
         let posts = [];
+        let recentFilterText = '';
+        let missingFilterText = '';
+        let recentCandidates = [];
+        let missingCandidates = [];
         let selectedFile = null;
         let previewUrl = null;
         let altDirty = false;
@@ -826,6 +851,53 @@ const site = Astro.url?.origin ?? "";
           return card;
         }
 
+        function matchesFilterTerm(post, term) {
+          if (!term) return true;
+          const search = term.toLowerCase();
+          const fields = [
+            typeof post.title === 'string' ? post.title : '',
+            typeof post.slug === 'string' ? post.slug : '',
+            Array.isArray(post.tags) ? post.tags.join(' ') : '',
+          ];
+          return fields.some((field) => field.toLowerCase().includes(search));
+        }
+
+        function renderRecentList() {
+          if (!recentPostsList) return;
+          recentPostsList.innerHTML = '';
+          const filtered = recentCandidates.filter((post) => matchesFilterTerm(post, recentFilterText));
+          if (!filtered.length) {
+            recentPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-xs text-body-muted">No matches.</div>';
+          } else {
+            filtered.forEach((post) => {
+              recentPostsList.appendChild(createPostCard(post));
+            });
+          }
+          if (recentCount) {
+            recentCount.textContent = String(recentCandidates.length);
+          }
+        }
+
+        function renderMissingList() {
+          if (!missingHeroPostsList) return;
+          missingHeroPostsList.innerHTML = '';
+          if (!missingCandidates.length) {
+            missingHeroPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-xs text-success">All posts have hero images! 🎉</div>';
+          } else {
+            const filtered = missingCandidates.filter((post) => matchesFilterTerm(post, missingFilterText));
+            if (!filtered.length) {
+              missingHeroPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-xs text-body-muted">No matches.</div>';
+            } else {
+              filtered.forEach((post) => {
+                missingHeroPostsList.appendChild(createPostCard(post));
+              });
+            }
+          }
+          if (missingCount) {
+            missingCount.textContent = String(missingCandidates.length);
+          }
+        }
+
         function selectPost(slug) {
           if (!select) return;
           select.value = slug;
@@ -841,6 +913,15 @@ const site = Astro.url?.origin ?? "";
           // Trigger change event for compatibility
           const changeEvent = new Event('change', { bubbles: true });
           select.dispatchEvent(changeEvent);
+
+          const uploadCard = root.querySelector('[data-upload-card].hero-upload-card');
+          if (uploadCard) {
+            uploadCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            uploadCard.setAttribute('data-highlight-state', 'active');
+            setTimeout(() => {
+              uploadCard.setAttribute('data-highlight-state', 'idle');
+            }, 1200);
+          }
         }
 
         function clearSelection() {
@@ -939,32 +1020,10 @@ const site = Astro.url?.origin ?? "";
             .filter((p) => !p.heroImage)
             .sort(alphabeticalSort);
 
-          // Populate recently added column (top 20)
-          recentPostsList.innerHTML = '';
-          const recentPosts = sortedByRecency.slice(0, 20);
-          if (recentPosts.length === 0) {
-            recentPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-xs text-body-muted">No posts yet</div>';
-          } else {
-            recentPosts.forEach(post => {
-              recentPostsList.appendChild(createPostCard(post));
-            });
-          }
-          if (recentCount) {
-            recentCount.textContent = recentPosts.length.toString();
-          }
-
-          // Populate posts without hero image column
-          missingHeroPostsList.innerHTML = '';
-          if (postsWithoutHero.length === 0) {
-            missingHeroPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-xs text-success">All posts have hero images! 🎉</div>';
-          } else {
-            postsWithoutHero.forEach(post => {
-              missingHeroPostsList.appendChild(createPostCard(post));
-            });
-          }
-          if (missingCount) {
-            missingCount.textContent = postsWithoutHero.length.toString();
-          }
+          recentCandidates = sortedByRecency.slice(0, 20);
+          missingCandidates = postsWithoutHero;
+          renderRecentList();
+          renderMissingList();
 
           updateHeroPromptUI();
         }
@@ -1225,6 +1284,22 @@ const site = Astro.url?.origin ?? "";
           });
         }
 
+        if (recentFilterInput) {
+          recentFilterInput.addEventListener('input', (event) => {
+            const target = event.currentTarget;
+            recentFilterText = typeof target.value === 'string' ? target.value : '';
+            renderRecentList();
+          });
+        }
+
+        if (missingFilterInput) {
+          missingFilterInput.addEventListener('input', (event) => {
+            const target = event.currentTarget;
+            missingFilterText = typeof target.value === 'string' ? target.value : '';
+            renderMissingList();
+          });
+        }
+
         if (altInput) {
           altInput.addEventListener('input', () => {
             altDirty = true;
@@ -1342,6 +1417,7 @@ const site = Astro.url?.origin ?? "";
   )}
 
   <style>
+    /* eslint-disable astro/no-unused-css-selector */
     @keyframes pulse-highlight {
       0% {
         box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4);
@@ -1356,5 +1432,10 @@ const site = Astro.url?.origin ?? "";
         border-color: inherit;
       }
     }
+
+    [data-upload-card][data-highlight-state="active"] {
+      animation: pulse-highlight 1.2s ease-in-out;
+    }
+    /* eslint-enable astro/no-unused-css-selector */
   </style>
 </Base>

@@ -1,8 +1,22 @@
 {
   "type": "crystal",
-  "name": "Amazonite",
   "slug": "amazonite",
-  "summary": "",
-  "properties": {},
-  "related": []
+  "name": "Amazonite",
+  "summary": "Amazonite carries a cool, steadying hum that helps settle an overstimulated mind and gently revive low-energy moods. It’s useful for remote workers, playing nicely near electronics without fuss, offering a calm backdrop for focus. Its presence encourages clearer boundaries, softer self-talk, and a sense of being quietly held while you reset.",
+  "properties": {
+    "keywords": [
+      "soothing",
+      "uncluttering",
+      "steadying"
+    ],
+    "chakra": "throat",
+    "element": "water",
+    "care": "Occasional moonlight or a brief rinse under cool running water.",
+    "placement": "Keep a small tumbled piece by your keyboard or rest it on your chest during a slow-breathing break."
+  },
+  "related": [
+    "herb:lemon-balm",
+    "ritual:gentle-boundary-setting",
+    "moon-phase:waning-moon"
+  ]
 }

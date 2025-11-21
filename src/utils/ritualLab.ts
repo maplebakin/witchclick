@@ -46,7 +46,7 @@ interface RawRitualFrontmatter {
   tags?: string[];
 }
 
-const postsDirectory = fileURLToPath(new URL("../../content/posts", import.meta.url));
+const postsDirectory = fileURLToPath(new URL("../../src/content/posts", import.meta.url));
 
 function walkMarkdownFiles(directory: string, results: string[] = []): string[] {
   const entries = fs.readdirSync(directory, { withFileTypes: true });

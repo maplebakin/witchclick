@@ -13,7 +13,7 @@ The WitchClick pipeline turns generated outlines into live posts. Follow this ch
 ## 3. Ingest content (manually or from the queue)
 - For one-off conversions, run `npm run ingest -- path/to/spec.json` to convert the spec into Markdown.
 - Add `--dry` to preview the generated Markdown, normalization report, and warnings without writing files.
-- The script automatically targets `src/content/posts` when it exists and reports validation errors with actionable messages.
+- The script automatically targets `src/content/posts` and reports validation errors with actionable messages.
 - To automate publishing, drop approved specs into `content/prompt-queue/approved/` and schedule `npm run ingest:queue`.
   - The queue runner validates every file, writes posts, and moves successes to `content/prompt-queue/shipped/`.
   - Failed specs land in `content/prompt-queue/failed/` with timestamps so you can inspect and retry.

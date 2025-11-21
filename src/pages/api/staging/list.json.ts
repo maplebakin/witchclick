@@ -56,7 +56,7 @@ export async function GET() {
           wordCount: data.wordCount || 0,
           readingMinutes: data.readingMinutes || 1,
           publishedAt: data.publishedAt || new Date().toISOString(),
-          filePath: `content/posts/${file}`,
+          filePath: `src/content/posts/${file}`,
           promptMetadata: data.promptMetadata,
         });
       }
