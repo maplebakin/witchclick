@@ -17,6 +17,36 @@ export function colorToHex(value: string | undefined): string | null {
     return trimmed.startsWith('#') ? trimmed.substring(0, 7) : `#${trimmed.substring(0, 6)}`;
   }
 
+  // HSL/HSLA values (space or comma separated)
+  const hslMatch = /hsla?\s*\(\s*([0-9.+-]+)(?:deg)?\s*[, ]\s*([0-9.+-]+)%\s*[, ]\s*([0-9.+-]+)%/i.exec(trimmed);
+  if (hslMatch && hslMatch[1] && hslMatch[2] && hslMatch[3]) {
+    const h = ((parseFloat(hslMatch[1]) % 360) + 360) % 360;
+    const s = Math.min(Math.max(parseFloat(hslMatch[2]), 0), 100) / 100;
+    const l = Math.min(Math.max(parseFloat(hslMatch[3]), 0), 100) / 100;
+
+    const c = (1 - Math.abs(2 * l - 1)) * s;
+    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+    const m = l - c / 2;
+    let r = 0, g = 0, b = 0;
+
+    if (h < 60) {
+      r = c; g = x; b = 0;
+    } else if (h < 120) {
+      r = x; g = c; b = 0;
+    } else if (h < 180) {
+      r = 0; g = c; b = x;
+    } else if (h < 240) {
+      r = 0; g = x; b = c;
+    } else if (h < 300) {
+      r = x; g = 0; b = c;
+    } else {
+      r = c; g = 0; b = x;
+    }
+
+    const toHex = (v: number) => Math.round((v + m) * 255).toString(16).padStart(2, '0');
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  }
+
   // Parse rgba/rgb values
   const rgbaMatch = /rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\s*\)/i.exec(trimmed);
   if (rgbaMatch && rgbaMatch[1] && rgbaMatch[2] && rgbaMatch[3]) {
@@ -95,6 +125,8 @@ export function debounce<T extends (...args: any[]) => void>(
 }
 
 export const ALL_COLOR_VARIABLES = [
+  // Page base
+  'background',
   // Core Brand Colors
   'colorMidnight', 'colorNight', 'colorIris', 'colorAmethyst', 'colorDusk',
   'colorGold', 'colorRune', 'colorFog', 'colorInk',
@@ -106,6 +138,9 @@ export const ALL_COLOR_VARIABLES = [
   // Surface Colors
   'surfacePlain', 'surfacePlainBorder', 'cardPanelSurface', 'cardPanelSurfaceStrong',
   'cardPanelBorder', 'cardPanelBorderStrong', 'cardPanelBorderSoft',
+  'glassSurface', 'glassSurfaceStrong', 'glassCard', 'glassHover',
+  'glassBorder', 'glassBorderStrong', 'glassHighlight', 'glassGlow',
+  'glassShadowSoft', 'glassShadowStrong', 'glassBlur', 'glassNoiseOpacity',
 
   // Text Colors
   'textPrimary', 'textSecondary', 'textTertiary', 'textStrong', 'textHint', 'textDisabled',
@@ -137,10 +172,22 @@ export const ALL_FONT_VARIABLES = [
 /**
  * Initialize all color inputs for the comprehensive editor
  */
-export function initializeAllColorElements(elements: Record<string, HTMLElement | null>) {
+type ElementValue =
+  | HTMLElement
+  | HTMLInputElement
+  | HTMLSelectElement
+  | Array<HTMLElement | HTMLInputElement | HTMLSelectElement>
+  | null;
+
+export function initializeAllColorElements(elements: Record<string, ElementValue>) {
   ALL_COLOR_VARIABLES.forEach((key) => {
-    elements[`${key}Picker`] = document.querySelector(`[data-color-picker="${key}"]`);
-    elements[`${key}Input`] = document.querySelector(`[data-color-input="${key}"]`);
+    const pickers = Array.from(document.querySelectorAll<HTMLInputElement>(`[data-color-picker="${key}"]`));
+    const inputs = Array.from(document.querySelectorAll<HTMLInputElement>(`[data-color-input="${key}"]`));
+
+    elements[`${key}Picker`] = pickers[0] ?? null;
+    elements[`${key}Input`] = inputs[0] ?? null;
+    elements[`${key}Pickers`] = pickers;
+    elements[`${key}Inputs`] = inputs;
   });
 
   ALL_FONT_VARIABLES.forEach((key) => {
@@ -152,42 +199,73 @@ export function initializeAllColorElements(elements: Record<string, HTMLElement 
  * Setup event listeners for all color inputs
  */
 export function setupAllColorListeners(
-  elements: Record<string, HTMLElement | null>,
+  elements: Record<string, ElementValue>,
   onUpdate: () => void,
   normalizeHex: (value: string) => string | null
 ) {
   const debouncedUpdate = debounce(onUpdate, 120);
 
   ALL_COLOR_VARIABLES.forEach((key) => {
-    const picker = elements[`${key}Picker`] as HTMLInputElement;
-    const input = elements[`${key}Input`] as HTMLInputElement;
+    const pickers = Array.isArray(elements[`${key}Pickers`])
+      ? (elements[`${key}Pickers`] as HTMLInputElement[])
+      : elements[`${key}Picker`]
+      ? [elements[`${key}Picker`] as HTMLInputElement]
+      : [];
+    const inputs = Array.isArray(elements[`${key}Inputs`])
+      ? (elements[`${key}Inputs`] as HTMLInputElement[])
+      : elements[`${key}Input`]
+      ? [elements[`${key}Input`] as HTMLInputElement]
+      : [];
 
-    picker?.addEventListener('input', () => {
-      if (input) input.value = picker.value;
-      debouncedUpdate();
+    const syncAll = (value: string) => {
+      pickers.forEach((picker) => {
+        if (picker.value !== value) picker.value = value;
+      });
+      inputs.forEach((input) => {
+        if (input.value !== value) input.value = value;
+      });
+    };
+
+    pickers.forEach((picker) => {
+      picker.addEventListener('input', () => {
+        syncAll(picker.value);
+        debouncedUpdate();
+      });
+      picker.addEventListener('change', () => {
+        const normalized = normalizeHex(picker.value);
+        if (normalized) {
+          syncAll(normalized);
+        }
+        debouncedUpdate();
+        debouncedUpdate.flush();
+      });
     });
 
-    input?.addEventListener('input', () => {
-      debouncedUpdate();
-    });
+    inputs.forEach((input) => {
+      input.addEventListener('input', () => {
+        syncAll(input.value);
+        debouncedUpdate();
+      });
 
-    input?.addEventListener('blur', () => {
-      const normalized = normalizeHex(input.value);
-      if (normalized && picker) {
-        picker.value = normalized;
-        input.value = normalized;
-      }
-      debouncedUpdate();
-      debouncedUpdate.flush();
+      input.addEventListener('blur', () => {
+        const normalized = normalizeHex(input.value);
+        if (normalized) {
+          syncAll(normalized);
+        }
+        debouncedUpdate();
+        debouncedUpdate.flush();
+      });
     });
   });
 
   ALL_FONT_VARIABLES.forEach((key) => {
     const select = elements[`${key}Select`];
-    select?.addEventListener('change', () => {
-      debouncedUpdate();
-      debouncedUpdate.flush();
-    });
+    if (select && !Array.isArray(select) && 'addEventListener' in select) {
+      (select as HTMLSelectElement).addEventListener('change', () => {
+        debouncedUpdate();
+        debouncedUpdate.flush();
+      });
+    }
   });
 }
 
@@ -195,7 +273,7 @@ export function setupAllColorListeners(
  * Populate all form inputs from preset data
  */
 export function populateAllFormInputs(
-  elements: Record<string, HTMLElement | null>,
+  elements: Record<string, ElementValue>,
   presetVariables: Record<string, string | undefined>,
   defaults: Record<string, string | undefined>
 ) {
@@ -205,11 +283,23 @@ export function populateAllFormInputs(
     // Use colorToHex to handle rgba/rgb values for the color picker
     const hexValue = colorToHex(value);
 
-    const picker = elements[`${key}Picker`] as HTMLInputElement;
-    const input = elements[`${key}Input`] as HTMLInputElement;
+    const pickers = Array.isArray(elements[`${key}Pickers`])
+      ? (elements[`${key}Pickers`] as HTMLInputElement[])
+      : elements[`${key}Picker`]
+      ? [elements[`${key}Picker`] as HTMLInputElement]
+      : [];
+    const inputs = Array.isArray(elements[`${key}Inputs`])
+      ? (elements[`${key}Inputs`] as HTMLInputElement[])
+      : elements[`${key}Input`]
+      ? [elements[`${key}Input`] as HTMLInputElement]
+      : [];
 
-    if (picker && hexValue) picker.value = hexValue;
-    if (input) input.value = value;
+    pickers.forEach((picker) => {
+      if (hexValue) picker.value = hexValue;
+    });
+    inputs.forEach((input) => {
+      input.value = value;
+    });
   });
 
   // Fonts
@@ -224,15 +314,18 @@ export function populateAllFormInputs(
 /**
  * Collect all current values from form inputs
  */
-export function collectAllFormValues(elements: Record<string, HTMLElement | null>): Record<string, string> {
+export function collectAllFormValues(elements: Record<string, ElementValue>): Record<string, string> {
   const values: Record<string, string> = {};
 
   // Colors
   ALL_COLOR_VARIABLES.forEach((key) => {
-    const input = elements[`${key}Input`] as HTMLInputElement;
-    if (input && input.value) {
-      values[key] = input.value;
-    }
+    const inputCandidates = Array.isArray(elements[`${key}Inputs`])
+      ? (elements[`${key}Inputs`] as HTMLInputElement[])
+      : elements[`${key}Input`]
+      ? [elements[`${key}Input`] as HTMLInputElement]
+      : [];
+    const input = inputCandidates.find((candidate) => !!candidate.value);
+    if (input && input.value) values[key] = input.value;
   });
 
   // Fonts
@@ -343,11 +436,11 @@ export function updateAllPreviewVariables(
   );
   previewRoot.style.setProperty(
     '--preview-cardTagBg',
-    resolved.cardTagBg || defaults.cardTagBg || '#4b2a63'
+    resolved.cardTagBg || defaults.cardTagBg || '#d18c47'
   );
   previewRoot.style.setProperty(
     '--preview-cardTagBorder',
-    resolved.cardTagBorder || defaults.cardTagBorder || '#4b2a63'
+    resolved.cardTagBorder || defaults.cardTagBorder || '#d18c47'
   );
   previewRoot.style.setProperty(
     '--preview-cardTagText',
@@ -405,11 +498,11 @@ export function updateAllPreviewVariables(
   );
   previewRoot.style.setProperty(
     '--preview-entityCardCta',
-    resolved.entityCardCta || defaults.entityCardCta || '#7c4eb0'
+    resolved.entityCardCta || defaults.entityCardCta || '#3d2914'
   );
   previewRoot.style.setProperty(
     '--preview-entityCardCtaHover',
-    resolved.entityCardCtaHover || defaults.entityCardCtaHover || '#9b6fd0'
+    resolved.entityCardCtaHover || defaults.entityCardCtaHover || '#452e17'
   );
   previewRoot.style.setProperty(
     '--preview-entityCardIcon',

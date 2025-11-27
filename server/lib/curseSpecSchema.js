@@ -3,7 +3,7 @@
 
 import { z } from 'zod';
 
-export const CURSE_TYPES = ['reveal', 'return', 'mirror', 'sever', 'echo'];
+export const CURSE_TYPES = ['reveal', 'return', 'mirror', 'sever', 'echo', 'smoke', 'threshold', 'knife'];
 export const CURSE_TARGETS = ['space', 'person', 'dynamic', 'memory', 'habit'];
 export const CURSE_TONES = ['gentle', 'poetic', 'scathing', 'restrained'];
 export const CURSE_TAGS = [
@@ -58,6 +58,12 @@ export const CurseGeneratorInputSchema = z.object({
   type: z.enum(CURSE_TYPES),
   target: z.enum(CURSE_TARGETS),
   tone: z.enum(CURSE_TONES),
+  topic: z
+    .string()
+    .trim()
+    .min(1, 'Topic must be at least 1 character')
+    .max(160, 'Topic must be at most 160 characters')
+    .optional(),
   sigilName: z
     .string()
     .trim()
@@ -88,21 +94,19 @@ const TagsSchema = z
 
 export const CurseSpecSchema = z.object({
   specVersion: z.literal(1),
-  title: enforceCharacterRange('Title', 50, 60),
+  title: enforceWordRange('Title', 5, 13),
   slug: z
     .string()
     .min(1, 'Slug is required')
     .regex(/^[a-z0-9-]+$/, 'Slug must be kebab-case (lowercase, numbers, hyphen)'),
-  openingReflection: enforceWordRange('Opening reflection', 75, 100),
-  invocation: enforceSingleLine('Invocation'),
-  method: enforceWordRange('Method', 150, 200),
-  closure: enforceWordRange('Closure / aftercare', 50, 75),
-  safetyNotes: z
-    .string()
-    .trim()
-    .min(20, 'Safety notes must be at least 20 characters')
-    .max(200, 'Safety notes must be at most 200 characters')
-    .optional(),
+  openingReflection: enforceWordRange('Opening reflection', 80, 110),
+  invocation: enforceSingleLine('Invocation').refine(
+    (value) => enforceWordRange('Invocation', 1, 16).safeParse(value).success,
+    'Invocation must be 1–16 words',
+  ),
+  method: enforceWordRange('Method', 130, 260),
+  closure: enforceWordRange('Closure / aftercare', 50, 120),
+  safetyNotes: enforceCharacterRange('Safety notes', 25, 200).optional(),
   generator: CurseGeneratorInputSchema,
   tags: TagsSchema,
 });
@@ -110,17 +114,18 @@ export const CurseSpecSchema = z.object({
 const DOC_LINES = [
   '{',
   '  "specVersion": 1,',
-  '  "title": string (50-60 chars),',
+  '  "title": string (5-13 words),',
   '  "slug": string (kebab-case),',
-  '  "openingReflection": string (75-100 words),',
-  '  "invocation": string (single line),',
-  '  "method": string (150-200 words),',
-  '  "closure": string (50-75 words),',
-  '  "safetyNotes"?: string (20-200 chars),',
+  '  "openingReflection": string (80-110 words),',
+  '  "invocation": string (single line, max 16 words),',
+  '  "method": string (130-260 words),',
+  '  "closure": string (50-120 words),',
+  '  "safetyNotes"?: string (25-200 chars),',
   '  "generator": {',
-  '    "type": "reveal"|"return"|"mirror"|"sever"|"echo",',
+  '    "type": "reveal"|"return"|"mirror"|"sever"|"echo"|"smoke"|"threshold"|"knife",',
   '    "target": "space"|"person"|"dynamic"|"memory"|"habit",',
   '    "tone": "gentle"|"poetic"|"scathing"|"restrained",',
+  '    "topic"?: string,',
   '    "sigilName"?: string,',
   '    "altarItem"?: string,',
   '    "journalingFollowUp"?: string',

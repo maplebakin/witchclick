@@ -245,78 +245,15 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           </section>
         </div>
 
-        <div id="cursesPanel" data-panel="curses" class="hidden grid grid-cols-1 gap-6 lg:grid-cols-12">
-          <section class="lg:col-span-5 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
-            <h2 class="mb-3 text-xl font-semibold">1) Build Curse Prompt</h2>
-            <div class="grid gap-3">
-              <label class="block">
-                <span class="text-xs font-medium">Type</span>
-                <select id="curseType" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
-                  {curseTypeOptions.map((value) => (
-                    <option value={value}>{toLabel(value)}</option>
-                  ))}
-                </select>
-              </label>
-              <label class="block">
-                <span class="text-xs font-medium">Target</span>
-                <select id="curseTarget" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
-                  {curseTargetOptions.map((value) => (
-                    <option value={value}>{toLabel(value)}</option>
-                  ))}
-                </select>
-              </label>
-              <label class="block">
-                <span class="text-xs font-medium">Tone</span>
-                <select id="curseTone" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
-                  {curseToneOptions.map((value) => (
-                    <option value={value}>{toLabel(value)}</option>
-                  ))}
-                </select>
-              </label>
-              <label class="block">
-                <span class="text-xs font-medium">Sigil name (optional)</span>
-                <input id="curseSigil" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Echo Lantern" />
-              </label>
-              <label class="block">
-                <span class="text-xs font-medium">Altar item (optional)</span>
-                <input id="curseAltar" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Clear quartz" />
-              </label>
-              <label class="block">
-                <span class="text-xs font-medium">Journaling follow-up (optional)</span>
-                <input id="curseJournal" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="What truth rose when the echo returned?" />
-              </label>
-              <div class="flex gap-2">
-                <button id="curseGenPrompt" class="rounded-lg bg-surface-accent-bolder px-3 py-2 text-inverse hover:bg-surface-accent-deep">Generate Prompt</button>
-                <button id="curseCopyPrompt" class="rounded-lg border px-3 py-2">Copy</button>
-              </div>
-              <textarea id="cursePromptOut" class="mt-2 h-64 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder="Prompt will appear here…"></textarea>
-              <p class="text-xs text-body-subtle">Canonical tags: {curseTags.join(", ")}</p>
-            </div>
-          </section>
-
-          <section class="lg:col-span-7 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
-            <h2 class="mb-3 text-xl font-semibold">2) Paste CurseSpec JSON → Validate → Ingest</h2>
-
-            <textarea id="curseSpec" class="h-56 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder='Paste the CurseSpec JSON here'></textarea>
-
-            <div class="mt-3 flex flex-wrap gap-2">
-              <button id="curseValidateBtn" class="rounded-lg border px-3 py-2 text-sm">Validate</button>
-              <button id="curseIngestBtn" class="rounded-lg bg-surface-success px-3 py-2 text-sm text-inverse hover:bg-surface-success-strong">Ingest</button>
-              <button id="curseClearBtn" class="rounded-lg border px-3 py-2 text-sm">Clear</button>
-            </div>
-
-            <div class="mt-3 flex flex-col gap-3">
-              <div
-                id="curseStatus"
-                class="rounded-lg border border-line-slate bg-surface-cool-soft px-3 py-2 text-sm text-muted-strong"
-              ></div>
-              <div
-                id="curseSummary"
-                class="rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[11px] text-body-muted"
-              ></div>
-            </div>
-
-            <div id="cursePreview" class="prose prose-neutral mt-4 max-w-none border-t pt-4"></div>
+        <div id="cursesPanel" data-panel="curses" class="hidden">
+          <section class="rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm space-y-3">
+            <h2 class="text-xl font-semibold">Curses Dashboard moved</h2>
+            <p class="text-sm text-body-muted">
+              The curses generator and archive live in a dedicated dashboard optimized for print/PDF workflows.
+            </p>
+            <a href="/admin/curses" class="inline-flex items-center gap-2 rounded-lg bg-surface-accent-bolder px-4 py-2 text-inverse hover:bg-surface-accent-deep">
+              Open Curses Dashboard →
+            </a>
           </section>
         </div>
       </div>
@@ -676,6 +613,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           addRow('Invocation', spec.invocation || '(missing)');
           addRow('Type / Target', (generator.type || '?') + ' → ' + (generator.target || '?'));
           addRow('Tone', generator.tone || '(unspecified)');
+          if (generator.topic) addRow('Topic', generator.topic);
           if (generator.sigilName) addRow('Sigil', generator.sigilName);
           if (generator.altarItem) addRow('Altar item', generator.altarItem);
           if (generator.journalingFollowUp) addRow('Journal', generator.journalingFollowUp);
@@ -890,7 +828,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           if (!spec.generator || typeof spec.generator !== 'object') {
             spec.generator = {};
           } else {
-            ['type','target','tone','sigilName','altarItem','journalingFollowUp'].forEach(function(key){
+            ['type','target','tone','topic','sigilName','altarItem','journalingFollowUp'].forEach(function(key){
               if (typeof spec.generator[key] === 'string') {
                 spec.generator[key] = spec.generator[key].trim();
               }
@@ -1454,10 +1392,12 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               var type = ($('curseType')?.value || CURSE_TYPES[0] || 'mirror');
               var target = ($('curseTarget')?.value || CURSE_TARGETS[0] || 'person');
               var tone = ($('curseTone')?.value || CURSE_TONES[0] || 'poetic');
+              var topic = ($('curseTopic')?.value || '').trim();
               var sigil = ($('curseSigil')?.value || '').trim();
               var altar = ($('curseAltar')?.value || '').trim();
               var journal = ($('curseJournal')?.value || '').trim();
               var body = { type, target, tone };
+              if (topic) body.topic = topic;
               if (sigil) body.sigilName = sigil;
               if (altar) body.altarItem = altar;
               if (journal) body.journalingFollowUp = journal;
@@ -1519,7 +1459,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               }
               setCurseStatus('Validation passed. Ingesting…', null, dryErrors);
               var data = await postCurse(finalSpec, { dryRun: false });
-              var path = data.path || ('content/white-magic-curses/' + (data.slug || finalSpec.slug || 'curse') + '.md');
+              var path = data.path || ('archive/curses/' + (data.slug || finalSpec.slug || 'curse') + '.md');
               var message = (data.saved === false ? 'Saved (dry run only).' : 'Ingested ✓') + ' → ' + path;
               setCurseStatus(message, true, extractArray(data.errors));
             } catch (e) {

@@ -40,7 +40,7 @@ Editors can reference the following affiliate keys in post specs and frontmatter
 ### White Magic Curses
 
 1. Visit `/admin` and switch the panel to **Curses** to build a generation prompt.
-2. Paste the generated CurseSpec JSON to validate, preview, and persist a markdown file under `content/white-magic-curses/`.
+2. Paste the generated CurseSpec JSON to validate, preview, and persist a markdown file under `archive/curses/` (print/PDF manual; no web CTAs/links).
 3. The CLI mirrors the same flow:
    - `npm run curses -- --type mirror --target person --tone poetic` writes `tmp/curse_prompt.txt`.
    - `npm run ingest:curses -- --from-file path/to/curse.json` validates and saves the curse markdown.
@@ -54,4 +54,7 @@ Editors can reference the following affiliate keys in post specs and frontmatter
 ## Builds & checks
 
 - `npm run build` now fails fast if legacy `npm_config_http_proxy` env vars are set so maintainers can clean them before Astro runs.
-
+- `npm run build:public` runs the normal build then prunes admin/api outputs from `dist/` for safer deploys.
+- `npm run check:prepub` runs type/lint, link check, and the public build in one go.
+- `npm run drafts:sync` copies Cauldron draft JSONs (`cauldron/src/data/drafts`) into `content/drafts/` for quick ingest or review.
+- `npm run themes:lint` validates theme JSON files for required fields and duplicate slug/mode pairs.

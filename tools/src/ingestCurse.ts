@@ -9,8 +9,7 @@ import type { CurseSpec } from '../../server/lib/curseSpecSchema.js';
 
 export async function ingestCurse(args: string[]) {
   const CWD = process.cwd();
-  const CONTENT_DIR = path.join(CWD, 'content');
-  const CURSE_DIR = path.join(CONTENT_DIR, 'white-magic-curses');
+  const ARCHIVE_DIR = path.join(CWD, 'archive', 'curses');
   const fromIdx = args.indexOf('--from-file');
   const dryRun = args.includes('--dry-run');
 
@@ -36,7 +35,7 @@ export async function ingestCurse(args: string[]) {
 
     const prepared = prepareCurseForPersistence(json, {
       cwd: CWD,
-      directory: CURSE_DIR,
+      directory: ARCHIVE_DIR,
     });
 
     if (!dryRun) {

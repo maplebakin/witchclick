@@ -142,10 +142,6 @@ describe("admin theme dashboard", () => {
     );
     expect(activeFile).toEqual({ midnight: midnightTheme.slug, dawn: dawnTheme.slug });
 
-    const legacyFile = JSON.parse(
-      await fs.readFile(path.join(tempDir, "content", "theme.json"), "utf8"),
-    );
-    expect(legacyFile).toEqual(midnightTheme.settings);
   });
 
   it("fills in default fonts when they are left blank in the payload", async () => {

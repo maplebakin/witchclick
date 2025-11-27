@@ -173,7 +173,9 @@ test.describe("site smoke", () => {
     });
 
     const postSlug = firstSlugFrom(path.join(contentRoot, "posts"));
-    const curseSlug = firstSlugFrom(path.join(contentRoot, "white-magic-curses"));
+    const curseSlug =
+      firstSlugFrom(path.join(repoRoot, "archive", "curses")) ||
+      firstSlugFrom(path.join(contentRoot, "white-magic-curses"));
 
     const routes = ["/", "/entities/", "/curses/", "/hub/", "/tools/"].map(canonicalPath);
     if (postSlug) routes.push(canonicalPath(`/post/${postSlug}/`));

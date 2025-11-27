@@ -56,6 +56,7 @@ const rawPort = process.env.DEV_API_PORT ?? process.env.PORT;
 const PORT = rawPort && Number.parseInt(rawPort, 10) > 0 ? Number.parseInt(rawPort, 10) : 8787;
 const HOST = process.env.HOST ?? process.env.DEV_API_HOST ?? 'localhost';
 const CWD = process.cwd();
+let parsedUrl = null;
 
 function listPostDirsForCollisions() {
   return resolvePostsDirectories({ root: CWD });
@@ -77,12 +78,214 @@ function readJSON(p) {
 }
 function ensureDir(p) { fs.mkdirSync(p, { recursive: true }); }
 
+function listCurseDirectories() {
+  return [CURSE_ARCHIVE_DIR, CURSE_LEGACY_DIR];
+}
+
+function findCurseFile(slug) {
+  if (!slug) return null;
+  const candidates = listCurseDirectories();
+  for (const dir of candidates) {
+    const direct = path.join(dir, `${slug}.md`);
+    if (fs.existsSync(direct)) {
+      try {
+        const parsed = readFrontmatter(direct);
+        return { file: direct, ...parsed };
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+  for (const dir of candidates) {
+    try {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (!entry.isFile() || !entry.name.toLowerCase().endsWith('.md')) continue;
+        const file = path.join(dir, entry.name);
+        try {
+          const parsed = readFrontmatter(file);
+          const fmSlug = frontmatterString(parsed.data, 'slug');
+          if (fmSlug && fmSlug === slug) {
+            return { file, ...parsed };
+          }
+        } catch {
+          /* ignore parse errors */
+        }
+      }
+    } catch {
+      /* ignore missing directories */
+    }
+  }
+  return null;
+}
+
+function listCursesForEditor() {
+  const seen = new Set();
+  const items = [];
+  const dirs = listCurseDirectories();
+  for (const dir of dirs) {
+    let entries = [];
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      if (!entry.isFile() || !entry.name.toLowerCase().endsWith('.md')) continue;
+      const file = path.join(dir, entry.name);
+      try {
+        const parsed = readFrontmatter(file);
+        const slug = frontmatterString(parsed.data, 'slug') || entry.name.replace(/\.md$/i, '');
+        if (!slug || seen.has(slug)) continue;
+        seen.add(slug);
+        const title = frontmatterString(parsed.data, 'title') || slug;
+        items.push({
+          slug,
+          title,
+          path: path.relative(CWD, file).replace(/\\/g, '/'),
+        });
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+  items.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }));
+  return items;
+}
+
+async function loadCurseForEditor(slug) {
+  if (!isValidSlug(slug)) {
+    throw new Error('Invalid slug');
+  }
+  const found = findCurseFile(slug);
+  if (!found) {
+    const err = new Error('Curse not found');
+    err.code = 'NOT_FOUND';
+    throw err;
+  }
+  const relativePath = path.relative(CWD, found.file).replace(/\\/g, '/');
+  const newline = /\r\n/.test(found.raw || '') ? '\r\n' : '\n';
+  const frontmatter = Array.isArray(found.lines) ? found.lines.join('\n') : '';
+  const markdown = typeof found.rest === 'string' ? found.rest.replace(/\r\n?/g, '\n') : '';
+  let stats = null;
+  try {
+    stats = await fsp.stat(found.file);
+  } catch {
+    stats = null;
+  }
+  return {
+    slug,
+    title: frontmatterString(found.data, 'title') || slug,
+    frontmatter,
+    markdown,
+    path: relativePath,
+    newline,
+    updatedAt: stats?.mtime ? stats.mtime.toISOString() : null,
+  };
+}
+
+async function saveCurseFromEditor(payload) {
+  const originalSlug = slugify(String(payload?.originalSlug || payload?.slug || ''));
+  if (!originalSlug) {
+    throw new Error('originalSlug is required');
+  }
+  const frontmatterInput = typeof payload?.frontmatter === 'string' ? payload.frontmatter : '';
+  const markdownInput = typeof payload?.markdown === 'string' ? payload.markdown : '';
+
+  const frontmatterNormalized = frontmatterInput.replace(/\r\n?/g, '\n').trimEnd();
+  const markdownNormalized = markdownInput.replace(/\r\n?/g, '\n');
+
+  let parsed;
+  try {
+    parsed = parseFrontmatter(`---\n${frontmatterNormalized}\n---\n${markdownNormalized}`);
+  } catch (err) {
+    const error = new Error(`Frontmatter parse failed: ${err?.message || String(err)}`);
+    error.code = 'PARSE_ERROR';
+    throw error;
+  }
+
+  const rawSlug = frontmatterString(parsed.data, 'slug') || originalSlug;
+  const normalizedSlug = slugify(rawSlug);
+  if (!normalizedSlug) throw new Error('Frontmatter slug is required');
+  if (!isValidSlug(normalizedSlug)) throw new Error(`Frontmatter slug is invalid: ${normalizedSlug}`);
+
+  const existing = findCurseFile(originalSlug);
+  const targetDir = CURSE_ARCHIVE_DIR;
+  ensureDir(targetDir);
+  const targetFile = path.join(targetDir, `${normalizedSlug}.md`);
+
+  if (fs.existsSync(targetFile) && (!existing || path.resolve(targetFile) !== path.resolve(existing.file))) {
+    const err = new Error(`Another curse already uses the slug "${normalizedSlug}".`);
+    err.code = 'SLUG_CONFLICT';
+    throw err;
+  }
+
+  const newline = existing && /\r\n/.test(existing.raw || '') ? '\r\n' : '\n';
+  const fmLines = parsed.lines || [];
+  const slugLine = `slug: ${normalizedSlug}`;
+  const slugIndex = fmLines.findIndex((line) => line.trim().toLowerCase().startsWith('slug:'));
+  if (slugIndex === -1) {
+    const titleIndex = fmLines.findIndex((line) => line.trim().toLowerCase().startsWith('title:'));
+    const insertAt = titleIndex === -1 ? 0 : titleIndex + 1;
+    fmLines.splice(insertAt, 0, slugLine);
+  } else {
+    const indent = fmLines[slugIndex].match(/^\s*/)?.[0] || '';
+    fmLines[slugIndex] = `${indent}${slugLine}`;
+  }
+
+  const fmBlock = fmLines.join('\n').replace(/\s+$/, '');
+  let bodyBlock = parsed.rest ? String(parsed.rest) : '';
+  bodyBlock = bodyBlock.replace(/\r\n?/g, '\n');
+  if (bodyBlock && !bodyBlock.endsWith('\\n')) bodyBlock += '\\n';
+
+  const fileContents = `---${newline}${fmBlock ? `${fmBlock}${newline}` : ''}---${newline}${bodyBlock ? bodyBlock.replace(/\n/g, newline) : ''}`;
+  await fsp.writeFile(targetFile, fileContents, 'utf8');
+
+  if (existing && path.resolve(existing.file) !== path.resolve(targetFile) && fs.existsSync(existing.file)) {
+    try { await fsp.rm(existing.file); } catch { /* ignore */ }
+  }
+
+  return {
+    slug: normalizedSlug,
+    path: path.relative(CWD, targetFile).replace(/\\\\/g, '/'),
+    newline,
+  };
+}
+
+async function deleteCurseBySlug(slug) {
+  const normalizedSlug = slugify(slug || '');
+  if (!normalizedSlug) {
+    const err = new Error('Invalid slug');
+    err.code = 'NOT_FOUND';
+    throw err;
+  }
+  const found = findCurseFile(normalizedSlug);
+  if (!found) {
+    const err = new Error('Curse not found');
+    err.code = 'NOT_FOUND';
+    throw err;
+  }
+  try {
+    await fsp.rm(found.file);
+  } catch (e) {
+    const err = new Error(e?.message || 'Failed to delete curse');
+    err.code = 'DELETE_FAILED';
+    throw err;
+  }
+  return {
+    slug: normalizedSlug,
+    path: path.relative(CWD, found.file).replace(/\\\\/g, '/'),
+  };
+}
+
 const HERO_IMAGE_ROOT = path.join(CWD, 'public', 'images', 'hero');
 const DOWNLOADS_ROOT = path.join(CWD, 'public', 'downloads');
 const THEME_BACKGROUNDS_ROOT = path.join(CWD, 'public', 'images', 'theme-backgrounds');
 const THEMES_DIR = path.join(CWD, 'content', 'themes');
 const ACTIVE_THEME_FILE = path.join(THEMES_DIR, 'active.json');
-const LEGACY_THEME_FILE = path.join(CWD, 'content', 'theme.json');
+const CURSE_ARCHIVE_DIR = path.join(CWD, 'archive', 'curses');
+const CURSE_LEGACY_DIR = path.join(CWD, 'content', 'white-magic-curses');
+ensureDir(CURSE_ARCHIVE_DIR);
 
 const THEME_REQUIRED_FIELDS = ['primary', 'accent', 'background', 'fontSerif', 'fontScript'];
 const THEME_EXTRA_FIELDS = [
@@ -1181,12 +1384,7 @@ async function saveThemeRecord(payload) {
   const filePath = path.join(THEMES_DIR, `${slug}.json`);
   await fsp.writeFile(filePath, JSON.stringify(record, null, 2), 'utf8');
 
-  const active = readActiveThemeMapping();
-  if (active.midnight === record.slug && record.mode === 'midnight') {
-    ensureDir(path.dirname(LEGACY_THEME_FILE));
-    await fsp.writeFile(LEGACY_THEME_FILE, JSON.stringify(record.settings, null, 2), 'utf8');
-  }
-
+  const _active = readActiveThemeMapping();
   resetThemeCache();
   return record;
 }
@@ -1213,11 +1411,6 @@ async function setActiveThemeRecord(payload) {
 
   ensureDir(THEMES_DIR);
   await fsp.writeFile(ACTIVE_THEME_FILE, JSON.stringify(next, null, 2), 'utf8');
-
-  if (mode === 'midnight') {
-    ensureDir(path.dirname(LEGACY_THEME_FILE));
-    await fsp.writeFile(LEGACY_THEME_FILE, JSON.stringify(theme.settings, null, 2), 'utf8');
-  }
 
   resetThemeCache();
   return { active: next, theme };
@@ -1562,8 +1755,9 @@ async function withRequestBoundary(req, res, handler) {
 }
 
 // ---------- HTTP SERVER ----------
-const server = http.createServer(async (req, res) => {
-  await withRequestBoundary(req, res, async () => {
+  const server = http.createServer(async (req, res) => {
+    await withRequestBoundary(req, res, async () => {
+      parsedUrl = null;
     if (req.method === 'OPTIONS') return send(res, 204, { ok: true });
 
     if (req.method === 'POST' && req.url === '/ping') {
@@ -1610,6 +1804,7 @@ const server = http.createServer(async (req, res) => {
       const type = select(body.type, CURSE_TYPES, 'mirror');
       const target = select(body.target, CURSE_TARGETS, 'person');
       const tone = select(body.tone, CURSE_TONES, 'poetic');
+      const topic = typeof body.topic === 'string' && body.topic.trim() ? body.topic.trim() : undefined;
       const sigilName = typeof body.sigilName === 'string' && body.sigilName.trim() ? body.sigilName.trim() : undefined;
       const altarItem = typeof body.altarItem === 'string' && body.altarItem.trim() ? body.altarItem.trim() : undefined;
       const journalingFollowUp = typeof body.journalingFollowUp === 'string' && body.journalingFollowUp.trim()
@@ -1620,6 +1815,7 @@ const server = http.createServer(async (req, res) => {
         type,
         target,
         tone,
+        topic,
         sigilName,
         altarItem,
         journalingFollowUp,
@@ -1635,12 +1831,12 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, {
         ok: true,
         prompt,
-        options: { type, target, tone, sigilName: sigilName ?? null, altarItem: altarItem ?? null, journalingFollowUp: journalingFollowUp ?? null },
+        options: { type, target, tone, topic: topic ?? null, sigilName: sigilName ?? null, altarItem: altarItem ?? null, journalingFollowUp: journalingFollowUp ?? null },
       });
     }
 
     if (req.method === 'POST') {
-      const parsedUrl = new URL(req.url, `http://localhost:${PORT}`);
+      parsedUrl = new URL(req.url, `http://localhost:${PORT}`);
       if (parsedUrl.pathname === '/ingest') {
         const payload = await parseBody(req);
         if (!payload) {
@@ -1794,7 +1990,10 @@ const server = http.createServer(async (req, res) => {
       });
     }
 
-    if (req.method === 'POST' && req.url === '/posts/list') {
+    const urlForRouting = parsedUrl ?? new URL(req.url || '', `http://localhost:${PORT}`);
+    const pathname = urlForRouting.pathname;
+
+    if (req.method === 'POST' && (req.url === '/posts/list' || pathname === '/posts/list')) {
       try {
         const items = await listPostsForHero();
         return send(res, 200, { ok: true, items });
@@ -1803,7 +2002,7 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
-    if (req.method === 'POST' && req.url === '/posts/load') {
+    if (req.method === 'POST' && (req.url === '/posts/load' || pathname === '/posts/load')) {
       try {
         const body = await parseBody(req);
         const slug = slugify(body?.slug ?? '');
@@ -1818,7 +2017,7 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
-    if (req.method === 'POST' && req.url === '/posts/update') {
+    if (req.method === 'POST' && (req.url === '/posts/update' || pathname === '/posts/update')) {
       try {
         const body = await parseBody(req);
         const data = await updatePostFromEditor(body || {});
@@ -1829,7 +2028,7 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
-    if (req.method === 'POST' && req.url === '/posts/delete') {
+    if (req.method === 'POST' && (req.url === '/posts/delete' || pathname === '/posts/delete')) {
       try {
         const body = await parseBody(req);
         const slug = slugify(body?.slug || '');
@@ -1837,6 +2036,57 @@ const server = http.createServer(async (req, res) => {
           return send(res, 400, { ok: false, error: 'Invalid slug' });
         }
         const data = await deletePostBySlug(slug);
+        return send(res, 200, { ok: true, ...data });
+      } catch (e) {
+        const status = e?.code === 'NOT_FOUND' ? 404 : 400;
+        return send(res, status, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && (req.url === '/curses/list' || pathname === '/curses/list')) {
+      try {
+        const items = listCursesForEditor();
+        return send(res, 200, { ok: true, items });
+      } catch (e) {
+        console.error('[curses/list] failed:', e);
+        return send(res, 200, { ok: false, error: e?.message || String(e), items: [] });
+      }
+    }
+
+    if (req.method === 'POST' && (req.url === '/curses/load' || pathname === '/curses/load')) {
+      try {
+        const body = await parseBody(req);
+        const slug = slugify(body?.slug || '');
+        if (!slug) {
+          return send(res, 400, { ok: false, error: 'Invalid slug' });
+        }
+        const data = await loadCurseForEditor(slug);
+        return send(res, 200, { ok: true, ...data });
+      } catch (e) {
+        const status = e?.code === 'NOT_FOUND' ? 404 : e?.code === 'PARSE_ERROR' ? 400 : 500;
+        return send(res, status, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && (req.url === '/curses/save' || pathname === '/curses/save')) {
+      try {
+        const body = await parseBody(req);
+        const data = await saveCurseFromEditor(body || {});
+        return send(res, 200, { ok: true, ...data });
+      } catch (e) {
+        const status = e?.code === 'NOT_FOUND' ? 404 : e?.code === 'SLUG_CONFLICT' ? 409 : e?.code === 'PARSE_ERROR' ? 400 : 500;
+        return send(res, status, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && (req.url === '/curses/delete' || pathname === '/curses/delete')) {
+      try {
+        const body = await parseBody(req);
+        const slug = slugify(body?.slug || '');
+        if (!slug) {
+          return send(res, 400, { ok: false, error: 'Invalid slug' });
+        }
+        const data = await deleteCurseBySlug(slug);
         return send(res, 200, { ok: true, ...data });
       } catch (e) {
         const status = e?.code === 'NOT_FOUND' ? 404 : 400;

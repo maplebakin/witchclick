@@ -20,7 +20,7 @@ describe('exportCurses', () => {
   beforeEach(() => {
     originalCwd = process.cwd();
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'export-curses-'));
-    fs.mkdirSync(path.join(tmpDir, 'content', 'white-magic-curses'), { recursive: true });
+    fs.mkdirSync(path.join(tmpDir, 'archive', 'curses'), { recursive: true });
     process.chdir(tmpDir);
   });
 
@@ -30,7 +30,7 @@ describe('exportCurses', () => {
   });
 
   it('renders printable HTML cards', () => {
-    const dir = path.join(tmpDir, 'content', 'white-magic-curses');
+    const dir = path.join(tmpDir, 'archive', 'curses');
     writeCurse(dir);
     exportCurses([]);
     const out = path.join(tmpDir, 'dist', 'exports', 'curses', 'curses.html');

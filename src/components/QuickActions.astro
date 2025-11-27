@@ -210,17 +210,21 @@
     width: 3.5rem;
     height: 3.5rem;
     border-radius: 50%;
-    background: linear-gradient(135deg, #6b21a8 0%, #7c3aed 100%);
-    border: none;
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-gold, #d4af37) 82%, transparent 18%) 0%,
+      color-mix(in srgb, var(--color-iris, #4b2a63) 82%, transparent 18%) 100%
+    );
+    border: 1px solid color-mix(in srgb, var(--color-gold, #d4af37) 25%, transparent 75%);
     color: white;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(107, 33, 168, 0.4);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--color-iris, #4b2a63) 35%, transparent 65%);
     transition: all 0.2s ease;
   }
 
   .quick-actions__trigger:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(107, 33, 168, 0.5);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--color-gold, #d4af37) 30%, var(--color-iris, #4b2a63) 70%);
   }
 
   .quick-actions__trigger:active {
@@ -228,12 +232,16 @@
   }
 
   .quick-actions__trigger:focus-visible {
-    outline: 2px solid #a78bfa;
+    outline: 2px solid color-mix(in srgb, var(--color-gold, #d4af37) 45%, var(--color-iris, #4b2a63) 55%);
     outline-offset: 2px;
   }
 
   :global(.quick-actions.is-open .quick-actions__trigger) {
-    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-gold, #d4af37) 88%, transparent 12%) 0%,
+      color-mix(in srgb, var(--color-iris, #4b2a63) 88%, transparent 12%) 100%
+    );
   }
 
   .quick-actions__panel {

@@ -7,14 +7,14 @@ const colors = require('tailwindcss/colors');
  */
 const customColors = {
   // Brand + primary ink
-  primary: colors.purple[900], // Core headlines, key brand accents
-  'primary-strong': colors.purple[800], // Elevated brand text (hover, emphasis)
-  secondary: colors.purple[700], // Secondary headlines, nav items
-  tertiary: colors.purple[600], // Supporting labels and subtitles
-  accent: colors.purple[500], // Interactive glyphs, icons, links
-  'accent-soft': colors.purple[300], // Soft accent text on dark cards
-  'accent-faint': colors.purple[200], // Muted accent details
-  'accent-ghost': colors.purple[100], // Very light accent overlays
+  primary: '#d18c47', // Core headlines, key brand accents
+  'primary-strong': '#b8662f', // Elevated brand text (hover, emphasis)
+  secondary: '#cc9966', // Secondary headlines, nav items
+  tertiary: '#b5783f', // Supporting labels and subtitles
+  accent: '#e4a667', // Interactive glyphs, icons, links
+  'accent-soft': '#f2bf8c', // Soft accent text on dark cards
+  'accent-faint': '#f8e0c2', // Muted accent details
+  'accent-ghost': '#fbf0df', // Very light accent overlays
 
   // Neutral copy stacks
   'body-strong': colors.gray[900], // Primary body copy on light backgrounds
@@ -70,15 +70,15 @@ const customColors = {
   // Surfaces & overlays
   'surface-base': colors.white, // Site canvas
   'surface-card': colors.white, // Elevated cards on base
-  'surface-muted': colors.purple[50], // Brand mist background
-  'surface-soft': colors.purple[100], // Brand soft background
+  'surface-muted': '#fbf5ee', // Brand mist background
+  'surface-soft': '#f6e9da', // Brand soft background
   'surface-overlay': colors.white, // Translucent overlays on photos
-  'surface-accent': colors.purple[500], // Accent panels & CTA fills
-  'surface-accent-strong': colors.purple[600], // Accent hover states
-  'surface-accent-bolder': colors.purple[700], // Strong accent backgrounds
-  'surface-accent-deep': colors.purple[800], // Deep brand fills
-  'surface-accent-night': colors.purple[900], // Rich brand overlays
-  'surface-accent-midnight': colors.purple[950], // Ultra-deep brand veils
+  'surface-accent': '#e4a667', // Accent panels & CTA fills
+  'surface-accent-strong': '#d18c47', // Accent hover states
+  'surface-accent-bolder': '#b8662f', // Strong accent backgrounds
+  'surface-accent-deep': '#8f4f21', // Deep brand fills
+  'surface-accent-night': '#3d2914', // Rich brand overlays
+  'surface-accent-midnight': '#1f140a', // Ultra-deep brand veils
   'surface-inverse': colors.slate[950], // Night mode background
   'surface-inverse-soft': colors.slate[900], // Slightly lifted night surface
   'surface-inverse-muted': colors.slate[800], // Subtle dark panels
@@ -99,14 +99,14 @@ const customColors = {
   'surface-cool-soft': colors.slate[50], // Cool neutral background
 
   // Border & divider system
-  'line-subtle': colors.purple[100], // Soft brand separators
-  'line-muted': colors.purple[200], // Default card borders
-  'line-strong': colors.purple[300], // Hover + interactive outlines
-  'line-bolder': colors.purple[400], // Accent dividers & tabs
-  'line-bold': colors.purple[500], // Emphasized accent borders
-  'line-accent': colors.purple[700], // CTA outlines
-  'line-accent-strong': colors.purple[800], // CTA hover outlines
-  'line-accent-deep': colors.purple[900], // Deep accent borders
+  'line-subtle': '#f2bf8c', // Soft brand separators
+  'line-muted': '#e4a667', // Default card borders
+  'line-strong': '#d18c47', // Hover + interactive outlines
+  'line-bolder': '#b8662f', // Accent dividers & tabs
+  'line-bold': '#8f4f21', // Emphasized accent borders
+  'line-accent': '#e4a667', // CTA outlines
+  'line-accent-strong': '#d18c47', // CTA hover outlines
+  'line-accent-deep': '#8f4f21', // Deep accent borders
   'line-inverse': colors.slate[800], // Default divider on dark
   'line-inverse-strong': colors.slate[900], // Strong divider on dark
   'line-night': colors.slate[950], // High-contrast night outlines
@@ -125,9 +125,9 @@ const customColors = {
   'line-contrast': colors.white, // Contrast border on dark surfaces
 
   // Focus indicators
-  focus: colors.purple[400], // Brand focus ring
-  'focus-soft': colors.purple[300], // Soft focus halo
-  'focus-strong': colors.purple[500], // High-emphasis focus
+  focus: '#e4a667', // Brand focus ring
+  'focus-soft': '#f2bf8c', // Soft focus halo
+  'focus-strong': '#d18c47', // High-emphasis focus
   'focus-muted': colors.slate[500], // Subtle focus for dense UIs
 
   // Gradient tokens for entity cards

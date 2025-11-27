@@ -4,6 +4,7 @@ export interface CursePromptOptions {
   type: string;
   target: string;
   tone: string;
+  topic?: string;
   sigilName?: string;
   altarItem?: string;
   journalingFollowUp?: string;

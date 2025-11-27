@@ -92,20 +92,40 @@ const heroFetchPriority = hasHeroImage ? 'high' : undefined;
 
 <style>
   .home-hero {
+    --hero-surface: var(
+      --hero-surface-layer,
+      var(--glass-card, color-mix(in srgb, var(--surface-panel) 88%, transparent 12%))
+    );
+    --hero-border-color: var(
+      --hero-border-color-layer,
+      color-mix(in srgb, var(--glass-border, var(--color-gold, #d4af37)) 82%, transparent 18%)
+    );
+    --hero-shadow-layer: var(
+      --hero-shadow-layer-fallback,
+      var(--glass-shadow-strong, 0 32px 70px -40px rgba(11, 6, 20, 0.6))
+    );
+    --hero-backdrop-layer: var(
+      --hero-backdrop,
+      radial-gradient(
+        circle at 18% 18%,
+        color-mix(in srgb, var(--glass-highlight, var(--color-gold, #d4af37)) 30%, transparent 70%),
+        transparent 56%
+      )
+    );
     position: relative;
     padding-block: var(--hero-padding-block, clamp(4rem, 10vw, 7rem));
     overflow: hidden;
     border-radius: var(--hero-radius, clamp(2rem, 5vw, 3.25rem));
-    border: var(--hero-border, 1px solid rgba(124, 78, 176, 0.25));
-    background: var(--hero-background);
-    box-shadow: var(--hero-shadow);
+    border: var(--hero-border, 1px solid var(--hero-border-color));
+    background: var(--hero-background, var(--hero-surface));
+    box-shadow: var(--hero-shadow, var(--hero-shadow-layer));
   }
 
   .home-hero__backdrop {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: var(--hero-backdrop);
+    background: var(--hero-backdrop-layer);
     mix-blend-mode: screen;
     opacity: 0.85;
   }
@@ -178,7 +198,11 @@ const heroFetchPriority = hasHeroImage ? 'high' : undefined;
     position: absolute;
     inset: 10% 8%;
     border-radius: 2rem;
-    background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--color-gold) 24%, transparent 76%), transparent 65%);
+    background: radial-gradient(
+      circle at 30% 20%,
+      color-mix(in srgb, var(--glass-highlight, var(--color-gold)) 32%, transparent 68%),
+      transparent 65%
+    );
     pointer-events: none;
     mix-blend-mode: screen;
   }
@@ -186,9 +210,9 @@ const heroFetchPriority = hasHeroImage ? 'high' : undefined;
   .home-hero__image {
     width: min(100%, 24rem);
     border-radius: 2rem;
-    border: var(--hero-image-border, 1px solid rgba(124, 78, 176, 0.35));
+    border: var(--hero-image-border, 1px solid color-mix(in srgb, var(--color-gold, #d4af37) 35%, var(--color-iris, #4b2a63) 25%));
     background: var(--hero-image-surface, rgba(24, 14, 34, 0.65));
-    box-shadow: var(--hero-media-shadow, 0 32px 70px -40px rgba(11, 6, 20, 0.6));
+    box-shadow: var(--hero-media-shadow, var(--glass-shadow-strong, 0 32px 70px -40px rgba(11, 6, 20, 0.6)));
     aspect-ratio: 4 / 5;
     object-fit: cover;
     filter: saturate(0.92) contrast(1.02);

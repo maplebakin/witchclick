@@ -3,7 +3,7 @@ import Base from "../../layouts/Base.astro";
 import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
 import { readSettings, buildCanonicalUrl } from "../../utils/settings";
-import stubDashboardScript from "../../scripts/admin-stub-dashboard.ts?url";
+import stubDashboardScript from "../../scripts/admin/admin-stub-dashboard.ts?url";
 import { generateStubPrompts, serializeStubEntries } from "../../../server/lib/stubPromptGenerator.js";
 
 const settings = readSettings();

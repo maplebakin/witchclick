@@ -53,18 +53,17 @@ export function buildMasterPrompt(options = {}) {
   const schemaDoc = generateSchemaDocumentation();
 
   const lines = [
+    // 1) ROLE + TONE
     ...buildHeaderFragment({ brandName }),
     ...AUDIENCE_AND_VOICE_FRAGMENT,
     ...VOICE_EXAMPLES_FRAGMENT,
     ...SECULAR_TAROT_FRAGMENT,
+
+    // 2) CONTENT RULES
     ...NON_NEGOTIABLES_FRAGMENT,
     ...SEO_REQUIREMENTS_FRAGMENT,
     ...BASE_VALIDATION_FRAGMENT,
     ...TYPE_STRUCTURE_FRAGMENT,
-    ...RETURN_FORMAT_FRAGMENT,
-    ...SCHEMA_HEADING_FRAGMENT,
-    schemaDoc,
-    '',
     ...buildInputsFragment({
       brandName,
       siteUrl,
@@ -78,10 +77,25 @@ export function buildMasterPrompt(options = {}) {
     }),
     ...buildEngagementFragment(engagementSignals || {}),
     ...buildProcessFragment(words),
+    'Never reuse, paraphrase, or reformat any text the user provides. Generate original content for every field.',
+
+    // 3) LENGTH WINDOWS
+    'COUNT WORDS AND CHARACTERS LITERALLY — NO ESTIMATES.',
+    'If any field violates its length rules, the entire output is invalid. Regenerate internally until every field meets its exact window before returning JSON.',
+    'Title must be between 50 and 60 characters, inclusive. Count characters exactly.',
+    'Generate the title only after all other fields are written, then adjust its length last to ensure 50–60 characters.',
+    'OpeningReflection must be 75–100 words. If you generate more or fewer words, shrink or expand the reflection while maintaining tone.',
+    'Use the same literal word-count accuracy for every word-bounded field.',
+
+    // 4) STRICT JSON CONTRACT
+    ...RETURN_FORMAT_FRAGMENT,
     ...RETURN_INSTRUCTIONS_FRAGMENT,
     ...sanitizeArray(strictJsonRules),
-    '',
     ...GOLDEN_JSON_FRAGMENT,
+
+    // 5) SCHEMA (last)
+    ...SCHEMA_HEADING_FRAGMENT,
+    schemaDoc,
   ];
 
   return lines.join('\n');

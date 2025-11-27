@@ -425,7 +425,7 @@ const jsonLd = {
     <ReadingProgress target='[data-reading-target="article"]' />
     <div class="grid gap-10 md:grid-cols-[minmax(0,1fr)_320px] md:items-start">
       <article
-        class="flex min-w-0 flex-col gap-8 md:gap-10"
+        class="post-body flex min-w-0 flex-col gap-8 md:gap-10"
         aria-labelledby="post-title"
         data-reading-target="article"
       >
@@ -548,5 +548,11 @@ const jsonLd = {
     </div>
 
   <BackToTop />
+  <style>
+    .post-body :is(h1, h2) {
+      color: var(--ink-strong, var(--text-strong));
+      letter-spacing: 0.02em;
+      text-transform: none;
+    }
+  </style>
 </Base>
-

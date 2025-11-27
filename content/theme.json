@@ -56,5 +56,13 @@
   "entityCardHeading": "#f8f2ed",
   "entityCardText": "#ebd9c7",
   "entityCardCta": "#3d2914",
-  "entityCardCtaHover": "#452e17"
+  "entityCardCtaHover": "#452e17",
+  "headerBackground": "#261a0d",
+  "headerBorder": "#cc9966",
+  "headerText": "#f4f1ff",
+  "headerTextHover": "#d4af37",
+  "footerBackground": "#261a0d",
+  "footerBorder": "#cc9966",
+  "footerText": "#f4f1ff",
+  "footerTextMuted": "#d9b2c4"
 }

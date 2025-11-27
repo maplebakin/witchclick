@@ -34,7 +34,7 @@ const { class: className } = Astro.props as Props;
     padding: clamp(1.6rem, 4vw, 2.3rem);
     border-radius: clamp(1.5rem, 3vw, 2rem);
     background:
-      radial-gradient(120% 120% at 12% 18%, rgba(124, 78, 176, 0.22), transparent 70%),
+      radial-gradient(120% 120% at 12% 18%, color-mix(in srgb, var(--color-iris, #4b2a63) 22%, transparent) 0%, transparent 70%),
       rgba(18, 7, 37, 0.9);
     border: 1px solid rgba(212, 175, 55, 0.28);
     box-shadow: 0 22px 55px -32px rgba(11, 6, 20, 0.55);

@@ -14,6 +14,7 @@ import {
   updateAllPreviewVariables,
   colorToHex,
 } from './theme-editor-comprehensive';
+import { THEME_SCOPES } from './theme-scopes';
 
 export interface ThemeEditorOptions {
   /**
@@ -34,12 +35,19 @@ interface EditorState {
   categoryFilter: string;
 }
 
+type ElementValue =
+  | HTMLElement
+  | HTMLInputElement
+  | HTMLSelectElement
+  | Array<HTMLElement | HTMLInputElement | HTMLSelectElement>
+  | null;
+
 export class ThemeEditor {
   private root: HTMLElement | null;
   private manager: ThemeManager;
   private undoRedo: UndoRedo<EditorState>;
   private state: EditorState;
-  private elements: Record<string, HTMLElement | null> = {};
+  private elements: Record<string, ElementValue> = {};
   private skipNextSync = false; // Flag to skip sync after explicit preset load
 
   constructor(options: ThemeEditorOptions = {}) {
@@ -73,28 +81,29 @@ export class ThemeEditor {
   private initializeElements(): void {
     // Mode and basic controls
     this.elements.modeSelect = document.getElementById('themeMode');
-    this.elements.nameInput = document.getElementById('themeName') as HTMLInputElement;
-    this.elements.slugInput = document.getElementById('themeSlug') as HTMLInputElement;
+    this.elements.nameInput = document.getElementById('themeName') as HTMLInputElement | null;
+    this.elements.slugInput = document.getElementById('themeSlug') as HTMLInputElement | null;
     this.elements.categorySelect = document.getElementById('themeCategory');
     this.elements.categoryFilter = document.getElementById('categoryFilter');
 
     // Scope selector
     this.elements.scopeSelector = document.getElementById('scopeSelector');
-    this.elements.scopeInfo = document.querySelector('[data-scope-info]');
-    this.elements.scopeLabel = document.querySelector('[data-scope-label]');
-    this.elements.scopeDescription = document.querySelector('[data-scope-description]');
-    this.elements.scopeHasOverride = document.querySelector('[data-scope-has-override]');
-    this.elements.scopeNoOverride = document.querySelector('[data-scope-no-override]');
-    this.elements.scopeOverview = document.querySelector('[data-scope-overview]');
-    this.elements.clearScopeBtn = document.querySelector('[data-clear-scope]');
+    this.elements.scopeCards = Array.from(document.querySelectorAll<HTMLElement>('[data-scope-card]'));
+    this.elements.scopeInfo = document.querySelector<HTMLElement>('[data-scope-info]');
+    this.elements.scopeLabel = document.querySelector<HTMLElement>('[data-scope-label]');
+    this.elements.scopeDescription = document.querySelector<HTMLElement>('[data-scope-description]');
+    this.elements.scopeHasOverride = document.querySelector<HTMLElement>('[data-scope-has-override]');
+    this.elements.scopeNoOverride = document.querySelector<HTMLElement>('[data-scope-no-override]');
+    this.elements.scopeOverview = document.querySelector<HTMLElement>('[data-scope-overview]');
+    this.elements.clearScopeBtn = document.querySelector<HTMLElement>('[data-clear-scope]');
 
     // All color and font inputs (comprehensive)
     initializeAllColorElements(this.elements);
 
     // Legacy color inputs for backwards compatibility
     ['primary', 'accent', 'background', 'textPrimary', 'textHeading', 'textMuted'].forEach((key) => {
-      this.elements[`${key}Picker`] = document.querySelector(`[data-color-picker="${key}"]`);
-      this.elements[`${key}Input`] = document.querySelector(`[data-color-input="${key}"]`);
+      this.elements[`${key}Picker`] = document.querySelector<HTMLInputElement>(`[data-color-picker="${key}"]`);
+      this.elements[`${key}Input`] = document.querySelector<HTMLInputElement>(`[data-color-input="${key}"]`);
     });
 
     // Legacy font selects
@@ -107,14 +116,14 @@ export class ThemeEditor {
     this.elements.deleteBtn = document.getElementById('deleteThemeBtn');
     this.elements.duplicateBtn = document.getElementById('duplicateThemeBtn');
     this.elements.newThemeBtn = document.getElementById('newThemeBtn');
-    this.elements.newMidnightBtn = document.querySelector('[data-new-theme="midnight"]');
-    this.elements.newDawnBtn = document.querySelector('[data-new-theme="dawn"]');
+    this.elements.newMidnightBtn = document.querySelector<HTMLElement>('[data-new-theme="midnight"]');
+    this.elements.newDawnBtn = document.querySelector<HTMLElement>('[data-new-theme="dawn"]');
 
     // New theme modal
     this.elements.newThemeModal = document.getElementById('newThemeModal');
     this.elements.cancelNewTheme = document.getElementById('cancelNewTheme');
-    this.elements.createMidnightBtn = document.querySelector('[data-create-theme="midnight"]');
-    this.elements.createDawnBtn = document.querySelector('[data-create-theme="dawn"]');
+    this.elements.createMidnightBtn = document.querySelector<HTMLElement>('[data-create-theme="midnight"]');
+    this.elements.createDawnBtn = document.querySelector<HTMLElement>('[data-create-theme="dawn"]');
 
     // Undo/Redo
     this.elements.undoBtn = document.getElementById('undoBtn');
@@ -127,46 +136,71 @@ export class ThemeEditor {
     this.elements.importInput = document.getElementById('importInput');
 
     // Lists and status
-    this.elements.midnightList = document.querySelector('[data-theme-list="midnight"]');
-    this.elements.dawnList = document.querySelector('[data-theme-list="dawn"]');
-    this.elements.statusEl = document.querySelector('[data-status]');
-    this.elements.breadcrumbs = document.querySelector('[data-breadcrumbs]');
-    this.elements.watcherStatus = document.querySelector('[data-watcher-status]');
+    this.elements.midnightList = document.querySelector<HTMLElement>('[data-theme-list="midnight"]');
+    this.elements.dawnList = document.querySelector<HTMLElement>('[data-theme-list="dawn"]');
+    this.elements.statusEl = document.querySelector<HTMLElement>('[data-status]');
+    this.elements.breadcrumbs = document.querySelector<HTMLElement>('[data-breadcrumbs]');
+    this.elements.watcherStatus = document.querySelector<HTMLElement>('[data-watcher-status]');
 
     // Preview
-    this.elements.previewRoot = document.querySelector('[data-theme-preview]');
-    this.elements.contrastDisplay = document.querySelector('[data-contrast-display]');
+    this.elements.previewRoot = document.querySelector<HTMLElement>('[data-theme-preview]');
+    this.elements.previewRoots = Array.from(document.querySelectorAll<HTMLElement>('[data-theme-preview]'));
+    this.elements.contrastDisplay = document.querySelector<HTMLElement>('[data-contrast-display]');
 
     // Active labels
-    this.elements.activeMidnight = document.querySelector('[data-active="midnight"]');
-    this.elements.activeDawn = document.querySelector('[data-active="dawn"]');
+    this.elements.activeMidnight = document.querySelector<HTMLElement>('[data-active="midnight"]');
+    this.elements.activeDawn = document.querySelector<HTMLElement>('[data-active="dawn"]');
+  }
+
+  private getEl<T extends HTMLElement = HTMLElement>(key: string): T | null {
+    const value = this.elements[key];
+    if (!value) return null;
+    if (Array.isArray(value)) {
+      const first = value.find((v) => v instanceof HTMLElement);
+      return (first as T) ?? null;
+    }
+    return value as T;
+  }
+
+  private getEls<T extends HTMLElement = HTMLElement>(key: string): T[] {
+    const value = this.elements[key];
+    if (!value) return [];
+    if (Array.isArray(value)) {
+      return value.filter((v): v is T => v instanceof HTMLElement) as T[];
+    }
+    return value instanceof HTMLElement ? [value as T] : [];
   }
 
   private setupEventListeners(): void {
     // Mode change
-    this.elements.modeSelect?.addEventListener('change', () => {
-      const newMode = (this.elements.modeSelect as HTMLSelectElement).value as ThemeMode;
+    this.getEl<HTMLSelectElement>('modeSelect')?.addEventListener('change', () => {
+      const newMode = (this.getEl<HTMLSelectElement>('modeSelect')?.value || this.state.mode) as ThemeMode;
       this.pushState({ ...this.state, mode: newMode });
       this.updatePreview();
     });
 
     // Category filter
-    this.elements.categoryFilter?.addEventListener('change', () => {
-      const filter = (this.elements.categoryFilter as HTMLSelectElement).value;
+    this.getEl<HTMLSelectElement>('categoryFilter')?.addEventListener('change', () => {
+      const filter = this.getEl<HTMLSelectElement>('categoryFilter')?.value || '';
       this.state.categoryFilter = filter;
       this.renderLists();
     });
 
     // Scope selector
-    this.elements.scopeSelector?.addEventListener('change', () => {
-      const newScope = (this.elements.scopeSelector as HTMLSelectElement).value;
-      this.pushState({ ...this.state, editingScope: newScope });
-      this.updateScopeUI();
-      this.updateScopeSections();
+    this.getEl<HTMLSelectElement>('scopeSelector')?.addEventListener('change', () => {
+      const newScope = this.getEl<HTMLSelectElement>('scopeSelector')?.value || this.state.editingScope;
+      this.setEditingScope(newScope);
+    });
+
+    // Scope cards (single-page scopes)
+    this.getEls<HTMLElement>('scopeCards').forEach((card) => {
+      const scopeId = card.dataset.scopeCard;
+      if (!scopeId) return;
+      card.addEventListener('click', () => this.setEditingScope(scopeId, { scroll: true }));
     });
 
     // Clear scope overrides
-    this.elements.clearScopeBtn?.addEventListener('click', () => {
+    this.getEl('clearScopeBtn')?.addEventListener('click', () => {
       if (!this.state.currentPreset) return;
       if (!confirm(`Clear all overrides for this scope? This cannot be undone.`)) return;
 
@@ -176,10 +210,11 @@ export class ThemeEditor {
     });
 
     // Name input - auto-generate slug
-    this.elements.nameInput?.addEventListener('input', () => {
-      const name = (this.elements.nameInput as HTMLInputElement).value;
+    this.getEl<HTMLInputElement>('nameInput')?.addEventListener('input', () => {
+      const name = this.getEl<HTMLInputElement>('nameInput')?.value || '';
       if (!this.state.currentPreset && name) {
-        (this.elements.slugInput as HTMLInputElement).value = slugify(name);
+        const slugInput = this.getEl<HTMLInputElement>('slugInput');
+        if (slugInput) slugInput.value = slugify(name);
       }
       this.updatePreview();
     });
@@ -196,8 +231,8 @@ export class ThemeEditor {
 
     // Legacy color inputs - sync picker and text input, update preview
     ['primary', 'accent', 'background', 'textPrimary', 'textHeading', 'textMuted'].forEach((key) => {
-      const picker = this.elements[`${key}Picker`] as HTMLInputElement;
-      const input = this.elements[`${key}Input`] as HTMLInputElement;
+      const picker = this.getEl<HTMLInputElement>(`${key}Picker`);
+      const input = this.getEl<HTMLInputElement>(`${key}Input`);
 
       picker?.addEventListener('input', () => {
         if (input) input.value = picker.value;
@@ -221,63 +256,63 @@ export class ThemeEditor {
     });
 
     // Legacy font selects
-    this.elements.fontSerifSelect?.addEventListener('change', () => this.updatePreview());
-    this.elements.fontScriptSelect?.addEventListener('change', () => this.updatePreview());
+    this.getEl<HTMLSelectElement>('fontSerifSelect')?.addEventListener('change', () => this.updatePreview());
+    this.getEl<HTMLSelectElement>('fontScriptSelect')?.addEventListener('change', () => this.updatePreview());
 
     // Action buttons
-    this.elements.saveBtn?.addEventListener('click', () => {
+    this.getEl('saveBtn')?.addEventListener('click', () => {
       void this.save();
     });
-    this.elements.setActiveBtn?.addEventListener('click', () => {
+    this.getEl('setActiveBtn')?.addEventListener('click', () => {
       void this.setActive();
     });
-    this.elements.deleteBtn?.addEventListener('click', () => {
+    this.getEl('deleteBtn')?.addEventListener('click', () => {
       void this.delete();
     });
-    this.elements.duplicateBtn?.addEventListener('click', () => {
+    this.getEl('duplicateBtn')?.addEventListener('click', () => {
       void this.duplicate();
     });
 
     // New theme button (opens modal)
-    this.elements.newThemeBtn?.addEventListener('click', () => {
+    this.getEl('newThemeBtn')?.addEventListener('click', () => {
       this.openNewThemeModal();
     });
 
     // New theme modal buttons
-    this.elements.cancelNewTheme?.addEventListener('click', () => {
+    this.getEl('cancelNewTheme')?.addEventListener('click', () => {
       this.closeNewThemeModal();
     });
 
-    this.elements.createMidnightBtn?.addEventListener('click', () => {
+    this.getEl('createMidnightBtn')?.addEventListener('click', () => {
       this.closeNewThemeModal();
       this.newTheme('midnight');
     });
 
-    this.elements.createDawnBtn?.addEventListener('click', () => {
+    this.getEl('createDawnBtn')?.addEventListener('click', () => {
       this.closeNewThemeModal();
       this.newTheme('dawn');
     });
 
     // Close modal when clicking backdrop
-    this.elements.newThemeModal?.addEventListener('click', (e) => {
-      if (e.target === this.elements.newThemeModal) {
+    this.getEl('newThemeModal')?.addEventListener('click', (e) => {
+      if (e.target === this.getEl('newThemeModal')) {
         this.closeNewThemeModal();
       }
     });
 
     // New theme buttons in library (legacy)
-    this.elements.newMidnightBtn?.addEventListener('click', () => this.newTheme('midnight'));
-    this.elements.newDawnBtn?.addEventListener('click', () => this.newTheme('dawn'));
+    this.getEl('newMidnightBtn')?.addEventListener('click', () => this.newTheme('midnight'));
+    this.getEl('newDawnBtn')?.addEventListener('click', () => this.newTheme('dawn'));
 
     // Undo/Redo
-    this.elements.undoBtn?.addEventListener('click', () => this.undo());
-    this.elements.redoBtn?.addEventListener('click', () => this.redo());
+    this.getEl('undoBtn')?.addEventListener('click', () => this.undo());
+    this.getEl('redoBtn')?.addEventListener('click', () => this.redo());
 
     // Export/Import
-    this.elements.exportBtn?.addEventListener('click', () => this.exportCurrent());
-    this.elements.exportAllBtn?.addEventListener('click', () => this.exportAll());
-    this.elements.importBtn?.addEventListener('click', () => this.elements.importInput?.click());
-    this.elements.importInput?.addEventListener('change', (e) => {
+    this.getEl('exportBtn')?.addEventListener('click', () => this.exportCurrent());
+    this.getEl('exportAllBtn')?.addEventListener('click', () => this.exportAll());
+    this.getEl('importBtn')?.addEventListener('click', () => this.getEl<HTMLInputElement>('importInput')?.click());
+    this.getEl<HTMLInputElement>('importInput')?.addEventListener('change', (e: Event) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) void this.importFromFile(file);
     });
@@ -289,7 +324,7 @@ export class ThemeEditor {
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         // Close modal if open
-        const modal = this.elements.newThemeModal as HTMLElement;
+        const modal = this.getEl('newThemeModal');
         if (modal && !modal.classList.contains('hidden')) {
           this.closeNewThemeModal();
           return;
@@ -353,6 +388,7 @@ export class ThemeEditor {
     this.renderLists();
     this.updateActiveLabels();
     this.updateScopeUI();
+    this.updateScopeCards();
     this.updateScopeOverview();
     this.updateScopeSections();
     this.updatePreview();
@@ -389,22 +425,30 @@ export class ThemeEditor {
   private renderForm(): void {
     const preset = this.state.currentPreset;
     const mode = this.state.mode;
-    const defaults = this.manager.getDefaultVariables(mode);
+    const defaults = this.getBaseVariables();
 
     // Mode select
-    if (this.elements.modeSelect) {
-      (this.elements.modeSelect as HTMLSelectElement).value = mode;
+    const modeSelect = this.getEl<HTMLSelectElement>('modeSelect');
+    if (modeSelect) {
+      modeSelect.value = mode;
+    }
+    const scopeSelect = this.getEl<HTMLSelectElement>('scopeSelector');
+    if (scopeSelect) {
+      scopeSelect.value = this.state.editingScope;
     }
 
     // Name and slug
-    if (this.elements.nameInput) {
-      (this.elements.nameInput as HTMLInputElement).value = preset?.name || '';
+    const nameInput = this.getEl<HTMLInputElement>('nameInput');
+    if (nameInput) {
+      nameInput.value = preset?.name || '';
     }
-    if (this.elements.slugInput) {
-      (this.elements.slugInput as HTMLInputElement).value = preset?.slug || '';
+    const slugInput = this.getEl<HTMLInputElement>('slugInput');
+    if (slugInput) {
+      slugInput.value = preset?.slug || '';
     }
-    if (this.elements.categorySelect) {
-      (this.elements.categorySelect as HTMLSelectElement).value = preset?.category || 'custom';
+    const categorySelect = this.getEl<HTMLSelectElement>('categorySelect');
+    if (categorySelect) {
+      categorySelect.value = preset?.category || 'custom';
     }
 
     // Get scope-specific variables (will return global variables if scope is 'global')
@@ -448,24 +492,28 @@ export class ThemeEditor {
     });
 
     // Legacy fonts
-    if (this.elements.fontSerifSelect) {
-      (this.elements.fontSerifSelect as HTMLSelectElement).value = preset?.variables.fontSerif || defaults.fontSerif || 'Literata';
+    const fontSerifSelect = this.getEl<HTMLSelectElement>('fontSerifSelect');
+    if (fontSerifSelect) {
+      fontSerifSelect.value = preset?.variables.fontSerif || defaults.fontSerif || 'Literata';
     }
-    if (this.elements.fontScriptSelect) {
-      (this.elements.fontScriptSelect as HTMLSelectElement).value = preset?.variables.fontScript || defaults.fontScript || 'Parisienne';
+    const fontScriptSelect = this.getEl<HTMLSelectElement>('fontScriptSelect');
+    if (fontScriptSelect) {
+      fontScriptSelect.value = preset?.variables.fontScript || defaults.fontScript || 'Parisienne';
     }
 
     // Update button states
-    if (this.elements.deleteBtn) {
-      (this.elements.deleteBtn as HTMLButtonElement).disabled = !preset;
+    const deleteBtn = this.getEl<HTMLButtonElement>('deleteBtn');
+    if (deleteBtn) {
+      deleteBtn.disabled = !preset;
     }
-    if (this.elements.duplicateBtn) {
-      (this.elements.duplicateBtn as HTMLButtonElement).disabled = !preset;
+    const duplicateBtn = this.getEl<HTMLButtonElement>('duplicateBtn');
+    if (duplicateBtn) {
+      duplicateBtn.disabled = !preset;
     }
-    if (this.elements.setActiveBtn) {
-      const btn = this.elements.setActiveBtn as HTMLButtonElement;
-      btn.textContent = mode === 'dawn' ? 'Set as active dawn theme' : 'Set as active midnight theme';
-      btn.disabled = !preset;
+    const setActiveBtn = this.getEl<HTMLButtonElement>('setActiveBtn');
+    if (setActiveBtn) {
+      setActiveBtn.textContent = mode === 'dawn' ? 'Set as active dawn theme' : 'Set as active midnight theme';
+      setActiveBtn.disabled = !preset;
     }
   }
 
@@ -561,21 +609,24 @@ export class ThemeEditor {
   private updateActiveLabels(): void {
     const state = this.manager.getState();
 
-    if (this.elements.activeMidnight) {
+    const midnightEl = this.getEl('activeMidnight');
+    if (midnightEl) {
       const slug = state.active.midnight;
       const preset = slug ? this.manager.getPreset('midnight', slug) : null;
-      this.elements.activeMidnight.textContent = preset?.name || '—';
+      midnightEl.textContent = preset?.name || '—';
     }
 
-    if (this.elements.activeDawn) {
+    const dawnEl = this.getEl('activeDawn');
+    if (dawnEl) {
       const slug = state.active.dawn;
       const preset = slug ? this.manager.getPreset('dawn', slug) : null;
-      this.elements.activeDawn.textContent = preset?.name || '—';
+      dawnEl.textContent = preset?.name || '—';
     }
   }
 
   private updateBreadcrumbs(): void {
-    if (!this.elements.breadcrumbs) return;
+    const breadcrumbs = this.getEl('breadcrumbs');
+    if (!breadcrumbs) return;
 
     const parts = ['Theme'];
     if (this.state.currentPreset) {
@@ -585,20 +636,18 @@ export class ThemeEditor {
       parts.push(this.state.editingScope);
     }
 
-    this.elements.breadcrumbs.textContent = parts.join(' > ');
+    breadcrumbs.textContent = parts.join(' > ');
   }
 
   private updateUndoRedoButtons(): void {
-    if (this.elements.undoBtn) {
-      (this.elements.undoBtn as HTMLButtonElement).disabled = !this.undoRedo.canUndo();
-    }
-    if (this.elements.redoBtn) {
-      (this.elements.redoBtn as HTMLButtonElement).disabled = !this.undoRedo.canRedo();
-    }
+    const undoBtn = this.getEl<HTMLButtonElement>('undoBtn');
+    const redoBtn = this.getEl<HTMLButtonElement>('redoBtn');
+    if (undoBtn) undoBtn.disabled = !this.undoRedo.canUndo();
+    if (redoBtn) redoBtn.disabled = !this.undoRedo.canRedo();
   }
 
   private updateWatcherStatus(): void {
-    const badge = this.elements.watcherStatus as HTMLElement | null;
+    const badge = this.getEl('watcherStatus');
     if (!badge) return;
     const mode = this.root?.getAttribute('data-theme-watch');
     if (mode === 'auto') {
@@ -613,16 +662,25 @@ export class ThemeEditor {
   }
 
   private updatePreview(): void {
-    if (!this.elements.previewRoot) return;
+    const previewRoots = this.getEls<HTMLElement>('previewRoots');
+    if (!previewRoots.length) {
+      const single = this.getEl<HTMLElement>('previewRoot');
+      if (single) {
+        previewRoots.push(single);
+      }
+    }
+    if (!previewRoots.length) return;
 
     const mode = this.state.mode;
-    const defaults = this.manager.getDefaultVariables(mode);
+    const defaults = this.getBaseVariables();
 
     // Collect all current values
     const variables = collectAllFormValues(this.elements);
 
-    // Update comprehensive preview variables
-    updateAllPreviewVariables(this.elements.previewRoot, variables, defaults);
+    // Update comprehensive preview variables on all preview roots
+    previewRoots.forEach((root) => {
+      updateAllPreviewVariables(root, variables, defaults);
+    });
 
     // Legacy variables for backwards compatibility
     const legacyVariables = {
@@ -635,13 +693,14 @@ export class ThemeEditor {
     };
 
     // Apply legacy CSS variables to preview
-    const preview = this.elements.previewRoot as HTMLElement;
-    preview.style.setProperty('--preview-primary', legacyVariables.primary);
-    preview.style.setProperty('--preview-accent', legacyVariables.accent);
-    preview.style.setProperty('--preview-background', legacyVariables.background);
-    preview.style.setProperty('--preview-text', legacyVariables.textPrimary);
-    preview.style.setProperty('--preview-text-heading', legacyVariables.textHeading);
-    preview.style.setProperty('--preview-muted', legacyVariables.textMuted);
+    previewRoots.forEach((preview) => {
+      preview.style.setProperty('--preview-primary', legacyVariables.primary);
+      preview.style.setProperty('--preview-accent', legacyVariables.accent);
+      preview.style.setProperty('--preview-background', legacyVariables.background);
+      preview.style.setProperty('--preview-text', legacyVariables.textPrimary);
+      preview.style.setProperty('--preview-text-heading', legacyVariables.textHeading);
+      preview.style.setProperty('--preview-muted', legacyVariables.textMuted);
+    });
 
     // Calculate derived colors
     const bg = variables.background || defaults.background || '#0f0820';
@@ -650,15 +709,18 @@ export class ThemeEditor {
       const luminance = this.getLuminance(bgRgb);
       const surface = this.adjustHex(bg, luminance > 0.5 ? -0.08 : 0.22);
       const border = this.adjustHex(bg, luminance > 0.5 ? -0.3 : 0.28);
-      preview.style.setProperty('--preview-surface', surface);
-      preview.style.setProperty('--preview-border', border);
+      previewRoots.forEach((preview) => {
+        preview.style.setProperty('--preview-surface', surface);
+        preview.style.setProperty('--preview-border', border);
+      });
     }
 
-    preview.setAttribute('data-mode', mode);
+    previewRoots.forEach((preview) => preview.setAttribute('data-mode', mode));
   }
 
   private updateContrastCheck(): void {
-    if (!this.elements.contrastDisplay) return;
+    const display = this.getEl('contrastDisplay');
+    if (!display) return;
 
     const background = this.getInputValue('backgroundInput') || '#0f0820';
     const textPrimary = this.getInputValue('textPrimaryInput') || '#fdfcfe';
@@ -667,7 +729,6 @@ export class ThemeEditor {
     const result1 = checkContrast(textPrimary, background);
     const result2 = checkContrast(textHeading, background);
 
-    const display = this.elements.contrastDisplay as HTMLElement;
     display.innerHTML = `
       <div class="space-y-3">
         <div class="text-xs font-semibold uppercase tracking-wide text-body-muted mb-3">Contrast Check</div>
@@ -701,15 +762,16 @@ export class ThemeEditor {
   }
 
   private getInputValue(elementKey: string): string {
-    const el = this.elements[elementKey] as HTMLInputElement;
+    const el = this.getEl<HTMLInputElement>(elementKey);
     return el?.value.trim() || '';
   }
 
   private collectFormData(): Partial<ThemePreset> {
     const mode = this.state.mode;
-    const defaults = this.manager.getDefaultVariables(mode);
+    const defaults = this.getBaseVariables();
     const preset = this.state.currentPreset;
     const scope = this.state.editingScope;
+    const baseVariables = this.getBaseVariables();
 
     // Collect all comprehensive variables (for scope-specific editing)
     const comprehensiveVariables = collectAllFormValues(this.elements);
@@ -742,9 +804,9 @@ export class ThemeEditor {
 
     const fontValues: ThemeVariables = {};
     const fontSerifValue =
-      (this.elements.fontSerifSelect as HTMLSelectElement)?.value || defaults.fontSerif || 'Literata';
+      this.getEl<HTMLSelectElement>('fontSerifSelect')?.value || defaults.fontSerif || 'Literata';
     const fontScriptValue =
-      (this.elements.fontScriptSelect as HTMLSelectElement)?.value || defaults.fontScript || 'Parisienne';
+      this.getEl<HTMLSelectElement>('fontScriptSelect')?.value || defaults.fontScript || 'Parisienne';
     if (fontSerifValue) {
       fontValues.fontSerif = fontSerifValue;
     }
@@ -770,22 +832,39 @@ export class ThemeEditor {
         ...fontValues, // Fonts remain global
       };
 
+      // Build override only for values that differ from the base global values
+      const filteredOverrides: ThemeVariables = {};
+      Object.entries(comprehensiveVariables).forEach(([key, value]) => {
+        const trimmed = value?.trim();
+        if (!trimmed) return;
+        const base = baseVariables[key];
+        if (base && base === trimmed) return;
+        filteredOverrides[key] = trimmed;
+      });
+
+      // Preserve quick overrides when they are different from base
+      Object.entries(scopedQuickValues).forEach(([key, value]) => {
+        const trimmed = value?.trim();
+        if (!trimmed) return;
+        const base = baseVariables[key];
+        if (base && base === trimmed) return;
+        filteredOverrides[key] = trimmed;
+      });
+
       // Update or create scope override
       const existingIndex = overrides.findIndex((o) => o.scope === scope);
       if (existingIndex >= 0 && overrides[existingIndex]) {
         overrides[existingIndex] = {
           scope,
           variables: {
-            ...comprehensiveVariables,
-            ...scopedQuickValues,
+            ...filteredOverrides,
           },
         };
-      } else {
+      } else if (Object.keys(filteredOverrides).length > 0) {
         overrides.push({
           scope,
           variables: {
-            ...comprehensiveVariables,
-            ...scopedQuickValues,
+            ...filteredOverrides,
           },
         });
       }
@@ -795,7 +874,7 @@ export class ThemeEditor {
       name: this.getInputValue('nameInput'),
       slug: this.getInputValue('slugInput'),
       mode,
-      category: (this.elements.categorySelect as HTMLSelectElement)?.value || 'custom',
+      category: this.getEl<HTMLSelectElement>('categorySelect')?.value || 'custom',
       variables,
       overrides: overrides.length > 0 ? overrides : undefined,
     };
@@ -831,14 +910,14 @@ export class ThemeEditor {
   }
 
   private openNewThemeModal(): void {
-    const modal = this.elements.newThemeModal as HTMLElement;
+    const modal = this.getEl('newThemeModal');
     if (modal) {
       modal.classList.remove('hidden');
     }
   }
 
   private closeNewThemeModal(): void {
-    const modal = this.elements.newThemeModal as HTMLElement;
+    const modal = this.getEl('newThemeModal');
     if (modal) {
       modal.classList.add('hidden');
     }
@@ -1023,9 +1102,8 @@ export class ThemeEditor {
   }
 
   private setStatus(message: string, type: 'success' | 'error' | 'info', actions?: { theme?: string; mode?: string }): void {
-    if (!this.elements.statusEl) return;
-
-    const el = this.elements.statusEl as HTMLElement;
+    const el = this.getEl('statusEl');
+    if (!el) return;
     el.innerHTML = '';
 
     // Create message text
@@ -1048,12 +1126,12 @@ export class ThemeEditor {
 
       // Set as Active button (if not already active)
       const activePreset = this.manager.getActivePreset(actions.mode as ThemeMode);
-      const isActive = this.state.currentPreset?.slug === activePreset?.slug;
-      if (!isActive) {
-        const activateBtn = document.createElement('button');
-        activateBtn.type = 'button';
-        activateBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-purple-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-purple-700 transition shadow-sm';
-        activateBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Set as Active`;
+    const isActive = this.state.currentPreset?.slug === activePreset?.slug;
+    if (!isActive) {
+      const activateBtn = document.createElement('button');
+      activateBtn.type = 'button';
+      activateBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-amber-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-amber-700 transition shadow-sm';
+      activateBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Set as Active`;
         activateBtn.addEventListener('click', () => {
           void this.setActive();
         });
@@ -1091,6 +1169,32 @@ export class ThemeEditor {
     }
   }
 
+  private setEditingScope(scopeId: string, options: { scroll?: boolean } = {}): void {
+    const scope = scopeId || 'global';
+    if (scope === this.state.editingScope) {
+      if (options.scroll) this.scrollToPalette();
+      return;
+    }
+
+    this.pushState({ ...this.state, editingScope: scope });
+
+    const selector = this.getEl<HTMLSelectElement>('scopeSelector');
+    if (selector && selector.value !== scope) {
+      selector.value = scope;
+    }
+
+    if (options.scroll) {
+      this.scrollToPalette();
+    }
+  }
+
+  private scrollToPalette(): void {
+    const target = document.querySelector<HTMLElement>('[data-scroll-target="palette"]');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
   private normalizeHex(value: string): string {
     const match = /^#?([0-9a-fA-F]{6})$/.exec(value?.trim() || '');
     return match && match[1] ? `#${match[1].toLowerCase()}` : '';
@@ -1124,7 +1228,7 @@ export class ThemeEditor {
    * Update scope UI elements based on current scope
    */
   private updateScopeOverview(): void {
-    const overview = this.elements.scopeOverview as HTMLElement | null;
+    const overview = this.getEl('scopeOverview');
     if (!overview) return;
     const overrides = this.state.currentPreset?.overrides || [];
     if (!overrides.length) {
@@ -1138,25 +1242,58 @@ export class ThemeEditor {
     overview.textContent = `Overrides: ${unique.join(', ')}`;
   }
 
+  private updateScopeCards(): void {
+    const currentScope = this.state.editingScope;
+    const overrides = this.state.currentPreset?.overrides || [];
+
+    this.getEls<HTMLElement>('scopeCards').forEach((card) => {
+      const scopeId = card.dataset.scopeCard;
+      if (!scopeId) return;
+      const hasOverride = scopeId === 'global' ? true : overrides.some((o) => o.scope === scopeId);
+
+      const statusEl = card.querySelector<HTMLElement>('[data-scope-status]');
+      if (statusEl) {
+        statusEl.textContent = scopeId === 'global'
+          ? 'Sitewide defaults'
+          : hasOverride
+            ? 'Overrides saved'
+            : 'Inherits global';
+        statusEl.className = `mt-3 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-semibold uppercase tracking-wide ${
+          hasOverride || scopeId === 'global'
+            ? 'bg-surface-accent-bolder text-inverse'
+            : 'bg-surface-base text-body-muted border border-line-subtle'
+        }`;
+      }
+
+      const activeBadge = card.querySelector<HTMLElement>('[data-scope-active]');
+      if (activeBadge) {
+        activeBadge.classList.toggle('hidden', scopeId !== currentScope);
+      }
+
+      const isActive = scopeId === currentScope;
+      card.classList.toggle('border-primary', isActive);
+      card.classList.toggle('ring-2', isActive);
+      card.classList.toggle('ring-primary', isActive);
+      card.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+  }
+
   private updateScopeUI(): void {
     const scope = this.state.editingScope;
     const preset = this.state.currentPreset;
 
     // Update scope info label
-    if (this.elements.scopeLabel) {
-      this.elements.scopeLabel.textContent = `Editing: ${this.getScopeName(scope)}`;
-    }
+    const scopeLabel = this.getEl('scopeLabel');
+    if (scopeLabel) scopeLabel.textContent = `Editing: ${this.getScopeName(scope)}`;
 
     // Check if this scope has overrides
     const hasOverride = preset?.overrides?.some((o) => o.scope === scope) || false;
 
     // Toggle override status indicators
-    if (this.elements.scopeHasOverride) {
-      this.elements.scopeHasOverride.classList.toggle('hidden', !hasOverride || scope === 'global');
-    }
-    if (this.elements.scopeNoOverride) {
-      this.elements.scopeNoOverride.classList.toggle('hidden', hasOverride || scope === 'global');
-    }
+    const hasOverrideEl = this.getEl('scopeHasOverride');
+    const noOverrideEl = this.getEl('scopeNoOverride');
+    hasOverrideEl?.classList.toggle('hidden', !hasOverride || scope === 'global');
+    noOverrideEl?.classList.toggle('hidden', hasOverride || scope === 'global');
   }
 
   /**
@@ -1181,20 +1318,10 @@ export class ThemeEditor {
    * Get display name for a scope
    */
   private getScopeName(scopeId: string): string {
-    const scopeMap: Record<string, string> = {
-      'global': 'Global Theme',
-      'homepage': 'Homepage',
-      'grimoire': 'Entity Grimoire',
-      'post': 'Post Detail',
-      'entity-detail': 'Entity Detail',
-      'start': 'Start Page',
-      'header': 'Site Header',
-      'footer': 'Site Footer',
-      'card': 'Post Cards',
-      'sidebar': 'Sidebar',
-      'hero': 'Hero Section',
-    };
-    return scopeMap[scopeId] || scopeId;
+    const scope = THEME_SCOPES.find((item) => item.id === scopeId);
+    if (scope) return scope.label;
+    if (scopeId === 'global') return 'Global Theme';
+    return scopeId;
   }
 
   /**
@@ -1221,12 +1348,16 @@ export class ThemeEditor {
     const preset = this.state.currentPreset;
     const scope = this.state.editingScope;
 
-    if (scope === 'global' || !preset) {
-      return preset?.variables || {};
+    if (!preset) return this.getBaseVariables();
+    if (scope === 'global') {
+      return { ...this.getBaseVariables() };
     }
 
-    const override = preset.overrides?.find((o) => o.scope === scope);
-    return override?.variables || {};
+    const override = this.getScopeOverride(scope);
+    return {
+      ...this.getBaseVariables(),
+      ...override,
+    };
   }
 
   /**
@@ -1265,5 +1396,24 @@ export class ThemeEditor {
     }
 
     this.pushState({ ...this.state, currentPreset: preset });
+  }
+
+  /**
+   * Get the current preset's global variables merged with defaults for the active mode.
+   */
+  private getBaseVariables(): ThemeVariables {
+    const defaults = this.manager.getDefaultVariables(this.state.mode);
+    const presetVars = this.state.currentPreset?.variables || {};
+    return { ...defaults, ...presetVars };
+  }
+
+  /**
+   * Get only the override variables for a specific scope.
+   */
+  private getScopeOverride(scopeId: string): ThemeVariables {
+    const preset = this.state.currentPreset;
+    if (!preset || !preset.overrides) return {};
+    const override = preset.overrides.find((o) => o.scope === scopeId);
+    return override?.variables || {};
   }
 }

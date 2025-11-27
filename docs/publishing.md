@@ -34,7 +34,7 @@ The WitchClick pipeline turns generated outlines into live posts. Follow this ch
 - Generate prompts in the admin console under the **Curses** panel or via `npm run curses -- --type mirror --target person --tone poetic`.
 - Validate JSON with `npm run ingest:curses -- --from-file ./curse.json` (add `--dry-run` to preview).
 - Render printable cards for ritual kits using `npm run export:curses`.
-- Curses are published to `content/white-magic-curses/` and appear automatically at `/curses`.
+- Curses are archived to `archive/curses/` for print/PDF manuals (no web CTAs/links) and are not published to the site.
 
 ## 7. Monitor after launch
 - Spot check the live page once the deploy finishes.

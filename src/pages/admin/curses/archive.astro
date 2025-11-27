@@ -1,0 +1,118 @@
+---
+import Base from "../../../layouts/Base.astro";
+import { readSettings, buildCanonicalUrl } from "../../../utils/settings";
+import HeadSlot from "@/components/HeadSlot.astro";
+import AdminNav from "@/components/AdminNav.astro";
+import adminCursesArchiveScript from "../../../scripts/admin/adminCursesArchive.ts?url";
+
+const settings = readSettings();
+const canonical = buildCanonicalUrl(settings, { path: "/admin/curses/archive" });
+
+const isDev = import.meta.env.DEV;
+const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
+const url = new URL(Astro.request.url);
+const keyOk = ADMIN_KEY && url.searchParams.get('key') === ADMIN_KEY;
+const canUse = isDev || !!keyOk;
+
+const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+---
+<Base
+  title="WitchClick — Curse Archive"
+  description="Browse, preview, and edit archived curses for print/PDF manuals."
+  canon={canonical}
+  wide={true}
+  noindex={true}
+>
+  <HeadSlot slot="head">
+    <meta name="robots" content="noindex" />
+  </HeadSlot>
+
+  {canUse ? (
+    <div class="space-y-6">
+      <AdminNav currentPath="/admin/curses/archive" />
+
+      <header class="rounded-2xl border border-line-subtle bg-surface-base p-6 shadow-sm space-y-3">
+        <div>
+          <h1 class="text-2xl font-semibold text-body-strong">Curse Archive & Editor</h1>
+          <p class="mt-1 text-sm text-body-muted">Edit archived curses stored in <code>archive/curses/</code>. Preview renders markdown sections for print/PDF.</p>
+        </div>
+        <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-4 text-xs text-body-muted">
+          <div class="font-semibold mb-2">Workflow:</div>
+          <ol class="ml-4 list-decimal space-y-1.5">
+            <li>Select a curse from the library</li>
+            <li>Review frontmatter and markdown; preview updates live</li>
+            <li>Save changes (writes to archive) or delete if needed</li>
+          </ol>
+          <p class="mt-2">Need a new curse? Use the <a class="text-primary hover:underline" href="/admin/curses">Curses Generator →</a></p>
+        </div>
+      </header>
+
+      <div
+        data-curses-archive
+        data-dev-api={DEV_API}
+        class="grid grid-cols-1 gap-6 lg:grid-cols-12"
+      >
+        <aside class="lg:col-span-4 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <h2 class="text-base font-semibold">Curse Library</h2>
+              <p class="text-xs text-body-muted">Select an archived curse to view/edit.</p>
+            </div>
+            <button data-curse-refresh class="rounded-lg border border-line-neutral px-3 py-1.5 text-xs font-medium hover:bg-surface-soft">🔄 Refresh</button>
+          </div>
+          <input
+            type="search"
+            data-curse-search
+            class="w-full rounded-lg border border-line-subtle px-3 py-2 text-sm"
+            placeholder="Search by title or slug…"
+          />
+          <p data-curse-list-status class="text-xs text-body-muted">Loading…</p>
+          <select
+            size="16"
+            data-curse-list
+            class="h-[28rem] w-full rounded-xl border border-line-subtle bg-surface-muted px-3 py-2 text-left text-sm font-medium text-primary focus:outline-none focus:ring-2 focus:ring-primary"
+          ></select>
+        </aside>
+
+        <section class="lg:col-span-8 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <h2 class="text-xl font-semibold">Archive Editor</h2>
+              <p data-curse-meta class="text-xs text-body-muted">Select a curse to load its markdown.</p>
+            </div>
+            <button data-curse-delete class="rounded-lg border-2 border-danger px-4 py-2 text-sm font-semibold text-danger hover:bg-danger hover:text-white transition disabled:opacity-50" disabled>🗑 Delete</button>
+          </div>
+
+          <label class="block">
+            <span class="text-xs font-medium">Frontmatter (YAML)</span>
+            <textarea data-curse-frontmatter class="mt-1 h-40 w-full rounded-lg border border-line-subtle px-3 py-2 font-mono text-xs" spellcheck="false" disabled></textarea>
+          </label>
+
+          <label class="block">
+            <span class="text-xs font-medium">Markdown</span>
+            <textarea data-curse-markdown class="mt-1 h-72 w-full rounded-lg border border-line-subtle px-3 py-2 font-mono text-sm" spellcheck="false" disabled></textarea>
+          </label>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <button data-curse-save class="rounded-lg bg-surface-accent-bolder px-4 py-2 text-sm font-semibold text-inverse hover:bg-surface-accent-deep disabled:opacity-50" disabled>Save changes</button>
+            <div data-curse-editor-status class="text-sm text-body-muted"></div>
+          </div>
+
+          <div data-curse-preview class="prose prose-neutral border-t pt-4"></div>
+        </section>
+      </div>
+    </div>
+  ) : (
+    <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
+      <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
+      <p class="text-body-muted">These tools only run in <strong>development</strong> (or with a temporary key when hosted on a server adapter).</p>
+      <ol class="mx-auto mt-4 list-decimal space-y-2 text-left text-sm text-body-muted">
+        <li>Run <code>npm run dev</code> locally.</li>
+        <li>Use the curses CLI: <code>node tools/wc.js curses --help</code>.</li>
+        <li>If you later switch to serverless, set <code>PUBLIC_ADMIN_KEY</code> and visit <code>/admin?key=…</code>.</li>
+      </ol>
+    </section>
+  )}
+
+  {canUse && <script type="module" is:inline src={adminCursesArchiveScript}></script>}
+</Base>

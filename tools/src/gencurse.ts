@@ -15,6 +15,7 @@ export function gencurse({
   type,
   target,
   tone,
+  topic,
   sigilName,
   altarItem,
   journalingFollowUp,
@@ -22,6 +23,7 @@ export function gencurse({
   type?: string;
   target?: string;
   tone?: string;
+  topic?: string;
   sigilName?: string;
   altarItem?: string;
   journalingFollowUp?: string;
@@ -33,11 +35,13 @@ export function gencurse({
   const safeTone = CURSE_TONES.includes(tone as any)
     ? (tone as typeof CURSE_TONES[number])
     : 'poetic';
+  const safeTopic = typeof topic === 'string' && topic.trim() ? topic.trim() : undefined;
 
   const prompt = buildCursePrompt({
     type: safeType,
     target: safeTarget,
     tone: safeTone,
+    topic: safeTopic,
     sigilName,
     altarItem,
     journalingFollowUp,

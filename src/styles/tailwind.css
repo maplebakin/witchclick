@@ -13,12 +13,12 @@
 
 :root {
   /* Canvas & Background */
-  --wc-canvas-from: hsl(270 60% 98%);
-  --wc-canvas-to: hsl(270 40% 92%);
+  --wc-canvas-from: color-mix(in srgb, var(--color-gold, #d4af37) 10%, white 90%);
+  --wc-canvas-to: color-mix(in srgb, var(--color-iris, #f2bf8c) 12%, white 88%);
   --wc-canvas-vignette: 0 0 0 / 0.08;
 
   /* Surface Tint & Patterns */
-  --surface-tint: hsl(270 55% 62%);
+  --surface-tint: color-mix(in srgb, var(--color-gold, #e4a667) 45%, var(--color-iris, #f2bf8c) 55%);
   --surface-parchment: radial-gradient(
     125% 125% at 50% 0%,
     color-mix(in oklab, white 96%, var(--surface-tint) 4%) 0%,
@@ -50,8 +50,8 @@
   /* Panel Surfaces */
   --panel-surface-strong: color-mix(in srgb, var(--color-night, #120725) 78%, var(--surface-tint) 22%);
   --panel-surface-soft: color-mix(in srgb, var(--color-dusk, #271534) 72%, var(--surface-tint) 28%);
-  --panel-border-strong: hsl(270 30% 75% / 0.35);
-  --panel-border-soft: hsl(270 30% 82% / 0.3);
+  --panel-border-strong: color-mix(in srgb, var(--color-gold, #d4af37) 38%, transparent 62%);
+  --panel-border-soft: color-mix(in srgb, var(--color-iris, #f2bf8c) 28%, transparent 72%);
   --panel-muted-surface: var(--panel-surface-soft);
   --panel-muted-border: var(--panel-border-soft);
   --panel-muted-text: var(--ink-body);
@@ -80,22 +80,22 @@
   /* Glass Panel */
   --glass-panel-radius: 1.75rem;
   --glass-panel-blur: 18px;
-  --glass-panel-border: rgba(124, 58, 237, 0.18);
+  --glass-panel-border: color-mix(in srgb, var(--color-gold, #e4a667) 32%, var(--color-iris, #f2bf8c) 28%);
   --glass-panel-overlay: transparent;
   --glass-panel-shadow: var(--elevation-tier-1);
 
   /* Background Layers */
-  --wc-bg-layer-1: radial-gradient(140% 80% at 50% -20%, oklch(0.94 0.08 300) 0%, transparent 65%);
-  --wc-bg-layer-2: linear-gradient(180deg, oklch(0.97 0.04 305) 0%, oklch(0.9 0.06 295) 100%);
+  --wc-bg-layer-1: radial-gradient(140% 80% at 50% -20%, color-mix(in srgb, var(--color-gold, #d4af37) 18%, white 82%) 0%, transparent 65%);
+  --wc-bg-layer-2: linear-gradient(180deg, color-mix(in srgb, var(--color-gold, #e4a667) 14%, white 86%) 0%, color-mix(in srgb, var(--color-iris, #f2bf8c) 12%, white 88%) 100%);
 
   /* Section Variables */
-  --section-border: rgba(124, 58, 237, 0.18);
-  --section-glow: rgba(124, 58, 237, 0.18);
-  --section-highlight: rgba(212, 175, 55, 0.12);
-  --section-surface-top: rgba(255, 255, 255, 0.96);
-  --section-surface-bottom: rgba(248, 244, 255, 0.98);
-  --section-text: color-mix(in srgb, #2a1a3f 92%, black 8%);
-  --section-veil: rgba(255, 255, 255, 0.32);
+  --section-border: color-mix(in srgb, var(--color-gold, #e4a667) 32%, var(--color-iris, #f2bf8c) 22%);
+  --section-glow: color-mix(in srgb, var(--color-iris, #f2bf8c) 20%, transparent 80%);
+  --section-highlight: color-mix(in srgb, var(--color-gold, #d4af37) 18%, transparent 82%);
+  --section-surface-top: color-mix(in srgb, white 96%, var(--color-gold, #d4af37) 4%);
+  --section-surface-bottom: color-mix(in srgb, white 94%, var(--color-iris, #f2bf8c) 6%);
+  --section-text: color-mix(in srgb, var(--color-night, #120725) 82%, var(--color-iris, #f2bf8c) 18%);
+  --section-veil: color-mix(in srgb, white 32%, var(--color-gold, #d4af37) 8%);
 }
 
 /* ---------------------------------------------------------------------------
@@ -109,6 +109,26 @@ body {
 /* Prose (Content) Font */
 .prose {
   font-family: var(--font-serif, Literata, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif);
+  color: var(--ink-body, var(--text-body));
+}
+
+.prose :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--ink-strong, var(--text-strong));
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.prose a {
+  color: var(--link-color, var(--text-accent));
+}
+
+.prose strong {
+  color: var(--text-accent-strong, var(--ink-strong));
+}
+
+.prose blockquote {
+  border-left-color: var(--border-accent-strong, var(--border-strong));
+  color: color-mix(in srgb, var(--ink-body, var(--text-body)) 88%, transparent 12%);
 }
 
 /* Link Reset */

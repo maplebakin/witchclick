@@ -48,6 +48,7 @@ export const adminNavSections: AdminNavSection[] = [
       { href: "/admin", label: "Generator" },
       { href: "/admin/write", label: "Write" },
       { href: "/admin/posts", label: "Posts" },
+      { href: "/admin/curses", label: "Curses" },
     ]
   },
   {

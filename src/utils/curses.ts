@@ -42,15 +42,19 @@ const shouldCache = runtimeEnv ? Boolean(runtimeEnv.PROD) : process.env.NODE_ENV
 
 function resolveCurseDirectory(): string | null {
   const cwd = process.cwd();
-  const dir = path.join(cwd, "content", "white-magic-curses");
-  try {
-    if (fs.statSync(dir).isDirectory()) {
-      return dir;
+  const archiveDir = path.join(cwd, "archive", "curses");
+  const legacyDir = path.join(cwd, "content", "white-magic-curses");
+  const candidates = [archiveDir, legacyDir];
+  for (const dir of candidates) {
+    try {
+      if (fs.statSync(dir).isDirectory()) {
+        return dir;
+      }
+    } catch {
+      // ignore missing paths
     }
-  } catch {
-    return null;
   }
-  return dir;
+  return null;
 }
 
 function parseSections(body: string): LoadedCurse["sections"] {

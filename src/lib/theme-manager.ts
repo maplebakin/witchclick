@@ -104,6 +104,20 @@ export interface ThemeVariables {
   footerText?: string;
   footerTextMuted?: string;
 
+  // Glass Surfaces
+  glassSurface?: string;
+  glassSurfaceStrong?: string;
+  glassCard?: string;
+  glassHover?: string;
+  glassBorder?: string;
+  glassBorderStrong?: string;
+  glassHighlight?: string;
+  glassGlow?: string;
+  glassShadowSoft?: string;
+  glassShadowStrong?: string;
+  glassBlur?: string;
+  glassNoiseOpacity?: string;
+
   // Legacy compatibility
   primary?: string;
   accent?: string;
@@ -145,49 +159,63 @@ export interface ThemeState {
 const DEFAULT_VARIABLES: Record<ThemeMode, ThemeVariables> = {
   midnight: {
     // Core Brand Colors
-    colorMidnight: '#07020f',
-    colorNight: '#120725',
-    colorIris: '#4b2a63',
-    colorAmethyst: '#7c4eb0',
-    colorDusk: '#271534',
-    colorGold: '#d4af37',
-    colorRune: '#f8f3ff',
-    colorFog: '#d7c8f3',
-    colorInk: '#f4f1ff',
+    colorMidnight: '#070a05',
+    colorNight: '#261a0d',
+    colorIris: '#f2bf8c',
+    colorAmethyst: '#d18c47',
+    colorDusk: '#22170b',
+    colorGold: '#e4a667',
+    colorRune: '#f8f2ed',
+    colorFog: '#cc9966',
+    colorInk: '#ebd9c7',
 
     // Surface Colors
-    surfacePlain: '#120a1e',
-    cardPanelSurface: '#1a0d2e',
-    cardPanelSurfaceStrong: '#221638',
-    cardPanelBorder: '#d4af37',
-    cardPanelBorderStrong: '#d4af37',
-    cardPanelBorderSoft: '#4b2a63',
+    surfacePlain: '#22170b',
+    cardPanelSurface: '#452e17',
+    cardPanelSurfaceStrong: '#764a1e',
+    cardPanelBorder: '#764a1e',
+    cardPanelBorderStrong: '#452e17',
+    cardPanelBorderSoft: '#362412',
+
+    // Glass Surfaces
+    glassSurface: '#452e17',
+    glassSurfaceStrong: '#764a1e',
+    glassCard: '#362412',
+    glassHover: '#764a1e',
+    glassBorder: '#cc9966',
+    glassBorderStrong: '#f2bf8c',
+    glassHighlight: '#d4af37',
+    glassGlow: '#f2bf8c',
+    glassShadowSoft: '0 22px 55px -32px rgba(11, 6, 20, 0.65)',
+    glassShadowStrong: '0 32px 85px -36px rgba(3, 2, 12, 0.78)',
+    glassBlur: '16px',
+    glassNoiseOpacity: '0.08',
 
     // Text Colors
-    textPrimary: '#f4f1ff',
-    textSecondary: '#f4f1ff',
-    textTertiary: '#f4f1ff',
-    textStrong: '#f9f5ff',
+    textPrimary: '#ebd9c7',
+    textSecondary: '#d18c47',
+    textTertiary: '#f2bf8c',
+    textStrong: '#f8f2ed',
     textBody: '#f9f5ff',
     textSubtle: '#f9f5ff',
-    textAccent: '#d4af37',
-    textAccentStrong: '#d4af37',
-    inkBody: '#f4f1ff',
-    inkStrong: '#ffffff',
-    inkMuted: '#d9b2c4',
-    linkColor: '#e0c07d',
+    textAccent: '#f2bf8c',
+    textAccentStrong: '#d18c47',
+    inkBody: '#ebd9c7',
+    inkStrong: '#f8f2ed',
+    inkMuted: '#f2bf8c',
+    linkColor: '#f2bf8c',
 
     // Card Components
-    cardBadgeBg: '#d4af37',
-    cardBadgeBorder: '#d4af37',
-    cardBadgeText: '#f8f3ff',
-    cardTagBg: '#4b2a63',
-    cardTagBorder: '#4b2a63',
-    cardTagText: '#f4f1ff',
+    cardBadgeBg: '#d18c47',
+    cardBadgeBorder: '#d18c47',
+    cardBadgeText: '#0f0a05',
+    cardTagBg: '#d18c47',
+    cardTagBorder: '#d18c47',
+    cardTagText: '#0f0a05',
 
     // Interactive
-    focusRingColor: '#e8d591',
-    cardFocusOutline: '#e8d591',
+    focusRingColor: '#e4a667',
+    cardFocusOutline: '#e4a667',
 
     // Typography
     fontSerif: 'Literata',
@@ -202,21 +230,21 @@ const DEFAULT_VARIABLES: Record<ThemeMode, ThemeVariables> = {
     info: '#60a5fa',
 
     // Header & Footer
-    headerBackground: '#120725',
-    headerBorder: '#4b2a63',
+    headerBackground: '#261a0d',
+    headerBorder: '#cc9966',
     headerText: '#f4f1ff',
     headerTextHover: '#d4af37',
-    footerBackground: '#07020f',
-    footerBorder: '#4b2a63',
+    footerBackground: '#261a0d',
+    footerBorder: '#cc9966',
     footerText: '#f4f1ff',
     footerTextMuted: '#d9b2c4',
 
     // Legacy compatibility
-    primary: '#6b21a8',
-    accent: '#d4af37',
-    background: '#0f0820',
-    textHeading: '#ffffff',
-    textMuted: '#d9b2c4',
+    primary: '#1f140a',
+    accent: '#cc9966',
+    background: '#0f0a05',
+    textHeading: '#261a0d',
+    textMuted: '#f2bf8c',
   },
   dawn: {
     // Core Brand Colors
@@ -243,6 +271,20 @@ const DEFAULT_VARIABLES: Record<ThemeMode, ThemeVariables> = {
     cardPanelBorder: '#9b86c8',
     cardPanelBorderStrong: '#9b86c8',
     cardPanelBorderSoft: '#9b86c8',
+
+    // Glass Surfaces
+    glassSurface: '#f6f0e8',
+    glassSurfaceStrong: '#efe6f7',
+    glassCard: '#ede5dc',
+    glassHover: '#f2ecfa',
+    glassBorder: '#c7b6e8',
+    glassBorderStrong: '#9b86c8',
+    glassHighlight: '#9b86c8',
+    glassGlow: '#caa043',
+    glassShadowSoft: '0 22px 55px -32px rgba(63, 49, 86, 0.28)',
+    glassShadowStrong: '0 32px 85px -36px rgba(99, 80, 128, 0.35)',
+    glassBlur: '16px',
+    glassNoiseOpacity: '0.08',
 
     // Text Colors
     textPrimary: '#2c1b3d',
@@ -833,7 +875,7 @@ export class ThemeManager {
 
     // Get base colors (with fallbacks)
     const background = variables.background || variables.colorMidnight || '#0f0820';
-    const primary = variables.primary || variables.colorAmethyst || '#7c4eb0';
+    const primary = variables.primary || variables.colorAmethyst || '#d18c47';
     const accent = variables.accent || variables.colorGold || '#d4af37';
 
     console.log('[generateTokensFromBase] Input colors:', { background, primary, accent });
@@ -980,6 +1022,8 @@ export class ThemeManager {
         // Strip "hsl(" prefix and ")" suffix to get just the HSL components
         const strippedValue = value.replace('hsl(', '').replace(')', '');
         root.style.setProperty(cssVar, strippedValue);
+      } else if (value) {
+        root.style.setProperty(cssVar, value);
       }
     });
 
@@ -995,6 +1039,53 @@ export class ThemeManager {
       const value = tokens[tokenKey];
       if (value && value.startsWith('#')) {
         root.style.setProperty(cssVar, value);
+      }
+    });
+
+    // Apply canonical design tokens directly from theme variables so components using base tokens stay in sync.
+    const v = preset.variables;
+    const directVars: Record<string, string | undefined> = {
+      '--color-midnight': v.colorMidnight || v.background,
+      '--color-night': v.colorNight,
+      '--color-iris': v.colorIris || v.primary,
+      '--color-amethyst': v.colorAmethyst || v.primary,
+      '--color-dusk': v.colorDusk,
+      '--color-gold': v.colorGold || v.accent,
+      '--color-rune': v.colorRune || v.textHeading,
+      '--color-fog': v.colorFog || v.textMuted,
+      '--color-ink': v.colorInk || v.textBody,
+      '--color-muted': v.textMuted,
+      '--color-border': v.cardPanelBorder || v.cardPanelBorderSoft,
+      '--color-border-strong': v.cardPanelBorderStrong || v.colorGold,
+      '--color-overlay': v.surfacePlain,
+      '--color-overlay-strong': v.surfacePlain,
+      '--surface-plain': v.surfacePlain || v.cardPanelSurface || v.background,
+      '--surface-plain-border': v.surfacePlainBorder || v.cardPanelBorder,
+      '--surface-plain-shadow': v.shadowSoft,
+      '--surface-card': v.cardPanelSurfaceStrong || v.cardPanelSurface,
+      '--surface-elevated': v.cardPanelSurfaceStrong || v.cardPanelSurface,
+      '--surface-hover': v.surfaceHover || v.cardPanelSurfaceStrong,
+      '--text-primary': v.textPrimary || v.colorInk,
+      '--text-heading': v.textHeading || v.textPrimary,
+      '--text-muted': v.textMuted || v.colorFog,
+      '--ink-body': v.inkBody || v.textBody || v.colorInk,
+      '--ink-strong': v.inkStrong || v.textStrong || v.textPrimary,
+      '--ink-muted': v.inkMuted || v.textMuted,
+      '--link-color': v.linkColor || v.colorGold || v.accent,
+      '--border-subtle': v.cardPanelBorderSoft || v.cardPanelBorder,
+      '--border-strong': v.cardPanelBorderStrong || v.cardPanelBorder || v.colorGold,
+      '--focus-ring': v.focusRingColor || v.cardFocusOutline || v.accent,
+      '--card-badge-bg': v.cardBadgeBg || v.cardPanelSurface || v.background,
+      '--card-badge-border': v.cardBadgeBorder || v.cardPanelBorder || v.cardPanelBorderStrong,
+      '--card-badge-text': v.cardBadgeText || v.textStrong || v.textPrimary,
+      '--card-tag-bg': v.cardTagBg || v.cardPanelSurface || v.background,
+      '--card-tag-border': v.cardTagBorder || v.cardPanelBorder || v.cardPanelBorderStrong,
+      '--card-tag-text': v.cardTagText || v.textPrimary || v.textStrong,
+    };
+
+    Object.entries(directVars).forEach(([cssVar, value]) => {
+      if (typeof value === 'string' && value.trim()) {
+        root.style.setProperty(cssVar, value.trim());
       }
     });
 

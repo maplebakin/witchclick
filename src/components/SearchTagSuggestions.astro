@@ -79,7 +79,7 @@ const tags = sorted.map(([value, count]) => ({
   }
 
   .search-tags__chip {
-    border: 1px solid color-mix(in srgb, var(--accent-purple-strong) 35%, transparent 65%);
+    border: 1px solid color-mix(in srgb, var(--text-accent, var(--color-gold)) 42%, transparent 58%);
     background: color-mix(in srgb, hsl(var(--surface-panel-primary)) 88%, transparent 12%);
     border-radius: 999px;
     font-size: 0.75rem;
@@ -90,20 +90,20 @@ const tags = sorted.map(([value, count]) => ({
 
   .search-tags__chip:hover,
   .search-tags__chip:focus-visible {
-    border-color: color-mix(in srgb, var(--accent-purple-strong) 55%, transparent 45%);
+    border-color: color-mix(in srgb, var(--text-accent, var(--color-gold)) 55%, transparent 45%);
     background: color-mix(in srgb, hsl(var(--surface-panel-primary)) 94%, transparent 6%);
     color: color-mix(in srgb, var(--link-color, #d4af37) 65%, var(--text-secondary, rgba(244, 241, 255, 0.85)) 35%);
   }
 
   :root[data-comfort-theme="dawn"] .search-tags__chip {
-    border-color: color-mix(in srgb, var(--accent-purple-soft) 30%, transparent 70%);
+    border-color: color-mix(in srgb, var(--text-accent, var(--color-gold)) 30%, transparent 70%);
     background: color-mix(in srgb, hsl(var(--surface-panel-primary)) 96%, transparent 4%);
     color: color-mix(in srgb, var(--text-body) 90%, white 10%);
   }
 
   :root[data-comfort-theme="dawn"] .search-tags__chip:hover,
   :root[data-comfort-theme="dawn"] .search-tags__chip:focus-visible {
-    border-color: color-mix(in srgb, var(--accent-purple-soft) 40%, transparent 60%);
+    border-color: color-mix(in srgb, var(--text-accent, var(--color-gold)) 40%, transparent 60%);
     background: color-mix(in srgb, hsl(var(--surface-panel-primary)) 98%, transparent 2%);
     color: color-mix(in srgb, var(--link-color, #caa043) 60%, var(--text-body) 40%);
   }

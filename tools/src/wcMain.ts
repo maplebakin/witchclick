@@ -163,12 +163,13 @@ async function cmdCurses(flags: Flags) {
   const type = String(flags.type ?? flags.t ?? 'mirror');
   const target = String(flags.target ?? flags.g ?? 'person');
   const tone = String(flags.tone ?? flags.o ?? 'poetic');
+  const topic = typeof flags.topic === 'string' ? flags.topic : undefined;
   const sigilName = typeof flags.sigil === 'string' ? flags.sigil : undefined;
   const altarItem = typeof flags.altar === 'string' ? flags.altar : undefined;
   const journalingFollowUp = typeof flags.journal === 'string' ? flags.journal : undefined;
 
   const mod = await import('./gencurse.js');
-  (mod as any).gencurse({ type, target, tone, sigilName, altarItem, journalingFollowUp });
+  (mod as any).gencurse({ type, target, tone, topic, sigilName, altarItem, journalingFollowUp });
 }
 
 async function cmdIngest(flags: Flags) {
@@ -345,7 +346,7 @@ export async function main(argv: string[] = process.argv.slice(2)) {
           'Usage:',
           '  node tools/wc.js genprompt --topic "..." --words 1200 --ads on|off --kofi on|off',
           '  node tools/wc.js lint spec.json [--target 1200]',
-          '  node tools/wc.js curses --type mirror --target person --tone poetic [--sigil "Sigil"] [--altar "Item"] [--journal "Question"]',
+          '  node tools/wc.js curses --type mirror --target person --tone poetic [--topic "situation"] [--sigil "Sigil"] [--altar "Item"] [--journal "Question"]',
           '  node tools/wc.js curses:ingest --from-file curse.json [--dry-run]',
           '  node tools/wc.js curses:export [--slug curse-slug]',
           '  node tools/wc.js ingest --from-file drafts/latest.json',

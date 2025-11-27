@@ -72,6 +72,16 @@ src/styles/
 
 **Usage:** PostRail, HubPlaylistRow, card components
 
+### Shared Color Groups (cross-theme)
+Common hex values reused by multiple tokens/themes. Use these as “title” categories when naming or aligning new tokens.
+
+- Gold Accent (`#d4af37`): colorGold, textAccent, textAccentStrong, cardPanelBorder(+Strong), cardBadgeBg/Border (Autumn Twilight, Blue-Ish, Cozy Midnight)
+- Iris Purple (`#4b2a63`): colorIris, cardPanelBorderSoft, cardTagBg/Border (Autumn Twilight, Blue-Ish, Cozy Midnight)
+- Rune White (`#f8f3ff`): colorRune, cardBadgeText (Autumn Twilight, Blue-Ish, Cozy Midnight)
+- Ink Light (`#f4f1ff`): colorInk, textSecondary/Tertiary, inkBody, cardTagText (Autumn Twilight, Blue-Ish, Cozy Midnight)
+- Body Copy Light (`#f9f5ff`): textStrong, textBody, textSubtle (Autumn Twilight, Blue-Ish, Cozy Midnight)
+- Focus Ring Gold (`#e8d591`): focusRingColor, cardFocusOutline (Autumn Twilight, Blue-Ish, Cozy Midnight)
+- Muted Mauve (`#d9b2c4`): accent/textMuted/inkMuted (Blue-Ish, Cozy Midnight)
 ---
 
 ### Border Colors (`tokens.css`)

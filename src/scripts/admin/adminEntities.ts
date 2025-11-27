@@ -1,4 +1,4 @@
-import { slugify } from '../../shared/slugify.js';
+import { slugify } from '../../../shared/slugify.js';
 
 const TYPES = ['crystal', 'herb', 'moonPhase', 'tarot', 'planetaryDay', 'ritual'] as const;
 type EntityType = (typeof TYPES)[number];

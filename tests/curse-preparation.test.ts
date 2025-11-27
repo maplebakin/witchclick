@@ -25,7 +25,7 @@ describe('cursePreparation', () => {
   });
 
   it('prepares and persists a curse markdown file', async () => {
-    const directory = path.join(tmpDir, 'content', 'white-magic-curses');
+    const directory = path.join(tmpDir, 'archive', 'curses');
     const spec = {
       specVersion: 1,
       title: 'Illuminate withheld echoes with uncompromised grace',
@@ -64,7 +64,7 @@ describe('cursePreparation', () => {
   });
 
   it('deduplicates slug collisions', () => {
-    const directory = path.join(tmpDir, 'content', 'white-magic-curses');
+    const directory = path.join(tmpDir, 'archive', 'curses');
     fs.mkdirSync(directory, { recursive: true });
     fs.writeFileSync(path.join(directory, 'existing-curse.md'), '---\nslug: existing-curse\n---\n');
 

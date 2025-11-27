@@ -40,6 +40,19 @@ const FONT_SELECTS: FontOption[] = [
   { id: "themeFontAccent", label: "Accent", options: [...SCRIPT_FONTS, ...SANS_FONTS] },
 ];
 
+const TEXT_ONLY_VARIABLES = new Set([
+  "glassShadowSoft",
+  "glassShadowStrong",
+  "glassBlur",
+  "glassNoiseOpacity",
+]);
+const NON_COLOR_SWATCH = new Set([
+  "glassShadowSoft",
+  "glassShadowStrong",
+  "glassBlur",
+  "glassNoiseOpacity",
+]);
+
 const LEGACY_FIELDS: Array<{ key: string; label: string; placeholder: string }> = [
   { key: "primary", label: "Primary", placeholder: "#6b21a8" },
   { key: "accent", label: "Accent", placeholder: "#d9b2c4" },
@@ -54,9 +67,9 @@ const QUICK_EDIT_KEYS = new Set(["primary", "accent", "background", "textPrimary
 const PAGE_LAYOUT_FIELDS: Array<{ key: string; label: string; placeholder: string }> = [
   { key: "background", label: "Page Background", placeholder: "#0f0820" },
   { key: "headerBackground", label: "Header Background", placeholder: "#120725" },
-  { key: "headerBorder", label: "Header Border", placeholder: "#4b2a63" },
+  { key: "headerBorder", label: "Header Border", placeholder: "#cc9966" },
   { key: "footerBackground", label: "Footer Background", placeholder: "#07020f" },
-  { key: "footerBorder", label: "Footer Border", placeholder: "#4b2a63" },
+  { key: "footerBorder", label: "Footer Border", placeholder: "#cc9966" },
 ];
 
 function toLabel(key: string): string {
@@ -87,23 +100,41 @@ const CUSTOM_LABELS: Record<string, string> = {
   footerBorder: "Footer Border",
   footerText: "Footer Text",
   footerTextMuted: "Footer Muted Text",
+  glassSurface: "Glass Base",
+  glassSurfaceStrong: "Glass Strong",
+  glassCard: "Glass Card",
+  glassHover: "Glass Hover",
+  glassBorder: "Glass Border",
+  glassBorderStrong: "Glass Border Strong",
+  glassHighlight: "Glass Highlight",
+  glassGlow: "Glass Glow",
+  glassShadowSoft: "Glass Shadow Soft",
+  glassShadowStrong: "Glass Shadow Strong",
+  glassBlur: "Glass Blur Radius",
+  glassNoiseOpacity: "Glass Noise Opacity",
 };
 
 function createColorControl(key: string, label = CUSTOM_LABELS[key] || toLabel(key)): HTMLElement {
   const wrapper = document.createElement("label");
   wrapper.className = "block text-xs font-medium uppercase tracking-wide text-body-muted";
+  const isTextOnly = TEXT_ONLY_VARIABLES.has(key);
+  const inputPlaceholder = isTextOnly ? "e.g. 0 22px 55px -32px rgba(...)" : "#000000";
   wrapper.innerHTML = `
     <span>${label}</span>
     <div class="mt-1 flex items-center gap-2">
-      <input
+      ${
+        isTextOnly
+          ? ""
+          : `<input
         type="color"
         data-color-picker="${key}"
         class="h-9 w-12 cursor-pointer rounded border border-line-neutral"
-      />
+      />`
+      }
       <input
         type="text"
         data-color-input="${key}"
-        placeholder="#000000"
+        placeholder="${inputPlaceholder}"
         class="flex-1 rounded-lg border border-line-neutral px-3 py-2 font-mono text-xs"
       />
     </div>
@@ -130,6 +161,64 @@ function createLegacyControl(field: { key: string; label: string; placeholder: s
       />
     </div>
   `;
+  return wrapper;
+}
+
+function applyGroupedValue(keys: string[], value: string) {
+  const events = ['input', 'change'];
+  keys.forEach((key) => {
+    const inputs = Array.from(
+      document.querySelectorAll<HTMLInputElement>(`[data-color-input="${key}"], [data-color-picker="${key}"]`)
+    );
+    inputs.forEach((el) => {
+      el.value = value;
+      events.forEach((evt) => el.dispatchEvent(new Event(evt, { bubbles: true })));
+    });
+  });
+}
+
+function createGroupControl(label: string, description: string, targetKeys: string[]): HTMLElement {
+  const wrapper = document.createElement("div");
+  wrapper.className = "space-y-2 rounded-lg border border-line-subtle bg-surface-base/70 p-3";
+  wrapper.innerHTML = `
+    <div class="flex items-center justify-between gap-2">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-body-muted">${label}</p>
+        <p class="text-[11px] text-body-muted">${description}</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="inline-block h-6 w-6 rounded border border-line-neutral shadow-inner" data-group-swatch></span>
+        <input
+          type="color"
+          class="h-9 w-12 cursor-pointer rounded border border-line-neutral"
+          aria-label="${label}"
+        />
+      </div>
+    </div>
+    <input
+      type="text"
+      placeholder="#6b21a8"
+      class="w-full rounded-lg border border-line-neutral px-3 py-2 font-mono text-xs"
+    />
+  `;
+
+  const colorPicker = wrapper.querySelector<HTMLInputElement>('input[type="color"]');
+  const textInput = wrapper.querySelector<HTMLInputElement>('input[type="text"]');
+  const swatch = wrapper.querySelector<HTMLElement>('[data-group-swatch]');
+  const syncAll = (value: string) => {
+    if (colorPicker && colorPicker.value !== value) colorPicker.value = value;
+    if (textInput && textInput.value !== value) textInput.value = value;
+    if (swatch) swatch.style.background = value;
+    applyGroupedValue(targetKeys, value);
+  };
+
+  colorPicker?.addEventListener("input", () => syncAll(colorPicker.value));
+  textInput?.addEventListener("blur", () => {
+    const value = textInput.value.trim();
+    if (!value) return;
+    syncAll(value);
+  });
+
   return wrapper;
 }
 
@@ -206,6 +295,53 @@ function buildPageLayoutSection(container: HTMLElement): void {
   container.appendChild(grid);
 }
 
+function buildScopeGrid(container: HTMLElement): void {
+  container.innerHTML = "";
+
+  THEME_SCOPES.forEach((scope) => {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.dataset.scopeCard = scope.id;
+    card.className = `
+      group flex h-full flex-col justify-between rounded-xl border border-line-subtle bg-surface-base px-3 py-3 text-left transition
+      hover:border-primary hover:bg-surface-soft
+    `;
+    card.setAttribute("aria-pressed", "false");
+    card.title = `Edit ${scope.label} without leaving the page`;
+
+    const status = document.createElement("span");
+    status.dataset.scopeStatus = scope.id;
+    status.className = "mt-3 inline-flex items-center gap-1 rounded-full bg-surface-base px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-body-muted border border-line-subtle";
+    status.textContent = scope.id === "global" ? "Sitewide defaults" : "Inherits global";
+
+    const active = document.createElement("span");
+    active.dataset.scopeActive = scope.id;
+    active.className = "hidden rounded-full bg-primary/10 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary";
+    active.textContent = "Editing";
+
+    card.innerHTML = `
+      <div class="flex items-start justify-between gap-3">
+        <div class="space-y-1">
+          <div class="text-sm font-semibold text-body">${scope.label}</div>
+          <p class="text-xs text-body-muted">${scope.description}</p>
+        </div>
+      </div>
+    `;
+
+    card.appendChild(status);
+    const footer = document.createElement("div");
+    footer.className = "mt-3 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-wide text-body-muted";
+    footer.appendChild(active);
+    const chip = document.createElement("span");
+    chip.className = "rounded-full bg-surface-base px-2 py-1 font-semibold border border-line-subtle";
+    chip.textContent = "On this page";
+    footer.appendChild(chip);
+    card.appendChild(footer);
+
+    container.appendChild(card);
+  });
+}
+
 function buildComprehensiveControls(container: HTMLElement): void {
   const details = document.createElement("details");
   details.className = "space-y-4 rounded-2xl border border-line-subtle bg-surface-base p-4 shadow-sm";
@@ -230,6 +366,126 @@ function buildComprehensiveControls(container: HTMLElement): void {
     </ol>
   `;
   details.appendChild(descriptionBox);
+
+  const quickLinks = document.createElement("div");
+  quickLinks.className = "grid gap-3 rounded-xl border border-line-subtle bg-surface-base/70 p-3";
+  const quickHeader = document.createElement("div");
+  quickHeader.className = "flex items-center justify-between gap-2";
+  quickHeader.innerHTML = `
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wide text-body-muted">Quick color links</p>
+      <p class="text-[11px] text-body-muted">One value updates multiple tokens at once.</p>
+    </div>
+  `;
+  quickLinks.appendChild(quickHeader);
+
+  const navTargets = [
+    "headerBackground",
+    "headerBorder",
+    "headerText",
+    "headerTextHover",
+    "footerBackground",
+    "footerBorder",
+    "footerText",
+    "footerTextMuted",
+  ];
+  const cardTargets = [
+    "cardPanelSurface",
+    "cardPanelSurfaceStrong",
+    "cardPanelBorder",
+    "cardPanelBorderStrong",
+    "cardPanelBorderSoft",
+    "glassSurface",
+    "glassSurfaceStrong",
+    "glassCard",
+    "glassBorder",
+    "glassBorderStrong",
+  ];
+
+  quickLinks.appendChild(
+    createGroupControl(
+      "Nav / footer shell",
+      "Header + footer backgrounds and borders share this base color.",
+      navTargets,
+    ),
+  );
+  quickLinks.appendChild(
+    createGroupControl(
+      "Cards / panels",
+      "Cards, panels, and glass shells share this surface/border color.",
+      cardTargets,
+    ),
+  );
+
+  details.appendChild(quickLinks);
+
+  const sharedPalette = document.createElement("div");
+  sharedPalette.className = "grid gap-3 rounded-xl border border-line-subtle bg-surface-base/70 p-3";
+  const sharedHeader = document.createElement("div");
+  sharedHeader.className = "flex items-center justify-between gap-2";
+  sharedHeader.innerHTML = `
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wide text-body-muted">Common swatches</p>
+      <p class="text-[11px] text-body-muted">Change one value → update all tokens that share it.</p>
+    </div>
+  `;
+  sharedPalette.appendChild(sharedHeader);
+
+  const COMMON_GROUPS: Array<{ label: string; description: string; keys: string[]; placeholder: string }> = [
+    {
+      label: "Gold accent",
+      description: "colorGold, accent text, card borders/badges",
+      placeholder: "#d4af37",
+      keys: ["colorGold", "textAccent", "textAccentStrong", "cardPanelBorder", "cardPanelBorderStrong", "cardBadgeBg", "cardBadgeBorder"],
+    },
+    {
+      label: "Iris purple",
+      description: "colorIris, tag borders, soft card borders",
+      placeholder: "#4b2a63",
+      keys: ["colorIris", "cardPanelBorderSoft", "cardTagBg", "cardTagBorder"],
+    },
+    {
+      label: "Rune white",
+      description: "colorRune, badge text",
+      placeholder: "#f8f3ff",
+      keys: ["colorRune", "cardBadgeText"],
+    },
+    {
+      label: "Ink light",
+      description: "colorInk, secondary/tertiary text, tag text",
+      placeholder: "#f4f1ff",
+      keys: ["colorInk", "textSecondary", "textTertiary", "inkBody", "cardTagText"],
+    },
+    {
+      label: "Body copy light",
+      description: "Strong/body/subtle text trio",
+      placeholder: "#f9f5ff",
+      keys: ["textStrong", "textBody", "textSubtle"],
+    },
+    {
+      label: "Focus ring gold",
+      description: "Focus ring + card focus outline",
+      placeholder: "#e8d591",
+      keys: ["focusRingColor", "cardFocusOutline"],
+    },
+    {
+      label: "Muted mauve",
+      description: "Accent, muted text, inkMuted",
+      placeholder: "#d9b2c4",
+      keys: ["accent", "textMuted", "inkMuted"],
+    },
+  ];
+
+  COMMON_GROUPS.forEach((group) => {
+    const control = createGroupControl(group.label, group.description, group.keys);
+    const colorPicker = control.querySelector<HTMLInputElement>('input[type="color"]');
+    const textInput = control.querySelector<HTMLInputElement>('input[type="text"]');
+    if (colorPicker) colorPicker.value = group.placeholder;
+    if (textInput) textInput.placeholder = group.placeholder;
+    sharedPalette.appendChild(control);
+  });
+
+  details.appendChild(sharedPalette);
 
   // Organize variables into categorized sections
   const variableGroups = [
@@ -257,6 +513,16 @@ function buildComprehensiveControls(container: HTMLElement): void {
       title: "Cards & panels",
       description: "Content boxes, list cards, spoons, badges, and tags",
       variables: ['cardPanelSurface', 'cardPanelSurfaceStrong', 'cardPanelBorder', 'cardPanelBorderStrong', 'cardPanelBorderSoft', 'cardBadgeBg', 'cardBadgeBorder', 'cardBadgeText', 'cardTagBg', 'cardTagBorder', 'cardTagText', 'cardSpoonBg', 'cardSpoonBorder', 'cardSpoonText']
+    },
+    {
+      title: "Glass shells",
+      description: "Frosted panels for navigation, hero, trays, and modals",
+      variables: ['glassSurface', 'glassSurfaceStrong', 'glassCard', 'glassHover', 'glassBorder', 'glassBorderStrong', 'glassHighlight', 'glassGlow']
+    },
+    {
+      title: "Glass tuning",
+      description: "Shadows, blur, and noise strength for glass layers",
+      variables: ['glassShadowSoft', 'glassShadowStrong', 'glassBlur', 'glassNoiseOpacity']
     },
     {
       title: "Status & feedback",
@@ -338,6 +604,25 @@ function buildPreviewSection(container: HTMLElement): void {
   preview.style.color = "var(--preview-text)";
   preview.style.setProperty("border-color", "var(--preview-border)");
   preview.innerHTML = `
+    <div class="grid gap-3 rounded-xl border border-line-subtle bg-surface-base/70 p-4 shadow-sm">
+      <div class="space-y-2">
+        <p class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">Backgrounds</p>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="rounded-lg border border-line-subtle px-3 py-2 text-xs font-semibold" style="background: var(--preview-background); color: var(--preview-text-primary)">
+            Page
+          </div>
+          <div class="rounded-lg border border-line-subtle px-3 py-2 text-xs font-semibold" style="background: var(--preview-cardPanelSurface); color: var(--preview-text-primary)">
+            Component
+          </div>
+        </div>
+      </div>
+      <div class="space-y-2">
+        <p class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">Text</p>
+        <h3 class="text-xl font-semibold leading-tight" data-preview-font="fontHeading" style="color: var(--preview-text-heading)">H1 Sample</h3>
+        <h4 class="text-lg font-semibold leading-tight" data-preview-font="fontHeading" style="color: var(--preview-text-heading)">H2 Sample</h4>
+        <p class="text-sm leading-relaxed" data-preview-font="fontSerif" style="color: var(--preview-text-primary)">Prose sample paragraph that tracks the active body color.</p>
+      </div>
+    </div>
     <div class="space-y-3 rounded-xl border border-line-subtle bg-surface-base/80 p-4 shadow-sm" style="background: var(--preview-surfacePlain); border-color: var(--preview-surfacePlainBorder)">
       <span class="text-[11px] font-semibold uppercase tracking-wide" style="color: var(--preview-text-muted)">Hero Preview</span>
       <h3 class="text-2xl font-semibold" data-preview-font="fontHeading" style="color: var(--preview-text-heading)">WitchClick Theme Preview</h3>
@@ -404,7 +689,7 @@ function buildPreviewSection(container: HTMLElement): void {
         <span class="text-[11px] uppercase tracking-wide text-body-muted">Every editable color token</span>
       </div>
       <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-        ${ALL_COLOR_VARIABLES.map((key) => `
+        ${ALL_COLOR_VARIABLES.filter((key) => !NON_COLOR_SWATCH.has(key)).map((key) => `
           <div class="space-y-2 rounded-xl border border-line-subtle bg-surface-base/90 p-3 shadow-sm" data-preview-swatch="${key}">
             <div class="h-10 w-full rounded-lg border border-line-subtle" style="background: var(--preview-${key})"></div>
             <div class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">${toLabel(key)}</div>
@@ -496,7 +781,7 @@ function buildEditorShell(root: HTMLElement): void {
       <div class="grid gap-3 sm:grid-cols-2">
         <button type="button" data-create-theme="midnight" class="group space-y-3 rounded-xl border-2 border-line-neutral bg-surface-base p-4 text-left transition hover:border-primary hover:bg-surface-soft">
           <div class="flex items-center gap-3">
-            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-purple-900 to-indigo-950 text-white shadow-lg">🌙</div>
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-900 via-orange-900 to-stone-900 text-white shadow-lg">🌙</div>
             <div class="flex-1">
               <div class="font-semibold">Midnight</div>
               <div class="text-xs text-body-muted">Dark theme</div>
@@ -653,12 +938,23 @@ function buildEditorShell(root: HTMLElement): void {
         <p data-scope-no-override class="text-xs text-body-muted">Using global defaults.</p>
         <p data-scope-overview class="text-[11px] text-body-muted">Overrides: Global only</p>
       </div>
+      <div class="space-y-3 rounded-xl border border-dashed border-line-subtle bg-surface-base/60 p-3">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-primary">All scopes on one page</p>
+            <p class="text-xs text-body-muted">Jump between global, pages, and components without leaving this editor.</p>
+          </div>
+          <span class="rounded-full bg-surface-soft px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-body-muted">Single-page scopes</span>
+        </div>
+        <div class="grid gap-3 md:grid-cols-2" data-scope-grid></div>
+      </div>
     </div>
   `;
   editorColumn.appendChild(detailsCard);
 
   const paletteCard = document.createElement("section");
   paletteCard.className = "space-y-4 rounded-2xl border border-line-subtle bg-surface-base p-4 shadow-sm";
+  paletteCard.dataset.scrollTarget = "palette";
   paletteCard.innerHTML = `
     <div class="space-y-2">
       <div>
@@ -715,6 +1011,11 @@ function buildEditorShell(root: HTMLElement): void {
   paletteCard.appendChild(fontSection);
 
   editorColumn.appendChild(paletteCard);
+
+  const scopeGrid = detailsCard.querySelector<HTMLElement>('[data-scope-grid]');
+  if (scopeGrid) {
+    buildScopeGrid(scopeGrid);
+  }
 
   buildComprehensiveControls(editorColumn);
   buildPreviewSection(editorColumn);

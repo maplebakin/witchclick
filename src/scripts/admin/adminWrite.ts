@@ -1,4 +1,4 @@
-import { analyzeSlug } from '../../shared/slugify.js';
+import { analyzeSlug } from '../../../shared/slugify.js';
 
 function initWriteAdmin() {
   const root = document.querySelector('[data-dev-api]');

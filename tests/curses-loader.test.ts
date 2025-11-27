@@ -20,7 +20,7 @@ describe('loadAllCurses', () => {
   beforeEach(() => {
     originalCwd = process.cwd();
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'curse-loader-'));
-    fs.mkdirSync(path.join(tmpDir, 'content', 'white-magic-curses'), { recursive: true });
+    fs.mkdirSync(path.join(tmpDir, 'archive', 'curses'), { recursive: true });
     process.chdir(tmpDir);
     resetCurseCache();
   });
@@ -32,7 +32,7 @@ describe('loadAllCurses', () => {
   });
 
   it('returns parsed curses with sections', () => {
-    const dir = path.join(tmpDir, 'content', 'white-magic-curses');
+    const dir = path.join(tmpDir, 'archive', 'curses');
     createCurse(
       dir,
       'mirror-truth',

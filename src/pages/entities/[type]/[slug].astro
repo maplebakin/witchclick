@@ -372,9 +372,9 @@ function pretty(v: unknown) {
     padding: 0.65rem 1rem;
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--entity-accent, #7c4eb0);
-    background: color-mix(in srgb, var(--entity-accent-surface, rgba(124, 78, 176, 0.08)) 80%, transparent 20%);
-    border: 1px solid var(--entity-accent-border, rgba(124, 78, 176, 0.25));
+    color: var(--entity-accent, color-mix(in srgb, var(--color-gold, #d4af37) 45%, var(--color-iris, #4b2a63) 55%));
+    background: color-mix(in srgb, var(--entity-accent-surface, color-mix(in srgb, var(--color-iris, #4b2a63) 10%, transparent 90%)) 80%, transparent 20%);
+    border: 1px solid var(--entity-accent-border, color-mix(in srgb, var(--color-gold, #d4af37) 25%, var(--color-iris, #4b2a63) 20%));
     border-radius: 0.75rem;
     text-decoration: none;
     transition: all 0.2s ease;
@@ -383,15 +383,15 @@ function pretty(v: unknown) {
   }
 
   .entity-back-link:hover {
-    color: var(--entity-accent-heading, #4c1d95);
-    background: color-mix(in srgb, var(--entity-accent-surface, rgba(124, 78, 176, 0.08)) 100%, white 0%);
-    border-color: var(--entity-accent, #7c4eb0);
+    color: var(--entity-accent-heading, color-mix(in srgb, var(--color-gold, #d4af37) 45%, var(--color-iris, #4b2a63) 55%));
+    background: color-mix(in srgb, var(--entity-accent-surface, color-mix(in srgb, var(--color-iris, #4b2a63) 10%, transparent 90%)) 100%, white 0%);
+    border-color: var(--entity-accent, color-mix(in srgb, var(--color-gold, #d4af37) 45%, var(--color-iris, #4b2a63) 55%));
     transform: translateX(-2px);
-    box-shadow: 0 2px 8px color-mix(in srgb, var(--entity-accent-shadow, rgba(124, 78, 176, 0.2)) 60%, transparent 40%);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--entity-accent-shadow, color-mix(in srgb, var(--color-iris, #4b2a63) 20%, transparent 80%)) 60%, transparent 40%);
   }
 
   .entity-back-link:focus-visible {
-    outline: 2px solid var(--entity-accent, #7c4eb0);
+    outline: 2px solid var(--entity-accent, color-mix(in srgb, var(--color-gold, #d4af37) 45%, var(--color-iris, #4b2a63) 55%));
     outline-offset: 3px;
   }
 
@@ -408,8 +408,8 @@ function pretty(v: unknown) {
     border-radius: 2rem;
     padding: clamp(2rem, 6vw, 4rem);
     overflow: hidden;
-    background: linear-gradient(135deg, var(--entity-accent-surface, rgba(124, 58, 237, 0.08)), rgba(255, 255, 255, 0.92));
-    box-shadow: 0 28px 60px -35px var(--entity-accent-shadow, rgba(124, 58, 237, 0.2));
+    background: linear-gradient(135deg, var(--entity-accent-surface, color-mix(in srgb, var(--color-iris, #4b2a63) 10%, transparent 90%)), rgba(255, 255, 255, 0.92));
+    box-shadow: 0 28px 60px -35px var(--entity-accent-shadow, color-mix(in srgb, var(--color-iris, #4b2a63) 20%, transparent 80%));
   }
 
   .entity-hero::before {
@@ -629,29 +629,29 @@ function pretty(v: unknown) {
     width: 1.5rem;
     height: 1.5rem;
     border-radius: 50%;
-    border: 1px solid color-mix(in srgb, var(--entity-accent, #7c4eb0) 30%, transparent 70%);
-    background: color-mix(in srgb, var(--entity-accent-surface, rgba(124, 78, 176, 0.08)) 60%, transparent 40%);
-    color: var(--entity-accent, #7c4eb0);
+    border: 1px solid color-mix(in srgb, var(--entity-accent, color-mix(in srgb, var(--color-gold, #d4af37) 45%, var(--color-iris, #4b2a63) 55%)) 30%, transparent 70%);
+    background: color-mix(in srgb, var(--entity-accent-surface, color-mix(in srgb, var(--color-iris, #4b2a63) 10%, transparent 90%)) 60%, transparent 40%);
+    color: var(--entity-accent, color-mix(in srgb, var(--color-gold, #d4af37) 45%, var(--color-iris, #4b2a63) 55%));
     cursor: pointer;
     transition: all 0.2s ease;
   }
 
   .entity-graph-help:hover {
-    border-color: var(--entity-accent, #7c4eb0);
-    background: color-mix(in srgb, var(--entity-accent-surface, rgba(124, 78, 176, 0.08)) 100%, transparent 0%);
+    border-color: var(--entity-accent, color-mix(in srgb, var(--color-gold, #d4af37) 45%, var(--color-iris, #4b2a63) 55%));
+    background: color-mix(in srgb, var(--entity-accent-surface, color-mix(in srgb, var(--color-iris, #4b2a63) 10%, transparent 90%)) 100%, transparent 0%);
     transform: scale(1.1);
   }
 
   .entity-graph-help:focus-visible {
-    outline: 2px solid var(--entity-accent, #7c4eb0);
+    outline: 2px solid var(--entity-accent, color-mix(in srgb, var(--color-gold, #d4af37) 45%, var(--color-iris, #4b2a63) 55%));
     outline-offset: 2px;
   }
 
   .entity-graph-legend {
     padding: 1.25rem 1.5rem;
     border-radius: 1rem;
-    border: 1px solid color-mix(in srgb, var(--entity-accent-border, rgba(124, 78, 176, 0.25)) 70%, transparent 30%);
-    background: color-mix(in srgb, var(--entity-accent-surface, rgba(124, 78, 176, 0.08)) 40%, var(--card-panel-surface, rgba(255, 255, 255, 0.9)) 60%);
+    border: 1px solid color-mix(in srgb, var(--entity-accent-border, color-mix(in srgb, var(--color-gold, #d4af37) 25%, var(--color-iris, #4b2a63) 20%)) 70%, transparent 30%);
+    background: color-mix(in srgb, var(--entity-accent-surface, color-mix(in srgb, var(--color-iris, #4b2a63) 10%, transparent 90%)) 40%, var(--card-panel-surface, rgba(255, 255, 255, 0.9)) 60%);
     opacity: 0;
     transform: translateY(-8px);
     transition: opacity 0.25s ease, transform 0.25s ease;
@@ -692,8 +692,8 @@ function pretty(v: unknown) {
   }
 
   .entity-graph-legend-dot--outbound {
-    background: color-mix(in srgb, var(--entity-accent, #7c4eb0) 70%, transparent 30%);
-    border: 2px solid var(--entity-accent, #7c4eb0);
+    background: color-mix(in srgb, var(--entity-accent, color-mix(in srgb, var(--color-gold, #d4af37) 45%, var(--color-iris, #4b2a63) 55%)) 70%, transparent 30%);
+    border: 2px solid var(--entity-accent, color-mix(in srgb, var(--color-gold, #d4af37) 45%, var(--color-iris, #4b2a63) 55%));
   }
 
   .entity-graph-legend-dot--inbound {
@@ -704,7 +704,7 @@ function pretty(v: unknown) {
   .entity-graph-legend-dot--center {
     background: var(--ink-strong, #1a102c);
     border: 2px solid var(--ink-strong, #1a102c);
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--entity-accent, #7c4eb0) 30%, transparent 70%);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--entity-accent, var(--text-accent, var(--color-gold, #d4af37))) 30%, transparent 70%);
   }
 
   @media (max-width: 768px) {

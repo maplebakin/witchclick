@@ -53,6 +53,18 @@ export const OPTIONAL_FIELDS = [
   "cardPanelBorder",
   "cardPanelBorderStrong",
   "cardPanelBorderSoft",
+  "glassSurface",
+  "glassSurfaceStrong",
+  "glassCard",
+  "glassHover",
+  "glassBorder",
+  "glassBorderStrong",
+  "glassHighlight",
+  "glassGlow",
+  "glassShadowSoft",
+  "glassShadowStrong",
+  "glassBlur",
+  "glassNoiseOpacity",
   "cardBadgeBg",
   "cardBadgeBorder",
   "cardBadgeText",
@@ -135,7 +147,6 @@ const DEFAULT_DAWN_THEME: ThemeSettings = {
 
 const THEMES_DIR = path.join(process.cwd(), "content", "themes");
 const ACTIVE_FILE = path.join(THEMES_DIR, "active.json");
-const LEGACY_FILE = path.join(process.cwd(), "content", "theme.json");
 
 const SHOULD_BYPASS_CACHE = process.env.NODE_ENV !== "production" || process.env.VITEST === "true";
 
@@ -150,7 +161,6 @@ export function getTheme(mode: ThemeMode = "midnight"): ThemeDefinition {
  * In production we memoize the response until one of the source files changes:
  * - `content/themes/active.json`
  * - Any theme JSON referenced by `active.json`
- * - `content/theme.json` (legacy fallback)
  *
  * Admin tooling that writes to these files can either rely on the automatic
  * mtime detection or call {@link resetThemeCache} after persisting updates to
@@ -239,21 +249,6 @@ function readActiveMapping(): Partial<Record<ThemeMode, string>> {
 }
 
 function fallbackTheme(mode: ThemeMode): ThemeDefinition {
-  if (mode === "midnight") {
-    try {
-      const overrides = readThemeFile(LEGACY_FILE);
-      const merged = mergeTheme(overrides, LEGACY_FILE, DEFAULT_THEME);
-      return {
-        ...merged,
-        slug: "legacy-midnight",
-        label: "Legacy Midnight",
-        mode: "midnight",
-      };
-    } catch {
-      // fall through to default below
-    }
-  }
-
   const base = mode === "dawn" ? DEFAULT_DAWN_THEME : DEFAULT_THEME;
   return {
     ...base,
@@ -286,30 +281,11 @@ function normalizeSettingsSource(raw: unknown, fallback?: Record<string, unknown
   return source;
 }
 
-function readThemeFile(filePath: string): Partial<ThemeSettings> {
-  try {
-    const raw = fs.readFileSync(filePath, "utf8");
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") {
-      throw new Error(`theme.json must contain an object`);
-    }
-    return parsed as Partial<ThemeSettings>;
-  } catch (error) {
-    if (isNotFoundError(error)) {
-      throw new Error(
-        `[theme] Missing theme configuration at ${filePath}. Create theme.json with colour and font settings.`,
-      );
-    }
-    const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`[theme] Failed to read theme.json: ${message}`);
-  }
-}
 
 function createThemeFingerprint(mapping: Partial<Record<ThemeMode, string>>): string {
   const segments: string[] = [];
 
   segments.push(`active:${readFileStamp(ACTIVE_FILE)}`);
-  segments.push(`legacy:${readFileStamp(LEGACY_FILE)}`);
 
   for (const mode of ["midnight", "dawn"] as const) {
     const slug = mapping[mode];

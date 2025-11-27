@@ -15,13 +15,19 @@
   --card-focus-offset: 5px;
 
   /* Card Surfaces */
-  --card-panel-surface: var(--theme-card-panel-surface, color-mix(in srgb, hsl(var(--surface-card)) 92%, transparent 8%));
-  --card-panel-surface-strong: var(--theme-card-panel-surface-strong, color-mix(in srgb, hsl(var(--surface-panel-primary)) 90%, transparent 10%));
+  --card-panel-surface: var(
+    --theme-card-panel-surface,
+    var(--glass-card, color-mix(in srgb, hsl(var(--surface-card)) 92%, transparent 8%))
+  );
+  --card-panel-surface-strong: var(
+    --theme-card-panel-surface-strong,
+    var(--glass-surface-strong, color-mix(in srgb, hsl(var(--surface-panel-primary)) 90%, transparent 10%))
+  );
 
   /* Card Borders */
-  --card-panel-border: color-mix(in srgb, var(--border-purple-subtle, rgba(124, 78, 176, 0.28)) 92%, transparent 8%);
-  --card-panel-border-strong: color-mix(in srgb, var(--border-accent-medium, rgba(212, 175, 55, 0.35)) 92%, transparent 8%);
-  --card-panel-border-soft: color-mix(in srgb, var(--border-purple-subtle, rgba(124, 78, 176, 0.28)) 75%, transparent 25%);
+  --card-panel-border: color-mix(in srgb, var(--glass-border, var(--border-accent-subtle, var(--border-subtle))) 92%, transparent 8%);
+  --card-panel-border-strong: color-mix(in srgb, var(--glass-border-strong, var(--border-accent-medium, var(--border-strong))) 92%, transparent 8%);
+  --card-panel-border-soft: color-mix(in srgb, var(--glass-border, var(--border-accent-subtle, var(--border-subtle))) 75%, transparent 25%);
 
   /* Focus Ring Styles */
   --card-focus-outline: var(--focus-ring, rgba(212, 175, 55, 0.6));
@@ -29,23 +35,23 @@
     0 0 0 2px color-mix(in srgb, var(--surface-panel-primary) 72%, transparent 28%),
     0 0 0 calc(var(--card-focus-offset) + 2px) color-mix(in srgb, var(--card-focus-outline) 45%, transparent 55%);
   --card-focus-ring-strong:
-    0 0 0 2px color-mix(in srgb, var(--accent-purple-soft) 45%, transparent 55%),
+    0 0 0 2px color-mix(in srgb, var(--text-accent, var(--color-gold)) 45%, transparent 55%),
     0 0 0 calc(var(--card-focus-offset) + 2px) color-mix(in srgb, var(--card-focus-outline) 55%, transparent 45%);
 
   /* Radial Highlights */
-  --card-highlight: var(--gradient-purple-radial);
-  --card-highlight-alt: var(--gradient-gold-radial);
+  --card-highlight: radial-gradient(120% 120% at 8% 10%, color-mix(in srgb, var(--glass-highlight, var(--text-accent, var(--color-gold))) 22%, transparent 78%), transparent 70%);
+  --card-highlight-alt: radial-gradient(120% 120% at 8% 10%, color-mix(in srgb, var(--glass-highlight, var(--text-accent, var(--color-gold))) 16%, transparent 84%), transparent 72%);
   --card-highlight-soft: radial-gradient(
     circle at 50% -20%,
-    color-mix(in srgb, var(--accent-purple-soft) 45%, transparent 55%),
+    color-mix(in srgb, var(--glass-highlight, var(--text-accent, var(--color-gold))) 38%, transparent 62%),
     transparent 70%
   );
 
   /* Elevation Tiers */
   --elevation-tier-1: var(--shadow-card, 0 20px 45px -25px rgba(11, 6, 20, 0.45));
-  --elevation-tier-2: 0 28px 60px -32px rgba(9, 5, 18, 0.58);
-  --elevation-tier-3: 0 36px 82px -36px rgba(6, 4, 16, 0.62);
-  --elevation-tier-ambient: 0 18px 48px -30px rgba(10, 6, 20, 0.45);
+  --elevation-tier-2: var(--glass-shadow-soft, 0 28px 60px -32px rgba(9, 5, 18, 0.58));
+  --elevation-tier-3: var(--glass-shadow-strong, 0 36px 82px -36px rgba(6, 4, 16, 0.62));
+  --elevation-tier-ambient: 0 18px 48px -30px color-mix(in srgb, var(--glass-shadow-soft, rgba(10, 6, 20, 0.45)) 85%, transparent 15%);
 
   /* Badge & Tag Styles */
   --card-badge-bg: color-mix(in srgb, var(--text-accent-strong, rgba(212, 175, 55, 0.92)) 20%, transparent 80%);
@@ -69,9 +75,9 @@
   --card-panel-surface-strong: var(--theme-card-panel-surface-strong, color-mix(in srgb, hsl(var(--surface-panel-primary)) 94%, white 6%));
 
   /* Card Borders */
-  --card-panel-border: color-mix(in srgb, var(--border-purple-subtle, rgba(180, 154, 217, 0.28)) 92%, transparent 8%);
-  --card-panel-border-strong: color-mix(in srgb, var(--border-accent-medium, rgba(155, 134, 200, 0.35)) 92%, transparent 8%);
-  --card-panel-border-soft: color-mix(in srgb, var(--border-purple-subtle, rgba(180, 154, 217, 0.3)) 70%, transparent 30%);
+  --card-panel-border: color-mix(in srgb, var(--border-accent-subtle, var(--border-subtle)) 92%, transparent 8%);
+  --card-panel-border-strong: color-mix(in srgb, var(--border-accent-medium, var(--border-strong)) 92%, transparent 8%);
+  --card-panel-border-soft: color-mix(in srgb, var(--border-accent-subtle, var(--border-subtle)) 70%, transparent 30%);
 
   /* Hover & Transitions */
   --card-hover-translate: -0.28rem;
@@ -82,28 +88,28 @@
     0 0 0 2px color-mix(in srgb, rgba(155, 134, 200, 0.45) 85%, transparent 15%),
     0 0 0 calc(var(--card-focus-offset) + 2px) color-mix(in srgb, var(--card-focus-outline) 55%, transparent 45%);
   --card-focus-ring-strong:
-    0 0 0 2px color-mix(in srgb, rgba(155, 134, 200, 0.5) 85%, transparent 15%),
+    0 0 0 2px color-mix(in srgb, var(--text-accent, var(--color-gold)) 45%, transparent 55%),
     0 0 0 calc(var(--card-focus-offset) + 2px) color-mix(in srgb, var(--card-focus-outline) 65%, transparent 35%);
 
   /* Radial Highlights */
-  --card-highlight: var(--gradient-purple-radial);
-  --card-highlight-alt: var(--gradient-gold-radial);
+  --card-highlight: radial-gradient(120% 120% at 8% 10%, color-mix(in srgb, var(--text-accent, var(--color-gold)) 18%, transparent 82%), transparent 72%);
+  --card-highlight-alt: radial-gradient(120% 120% at 8% 10%, color-mix(in srgb, var(--text-accent, var(--color-gold)) 14%, transparent 86%), transparent 74%);
   --card-highlight-soft: radial-gradient(
     circle at 50% -20%,
-    color-mix(in srgb, rgba(180, 154, 217, 0.5) 70%, transparent 30%),
+    color-mix(in srgb, var(--glass-highlight, var(--text-accent, var(--color-gold))) 32%, transparent 68%),
     transparent 70%
   );
 
   /* Elevation Tiers */
   --elevation-tier-1: var(--shadow-card, 0 18px 48px -30px rgba(93, 76, 128, 0.32));
-  --elevation-tier-2: 0 24px 58px -34px rgba(93, 76, 128, 0.32);
-  --elevation-tier-3: 0 32px 80px -36px rgba(86, 64, 132, 0.34);
-  --elevation-tier-ambient: 0 18px 48px -32px rgba(100, 82, 140, 0.26);
+  --elevation-tier-2: var(--glass-shadow-soft, 0 24px 58px -34px rgba(93, 76, 128, 0.32));
+  --elevation-tier-3: var(--glass-shadow-strong, 0 32px 80px -36px rgba(86, 64, 132, 0.34));
+  --elevation-tier-ambient: 0 18px 48px -32px color-mix(in srgb, var(--glass-shadow-soft, rgba(100, 82, 140, 0.26)) 82%, transparent 18%);
 
   /* Badge & Tag Styles */
   --card-badge-bg: color-mix(in srgb, var(--text-accent, rgba(155, 134, 200, 0.7)) 28%, transparent 72%);
   --card-badge-border: color-mix(in srgb, var(--border-accent-medium, rgba(155, 134, 200, 0.35)) 85%, transparent 15%);
-  --card-badge-text: color-mix(in srgb, var(--text-strong) 92%, var(--accent-purple-soft) 8%);
+  --card-badge-text: color-mix(in srgb, var(--text-strong) 92%, var(--text-accent, var(--color-gold)) 8%);
 
   --card-tag-bg: color-mix(in srgb, var(--chip-background, rgba(186, 166, 220, 0.25)) 92%, transparent 8%);
   --card-tag-border: color-mix(in srgb, var(--chip-border, rgba(155, 134, 200, 0.45)) 85%, transparent 15%);
@@ -139,6 +145,7 @@
   color: var(--text-body);
   overflow: hidden;
   isolation: isolate;
+  backdrop-filter: blur(var(--glass-blur, 16px));
   transform: translateZ(0);
   box-shadow: var(--card-elevation-base, var(--wc-shadow-soft, var(--elevation-tier-1)));
   transition:
@@ -540,7 +547,7 @@
 
 .post-article-unified-card {
   background:
-    var(--gradient-purple-radial),
+    var(--card-highlight-soft),
     var(--card-panel-surface-strong, var(--surface-panel-primary));
   border: 1px solid var(--card-panel-border-strong);
   border-radius: var(--card-radius);

@@ -243,7 +243,7 @@ See `AGENTS.md` for full collaboration guidelines (includes branching, PR format
 - `server/lib/specPreparation.js` - Core validation/preparation logic
 - `src/utils/posts.ts` - Post loading with dual-directory support
 - `content/products.json` - Affiliate product definitions
-- `content/theme.json` - Visual theme customization
+- `content/themes/*.json` - Visual themes (managed via Admin Theme editor; `active.json` selects current)
 
 ## Astro-Specific Notes
 

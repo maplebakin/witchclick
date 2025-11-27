@@ -256,14 +256,14 @@
   --theme-ink-strong: #f8f2ed;
   --theme-ink-muted: #f2bf8c;
   --theme-link-color: #f2bf8c;
-  --theme-card-badge-bg: #22170b;
-  --theme-card-badge-border: #362412;
-  --theme-card-badge-text: #f8f3ff;
-  --theme-card-tag-bg: #362412;
-  --theme-card-tag-border: #22170b;
-  --theme-card-tag-text: #f4f1ff;
-  --theme-focus-ring-color: #e8d591;
-  --theme-card-focus-outline: #e8d591;
+  --theme-card-badge-bg: #d18c47;
+  --theme-card-badge-border: #d18c47;
+  --theme-card-badge-text: #0f0a05;
+  --theme-card-tag-bg: #d18c47;
+  --theme-card-tag-border: #d18c47;
+  --theme-card-tag-text: #0f0a05;
+  --theme-focus-ring-color: #e4a667;
+  --theme-card-focus-outline: #e4a667;
   --theme-success: #4ade80;
   --theme-warning: #fbbf24;
   --theme-error: #f87171;
@@ -276,6 +276,14 @@
   --theme-entity-card-text: #ebd9c7;
   --theme-entity-card-cta: #3d2914;
   --theme-entity-card-cta-hover: #452e17;
+  --theme-header-background: #261a0d;
+  --theme-header-border: #cc9966;
+  --theme-header-text: #f4f1ff;
+  --theme-header-text-hover: #d4af37;
+  --theme-footer-background: #261a0d;
+  --theme-footer-border: #cc9966;
+  --theme-footer-text: #f4f1ff;
+  --theme-footer-text-muted: #d9b2c4;
 }
 
 /* Scope Test Theme (midnight mode) */

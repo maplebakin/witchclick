@@ -1,0 +1,153 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readSettings, buildCanonicalUrl } from "../../utils/settings";
+import HeadSlot from "@/components/HeadSlot.astro";
+import AdminNav from "@/components/AdminNav.astro";
+import {
+  CURSE_TARGETS,
+  CURSE_TONES,
+  CURSE_TYPES,
+} from "../../../server/lib/curseSpecSchema.js";
+import adminCursesScript from "../../scripts/admin/adminCurses.ts?url";
+
+const settings = readSettings();
+const canonical = buildCanonicalUrl(settings, { path: "/admin/curses" });
+
+const curseTypeOptions = CURSE_TYPES;
+const curseTargetOptions = CURSE_TARGETS;
+const curseToneOptions = CURSE_TONES;
+
+const isDev = import.meta.env.DEV;
+const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
+const url = new URL(Astro.request.url);
+const keyOk = ADMIN_KEY && url.searchParams.get('key') === ADMIN_KEY;
+const canUse = isDev || !!keyOk;
+
+const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+---
+<Base
+  title="WitchClick — Curses"
+  description="Generate and ingest curses for the archive (print/PDF)."
+  canon={canonical}
+  wide={true}
+  noindex={true}
+>
+  <HeadSlot slot="head">
+    <meta name="robots" content="noindex" />
+  </HeadSlot>
+
+  {canUse ? (
+    <div class="space-y-6">
+      <AdminNav currentPath="/admin/curses" />
+
+      <header class="rounded-2xl border border-line-subtle bg-surface-base p-6 shadow-sm space-y-3">
+        <div>
+          <h1 class="text-2xl font-semibold text-body-strong">Curses Generator</h1>
+          <p class="mt-1 text-sm text-body-muted">Archive-only curses for print/PDF manuals. Prompts forbid web CTAs/links; ingestion saves to <code>archive/curses/</code>.</p>
+        </div>
+        <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-4 text-xs text-body-muted">
+          <div class="font-semibold mb-2">How this works:</div>
+          <ol class="ml-4 list-decimal space-y-1.5">
+            <li>Configure generator inputs → get an AI-ready prompt</li>
+            <li>Paste CurseSpec JSON → validate (dry run) or ingest to the archive</li>
+            <li>Need to edit existing curses? Visit the <a class="text-primary hover:underline" href="/admin/curses/archive">Curses Archive & Editor →</a></li>
+          </ol>
+        </div>
+      </header>
+
+      <div
+        data-curses-dashboard
+        data-dev-api={DEV_API}
+        data-curse-types={JSON.stringify(curseTypeOptions)}
+        data-curse-targets={JSON.stringify(curseTargetOptions)}
+        data-curse-tones={JSON.stringify(curseToneOptions)}
+        class="space-y-6"
+      >
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <section class="lg:col-span-5 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm space-y-3">
+            <div>
+              <h2 class="text-xl font-semibold">Prompt Builder</h2>
+              <p class="text-xs text-body-muted">Archive-focused prompt (no ads/CTAs). Saved output goes to <code>archive/curses/</code>.</p>
+            </div>
+            <div class="grid gap-3">
+              <label class="block">
+                <span class="text-xs font-medium">Type</span>
+                <select data-curse-type class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+                  {curseTypeOptions.map((value) => (
+                    <option value={value}>{value}</option>
+                  ))}
+                </select>
+              </label>
+              <label class="block">
+                <span class="text-xs font-medium">Target</span>
+                <select data-curse-target class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+                  {curseTargetOptions.map((value) => (
+                    <option value={value}>{value}</option>
+                  ))}
+                </select>
+              </label>
+              <label class="block">
+                <span class="text-xs font-medium">Tone</span>
+                <select data-curse-tone class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+                  {curseToneOptions.map((value) => (
+                    <option value={value}>{value}</option>
+                  ))}
+                </select>
+              </label>
+              <label class="block">
+                <span class="text-xs font-medium">Topic (optional)</span>
+                <input data-curse-topic class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Boundary-setting for workplace gossip" />
+              </label>
+              <label class="block">
+                <span class="text-xs font-medium">Sigil name (optional)</span>
+                <input data-curse-sigil class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Echo Lantern" />
+              </label>
+              <label class="block">
+                <span class="text-xs font-medium">Altar item (optional)</span>
+                <input data-curse-altar class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Clear quartz" />
+              </label>
+              <label class="block">
+                <span class="text-xs font-medium">Journaling follow-up (optional)</span>
+                <input data-curse-journal class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="What truth rose when the echo returned?" />
+              </label>
+              <div class="flex gap-2">
+                <button data-curse-generate class="rounded-lg bg-surface-accent-bolder px-3 py-2 text-inverse hover:bg-surface-accent-deep">Generate Prompt</button>
+                <button data-curse-copy class="rounded-lg border px-3 py-2">Copy</button>
+              </div>
+              <textarea data-curse-prompt-out class="mt-2 h-60 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder="Prompt will appear here…"></textarea>
+              <div data-curse-gen-status class="text-xs text-body-muted"></div>
+            </div>
+          </section>
+
+          <section class="lg:col-span-7 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm space-y-3">
+            <div>
+              <h2 class="text-xl font-semibold">Validate or Ingest CurseSpec JSON</h2>
+              <p class="text-xs text-body-muted">Paste raw JSON (no fences). Dry-run validates; ingest writes to <code>archive/curses/</code>.</p>
+            </div>
+            <textarea data-curse-spec class="h-56 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder='Paste the CurseSpec JSON here'></textarea>
+            <div class="flex flex-wrap gap-2">
+              <button data-curse-validate class="rounded-lg border px-3 py-2 text-sm">✓ Validate (dry run)</button>
+              <button data-curse-ingest class="rounded-lg bg-surface-success px-3 py-2 text-sm text-inverse hover:bg-surface-success-strong">💾 Ingest to archive</button>
+              <button data-curse-clear class="rounded-lg border px-3 py-2 text-sm">Clear</button>
+            </div>
+            <div data-curse-ingest-status class="text-sm text-body-muted"></div>
+            <div data-curse-summary class="rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[11px] text-body-muted"></div>
+            <div data-curse-preview class="prose prose-neutral border-t pt-4"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
+      <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
+      <p class="text-body-muted">These tools only run in <strong>development</strong> (or with a temporary key when hosted on a server adapter).</p>
+      <ol class="mx-auto mt-4 list-decimal space-y-2 text-left text-sm text-body-muted">
+        <li>Run <code>npm run dev</code> locally.</li>
+        <li>Use the curses CLI: <code>node tools/wc.js curses --help</code>.</li>
+        <li>If you later switch to serverless, set <code>PUBLIC_ADMIN_KEY</code> and visit <code>/admin?key=…</code>.</li>
+      </ol>
+    </section>
+  )}
+
+  {canUse && <script type="module" is:inline src={adminCursesScript}></script>}
+</Base>

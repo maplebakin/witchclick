@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const CURSE_TYPES: readonly ['reveal', 'return', 'mirror', 'sever', 'echo'];
+export const CURSE_TYPES: readonly ['reveal', 'return', 'mirror', 'sever', 'echo', 'smoke', 'threshold', 'knife'];
 export const CURSE_TARGETS: readonly ['space', 'person', 'dynamic', 'memory', 'habit'];
 export const CURSE_TONES: readonly ['gentle', 'poetic', 'scathing', 'restrained'];
 export const CURSE_TAGS: readonly [
@@ -16,6 +16,7 @@ export declare const CurseGeneratorInputSchema: z.ZodObject<{
   type: z.ZodEnum<typeof CURSE_TYPES>;
   target: z.ZodEnum<typeof CURSE_TARGETS>;
   tone: z.ZodEnum<typeof CURSE_TONES>;
+  topic: z.ZodOptional<z.ZodString>;
   sigilName: z.ZodOptional<z.ZodString>;
   altarItem: z.ZodOptional<z.ZodString>;
   journalingFollowUp: z.ZodOptional<z.ZodString>;
@@ -23,6 +24,7 @@ export declare const CurseGeneratorInputSchema: z.ZodObject<{
   type: typeof CURSE_TYPES[number];
   target: typeof CURSE_TARGETS[number];
   tone: typeof CURSE_TONES[number];
+  topic?: string | undefined;
   sigilName?: string | undefined;
   altarItem?: string | undefined;
   journalingFollowUp?: string | undefined;
@@ -30,6 +32,7 @@ export declare const CurseGeneratorInputSchema: z.ZodObject<{
   type: typeof CURSE_TYPES[number];
   target: typeof CURSE_TARGETS[number];
   tone: typeof CURSE_TONES[number];
+  topic?: string | undefined;
   sigilName?: string | undefined;
   altarItem?: string | undefined;
   journalingFollowUp?: string | undefined;
@@ -40,10 +43,10 @@ export declare const CurseSpecSchema: z.ZodObject<{
   title: z.ZodString;
   slug: z.ZodString;
   openingReflection: z.ZodEffects<z.ZodString, string, string>;
-  invocation: z.ZodEffects<z.ZodString, string, string>;
+  invocation: z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>;
   method: z.ZodEffects<z.ZodString, string, string>;
   closure: z.ZodEffects<z.ZodString, string, string>;
-  safetyNotes: z.ZodOptional<z.ZodString>;
+  safetyNotes: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
   generator: typeof CurseGeneratorInputSchema;
   tags: z.ZodEffects<z.ZodArray<z.ZodEnum<typeof CURSE_TAGS>, "many">, readonly typeof CURSE_TAGS[number][], readonly typeof CURSE_TAGS[number][]>;
 }, "strip", z.ZodTypeAny, {

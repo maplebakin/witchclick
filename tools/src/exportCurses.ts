@@ -56,12 +56,12 @@ export function exportCurses(args: string[]) {
   const slug = slugArgIndex >= 0 ? String(args[slugArgIndex + 1] || '').toLowerCase() : '';
 
   const CWD = process.cwd();
-  const DIR = path.join(CWD, 'content', 'white-magic-curses');
+  const DIR = path.join(CWD, 'archive', 'curses');
   const OUT_DIR = path.join(CWD, 'dist', 'exports', 'curses');
 
   const files = readCurseFiles(DIR);
   if (!files.length) {
-    throw new Error('No curses found. Make sure content/white-magic-curses exists.');
+    throw new Error('No curses found. Make sure archive/curses exists.');
   }
 
   const selected = slug

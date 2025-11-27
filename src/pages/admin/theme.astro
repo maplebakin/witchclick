@@ -30,15 +30,105 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
     <div class="space-y-6">
       <AdminNav currentPath="/admin/theme" />
 
-      <div
-        id="themeEditorRoot"
-        data-dev-api={DEV_API}
-        data-theme-watch={import.meta.env.DEV ? "auto" : "manual"}
-        class="rounded-2xl border border-dashed border-line-subtle bg-surface-base/60 p-6 text-center text-sm text-body-muted"
-      >
-        <p class="font-medium text-primary">Loading Theme Editor…</p>
-        <p class="mt-2 text-xs">Fetching presets from the development API.</p>
-      </div>
+      <section class="space-y-4 rounded-2xl border border-line-subtle bg-surface-base/70 p-6 shadow-sm">
+        <header class="grid gap-1">
+          <p class="text-xs font-semibold uppercase tracking-[0.28em] text-body-muted">Theme Editor</p>
+          <h1 class="text-xl font-semibold text-body-strong">Backgrounds & Text</h1>
+          <p class="text-sm text-body-muted">Adjust the canonical tokens. Edits flow to all runtime themes.</p>
+        </header>
+
+        <section
+          class="rounded-2xl border border-line-subtle bg-surface-base/60 p-6 shadow-sm space-y-4"
+          data-theme-preview
+        >
+          <header class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.28em] text-body-muted">Live token preview</p>
+              <p class="text-sm text-body-muted">Header · hero · card · chip — mirrors new glass tokens</p>
+            </div>
+            <span class="rounded-full border border-line-subtle px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-body-muted">
+              Uses current editor values
+            </span>
+          </header>
+
+          <div class="grid gap-4 lg:grid-cols-2">
+            <div class="space-y-3 rounded-xl border border-line-subtle bg-surface-base/80 p-4 shadow-sm backdrop-blur">
+              <div class="preview-header flex items-center justify-between rounded-lg border px-3 py-2 shadow-sm">
+                <span class="font-semibold tracking-wide text-primary">WitchClick</span>
+                <div class="flex items-center gap-2 text-xs uppercase tracking-wide text-body-muted">
+                  <span class="rounded-full border border-line-subtle px-2 py-1">Posts</span>
+                  <span class="rounded-full border border-line-subtle px-2 py-1">Tools</span>
+                  <span class="rounded-full border border-line-subtle px-2 py-1">Entities</span>
+                </div>
+              </div>
+              <div class="preview-hero rounded-2xl border p-4 shadow-md backdrop-blur">
+                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-body-muted">Hero</p>
+                <h3 class="mt-1 text-xl font-semibold text-body-strong">Preview a cozy ritual prompt</h3>
+                <p class="text-sm text-body-muted">Glass overlays should keep text legible and accents glowing.</p>
+                <div class="mt-3 inline-flex items-center gap-2 rounded-full border border-line-subtle bg-surface-muted/70 px-3 py-1 text-xs font-semibold text-body-muted">
+                  <span class="h-2 w-2 rounded-full bg-primary"></span>
+                  glass accent
+                </div>
+              </div>
+            </div>
+
+            <div class="grid gap-3">
+              <div class="preview-card flex items-center gap-3 rounded-xl border p-3 shadow-sm backdrop-blur">
+                <div class="h-10 w-10 rounded-full border shadow-inner preview-avatar" aria-hidden="true"></div>
+                <div class="space-y-1">
+                  <p class="text-sm font-semibold text-body-strong">Card preview</p>
+                  <p class="text-xs text-body-muted">Card surfaces pick up glass border + glow tokens.</p>
+                </div>
+              </div>
+              <div class="preview-chips flex flex-wrap items-center gap-2 rounded-xl border border-dashed p-3">
+                <span class="preview-chip">
+                  glass chip
+                </span>
+                <span class="preview-chip">
+                  accent tag
+                </span>
+                <span class="preview-chip">
+                  focus ring
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <details class="rounded-2xl border border-line-subtle bg-surface-base/60 p-4 shadow-sm" open>
+          <summary class="cursor-pointer text-sm font-semibold flex items-center gap-2">
+            <span>Editor controls</span>
+            <span class="text-[11px] font-semibold uppercase tracking-wide rounded-full border border-line-subtle px-2 py-0.5 text-body-muted">Click to collapse</span>
+          </summary>
+          <div class="mt-4 grid gap-3 md:grid-cols-2">
+            <div class="rounded-xl border border-line-subtle bg-surface-base/60 p-4 text-sm text-body-muted">
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-body-subtle">Backgrounds</p>
+              <ul class="mt-2 grid gap-1 text-body">
+                <li>Page background</li>
+                <li>Component surfaces</li>
+              </ul>
+            </div>
+            <div class="rounded-xl border border-line-subtle bg-surface-base/60 p-4 text-sm text-body-muted">
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-body-subtle">Text</p>
+              <ul class="mt-2 grid gap-1 text-body">
+                <li>H1</li>
+                <li>H2</li>
+                <li>Prose</li>
+              </ul>
+            </div>
+          </div>
+
+          <div
+            id="themeEditorRoot"
+            data-dev-api={DEV_API}
+            data-theme-watch={import.meta.env.DEV ? "auto" : "manual"}
+            class="mt-4 rounded-xl border border-dashed border-line-subtle bg-surface-base/60 p-6 text-center text-sm text-body-muted"
+          >
+            <p class="font-medium text-primary">Loading Theme Editor…</p>
+            <p class="mt-2 text-xs">Fetching presets from the development API.</p>
+          </div>
+        </details>
+      </section>
     </div>
   ) : (
     <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
@@ -61,4 +151,87 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
       }
     </script>
   )}
+
+  <style>
+    [data-theme-preview] {
+      /* Map preview values from the editor onto the preview block */
+      --glass-surface: var(--preview-glassSurface, var(--glass-surface));
+      --glass-surface-strong: var(--preview-glassSurfaceStrong, var(--glass-surface-strong));
+      --glass-card: var(--preview-glassCard, var(--glass-card));
+      --glass-hover: var(--preview-glassHover, var(--glass-hover));
+      --glass-border: var(--preview-glassBorder, var(--glass-border));
+      --glass-border-strong: var(--preview-glassBorderStrong, var(--glass-border-strong));
+      --glass-highlight: var(--preview-glassHighlight, var(--glass-highlight));
+      --glass-glow: var(--preview-glassGlow, var(--glass-glow));
+      --card-panel-surface: var(--preview-cardPanelSurface, var(--card-panel-surface));
+      --card-panel-surface-strong: var(--preview-cardPanelSurfaceStrong, var(--card-panel-surface-strong));
+      --card-panel-border: var(--preview-cardPanelBorder, var(--card-panel-border));
+      --card-panel-border-strong: var(--preview-cardPanelBorderStrong, var(--card-panel-border-strong));
+      --card-panel-border-soft: var(--preview-cardPanelBorderSoft, var(--card-panel-border-soft));
+      --header-background: var(--preview-headerBackground, var(--header-background));
+      --header-border: var(--preview-headerBorder, var(--header-border));
+      --header-text: var(--preview-headerText, var(--text-strong));
+      --footer-background: var(--preview-footerBackground, var(--footer-background));
+      --footer-border: var(--preview-footerBorder, var(--footer-border));
+      --text-body: var(--preview-textBody, var(--text-body));
+      --text-accent: var(--preview-textAccent, var(--text-accent));
+      --text-primary: var(--preview-textPrimary, var(--text-primary));
+      --text-secondary: var(--preview-textSecondary, var(--text-secondary));
+      --text-tertiary: var(--preview-textTertiary, var(--text-tertiary));
+      --text-muted: var(--preview-textMuted, var(--text-muted));
+      --text-heading: var(--preview-textHeading, var(--text-heading));
+      --link-color: var(--preview-linkColor, var(--link-color));
+      color: var(--preview-textPrimary, var(--text-primary));
+    }
+
+    [data-theme-preview] .preview-header {
+      background: var(--header-background, var(--glass-surface));
+      border-color: var(--header-border, var(--glass-border));
+      color: var(--header-text, var(--text-strong));
+    }
+
+    [data-theme-preview] .preview-hero {
+      background: var(--glass-surface);
+      border-color: var(--glass-border);
+      box-shadow: var(--glass-shadow-strong, var(--shadow-soft));
+      color: var(--text-body);
+    }
+
+    [data-theme-preview] .preview-card {
+      background: var(--glass-card);
+      border-color: var(--glass-border-strong, var(--glass-border));
+      box-shadow: var(--glass-shadow-soft, var(--shadow-soft));
+      color: var(--text-body);
+    }
+
+    [data-theme-preview] .preview-avatar {
+      background: var(--glass-surface-strong);
+      border-color: var(--glass-border);
+    }
+
+    [data-theme-preview] .preview-chips {
+      border-color: var(--glass-border);
+      background: color-mix(in srgb, var(--glass-surface) 92%, transparent 8%);
+    }
+
+    [data-theme-preview] .preview-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid var(--glass-border-strong, var(--glass-border));
+      background: color-mix(in srgb, var(--glass-hover) 88%, transparent 12%);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-body);
+    }
+
+    /* Override admin text utility defaults inside preview so theme tokens win */
+    [data-theme-preview] .text-body-strong {
+      color: var(--preview-textHeading, var(--text-heading)) !important;
+    }
+  </style>
 </Base>

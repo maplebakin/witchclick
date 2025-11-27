@@ -467,25 +467,26 @@ function isActive(href: string): boolean {
   }
 
   .site-nav__button--utility {
-    background: color-mix(in srgb, var(--header-background) 48%, transparent 52%);
+    background: color-mix(in srgb, var(--glass-surface, var(--header-background)) 78%, transparent 22%);
+    border-color: color-mix(in srgb, var(--glass-border, var(--header-border)) 88%, transparent 12%);
   }
 
   .site-nav__button--utility:hover,
   .site-nav__button--utility:focus-visible {
-    background: color-mix(in srgb, var(--header-background) 38%, var(--color-iris) 62%);
-    border-color: color-mix(in srgb, var(--header-border) 35%, var(--color-iris) 65%);
+    background: color-mix(in srgb, var(--glass-hover, var(--header-background)) 82%, var(--glass-highlight, var(--color-iris)) 18%);
+    border-color: color-mix(in srgb, var(--glass-border, var(--header-border)) 65%, var(--glass-highlight, var(--color-iris)) 35%);
   }
 
   .site-nav__button--admin {
-    background: color-mix(in srgb, var(--header-background) 42%, var(--color-gold) 58%);
-    border-color: color-mix(in srgb, var(--header-border) 38%, var(--color-gold) 62%);
+    background: color-mix(in srgb, var(--glass-surface-strong, var(--header-background)) 78%, var(--glass-highlight, var(--color-gold)) 22%);
+    border-color: color-mix(in srgb, var(--glass-border-strong, var(--header-border)) 82%, transparent 18%);
     color: color-mix(in srgb, var(--layout-shell-ink) 95%, white 5%);
   }
 
   .site-nav__button--admin:hover,
   .site-nav__button--admin:focus-visible {
-    background: color-mix(in srgb, var(--header-background) 35%, var(--color-gold) 65%);
-    border-color: color-mix(in srgb, var(--header-border) 30%, var(--color-gold) 70%);
+    background: color-mix(in srgb, var(--glass-hover, var(--header-background)) 76%, var(--glass-highlight, var(--color-gold)) 24%);
+    border-color: color-mix(in srgb, var(--glass-border-strong, var(--header-border)) 68%, var(--glass-highlight, var(--color-gold)) 32%);
   }
 
   .site-nav__item--submenu {
@@ -559,10 +560,10 @@ function isActive(href: string): boolean {
     margin-top: var(--space-2);
     padding: clamp(var(--space-4), 2vw, var(--space-5));
     border-radius: 1rem;
-    border: 1px solid color-mix(in srgb, var(--header-border) 55%, transparent 45%);
-    background: color-mix(in srgb, var(--header-background) 92%, transparent 8%);
-    backdrop-filter: blur(14px);
-    box-shadow: var(--shadow-soft);
+    border: 1px solid color-mix(in srgb, var(--glass-border, var(--header-border)) 85%, transparent 15%);
+    background: color-mix(in srgb, var(--glass-surface-strong, var(--header-background)) 94%, transparent 6%);
+    backdrop-filter: blur(var(--glass-blur, 16px));
+    box-shadow: var(--glass-shadow-strong, var(--shadow-soft));
     min-width: clamp(24rem, 38vw, 36rem);
     opacity: 0;
     visibility: hidden;
@@ -613,7 +614,7 @@ function isActive(href: string): boolean {
     padding: var(--space-2) var(--space-3);
     border-radius: 0.75rem;
     border: 1px solid transparent;
-    background: color-mix(in srgb, var(--header-background) 58%, transparent 42%);
+    background: color-mix(in srgb, var(--glass-card, var(--header-background)) 82%, transparent 18%);
     color: color-mix(in srgb, var(--layout-shell-ink) 90%, white 10%);
     font-family: var(--font-body-ui);
     font-size: 0.85rem;
@@ -628,8 +629,8 @@ function isActive(href: string): boolean {
 
   .site-nav__admin-link:hover,
   .site-nav__admin-link:focus-visible {
-    border-color: color-mix(in srgb, var(--header-border) 38%, var(--color-iris) 62%);
-    background: color-mix(in srgb, var(--header-background) 42%, var(--color-iris) 58%);
+    border-color: color-mix(in srgb, var(--glass-border, var(--header-border)) 65%, var(--glass-highlight, var(--color-iris)) 35%);
+    background: color-mix(in srgb, var(--glass-hover, var(--header-background)) 80%, var(--glass-highlight, var(--color-iris)) 20%);
     color: var(--comfort-chip-text-strong, var(--text-accent-strong));
     transform: translateX(0.125rem);
   }
@@ -709,18 +710,18 @@ function isActive(href: string): boolean {
   .site-search-panel__backdrop {
     position: absolute;
     inset: 0;
-    background: color-mix(in srgb, var(--color-night) 85%, transparent 15%);
-    backdrop-filter: blur(10px);
+    background: color-mix(in srgb, var(--glass-glow, var(--color-night)) 72%, transparent 28%);
+    backdrop-filter: blur(var(--glass-blur, 16px));
   }
 
   .site-search-panel__dialog {
     position: relative;
     width: min(92vw, 36rem);
     border-radius: 1.5rem;
-    border: 1px solid color-mix(in srgb, var(--header-border) 48%, transparent 52%);
-    background: color-mix(in srgb, var(--header-background) 96%, transparent 4%);
+    border: 1px solid color-mix(in srgb, var(--glass-border, var(--header-border)) 82%, transparent 18%);
+    background: color-mix(in srgb, var(--glass-surface, var(--header-background)) 94%, transparent 6%);
     padding: clamp(1.25rem, 4vw, 1.75rem);
-    box-shadow: var(--shadow-soft);
+    box-shadow: var(--glass-shadow-strong, var(--shadow-soft));
     z-index: 1;
     display: grid;
     gap: var(--space-3);

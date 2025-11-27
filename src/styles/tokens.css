@@ -44,6 +44,20 @@
   --surface-elevated: hsl(var(--neutral-7) / 0.9);
   --surface-hover: hsl(var(--neutral-7) / 0.78);
 
+  /* Glass Surfaces (frosted, layered) */
+  --glass-surface: color-mix(in hsl, hsl(var(--surface-card)) 88%, transparent 12%);
+  --glass-surface-strong: color-mix(in hsl, hsl(var(--surface-panel)) 92%, transparent 8%);
+  --glass-card: color-mix(in hsl, hsl(var(--surface-panel)) 86%, transparent 14%);
+  --glass-hover: color-mix(in hsl, hsl(var(--surface-hover)) 82%, transparent 18%);
+  --glass-border: color-mix(in hsl, hsl(var(--border-subtle)) 65%, transparent 35%);
+  --glass-border-strong: color-mix(in hsl, hsl(var(--border-strong)) 72%, transparent 28%);
+  --glass-highlight: color-mix(in hsl, hsl(var(--text-accent)) 28%, transparent 72%);
+  --glass-glow: color-mix(in hsl, hsl(var(--text-accent)) 18%, transparent 82%);
+  --glass-shadow-soft: 0 22px 55px -32px hsl(var(--neutral-9) / 0.65);
+  --glass-shadow-strong: 0 32px 85px -36px hsl(var(--neutral-9) / 0.78);
+  --glass-blur: 16px;
+  --glass-noise-opacity: 0.08;
+
   --border-subtle: hsl(var(--neutral-6) / 0.42);
   --border-strong: hsl(var(--neutral-4) / 0.6);
 
@@ -174,6 +188,15 @@
   --surface-card: hsl(260 45% 97% / 1);
   --surface-elevated: hsl(260 35% 96% / 1);
   --surface-hover: hsl(260 22% 92% / 1);
+
+  --glass-surface: color-mix(in hsl, hsl(var(--surface-card)) 92%, white 8%);
+  --glass-surface-strong: color-mix(in hsl, hsl(var(--surface-panel)) 94%, white 6%);
+  --glass-card: color-mix(in hsl, hsl(var(--surface-panel)) 90%, white 10%);
+  --glass-hover: color-mix(in hsl, hsl(var(--surface-hover)) 88%, white 12%);
+  --glass-border: color-mix(in hsl, hsl(var(--border-subtle)) 65%, transparent 35%);
+  --glass-border-strong: color-mix(in hsl, hsl(var(--border-strong)) 70%, transparent 30%);
+  --glass-highlight: color-mix(in hsl, hsl(var(--text-accent)) 24%, transparent 76%);
+  --glass-glow: color-mix(in hsl, hsl(var(--text-accent)) 16%, transparent 84%);
 
   --text-strong: hsl(260 30% 18% / 1);
   --text-body: hsl(260 28% 24% / 0.92);

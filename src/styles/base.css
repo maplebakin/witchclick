@@ -39,36 +39,36 @@
   --space-9: 4rem;
 
   /* Core Brand Colors */
-  --color-midnight: #07020f;
-  --color-night: #120725;
-  --color-iris: #4b2a63;
-  --color-amethyst: #7c4eb0;
-  --color-dusk: #271534;
-  --color-gold: #d4af37;
-  --color-rune: #f8f3ff;
-  --color-fog: #d7c8f3;
-  --color-ink: #f4f1ff;
-  --color-muted: rgba(244, 241, 255, 0.72);
-  --color-border: rgba(125, 98, 162, 0.45);
-  --color-border-strong: rgba(212, 175, 55, 0.65);
-  --color-overlay: rgba(18, 7, 37, 0.48);
-  --color-overlay-strong: rgba(18, 7, 37, 0.62);
+  --color-midnight: #070a05;
+  --color-night: #261a0d;
+  --color-iris: #f2bf8c;
+  --color-amethyst: #d18c47;
+  --color-dusk: #22170b;
+  --color-gold: #e4a667;
+  --color-rune: #f8f2ed;
+  --color-fog: #cc9966;
+  --color-ink: #ebd9c7;
+  --color-muted: rgba(235, 217, 199, 0.72);
+  --color-border: #452e17;
+  --color-border-strong: rgba(228, 166, 103, 0.7);
+  --color-overlay: #22170b;
+  --color-overlay-strong: #261a0d;
 
   /* Surface Colors */
-  --surface-plain: rgba(18, 10, 30, 0.92);
-  --surface-plain-border: rgba(124, 78, 176, 0.32);
-  --surface-plain-shadow: 0 24px 55px -28px rgba(3, 2, 12, 0.72);
+  --surface-plain: color-mix(in srgb, var(--color-midnight) 88%, black 12%);
+  --surface-plain-border: color-mix(in srgb, var(--color-border) 88%, transparent 12%);
+  --surface-plain-shadow: 0 24px 55px -28px color-mix(in srgb, var(--color-midnight) 72%, transparent 28%);
 
   /* Shadows */
   --shadow-soft: 0 18px 45px -28px rgba(11, 6, 20, 0.55);
   --shadow-strong: 0 28px 75px -24px rgba(3, 2, 12, 0.72);
 
   /* Site chrome authoring tokens */
-  --page-bg-base: 263 76% 3% / 1;
-  --header-bg-base: 281 35% 9% / 1;
-  --header-border-base: 268 32% 24% / 1;
-  --footer-bg-base: 263 76% 3% / 0.85;
-  --footer-border-base: 268 24% 49% / 0.3;
+  --page-bg-base: 30 50% 4% / 1;
+  --header-bg-base: 24 36% 12% / 1;
+  --header-border-base: 30 46% 58% / 1;
+  --footer-bg-base: 30 50% 4% / 0.9;
+  --footer-border-base: 30 46% 58% / 0.3;
 
   --page-bg-color: hsl(var(--page-bg-base, 263 76% 3% / 1));
   --header-bg-color: hsl(var(--header-bg-base, 281 35% 9% / 1));
@@ -563,6 +563,28 @@ main {
 }
 
 /* ---------------------------------------------------------------------------
+   Glass Utilities
+   --------------------------------------------------------------------------- */
+
+.glass-panel {
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--wc-radius-lg, 1rem);
+  backdrop-filter: blur(var(--glass-blur, 16px));
+  box-shadow: var(--glass-shadow-soft, var(--shadow-soft));
+}
+
+.glass-panel--strong {
+  background: var(--glass-surface-strong);
+  border-color: var(--glass-border-strong, var(--glass-border));
+  box-shadow: var(--glass-shadow-strong, var(--shadow-3));
+}
+
+.glass-veil {
+  background: color-mix(in srgb, var(--glass-highlight, var(--text-accent)) 35%, transparent 65%);
+}
+
+/* ---------------------------------------------------------------------------
    Site Shell Layout
    --------------------------------------------------------------------------- */
 
@@ -647,7 +669,7 @@ main {
   transform: none;
   box-shadow: 
     0 24px 60px -20px color-mix(in srgb, var(--color-night) 70%, transparent 30%),
-    0 0 30px rgba(124, 78, 176, 0.15),
+    0 0 30px color-mix(in srgb, var(--color-gold) 22%, transparent 78%),
     inset 0 1px 0 rgba(244, 241, 255, 0.08);
   border-color: color-mix(in srgb, var(--color-border) 55%, transparent 45%);
 }
@@ -966,10 +988,15 @@ main {
   top: 0;
   z-index: 40;
   isolation: isolate;
-  backdrop-filter: blur(20px) saturate(180%);
-  background: var(--header-background);
-  border-bottom: 1px solid transparent;
-  box-shadow: var(--header-shadow);
+  --header-surface: var(--glass-surface, var(--header-background));
+  --header-surface-strong: var(--glass-surface-strong, var(--header-background));
+  --header-edge: var(--header-border, var(--glass-border, color-mix(in srgb, var(--color-border, #7d62a2) 65%, transparent 35%)));
+  --header-highlight: var(--header-divider, color-mix(in srgb, var(--glass-highlight, var(--header-edge)) 78%, transparent 22%));
+  --header-shadow-layer: var(--header-shadow, var(--glass-shadow-soft, var(--shadow-soft)));
+  backdrop-filter: blur(var(--glass-blur, 16px)) saturate(180%);
+  background: var(--header-surface);
+  border-bottom: 1px solid var(--header-edge);
+  box-shadow: var(--header-shadow-layer);
   transition:
     background-color 280ms ease,
     border-color 280ms ease,
@@ -983,18 +1010,18 @@ main {
   inset-inline: 0;
   inset-block-end: 0;
   height: 1px;
-  background: var(--header-divider);
-  opacity: 0.85;
+  background: var(--header-highlight);
+  opacity: 0.9;
   pointer-events: none;
 }
 
 :root[data-comfort-theme="dawn"] .site-header {
-  background: color-mix(in srgb, var(--header-background) 90%, white 10%);
-  border-bottom-color: color-mix(in srgb, var(--header-border) 65%, transparent 35%);
+  background: color-mix(in srgb, var(--header-surface) 94%, white 6%);
+  border-bottom-color: color-mix(in srgb, var(--header-edge) 82%, transparent 18%);
 }
 
 :root[data-comfort-theme="dawn"] .site-header::after {
-  background: color-mix(in srgb, var(--header-divider) 70%, white 30%);
+  background: color-mix(in srgb, var(--header-highlight) 82%, white 18%);
 }
 
 .site-header__inner {
@@ -1342,7 +1369,7 @@ main {
 
 :root[data-comfort-theme="dawn"] .search-results {
   background: rgba(255, 252, 247, 0.98);
-  border-color: rgba(122, 94, 154, 0.28);
+  border-color: color-mix(in srgb, var(--color-gold) 28%, transparent 72%);
 }
 
 .search-result {
@@ -1374,7 +1401,7 @@ main {
 
 .search-result:hover,
 .search-result:focus-visible {
-  background: rgba(124, 78, 176, 0.35);
+  background: color-mix(in srgb, var(--color-gold) 22%, transparent 78%);
   color: var(--text-accent-strong);
   transform: translateX(4px);
 }
@@ -1384,8 +1411,8 @@ main {
   inset: 0;
   z-index: 50;
   padding: clamp(var(--space-4), 3vh, var(--space-6)) clamp(var(--space-4), 5vw, var(--space-6));
-  background: var(--header-mobile-background, rgba(18, 7, 37, 0.95));
-  backdrop-filter: blur(18px);
+  background: var(--header-mobile-background, color-mix(in srgb, var(--glass-surface-strong, rgba(18, 7, 37, 0.92)) 94%, transparent 6%));
+  backdrop-filter: blur(var(--glass-blur, 18px));
   color: var(--layout-shell-ink, #f4f1ff);
   transform: translateY(-100%);
   opacity: 0;
@@ -1482,14 +1509,15 @@ main {
 .site-footer {
   margin-top: var(--space-9);
   padding-block: var(--space-8);
-  border-top: 1px solid hsl(var(--footer-border));
-  background: hsl(var(--footer-background));
-  backdrop-filter: blur(12px);
+  border-top: 1px solid color-mix(in srgb, var(--glass-border, hsl(var(--footer-border))) 88%, transparent 12%);
+  background: color-mix(in srgb, var(--glass-surface-strong, hsl(var(--footer-background))) 94%, transparent 6%);
+  backdrop-filter: blur(var(--glass-blur, 12px));
+  box-shadow: var(--glass-shadow-soft, var(--shadow-soft));
 }
 
 :root[data-comfort-theme="dawn"] .site-footer {
-  background: hsl(var(--footer-background));
-  border-top-color: hsl(var(--footer-border));
+  background: color-mix(in srgb, var(--glass-surface, hsl(var(--footer-background))) 96%, white 4%);
+  border-top-color: color-mix(in srgb, var(--glass-border, hsl(var(--footer-border))) 78%, transparent 22%);
   color: var(--text-strong);
 }
 

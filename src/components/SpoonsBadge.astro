@@ -49,7 +49,7 @@ const tooltipId = spoonLevel ? `spoons-tip-${randomUUID().slice(0, 8)}` : "";
   }
 
   .spoons-badge:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--accent-purple-strong) 65%, transparent);
+    outline: 2px solid color-mix(in srgb, var(--text-accent, var(--color-gold)) 65%, transparent);
     outline-offset: 2px;
   }
 
@@ -58,7 +58,7 @@ const tooltipId = spoonLevel ? `spoons-tip-${randomUUID().slice(0, 8)}` : "";
     height: 0.55rem;
     border-radius: 999px;
     background: color-mix(in srgb, var(--card-spoon-text, #ede9fe) 88%, transparent 12%);
-    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--card-spoon-border, rgba(124, 58, 237, 0.35)) 75%, transparent 25%);
+    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--card-spoon-border, rgba(212, 175, 55, 0.35)) 75%, transparent 25%);
   }
 
   .spoons-badge__text {
@@ -79,8 +79,8 @@ const tooltipId = spoonLevel ? `spoons-tip-${randomUUID().slice(0, 8)}` : "";
     text-transform: none;
     letter-spacing: normal;
     color: var(--text-body);
-    background: color-mix(in srgb, hsl(var(--surface-card)) 85%, var(--accent-purple-soft) 15%);
-    border: 1px solid color-mix(in srgb, var(--accent-purple-soft) 20%, transparent);
+    background: color-mix(in srgb, hsl(var(--surface-card)) 85%, var(--text-accent, var(--color-gold)) 15%);
+    border: 1px solid color-mix(in srgb, var(--text-accent, var(--color-gold)) 20%, transparent);
     box-shadow: 0 10px 28px -22px rgba(17, 24, 39, 0.55);
     pointer-events: none;
     opacity: 0;

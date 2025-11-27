@@ -105,7 +105,11 @@ const { target = '[data-reading-target="article"]' } = Astro.props as Props;
     transform-origin: left center;
     transform: scaleX(var(--reading-progress, 0));
     transition: transform 160ms ease;
-    background: linear-gradient(90deg, rgba(212, 175, 55, 0.9), rgba(124, 78, 176, 0.9));
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-gold, #d4af37) 88%, transparent 12%),
+      color-mix(in srgb, var(--color-iris, #4b2a63) 88%, transparent 12%)
+    );
   }
 
   @media (prefers-reduced-motion: reduce) {

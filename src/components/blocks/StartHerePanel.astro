@@ -57,16 +57,16 @@ const steps = [
     position: relative;
     padding: clamp(2rem, 6vw, 3.25rem);
     border-radius: clamp(1.75rem, 4vw, 2.5rem);
-    border: 1px solid rgba(124, 58, 237, 0.35);
-    background: #0f0820;
-    box-shadow: 0 20px 52px -30px rgba(0, 0, 0, 0.6);
+    border: 1px solid color-mix(in srgb, var(--color-gold, #e4a667) 32%, transparent 68%);
+    background: color-mix(in srgb, var(--surface-plain, #22170b) 92%, transparent 8%);
+    box-shadow: 0 20px 52px -30px color-mix(in srgb, var(--color-night, #261a0d) 65%, transparent 35%);
     overflow: hidden;
   }
 
   :root[data-comfort-theme="dawn"] .start-here__inner {
-    border-color: rgba(122, 94, 154, 0.35);
-    background: #f8f5f0;
-    box-shadow: 0 20px 52px -30px rgba(71, 54, 96, 0.28);
+    border-color: color-mix(in srgb, var(--color-gold, #e4a667) 22%, transparent 78%);
+    background: color-mix(in srgb, white 96%, var(--color-gold, #e4a667) 4%);
+    box-shadow: 0 20px 52px -30px color-mix(in srgb, var(--color-night, #261a0d) 35%, transparent 65%);
   }
 
   .start-here__header {
@@ -108,24 +108,24 @@ const steps = [
     gap: 0.75rem;
     padding: clamp(1.25rem, 4vw, 1.75rem);
     border-radius: clamp(1.5rem, 4vw, 2rem);
-    border: 1px solid rgba(124, 58, 237, 0.3);
-    background: #0a0615;
-    box-shadow: 0 18px 45px -28px rgba(0, 0, 0, 0.5);
+    border: 1px solid color-mix(in srgb, var(--border-accent-subtle, var(--border-subtle)) 85%, transparent 15%);
+    background: color-mix(in srgb, var(--surface-card, #452e17) 92%, transparent 8%);
+    box-shadow: 0 18px 45px -28px color-mix(in srgb, var(--color-night, #261a0d) 55%, transparent 45%);
     transition: transform 220ms ease, box-shadow 220ms ease;
   }
 
   .start-here__card:hover,
   .start-here__card:focus-within {
     transform: translateY(-4px);
-    box-shadow: 0 28px 75px -24px rgba(0, 0, 0, 0.7);
-    border-color: var(--accent-purple-soft);
+    box-shadow: 0 28px 75px -24px color-mix(in srgb, var(--color-night, #261a0d) 65%, transparent 35%);
+    border-color: color-mix(in srgb, var(--border-accent-strong, var(--border-strong)) 65%, transparent 35%);
   }
 
   .start-here__badge {
     width: 2rem;
     height: 2rem;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--accent-purple-strong) 65%, var(--text-accent-strong) 35%);
+    background: color-mix(in srgb, var(--text-accent-strong, var(--color-gold)) 70%, var(--color-night, #261a0d) 30%);
     color: color-mix(in srgb, white 92%, var(--surface-panel-primary) 8%);
     font-weight: 600;
     display: grid;
@@ -155,14 +155,14 @@ const steps = [
     gap: 0.4rem;
     padding: 0.4rem 0.85rem;
     border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--accent-purple-strong) 42%, transparent 58%);
+    border: 1px solid color-mix(in srgb, var(--text-accent, var(--color-gold)) 42%, transparent 58%);
     background: color-mix(in srgb, var(--surface-panel-primary) 85%, transparent 15%);
   }
 
   .start-here__link:hover,
   .start-here__link:focus-visible {
     color: color-mix(in srgb, var(--link-color) 55%, var(--text-accent-strong) 45%);
-    border-color: color-mix(in srgb, var(--accent-purple-strong) 52%, transparent 48%);
+    border-color: color-mix(in srgb, var(--text-accent, var(--color-gold)) 52%, transparent 48%);
     background: color-mix(in srgb, var(--surface-panel-primary) 92%, transparent 8%);
   }
 

@@ -88,7 +88,7 @@ function buildMarkdownBody(spec) {
 
 export function prepareCurseForPersistence(rawSpec, options = {}) {
   const cwd = options.cwd || process.cwd();
-  const directory = options.directory || path.join(cwd, 'content', 'white-magic-curses');
+  const directory = options.directory || path.join(cwd, 'archive', 'curses');
 
   const parsed = CurseSpecSchema.safeParse({
     ...rawSpec,
