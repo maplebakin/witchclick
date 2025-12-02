@@ -44,7 +44,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           <select id="authorSelect" class="flex-1 rounded-lg border border-line-neutral px-3 py-2 text-sm">
             <option value="">Select an author...</option>
           </select>
-          <button type="button" id="newAuthorBtn" class="rounded-lg bg-surface-success px-4 py-2 text-sm font-medium text-inverse hover:bg-surface-success-strong">
+          <button type="button" id="newAuthorBtn" class="admin-btn-primary px-4 py-2 text-sm font-medium">
             New Author
           </button>
         </div>
@@ -97,10 +97,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           </div>
 
           <div class="flex items-center gap-3 border-t border-line-subtle pt-4">
-            <button type="submit" class="rounded-lg bg-surface-success px-5 py-2.5 text-sm font-medium text-inverse hover:bg-surface-success-strong">
+            <button type="submit" class="admin-btn-primary px-5 py-2.5 text-sm font-medium">
               Save Author
             </button>
-            <button type="button" id="deleteBtn" class="hidden rounded-lg border border-danger px-5 py-2.5 text-sm font-medium text-danger hover:bg-surface-danger hover:text-inverse">
+            <button type="button" id="deleteBtn" class="hidden admin-btn-secondary px-5 py-2.5 text-sm font-medium text-danger hover:bg-surface-danger hover:text-inverse">
               Delete Author
             </button>
             <p class="ml-auto text-sm" data-status></p>

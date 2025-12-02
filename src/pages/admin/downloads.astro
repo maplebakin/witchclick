@@ -36,9 +36,9 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
       <section class="lg:col-span-4 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
         <div class="mb-3 flex items-center justify-between gap-2">
           <h1 class="text-xl font-semibold">Downloads</h1>
-          <button id="newBtn" class="rounded-lg border px-3 py-1 text-sm">New</button>
+          <button id="newBtn" class="admin-btn-secondary px-3 py-1 text-sm">New</button>
         </div>
-        <input id="search" placeholder="Search..." class="mb-3 w-full rounded-lg border px-3 py-2 text-sm" />
+        <input id="search" placeholder="Search..." class="mb-3 w-full admin-btn-secondary px-3 py-2 text-sm" />
         <div id="list" class="max-h-[70vh] overflow-auto text-sm"></div>
       </section>
 
@@ -51,22 +51,22 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           >No download loaded</span>
         </div>
         <div class="grid gap-3 md:grid-cols-2">
-          <label class="block"><span class="text-xs font-medium">Name</span><input id="name" class="mt-1 w-full rounded-lg border px-3 py-2" /></label>
-          <label class="block"><span class="text-xs font-medium">Slug</span><input id="slug" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="tarot-study-planner" /></label>
-          <label class="block"><span class="text-xs font-medium">Price</span><input id="price" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="5.00" /></label>
-          <label class="block"><span class="text-xs font-medium">Currency</span><input id="currency" class="mt-1 w-full rounded-lg border px-3 py-2" value="USD" /></label>
-          <label class="block md:col-span-2"><span class="text-xs font-medium">Summary</span><input id="summary" class="mt-1 w-full rounded-lg border px-3 py-2" /></label>
-          <label class="block md:col-span-2"><span class="text-xs font-medium">Cover image URL (public)</span><input id="cover" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="/images/downloads/cover.jpg" /></label>
-          <label class="block md:col-span-2"><span class="text-xs font-medium">File URL (public PDF)</span><input id="file" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="/files/file.pdf" /></label>
-          <label class="block md:col-span-2"><span class="text-xs font-medium">External checkout URL (optional)</span><input id="url" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="https://ko-fi.com/s/..." /></label>
-          <label class="block md:col-span-2"><span class="text-xs font-medium">Features (one per line)</span><textarea id="features" class="mt-1 h-24 w-full rounded-lg border px-3 py-2"></textarea></label>
-          <label class="block md:col-span-2"><span class="text-xs font-medium">Tags (comma-separated)</span><input id="tags" class="mt-1 w-full rounded-lg border px-3 py-2" /></label>
+          <label class="block"><span class="text-xs font-medium">Name</span><input id="name" class="mt-1 w-full admin-btn-secondary px-3 py-2" /></label>
+          <label class="block"><span class="text-xs font-medium">Slug</span><input id="slug" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="tarot-study-planner" /></label>
+          <label class="block"><span class="text-xs font-medium">Price</span><input id="price" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="5.00" /></label>
+          <label class="block"><span class="text-xs font-medium">Currency</span><input id="currency" class="mt-1 w-full admin-btn-secondary px-3 py-2" value="USD" /></label>
+          <label class="block md:col-span-2"><span class="text-xs font-medium">Summary</span><input id="summary" class="mt-1 w-full admin-btn-secondary px-3 py-2" /></label>
+          <label class="block md:col-span-2"><span class="text-xs font-medium">Cover image URL (public)</span><input id="cover" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="/images/downloads/cover.jpg" /></label>
+          <label class="block md:col-span-2"><span class="text-xs font-medium">File URL (public PDF)</span><input id="file" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="/files/file.pdf" /></label>
+          <label class="block md:col-span-2"><span class="text-xs font-medium">External checkout URL (optional)</span><input id="url" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="https://ko-fi.com/s/..." /></label>
+          <label class="block md:col-span-2"><span class="text-xs font-medium">Features (one per line)</span><textarea id="features" class="mt-1 h-24 w-full admin-btn-secondary px-3 py-2"></textarea></label>
+          <label class="block md:col-span-2"><span class="text-xs font-medium">Tags (comma-separated)</span><input id="tags" class="mt-1 w-full admin-btn-secondary px-3 py-2" /></label>
         </div>
         <div class="mt-4 flex flex-wrap items-center gap-3">
-          <button id="save" class="rounded-lg bg-surface-success px-4 py-2 text-inverse hover:bg-surface-success-strong">Save</button>
+          <button id="save" class="admin-btn-primary px-4 py-2 text-sm font-semibold">Save</button>
           <button
             id="delete"
-            class="rounded-lg border border-danger px-4 py-2 text-danger hover:bg-surface-danger hover:text-inverse disabled:cursor-not-allowed disabled:opacity-60"
+            class="admin-btn-secondary px-4 py-2 text-sm font-semibold text-danger hover:bg-surface-danger hover:text-inverse disabled:cursor-not-allowed disabled:opacity-60"
             type="button"
             disabled
           >Delete</button>

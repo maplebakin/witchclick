@@ -58,7 +58,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               <h2 class="text-base font-semibold">Curse Library</h2>
               <p class="text-xs text-body-muted">Select an archived curse to view/edit.</p>
             </div>
-            <button data-curse-refresh class="rounded-lg border border-line-neutral px-3 py-1.5 text-xs font-medium hover:bg-surface-soft">🔄 Refresh</button>
+            <button data-curse-refresh class="admin-btn-secondary px-3 py-1.5 text-xs font-medium">🔄 Refresh</button>
           </div>
           <input
             type="search"
@@ -80,7 +80,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               <h2 class="text-xl font-semibold">Archive Editor</h2>
               <p data-curse-meta class="text-xs text-body-muted">Select a curse to load its markdown.</p>
             </div>
-            <button data-curse-delete class="rounded-lg border-2 border-danger px-4 py-2 text-sm font-semibold text-danger hover:bg-danger hover:text-white transition disabled:opacity-50" disabled>🗑 Delete</button>
+            <button data-curse-delete class="admin-btn-secondary px-4 py-2 text-sm font-semibold text-danger disabled:opacity-50" disabled>🗑 Delete</button>
           </div>
 
           <label class="block">
@@ -94,7 +94,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           </label>
 
           <div class="flex flex-wrap items-center gap-3">
-            <button data-curse-save class="rounded-lg bg-surface-accent-bolder px-4 py-2 text-sm font-semibold text-inverse hover:bg-surface-accent-deep disabled:opacity-50" disabled>Save changes</button>
+            <button data-curse-save class="admin-btn-primary px-4 py-2 text-sm font-semibold disabled:opacity-50" disabled>Save changes</button>
             <div data-curse-editor-status class="text-sm text-body-muted"></div>
           </div>
 

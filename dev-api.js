@@ -292,6 +292,7 @@ const THEME_EXTRA_FIELDS = [
   'colorMidnight', 'colorNight', 'colorIris', 'colorAmethyst', 'colorDusk', 'colorGold', 'colorRune', 'colorFog', 'colorInk',
   'colorMuted', 'colorBorder', 'colorBorderStrong', 'colorOverlay', 'colorOverlayStrong',
   'surfacePlain', 'surfacePlainBorder', 'cardPanelSurface', 'cardPanelSurfaceStrong', 'cardPanelBorder', 'cardPanelBorderStrong', 'cardPanelBorderSoft',
+  'glassSurface', 'glassSurfaceStrong', 'glassCard', 'glassHover', 'glassBorder', 'glassBorderStrong', 'glassHighlight', 'glassGlow', 'glassShadowSoft', 'glassShadowStrong', 'glassBlur', 'glassNoiseOpacity',
   'textSecondary', 'textTertiary', 'textStrong', 'textHint', 'textDisabled', 'textBody', 'textSubtle', 'textAccent', 'textAccentStrong',
   'inkBody', 'inkStrong', 'inkMuted', 'linkColor',
   'cardBadgeBg', 'cardBadgeBorder', 'cardBadgeText', 'cardTagBg', 'cardTagBorder', 'cardTagText', 'cardSpoonBg', 'cardSpoonBorder', 'cardSpoonText',

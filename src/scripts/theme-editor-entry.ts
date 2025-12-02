@@ -350,197 +350,103 @@ function buildComprehensiveControls(container: HTMLElement): void {
   const summary = document.createElement("summary");
   summary.className = "cursor-pointer text-sm font-semibold flex items-center gap-2";
   summary.innerHTML = `
-    <span>Step 4 · Fine-tune sections</span>
-    <span class="text-[10px] font-semibold uppercase tracking-wide rounded-full bg-surface-accent px-2 py-0.5 text-inverse">Optional detail work</span>
+    <span>Token categories</span>
+    <span class="text-[10px] font-semibold uppercase tracking-wide rounded-full bg-surface-accent px-2 py-0.5 text-inverse">Organized like TOKEN-CATEGORIES.md</span>
   `;
   details.appendChild(summary);
 
-  const descriptionBox = document.createElement("div");
-  descriptionBox.className = "space-y-2 rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-3";
-  descriptionBox.innerHTML = `
-    <p class="text-xs text-body-muted"><strong>Plain language:</strong> Everything below maps to a real spot on the site (navigation bars, cards, alerts, etc.). Pick a scope above, then work through the groups until the live preview feels right.</p>
-    <ol class="text-xs text-body-muted list-decimal pl-5 space-y-1">
-      <li><strong>Global</strong> scope updates the entire site. Other scopes only affect that page or component.</li>
-      <li>Leave a field blank if you're unsure—inheritance keeps the previous color.</li>
-      <li>Stop at any time. These are optional details for extra polish.</li>
-    </ol>
-  `;
-  details.appendChild(descriptionBox);
+  const availableVariables = new Set<string>(ALL_COLOR_VARIABLES as unknown as string[]);
 
-  const quickLinks = document.createElement("div");
-  quickLinks.className = "grid gap-3 rounded-xl border border-line-subtle bg-surface-base/70 p-3";
-  const quickHeader = document.createElement("div");
-  quickHeader.className = "flex items-center justify-between gap-2";
-  quickHeader.innerHTML = `
-    <div>
-      <p class="text-xs font-semibold uppercase tracking-wide text-body-muted">Quick color links</p>
-      <p class="text-[11px] text-body-muted">One value updates multiple tokens at once.</p>
-    </div>
-  `;
-  quickLinks.appendChild(quickHeader);
-
-  const navTargets = [
-    "headerBackground",
-    "headerBorder",
-    "headerText",
-    "headerTextHover",
-    "footerBackground",
-    "footerBorder",
-    "footerText",
-    "footerTextMuted",
-  ];
-  const cardTargets = [
-    "cardPanelSurface",
-    "cardPanelSurfaceStrong",
-    "cardPanelBorder",
-    "cardPanelBorderStrong",
-    "cardPanelBorderSoft",
-    "glassSurface",
-    "glassSurfaceStrong",
-    "glassCard",
-    "glassBorder",
-    "glassBorderStrong",
-  ];
-
-  quickLinks.appendChild(
-    createGroupControl(
-      "Nav / footer shell",
-      "Header + footer backgrounds and borders share this base color.",
-      navTargets,
-    ),
-  );
-  quickLinks.appendChild(
-    createGroupControl(
-      "Cards / panels",
-      "Cards, panels, and glass shells share this surface/border color.",
-      cardTargets,
-    ),
-  );
-
-  details.appendChild(quickLinks);
-
-  const sharedPalette = document.createElement("div");
-  sharedPalette.className = "grid gap-3 rounded-xl border border-line-subtle bg-surface-base/70 p-3";
-  const sharedHeader = document.createElement("div");
-  sharedHeader.className = "flex items-center justify-between gap-2";
-  sharedHeader.innerHTML = `
-    <div>
-      <p class="text-xs font-semibold uppercase tracking-wide text-body-muted">Common swatches</p>
-      <p class="text-[11px] text-body-muted">Change one value → update all tokens that share it.</p>
-    </div>
-  `;
-  sharedPalette.appendChild(sharedHeader);
-
-  const COMMON_GROUPS: Array<{ label: string; description: string; keys: string[]; placeholder: string }> = [
+  const variableGroups: Array<{ title: string; description: string; variables: string[] }> = [
     {
-      label: "Gold accent",
-      description: "colorGold, accent text, card borders/badges",
-      placeholder: "#d4af37",
-      keys: ["colorGold", "textAccent", "textAccentStrong", "cardPanelBorder", "cardPanelBorderStrong", "cardBadgeBg", "cardBadgeBorder"],
+      title: "Foundation & named",
+      description: "Background and named swatches that seed other sets.",
+      variables: ["background", "colorMidnight", "colorNight", "colorDusk", "colorInk", "colorRune", "colorFog"],
     },
     {
-      label: "Iris purple",
-      description: "colorIris, tag borders, soft card borders",
-      placeholder: "#4b2a63",
-      keys: ["colorIris", "cardPanelBorderSoft", "cardTagBg", "cardTagBorder"],
+      title: "Brand & CTA",
+      description: "Primary/secondary accents, links, and focus/focus-ring.",
+      variables: ["colorGold", "colorAmethyst", "colorIris", "textAccent", "textAccentStrong", "linkColor", "focusRingColor"],
     },
     {
-      label: "Rune white",
-      description: "colorRune, badge text",
-      placeholder: "#f8f3ff",
-      keys: ["colorRune", "cardBadgeText"],
+      title: "Text palette",
+      description: "UI text roles and headings (matches textPalette/typography categories).",
+      variables: ["textPrimary", "textSecondary", "textTertiary", "textBody", "textSubtle", "textStrong", "textHint", "textDisabled", "textHeading", "inkBody", "inkStrong", "inkMuted"],
     },
     {
-      label: "Ink light",
-      description: "colorInk, secondary/tertiary text, tag text",
-      placeholder: "#f4f1ff",
-      keys: ["colorInk", "textSecondary", "textTertiary", "inkBody", "cardTagText"],
+      title: "Surfaces & navigation",
+      description: "Page backgrounds, header/footer shells, and dividers.",
+      variables: ["surfacePlain", "surfacePlainBorder", "headerBackground", "headerBorder", "headerText", "headerTextHover", "footerBackground", "footerBorder", "footerText", "footerTextMuted"],
     },
     {
-      label: "Body copy light",
-      description: "Strong/body/subtle text trio",
-      placeholder: "#f9f5ff",
-      keys: ["textStrong", "textBody", "textSubtle"],
+      title: "Cards & tags",
+      description: "Card/panel shells, borders, badges, tags, spoons, and focus outlines.",
+      variables: [
+        "cardPanelSurface",
+        "cardPanelSurfaceStrong",
+        "cardPanelBorder",
+        "cardPanelBorderStrong",
+        "cardPanelBorderSoft",
+        "cardBadgeBg",
+        "cardBadgeBorder",
+        "cardBadgeText",
+        "cardTagBg",
+        "cardTagBorder",
+        "cardTagText",
+        "cardSpoonBg",
+        "cardSpoonBorder",
+        "cardSpoonText",
+        "cardFocusOutline",
+      ],
     },
     {
-      label: "Focus ring gold",
-      description: "Focus ring + card focus outline",
-      placeholder: "#e8d591",
-      keys: ["focusRingColor", "cardFocusOutline"],
+      title: "Glass",
+      description: "Glass surfaces, borders, hover, and supporting effects.",
+      variables: [
+        "glassSurface",
+        "glassSurfaceStrong",
+        "glassCard",
+        "glassHover",
+        "glassBorder",
+        "glassBorderStrong",
+        "glassHighlight",
+        "glassGlow",
+        "glassShadowSoft",
+        "glassShadowStrong",
+        "glassBlur",
+        "glassNoiseOpacity",
+      ],
     },
     {
-      label: "Muted mauve",
-      description: "Accent, muted text, inkMuted",
-      placeholder: "#d9b2c4",
-      keys: ["accent", "textMuted", "inkMuted"],
-    },
-  ];
-
-  COMMON_GROUPS.forEach((group) => {
-    const control = createGroupControl(group.label, group.description, group.keys);
-    const colorPicker = control.querySelector<HTMLInputElement>('input[type="color"]');
-    const textInput = control.querySelector<HTMLInputElement>('input[type="text"]');
-    if (colorPicker) colorPicker.value = group.placeholder;
-    if (textInput) textInput.placeholder = group.placeholder;
-    sharedPalette.appendChild(control);
-  });
-
-  details.appendChild(sharedPalette);
-
-  // Organize variables into categorized sections
-  const variableGroups = [
-    {
-      title: "Site backdrop & dividers",
-      description: "Background hues, overlays, and the subtle strokes between sections",
-      variables: ['colorMidnight', 'colorNight', 'colorDusk', 'surfacePlain', 'surfacePlainBorder', 'colorBorder', 'colorBorderStrong', 'colorOverlay', 'colorOverlayStrong']
+      title: "Status",
+      description: "Semantic colors seeded from status in TOKEN-CATEGORIES.",
+      variables: ["success", "warning", "error", "info"],
     },
     {
-      title: "Actions & highlights",
-      description: "Buttons, CTA trims, hover colors, and focus outlines",
-      variables: ['colorGold', 'colorAmethyst', 'colorIris', 'focusRingColor', 'cardFocusOutline', 'linkColor']
+      title: "Entity",
+      description: "Entity-specific highlights and gradients.",
+      variables: [
+        "entityCardBorder",
+        "entityCardGlow",
+        "entityCardHighlight",
+        "entityCardSurfaceTop",
+        "entityCardSurfaceBottom",
+        "entityCardHeading",
+        "entityCardText",
+        "entityCardLabel",
+        "entityCardCta",
+        "entityCardCtaHover",
+        "entityCardIcon",
+        "entityCardIconShadow",
+      ],
     },
-    {
-      title: "Readable text & accents",
-      description: "Paragraphs, headings, quiet labels, and specialty inks",
-      variables: ['colorInk', 'colorRune', 'colorFog', 'colorMuted', 'textSecondary', 'textTertiary', 'textStrong', 'textHint', 'textDisabled', 'textBody', 'textSubtle', 'textAccent', 'textAccentStrong', 'inkBody', 'inkStrong', 'inkMuted']
-    },
-    {
-      title: "Navigation bars",
-      description: "Header and footer backgrounds, borders, and link colors",
-      variables: ['headerBackground', 'headerBorder', 'headerText', 'headerTextHover', 'footerBackground', 'footerBorder', 'footerText', 'footerTextMuted']
-    },
-    {
-      title: "Cards & panels",
-      description: "Content boxes, list cards, spoons, badges, and tags",
-      variables: ['cardPanelSurface', 'cardPanelSurfaceStrong', 'cardPanelBorder', 'cardPanelBorderStrong', 'cardPanelBorderSoft', 'cardBadgeBg', 'cardBadgeBorder', 'cardBadgeText', 'cardTagBg', 'cardTagBorder', 'cardTagText', 'cardSpoonBg', 'cardSpoonBorder', 'cardSpoonText']
-    },
-    {
-      title: "Glass shells",
-      description: "Frosted panels for navigation, hero, trays, and modals",
-      variables: ['glassSurface', 'glassSurfaceStrong', 'glassCard', 'glassHover', 'glassBorder', 'glassBorderStrong', 'glassHighlight', 'glassGlow']
-    },
-    {
-      title: "Glass tuning",
-      description: "Shadows, blur, and noise strength for glass layers",
-      variables: ['glassShadowSoft', 'glassShadowStrong', 'glassBlur', 'glassNoiseOpacity']
-    },
-    {
-      title: "Status & feedback",
-      description: "Toast chips, form hints, and alerts",
-      variables: ['success', 'warning', 'error', 'info']
-    },
-    {
-      title: "Entity spotlight",
-      description: "Special styling for Grimoire cards (only shows when that scope is selected)",
-      variables: ['entityCardBorder', 'entityCardGlow', 'entityCardHighlight', 'entityCardSurfaceTop', 'entityCardSurfaceBottom', 'entityCardHeading', 'entityCardText', 'entityCardLabel', 'entityCardCta', 'entityCardCtaHover', 'entityCardIcon', 'entityCardIconShadow']
-    }
   ];
 
   const groupsContainer = document.createElement("div");
   groupsContainer.className = "space-y-6";
 
   variableGroups.forEach(group => {
-    const visibleVariables = group.variables.filter((key) => !QUICK_EDIT_KEYS.has(key));
+    const visibleVariables = group.variables.filter((key) => availableVariables.has(key));
     if (!visibleVariables.length) {
       return;
     }
@@ -566,21 +472,6 @@ function buildComprehensiveControls(container: HTMLElement): void {
   });
 
   details.appendChild(groupsContainer);
-
-  const scopeDetails = document.createElement("details");
-  scopeDetails.className = "rounded-xl border border-dashed border-line-subtle bg-surface-base/60 p-4";
-  scopeDetails.dataset.scopeSection = "grimoire";
-  const scopeSummary = document.createElement("summary");
-  scopeSummary.className = "cursor-pointer text-sm font-semibold";
-  scopeSummary.textContent = "Bonus: Entity Grimoire extras";
-  scopeDetails.appendChild(scopeSummary);
-
-  const scopeCopy = document.createElement("p");
-  scopeCopy.className = "mt-2 text-xs text-body-muted";
-  scopeCopy.textContent = "Switch the scope selector to “Entity Grimoire” to reveal these vibrant highlight controls.";
-  scopeDetails.appendChild(scopeCopy);
-
-  details.appendChild(scopeDetails);
 
   container.appendChild(details);
 }

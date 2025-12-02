@@ -27,107 +27,252 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
   </HeadSlot>
 
   {authorized ? (
-    <div class="space-y-6">
+    <div class="space-y-8">
       <AdminNav currentPath="/admin/theme" />
 
-      <section class="space-y-4 rounded-2xl border border-line-subtle bg-surface-base/70 p-6 shadow-sm">
-        <header class="grid gap-1">
-          <p class="text-xs font-semibold uppercase tracking-[0.28em] text-body-muted">Theme Editor</p>
-          <h1 class="text-xl font-semibold text-body-strong">Backgrounds & Text</h1>
-          <p class="text-sm text-body-muted">Adjust the canonical tokens. Edits flow to all runtime themes.</p>
+      <section class="theme-shell rounded-3xl border border-line-subtle bg-surface-base/80 p-6 shadow-lg" data-theme-preview>
+        <header class="theme-header mb-4 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-[0.28em] text-body-muted">Theme Admin</p>
+            <h1 class="text-2xl font-semibold leading-tight text-body-strong">Runtime tokens</h1>
+            <p class="text-sm text-body-muted">Swatches grouped to match the editor layout.</p>
+          </div>
+          <a href="#themeEditorRoot" class="theme-cta">Go to editor</a>
         </header>
 
-        <section
-          class="rounded-2xl border border-line-subtle bg-surface-base/60 p-6 shadow-sm space-y-4"
-          data-theme-preview
-        >
-          <header class="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p class="text-xs font-semibold uppercase tracking-[0.28em] text-body-muted">Live token preview</p>
-              <p class="text-sm text-body-muted">Header · hero · card · chip — mirrors new glass tokens</p>
+        <section class="rounded-2xl border border-line-subtle bg-surface-base/80 p-5 shadow-md backdrop-blur">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="space-y-1">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-body-muted">Token Sections</p>
+              <h2 class="text-lg font-semibold text-body-strong">Organized swatches</h2>
+              <p class="text-sm text-body-muted">Click to copy resolved values coming from the current preview theme.</p>
             </div>
-            <span class="rounded-full border border-line-subtle px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-body-muted">
-              Uses current editor values
-            </span>
-          </header>
+            <span class="rounded-full bg-surface-soft px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-body-muted">Live values</span>
+          </div>
 
-          <div class="grid gap-4 lg:grid-cols-2">
-            <div class="space-y-3 rounded-xl border border-line-subtle bg-surface-base/80 p-4 shadow-sm backdrop-blur">
-              <div class="preview-header flex items-center justify-between rounded-lg border px-3 py-2 shadow-sm">
-                <span class="font-semibold tracking-wide text-primary">WitchClick</span>
-                <div class="flex items-center gap-2 text-xs uppercase tracking-wide text-body-muted">
-                  <span class="rounded-full border border-line-subtle px-2 py-1">Posts</span>
-                  <span class="rounded-full border border-line-subtle px-2 py-1">Tools</span>
-                  <span class="rounded-full border border-line-subtle px-2 py-1">Entities</span>
-                </div>
+          <div class="token-grid mt-5">
+            <article class="token-section">
+              <header>
+                <p class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">Foundation</p>
+                <h3 class="text-base font-semibold text-body-strong">Neutrals & page</h3>
+              </header>
+              <div class="token-section__swatches">
+                <button type="button" class="token-swatch" data-token-swatch="page-background" style="--swatch-color: var(--page-shell-bg);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">page-background</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+                <button type="button" class="token-swatch" data-token-swatch="surface-plain" style="--swatch-color: var(--panel-surface);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">surface-plain</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+                <button type="button" class="token-swatch" data-token-swatch="surface-strong" style="--swatch-color: var(--panel-strong);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">surface-strong</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
               </div>
-              <div class="preview-hero rounded-2xl border p-4 shadow-md backdrop-blur">
-                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-body-muted">Hero</p>
-                <h3 class="mt-1 text-xl font-semibold text-body-strong">Preview a cozy ritual prompt</h3>
-                <p class="text-sm text-body-muted">Glass overlays should keep text legible and accents glowing.</p>
-                <div class="mt-3 inline-flex items-center gap-2 rounded-full border border-line-subtle bg-surface-muted/70 px-3 py-1 text-xs font-semibold text-body-muted">
-                  <span class="h-2 w-2 rounded-full bg-primary"></span>
-                  glass accent
-                </div>
-              </div>
-            </div>
+            </article>
 
-            <div class="grid gap-3">
-              <div class="preview-card flex items-center gap-3 rounded-xl border p-3 shadow-sm backdrop-blur">
-                <div class="h-10 w-10 rounded-full border shadow-inner preview-avatar" aria-hidden="true"></div>
-                <div class="space-y-1">
-                  <p class="text-sm font-semibold text-body-strong">Card preview</p>
-                  <p class="text-xs text-body-muted">Card surfaces pick up glass border + glow tokens.</p>
-                </div>
+            <article class="token-section">
+              <header>
+                <p class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">Brand/Core</p>
+                <h3 class="text-base font-semibold text-body-strong">Accent ladder</h3>
+              </header>
+              <div class="token-section__swatches">
+                <button type="button" class="token-swatch" data-token-swatch="brand-primary" style="--swatch-color: var(--brand-accent);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">brand-primary</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+                <button type="button" class="token-swatch" data-token-swatch="brand-secondary" style="--swatch-color: var(--brand-secondary);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">brand-secondary</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+                <button type="button" class="token-swatch" data-token-swatch="brand-glow" style="--swatch-color: var(--glass-glow);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">brand-glow</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
               </div>
-              <div class="preview-chips flex flex-wrap items-center gap-2 rounded-xl border border-dashed p-3">
-                <span class="preview-chip">
-                  glass chip
-                </span>
-                <span class="preview-chip">
-                  accent tag
-                </span>
-                <span class="preview-chip">
-                  focus ring
-                </span>
+            </article>
+
+            <article class="token-section">
+              <header>
+                <p class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">Text Palette</p>
+                <h3 class="text-base font-semibold text-body-strong">Copy & links</h3>
+              </header>
+              <div class="token-section__swatches">
+                <button type="button" class="token-swatch" data-token-swatch="text-heading" style="--swatch-color: var(--text-heading-token);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">text-heading</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+                <button type="button" class="token-swatch" data-token-swatch="text-body" style="--swatch-color: var(--text-body-token);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">text-body</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+                <button type="button" class="token-swatch" data-token-swatch="text-muted" style="--swatch-color: var(--text-muted-token);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">text-muted</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+                <button type="button" class="token-swatch" data-token-swatch="link" style="--swatch-color: var(--link-color-token);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">link</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
               </div>
-            </div>
+            </article>
+
+            <article class="token-section">
+              <header>
+                <p class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">Glass & Cards</p>
+                <h3 class="text-base font-semibold text-body-strong">Overlays</h3>
+              </header>
+              <div class="token-section__swatches">
+                <button type="button" class="token-swatch" data-token-swatch="glass-surface" style="--swatch-color: var(--glass-surface);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">glass-surface</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+                <button type="button" class="token-swatch" data-token-swatch="glass-border" style="--swatch-color: var(--glass-border);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">glass-border</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+                <button type="button" class="token-swatch" data-token-swatch="card-panel" style="--swatch-color: var(--panel-surface-strong);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">card-panel</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+                <button type="button" class="token-swatch" data-token-swatch="card-border" style="--swatch-color: var(--card-border-strong);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">card-border</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+              </div>
+            </article>
+
+            <article class="token-section">
+              <header>
+                <p class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">Entity + Status</p>
+                <h3 class="text-base font-semibold text-body-strong">Contrast checks</h3>
+              </header>
+              <div class="token-section__swatches">
+                <button type="button" class="token-swatch" data-token-swatch="entity-surface" style="--swatch-color: var(--entity-surface);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">entity-surface</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+                <button type="button" class="token-swatch" data-token-swatch="success" style="--swatch-color: var(--status-success);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">success</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+                <button type="button" class="token-swatch" data-token-swatch="warning" style="--swatch-color: var(--status-warning);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">warning</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+                <button type="button" class="token-swatch" data-token-swatch="error" style="--swatch-color: var(--status-error);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">error</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+              </div>
+            </article>
+
+            <article class="token-section">
+              <header>
+                <p class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">Admin</p>
+                <h3 class="text-base font-semibold text-body-strong">Back-compat</h3>
+              </header>
+              <div class="token-section__swatches">
+                <button type="button" class="token-swatch" data-token-swatch="admin-surface" style="--swatch-color: var(--admin-surface);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">admin-surface</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+                <button type="button" class="token-swatch" data-token-swatch="admin-accent" style="--swatch-color: var(--admin-accent-token);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">admin-accent</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+                <button type="button" class="token-swatch" data-token-swatch="focus-ring" style="--swatch-color: var(--focus-ring-token);">
+                  <span class="token-swatch__dot"></span>
+                  <div>
+                    <span class="token-swatch__name">focus-ring</span>
+                    <span class="token-swatch__value" data-token-value>—</span>
+                  </div>
+                </button>
+              </div>
+            </article>
           </div>
         </section>
 
-        <details class="rounded-2xl border border-line-subtle bg-surface-base/60 p-4 shadow-sm" open>
-          <summary class="cursor-pointer text-sm font-semibold flex items-center gap-2">
-            <span>Editor controls</span>
-            <span class="text-[11px] font-semibold uppercase tracking-wide rounded-full border border-line-subtle px-2 py-0.5 text-body-muted">Click to collapse</span>
-          </summary>
-          <div class="mt-4 grid gap-3 md:grid-cols-2">
-            <div class="rounded-xl border border-line-subtle bg-surface-base/60 p-4 text-sm text-body-muted">
-              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-body-subtle">Backgrounds</p>
-              <ul class="mt-2 grid gap-1 text-body">
-                <li>Page background</li>
-                <li>Component surfaces</li>
-              </ul>
+        <section class="rounded-2xl border border-line-subtle bg-surface-base/80 p-5 shadow-md backdrop-blur mt-5">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-body-muted">Theme Editor</p>
+              <h2 class="text-lg font-semibold text-body-strong">Manage palettes</h2>
+              <p class="text-sm text-body-muted">Use the full editor for palettes, scopes, imports, and exports. The preview and swatches above stay in sync.</p>
             </div>
-            <div class="rounded-xl border border-line-subtle bg-surface-base/60 p-4 text-sm text-body-muted">
-              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-body-subtle">Text</p>
-              <ul class="mt-2 grid gap-1 text-body">
-                <li>H1</li>
-                <li>H2</li>
-                <li>Prose</li>
-              </ul>
-            </div>
+            <a class="theme-cta" href="#themeEditorRoot">Open editor</a>
           </div>
-
           <div
             id="themeEditorRoot"
             data-dev-api={DEV_API}
             data-theme-watch={import.meta.env.DEV ? "auto" : "manual"}
-            class="mt-4 rounded-xl border border-dashed border-line-subtle bg-surface-base/60 p-6 text-center text-sm text-body-muted"
+            class="mt-5 rounded-xl border border-dashed border-line-subtle bg-surface-base/70 p-5 text-center text-sm text-body-muted"
           >
             <p class="font-medium text-primary">Loading Theme Editor…</p>
             <p class="mt-2 text-xs">Fetching presets from the development API.</p>
           </div>
-        </details>
+        </section>
       </section>
     </div>
   ) : (
@@ -152,86 +297,226 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
     </script>
   )}
 
+  {authorized && (
+    <script type="module" is:inline>
+      const swatches = Array.from(document.querySelectorAll("[data-token-swatch]"));
+
+      const toReadableColor = (value) => {
+        const rgba = value.match(/^rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\)$/i);
+        if (rgba) {
+          const [, r, g, b, a] = rgba;
+          const hex = `#${[r, g, b].map((v) => Number(v).toString(16).padStart(2, "0")).join("")}`;
+          if (a !== undefined && a !== "" && a !== "1") {
+            const alpha = Math.round(Number(a) * 255)
+              .toString(16)
+              .padStart(2, "0");
+            return `${hex}${alpha}`;
+          }
+          return hex;
+        }
+        return value;
+      };
+
+      const refreshSwatches = () => {
+        const seenValues = new Set();
+        swatches.forEach((swatch) => {
+          const valueEl = swatch.querySelector("[data-token-value]");
+          const dot = swatch.querySelector(".token-swatch__dot");
+          const styleTarget = dot || swatch;
+          const computed = getComputedStyle(styleTarget);
+          const resolvedColor = computed.backgroundColor?.trim() || "";
+          const fallback = getComputedStyle(swatch).getPropertyValue("--swatch-color").trim();
+          const formatted = toReadableColor(
+            resolvedColor && resolvedColor !== "rgba(0, 0, 0, 0)" ? resolvedColor : fallback
+          ).trim();
+          const isDuplicate = formatted ? seenValues.has(formatted) : false;
+          if (formatted) {
+            seenValues.add(formatted);
+          }
+
+          swatch.dataset.value = formatted || fallback || resolvedColor;
+          if (valueEl) {
+            valueEl.textContent = isDuplicate ? "" : formatted || "—";
+            valueEl.classList.toggle("is-duplicate", isDuplicate);
+          }
+        });
+      };
+
+      refreshSwatches();
+      const docObserver = new MutationObserver(refreshSwatches);
+      docObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["style", "data-theme"] });
+
+      const preview = document.querySelector("[data-theme-preview]");
+      if (preview) {
+        const previewObserver = new MutationObserver(refreshSwatches);
+        previewObserver.observe(preview, { attributes: true, subtree: true, attributeFilter: ["style"] });
+      }
+
+      swatches.forEach((swatch) => {
+        swatch.addEventListener("click", async () => {
+          const value = swatch.dataset.value;
+          if (!value) return;
+          try {
+            await navigator.clipboard.writeText(value);
+            swatch.classList.add("copied");
+            setTimeout(() => swatch.classList.remove("copied"), 900);
+          } catch {
+            swatch.classList.add("copied");
+            setTimeout(() => swatch.classList.remove("copied"), 900);
+          }
+        });
+      });
+    </script>
+  )}
+
   <style>
+    :global(html[data-theme-preview="active"]),
+    :global(html[data-theme-preview="active"]) body {
+      --surface-base: var(--preview-background, var(--surface-base));
+      --panel-surface: var(--preview-cardPanelSurface, var(--glass-surface, var(--surface-base)));
+      --panel-border: var(--preview-cardPanelBorder, var(--glass-border, var(--border-subtle)));
+      --text-body: var(--preview-textBody, var(--text-body, #f5f5f5));
+      --text-heading: var(--preview-textHeading, var(--text-heading, #ffffff));
+      --text-muted: var(--preview-textMuted, var(--text-muted, #d1d5db));
+      background: color-mix(in srgb, var(--surface-base) 92%, transparent 8%);
+      color: var(--text-body);
+    }
+
     [data-theme-preview] {
-      /* Map preview values from the editor onto the preview block */
-      --glass-surface: var(--preview-glassSurface, var(--glass-surface));
-      --glass-surface-strong: var(--preview-glassSurfaceStrong, var(--glass-surface-strong));
-      --glass-card: var(--preview-glassCard, var(--glass-card));
-      --glass-hover: var(--preview-glassHover, var(--glass-hover));
-      --glass-border: var(--preview-glassBorder, var(--glass-border));
-      --glass-border-strong: var(--preview-glassBorderStrong, var(--glass-border-strong));
-      --glass-highlight: var(--preview-glassHighlight, var(--glass-highlight));
-      --glass-glow: var(--preview-glassGlow, var(--glass-glow));
-      --card-panel-surface: var(--preview-cardPanelSurface, var(--card-panel-surface));
-      --card-panel-surface-strong: var(--preview-cardPanelSurfaceStrong, var(--card-panel-surface-strong));
-      --card-panel-border: var(--preview-cardPanelBorder, var(--card-panel-border));
-      --card-panel-border-strong: var(--preview-cardPanelBorderStrong, var(--card-panel-border-strong));
-      --card-panel-border-soft: var(--preview-cardPanelBorderSoft, var(--card-panel-border-soft));
-      --header-background: var(--preview-headerBackground, var(--header-background));
-      --header-border: var(--preview-headerBorder, var(--header-border));
+      --page-shell-bg: var(--preview-background, var(--surface-base));
+      --panel-surface: var(--preview-cardPanelSurface, var(--glass-surface));
+      --panel-surface-strong: var(--preview-cardPanelSurfaceStrong, var(--glass-surface-strong));
+      --panel-strong: var(--preview-surfacePlain, var(--glass-surface-strong));
+      --panel-border: var(--preview-cardPanelBorder, var(--glass-border));
+      --card-border-strong: var(--preview-cardPanelBorderStrong, var(--glass-border-strong));
+      --header-background: var(--preview-headerBackground, var(--glass-surface));
+      --header-border: var(--preview-headerBorder, var(--glass-border));
       --header-text: var(--preview-headerText, var(--text-strong));
-      --footer-background: var(--preview-footerBackground, var(--footer-background));
-      --footer-border: var(--preview-footerBorder, var(--footer-border));
       --text-body: var(--preview-textBody, var(--text-body));
-      --text-accent: var(--preview-textAccent, var(--text-accent));
-      --text-primary: var(--preview-textPrimary, var(--text-primary));
-      --text-secondary: var(--preview-textSecondary, var(--text-secondary));
-      --text-tertiary: var(--preview-textTertiary, var(--text-tertiary));
-      --text-muted: var(--preview-textMuted, var(--text-muted));
-      --text-heading: var(--preview-textHeading, var(--text-heading));
-      --link-color: var(--preview-linkColor, var(--link-color));
-      color: var(--preview-textPrimary, var(--text-primary));
+      --text-heading-token: var(--preview-textHeading, var(--text-heading));
+      --text-body-token: var(--preview-textPrimary, var(--text-primary));
+      --text-muted-token: var(--preview-textMuted, var(--text-muted));
+      --link-color-token: var(--preview-linkColor, var(--link-color));
+      --brand-accent: var(--preview-primary, var(--text-accent));
+      --brand-secondary: var(--preview-textAccent, var(--text-accent));
+      --cta: var(--preview-primary, var(--text-accent));
+      --cta-hover: color-mix(in srgb, var(--cta) 82%, white 18%);
+      --glass-hover-token: var(--preview-glassHover, var(--glass-hover));
+      --entity-surface: var(--preview-entityCardSurfaceTop, var(--glass-surface));
+      --entity-surface-strong: var(--preview-entityCardSurfaceBottom, var(--glass-surface-strong));
+      --entity-border: var(--preview-entityCardBorder, var(--glass-border-strong));
+      --entity-glow: var(--preview-entityCardGlow, var(--glass-glow));
+      --entity-tile-bg: color-mix(in srgb, var(--entity-surface) 82%, transparent);
+      --admin-surface: var(--preview-adminSurface, var(--admin-surface-base, var(--surface-base)));
+      --admin-accent-token: var(--preview-adminAccent, var(--admin-accent));
+      --focus-ring-token: var(--preview-focusRingColor, var(--focus-ring));
+      --status-success: var(--preview-success, #16a34a);
+      --status-warning: var(--preview-warning, #f59e0b);
+      --status-error: var(--preview-error, #ef4444);
+      color: var(--text-body-token);
     }
 
-    [data-theme-preview] .preview-header {
-      background: var(--header-background, var(--glass-surface));
-      border-color: var(--header-border, var(--glass-border));
-      color: var(--header-text, var(--text-strong));
+    .theme-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: color-mix(in srgb, var(--page-shell-bg) 95%, black 5%);
+      box-shadow: 0 18px 48px -28px hsl(var(--neutral-9) / 0.5);
     }
 
-    [data-theme-preview] .preview-hero {
-      background: var(--glass-surface);
-      border-color: var(--glass-border);
-      box-shadow: var(--glass-shadow-strong, var(--shadow-soft));
-      color: var(--text-body);
-    }
-
-    [data-theme-preview] .preview-card {
-      background: var(--glass-card);
-      border-color: var(--glass-border-strong, var(--glass-border));
-      box-shadow: var(--glass-shadow-soft, var(--shadow-soft));
-      color: var(--text-body);
-    }
-
-    [data-theme-preview] .preview-avatar {
-      background: var(--glass-surface-strong);
-      border-color: var(--glass-border);
-    }
-
-    [data-theme-preview] .preview-chips {
-      border-color: var(--glass-border);
-      background: color-mix(in srgb, var(--glass-surface) 92%, transparent 8%);
-    }
-
-    [data-theme-preview] .preview-chip {
+    .theme-cta {
       display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
-      padding: 0.35rem 0.75rem;
-      border-radius: 999px;
-      border: 1px solid var(--glass-border-strong, var(--glass-border));
-      background: color-mix(in srgb, var(--glass-hover) 88%, transparent 12%);
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.85rem 1rem;
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--brand-accent) 92%, white 8%);
+      color: #0c0618;
+      font-weight: 700;
       text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border: 1px solid color-mix(in srgb, var(--brand-accent) 45%, white 14%);
+      box-shadow: 0 8px 30px color-mix(in srgb, var(--brand-accent) 45%, transparent);
+      transition: transform var(--dur-med) var(--ease-out-curve), box-shadow var(--dur-med) var(--ease-out-curve);
+    }
+
+    .theme-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 40px color-mix(in srgb, var(--brand-accent) 55%, transparent);
+    }
+
+    .token-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    }
+
+    .token-section {
+      border: 1px solid var(--panel-border);
+      background: color-mix(in srgb, var(--panel-surface) 86%, transparent);
+      border-radius: 14px;
+      padding: 1rem;
+      box-shadow: 0 16px 36px -28px hsl(var(--neutral-9) / 0.55);
+    }
+
+    .token-section__swatches {
+      margin-top: 0.75rem;
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .token-swatch {
+      width: 100%;
+      text-align: left;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 0.85rem;
+      border-radius: 12px;
+      border: 1px solid color-mix(in srgb, var(--panel-border) 80%, transparent);
+      background: color-mix(in srgb, var(--swatch-color) 85%, transparent);
+      cursor: pointer;
+      transition: transform var(--dur-fast) var(--ease-out-curve), box-shadow var(--dur-fast) var(--ease-out-curve);
       color: var(--text-body);
     }
 
-    /* Override admin text utility defaults inside preview so theme tokens win */
-    [data-theme-preview] .text-body-strong {
-      color: var(--preview-textHeading, var(--text-heading)) !important;
+    .token-swatch:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 30px -18px hsl(var(--neutral-9) / 0.6);
+    }
+
+    .token-swatch__dot {
+      height: 2.25rem;
+      width: 2.25rem;
+      border-radius: 10px;
+      border: 1px solid color-mix(in srgb, var(--panel-border) 70%, transparent);
+      background: var(--swatch-color);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, #fff 20%, transparent);
+      flex-shrink: 0;
+    }
+
+    .token-swatch__name {
+      display: block;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text-heading-token);
+    }
+
+    .token-swatch__value {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted-token);
+      word-break: break-all;
+      min-height: 1.1em;
+    }
+
+    .token-swatch.copied {
+      box-shadow: 0 0 0 2px var(--focus-ring-token);
+    }
+
+    .token-swatch__value.is-duplicate {
+      visibility: hidden;
     }
   </style>
 </Base>

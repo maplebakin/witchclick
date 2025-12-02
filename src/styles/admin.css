@@ -6,40 +6,74 @@
    =========================================================================== */
 
 /* ---------------------------------------------------------------------------
-   Text Colors - WCAG AA Compliant on White Backgrounds
+   Theme-aware admin tokens with WCAG fallbacks
+   --------------------------------------------------------------------------- */
+:root {
+  /* Normalize runtime HSL component tokens into real colors before mixing */
+  --admin-base-text-strong: hsl(var(--text-heading, var(--text-strong, 0 0% 100% / 1)));
+  --admin-base-text-body: hsl(var(--text-body, 0 0% 16% / 1));
+  --admin-base-text-muted: hsl(var(--text-muted, 0 0% 42% / 1));
+
+  /* Text aligns to runtime theme tokens; mixed with dark fallback to avoid white-on-white */
+  --admin-text-strong: color-mix(in srgb, var(--admin-base-text-strong) 35%, #0f172a 65%);
+  --admin-text-body: color-mix(in srgb, var(--admin-base-text-body) 35%, #0f172a 65%);
+  --admin-text-muted: color-mix(in srgb, var(--admin-base-text-muted) 40%, #0f172a 60%);
+  --admin-text-subtle: color-mix(in srgb, var(--admin-base-text-muted) 45%, #0f172a 55%);
+  --admin-text-muted-strong: color-mix(in srgb, var(--admin-base-text-muted) 42%, #0f172a 58%);
+  --admin-text-muted-soft: color-mix(in srgb, var(--admin-base-text-muted) 48%, #0f172a 52%);
+  --admin-text-muted-subtle: color-mix(in srgb, var(--admin-base-text-muted) 52%, #0f172a 48%);
+
+  /* Surfaces pull from card/panel tokens set by the theme editor */
+  --admin-surface-base: hsl(var(--card-panel-surface, var(--surface-base, 0 0% 100% / 1)));
+  --admin-surface-muted: hsl(var(--card-panel-surface-strong, var(--surface-card, var(--surface-panel, 0 0% 96% / 1))));
+  --admin-border-subtle: hsl(var(--card-panel-border, var(--border-subtle, 0 0% 86% / 1)));
+  --admin-border-strong: hsl(var(--card-panel-border-strong, var(--border-strong, 0 0% 70% / 1)));
+  --admin-focus: var(--focus-ring-color, var(--focus-ring, #2563eb));
+}
+
+/* ---------------------------------------------------------------------------
+   Text Colors - WCAG AA Compliant
    --------------------------------------------------------------------------- */
 
 .text-body-strong {
-  color: #111827 !important; /* gray-900 - 14.8:1 contrast */
+  color: var(--admin-text-strong) !important;
 }
 
 .text-body {
-  color: #1f2937 !important; /* gray-800 - 12.6:1 contrast */
+  color: var(--admin-text-body) !important;
 }
 
 .text-body-muted {
-  color: #374151 !important; /* gray-700 - 8.6:1 contrast */
+  color: var(--admin-text-muted) !important;
 }
 
 .text-body-subtle {
-  color: #4b5563 !important; /* gray-600 - 7:1 contrast */
+  color: var(--admin-text-subtle) !important;
 }
 
 .text-muted-strong {
-  color: #334155 !important; /* slate-700 - 9.7:1 contrast */
+  color: var(--admin-text-muted-strong) !important;
 }
 
 .text-muted {
-  color: #475569 !important; /* slate-600 - 7.5:1 contrast */
+  color: var(--admin-text-muted-soft) !important;
 }
 
 .text-muted-subtle {
-  color: #64748b !important; /* slate-500 - 4.8:1 contrast */
+  color: var(--admin-text-muted-subtle) !important;
+}
+
+.text-primary {
+  color: var(--text-accent, #7c3aed) !important;
+}
+
+.text-secondary {
+  color: var(--text-secondary, var(--text-muted, #475569)) !important;
 }
 
 /* Small Text - Higher Contrast Required */
 .text-xs {
-  color: #374151 !important; /* gray-700 - higher contrast for small text */
+  color: var(--admin-text-muted) !important;
 }
 
 /* Inverse Text - For Dark Backgrounds */
@@ -76,19 +110,24 @@
   color: #b91c1c !important; /* red-700 - 5.9:1 on white */
 }
 
+.bg-primary {
+  background-color: var(--text-accent, #7c3aed) !important;
+  color: hsl(var(--text-heading, var(--text-strong, 0 0% 100% / 1))) !important;
+}
+
 /* ---------------------------------------------------------------------------
    Button & Surface Backgrounds
    --------------------------------------------------------------------------- */
 
 /* Primary Action Buttons */
 .bg-surface-accent-bolder {
-  background-color: #7c3aed !important; /* purple-600 */
-  color: #ffffff !important;
+  background-color: color-mix(in srgb, var(--text-accent, #7c3aed) 92%, transparent 8%) !important;
+  color: hsl(var(--text-strong, 0 0% 100% / 1)) !important;
 }
 
 .bg-surface-accent-deep {
-  background-color: #6d28d9 !important; /* purple-700 */
-  color: #ffffff !important;
+  background-color: color-mix(in srgb, var(--text-accent, #6d28d9) 92%, transparent 8%) !important;
+  color: hsl(var(--text-strong, 0 0% 100% / 1)) !important;
 }
 
 .hover\:bg-surface-accent-deep:hover {
@@ -97,12 +136,12 @@
 
 /* Success Buttons */
 .bg-surface-success {
-  background-color: #16a34a !important; /* green-600 */
+  background-color: var(--success, #16a34a) !important;
   color: #ffffff !important;
 }
 
 .bg-surface-success-strong {
-  background-color: #15803d !important; /* green-700 */
+  background-color: color-mix(in srgb, var(--success, #15803d) 90%, black 10%) !important;
   color: #ffffff !important;
 }
 
@@ -112,12 +151,12 @@
 
 /* Info Buttons */
 .bg-surface-info {
-  background-color: #2563eb !important; /* blue-600 */
+  background-color: var(--info, #2563eb) !important;
   color: #ffffff !important;
 }
 
 .bg-surface-info-strong {
-  background-color: #1d4ed8 !important; /* blue-700 */
+  background-color: color-mix(in srgb, var(--info, #1d4ed8) 90%, black 10%) !important;
   color: #ffffff !important;
 }
 
@@ -134,19 +173,19 @@
 }
 
 .bg-surface-neutral-soft {
-  background-color: #f9fafb !important; /* gray-50 */
+  background-color: color-mix(in srgb, var(--admin-surface-base, var(--surface-base, #f9fafb)) 92%, transparent 8%) !important;
 }
 
 .bg-surface-success-soft {
-  background-color: #f0fdf4 !important; /* green-50 */
+  background-color: color-mix(in srgb, var(--success, #16a34a) 12%, white 88%) !important;
 }
 
 .bg-surface-danger-soft {
-  background-color: #fef2f2 !important; /* red-50 */
+  background-color: color-mix(in srgb, var(--error, #b91c1c) 12%, white 88%) !important;
 }
 
 .bg-surface-emerald-soft {
-  background-color: #ecfdf5 !important; /* emerald-50 */
+  background-color: color-mix(in srgb, var(--success, #16a34a) 10%, white 90%) !important;
 }
 
 /* ---------------------------------------------------------------------------
@@ -154,23 +193,23 @@
    --------------------------------------------------------------------------- */
 
 .border-line-neutral {
-  border-color: #e5e7eb !important; /* gray-200 */
+  border-color: var(--admin-border-subtle, var(--border-subtle, #e5e7eb)) !important;
 }
 
 .border-line-slate {
-  border-color: #e2e8f0 !important; /* slate-200 */
+  border-color: color-mix(in srgb, var(--admin-border-subtle, var(--border-subtle, #e2e8f0)) 92%, transparent 8%) !important;
 }
 
 .border-line-danger {
-  border-color: #fecaca !important; /* red-200 */
+  border-color: color-mix(in srgb, var(--error, #b91c1c) 25%, transparent 75%) !important;
 }
 
 .border-line-success-soft {
-  border-color: #bbf7d0 !important; /* green-200 */
+  border-color: color-mix(in srgb, var(--success, #16a34a) 22%, transparent 78%) !important;
 }
 
 .border-line-emerald {
-  border-color: #a7f3d0 !important; /* emerald-200 */
+  border-color: color-mix(in srgb, var(--success, #16a34a) 28%, transparent 72%) !important;
 }
 
 /* ---------------------------------------------------------------------------
@@ -180,9 +219,9 @@
 input,
 select,
 textarea {
-  color: #111827 !important; /* gray-900 - 14.8:1 contrast */
-  background-color: #ffffff !important;
-  border-color: #d1d5db !important; /* gray-300 */
+  color: var(--admin-text-body, #111827) !important;
+  background-color: var(--admin-surface-base, #ffffff) !important;
+  border-color: var(--admin-border-subtle, #d1d5db) !important;
 }
 
 /* Select Dropdown Styling */
@@ -196,15 +235,15 @@ select {
 }
 
 select option {
-  background-color: #ffffff !important;
-  color: #111827 !important;
+  background-color: var(--admin-surface-base, #ffffff) !important;
+  color: var(--admin-text-body, #111827) !important;
 }
 
 /* Placeholder Text */
 input::placeholder,
 select::placeholder,
 textarea::placeholder {
-  color: #6b7280 !important; /* gray-500 - 4.6:1 contrast */
+  color: var(--admin-text-muted, #6b7280) !important;
   opacity: 1;
 }
 
@@ -212,8 +251,8 @@ textarea::placeholder {
 input:disabled,
 select:disabled,
 textarea:disabled {
-  color: #9ca3af !important; /* gray-400 */
-  background-color: #f3f4f6 !important; /* gray-100 */
+  color: color-mix(in srgb, var(--admin-text-muted, #9ca3af) 80%, white 20%) !important;
+  background-color: color-mix(in srgb, var(--admin-surface-base, #f3f4f6) 90%, white 10%) !important;
   cursor: not-allowed;
 }
 
@@ -221,16 +260,16 @@ textarea:disabled {
 input:hover:not(:disabled),
 select:hover:not(:disabled),
 textarea:hover:not(:disabled) {
-  border-color: #9ca3af !important; /* gray-400 */
+  border-color: var(--admin-border-strong, #9ca3af) !important;
 }
 
 /* Focus States */
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: #7c3aed !important; /* purple-600 */
+  border-color: var(--admin-focus, #7c3aed) !important;
   outline: none !important;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--admin-focus, #7c3aed) 22%, transparent 78%) !important;
 }
 
 /* ---------------------------------------------------------------------------
@@ -238,7 +277,10 @@ textarea:focus {
    --------------------------------------------------------------------------- */
 
 button {
-  color: #111827 !important;
+  color: var(--admin-text-strong, #111827) !important;
+  border-radius: 0.75rem;
+  padding: 0.45rem 0.85rem;
+  font-weight: 600;
 }
 
 button:disabled {
@@ -249,8 +291,35 @@ button:disabled {
 /* Focus Visible States */
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid #7c3aed !important; /* purple-600 */
+  outline: 2px solid var(--admin-focus, var(--focus-ring, #7c3aed)) !important;
   outline-offset: 2px;
+}
+
+/* Primary/Secondary Buttons */
+.admin-btn-primary {
+  background: color-mix(in srgb, var(--text-accent, #7c3aed) 92%, transparent 8%) !important;
+  color: hsl(var(--text-heading, var(--text-strong, 0 0% 100% / 1))) !important;
+  border: 1px solid color-mix(in srgb, var(--text-accent, #7c3aed) 45%, transparent 55%) !important;
+  box-shadow: var(--glass-shadow-soft, 0 10px 25px -18px rgba(15, 23, 42, 0.35)) !important;
+}
+
+.admin-btn-primary:hover,
+.admin-btn-primary:focus-visible {
+  background: color-mix(in srgb, var(--text-accent, #7c3aed) 86%, hsl(var(--text-strong, 0 0% 100% / 1)) 14%) !important;
+  border-color: color-mix(in srgb, var(--text-accent, #7c3aed) 60%, transparent 40%) !important;
+}
+
+.admin-btn-secondary {
+  background: color-mix(in srgb, var(--admin-surface-base, var(--surface-base, #ffffff)) 92%, transparent 8%) !important;
+  color: var(--admin-text-body, var(--text-body, #1f2937)) !important;
+  border: 1px solid color-mix(in srgb, var(--admin-border-subtle, var(--border-subtle, #d1d5db)) 85%, transparent 15%) !important;
+  box-shadow: var(--glass-shadow-soft, 0 8px 20px -16px rgba(15, 23, 42, 0.25)) !important;
+}
+
+.admin-btn-secondary:hover,
+.admin-btn-secondary:focus-visible {
+  border-color: color-mix(in srgb, var(--admin-border-strong, var(--border-strong, #9ca3af)) 75%, transparent 25%) !important;
+  background: color-mix(in srgb, var(--glass-hover, var(--admin-surface-muted, #f3f4f6)) 92%, transparent 8%) !important;
 }
 
 /* ---------------------------------------------------------------------------
@@ -267,33 +336,33 @@ a:focus-visible {
 }
 
 .admin-badge--success {
-  background-color: #dcfce7; /* green-100 */
-  color: #166534; /* green-800 - 7.3:1 contrast */
-  border: 1px solid #86efac; /* green-300 */
+  background-color: color-mix(in srgb, var(--success, #16a34a) 16%, white 84%);
+  color: color-mix(in srgb, var(--success, #166534) 90%, black 10%);
+  border: 1px solid color-mix(in srgb, var(--success, #16a34a) 35%, transparent 65%);
 }
 
 .admin-badge--warning {
-  background-color: #fef3c7; /* amber-100 */
-  color: #92400e; /* amber-800 - 8:1 contrast */
-  border: 1px solid #fcd34d; /* amber-300 */
+  background-color: color-mix(in srgb, var(--warning, #f59e0b) 18%, white 82%);
+  color: color-mix(in srgb, var(--warning, #92400e) 92%, black 8%);
+  border: 1px solid color-mix(in srgb, var(--warning, #f59e0b) 38%, transparent 62%);
 }
 
 .admin-badge--danger {
-  background-color: #fee2e2; /* red-100 */
-  color: #991b1b; /* red-800 - 8.3:1 contrast */
-  border: 1px solid #fca5a5; /* red-300 */
+  background-color: color-mix(in srgb, var(--error, #ef4444) 18%, white 82%);
+  color: color-mix(in srgb, var(--error, #991b1b) 92%, black 8%);
+  border: 1px solid color-mix(in srgb, var(--error, #ef4444) 38%, transparent 62%);
 }
 
 .admin-badge--info {
-  background-color: #dbeafe; /* blue-100 */
-  color: #1e40af; /* blue-800 - 7:1 contrast */
-  border: 1px solid #93c5fd; /* blue-300 */
+  background-color: color-mix(in srgb, var(--info, #2563eb) 16%, white 84%);
+  color: color-mix(in srgb, var(--info, #1e40af) 92%, black 8%);
+  border: 1px solid color-mix(in srgb, var(--info, #2563eb) 35%, transparent 65%);
 }
 
 .admin-badge--neutral {
-  background-color: #f3f4f6; /* gray-100 */
-  color: #374151; /* gray-700 - 8.6:1 contrast */
-  border: 1px solid #d1d5db; /* gray-300 */
+  background-color: color-mix(in srgb, var(--admin-surface-muted, var(--surface-muted, #f3f4f6)) 94%, transparent 6%);
+  color: var(--admin-text-muted, var(--text-muted, #374151));
+  border: 1px solid var(--admin-border-subtle, var(--border-subtle, #d1d5db));
 }
 
 /* ---------------------------------------------------------------------------
@@ -303,14 +372,14 @@ a:focus-visible {
 .admin-section-header {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #111827; /* gray-900 */
+  color: var(--admin-text-strong, #111827);
   margin-bottom: 0.75rem;
 }
 
 .admin-section-subheader {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #4b5563; /* gray-600 */
+  color: var(--admin-text-muted, #4b5563);
   margin-bottom: 0.5rem;
 }
 
@@ -326,27 +395,27 @@ a:focus-visible {
 }
 
 .admin-status--success {
-  background-color: #f0fdf4; /* green-50 */
-  border-color: #86efac; /* green-300 */
-  color: #166534; /* green-800 */
+  background-color: color-mix(in srgb, var(--success, #16a34a) 10%, white 90%);
+  border-color: color-mix(in srgb, var(--success, #16a34a) 38%, transparent 62%);
+  color: color-mix(in srgb, var(--success, #166534) 90%, black 10%);
 }
 
 .admin-status--error {
-  background-color: #fef2f2; /* red-50 */
-  border-color: #fca5a5; /* red-300 */
-  color: #991b1b; /* red-800 */
+  background-color: color-mix(in srgb, var(--error, #ef4444) 10%, white 90%);
+  border-color: color-mix(in srgb, var(--error, #ef4444) 38%, transparent 62%);
+  color: color-mix(in srgb, var(--error, #991b1b) 92%, black 8%);
 }
 
 .admin-status--warning {
-  background-color: #fffbeb; /* amber-50 */
-  border-color: #fcd34d; /* amber-300 */
-  color: #92400e; /* amber-800 */
+  background-color: color-mix(in srgb, var(--warning, #f59e0b) 12%, white 88%);
+  border-color: color-mix(in srgb, var(--warning, #f59e0b) 42%, transparent 58%);
+  color: color-mix(in srgb, var(--warning, #92400e) 90%, black 10%);
 }
 
 .admin-status--info {
-  background-color: #eff6ff; /* blue-50 */
-  border-color: #93c5fd; /* blue-300 */
-  color: #1e40af; /* blue-800 */
+  background-color: color-mix(in srgb, var(--info, #2563eb) 12%, white 88%);
+  border-color: color-mix(in srgb, var(--info, #2563eb) 40%, transparent 60%);
+  color: color-mix(in srgb, var(--info, #1e40af) 92%, black 8%);
 }
 
 /* ---------------------------------------------------------------------------
@@ -360,7 +429,7 @@ h3,
 h4,
 h5,
 h6 {
-  color: #111827 !important; /* gray-900 */
+  color: var(--admin-text-strong, var(--text-heading, #111827)) !important;
 }
 
 /* ---------------------------------------------------------------------------
@@ -368,10 +437,10 @@ h6 {
    --------------------------------------------------------------------------- */
 
 a:not(.admin-nav-link):not(.site-nav__link):not([class*="button"]) {
-  color: #6d28d9; /* purple-700 - 5.2:1 contrast */
+  color: var(--link-color, var(--text-accent, #6d28d9)); /* uses theme link */
   text-decoration: underline;
 }
 
 a:not(.admin-nav-link):not(.site-nav__link):not([class*="button"]):hover {
-  color: #5b21b6; /* purple-800 - 7.1:1 contrast */
+  color: color-mix(in srgb, var(--link-color, var(--text-accent, #6d28d9)) 78%, black 22%);
 }

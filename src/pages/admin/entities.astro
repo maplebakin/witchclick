@@ -80,11 +80,11 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as 
         <div class="mb-4 space-y-2">
           <div class="flex items-center justify-between gap-2">
             <h2 class="text-lg font-semibold">Entity Library</h2>
-            <button id="newBtn" class="rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-white hover:opacity-90">+ New</button>
+            <button id="newBtn" class="admin-btn-primary px-3 py-1.5 text-sm font-semibold">+ New</button>
           </div>
           <p class="text-xs text-body-muted">Search and select to edit, or create new</p>
         </div>
-        <input id="search" placeholder="Search entities..." class="mb-3 w-full rounded-lg border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
+        <input id="search" placeholder="Search entities..." class="mb-3 w-full admin-btn-secondary px-3 py-2 text-sm" />
         <div id="list" class="max-h-[70vh] overflow-auto text-sm"></div>
       </section>
 
@@ -98,22 +98,22 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as 
         <div class="grid gap-3 md:grid-cols-2">
           <label class="block">
             <span class="text-xs font-medium">Type</span>
-            <select id="type" class="mt-1 w-full rounded-lg border px-3 py-2">
+            <select id="type" class="mt-1 w-full admin-btn-secondary px-3 py-2">
               {TYPES.map(t => <option value={t}>{t}</option>)}
             </select>
           </label>
           <label class="block">
             <span class="text-xs font-medium">Slug</span>
-            <input id="slug" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="peppermint" />
+            <input id="slug" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="peppermint" />
             <p class="mt-1 text-xs text-body-faint">Leave blank to auto-fill from Name.</p>
           </label>
           <label class="block md:col-span-2">
             <span class="text-xs font-medium">Name</span>
-            <input id="name" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Peppermint" />
+            <input id="name" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="Peppermint" />
           </label>
           <label class="block md:col-span-2">
             <span class="text-xs font-medium">Summary</span>
-            <textarea id="summary" class="mt-1 h-20 w-full rounded-lg border px-3 py-2"></textarea>
+            <textarea id="summary" class="mt-1 h-20 w-full admin-btn-secondary px-3 py-2"></textarea>
           </label>
         </div>
 
@@ -125,19 +125,19 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as 
           <p class="text-xs text-body-muted">Add key-value pairs for entity-specific metadata (e.g., "chakra: heart", "planet: Venus")</p>
           <div id="props" class="space-y-2"></div>
           <div class="flex gap-2">
-            <button id="addProp" class="rounded-lg border border-line-neutral px-3 py-1.5 text-sm font-medium hover:bg-surface-soft">+ Add Property</button>
-            <button id="suggest" class="rounded-lg border border-primary px-3 py-1.5 text-sm font-medium text-primary hover:bg-surface-soft">✨ Add Suggestions</button>
+            <button id="addProp" class="admin-btn-secondary px-3 py-1.5 text-sm font-medium">+ Add Property</button>
+            <button id="suggest" class="admin-btn-primary px-3 py-1.5 text-sm font-medium">✨ Add Suggestions</button>
           </div>
         </div>
 
         <label class="mt-4 block">
           <span class="text-xs font-medium uppercase tracking-wide text-body-subtle">Related Entities</span>
-          <input id="related" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="fluorite,new-moon,clear-quartz" />
+          <input id="related" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="fluorite,new-moon,clear-quartz" />
           <p class="mt-1 text-xs text-body-muted">Comma-separated slugs of related entities for cross-linking</p>
         </label>
 
         <div class="mt-6 flex gap-3 border-t border-line-subtle pt-4">
-          <button id="save" class="rounded-lg bg-success px-6 py-2.5 text-sm font-semibold text-white hover:opacity-90">💾 Save Entity</button>
+          <button id="save" class="admin-btn-primary px-6 py-2.5 text-sm font-semibold">💾 Save Entity</button>
           <span id="status" class="self-center text-sm text-body-muted"></span>
         </div>
       </section>

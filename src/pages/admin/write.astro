@@ -65,18 +65,18 @@ const site = Astro.url?.origin ?? "";
         <div class="grid gap-3 md:grid-cols-2">
           <label class="block">
             <span class="text-xs font-medium">Title</span>
-            <input id="title" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Tea Ritual for Focus" />
+            <input id="title" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="Tea Ritual for Focus" />
           </label>
           <label class="block">
             <span class="text-xs font-medium">Slug (optional)</span>
-            <input id="slug" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="tea-ritual-for-focus" />
+            <input id="slug" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="tea-ritual-for-focus" />
             <p class="mt-1 text-[11px] text-body-subtle">Leave blank to auto-generate from the title.</p>
             <p id="slugPreview" class="mt-1 text-[11px] font-mono text-body-faint"></p>
             <p id="slugStatus" class="mt-1 text-[11px] text-body-subtle"></p>
           </label>
           <label class="block md:col-span-2">
             <span class="text-xs font-medium">Excerpt</span>
-            <input id="excerpt" class="mt-1 w-full rounded-lg border px-3 py-2" />
+            <input id="excerpt" class="mt-1 w-full admin-btn-secondary px-3 py-2" />
             <p id="excerptHint" class="mt-1 text-[11px] text-body-subtle">
               Aim for around 220 characters so your intro stays readable in feeds. Leave blank to auto-generate from your
               Markdown.
@@ -86,7 +86,7 @@ const site = Astro.url?.origin ?? "";
             <span class="text-xs font-medium">TL;DR (optional)</span>
             <textarea
               id="tldr"
-              class="mt-1 w-full rounded-lg border px-3 py-2"
+              class="mt-1 w-full admin-btn-secondary px-3 py-2"
               rows="2"
               placeholder="One or two sentences that capture the core insight"
             ></textarea>
@@ -96,7 +96,7 @@ const site = Astro.url?.origin ?? "";
           </label>
           <label class="block md:col-span-2">
             <span class="text-xs font-medium">Meta Description</span>
-            <input id="meta" class="mt-1 w-full rounded-lg border px-3 py-2" />
+            <input id="meta" class="mt-1 w-full admin-btn-secondary px-3 py-2" />
             <p id="metaHint" class="mt-1 text-[11px] text-body-subtle">
               Aim for 120–160 characters. Keep it concise, actionable, and include your primary keywords. Leave blank for an
               auto-generated summary.
@@ -117,7 +117,7 @@ const site = Astro.url?.origin ?? "";
           </label>
           <label class="block md:col-span-2">
             <span class="text-xs font-medium">Tags (comma or newline separated, 4–7 ideal)</span>
-            <input id="tags" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="tea, ritual, focus, study" />
+            <input id="tags" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="tea, ritual, focus, study" />
           </label>
           <fieldset class="block md:col-span-2">
             <legend class="text-xs font-medium">Category</legend>
@@ -134,7 +134,7 @@ const site = Astro.url?.origin ?? "";
           </fieldset>
           <label class="block md:col-span-1">
             <span class="text-xs font-medium">Spoons (optional)</span>
-            <select id="spoons" class="mt-1 w-full rounded-lg border px-3 py-2">
+            <select id="spoons" class="mt-1 w-full admin-btn-secondary px-3 py-2">
               <option value="">Auto-detect from length</option>
               <option value="low">Low — quick read</option>
               <option value="medium">Medium — moderate focus</option>
@@ -155,18 +155,18 @@ const site = Astro.url?.origin ?? "";
 
         <label class="mt-4 block">
           <span class="text-xs font-medium">Entities (optional, type:slug, comma-separated)</span>
-          <input id="entities" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="herb:peppermint, crystal:fluorite" />
+          <input id="entities" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="herb:peppermint, crystal:fluorite" />
           <p id="entityValidation" class="mt-2 text-xs"></p>
         </label>
 
         <label class="mt-4 block">
           <span class="text-xs font-medium">Markdown</span>
-          <textarea id="markdown" class="mt-1 h-80 w-full rounded-lg border px-3 py-2 font-mono text-sm" placeholder="## Heading&#10;&#10;Your cozy content here..."></textarea>
+          <textarea id="markdown" class="mt-1 h-80 w-full admin-btn-secondary px-3 py-2 font-mono text-sm" placeholder="## Heading&#10;&#10;Your cozy content here..."></textarea>
         </label>
 
         <div class="mt-4 flex flex-col gap-2 md:flex-row md:items-center">
-          <button id="save" class="rounded-lg bg-surface-accent-bolder px-4 py-2 text-inverse hover:bg-surface-accent-deep">Save</button>
-          <button id="savePublish" class="rounded-lg border px-4 py-2">Save + Publish bundle</button>
+          <button id="save" class="admin-btn-primary px-4 py-2">Save</button>
+          <button id="savePublish" class="admin-btn-secondary px-4 py-2">Save + Publish bundle</button>
           <div id="status" class="text-sm text-body-muted md:flex-1"></div>
         </div>
       </section>

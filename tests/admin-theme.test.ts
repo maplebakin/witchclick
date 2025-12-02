@@ -159,6 +159,44 @@ describe("admin theme dashboard", () => {
     expect(theme.settings.fontScript).toBe("Parisienne");
   });
 
+  it("preserves glass token fields when saving themes", async () => {
+    const payload = {
+      mode: "midnight",
+      label: "Glass Test",
+      settings: {
+        primary: "#331144",
+        accent: "#c58af3",
+        background: "#0f0820",
+        fontSerif: "Literata",
+        fontScript: "Parisienne",
+        glassSurface: "rgba(20, 18, 31, 0.78)",
+        glassBorderStrong: "#d4af37",
+        glassGlow: "#f8f3ff",
+        glassBlur: "22px",
+        glassNoiseOpacity: "0.12",
+      },
+    } as const;
+
+    const saved = await saveThemeRecord(payload);
+    expect(saved.settings.glassSurface).toBe(payload.settings.glassSurface);
+    expect(saved.settings.glassBorderStrong).toBe(payload.settings.glassBorderStrong);
+    expect(saved.settings.glassGlow).toBe(payload.settings.glassGlow);
+    expect(saved.settings.glassBlur).toBe("22px");
+    expect(saved.settings.glassNoiseOpacity).toBe("0.12");
+
+    const themeDir = path.join(tempDir, "content", "themes");
+    const savedFile = JSON.parse(
+      await fs.readFile(path.join(themeDir, `${saved.slug}.json`), "utf8"),
+    );
+    expect(savedFile.settings.glassSurface).toBe(payload.settings.glassSurface);
+    expect(savedFile.settings.glassNoiseOpacity).toBe(payload.settings.glassNoiseOpacity);
+
+    const listing = await listThemes();
+    const roundTrip = listing.items.midnight.find((item) => item.slug === saved.slug);
+    expect(roundTrip?.settings.glassGlow).toBe(payload.settings.glassGlow);
+    expect(roundTrip?.settings.glassBlur).toBe(payload.settings.glassBlur);
+  });
+
   it("resets the theme cache after save, update, and delete operations", async () => {
     const originalNodeEnv = process.env.NODE_ENV;
     const originalVitest = process.env.VITEST;

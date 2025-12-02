@@ -138,16 +138,16 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             <div class="grid gap-3">
               <label class="block">
                 <span class="text-xs font-medium uppercase tracking-wide text-body-subtle">Topic</span>
-                <input id="topic" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="tea ritual for focus" />
+                <input id="topic" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="tea ritual for focus" />
                 <p class="mt-1 text-[11px] text-body-faint">What should this post be about?</p>
               </label>
               <label class="block">
                 <span class="text-xs font-medium">Word count</span>
-                <input id="words" type="number" class="mt-1 w-full rounded-lg border px-3 py-2" value="1200" />
+                <input id="words" type="number" class="mt-1 w-full admin-btn-secondary px-3 py-2" value="1200" />
               </label>
               <label class="block">
                 <span class="text-xs font-medium">Template</span>
-                <select id="mode" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+                <select id="mode" class="mt-1 w-full admin-btn-secondary px-3 py-2 text-sm">
                   <option value="" selected>Standard ritual workflow</option>
                   {presetOptions.map((option) => (
                     <option value={option.key}>{option.label}</option>
@@ -157,7 +157,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               </label>
               <label class="block">
                 <span class="text-xs font-medium">Writing style</span>
-                <select id="style" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+                <select id="style" class="mt-1 w-full admin-btn-secondary px-3 py-2 text-sm">
                   {styleOptions.map((option) => (
                     <option value={option.key} selected={option.key === "cozy"}>
                       {option.label}
@@ -175,10 +175,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
                 </label>
               </div>
               <div class="flex gap-2">
-                <button id="genPrompt" class="rounded-lg bg-surface-accent-bolder px-3 py-2 text-inverse hover:bg-surface-accent-deep">Generate Prompt</button>
-                <button id="copyPrompt" class="rounded-lg border px-3 py-2">Copy</button>
+                <button id="genPrompt" class="admin-btn-primary px-3 py-2 text-sm font-semibold">Generate Prompt</button>
+                <button id="copyPrompt" class="admin-btn-secondary px-3 py-2">Copy</button>
               </div>
-              <textarea id="promptOut" class="mt-2 h-64 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder="Prompt will appear here…"></textarea>
+              <textarea id="promptOut" class="mt-2 h-64 w-full admin-btn-secondary px-3 py-2 font-mono text-xs" placeholder="Prompt will appear here…"></textarea>
               <p class="text-xs text-body-subtle">Paste this into your LLM → get JSON → paste into the box on the right.</p>
             </div>
           </section>
@@ -189,7 +189,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               <p class="text-xs text-body-muted">Paste PostSpec JSON from your AI, then validate, preview, and ingest</p>
             </div>
 
-            <textarea id="spec" class="h-56 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder='Paste the PostSpec v2 JSON here (get it from your LLM using the generated prompt)'></textarea>
+            <textarea id="spec" class="h-56 w-full admin-btn-secondary px-3 py-2 font-mono text-xs" placeholder='Paste the PostSpec v2 JSON here (get it from your LLM using the generated prompt)'></textarea>
 
             <div class="mt-3 space-y-4 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] lg:gap-6">
               <div class="space-y-3">
@@ -202,11 +202,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
                     </div>
                   </div>
                   <div class="flex flex-wrap gap-2">
-                    <button id="validateBtn" class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft">✓ Validate</button>
-                    <button id="previewBtn" class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft">👁 Preview</button>
-                    <button id="ingestBtn" class="rounded-lg bg-success px-4 py-2 text-sm font-semibold text-white hover:opacity-90">💾 Save</button>
-                    <button id="ingestPublishBtn" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:opacity-90">🚀 Publish Now</button>
-                    <button id="clearBtn" class="rounded-lg border border-line-neutral px-4 py-2 text-sm font-medium hover:bg-surface-soft">Clear</button>
+                    <button id="validateBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">✓ Validate</button>
+                    <button id="previewBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">👁 Preview</button>
+                    <button id="ingestBtn" class="admin-btn-primary px-4 py-2 text-sm font-semibold">💾 Save</button>
+                    <button id="ingestPublishBtn" class="admin-btn-primary px-4 py-2 text-sm font-semibold">🚀 Publish Now</button>
+                    <button id="clearBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">Clear</button>
                   </div>
                   <div class="text-xs text-body-muted rounded-lg border border-dashed border-line-subtle bg-surface-base/60 px-3 py-2">
                     <strong>💡 Tip:</strong> Validate first to check for errors, Preview to see the rendered flow. Use the save mode toggle to store drafts without publishing. <a href="/admin/staging" class="text-primary hover:underline">View staged drafts →</a>
@@ -230,11 +230,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
                     <h3 class="text-sm font-semibold text-body-strong">Recent Posts</h3>
                     <p class="text-xs text-body-muted">Quick links to the latest ingestions.</p>
                   </div>
-                  <button type="button" data-recent-refresh class="rounded-lg border border-line-neutral px-3 py-1 text-xs font-semibold hover:bg-surface-soft">↻ Refresh</button>
+                  <button type="button" data-recent-refresh class="admin-btn-secondary px-3 py-1 text-xs font-semibold">↻ Refresh</button>
                 </div>
                 <label class="flex items-center gap-2 text-xs text-body-muted">
                   <span class="sr-only">Filter recent posts</span>
-                  <input type="search" data-recent-filter class="w-full rounded-lg border border-line-neutral px-3 py-1.5 text-sm" placeholder="Filter posts…" />
+                  <input type="search" data-recent-filter class="w-full admin-btn-secondary px-3 py-1.5 text-sm" placeholder="Filter posts…" />
                 </label>
                 <div class="space-y-2" data-recent-list>
                   <div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-body-muted">Fetching recent posts…</div>
@@ -251,7 +251,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             <p class="text-sm text-body-muted">
               The curses generator and archive live in a dedicated dashboard optimized for print/PDF workflows.
             </p>
-            <a href="/admin/curses" class="inline-flex items-center gap-2 rounded-lg bg-surface-accent-bolder px-4 py-2 text-inverse hover:bg-surface-accent-deep">
+            <a href="/admin/curses" class="inline-flex items-center gap-2 admin-btn-primary px-4 py-2 text-sm font-semibold">
               Open Curses Dashboard →
             </a>
           </section>
@@ -350,7 +350,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         function setStatus(msg, ok, warnings, notes, errors, postStubs, slug){
           var el=$('status');
           if (!el) return;
-          var base='rounded-lg border px-3 py-2 text-sm';
+          var base='admin-btn-secondary px-3 py-2 text-sm';
           if (ok === false) {
             el.className = base + ' border-line-danger bg-surface-danger-soft text-danger';
           } else if (ok === true) {
@@ -446,7 +446,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         function setCurseStatus(msg, ok, errors){
           var el = $('curseStatus');
           if (!el) return;
-          var base='rounded-lg border px-3 py-2 text-sm';
+          var base='admin-btn-secondary px-3 py-2 text-sm';
           if (ok === false) {
             el.className = base + ' border-line-danger bg-surface-danger-soft text-danger';
           } else if (ok === true) {

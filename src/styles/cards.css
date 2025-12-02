@@ -10,8 +10,8 @@
 :root {
   /* Card Geometry */
   --card-radius: clamp(1.3rem, 3vw, 1.8rem);
-  --card-hover-translate: -0.4rem;
-  --card-transition: 220ms ease;
+  --card-hover-translate: -0.22rem;
+  --card-transition: 200ms ease;
   --card-focus-offset: 5px;
 
   /* Card Surfaces */
@@ -153,6 +153,7 @@
     box-shadow var(--card-transition),
     border-color var(--card-transition),
     background 260ms ease;
+  background: var(--card-panel-surface);
 }
 
 .card-panel:hover,
@@ -171,6 +172,24 @@
   outline: 2px solid var(--card-focus-outline);
   outline-offset: var(--card-focus-offset);
   box-shadow: var(--card-focus-ring), var(--card-elevation-hover, var(--elevation-tier-2));
+}
+
+.card-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(160% 120% at 12% 10%, color-mix(in srgb, var(--glass-highlight, var(--text-accent)) 24%, transparent 76%), transparent 62%),
+    radial-gradient(140% 110% at 88% 8%, color-mix(in srgb, var(--glass-glow, var(--text-accent)) 18%, transparent 82%), transparent 70%);
+  opacity: 0.24;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transition: opacity var(--card-transition);
+}
+
+.card-panel:hover::before,
+.card-panel:focus-visible::before {
+  opacity: 0.35;
 }
 
 /* ---------------------------------------------------------------------------
@@ -276,16 +295,16 @@
   align-items: center;
   gap: 0.3rem;
   border-radius: 9999px;
-  padding: 0.4rem 0.85rem;
-  font-size: 0.7rem;
+  padding: 0.42rem 0.9rem;
+  font-size: 0.72rem;
   line-height: 1.2;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  background: var(--card-pill-bg, var(--card-tag-bg));
-  border: 1px solid var(--card-pill-border, var(--card-tag-border));
+  background: color-mix(in srgb, var(--card-pill-bg, var(--card-tag-bg)) 92%, transparent 8%);
+  border: 1px solid color-mix(in srgb, var(--card-pill-border, var(--card-tag-border)) 85%, transparent 15%);
   color: var(--card-pill-text, var(--card-tag-text));
-  box-shadow: var(--card-pill-shadow, 0 4px 12px -8px rgba(11, 6, 20, 0.35));
+  box-shadow: var(--card-pill-shadow, 0 6px 16px -10px rgba(11, 6, 20, 0.3));
 }
 
 .card-badge {
@@ -293,7 +312,7 @@
   --card-pill-border: var(--card-badge-border);
   --card-pill-text: var(--card-badge-text);
   text-transform: uppercase;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.1em;
   font-size: 0.7rem;
 }
 
@@ -445,12 +464,12 @@
   display: block;
   object-fit: cover;
   transform: scale(1);
-  transition: transform 280ms ease;
+  transition: transform 220ms ease;
 }
 
 .ritual-card:hover .card-figure__media,
 .ritual-card:focus-visible .card-figure__media {
-  transform: scale(1.03);
+  transform: scale(1.015);
 }
 
 .ritual-card .card-body {
@@ -466,8 +485,8 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.68rem;
-  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--text-subtle) 94%, transparent 6%);
   margin: 0;
@@ -495,17 +514,18 @@
 .ritual-card .card-heading {
   margin: 0;
   font-family: var(--font-heading, var(--font-body));
-  font-size: clamp(1.15rem, 2.6vw, 1.4rem);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: clamp(1.2rem, 2.8vw, 1.5rem);
+  letter-spacing: 0.01em;
+  text-transform: none;
   color: var(--text-strong);
+  line-height: 1.25;
 }
 
 .ritual-card .card-subtle {
   margin: 0;
-  font-size: 0.97rem;
-  line-height: 1.65;
-  color: color-mix(in srgb, var(--text-body) 94%, transparent 6%);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--text-body) 90%, transparent 10%);
 }
 
 .ritual-card .card-tags {

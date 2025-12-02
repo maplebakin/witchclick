@@ -1,12 +1,12 @@
 {
-  "generated": "2025-11-27T16:07:25.270Z",
+  "generated": "2025-11-29T18:52:04.426Z",
   "count": 7,
   "themes": [
     {
       "slug": "cozy-dawn",
       "label": "Cozy Dawn",
       "mode": "dawn",
-      "category": "default"
+      "category": "custom"
     },
     {
       "slug": "golden-harvest",

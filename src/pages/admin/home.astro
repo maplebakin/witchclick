@@ -92,7 +92,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         <section class="rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm">
           <div class="mb-4 flex items-center justify-between">
             <h2 class="text-lg font-semibold text-primary">Testimonials</h2>
-            <button type="button" id="addTestimonialBtn" class="rounded-lg border border-line-neutral px-3 py-1 text-xs font-medium hover:bg-surface-soft">
+            <button type="button" id="addTestimonialBtn" class="admin-btn-secondary px-3 py-1 text-xs font-medium">
               Add Testimonial
             </button>
           </div>
@@ -115,10 +115,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
       </div>
 
       <div class="flex items-center gap-3">
-        <button type="button" id="saveBtn" class="rounded-lg bg-surface-success px-5 py-2.5 text-sm font-medium text-inverse hover:bg-surface-success-strong">
+        <button type="button" id="saveBtn" class="admin-btn-primary px-5 py-2.5 text-sm font-medium">
           Save Homepage
         </button>
-        <button type="button" id="resetBtn" class="rounded-lg border border-line-neutral px-5 py-2.5 text-sm font-medium hover:bg-surface-soft">
+        <button type="button" id="resetBtn" class="admin-btn-secondary px-5 py-2.5 text-sm font-medium">
           Reset
         </button>
         <p class="ml-auto text-sm" data-status></p>

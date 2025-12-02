@@ -669,6 +669,17 @@ export class ThemeEditor {
         previewRoots.push(single);
       }
     }
+
+    // Also bind preview variables to the document element so the page chrome
+    // (nav, buttons, backgrounds) reflects the active palette while editing.
+    const docEl = typeof document !== 'undefined' ? document.documentElement : null;
+    if (docEl) {
+      docEl.dataset.themePreview = 'active';
+      if (!previewRoots.includes(docEl)) {
+        previewRoots.push(docEl);
+      }
+    }
+
     if (!previewRoots.length) return;
 
     const mode = this.state.mode;
@@ -923,18 +934,23 @@ export class ThemeEditor {
     }
   }
 
-  private async save(): Promise<void> {
+  private async persistCurrentForm(options: { silent?: boolean } = {}): Promise<ThemePreset | null> {
+    const { silent = false } = options;
     const data = this.collectFormData();
 
     if (!data.name || !data.slug) {
-      this.setStatus('Please provide a theme name', 'error');
-      return;
+      if (!silent) {
+        this.setStatus('Please provide a theme name', 'error');
+      }
+      return null;
     }
 
     const isUpdate = !!this.state.currentPreset;
 
     try {
-      this.setStatus(isUpdate ? 'Updating theme…' : 'Creating theme…', 'info');
+      if (!silent) {
+        this.setStatus(isUpdate ? 'Updating theme…' : 'Creating theme…', 'info');
+      }
 
       const mode = (data.mode as ThemeMode) || this.state.mode;
 
@@ -958,19 +974,29 @@ export class ThemeEditor {
       }
 
       this.pushState({ ...this.state, mode: result.mode, currentPreset: result });
-      this.setStatus(
-        `✓ ${isUpdate ? 'Updated' : 'Created'} "${result.name}"`,
-        'success',
-        { theme: result.slug, mode: result.mode }
-      );
+      if (!silent) {
+        this.setStatus(
+          `✓ ${isUpdate ? 'Updated' : 'Created'} "${result.name}"`,
+          'success',
+          { theme: result.slug, mode: result.mode }
+        );
+      }
+      return result;
     } catch (error) {
       console.error('Failed to save theme', error);
-      this.setStatus(error instanceof Error ? error.message : 'Failed to save', 'error');
+      if (!silent) {
+        this.setStatus(error instanceof Error ? error.message : 'Failed to save', 'error');
+      }
+      return null;
     }
   }
 
+  private async save(): Promise<void> {
+    await this.persistCurrentForm();
+  }
+
   private async setActive(): Promise<void> {
-    const preset = this.state.currentPreset;
+    let preset = this.state.currentPreset;
     console.log('[ThemeEditor.setActive] currentPreset:', preset?.slug, preset?.name);
     console.log('[ThemeEditor.setActive] currentPreset.variables.background:', preset?.variables.background);
 
@@ -980,6 +1006,17 @@ export class ThemeEditor {
     }
 
     try {
+      // Persist any unsaved form edits before activating
+      this.setStatus('Saving changes…', 'info');
+      const saved = await this.persistCurrentForm({ silent: true });
+      if (saved) {
+        preset = saved;
+      }
+      if (!preset) {
+        this.setStatus('Please save the theme first', 'error');
+        return;
+      }
+
       this.setStatus('Setting active theme…', 'info');
       console.log('[ThemeEditor.setActive] Calling manager.setActive with:', preset.mode, preset.slug);
       await this.manager.setActive(preset.mode, preset.slug);

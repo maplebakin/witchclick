@@ -72,7 +72,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             <div class="grid gap-3">
               <label class="block">
                 <span class="text-xs font-medium">Type</span>
-                <select data-curse-type class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+                <select data-curse-type class="mt-1 w-full admin-btn-secondary px-3 py-2 text-sm">
                   {curseTypeOptions.map((value) => (
                     <option value={value}>{value}</option>
                   ))}
@@ -80,7 +80,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               </label>
               <label class="block">
                 <span class="text-xs font-medium">Target</span>
-                <select data-curse-target class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+                <select data-curse-target class="mt-1 w-full admin-btn-secondary px-3 py-2 text-sm">
                   {curseTargetOptions.map((value) => (
                     <option value={value}>{value}</option>
                   ))}
@@ -88,7 +88,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               </label>
               <label class="block">
                 <span class="text-xs font-medium">Tone</span>
-                <select data-curse-tone class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+                <select data-curse-tone class="mt-1 w-full admin-btn-secondary px-3 py-2 text-sm">
                   {curseToneOptions.map((value) => (
                     <option value={value}>{value}</option>
                   ))}
@@ -96,25 +96,25 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               </label>
               <label class="block">
                 <span class="text-xs font-medium">Topic (optional)</span>
-                <input data-curse-topic class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Boundary-setting for workplace gossip" />
+                <input data-curse-topic class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="Boundary-setting for workplace gossip" />
               </label>
               <label class="block">
                 <span class="text-xs font-medium">Sigil name (optional)</span>
-                <input data-curse-sigil class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Echo Lantern" />
+                <input data-curse-sigil class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="Echo Lantern" />
               </label>
               <label class="block">
                 <span class="text-xs font-medium">Altar item (optional)</span>
-                <input data-curse-altar class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Clear quartz" />
+                <input data-curse-altar class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="Clear quartz" />
               </label>
               <label class="block">
                 <span class="text-xs font-medium">Journaling follow-up (optional)</span>
-                <input data-curse-journal class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="What truth rose when the echo returned?" />
+                <input data-curse-journal class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="What truth rose when the echo returned?" />
               </label>
               <div class="flex gap-2">
-                <button data-curse-generate class="rounded-lg bg-surface-accent-bolder px-3 py-2 text-inverse hover:bg-surface-accent-deep">Generate Prompt</button>
-                <button data-curse-copy class="rounded-lg border px-3 py-2">Copy</button>
+                <button data-curse-generate class="admin-btn-primary px-3 py-2 text-sm">Generate Prompt</button>
+                <button data-curse-copy class="admin-btn-secondary px-3 py-2 text-sm">Copy</button>
               </div>
-              <textarea data-curse-prompt-out class="mt-2 h-60 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder="Prompt will appear here…"></textarea>
+              <textarea data-curse-prompt-out class="mt-2 h-60 w-full admin-btn-secondary px-3 py-2 font-mono text-xs" placeholder="Prompt will appear here…"></textarea>
               <div data-curse-gen-status class="text-xs text-body-muted"></div>
             </div>
           </section>
@@ -124,11 +124,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               <h2 class="text-xl font-semibold">Validate or Ingest CurseSpec JSON</h2>
               <p class="text-xs text-body-muted">Paste raw JSON (no fences). Dry-run validates; ingest writes to <code>archive/curses/</code>.</p>
             </div>
-            <textarea data-curse-spec class="h-56 w-full rounded-lg border px-3 py-2 font-mono text-xs" placeholder='Paste the CurseSpec JSON here'></textarea>
+            <textarea data-curse-spec class="h-56 w-full admin-btn-secondary px-3 py-2 font-mono text-xs" placeholder='Paste the CurseSpec JSON here'></textarea>
             <div class="flex flex-wrap gap-2">
-              <button data-curse-validate class="rounded-lg border px-3 py-2 text-sm">✓ Validate (dry run)</button>
-              <button data-curse-ingest class="rounded-lg bg-surface-success px-3 py-2 text-sm text-inverse hover:bg-surface-success-strong">💾 Ingest to archive</button>
-              <button data-curse-clear class="rounded-lg border px-3 py-2 text-sm">Clear</button>
+              <button data-curse-validate class="admin-btn-secondary px-3 py-2 text-sm">✓ Validate (dry run)</button>
+              <button data-curse-ingest class="admin-btn-primary px-3 py-2 text-sm">💾 Ingest to archive</button>
+              <button data-curse-clear class="admin-btn-secondary px-3 py-2 text-sm">Clear</button>
             </div>
             <div data-curse-ingest-status class="text-sm text-body-muted"></div>
             <div data-curse-summary class="rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[11px] text-body-muted"></div>
