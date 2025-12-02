@@ -1,19 +1,23 @@
 ---
-title: "Severance Ritual: Cut the Cord with Clean Precision"
-slug: "severance-ritual-cut-cord-clean-precision"
-invocation: "May every thread between us dissolve cleanly; may their energy return to its source and mine to me, and may we walk separate paths from this moment forward."
+title: 'Severance Ritual: Cut the Cord with Clean Precision'
+slug: severance-ritual-cut-cord-clean-precision
+invocation: >-
+  May every thread between us dissolve cleanly; may their energy return to its
+  source and mine to me, and may we walk separate paths from this moment
+  forward.
 tags:
-  - "white-magic"
-  - "ethical-curse"
-  - "returning-energy"
-  - "truthwork"
-  - "mirrorcasting"
-  - "clean-cursing"
+  - white-magic
+  - ethical-curse
+  - returning-energy
+  - truthwork
+  - mirrorcasting
+  - clean-cursing
 generator:
-  type: "sever"
-  target: "person"
-  tone: "scathing"
+  type: sever
+  target: person
+  tone: scathing
 specVersion: 1
+category: library
 ---
 
 ## Opening Reflection

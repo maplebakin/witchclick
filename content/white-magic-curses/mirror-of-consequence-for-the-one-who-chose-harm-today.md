@@ -1,19 +1,22 @@
 ---
-title: "Mirror of Consequence for the One Who Chose Harm, Today"
-slug: "mirror-of-consequence-for-the-one-who-chose-harm-today"
-invocation: "May every act of harm, every lie, and every careless choice return to its rightful source, until truth is unavoidable and accountability takes root."
+title: 'Mirror of Consequence for the One Who Chose Harm, Today'
+slug: mirror-of-consequence-for-the-one-who-chose-harm-today
+invocation: >-
+  May every act of harm, every lie, and every careless choice return to its
+  rightful source, until truth is unavoidable and accountability takes root.
 tags:
-  - "white-magic"
-  - "ethical-curse"
-  - "returning-energy"
-  - "truthwork"
-  - "mirrorcasting"
-  - "clean-cursing"
+  - white-magic
+  - ethical-curse
+  - returning-energy
+  - truthwork
+  - mirrorcasting
+  - clean-cursing
 generator:
-  type: "mirror"
-  target: "person"
-  tone: "scathing"
+  type: mirror
+  target: person
+  tone: scathing
 specVersion: 1
+category: library
 ---
 
 ## Opening Reflection

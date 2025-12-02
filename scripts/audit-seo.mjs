@@ -11,7 +11,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 
-const postsDir = path.join(rootDir, 'src/content/posts');
+const contentDirs = [
+  'content/white-magic-curses',
+  'content/posts',
+].map(dir => path.join(rootDir, dir));
 
 function countInternalLinks(markdown) {
   // Count markdown links that point to internal paths
@@ -121,9 +124,15 @@ function main() {
   console.log('🔍 SEO Audit Report\n');
   console.log('=' .repeat(80));
 
-  const files = fs.readdirSync(postsDir)
-    .filter(f => f.endsWith('.md'))
-    .map(f => path.join(postsDir, f));
+  const files = contentDirs.flatMap(dir => {
+    if (!fs.existsSync(dir)) {
+      // It's okay for a content directory not to exist (e.g., /posts is often empty)
+      return [];
+    }
+    return fs.readdirSync(dir)
+      .filter(f => f.endsWith('.md'))
+      .map(f => path.join(dir, f));
+  });
 
   const results = files.map(auditPost);
 

@@ -19,6 +19,7 @@
     "check": "astro check && tsc -p . --noEmit && npm run lint",
     "check:links": "npm run linkcheck",
     "check:prepub": "npm run check && npm run check:links && npm run build:public",
+    "audit:seo": "node scripts/audit-seo.mjs",
     "check:affiliates": "node ./scripts/check-affiliate-ids.mjs",
     "themes:lint": "node ./scripts/themes-lint.mjs",
     "test:e2e": "playwright test",
