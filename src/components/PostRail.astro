@@ -144,30 +144,30 @@ const contentSummary = contentItems.join(' • ');
     width: 100%;
     padding: 1rem 1.25rem;
     border-radius: 1rem;
-    border: 2px solid color-mix(in srgb, var(--color-gold, #d4af37) 45%, transparent 55%);
-    background: color-mix(in srgb, var(--color-night, #120725) 88%, transparent 12%);
+    border: 2px solid color-mix(in srgb, var(--theme-color-gold, #d4af37) 45%, transparent 55%);
+    background: color-mix(in srgb, var(--theme-color-night, #120725) 88%, transparent 12%);
     font-size: 0.875rem;
     font-weight: 600;
-    color: rgba(249, 245, 255, 0.95);
+    color: var(--theme-text-primary, rgba(249, 245, 255, 0.95));
     cursor: pointer;
     transition: all 0.2s ease;
     min-height: 44px; /* Ensure minimum touch target */
   }
 
   .post-rail__mobile-trigger:hover {
-    border-color: rgba(212, 175, 55, 0.6);
-    background: rgba(18, 7, 37, 0.95);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-color: color-mix(in srgb, var(--theme-color-gold, #d4af37) 60%, transparent 40%);
+    background: color-mix(in srgb, var(--theme-color-night, #120725) 95%, transparent 5%);
+    box-shadow: 0 4px 12px var(--theme-glass-shadow-soft, rgba(0, 0, 0, 0.3));
   }
 
   .post-rail__mobile-trigger:focus-visible {
-    outline: 2px solid rgba(212, 175, 55, 0.8);
+    outline: 2px solid var(--theme-focus-ring-color, #d4af37);
     outline-offset: 3px;
   }
 
   :global(.post-rail__mobile-trigger[aria-expanded="true"]) {
-    border-color: color-mix(in srgb, var(--color-gold, #d4af37) 55%, var(--color-iris, var(--color-gold, #d4af37)) 45%);
-    background: color-mix(in srgb, var(--color-night, #120725) 96%, transparent 4%);
+    border-color: color-mix(in srgb, var(--theme-color-gold, #d4af37) 55%, var(--theme-color-iris, var(--theme-color-gold, #d4af37)) 45%);
+    background: color-mix(in srgb, var(--theme-color-night, #120725) 96%, transparent 4%);
   }
 
   .post-rail__trigger-content {
@@ -182,7 +182,7 @@ const contentSummary = contentItems.join(' • ');
     font-size: 0.75rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: rgba(249, 245, 255, 0.95);
+    color: var(--theme-text-primary, rgba(249, 245, 255, 0.95));
   }
 
   .post-rail__trigger-badge {
@@ -190,12 +190,12 @@ const contentSummary = contentItems.join(' • ');
     font-weight: 500;
     letter-spacing: 0.02em;
     text-transform: none;
-    color: rgba(212, 175, 55, 0.85);
+    color: var(--theme-color-gold, rgba(212, 175, 55, 0.85));
   }
 
   .post-rail__trigger-chevron {
     flex-shrink: 0;
-    color: rgba(212, 175, 55, 0.7);
+    color: var(--theme-color-gold, rgba(212, 175, 55, 0.7));
     transition: transform 0.2s ease;
   }
 
@@ -209,8 +209,8 @@ const contentSummary = contentItems.join(' • ');
     gap: 1.5rem;
     border-radius: clamp(1.35rem, 3vw, 1.75rem);
     background:
-      radial-gradient(120% 120% at 8% 10%, color-mix(in srgb, var(--color-iris, var(--color-gold, #d4af37)) 18%, transparent) 0%, transparent 70%),
-      color-mix(in srgb, var(--color-night, #120725) 82%, transparent 18%);
+      radial-gradient(120% 120% at 8% 10%, color-mix(in srgb, var(--theme-color-iris, var(--theme-color-gold, #d4af37)) 18%, transparent) 0%, transparent 70%),
+      color-mix(in srgb, var(--theme-color-night, #120725) 82%, transparent 18%);
     border: 1px solid color-mix(in srgb, var(--color-gold, #d4af37) 28%, var(--color-iris, var(--color-gold, #d4af37)) 22%);
     padding: clamp(1.1rem, 2.5vw, 1.5rem);
     opacity: 0;
@@ -254,7 +254,7 @@ const contentSummary = contentItems.join(' • ');
     padding: 0.9rem 1rem;
     border-radius: 1rem;
     border: 1px solid color-mix(in srgb, var(--color-gold, #d4af37) 25%, transparent 75%);
-    background: var(--surface-card, color-mix(in srgb, var(--color-night, #120725) 70%, transparent 30%));
+    background: var(--theme-surface-card, color-mix(in srgb, var(--theme-color-night, #120725) 70%, transparent 30%));
     color: inherit;
     text-decoration: none;
     transition: transform 160ms ease, border-color 160ms ease,
@@ -263,16 +263,16 @@ const contentSummary = contentItems.join(' • ');
 
   .post-rail__card:hover {
     transform: translateY(-2px) scale(1.01);
-    border-color: color-mix(in srgb, var(--color-gold, #d4af37) 45%, transparent 55%);
-    background: color-mix(in srgb, var(--color-gold, #d4af37) 8%, var(--surface-card, rgba(0, 0, 0, 0.12)) 92%);
-    box-shadow: 0 4px 18px color-mix(in srgb, var(--color-iris, var(--color-gold, #d4af37)) 20%, transparent 80%);
+    border-color: color-mix(in srgb, var(--theme-color-gold, #d4af37) 45%, transparent 55%);
+    background: color-mix(in srgb, var(--theme-color-gold, #d4af37) 8%, var(--theme-surface-card, rgba(0, 0, 0, 0.12)) 92%);
+    box-shadow: 0 4px 18px color-mix(in srgb, var(--theme-color-iris, var(--theme-color-gold, #d4af37)) 20%, transparent 80%);
   }
 
   .post-rail__card:focus-visible {
     transform: translateY(-2px);
-    border-color: var(--border-accent-strong);
-    background: var(--surface-card-hover);
-    outline: 2px solid var(--focus-ring);
+    border-color: var(--theme-border-strong);
+    background: var(--theme-surface-card-hover);
+    outline: 2px solid var(--theme-focus-ring-color);
     outline-offset: 3px;
   }
 
@@ -314,8 +314,8 @@ const contentSummary = contentItems.join(' • ');
     gap: 0.3rem;
     padding: 0.85rem 0.9rem;
     border-radius: 0.95rem;
-    border: 1px solid color-mix(in srgb, var(--color-iris, var(--color-gold, #d4af37)) 22%, transparent 78%);
-    background: color-mix(in srgb, var(--surface-panel, rgba(255, 255, 255, 0.92)) 90%, transparent 10%);
+    border: 1px solid color-mix(in srgb, var(--theme-color-iris, var(--theme-color-gold, #d4af37)) 22%, transparent 78%);
+    background: color-mix(in srgb, var(--theme-surface-panel, rgba(255, 255, 255, 0.92)) 90%, transparent 10%);
     text-decoration: none;
     transition: transform 160ms ease, border-color 160ms ease,
                 background 160ms ease, box-shadow 160ms ease;
@@ -323,16 +323,16 @@ const contentSummary = contentItems.join(' • ');
 
   .post-rail__entity:hover {
     transform: translateX(2px);
-    border-color: color-mix(in srgb, var(--color-gold, #d4af37) 32%, var(--color-iris, var(--color-gold, #d4af37)) 28%);
-    background: color-mix(in srgb, var(--surface-elevated, rgba(255, 255, 255, 0.96)) 92%, transparent 8%);
-    box-shadow: 0 2px 8px color-mix(in srgb, var(--color-iris, var(--color-gold, #d4af37)) 18%, transparent 82%);
+    border-color: color-mix(in srgb, var(--theme-color-gold, #d4af37) 32%, var(--theme-color-iris, var(--theme-color-gold, #d4af37)) 28%);
+    background: color-mix(in srgb, var(--theme-surface-elevated, rgba(255, 255, 255, 0.96)) 92%, transparent 8%);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--theme-color-iris, var(--theme-color-gold, #d4af37)) 18%, transparent 82%);
   }
 
   .post-rail__entity:focus-visible {
     transform: translateX(2px);
-    border-color: var(--border-purple-medium);
-    background: var(--surface-elevated);
-    outline: 2px solid var(--focus-ring);
+    border-color: var(--theme-border-strong);
+    background: var(--theme-surface-elevated);
+    outline: 2px solid var(--theme-focus-ring-color);
     outline-offset: 3px;
   }
 
@@ -364,13 +364,13 @@ const contentSummary = contentItems.join(' • ');
     display: inline-flex;
     gap: 0.4rem;
     align-items: center;
-    color: rgba(249, 245, 255, 0.82);
+    color: var(--theme-text-primary, rgba(249, 245, 255, 0.82));
     text-decoration: none;
   }
 
   .post-rail__toc-item a:hover,
   .post-rail__toc-item a:focus-visible {
-    color: rgba(212, 175, 55, 0.92);
+    color: var(--theme-color-gold, rgba(212, 175, 55, 0.92));
   }
 
   .post-rail__toc-item--nested {
@@ -386,79 +386,79 @@ const contentSummary = contentItems.join(' • ');
     width: 0.4rem;
     height: 0.4rem;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--color-iris, var(--color-gold, #d4af37)) 45%, transparent 55%);
+    background: color-mix(in srgb, var(--theme-color-iris, var(--theme-color-gold, #d4af37)) 45%, transparent 55%);
   }
 
   :root[data-comfort-theme="dawn"] .post-rail__mobile-trigger {
-    background: rgba(253, 247, 238, 0.95);
-    border-color: rgba(155, 134, 200, 0.45);
-    color: rgba(87, 63, 115, 0.95);
+    background: var(--theme-surface-base, rgba(253, 247, 238, 0.95));
+    border-color: var(--theme-color-amethyst, rgba(155, 134, 200, 0.45));
+    color: var(--theme-text-primary, rgba(87, 63, 115, 0.95));
   }
 
   :root[data-comfort-theme="dawn"] .post-rail__mobile-trigger:hover {
-    border-color: rgba(155, 134, 200, 0.65);
-    background: rgba(253, 247, 238, 1);
-    box-shadow: 0 4px 12px rgba(71, 54, 96, 0.15);
+    border-color: var(--theme-color-amethyst, rgba(155, 134, 200, 0.65));
+    background: var(--theme-surface-hover, rgba(253, 247, 238, 1));
+    box-shadow: 0 4px 12px var(--theme-glass-shadow-soft, rgba(71, 54, 96, 0.15));
   }
 
   :global(:root[data-comfort-theme="dawn"] .post-rail__mobile-trigger[aria-expanded="true"]) {
-    border-color: rgba(180, 154, 217, 0.6);
-    background: rgba(252, 248, 242, 1);
+    border-color: var(--theme-color-amethyst, rgba(180, 154, 217, 0.6));
+    background: var(--theme-surface-base, rgba(252, 248, 242, 1));
   }
 
   :root[data-comfort-theme="dawn"] .post-rail__trigger-badge {
-    color: rgba(122, 94, 154, 0.85);
+    color: var(--theme-color-amethyst, rgba(122, 94, 154, 0.85));
   }
 
   :root[data-comfort-theme="dawn"] .post-rail__trigger-chevron {
-    color: rgba(122, 94, 154, 0.7);
+    color: var(--theme-color-amethyst, rgba(122, 94, 154, 0.7));
   }
 
   :root[data-comfort-theme="dawn"] .post-rail__panel {
     background:
-      radial-gradient(120% 120% at 8% 10%, rgba(180, 154, 217, 0.2), transparent 70%),
-      rgba(252, 248, 242, 0.96);
-    border-color: rgba(155, 134, 200, 0.35);
+      radial-gradient(120% 120% at 8% 10%, var(--theme-color-amethyst, rgba(180, 154, 217, 0.2)), transparent 70%),
+      var(--theme-surface-base, rgba(252, 248, 242, 0.96));
+    border-color: var(--theme-color-amethyst, rgba(155, 134, 200, 0.35));
   }
 
   :root[data-comfort-theme="dawn"] .post-rail__card {
-    background: rgba(255, 255, 255, 0.88);
-    border-color: rgba(180, 154, 217, 0.28);
-    color: rgba(58, 40, 84, 0.95);
+    background: var(--theme-surface-card, rgba(255, 255, 255, 0.88));
+    border-color: var(--theme-color-amethyst, rgba(180, 154, 217, 0.28));
+    color: var(--theme-text-primary, rgba(58, 40, 84, 0.95));
   }
 
   :root[data-comfort-theme="dawn"] .post-rail__card:hover,
   :root[data-comfort-theme="dawn"] .post-rail__card:focus-visible {
-    background: rgba(255, 255, 255, 0.98);
-    border-color: rgba(212, 175, 55, 0.4);
+    background: var(--theme-surface-card-hover, rgba(255, 255, 255, 0.98));
+    border-color: var(--theme-color-gold, rgba(212, 175, 55, 0.4));
   }
 
   :root[data-comfort-theme="dawn"] .post-rail__card-excerpt {
-    color: rgba(87, 63, 115, 0.7);
+    color: var(--theme-text-muted, rgba(87, 63, 115, 0.7));
   }
 
   :root[data-comfort-theme="dawn"] .post-rail__card-meta {
-    color: rgba(155, 134, 200, 0.7);
+    color: var(--theme-color-amethyst, rgba(155, 134, 200, 0.7));
   }
 
   :root[data-comfort-theme="dawn"] .post-rail__entity {
-    background: rgba(255, 255, 255, 0.92);
-    border-color: rgba(180, 154, 217, 0.3);
-    color: rgba(58, 40, 84, 0.95);
+    background: var(--theme-surface-panel, rgba(255, 255, 255, 0.92));
+    border-color: var(--theme-color-amethyst, rgba(180, 154, 217, 0.3));
+    color: var(--theme-text-primary, rgba(58, 40, 84, 0.95));
   }
 
   :root[data-comfort-theme="dawn"] .post-rail__entity:hover,
   :root[data-comfort-theme="dawn"] .post-rail__entity:focus-visible {
-    background: rgba(255, 255, 255, 0.98);
-    border-color: rgba(212, 175, 55, 0.35);
+    background: var(--theme-surface-elevated, rgba(255, 255, 255, 0.98));
+    border-color: var(--theme-color-gold, rgba(212, 175, 55, 0.35));
   }
 
   :root[data-comfort-theme="dawn"] .post-rail__entity-description {
-    color: rgba(87, 63, 115, 0.65);
+    color: var(--theme-text-subtle, rgba(87, 63, 115, 0.65));
   }
 
   :root[data-comfort-theme="dawn"] .post-rail__toc-item--nested::before {
-    background: rgba(155, 134, 200, 0.5);
+    background: var(--theme-color-amethyst, rgba(155, 134, 200, 0.5));
   }
 
   @media (min-width: 768px) {
