@@ -2,13 +2,12 @@
 title: 'Yarn Colors for Your Astrological Chart: A Soft Mapping'
 slug: yarn-colors-astrological-chart-signs-nodes-ascendant
 excerpt: >-
-  What if your birth chart could become a palette you could hold in your hands?
-  A way to translate the abstract language of planets and signs into skeins of
-  color, texture, and warmth.
+  What if your birth chart could become a palette you could hold in your hands? A way to translate the abstract language
+  of planets and signs into skeins of color, texture, and warmth.
 metaTitle: 'Yarn Colors for Your Astrological Chart: A Soft Mapping'
 metaDescription: >-
-  Explore yarn colors matched to your sun sign, moon, ascendant, and nodes—a
-  gentle way to weave your chart into something you can touch.
+  Explore yarn colors matched to your sun sign, moon, ascendant, and nodes—a gentle way to weave your chart into
+  something you can touch.
 tags:
   - astrology
   - yarn craft
@@ -22,7 +21,7 @@ outline:
   - 'Nodes and Ascendants: Your Personal Threads'
   - Journaling Prompts
   - Gentle Closing
-wordCount: 1180
+wordCount: 1226
 readingMinutes: 6
 entities: []
 includeAds: true
@@ -37,12 +36,9 @@ internalLinkHints:
   - moon sign
 internalLinks: []
 publishedAt: '2025-11-08T15:27:00.842Z'
-canonicalUrl: >-
-  https://witchclick.space/post/yarn-colors-astrological-chart-signs-nodes-ascendant
-heroImage: >-
-  /images/hero/yarn-colors-astrological-chart-signs-nodes-ascendant/yarn-chart.jpg
-heroImageSrc: >-
-  /images/hero/yarn-colors-astrological-chart-signs-nodes-ascendant/yarn-chart.jpg
+canonicalUrl: 'https://witchclick.space/post/yarn-colors-astrological-chart-signs-nodes-ascendant'
+heroImage: /images/hero/yarn-colors-astrological-chart-signs-nodes-ascendant/yarn-chart.jpg
+heroImageSrc: /images/hero/yarn-colors-astrological-chart-signs-nodes-ascendant/yarn-chart.jpg
 heroAlt: ''
 specVersion: 2
 promptMetadata:
@@ -55,7 +51,6 @@ promptMetadata:
   generatedAt: '2025-11-08T15:27:00.841Z'
 cluster: cozy-witchcraft
 ---
-
 ## Opening Reflection
 
 There's something about holding yarn that feels different from reading words on a screen. The weight of it. The way certain colors make your chest feel open or quiet or alive. I've been thinking about how we try to understand ourselves through astrology—through these abstract symbols and planetary placements—and how sometimes the understanding doesn't quite land until we can touch it.
@@ -103,3 +98,5 @@ So if the traditional Aries red feels wrong for your Aries sun, trust that. If y
 You don't have to make anything with these colors. Sometimes it's enough to gather them, to see your chart spread out in skeins on your table. Your sun, moon, and rising in a little pile. Your nodes as bookends. Maybe you keep them in a basket near where you sit, and on days when you need to remember who you are, you run your fingers through them. This is my fire. This is my water. This is where I've been, and this is where I'm going.
 
 Your chart in color is a map you get to draw and redraw. The yarn is just fiber, the colors just dye. But in your hands, with your intention, they become a way of holding all the contradictions of who you are—the parts that make sense and the parts that don't, the places you've been and the places you're learning to go. Let it be messy. Let it be imperfect. Let it be yours.
+
+Further reading: [The Subtle Spiritual Meaning of a Double Crown Hair Pattern](/post/spiritual-meaning-double-crown-hair-pattern), [Astrology as Neurodivergent Social Pattern Mapper](/post/astrology-neurodivergent-social-pattern-mapper), [Ancestral Fiber Craft Connection Tarot Spread](/post/ancestral-fiber-craft-connection-tarot-spread). Evidence base: [Mindfulness overview (APA)](https://www.apa.org/topics/mindfulness).

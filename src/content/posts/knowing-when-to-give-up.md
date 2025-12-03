@@ -2,14 +2,12 @@
 title: 'Knowing When to Give Up: A Gentle Quitter''s Guide'
 slug: knowing-when-to-give-up
 excerpt: >-
-  When is quitting the kindest, smartest move? This gentle, secular guide offers
-  a 5-minute triage ritual and a deeper closure practice, plus an easy checklist
-  and one clean question.
+  When is quitting the kindest, smartest move? This gentle, secular guide offers a 5-minute triage ritual and a deeper
+  closure practice, plus an easy checklist and one clean question.
 metaTitle: 'Knowing When to Give Up: A Gentle Quitter''s Guide'
 metaDescription: >-
-  A cozy, secular guide to knowing when to give up. Try a 5-minute triage ritual
-  or a deeper closure practice, with accessibility tweaks, a checklist, and one
-  clean question.
+  A cozy, secular guide to knowing when to give up. Try a 5-minute triage ritual or a deeper closure practice, with
+  accessibility tweaks, a checklist, and one clean question.
 tags:
   - release
   - self-kindness
@@ -26,7 +24,7 @@ outline:
   - 'Checklist: Healthy Quit Signals'
   - Safety & Ethics
   - 'Wrap-up: Reflection Prompt'
-wordCount: 1350
+wordCount: 1392
 readingMinutes: 7
 includeAds: true
 includeKofi: false
@@ -184,3 +182,5 @@ This guide is for reflection and everyday decisions. It is not therapy, crisis s
 ## Wrap-up: Reflection Prompt
 
 What becomes possible for Future-You when you release this with care?
+
+Further reading: [Energy Return Ritual: Restore Balance Without Distortion](/post/energy-return-ritual-restore-balance), [When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning](/post/when-everything-feels-pointless), [Heart Healing Ritual for Unfinished Love](/post/heart-healing-ritual-unfinished-love). Evidence base: [Understanding personal boundaries](https://www.apa.org/topics/relationships/boundaries).

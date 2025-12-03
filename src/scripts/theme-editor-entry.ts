@@ -1,6 +1,6 @@
 import { ThemeEditor } from "@/lib/theme-editor";
 import { THEME_SCOPES } from "@/lib/theme-scopes";
-import { ALL_COLOR_VARIABLES, ALL_FONT_VARIABLES } from "@/lib/theme-editor-comprehensive";
+import { ALL_COLOR_VARIABLE_KEYS, ALL_FONT_VARIABLE_KEYS } from "@/lib/theme-variable-keys";
 
 type FontOption = {
   id: string;
@@ -54,22 +54,22 @@ const NON_COLOR_SWATCH = new Set([
 ]);
 
 const LEGACY_FIELDS: Array<{ key: string; label: string; placeholder: string }> = [
-  { key: "primary", label: "Primary", placeholder: "#6b21a8" },
-  { key: "accent", label: "Accent", placeholder: "#d9b2c4" },
-  { key: "background", label: "Background", placeholder: "#0f0820" },
-  { key: "textPrimary", label: "Body Text", placeholder: "#fdfcfe" },
-  { key: "textHeading", label: "Heading", placeholder: "#ffffff" },
-  { key: "textMuted", label: "Muted", placeholder: "#d9b2c4" },
+  { key: "primary", label: "Primary", placeholder: "var(--primary)" },
+  { key: "accent", label: "Accent", placeholder: "var(--text-muted)" },
+  { key: "background", label: "Background", placeholder: "var(--background)" },
+  { key: "textPrimary", label: "Body Text", placeholder: "var(--text-primary)" },
+  { key: "textHeading", label: "Heading", placeholder: "var(--text-heading)" },
+  { key: "textMuted", label: "Muted", placeholder: "var(--text-muted)" },
 ];
 
 const QUICK_EDIT_KEYS = new Set(["primary", "accent", "background", "textPrimary", "textHeading", "textMuted"]);
 
 const PAGE_LAYOUT_FIELDS: Array<{ key: string; label: string; placeholder: string }> = [
-  { key: "background", label: "Page Background", placeholder: "#0f0820" },
-  { key: "headerBackground", label: "Header Background", placeholder: "#120725" },
-  { key: "headerBorder", label: "Header Border", placeholder: "#cc9966" },
-  { key: "footerBackground", label: "Footer Background", placeholder: "#07020f" },
-  { key: "footerBorder", label: "Footer Border", placeholder: "#cc9966" },
+  { key: "background", label: "Page Background", placeholder: "var(--background)" },
+  { key: "headerBackground", label: "Header Background", placeholder: "var(--header-background)" },
+  { key: "headerBorder", label: "Header Border", placeholder: "var(--header-border)" },
+  { key: "footerBackground", label: "Footer Background", placeholder: "var(--footer-background)" },
+  { key: "footerBorder", label: "Footer Border", placeholder: "var(--footer-border)" },
 ];
 
 function toLabel(key: string): string {
@@ -118,7 +118,7 @@ function createColorControl(key: string, label = CUSTOM_LABELS[key] || toLabel(k
   const wrapper = document.createElement("label");
   wrapper.className = "block text-xs font-medium uppercase tracking-wide text-body-muted";
   const isTextOnly = TEXT_ONLY_VARIABLES.has(key);
-  const inputPlaceholder = isTextOnly ? "e.g. 0 22px 55px -32px rgba(...)" : "#000000";
+  const inputPlaceholder = isTextOnly ? "e.g. 0 22px 55px -32px rgba(...)" : "var(--color-ink)";
   wrapper.innerHTML = `
     <span>${label}</span>
     <div class="mt-1 flex items-center gap-2">
@@ -197,7 +197,7 @@ function createGroupControl(label: string, description: string, targetKeys: stri
     </div>
     <input
       type="text"
-      placeholder="#6b21a8"
+      placeholder="var(--primary)"
       class="w-full rounded-lg border border-line-neutral px-3 py-2 font-mono text-xs"
     />
   `;
@@ -355,7 +355,7 @@ function buildComprehensiveControls(container: HTMLElement): void {
   `;
   details.appendChild(summary);
 
-  const availableVariables = new Set<string>(ALL_COLOR_VARIABLES as unknown as string[]);
+  const availableVariables = new Set<string>(ALL_COLOR_VARIABLE_KEYS as unknown as string[]);
 
   const variableGroups: Array<{ title: string; description: string; variables: string[] }> = [
     {
@@ -565,7 +565,7 @@ function buildPreviewSection(container: HTMLElement): void {
         <span class="text-[11px] uppercase tracking-wide text-body-muted">Fonts update in real time</span>
       </div>
       <div class="space-y-3">
-        ${ALL_FONT_VARIABLES.map((key) => `
+        ${ALL_FONT_VARIABLE_KEYS.map((key) => `
           <div class="rounded-lg border border-line-subtle bg-surface-base/80 p-3 shadow-sm" data-preview-font-section="${key}">
             <div class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">${toLabel(key)}</div>
             <p class="mt-1 text-lg" data-preview-font="${key}">The quick brown fox dances softly.</p>
@@ -580,7 +580,7 @@ function buildPreviewSection(container: HTMLElement): void {
         <span class="text-[11px] uppercase tracking-wide text-body-muted">Every editable color token</span>
       </div>
       <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-        ${ALL_COLOR_VARIABLES.filter((key) => !NON_COLOR_SWATCH.has(key)).map((key) => `
+        ${ALL_COLOR_VARIABLE_KEYS.filter((key) => !NON_COLOR_SWATCH.has(key)).map((key) => `
           <div class="space-y-2 rounded-xl border border-line-subtle bg-surface-base/90 p-3 shadow-sm" data-preview-swatch="${key}">
             <div class="h-10 w-full rounded-lg border border-line-subtle" style="background: var(--preview-${key})"></div>
             <div class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">${toLabel(key)}</div>
@@ -646,7 +646,7 @@ function buildEditorShell(root: HTMLElement): void {
       </div>
       <div class="flex flex-wrap items-center gap-2">
         <span data-watcher-status class="rounded-full border border-line-neutral bg-surface-base/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-body-muted">Watcher: --</span>
-        <button id="newThemeBtn" type="button" class="rounded-lg bg-primary px-4 py-1.5 text-sm font-semibold text-white hover:opacity-90">+ New Theme</button>
+        <button id="newThemeBtn" type="button" class="rounded-lg bg-primary px-4 py-1.5 text-sm font-semibold text-inverse hover:opacity-90">+ New Theme</button>
         <button id="undoBtn" type="button" class="rounded-lg border border-line-neutral px-3 py-1.5 text-sm">Undo</button>
         <button id="redoBtn" type="button" class="rounded-lg border border-line-neutral px-3 py-1.5 text-sm">Redo</button>
         <button id="exportBtn" type="button" class="rounded-lg border border-line-neutral px-3 py-1.5 text-sm">Export</button>
@@ -681,7 +681,7 @@ function buildEditorShell(root: HTMLElement): void {
         </button>
         <button type="button" data-create-theme="dawn" class="group space-y-3 rounded-xl border-2 border-line-neutral bg-surface-base p-4 text-left transition hover:border-primary hover:bg-surface-soft">
           <div class="flex items-center gap-3">
-            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-orange-200 text-gray-800 shadow-lg">🌅</div>
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-orange-200 text-inverse-soft shadow-lg">🌅</div>
             <div class="flex-1">
               <div class="font-semibold">Dawn</div>
               <div class="text-xs text-body-muted">Light theme</div>

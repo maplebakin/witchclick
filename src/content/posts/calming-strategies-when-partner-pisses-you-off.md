@@ -1,19 +1,13 @@
 ---
-title: >-
-  When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the
-  Room
+title: 'When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the Room'
 slug: calming-strategies-when-partner-pisses-you-off
 excerpt: >-
-  You can be mad and still be kind to your nervous system. These calm-first
-  strategies help you cool down, speak clearly, and repair without bulldozing
-  your needs.
-metaTitle: >-
-  When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the
-  Room
+  You can be mad and still be kind to your nervous system. These calm-first strategies help you cool down, speak
+  clearly, and repair without bulldozing your needs.
+metaTitle: 'When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the Room'
 metaDescription: >-
-  Angry and activated? Use gentle, practical rituals to cool down, name the real
-  need, and repair without losing yourself. Scripts, checklists, and cozy resets
-  inside.
+  Angry and activated? Use gentle, practical rituals to cool down, name the real need, and repair without losing
+  yourself. Scripts, checklists, and cozy resets inside.
 tags:
   - release
   - relationships
@@ -37,7 +31,7 @@ outline:
   - 'Cozy Reset Breaks: Games, Tea, and Tidying'
   - 'FAQ: What if They Won’t Meet Me Halfway?'
   - 'Closing: Anger Can Be Honest and Loving'
-wordCount: 1024
+wordCount: 1046
 readingMinutes: 5
 includeAds: true
 includeKofi: false
@@ -75,9 +69,7 @@ internalLinkHints:
   - Secular Tarot Spread When You're Seeking a Clear Sign
   - 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
 heroImageSrc: /hero-images/calming-strategies-when-partner-pisses-you-off.png
-heroImageAlt: >-
-  When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the
-  Room — hero image
+heroImageAlt: 'When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the Room — hero image'
 spoonLevel: high
 cluster: rituals-practices
 ---
@@ -226,3 +218,5 @@ You deserve respect during conflict, not just after.
 Anger shows you care about what matters. Aim it with a calm body and clear asks. Tiny repairs today become trust tomorrow.
 
 If you need a gentle re-entry tool for stuck days, try our guide on easing anxiety and re-entering your day. For heavy news or loud seasons, set your space to calm your system before you talk.
+
+Further reading: [When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day](/post/anxiety-from-avoiding-responsibilities-gentle-rituals), [When You're Sick and Home with a Sick Kiddo](/post/sick-parent-sick-child-reflection), [Gentle Heart Ritual for Navigating Atrial Septal Defects](/post/gentle-heart-ritual-for-navigating-atrial-septal-defects). Evidence base: [Mindfulness overview (APA)](https://www.apa.org/topics/mindfulness).

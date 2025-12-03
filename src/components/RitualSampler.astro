@@ -1,0 +1,190 @@
+---
+import { readSettings } from '../utils/settings';
+
+interface Props {
+  title: string;
+  description?: string;
+  reflectionPrompts: string[];
+}
+
+const { title, description, reflectionPrompts } = Astro.props;
+
+// Re-using theming logic from PrintablePlanner.astro for consistency
+const settings = readSettings();
+const activeMidnight = settings.activeThemes?.midnight;
+const activeDawn = settings.activeThemes?.dawn;
+
+const themeAccent = activeMidnight?.primary || activeDawn?.primary || '#B04F5C'; // Use Yule Cranberry Red as default fallback
+const accent = themeAccent;
+
+const currentFontHeading = activeMidnight?.fontHeading || activeDawn?.fontHeading || 'Cinzel';
+const currentFontBody = activeMidnight?.fontSerif || activeDawn?.fontSerif || 'Cormorant Garamond';
+
+const defaultText = '#2C3E50'; // Dark Charcoal
+const defaultMuted = '#6A807E'; // Muted Green-Gray
+const defaultPlainSurface = '#F5F8F7'; // Pale Icy Blue/White
+const defaultCardSurface = '#E8ECEB'; // Slightly darker surface
+const defaultElevatedSurface = '#D9DFDE'; // More elevated surface
+const defaultBorder = '#CCD3D2'; // Pale Border
+const defaultShadow = '0 8px 24px rgba(44, 62, 80, 0.1)'; // Subtle dark shadow
+
+const currentSurfacePlain = activeMidnight?.surfacePlain || activeDawn?.surfacePlain || defaultPlainSurface;
+const currentSurfaceCard = activeMidnight?.cardPanelSurface || activeDawn?.cardPanelSurface || defaultCardSurface;
+const currentSurfaceElevated = activeMidnight?.cardPanelSurfaceStrong || activeDawn?.cardPanelSurfaceStrong || defaultElevatedSurface;
+const currentBorderSubtle = activeMidnight?.cardPanelBorderSoft || activeDawn?.cardPanelBorderSoft || defaultBorder;
+const currentShadowSoft = activeMidnight?.shadowSoft || activeDawn?.shadowSoft || defaultShadow;
+
+const currentText = activeMidnight?.textBody || activeDawn?.textBody || defaultText;
+const currentTextMuted = activeMidnight?.textMuted || activeDawn?.textMuted || defaultMuted;
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} - Ritual Sampler</title>
+    {description && <meta name="description" content={description} />}
+    <style>
+      @page {
+        size: A4;
+        margin: 1in;
+      }
+
+      :root {
+        color-scheme: light;
+        font-family: "${currentFontHeading}", serif;
+        --accent: ${accent};
+        --text: ${currentText};
+        --muted: ${currentTextMuted};
+        --surface-plain: ${currentSurfacePlain};
+        --surface-card: ${currentSurfaceCard};
+        --surface-elevated: ${currentSurfaceElevated};
+        --border-subtle: ${currentBorderSubtle};
+        --shadow-soft: ${currentShadowSoft};
+        --font-heading: "${currentFontHeading}", serif;
+        --font-body: "${currentFontBody}", serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--text);
+        background: var(--surface-plain);
+        font-family: var(--font-body);
+      }
+
+      main {
+        background: var(--surface-card);
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: var(--shadow-soft);
+        min-height: calc(100vh - 2rem);
+      }
+
+      h1 {
+        font-family: var(--font-heading);
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--accent);
+      }
+
+      :global(h2) {
+        font-family: var(--font-heading);
+        font-size: 1.75rem;
+        margin-top: 2.5rem;
+        margin-bottom: 0.75rem;
+        color: var(--text);
+      }
+
+      p {
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+
+      .prompt-card {
+        border: 2px solid var(--border-subtle);
+        border-radius: 16px;
+        padding: 1.25rem;
+        background: var(--surface-elevated);
+        margin-top: 1.5rem;
+      }
+
+      .prompt-card h3 {
+        margin-top: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--accent);
+        font-family: var(--font-body);
+      }
+
+      .note-space {
+        min-height: 80px; /* Space for notes */
+        border: 1px dashed var(--muted);
+        border-radius: 8px;
+        margin-top: 1rem;
+        padding: 0.5rem;
+      }
+
+      .note-label {
+        font-size: 0.8rem;
+        color: var(--muted);
+        margin-top: 0.25rem;
+      }
+
+      footer {
+        margin-top: 2.5rem;
+        font-size: 0.8rem;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      @media print {
+        body {
+          background: white;
+        }
+        main {
+          box-shadow: none;
+          border-radius: 0;
+          padding: 1.25in;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main style={{ "--accent": accent }}>
+      <header>
+        <h1>{title}</h1>
+        {description && <p>{description}</p>}
+        <p class="text-sm">Your personal reflection space for this ritual. Connect, ponder, and grow.</p>
+      </header>
+
+      <section>
+        <h2>Reflection Prompts</h2>
+        {reflectionPrompts.length === 0 ? (
+          <p>No specific reflection prompts found for this ritual. Use the space below for general notes.</p>
+        ) : (
+          reflectionPrompts.map((prompt, index) => (
+            <div class="prompt-card">
+              <h3>Prompt {index + 1}:</h3>
+              <p>{prompt}</p>
+              <div class="note-space"></div>
+              <p class="note-label">Personal Notes:</p>
+            </div>
+          ))
+        )}
+      </section>
+      
+      {reflectionPrompts.length > 0 && (
+        <section class="prompt-card">
+          <h3>General Notes & Insights</h3>
+          <div class="note-space" style={{ minHeight: '160px' }}></div>
+        </section>
+      )}
+
+      <footer>Crafted by Mira Ash, for the WitchClick coven. May your rituals be kind and your spells true.</footer>
+    </main>
+  </body>
+</html>

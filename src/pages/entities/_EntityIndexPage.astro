@@ -4,8 +4,6 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import EntityCard from "../../components/EntityCard.astro";
 import { getTypeMetadata } from "../../data/typeMetadata";
 import { getEntitiesForType } from "../../utils/entityIndex";
-import { resolveTailwindColor, mixColors, toRgba } from "../../utils/color";
-import { toCssVariables } from "../../utils/style";
 
 interface Props {
   type: string;
@@ -21,40 +19,6 @@ function formatTypeLabel(value: string): string {
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
-const accentHex = resolveTailwindColor(metadata.themeColor);
-const accentStrong = mixColors(accentHex, "#1f2937", 0.45);
-const accentMuted = toRgba(accentHex, 0.75);
-const accentBody = mixColors(accentHex, "#334155", 0.65);
-const accentBorder = toRgba(accentHex, 0.35);
-const accentPanelBg = toRgba(accentHex, 0.12);
-const accentPanelBorder = toRgba(accentHex, 0.25);
-const accentIcon = toRgba(accentHex, 0.25);
-const accentVeil = toRgba(accentHex, 0.18);
-
-const sectionSurfaceTop = "rgba(255, 255, 255, 0.96)";
-const sectionSurfaceBottom = "rgba(248, 244, 255, 0.99)";
-
-const sectionVars = toCssVariables({
-  "index-accent": accentHex,
-  "index-accent-strong": accentStrong,
-  "index-accent-muted": accentMuted,
-  "index-accent-body": accentBody,
-  "index-accent-border": accentBorder,
-  "index-accent-panel-bg": accentPanelBg,
-  "index-accent-panel-border": accentPanelBorder,
-  "index-accent-icon": accentIcon,
-  "section-border": accentPanelBorder,
-  "section-glow": accentPanelBg,
-  "section-highlight": accentVeil,
-  "section-veil": toRgba(accentHex, 0.14),
-  "section-text": accentBody,
-  "section-heading": accentStrong,
-  "section-subheading": accentMuted,
-  "section-surface-top": sectionSurfaceTop,
-  "section-surface-bottom": sectionSurfaceBottom,
-});
-
-const sectionStyle = sectionVars ? `${sectionVars};` : undefined;
 const typeLabel = formatTypeLabel(type);
 const lowerTypeLabel = typeLabel.toLowerCase();
 const breadcrumbs = [
@@ -63,26 +27,30 @@ const breadcrumbs = [
   { label: typeLabel },
 ];
 ---
-<Base title={metadata.title} description={metadata.subtitle} ambientColor={accentHex} bodyDataType={type}>
+<Base title={metadata.title} description={metadata.subtitle} bodyDataType={type}>
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
-  <section class="entity-index wc-section-shell" style={sectionStyle}>
-    <header class="entity-header space-y-4">
-      <h1 class="entity-heading text-4xl font-serif leading-tight">
-        <span class="entity-heading-icon" aria-hidden="true">{metadata.icon}</span>
-        <span class="entity-heading-text">{metadata.title}</span>
-        <span class="entity-heading-subtitle">{metadata.subtitle}</span>
+  <section class="max-w-screen-lg mx-auto py-8 md:py-12 px-4">
+    <header class="space-y-4">
+      <h1 class="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 font-serif text-4xl leading-tight text-neutral-800">
+        <span class="text-4xl text-neutral-400" aria-hidden="true">{metadata.icon}</span>
+        <span class="flex flex-col">
+          <span>{metadata.title}</span>
+          <span class="text-base font-normal text-neutral-500">{metadata.subtitle}</span>
+        </span>
       </h1>
-      <p class="entity-intro max-w-3xl text-base leading-relaxed">{metadata.introText}</p>
+      <p class="max-w-3xl text-base leading-relaxed text-neutral-600">{metadata.introText}</p>
     </header>
 
     {entities.length === 0 ? (
-      <p class="entity-empty mt-10 rounded-2xl border border-dashed p-6 text-sm">
-        No {lowerTypeLabel} entries are live yet. Share a note with the
-        <a class="entity-empty-link" href="/about">WitchClick team</a>
-        to request a feature or check back soon for fresh lore.
-      </p>
+      <div class="mt-10 rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 p-6 text-center text-sm text-neutral-600">
+        <p>
+          No {lowerTypeLabel} entries are live yet. Share a note with the
+          <a class="font-semibold text-brand-primary hover:underline" href="/about">WitchClick team</a>
+          to request a feature or check back soon for fresh lore.
+        </p>
+      </div>
     ) : (
-      <div class="entity-grid grid sm:grid-cols-2">
+      <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
         {entities.map((entity) => (
           <EntityCard
             type={entity.type}
@@ -99,80 +67,3 @@ const breadcrumbs = [
     )}
   </section>
 </Base>
-
-<style>
-  .entity-index {
-    width: min(100%, 72rem);
-    margin-inline: auto;
-    display: grid;
-    gap: clamp(2rem, 4vw, 2.75rem);
-  }
-
-  .entity-heading {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    line-height: 1.05;
-  }
-
-  .entity-heading-icon {
-    font-size: 2.75rem;
-    line-height: 1;
-    color: var(--index-accent-icon, rgba(124, 58, 237, 0.25));
-  }
-
-  .entity-heading-text {
-    color: var(--section-heading, var(--index-accent-strong, #4c1d95));
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .entity-heading-subtitle {
-    font-size: 1.05rem;
-    font-weight: 400;
-    color: var(--section-subheading, var(--index-accent-muted, rgba(124, 58, 237, 0.75)));
-  }
-
-  .entity-intro {
-    color: var(--section-text, var(--index-accent-body, #4b5563));
-  }
-
-  .entity-empty {
-    border-color: var(--index-accent-border, rgba(124, 58, 237, 0.35));
-    background: color-mix(in srgb, var(--index-accent-panel-bg, rgba(124, 58, 237, 0.12)) 80%, white 20%);
-    color: var(--section-text, var(--index-accent-body, #4b5563));
-  }
-
-  .entity-empty-link {
-    color: var(--section-heading, var(--index-accent-strong, #4c1d95));
-    font-weight: 600;
-    text-decoration: underline;
-  }
-
- .entity-grid {
-  display: grid;
-  position: relative;
-  gap: clamp(1.75rem, 3vw, 2.35rem);
-  margin-top: clamp(2rem, 4vw, 2.5rem);
-
-  /* 👇 new rules for flexible rows */
-  grid-auto-rows: auto;
-  align-items: start;
-}
-
-  @media (min-width: 640px) {
-    .entity-heading {
-      flex-direction: row;
-      align-items: baseline;
-    }
-
-    .entity-heading-icon {
-      font-size: 2.5rem;
-    }
-
-    .entity-heading-subtitle {
-      margin-left: 1rem;
-    }
-  }
-</style>

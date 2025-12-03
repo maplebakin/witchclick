@@ -117,6 +117,12 @@
             "high"
           ]
         },
+        "reflectionPrompts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "affiliateAnchors": {
           "type": "array",
           "items": {

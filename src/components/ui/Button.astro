@@ -1,0 +1,93 @@
+---
+// src/components/ui/Button.astro
+import type { HTMLAttributes } from 'astro/types';
+
+type Props = {
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  href?: string;
+  class?: string;
+  'aria-label'?: string;
+} & HTMLAttributes<'a'> & HTMLAttributes<'button'>;
+
+const {
+  variant = 'primary',
+  size = 'md',
+  href,
+  class: className,
+  ...props
+} = Astro.props;
+
+const baseClasses = [
+  'inline-flex',
+  'items-center',
+  'justify-center',
+  'rounded-lg',
+  'font-semibold',
+  'text-center',
+  'transition-all',
+  'focus-visible:outline',
+  'focus-visible:outline-2',
+  'focus-visible:outline-offset-2',
+  'focus-visible:outline-focus',
+  'disabled:cursor-not-allowed',
+  'disabled:opacity-60',
+];
+
+const variantClasses = {
+  primary: [
+    'bg-primary',
+    'text-inverse',
+    'border',
+    'border-primary-strong',
+    'hover:bg-primary-strong',
+    'shadow-sm',
+    'hover:shadow-md',
+  ],
+  secondary: [
+    'bg-surface-base',
+    'text-body-strong',
+    'border',
+    'border-line-neutral',
+    'hover:bg-surface-neutral-soft',
+    'hover:border-line-neutral-strong',
+    'shadow-sm',
+    'hover:shadow-md',
+  ],
+  danger: [
+    'bg-danger',
+    'text-inverse',
+    'border',
+    'border-danger-strong',
+    'hover:bg-danger-strong',
+    'shadow-sm',
+  ],
+  ghost: [
+    'bg-transparent',
+    'text-body-strong',
+    'border-transparent',
+    'border',
+    'hover:bg-surface-neutral-soft',
+    'hover:text-primary',
+  ],
+};
+
+const sizeClasses = {
+  sm: 'px-3 py-1.5 text-xs',
+  md: 'px-4 py-2 text-sm',
+  lg: 'px-6 py-3 text-base',
+}
+
+const classes = [
+  ...baseClasses,
+  ...variantClasses[variant],
+  ...sizeClasses[size],
+  className,
+].join(' ');
+
+const Tag = href ? 'a' : 'button';
+---
+
+<Tag class={classes} href={href} {...props}>
+  <slot />
+</Tag>

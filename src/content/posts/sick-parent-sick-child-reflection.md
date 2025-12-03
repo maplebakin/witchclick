@@ -2,14 +2,12 @@
 title: When You're Sick and Home with a Sick Kiddo
 slug: sick-parent-sick-child-reflection
 excerpt: >-
-  When you're both under the weather, the usual rules dissolve. This reflection
-  explores the strange tenderness of being sick together—and what it asks of you
-  when you have nothing left to give.
+  When you're both under the weather, the usual rules dissolve. This reflection explores the strange tenderness of being
+  sick together—and what it asks of you when you have nothing left to give.
 metaTitle: When You're Sick and Home with a Sick Kiddo
 metaDescription: >-
-  A gentle reflection on caring for yourself and a sick child
-  simultaneously—exploring the tender exhaustion and quiet moments of shared
-  rest.
+  A gentle reflection on caring for yourself and a sick child simultaneously—exploring the tender exhaustion and quiet
+  moments of shared rest.
 tags:
   - parenting
   - self-care
@@ -22,7 +20,7 @@ outline:
   - What Gets Dropped (And Why That's Okay)
   - Journaling Prompts
   - Gentle Closing
-wordCount: 889
+wordCount: 940
 readingMinutes: 4
 entities: []
 includeAds: true
@@ -51,7 +49,6 @@ promptMetadata:
   generatedAt: '2025-10-30T13:59:36.444Z'
 cluster: motherquest
 ---
-
 ## Opening Reflection
 
 You're on the couch with a fever that makes your skin feel two sizes too small. Your child is curled against you, their small body radiating heat, their breathing thick and congested. The TV is on—something colorful and repetitive that neither of you is really watching. There's a pile of tissues on the coffee table, two half-empty water bottles, and the vague sense that you should be doing something, anything, but you can't quite remember what.
@@ -101,3 +98,5 @@ Somewhere in the fog of fever and exhaustion, there's a small truth: You showed 
 Be gentle with yourself about what today required. Let yourself rest without earning it. Let the mess stay messy. Let 'good enough' be more than enough.
 
 And when you're both finally well again, maybe you'll remember this—not as the time everything fell apart, but as the time you learned that love doesn't require perfection. It just requires presence. And today, sick and tired and human, you were present. That's everything.
+
+Further reading: [Day After Acupuncture Recovery: Gentle Body Awareness](/post/day-after-acupuncture-recovery-gentle-body-awareness), [When to Let Yourself Rest: A Gentle Ritual & Guide](/post/when-to-let-yourself-rest), [Gentle Heart Ritual for Navigating Atrial Septal Defects](/post/gentle-heart-ritual-for-navigating-atrial-septal-defects). Evidence base: [Mindfulness overview (APA)](https://www.apa.org/topics/mindfulness).

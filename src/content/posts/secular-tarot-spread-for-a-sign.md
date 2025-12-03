@@ -2,13 +2,12 @@
 title: Secular Tarot Spread When You're Seeking a Clear Sign
 slug: secular-tarot-spread-for-a-sign
 excerpt: >-
-  Looking for a nudge without the mystique? This secular spread helps you notice
-  patterns, name options, and choose one small, testable next step.
+  Looking for a nudge without the mystique? This secular spread helps you notice patterns, name options, and choose one
+  small, testable next step.
 metaTitle: Secular Tarot Spread When You're Seeking a Clear Sign
 metaDescription: >-
-  A gentle, secular tarot spread for when you're seeking a sign. Quick
-  low‑energy steps and a deeper version, plus accessibility tips, ethics, and a
-  simple checklist.
+  A gentle, secular tarot spread for when you're seeking a sign. Quick low‑energy steps and a deeper version, plus
+  accessibility tips, ethics, and a simple checklist.
 tags:
   - calm
   - secular tarot
@@ -24,7 +23,7 @@ outline:
   - Safety & Ethics
   - Checklist / Summary
   - Wrap-Up with Reflection Prompt
-wordCount: 955
+wordCount: 971
 readingMinutes: 5
 includeAds: false
 includeKofi: true
@@ -136,3 +135,5 @@ Learning by doing is the magic here. Keep your notes in a softcover dot‑grid n
 You might also enjoy reading 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions' next, or circling back to 'Brew a Tea Ritual for Focus: Simple Steps That Stick' before your next pull.
 
 Journal prompt: what small, testable step will I try this week, and how will I know it helped?
+
+Further reading: [Colours as Doorways: Emotional and Spiritual Inquiry](/post/colours-emotional-spiritual-inquiry), [Secular Tarot in Psychological Practice: A Gentle Guide](/post/secular-tarot-in-psychological-practice), [Discovering Magic In The Mundane, Right Here Now Today](/post/discovering-magic-in-the-mundane-right-here-now-today). Evidence base: [Mindfulness overview (APA)](https://www.apa.org/topics/mindfulness).

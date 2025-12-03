@@ -1,0 +1,75 @@
+---
+interface Props {
+  title: string;
+  url: string;
+}
+
+const { title, url } = Astro.props;
+
+const encodedTitle = encodeURIComponent(title);
+const encodedUrl = encodeURIComponent(url);
+
+const shareLinks = [
+  {
+    name: "Twitter",
+    href: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`,
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M4 4l11.733 16h4.267l-11.733 -16z"></path><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"></path></svg>`,
+  },
+  {
+    name: "Facebook",
+    href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-facebook"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M7 10v4h3v7h4v-7h3l1-4h-4v-2a2 2 0 0 1 2-2h2v-4h-3a5 5 0 0 0-5 5v2h-3"></path></svg>`,
+  },
+  {
+    name: "LinkedIn",
+    href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-linkedin"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M4 21v-11h4v11h-4z"></path><path d="M12 21v-7h4v7h4v-7a8 8 0 0 0-8-8h-4v-11h4a8 8 0 0 1 8 8v7"></path><path d="M12 8c.575 0 1.07 -.075 1.48 -.221m.86 -.505a2.5 2.5 0 0 0-2.34-2.274a2.5 2.5 0 0 0-2.5 2.5a2.5 2.5 0 0 0 .584 1.588"></path></svg>`,
+  },
+  {
+    name: "Pinterest",
+    href: `https://pinterest.com/pin/create/button/?url=${encodedUrl}&description=${encodedTitle}`,
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-pinterest"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M8 20l4 -9m-5 0l5 -9l5 9m-1.5 5h-10.5"></path><path d="M12 21a9 9 0 1 0 0-18a9 9 0 0 0 0 18z"></path></svg>`,
+  },
+];
+---
+
+<div class="flex flex-wrap items-center justify-center gap-3 py-6">
+  <span class="text-sm font-semibold text-body-muted">Share this incantation:</span>
+  {shareLinks.map((link) => (
+    <a
+      href={link.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-surface-base text-accent hover:bg-surface-elevated transition-colors"
+      aria-label={`Share on ${link.name}`}
+    >
+      <Fragment set:html={link.icon} />
+    </a>
+  ))}
+  <button
+    id="copyLinkBtn"
+    class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-surface-base text-accent hover:bg-surface-elevated transition-colors"
+    aria-label="Copy link"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-link"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M9 15l6 -6"></path><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.071l-.536 .463"></path><path d="M8 19l-.463 .536a5 5 0 0 1 -7.071 -7.071l.536 -.463"></path></svg>
+  </button>
+</div>
+
+<script is:inline>
+  document.getElementById('copyLinkBtn')?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      // Optional: Provide visual feedback to the user
+      const btn = document.getElementById('copyLinkBtn');
+      if (btn) {
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-check"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M5 12l5 5l10-10"></path></svg>';
+        setTimeout(() => {
+          btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-link"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M9 15l6 -6"></path><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.071l-.536 .463"></path><path d="M8 19l-.463 .536a5 5 0 0 1 -7.071 -7.071l.536 -.463"></path></svg>';
+        }, 2000);
+      }
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+      // Optional: Provide error feedback
+    }
+  });
+</script>

@@ -21,7 +21,7 @@ const baseClass = `ad ad--${slot} ${className}`.trim();
 const ariaLabel = slot === 'side' ? 'Sponsored sidebar' : 'Sponsored message';
 ---
 {isAdsense && (
-  <aside class={baseClass} data-slot={slot} aria-label={ariaLabel} role="complementary">
+  <aside id={`adsense-slot-${slotId}`} class={baseClass} data-slot={slot} aria-label={ariaLabel} role="complementary" style="display:none;">
     <p class="ad__label">Sponsored</p>
     <div class="ad__frame">
       <ins
@@ -34,7 +34,49 @@ const ariaLabel = slot === 'side' ? 'Sponsored sidebar' : 'Sponsored message';
       />
     </div>
     <script is:inline>
-      try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch {}
+      document.addEventListener('DOMContentLoaded', () => {
+        const slotId = "{slotId}"; // Get slotId from Astro component context
+        const adSlotElement = document.getElementById(`adsense-slot-${slotId}`);
+        const CONSENT_KEY = 'cookie_consent_status';
+
+        function loadAd() {
+          try {
+            if (localStorage.getItem(CONSENT_KEY) === 'accepted') {
+              (window.adsbygoogle = window.adsbygoogle || []).push({});
+              if (adSlotElement) {
+                adSlotElement.style.display = ''; // Show the ad slot
+              }
+            } else {
+              if (adSlotElement) {
+                adSlotElement.style.display = 'none'; // Keep hidden if not accepted
+              }
+            }
+          } catch (e) {
+            console.error("AdSense load error:", e);
+            if (adSlotElement) {
+              adSlotElement.style.display = 'none';
+            }
+          }
+        }
+
+        // Initial check
+        loadAd();
+
+        // Listen for consent changes
+        window.addEventListener('cookieConsentChanged', (event) => {
+          if (event.detail.status === 'accepted') {
+            loadAd();
+          } else {
+            // If ads were loaded and consent is revoked, clear/hide them
+            if (adSlotElement) {
+              adSlotElement.style.display = 'none';
+              // Optionally, you might want to remove the AdSense iframe content here
+              // to truly stop tracking, but simply hiding is usually sufficient
+              // and less error-prone.
+            }
+          }
+        });
+      });
     </script>
   </aside>
 )}

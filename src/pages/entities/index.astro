@@ -1,44 +1,8 @@
 ---
 import Base from "../../layouts/Base.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import EntityHubCard from "../../components/EntityHubCard.astro";
 import { sections } from "../../data/typeMetadata";
-import { mixColors, resolveTailwindColor, toRgba } from "../../utils/color";
-
-const labelFor = (type: string) =>
-  type
-    .replace(/([A-Z])/g, " $1")
-    .replace(/^./, (char) => char.toUpperCase());
-
-const themedSections = sections.map((section) => {
-  const accent = resolveTailwindColor(section.themeColor);
-  const glow = toRgba(accent, 0.16);
-  const border = toRgba(accent, 0.32);
-  const highlight = mixColors("#ffffff", accent, 0.12);
-  const surfaceTop = mixColors("#ffffff", accent, 0.08);
-  const surfaceBottom = mixColors("#f3edff", accent, 0.22);
-  const heading = mixColors(accent, "#140b1e", 0.28);
-  const text = mixColors(accent, "#1a102b", 0.18);
-  const ribbon = mixColors(accent, "#ffffff", 0.48);
-  const cta = mixColors(accent, "#201333", 0.32);
-  const ctaHover = mixColors(accent, "#120824", 0.18);
-  const iconShadow = toRgba(accent, 0.35);
-
-  return {
-    ...section,
-    accent,
-    glow,
-    border,
-    highlight,
-    surfaceTop,
-    surfaceBottom,
-    heading,
-    text,
-    ribbon,
-    cta,
-    ctaHover,
-    iconShadow,
-  };
-});
 
 const breadcrumbs = [
   { label: "Home", href: "/" },
@@ -49,192 +13,19 @@ const breadcrumbs = [
 <Base title="The Grimoire — WitchClick" desktopWide={true}>
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
 
-  <section class="entity-hub">
-    <header class="entity-hub__header">
-      <h1 class="entity-hub__title">The Grimoire</h1>
-      <p class="entity-hub__intro">
+  <section class="max-w-screen-xl mx-auto py-8 md:py-12 px-4">
+    <header class="max-w-2xl">
+      <h1 class="font-serif text-4xl md:text-5xl font-bold uppercase tracking-wider text-neutral-800">The Grimoire</h1>
+      <p class="mt-4 text-lg leading-relaxed text-neutral-600">
         Choose your path through this digital grimoire — each chapter holds whispered wisdom waiting to unfold.
       </p>
     </header>
 
-    <div class="entity-hub-grid">
-      {themedSections.map((section) => (
-        <a
-          href={section.href}
-          class="card-panel card-tier-2 card-panel-soft entity-hub-card"
-          style={`--entity-card-border: ${section.border}; --entity-card-glow: ${section.glow}; --entity-card-highlight: ${section.highlight}; --entity-card-surface-top: ${section.surfaceTop}; --entity-card-surface-bottom: ${section.surfaceBottom}; --entity-card-heading: ${section.heading}; --entity-card-text: ${section.text}; --entity-card-label: ${section.ribbon}; --entity-card-cta: ${section.cta}; --entity-card-cta-hover: ${section.ctaHover}; --entity-card-icon: ${section.accent}; --entity-card-icon-shadow: ${section.iconShadow};`}
-        >
-          <div class="entity-card">
-            <div class="entity-card-ribbon" aria-hidden="true">
-              <span class="entity-card-icon">{section.icon}</span>
-              <span class="entity-card-label">{labelFor(section.type)}</span>
-            </div>
-            <div class="entity-card-body">
-              <h2 class="entity-card-title">{section.title}</h2>
-              <p class="entity-card-summary">{section.subtitle}</p>
-            </div>
-          </div>
-          <span class="entity-card-cta">
-            Explore
-            <span aria-hidden="true">→</span>
-          </span>
-        </a>
+    <div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 sm:gap-8">
+      {sections.map((section) => (
+        <EntityHubCard section={section} />
       ))}
     </div>
   </section>
 </Base>
 
-<style>
-  .entity-hub {
-    width: min(100%, 76rem);
-    margin-inline: auto;
-    display: grid;
-    gap: clamp(2rem, 5vw, 3rem);
-  }
-
-  .entity-hub__header {
-    display: grid;
-    gap: clamp(1rem, 3vw, 1.5rem);
-    max-width: 48rem;
-  }
-
-  .entity-hub__title {
-    margin: 0;
-    font-family: var(--font-heading);
-    font-size: clamp(2.35rem, 5.5vw, 3.25rem);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #f4f1ff;
-  }
-
-  .entity-hub__intro {
-    margin: 0;
-    font-size: 1.1rem;
-    line-height: 1.75;
-    color: rgba(244, 241, 255, 0.88);
-  }
-
-  .entity-hub-grid {
-    display: grid;
-    gap: clamp(1.5rem, 3vw, 2.5rem);
-    margin-top: clamp(1.5rem, 4vw, 2.5rem);
-  }
-
-  @media (min-width: 640px) {
-    .entity-hub-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .entity-hub-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  .entity-hub-card {
-    --card-hover-translate: -0.4rem;
-    display: grid;
-    gap: clamp(1.5rem, 3vw, 2.25rem);
-
-    /* tighter on the left, a bit more air on the right */
-    padding-top: clamp(1.85rem, 4vw, 2.5rem);
-    padding-bottom: clamp(1.85rem, 4vw, 2.5rem);
-    padding-right: clamp(1.6rem, 3.5vw, 2.5rem);
-    padding-left: clamp(0.25rem, 1vw, 0.75rem);
-
-    border: 1px solid rgba(124, 58, 237, 0.35);
-    background: #0f0820;
-    color: #f4f1ff;
-    box-shadow: 0 20px 52px -30px rgba(0, 0, 0, 0.6);
-    min-height: 100%;
-    border-radius: clamp(1.5rem, 4vw, 2rem);
-    transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
-  }
-
-  .entity-hub-card:hover,
-  .entity-hub-card:focus-visible {
-    border-color: rgba(124, 58, 237, 0.55);
-    box-shadow: 0 28px 75px -24px rgba(0, 0, 0, 0.7);
-    transform: translateY(var(--card-hover-translate));
-  }
-
-  .entity-hub-card:focus-visible {
-    outline: 2px solid rgba(124, 58, 237, 0.6);
-    outline-offset: 2px;
-  }
-
-  /* === CARD LAYOUT ===================================================== */
-
-  .entity-card {
-    display: grid;
-    gap: clamp(1rem, 2.5vw, 1.75rem);
-    align-items: flex-start;
-  }
-
-  /* On larger screens, put ribbon + body side-by-side,
-     but keep everything left-aligned and simple. */
-  @media (min-width: 900px) {
-    .entity-card {
-      grid-template-columns: minmax(0, 0.4fr) minmax(0, 1fr);
-      gap: 0.5rem;
-    }
-  }
-
-  .entity-card-ribbon {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-    color: rgba(212, 175, 55, 0.85);
-  }
-
-  .entity-card-icon {
-    font-size: clamp(1.75rem, 3vw, 2.25rem);
-    color: rgba(212, 175, 55, 0.9);
-    filter: drop-shadow(0 6px 18px rgba(212, 175, 55, 0.3));
-  }
-
-  .entity-card-label {
-    font-size: 0.75rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    max-width: 100%;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-    display: inline-block;
-  }
-
-  .entity-card-body h2 {
-    margin: 0;
-    font-family: var(--font-heading);
-    font-size: clamp(1.65rem, 4vw, 2.15rem);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: #f4f1ff;
-  }
-
-  .entity-card-body p {
-    margin-bottom: 0;
-    line-height: 1.65;
-    font-size: 1rem;
-    color: rgba(244, 241, 255, 0.88);
-  }
-
-  .entity-card-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: rgba(212, 175, 55, 0.85);
-    transition: color 220ms ease;
-  }
-
-  .entity-hub-card:hover .entity-card-cta,
-  .entity-hub-card:focus-visible .entity-card-cta {
-    color: rgba(212, 175, 55, 1);
-  }
-</style>

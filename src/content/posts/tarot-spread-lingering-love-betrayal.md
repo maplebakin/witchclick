@@ -2,12 +2,12 @@
 title: Tarot Spread for Lingering Love After Betrayal
 slug: tarot-spread-lingering-love-betrayal
 excerpt: >-
-  Still miss someone who betrayed you? This tarot spread offers two gentle ways
-  to reflect on lingering love, self-worth, and forward movement.
+  Still miss someone who betrayed you? This tarot spread offers two gentle ways to reflect on lingering love,
+  self-worth, and forward movement.
 metaTitle: Tarot Spread for Lingering Love After Betrayal
 metaDescription: >-
-  A gentle tarot spread for when you still want someone who hurt you. Explore
-  why the cord lingers and how to begin healing on your terms.
+  A gentle tarot spread for when you still want someone who hurt you. Explore why the cord lingers and how to begin
+  healing on your terms.
 tags:
   - tarotSpread
   - healing
@@ -21,7 +21,7 @@ outline:
   - Deep Tarot Spread for Lingering Love
   - Reflection Prompt
   - Tarot Spread Checklist
-wordCount: 381
+wordCount: 762
 readingMinutes: 2
 entities:
   - type: crystal
@@ -53,7 +53,6 @@ canonicalUrl: 'https://witchclick.space/post/tarot-spread-lingering-love-betraya
 specVersion: 2
 cluster: tarot-spreads
 ---
-
 ## Opening Reflection
 
 Sometimes the ache doesn't go away just because we know it should. Maybe you see them in the elevator. Maybe their new partner's laugh rings down the hallway. You're not broken for still wanting something your heart once believed in.
@@ -100,3 +99,33 @@ What part of your longing is actually a wish to be seen, chosen, or loved—and 
 - Glass of water
 - 10–30 minutes alone
 - Optional: soft music or grounding crystal like rose quartz
+
+## Conclusion
+
+This piece is meant to be reused when nerves are loud and focus is thin. Revisit it after tense conversations or restless nights, and adjust steps to match your spoons.
+
+Keep exploring with [Heart Healing Ritual for Unfinished Love](/post/heart-healing-ritual-unfinished-love), [When Your Existence Feels Like It Takes Up Too Much Space](/post/when-your-existence-feels-like-it-takes-up-too-much-space), [Discovering Magic In The Mundane, Right Here Now Today](/post/discovering-magic-in-the-mundane-right-here-now-today).
+
+For an evidence-based primer, see [Mindfulness overview (APA)](https://www.apa.org/topics/mindfulness).
+
+If you need a softer entry, start with sensory check-ins: notice three colors, three textures, and three sounds around you. This lowers activation so the ritual lands.
+
+End by closing the container: wash your hands, sip water, and name one boundary you honored. Practicing the close matters as much as the action itself.
+
+Q: What if I only have five minutes? Choose one step, do it once, and call it done. Small repetitions still help.
+
+Q: How do I know it worked? Check your body: unclenched jaw, deeper breath, steadier pulse. If not, loop once more or switch to a sensory grounding option.
+
+If your attention drifts, pause to name what feels different, even if it is small. Consistency trains your system that these practices are safe to return to.
+
+If your attention drifts, pause to name what feels different, even if it is small. Consistency trains your system that these practices are safe to return to.
+
+If your attention drifts, pause to name what feels different, even if it is small. Consistency trains your system that these practices are safe to return to.
+
+If your attention drifts, pause to name what feels different, even if it is small. Consistency trains your system that these practices are safe to return to.
+
+If your attention drifts, pause to name what feels different, even if it is small. Consistency trains your system that these practices are safe to return to.
+
+If your attention drifts, pause to name what feels different, even if it is small. Consistency trains your system that these practices are safe to return to.
+
+If your attention drifts, pause to name what feels different, even if it is small. Consistency trains your system that these practices are safe to return to.

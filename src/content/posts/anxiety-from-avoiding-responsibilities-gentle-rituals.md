@@ -2,13 +2,12 @@
 title: 'When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day'
 slug: anxiety-from-avoiding-responsibilities-gentle-rituals
 excerpt: >-
-  Avoiding a task can make the anxiety louder. This guide offers tiny, kind
-  moves—rituals, checklists, and cozy supports—that help you re-enter your day
-  without bullying yourself.
+  Avoiding a task can make the anxiety louder. This guide offers tiny, kind moves—rituals, checklists, and cozy
+  supports—that help you re-enter your day without bullying yourself.
 metaTitle: 'When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day'
 metaDescription: >-
-  Stuck in the anxiety–avoidance loop? Use tiny rituals, cozy tools, and kind
-  structure to take the next small step without harsh self-talk.
+  Stuck in the anxiety–avoidance loop? Use tiny rituals, cozy tools, and kind structure to take the next small step
+  without harsh self-talk.
 tags:
   - calm
   - anxiety
@@ -31,7 +30,7 @@ outline:
   - 'FAQ: Am I Lazy? What if I Mess Up?'
   - 'Checklist: Try This Flow Today'
   - 'Closing: You’re Not Behind'
-wordCount: 889
+wordCount: 919
 readingMinutes: 4
 includeAds: true
 includeKofi: false
@@ -49,9 +48,7 @@ affiliateAnchors:
     text: calming restart tea
     insertedCount: 0
 internalLinks:
-  - text: >-
-      When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the
-      Room
+  - text: 'When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the Room'
     href: /post/calming-strategies-when-partner-pisses-you-off
   - text: 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
     href: /post/when-everything-feels-pointless
@@ -62,21 +59,16 @@ internalLinks:
   - text: 'Brew a Tea Ritual for Focus: Simple Steps That Stick'
     href: /post/tea-ritual-for-focus
 publishedAt: '2025-09-13T16:56:07.981Z'
-canonicalUrl: >-
-  https://witchclick.space/post/anxiety-from-avoiding-responsibilities-gentle-rituals
+canonicalUrl: 'https://witchclick.space/post/anxiety-from-avoiding-responsibilities-gentle-rituals'
 specVersion: 2
 internalLinkHints:
-  - >-
-    When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the
-    Room
+  - 'When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the Room'
   - 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning'
   - 'Knowing When to Give Up: A Gentle Quitter''s Guide'
   - 'Secular Tarot in Psychological Practice: A Gentle Guide'
   - 'Brew a Tea Ritual for Focus: Simple Steps That Stick'
 heroImageSrc: /hero-images/anxiety-from-avoiding-responsibilities-gentle-rituals.png
-heroImageAlt: >-
-  When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day — hero
-  image
+heroImageAlt: 'When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day — hero image'
 spoonLevel: low
 cluster: cozy-witchcraft
 ---
@@ -196,3 +188,5 @@ Pin this list where you can see it. Repeat tomorrow with fresh pebbles.
 You’re arriving. Every tiny motion is a vote for the life you’re building. Be gentle, keep it small, and let the day meet you where you are.
 
 If the news feels heavy, set up your space with care using our guide to a calm space during political unrest. Soft surroundings help soft steps.
+
+Further reading: [Secular Tarot in Psychological Practice: A Gentle Guide](/post/secular-tarot-in-psychological-practice), [When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the Room](/post/calming-strategies-when-partner-pisses-you-off), [Day After Acupuncture Recovery: Gentle Body Awareness](/post/day-after-acupuncture-recovery-gentle-body-awareness). Evidence base: [NHS anxiety self-help](https://www.nhs.uk/mental-health/self-help/).

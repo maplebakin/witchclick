@@ -2,14 +2,12 @@
 title: First-Day New Job Secular Tarot Spread and Journal
 slug: first-day-new-job-secular-tarot-spread-journal
 excerpt: >-
-  A calm-first, secular tarot and journaling guide for day one. Includes a
-  5-minute quick ritual, a deeper spread, accessibility tweaks, a summary
-  checklist, and a single reflective prompt.
+  A calm-first, secular tarot and journaling guide for day one. Includes a 5-minute quick ritual, a deeper spread,
+  accessibility tweaks, a summary checklist, and a single reflective prompt.
 metaTitle: First-Day New Job Secular Tarot Spread and Journal
 metaDescription: >-
-  A gentle, secular tarot spread and journal guide for your first day at a new
-  job. Quick and deep versions, accessibility tweaks, checklist, and calm-first
-  tips.
+  A gentle, secular tarot spread and journal guide for your first day at a new job. Quick and deep versions,
+  accessibility tweaks, checklist, and calm-first tips.
 tags:
   - planning
   - secular-tarot
@@ -25,7 +23,7 @@ outline:
   - Checklist / Summary
   - Safety & Ethics
   - 'Wrap-up: Reflection Prompt'
-wordCount: 1219
+wordCount: 1258
 readingMinutes: 6
 includeAds: true
 includeKofi: true
@@ -147,3 +145,5 @@ Curious about method? Our stance stays secular: images prompt patterns, and you 
 ## Wrap-up: Reflection Prompt
 
 When you hang up your lanyard tonight, what is the one small thing you want future-you to remember about how you began?
+
+Further reading: [Pre-Interview Grounding Ritual: Quick and Deep Guide](/post/pre-interview-grounding-ritual), [Focus Tea Rituals for Gentle, Distracted Brains](/post/focus-tea-rituals-gentle-brains), [When to Let Yourself Rest: A Gentle Ritual & Guide](/post/when-to-let-yourself-rest). Evidence base: [Mindfulness overview (APA)](https://www.apa.org/topics/mindfulness).

@@ -2,14 +2,12 @@
 title: 'Pre-Interview Grounding Ritual: Quick and Deep Guide'
 slug: pre-interview-grounding-ritual
 excerpt: >-
-  A simple, secular grounding ritual for the hour before an interview. Includes
-  a 5-minute quick path, a deeper option, a checklist, and one clear reflection
-  prompt.
+  A simple, secular grounding ritual for the hour before an interview. Includes a 5-minute quick path, a deeper option,
+  a checklist, and one clear reflection prompt.
 metaTitle: 'Pre-Interview Grounding Ritual: Quick and Deep Guide'
 metaDescription: >-
-  Calm nerves and focus fast before your interview. A secular grounding ritual
-  with a 5-minute path and a deeper option, plus a checklist and gentle safety
-  notes to keep things practical.
+  Calm nerves and focus fast before your interview. A secular grounding ritual with a 5-minute path and a deeper option,
+  plus a checklist and gentle safety notes to keep things practical.
 tags:
   - planning
   - grounding
@@ -26,7 +24,7 @@ outline:
   - Variations & Accessibility
   - Safety & Ethics
   - Wrap-up with Reflection Prompt
-wordCount: 1187
+wordCount: 1215
 readingMinutes: 6
 includeAds: true
 includeKofi: false
@@ -145,3 +143,5 @@ This ritual is supportive, not medical or therapeutic advice. If breath work mak
 Close your eyes for one breath. Touch the object and read your cue word. Picture the first minute of the interview: joining the call or walking through the door. Imagine placing your feet, saying your name, and asking your first friendly question. You do not need perfect. You need present.
 
 **Reflection Prompt:** What small action will keep me steady in the first minute, and what will I let go of on purpose?
+
+Further reading: [Focus Tea Rituals for Gentle, Distracted Brains](/post/focus-tea-rituals-gentle-brains), [First-Day New Job Secular Tarot Spread and Journal](/post/first-day-new-job-secular-tarot-spread-journal), [Create a Calm Space During Political Unrest: A Gentle Guide](/post/calm-space-during-political-unrest-2). Evidence base: [NHS anxiety self-help](https://www.nhs.uk/mental-health/self-help/).

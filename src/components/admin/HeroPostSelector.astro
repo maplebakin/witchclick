@@ -1,0 +1,285 @@
+---
+// src/components/admin/HeroPostSelector.astro
+import Card from "@/components/ui/Card.astro";
+import Input from "@/components/ui/Input.astro";
+import Button from "@/components/ui/Button.astro";
+
+// This component is still complex and manages a lot of state.
+// A full refactor would introduce a proper client-side framework (Solid, Preact, Svelte).
+// For now, we encapsulate the existing vanilla JS to isolate it.
+---
+<Card as="li" class="hero-upload-card" data-upload-card data-highlight-state="idle">
+  <div class="flex items-start gap-4">
+    <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-brand-accent/10 text-sm font-semibold text-brand-primary">
+      1
+    </span>
+    <div class="flex-1 space-y-3">
+      <div class="space-y-1">
+        <h2 class="text-base font-semibold text-neutral-800">Step 1 — Select a post</h2>
+        <p class="text-sm text-neutral-500">
+          Choose an existing post that should receive a fresh hero image.
+        </p>
+      </div>
+      <div class="grid gap-4 lg:grid-cols-2">
+        <!-- Recently Added Posts Column -->
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold uppercase tracking-wide text-neutral-800">Recently Added</span>
+            <span class="text-[10px] font-medium uppercase tracking-wide rounded-full bg-brand-accent/20 px-2 py-0.5 text-brand-primary" data-recent-count>0</span>
+          </div>
+          <Input
+            type="search"
+            class="w-full text-sm py-1.5"
+            placeholder="Filter posts…"
+            data-recent-filter
+          />
+          <div class="space-y-1 rounded-lg border border-neutral-200 bg-white p-2 max-h-64 overflow-y-auto" data-recent-posts>
+            <div class="flex items-center justify-center py-8 text-xs text-neutral-500">Loading posts…</div>
+          </div>
+        </div>
+
+        <!-- Posts Without Hero Image Column -->
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold uppercase tracking-wide text-neutral-800">Needs Hero Image</span>
+            <span class="text-[10px] font-medium uppercase tracking-wide rounded-full bg-status-success-soft px-2 py-0.5 text-status-success" data-missing-count>0</span>
+          </div>
+          <Input
+            type="search"
+            class="w-full text-sm py-1.5"
+            placeholder="Filter posts…"
+            data-missing-filter
+          />
+          <div class="space-y-1 rounded-lg border border-neutral-200 bg-white p-2 max-h-64 overflow-y-auto" data-missing-hero-posts>
+            <div class="flex items-center justify-center py-8 text-xs text-neutral-500">Loading posts…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hidden select for backward compatibility -->
+      <select class="hidden" data-post-select disabled>
+        <option>Loading posts…</option>
+      </select>
+
+      <!-- Selected post display -->
+      <div class="hidden rounded-lg border-2 border-brand-primary bg-brand-accent/10 px-4 py-3" data-selected-post-display>
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex-1">
+            <div class="text-[10px] font-semibold uppercase tracking-wide text-neutral-500 mb-1">Selected Post</div>
+            <div class="font-semibold text-neutral-800" data-selected-title></div>
+            <div class="text-xs text-neutral-500" data-selected-slug></div>
+          </div>
+          <Button type="button" variant="danger" size="sm" class="!px-2 !py-1 text-xs hover:underline" data-clear-selection>Clear</Button>
+        </div>
+      </div>
+    </div>
+  </div>
+</Card>
+
+<script>
+  // This logic is still complex, but now it is scoped to this component.
+  // This is the first step towards a full refactor.
+  document.addEventListener('DOMContentLoaded', () => {
+    const root = document.querySelector('.hero-upload-card');
+    if (!root) return;
+    
+    const heroUploaderRoot = root.closest('#heroUploader');
+    if (!heroUploaderRoot) return;
+    
+    const DEV_API = heroUploaderRoot.getAttribute('data-dev-api') || 'http://localhost:8787';
+
+    const select = root.querySelector('[data-post-select]') as HTMLSelectElement;
+    const recentPostsList = root.querySelector('[data-recent-posts]');
+    const missingHeroPostsList = root.querySelector('[data-missing-hero-posts]');
+    const recentFilterInput = root.querySelector('[data-recent-filter]') as HTMLInputElement;
+    const missingFilterInput = root.querySelector('[data-missing-filter]') as HTMLInputElement;
+    const recentCount = root.querySelector('[data-recent-count]');
+    const missingCount = root.querySelector('[data-missing-count]');
+    const selectedPostDisplay = root.querySelector('[data-selected-post-display]');
+    const selectedTitleEl = root.querySelector('[data-selected-title]');
+    const selectedSlugEl = root.querySelector('[data-selected-slug]');
+    const clearSelectionBtn = root.querySelector('[data-clear-selection]');
+
+    let posts: any[] = [];
+    let recentFilterText = '';
+    let missingFilterText = '';
+    let recentCandidates: any[] = [];
+    let missingCandidates: any[] = [];
+
+    function createPostCard(post: any) {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'w-full text-left px-3 py-2 rounded-lg border border-neutral-200 bg-white hover:border-brand-primary hover:bg-neutral-50 transition text-sm';
+      card.dataset.postSlug = post.slug;
+
+      const title = document.createElement('div');
+      title.className = 'font-semibold text-neutral-800 truncate';
+      title.textContent = post.title || post.slug;
+
+      const slug = document.createElement('div');
+      slug.className = 'text-xs text-neutral-500 truncate mt-0.5';
+      slug.textContent = post.slug;
+
+      card.appendChild(title);
+      card.appendChild(slug);
+
+      if (post.heroImage) {
+        const badge = document.createElement('div');
+        badge.className = 'text-[10px] font-medium text-status-success mt-1';
+        badge.textContent = '✓ Has hero image';
+        card.appendChild(badge);
+      }
+
+      card.addEventListener('click', () => {
+        selectPost(post.slug);
+      });
+
+      return card;
+    }
+
+    function matchesFilterTerm(post: any, term: string) {
+      if (!term) return true;
+      const search = term.toLowerCase();
+      const fields = [
+        typeof post.title === 'string' ? post.title : '',
+        typeof post.slug === 'string' ? post.slug : '',
+        Array.isArray(post.tags) ? post.tags.join(' ') : '',
+      ];
+      return fields.some((field) => field.toLowerCase().includes(search));
+    }
+    
+    function renderRecentList() {
+      if (!recentPostsList) return;
+      recentPostsList.innerHTML = '';
+      const filtered = recentCandidates.filter((post) => matchesFilterTerm(post, recentFilterText));
+      if (!filtered.length) {
+        recentPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-xs text-neutral-500">No matches.</div>';
+      } else {
+        filtered.forEach((post) => {
+          recentPostsList.appendChild(createPostCard(post));
+        });
+      }
+      if (recentCount) {
+        recentCount.textContent = String(recentCandidates.length);
+      }
+    }
+
+    function renderMissingList() {
+      if (!missingHeroPostsList) return;
+      missingHeroPostsList.innerHTML = '';
+      if (!missingCandidates.length) {
+        missingHeroPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-xs text-status-success">All posts have hero images! 🎉</div>';
+      } else {
+        const filtered = missingCandidates.filter((post) => matchesFilterTerm(post, missingFilterText));
+        if (!filtered.length) {
+          missingHeroPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-xs text-neutral-500">No matches.</div>';
+        } else {
+          filtered.forEach((post) => {
+            missingHeroPostsList.appendChild(createPostCard(post));
+          });
+        }
+      }
+      if (missingCount) {
+        missingCount.textContent = String(missingCandidates.length);
+      }
+    }
+
+    function selectPost(slug: string) {
+      if (!select) return;
+      select.value = slug;
+
+      const post = posts.find(p => p.slug === slug);
+      if (post && selectedPostDisplay && selectedTitleEl && selectedSlugEl) {
+        selectedTitleEl.textContent = post.title || slug;
+        selectedSlugEl.textContent = slug;
+        selectedPostDisplay.classList.remove('hidden');
+      }
+
+      const changeEvent = new Event('change', { bubbles: true });
+      select.dispatchEvent(changeEvent);
+
+      const uploadCard = heroUploaderRoot.querySelector('[data-upload-card]');
+      if (uploadCard) {
+        uploadCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function clearSelection() {
+      if (!select) return;
+      select.value = '';
+
+      if (selectedPostDisplay) {
+        selectedPostDisplay.classList.add('hidden');
+      }
+      
+      const changeEvent = new Event('change', { bubbles: true });
+      select.dispatchEvent(changeEvent);
+    }
+    
+    function renderOptions() {
+      if (!select || !recentPostsList || !missingHeroPostsList) return;
+      // ... (rest of the renderOptions logic)
+    }
+
+    async function loadPosts() {
+      try {
+        const response = await fetch(`${DEV_API}/posts/list`, { method: 'POST' });
+        const data = await response.json();
+        posts = Array.isArray(data.items) ? data.items : [];
+        
+        const alphabeticalSort = (a, b) => (a.title || a.slug).localeCompare(b.title || b.slug, undefined, { sensitivity: 'base' });
+        
+        const parseDateValue = (value) => {
+          if (typeof value !== 'string' || !value.trim()) return null;
+          const parsed = Date.parse(value);
+          return Number.isFinite(parsed) ? parsed : null;
+        };
+
+        const sortedByRecency = [...posts].sort((a, b) => {
+            const scoreA = parseDateValue(a?.createdAt) ?? parseDateValue(a?.publishedAt) ?? 0;
+            const scoreB = parseDateValue(b?.createdAt) ?? parseDateValue(b?.publishedAt) ?? 0;
+            return scoreB - scoreA;
+        });
+
+        recentCandidates = sortedByRecency.slice(0, 20);
+        missingCandidates = posts.filter((p) => !p.heroImage).sort(alphabeticalSort);
+        
+        renderRecentList();
+        renderMissingList();
+
+        // Pre-select post if in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const preselect = urlParams.get('post');
+        if (preselect && posts.find(p => p.slug === preselect)) {
+            selectPost(preselect);
+        }
+
+      } catch (err) {
+        if(recentPostsList) recentPostsList.innerHTML = '<div class="text-danger text-xs">Could not load posts.</div>';
+        if(missingHeroPostsList) missingHeroPostsList.innerHTML = '<div class="text-danger text-xs">Could not load posts.</div>';
+      }
+    }
+
+    if (recentFilterInput) {
+      recentFilterInput.addEventListener('input', (event) => {
+        recentFilterText = (event.currentTarget as HTMLInputElement).value || '';
+        renderRecentList();
+      });
+    }
+
+    if (missingFilterInput) {
+      missingFilterInput.addEventListener('input', (event) => {
+        missingFilterText = (event.currentTarget as HTMLInputElement).value || '';
+        renderMissingList();
+      });
+    }
+    
+    if (clearSelectionBtn) {
+      clearSelectionBtn.addEventListener('click', () => {
+        clearSelection();
+      });
+    }
+
+    loadPosts();
+  });
+</script>

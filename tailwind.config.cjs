@@ -1,159 +1,18 @@
-const colors = require('tailwindcss/colors');
-
-/**
- * Semantic color tokens keep the current palette intact while giving us
- * meaningful handles for future accessibility work. Only rename values here
- * once the visual design intentionally changes.
- */
-const customColors = {
-  // Brand + primary ink
-  primary: '#d18c47', // Core headlines, key brand accents
-  'primary-strong': '#b8662f', // Elevated brand text (hover, emphasis)
-  secondary: '#cc9966', // Secondary headlines, nav items
-  tertiary: '#b5783f', // Supporting labels and subtitles
-  accent: '#e4a667', // Interactive glyphs, icons, links
-  'accent-soft': '#f2bf8c', // Soft accent text on dark cards
-  'accent-faint': '#f8e0c2', // Muted accent details
-  'accent-ghost': '#fbf0df', // Very light accent overlays
-
-  // Neutral copy stacks
-  'body-strong': colors.gray[900], // Primary body copy on light backgrounds
-  body: colors.gray[800], // Default paragraph text
-  'body-muted': colors.gray[700], // Secondary copy
-  'body-subtle': colors.gray[600], // Metadata + helper text
-  'body-faint': colors.gray[500], // Disabled states on light surfaces
-
-  // Slate metadata + dark-surface ink
-  'muted-strong': colors.slate[700], // Strong neutral text on tinted panels
-  muted: colors.slate[600], // Metadata on light cards
-  'muted-subtle': colors.slate[500], // Supporting captions
-  'muted-faint': colors.slate[400], // Quiet hints + placeholders
-
-  // Inverse palettes for dark surfaces
-  inverse: colors.white, // Primary ink on night surfaces
-  'inverse-soft': colors.slate[50], // Sub-headings on dark backgrounds (lighter for better readability)
-  'inverse-muted': colors.slate[100], // Metadata on dark backgrounds (lighter for better readability)
-  'inverse-subtle': colors.slate[200], // Quiet hints on dark backgrounds
-  'inverse-faint': colors.slate[300], // Disabled states on dark backgrounds
-
-  // Informational accents
-  info: colors.indigo[700], // Info badges & headings
-  'info-soft': colors.indigo[300], // Info text on dark panels
-  'info-faint': colors.indigo[200], // Info highlights
-  'info-haze': colors.indigo[100], // Whispered info accents
-
-  // Positive / success hues
-  success: colors.green[700], // Success text and icons
-  'success-strong': colors.green[800], // Bold success moments
-  'success-deep': colors.green[900], // Deep success emphasis
-  'success-soft': colors.green[50], // Success backgrounds (soft)
-  'success-tint': colors.green[100], // Success callouts (tinted)
-  'success-emerald': colors.emerald[700], // Emerald-toned success text
-
-  // Warning + danger signals
-  warning: colors.amber[700], // Warning text & badges
-  'warning-strong': colors.amber[900], // High-emphasis warnings
-  'warning-soft': colors.amber[50], // Warning surface wash
-  danger: colors.red[700], // Error text & destructive buttons
-  'danger-soft': colors.red[50], // Error background wash
-
-  // Additional tints
-  'rose-soft': colors.rose[300], // Soft rose highlights
-  'cloud-soft': colors.neutral[300], // Frosted overlays on dark cards
-  'cloud-muted': colors.neutral[400], // Neutral overlay details
-  'neutral-soft': colors.gray[50], // Gentle neutral surface
-  'neutral-tint': colors.gray[100], // Neutral cards
-  'cool-soft': colors.slate[50], // Cool neutral background wash
-  'emerald-soft': colors.emerald[50], // Emerald callout backgrounds
-  'amber-soft': colors.amber[50], // Amber callout backgrounds
-
-  // Surfaces & overlays
-  'surface-base': colors.white, // Site canvas
-  'surface-card': colors.white, // Elevated cards on base
-  'surface-muted': '#fbf5ee', // Brand mist background
-  'surface-soft': '#f6e9da', // Brand soft background
-  'surface-overlay': colors.white, // Translucent overlays on photos
-  'surface-accent': '#e4a667', // Accent panels & CTA fills
-  'surface-accent-strong': '#d18c47', // Accent hover states
-  'surface-accent-bolder': '#b8662f', // Strong accent backgrounds
-  'surface-accent-deep': '#8f4f21', // Deep brand fills
-  'surface-accent-night': '#3d2914', // Rich brand overlays
-  'surface-accent-midnight': '#1f140a', // Ultra-deep brand veils
-  'surface-inverse': colors.slate[950], // Night mode background
-  'surface-inverse-soft': colors.slate[900], // Slightly lifted night surface
-  'surface-inverse-muted': colors.slate[800], // Subtle dark panels
-  'surface-backdrop': colors.zinc[950], // Full-screen overlays & modals
-  'surface-veil': colors.zinc[900], // Frosted overlay veil
-  'surface-info': colors.indigo[600], // Info hero backgrounds
-  'surface-info-strong': colors.indigo[700], // Info hover state
-  'surface-info-soft': colors.indigo[500], // Info tint overlays
-  'surface-success': colors.green[600], // Success hero strips
-  'surface-success-strong': colors.green[700], // Success hover strips
-  'surface-success-soft': colors.green[50], // Success background wash
-  'surface-success-tint': colors.green[100], // Success highlight cards
-  'surface-warning-soft': colors.amber[50], // Warning highlight cards
-  'surface-danger-soft': colors.red[50], // Error highlight cards
-  'surface-emerald-soft': colors.emerald[50], // Emerald accent cards
-  'surface-neutral-soft': colors.gray[50], // Neutral highlight cards
-  'surface-neutral-tint': colors.gray[100], // Neutral panel tint
-  'surface-cool-soft': colors.slate[50], // Cool neutral background
-
-  // Border & divider system
-  'line-subtle': '#f2bf8c', // Soft brand separators
-  'line-muted': '#e4a667', // Default card borders
-  'line-strong': '#d18c47', // Hover + interactive outlines
-  'line-bolder': '#b8662f', // Accent dividers & tabs
-  'line-bold': '#8f4f21', // Emphasized accent borders
-  'line-accent': '#e4a667', // CTA outlines
-  'line-accent-strong': '#d18c47', // CTA hover outlines
-  'line-accent-deep': '#8f4f21', // Deep accent borders
-  'line-inverse': colors.slate[800], // Default divider on dark
-  'line-inverse-strong': colors.slate[900], // Strong divider on dark
-  'line-night': colors.slate[950], // High-contrast night outlines
-  'line-inverse-muted': colors.slate[500], // Inputs on dark
-  'line-neutral': colors.gray[200], // Neutral dividers
-  'line-neutral-strong': colors.gray[300], // Strong neutral borders
-  'line-slate': colors.slate[200], // Cool neutral borders
-  'line-success-soft': colors.green[200], // Success outlines
-  'line-emerald': colors.emerald[200], // Emerald accents
-  'line-warning': colors.amber[200], // Warning outlines
-  'line-danger': colors.red[200], // Error outlines
-  'line-info': colors.indigo[400], // Info outlines
-  'line-info-strong': colors.indigo[500], // Info hover outlines
-  'line-veil': colors.zinc[200], // Veiled dividers
-  'line-veil-strong': colors.zinc[800], // Veil outline on dark
-  'line-contrast': colors.white, // Contrast border on dark surfaces
-
-  // Focus indicators
-  focus: '#e4a667', // Brand focus ring
-  'focus-soft': '#f2bf8c', // Soft focus halo
-  'focus-strong': '#d18c47', // High-emphasis focus
-  'focus-muted': colors.slate[500], // Subtle focus for dense UIs
-
-  // Gradient tokens for entity cards
-  'gradient-default-start': colors.slate[500], // Default card gradient start
-  'gradient-default-end': colors.slate[900], // Default card gradient end
-  'gradient-crystal-start': colors.violet[400], // Crystal gradient start
-  'gradient-crystal-end': colors.fuchsia[600], // Crystal gradient end
-  'gradient-herb-start': colors.emerald[400], // Herb gradient start
-  'gradient-herb-end': colors.lime[500], // Herb gradient end
-  'gradient-moon-start': colors.sky[400], // Moon phase gradient start
-  'gradient-moon-end': colors.indigo[500], // Moon phase gradient end
-  'gradient-ritual-start': colors.amber[400], // Ritual gradient start
-  'gradient-ritual-end': colors.orange[600], // Ritual gradient end
-  'gradient-tarot-start': colors.violet[500], // Tarot gradient start
-  'gradient-tarot-end': colors.rose[500], // Tarot gradient end
-};
+const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.js');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{astro,html,js,ts,tsx,md,mdx}"],
   theme: {
     extend: {
-      colors: customColors,
+      colors: {
+        ...mapToLegacySemanticNames(),
+        ...simplifiedColors,
+      },
       fontFamily: {
         serif: ['Literata', 'ui-serif', 'Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif'],
-        script: ['Parisienne', 'cursive'],
+        // Ensure a strong preference for a magical script, with a better fallback than generic 'cursive'
+        script: ['"Parisienne"', '"Great Vibes"', 'cursive'],
       },
       typography: ({ theme }) => ({
         DEFAULT: {
@@ -161,15 +20,50 @@ module.exports = {
             color: theme('colors.body-strong'),
             lineHeight: '1.9',
             a: {
-              color: theme('colors.secondary'),
-              textDecoration: 'none',
-              '&:hover': { textDecoration: 'underline' },
+              color: theme('colors.secondary'), // Or your preferred accent color
+              textDecoration: 'none', // Remove default underline
+              position: 'relative', // Enable pseudo-element positioning
+              zIndex: 1, // Ensure link text is above pseudo-element
+              '&::after': { // Add a pseudo-element for the dynamic underline
+                content: '""',
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: '-0.15em', // Adjust as needed
+                height: '2px', // Thicker underline
+                borderRadius: '999px',
+                background: theme('colors.accent'), // Use an accent color for the underline
+                opacity: 0,
+                transform: 'scaleX(0.7)', // Start slightly scaled down
+                transformOrigin: 'center',
+                transition: 'opacity 240ms ease, transform 280ms cubic-bezier(0.4, 0, 0.2, 1)',
+                zIndex: -1, // Place behind text
+              },
+              '&:hover': {
+                color: theme('colors.accent'), // Change link color on hover
+                textDecoration: 'none',
+                '&::after': {
+                  opacity: 1,
+                  transform: 'scaleX(1)', // Expand on hover
+                },
+              },
+              '&:focus-visible': { // Ensure accessibility for keyboard users
+                outline: 'none', // Remove default outline for custom focus ring
+                '&::after': {
+                  opacity: 1,
+                  transform: 'scaleX(1)', // Expand on focus
+                },
+              },
             },
             'h1,h2,h3,h4': {
+              // Use a strong heading font, NOT the script font, by default for prose headings.
+              // The script font should be reserved for decorative accents or specific elements.
               color: theme('colors.primary'),
-              fontFamily: theme('fontFamily.script').join(', '),
+              fontFamily: theme('fontFamily.serif').join(', '), // Or a dedicated 'heading' font if available
               marginTop: '2.5rem',
               marginBottom: '1rem',
+              letterSpacing: '0.05em', // Add a touch more spacing for heading emphasis
+              textTransform: 'uppercase', // Make it feel more inscribed
             },
             'h1 + *': {
               marginTop: '0',
@@ -192,8 +86,8 @@ module.exports = {
             blockquote: {
               borderLeftColor: theme('colors.line-subtle'),
               color: theme('colors.body-muted'),
-              fontFamily: theme('fontFamily.script').join(', '),
-              fontSize: '1.15rem',
+              fontFamily: theme('fontFamily.serif').join(', '), // Ensure blockquotes are readable, not overly decorative
+              fontSize: '1.1rem', // Slightly adjust size for better readability
               lineHeight: '1.7',
             },
             code: {
@@ -210,7 +104,42 @@ module.exports = {
             p: { color: theme('colors.inverse') },
             strong: { color: theme('colors.inverse') },
             li: { color: theme('colors.inverse') },
-            a: { color: theme('colors.accent-soft') },
+            a: {
+              color: theme('colors.accent-soft'),
+              textDecoration: 'none',
+              position: 'relative',
+              zIndex: 1,
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: '-0.15em',
+                height: '2px',
+                borderRadius: '999px',
+                background: theme('colors.accent-soft'),
+                opacity: 0,
+                transform: 'scaleX(0.7)',
+                transformOrigin: 'center',
+                transition: 'opacity 240ms ease, transform 280ms cubic-bezier(0.4, 0, 0.2, 1)',
+                zIndex: -1,
+              },
+              '&:hover': {
+                color: theme('colors.accent'),
+                textDecoration: 'none',
+                '&::after': {
+                  opacity: 1,
+                  transform: 'scaleX(1)',
+                },
+              },
+              '&:focus-visible': {
+                outline: 'none',
+                '&::after': {
+                  opacity: 1,
+                  transform: 'scaleX(1)',
+                },
+              },
+            },
             blockquote: {
               borderLeftColor: theme('colors.line-bold'),
               color: theme('colors.inverse-soft'),
@@ -225,6 +154,6 @@ module.exports = {
     },
   },
   plugins: [require('@tailwindcss/typography')],
+  darkMode: 'class',
 };
 
-module.exports.customColors = customColors;

@@ -30,6 +30,9 @@ const posts = defineCollection({
       .optional(),
     spoons: z.enum(["low", "medium", "high"]).optional(),
 
+    // New: Reflection prompts for printable samplers
+    reflectionPrompts: z.array(z.string()).optional(), // Array of reflection prompts
+
     // Monetization helpers
     affiliateAnchors: z
       .array(z.object({ key: z.string(), text: z.string() }))

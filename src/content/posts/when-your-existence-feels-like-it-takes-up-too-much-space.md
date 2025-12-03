@@ -1,30 +1,58 @@
 ---
-title: "When Your Existence Feels Like It Takes Up Too Much Space"
-slug: "when-your-existence-feels-like-it-takes-up-too-much-space"
-excerpt: "A soft reflection for the days when your presence feels oversized or intrusive. Instead of shrinking, this piece invites you to move slowly through the feeling and rediscover the quiet truth of your belonging."
-metaTitle: "When Your Existence Feels Like It Takes Up Too Much Space"
-metaDescription: "A gentle, grounding reflection for moments when you feel like your presence takes up too much space. A soft invitation back into belonging, breath, and quiet worth."
-tags: ["self-worth","introspection","gentle-living","healing","belonging"]
-outline: ["Opening Reflection","The Weight of Being Seen","When You Start to Shrink","The Soft Gravity of Being Human","Journaling Prompts","Gentle Closing"]
-wordCount: 650
+title: When Your Existence Feels Like It Takes Up Too Much Space
+slug: when-your-existence-feels-like-it-takes-up-too-much-space
+excerpt: >-
+  A soft reflection for the days when your presence feels oversized or intrusive. Instead of shrinking, this piece
+  invites you to move slowly through the feeling and rediscover the quiet truth of your belonging.
+metaTitle: When Your Existence Feels Like It Takes Up Too Much Space
+metaDescription: >-
+  A gentle, grounding reflection for moments when you feel like your presence takes up too much space. A soft invitation
+  back into belonging, breath, and quiet worth.
+tags:
+  - self-worth
+  - introspection
+  - gentle-living
+  - healing
+  - belonging
+outline:
+  - Opening Reflection
+  - The Weight of Being Seen
+  - When You Start to Shrink
+  - The Soft Gravity of Being Human
+  - Journaling Prompts
+  - Gentle Closing
+wordCount: 732
 readingMinutes: 3
 entities: []
 includeAds: true
 includeKofi: false
 affiliateAnchors: []
-internalLinkHints: ["gentle belonging","quiet corners","tender boundaries","soft gravity","inner permission"]
+internalLinkHints:
+  - gentle belonging
+  - quiet corners
+  - tender boundaries
+  - soft gravity
+  - inner permission
 internalLinks: []
-publishedAt: "2025-11-21T13:18:07.692Z"
-canonicalUrl: "https://witchclick.space/post/when-your-existence-feels-like-it-takes-up-too-much-space"
-heroImage: "/images/hero/when-your-existence-feels-like-it-takes-up-too-much-space/hero-image-prompt-for-witchclick-article-_when-your-existence-feels-like-it-takes-up-too-much-space_-_scene-focus_-a-soft-reflection-for-the-days-when-your-presence-feels-oversized-or-intrusive-instead-of-shrinking-this-piece-invites-you-to-move-sl.jpg"
-heroImageSrc: "/images/hero/when-your-existence-feels-like-it-takes-up-too-much-space/hero-image-prompt-for-witchclick-article-_when-your-existence-feels-like-it-takes-up-too-much-space_-_scene-focus_-a-soft-reflection-for-the-days-when-your-presence-feels-oversized-or-intrusive-instead-of-shrinking-this-piece-invites-you-to-move-sl.jpg"
-heroAlt: ""
+publishedAt: '2025-11-21T13:18:07.692Z'
+canonicalUrl: 'https://witchclick.space/post/when-your-existence-feels-like-it-takes-up-too-much-space'
+heroImage: >-
+  /images/hero/when-your-existence-feels-like-it-takes-up-too-much-space/hero-image-prompt-for-witchclick-article-_when-your-existence-feels-like-it-takes-up-too-much-space_-_scene-focus_-a-soft-reflection-for-the-days-when-your-presence-feels-oversized-or-intrusive-instead-of-shrinking-this-piece-invites-you-to-move-sl.jpg
+heroImageSrc: >-
+  /images/hero/when-your-existence-feels-like-it-takes-up-too-much-space/hero-image-prompt-for-witchclick-article-_when-your-existence-feels-like-it-takes-up-too-much-space_-_scene-focus_-a-soft-reflection-for-the-days-when-your-presence-feels-oversized-or-intrusive-instead-of-shrinking-this-piece-invites-you-to-move-sl.jpg
+heroAlt: ''
 specVersion: 2
-category: "ritual"
-contentType: "reflection"
-promptMetadata: {"topic":"When Your Existence Feels Like It Takes Up Too Much Space","requestedWords":1200,"deliveredWords":650,"toggles":{"ads":"on","kofi":"off"},"generatedAt":"2025-11-21T13:18:07.691Z"}
+category: ritual
+contentType: reflection
+promptMetadata:
+  topic: When Your Existence Feels Like It Takes Up Too Much Space
+  requestedWords: 1200
+  deliveredWords: 650
+  toggles:
+    ads: 'on'
+    kofi: 'off'
+  generatedAt: '2025-11-21T13:18:07.691Z'
 ---
-
 ## Opening Reflection
 
 There are days when being a person feels strangely large, as if every move you make echoes louder than you meant it to. You walk into a room, or a memory, or a conversation, and something inside whispers that you should have taken up less space, spoken more quietly, existed a little softer.
@@ -72,3 +100,7 @@ This gravity isn't asking you to be bold or loud. Only to be here. Gently, fully
 You are not an intrusion. You are not an inconvenience. You are a whole being with edges and warmth and history, and your presence is allowed.
 
 Let this be a soft reminder that your existence doesn't need to be justified. You can sit in your own shape without shrinking. You can breathe without apology. And somewhere inside you, a small light still knows this truth.
+
+Further reading: [Gentle Heart Ritual for Navigating Atrial Septal Defects](/post/gentle-heart-ritual-for-navigating-atrial-septal-defects), [Tarot Spread for Lingering Love After Betrayal](/post/tarot-spread-lingering-love-betrayal), [Day After Acupuncture Recovery: Gentle Body Awareness](/post/day-after-acupuncture-recovery-gentle-body-awareness). Evidence base: [Mindfulness overview (APA)](https://www.apa.org/topics/mindfulness).
+
+If you want a quick reset, do one breath in, one breath out, then name one action you can take within five minutes. Small moves stack and keep the path gentle.

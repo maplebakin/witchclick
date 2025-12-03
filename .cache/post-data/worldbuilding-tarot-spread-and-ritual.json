@@ -1,0 +1,239 @@
+{
+  "slug": "worldbuilding-tarot-spread-and-ritual",
+  "data": {
+    "title": "Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore",
+    "slug": "worldbuilding-tarot-spread-and-ritual",
+    "excerpt": "Use tarot as a friendly world-design engine. This spread and ritual help you sketch setting, power, and conflict while keeping your lore grounded and playable.",
+    "metaTitle": "Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore",
+    "metaDescription": "Design richer worlds with a tarot spread and mini ritual that map your setting, stakes, and tone. Step-by-step prompts, timing tips, and a short checklist.",
+    "tags": [
+      "planning",
+      "tarot",
+      "worldbuilding",
+      "writing ritual",
+      "creative prompts",
+      "story design",
+      "cozy"
+    ],
+    "outline": [
+      "Why tarot works for worldbuilding",
+      "The World Loom: a 7-card spread",
+      "Step-by-step ritual setup",
+      "Reading the results: suits and majors",
+      "Timing and pacing magic",
+      "Quick Checklist",
+      "Safety, accessibility, and ethics",
+      "Wrap-up"
+    ],
+    "wordCount": 917,
+    "readingMinutes": 4,
+    "entities": [
+      {
+        "type": "tarot",
+        "slug": "the-world"
+      },
+      {
+        "type": "tarot",
+        "slug": "the-emperor"
+      },
+      {
+        "type": "tarot",
+        "slug": "the-magician"
+      },
+      {
+        "type": "tarot",
+        "slug": "the-hermit"
+      },
+      {
+        "type": "tarot",
+        "slug": "the-tower"
+      },
+      {
+        "type": "tarot",
+        "slug": "the-star"
+      },
+      {
+        "type": "planetaryDay",
+        "slug": "wednesday"
+      },
+      {
+        "type": "planetaryDay",
+        "slug": "saturday"
+      },
+      {
+        "type": "moonPhase",
+        "slug": "new-moon"
+      },
+      {
+        "type": "moonPhase",
+        "slug": "first-quarter"
+      },
+      {
+        "type": "moonPhase",
+        "slug": "full-moon"
+      },
+      {
+        "type": "ritual",
+        "slug": "worldbuilding-spread"
+      },
+      {
+        "type": "ritual",
+        "slug": "desk-altar"
+      },
+      {
+        "type": "crystal",
+        "slug": "fluorite"
+      },
+      {
+        "type": "crystal",
+        "slug": "labradorite"
+      }
+    ],
+    "includeAds": true,
+    "includeKofi": false,
+    "affiliateAnchors": [
+      {
+        "key": "tarot-deck",
+        "text": "storybuilding tarot deck",
+        "insertedCount": 0
+      },
+      {
+        "key": "tarot-cloth",
+        "text": "grid-lined tarot cloth",
+        "insertedCount": 0
+      },
+      {
+        "key": "ritual-journal",
+        "text": "lore-building journal",
+        "insertedCount": 0
+      },
+      {
+        "key": "grounding-stone",
+        "text": "iridescent grounding stone",
+        "insertedCount": 0
+      }
+    ],
+    "internalLinks": [
+      {
+        "text": "Sunday Football Tarot: A Game-Day Spread and Ritual Guide",
+        "href": "/post/sunday-football-tarot-spread-and-ritual"
+      },
+      {
+        "text": "PlayStation Tarot: Cozy Game-Night Spread & Ritual",
+        "href": "/post/playstation-tarot-spread-and-ritual"
+      },
+      {
+        "text": "Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions",
+        "href": "/post/tarot-as-a-secular-tool"
+      },
+      {
+        "text": "Tarot Ritual for When Creativity Feels Pointless",
+        "href": "/post/creativity-tarot-ritual"
+      },
+      {
+        "text": "Brew a Tea Ritual for Focus: Simple Steps That Stick",
+        "href": "/post/tea-ritual-for-focus"
+      }
+    ],
+    "publishedAt": "2025-09-11T22:36:55.713Z",
+    "canonicalUrl": "https://example.com/post/worldbuilding-tarot-spread-and-ritual",
+    "specVersion": 2,
+    "internalLinkHints": [
+      "Sunday Football Tarot: A Game-Day Spread and Ritual Guide",
+      "PlayStation Tarot: Cozy Game-Night Spread & Ritual",
+      "Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions",
+      "Tarot Ritual for When Creativity Feels Pointless",
+      "Brew a Tea Ritual for Focus: Simple Steps That Stick"
+    ],
+    "heroImageSrc": "/hero-images/worldbuilding-tarot-spread-and-ritual.png",
+    "heroImageAlt": "Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore — hero image",
+    "spoonLevel": "medium",
+    "cluster": "tarot-spreads",
+    "tldr": "Design richer worlds with a tarot spread and mini ritual that map your setting, stakes, and tone. Step-by-step prompts, timing tips, and a short checklist.",
+    "spoons": "medium"
+  },
+  "tldr": "Design richer worlds with a tarot spread and mini ritual that map your setting, stakes, and tone. Step-by-step prompts, timing tips, and a short checklist.",
+  "spoons": "medium",
+  "content": "<h2 id=\"why-tarot-works-for-worldbuilding\">Why tarot works for worldbuilding</h2>\n<p>Tarot gives you structured surprise: clear positions plus symbolic cards. That mix is perfect for building worlds that feel alive without over-planning every brick. Instead of blocks of lore that never get used, you create playable prompts: places to visit, rules to test, tensions to explore.</p>\n<p>Think of each card as a lever: it tilts the map, suggests a cost, or points to a faction. You stay in motion, not stuck in perfection.</p>\n<h2 id=\"the-world-loom-a-7-card-spread\">The World Loom: a 7-card spread</h2>\n<p>Lay the cards in a loose loom pattern (row of three, row of three, one crowning):</p>\n<p>[1] [2] [3]\n[4] [5] [6]\n [7]</p>\n<p>Card 1 — Tone &amp; Genre Thread \nWhat mood or genre spine runs through the world? (Horror, hopepunk, mythic slice-of-life?)</p>\n<p>Card 2 — Map &amp; Borders \nWhat landscape shapes travel and trade? Borders, rivers, sky-rails, portals.</p>\n<p>Card 3 — Power &amp; Law \nWho makes rules? Crowns, councils, guilds, gods, code.</p>\n<p>Card 4 — Magic/Tech Cost \nWhat is the price of wonder? Fuel, favor, memory, time.</p>\n<p>Card 5 — Everyday Texture \nWhat do people eat, wear, celebrate, and complain about? Markets, weather, crafts.</p>\n<p>Card 6 — Conflict Engine \nWhat keeps stories moving? Scarcity, ideology, monsters, failing infrastructure.</p>\n<p>Card 7 — Hook &amp; Session Zero \nWhat first quest or chapter naturally begins here? A delivery, a festival, a blackout.</p>\n<p>Optional: Draw a clarifier for any position that feels fuzzy. Keep clarifiers at one per slot so the spread stays readable.</p>\n<h2 id=\"step-by-step-ritual-setup\">Step-by-step ritual setup</h2>\n<p>Build a tiny desk altar that signals 'we are designing now.' Keep it simple and portable.</p>\n<p>Tools </p>\n<ul>\n<li>Tarot deck and a flat surface </li>\n<li>One small <a href=\"https://www.amazon.com/s?k=gemstone+infused+candle&tag=witchclickspa-20&utm_source=witchclick&utm_medium=affiliate&utm_campaign=gemstone_candle\" rel=\"sponsored nofollow\" target=\"_blank\" data-affiliate=\"true\" data-analytics=\"aff_click\" data-analytics-meta=\"gemstone-candle\">candle</a> or LED light </li>\n<li>A tactile token (pebble or <a href=\"https://www.amazon.com/s?k=tumbled+stones+set&tag=witchclickspa-20&utm_source=witchclick&utm_medium=affiliate&utm_campaign=tumbled_stones\" rel=\"sponsored nofollow\" target=\"_blank\" data-affiliate=\"true\" data-analytics=\"aff_click\" data-analytics-meta=\"tumbled-stones\">crystal</a>s like fluorite or labradorite) </li>\n<li>A pen and a journal (spare notebooks for maps and names) </li>\n<li>A timer (25–40 minute block works well)</li>\n</ul>\n<p>Ritual </p>\n<ol>\n<li>Clear the space. Wipe the surface, light the candle, place your token. Say: I’m weaving a world that plays well. </li>\n<li>Shuffle with a prompt. Whisper: Tone, map, law, cost, texture, conflict, hook. </li>\n<li>Lay the World Loom. Place cards 1–6 left to right, top then middle rows, then crown with card 7. </li>\n<li>Read aloud and write. For each card, write one sentence and one concrete example. In your journal, bold the sentence that players/readers will actually feel. </li>\n<li>Name three test scenes. After card 7, list three micro-scenes the world invites right now. </li>\n<li>Close. Pinch the candle out. Touch your token. Say: The loom holds; I’ll return.</li>\n</ol>\n<h2 id=\"reading-the-results-suits-and-majors\">Reading the results: suits and majors</h2>\n<p>Suits as systems </p>\n<ul>\n<li>Wands (fire): Expansion, ambition, frontier energy. Wands on Card 2 suggest fast routes and volatile borders. </li>\n<li>Cups (water): Culture, faith, memory. Cups on Card 5 point to festivals, guild feasts, and grief rituals. </li>\n<li>Swords (air): Law, ideology, information. Swords on Card 3 hint at constitutions, surveillance, or academic gatekeeping. </li>\n<li>Pentacles (earth): Resources, bodies, labor. Pentacles on Card 4 mark tangible costs: fuel, blood, coin, time.</li>\n</ul>\n<p>Majors as anchors </p>\n<ul>\n<li>The World: Cohesion, travel loops, end-of-arc vistas. Great on Cards 1 or 7. </li>\n<li>The Emperor: Institutions, zoning, bureaucracy; sturdy on Card 3. </li>\n<li>The Magician: Tools, interfaces, spellcraft; strong on Cards 4 or 6. </li>\n<li>The Hermit: Lorekeepers, hidden libraries; lovely on Card 5. </li>\n<li>The Tower: Collapse moments; sharp on Card 6. </li>\n<li>The Star: Hope, recovery; soothing on Card 1 or 7.</li>\n</ul>\n<p>When a card clashes with your first idea, let the clash stand. Worlds feel real when frictions remain visible.</p>\n<h2 id=\"timing-and-pacing-magic\">Timing and pacing magic</h2>\n<p>Planetary days </p>\n<ul>\n<li>Wednesday (Mercury day): Draft lore, maps, and names. </li>\n<li>Saturday (Saturn): Rules, borders, logistics. </li>\n<li>Sunday (Sun): Theme, big-picture tone.</li>\n</ul>\n<p>Moon phases </p>\n<ul>\n<li>New moon: Start fresh regions or cultures. </li>\n<li>First quarter: Put systems under stress tests. </li>\n<li>Full moon: Playtest scenes aloud. </li>\n<li>Waning moon: Prune lore; tighten pacing beats.</li>\n</ul>\n<p>Session rhythm \nWork in two or three focused blocks. Between blocks, take a 3–5 minute reset: stretch, drink water, or play a single round of cozy games. Return with one clear next step.</p>\n<h2 id=\"quick-checklist\">Quick Checklist</h2>\n<ul>\n<li><input disabled=\"\" type=\"checkbox\"> Deck, candle, token (crystals welcome)</li>\n<li><input disabled=\"\" type=\"checkbox\"> Spread laid; one sentence + example per card</li>\n<li><input disabled=\"\" type=\"checkbox\"> Hook chosen; three micro-scenes listed</li>\n<li><input disabled=\"\" type=\"checkbox\"> Notes written in your journal (stash spare notebooks)</li>\n<li><input disabled=\"\" type=\"checkbox\"> Lore pruned for pacing beats</li>\n<li><input disabled=\"\" type=\"checkbox\"> Short break (stretch or cozy games)</li>\n</ul>\n<h2 id=\"safety-accessibility-and-ethics\">Safety, accessibility, and ethics</h2>\n<p>This practice is creative, not predictive. Use it to spark ideas; keep critical thinking on. If divination isn’t your thing, treat the deck as a shuffled prompt tool.</p>\n<p>Accessibility ideas: if holding cards is tricky, draw digitally or pick random numbers; speak your notes into voice-to-text instead of writing; if <a href=\"https://www.amazon.com/s?k=altar+tools+chalice+altar+cloth+ritual+candles&tag=witchclickspa-20&utm_source=witchclick&utm_medium=affiliate&utm_campaign=altar_kit\" rel=\"sponsored nofollow\" target=\"_blank\" data-affiliate=\"true\" data-analytics=\"aff_click\" data-analytics-meta=\"altar-kit\">candles</a> aren’t safe, use an LED. Keep the desk altar tiny and movable.</p>\n<p>Ethics: borrow from cultures with respect; change names and surface features; avoid flattening living traditions into props. Your world can be wondrous without taking without consent.</p>\n<h2 id=\"wrap-up\">Wrap-up</h2>\n<p>Worlds don’t appear all at once; they accrete. The World Loom spread gives you just enough structure to keep moving, and the ritual makes the work feel inviting. When you return to the desk altar, pick one card and deepen it, or draw a single clarifier for tomorrow’s pacing beats. If you get stuck, reread Card 7 and start with the hook.</p>\n<p>Further reading: <a href=\"/post/tarot-as-a-secular-tool\">Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions</a>, <a href=\"/post/sunday-football-tarot-spread-and-ritual\">Sunday Football Tarot: A Game-Day Spread and Ritual Guide</a>, <a href=\"/post/when-life-feels-on-pause\">When Life Feels on Pause: A Gentle Ritual &amp; Guide</a>. Evidence base: <a href=\"https://www.apa.org/topics/mindfulness\">Mindfulness overview (APA)</a>.</p>\n",
+  "hasAffiliates": true,
+  "relatedPosts": [
+    {
+      "slug": "playstation-tarot-spread-and-ritual",
+      "title": "PlayStation Tarot: Cozy Game-Night Spread & Ritual",
+      "href": "/post/playstation-tarot-spread-and-ritual",
+      "excerpt": "Blend controller-in-hand comfort with a simple tarot ritual. This spread tracks energy, obstacles, and reset moments so you can enjoy game night with focus and ease.",
+      "readingMinutes": 3,
+      "spoonLevel": "low",
+      "score": 226
+    },
+    {
+      "slug": "sunday-football-tarot-spread-and-ritual",
+      "title": "Sunday Football Tarot: A Game-Day Spread and Ritual Guide",
+      "href": "/post/sunday-football-tarot-spread-and-ritual",
+      "excerpt": "A cozy, sports-night twist on tarot: use this 7-card spread and tiny ritual to track momentum, read defenses, and spot turning points—without pressure or predictions.",
+      "readingMinutes": 3,
+      "spoonLevel": "low",
+      "score": 132
+    },
+    {
+      "slug": "tarot-as-a-secular-tool",
+      "title": "Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions",
+      "href": "/post/tarot-as-a-secular-tool",
+      "excerpt": "Tarot can be a map for your thoughts, no dogma required. Use the cards as prompts, capture what you notice, and choose a next step you can actually do.",
+      "readingMinutes": 3,
+      "spoonLevel": "medium",
+      "score": 57
+    },
+    {
+      "slug": "creativity-tarot-ritual",
+      "title": "Tarot Ritual for When Creativity Feels Pointless",
+      "href": "/post/creativity-tarot-ritual",
+      "excerpt": "When your creativity feels pointless, this gentle tarot and journaling ritual helps you reconnect with your spark—no pressure, just presence.",
+      "readingMinutes": 3,
+      "spoonLevel": "medium",
+      "score": 51
+    }
+  ],
+  "headingOutline": [
+    {
+      "id": "why-tarot-works-for-worldbuilding",
+      "label": "Why tarot works for worldbuilding",
+      "level": 2
+    },
+    {
+      "id": "the-world-loom-a-7-card-spread",
+      "label": "The World Loom: a 7-card spread",
+      "level": 2
+    },
+    {
+      "id": "step-by-step-ritual-setup",
+      "label": "Step-by-step ritual setup",
+      "level": 2
+    },
+    {
+      "id": "reading-the-results-suits-and-majors",
+      "label": "Reading the results: suits and majors",
+      "level": 2
+    },
+    {
+      "id": "timing-and-pacing-magic",
+      "label": "Timing and pacing magic",
+      "level": 2
+    },
+    {
+      "id": "quick-checklist",
+      "label": "Quick Checklist",
+      "level": 2
+    },
+    {
+      "id": "safety-accessibility-and-ethics",
+      "label": "Safety, accessibility, and ethics",
+      "level": 2
+    },
+    {
+      "id": "wrap-up",
+      "label": "Wrap-up",
+      "level": 2
+    }
+  ]
+}

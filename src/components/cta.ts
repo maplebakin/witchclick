@@ -1,5 +1,3 @@
-export const KO_FI_URL = 'https://ko-fi.com/streamthreadsystems';
-
 
 export const KOFI_CTA_VARIANTS: string[] = [
 "If this post lit a little lantern for you, you can toss a coin to the stream at Ko‑fi. It keeps the kettle warm and the words flowing.",

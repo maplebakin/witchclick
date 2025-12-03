@@ -34,9 +34,11 @@ export const headerUtilityLinks: NavLink[] = [
 ];
 
 export const footerUtilityLinks: NavLink[] = [
+  { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
-  { href: "/partners", label: "Partners" },
   { href: "/privacy", label: "Privacy" },
+  { href: "/disclosures", label: "Disclosures" },
+  { href: "/partners", label: "Partners" },
   { href: "/rss.xml", label: "RSS", rel: "alternate" },
   { href: "/feed.json", label: "JSON Feed", rel: "alternate" },
 ];

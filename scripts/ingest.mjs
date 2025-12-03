@@ -4,6 +4,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
 import prompts from "./lib/prompts.js";
 import { executeIngest } from "../server/lib/ingestExecutor.js";
 import { generateSchemaDocumentation } from "../server/lib/postSpecSchema.js";
@@ -101,6 +102,7 @@ export async function ingestFromSpec(input, options = {}) {
     createdPosts: persistence?.createdPosts ?? [],
     source: inputPath || null,
     promptMetadata: promptMetadata ?? null,
+    postsDirectories,
   };
 
   emitLog?.({
@@ -153,6 +155,7 @@ async function main() {
       printDryRun(result);
       return;
     }
+    await maybeRunAutoSeo(result, opts.autoSeo);
     printSuccess(result);
   } catch (err) {
     if (err instanceof IngestValidationError) {
@@ -247,6 +250,7 @@ async function runInteractiveIngest(options) {
   }
 
   const result = await ingestFromSpec(spec, { dir: options.dir, dry: false, inputPath: sourcePath });
+  await maybeRunAutoSeo(result, options.autoSeo);
   printSuccess(result);
 }
 
@@ -348,12 +352,14 @@ function normalizeSlugCandidate(candidate) {
 }
 
 function parseArgs(a) {
-  const out = { input: null, dry: false, dir: null, interactive: false };
+  const out = { input: null, dry: false, dir: null, interactive: false, autoSeo: true };
   for (let i = 0; i < a.length; i++) {
     const t = a[i];
     if (t === "--dry") out.dry = true;
     else if (t === "--dir") out.dir = a[++i];
     else if (t === "--interactive") out.interactive = true;
+    else if (t === "--no-auto-seo") out.autoSeo = false;
+    else if (t === "--auto-seo") out.autoSeo = true;
     else if (t === "--help" || t === "-h") continue;
     else if (!out.input) out.input = t;
   }
@@ -418,10 +424,27 @@ function printSuccess(result) {
 }
 
 function printHelp() {
-  console.log("Usage: node scripts/ingest.mjs <spec.json> [--dry] [--dir <outDir>]");
-  console.log("       node scripts/ingest.mjs --interactive [--dry] [--dir <outDir>]");
+  console.log("Usage: node scripts/ingest.mjs <spec.json> [--dry] [--dir <outDir>] [--no-auto-seo]");
+  console.log("       node scripts/ingest.mjs --interactive [--dry] [--dir <outDir>] [--no-auto-seo]");
   console.log("       node scripts/ingest.mjs --help");
   console.log("");
   console.log("Input must be a PostSpec v2 JSON payload (see below):");
   console.log(generateSchemaDocumentation());
+}
+
+async function maybeRunAutoSeo(result, autoSeoEnabled) {
+  if (!autoSeoEnabled) return;
+  if (result?.dryRun) return;
+  if (!result?.slug) return;
+  if (!Array.isArray(result?.postsDirectories) || result.postsDirectories.length === 0) return;
+
+  const scriptPath = path.join(PROJECT_ROOT, "scripts", "seo-fix-apply.mjs");
+  const dirArg = result.postsDirectories.join(",");
+  const args = [scriptPath, "--slug", result.slug, "--dirs", dirArg];
+
+  console.log(`Running SEO auto-fix for ${result.slug}...`);
+  const child = spawnSync("node", args, { stdio: "inherit" });
+  if (child.status !== 0) {
+    throw new Error("SEO auto-fix failed during ingest. Check logs above.");
+  }
 }

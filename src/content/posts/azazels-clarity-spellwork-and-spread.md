@@ -1,29 +1,62 @@
 ---
-title: "Azazel's Clarity Spellwork and Scrying Spread"
-slug: "azazels-clarity-spellwork-and-spread"
-excerpt: "Azazel's wind carves truth from illusion in this spellwork and spread. Invoke with mirror, flame, and cards; ground in journaled insight. Consent threads every step, substitutions weave validity, mundane paths parallel the arcane."
-metaTitle: "Azazel's Clarity Spellwork and Scrying Spread"
-metaDescription: "Whisper to Azazel amid desert embers for unyielding clarity via consensual scrying spell and three-card tarot spread. Fuse sigil fire, mirror gaze, and mundane journaling to shatter confusion's veil with shadow-kissed truth and practical steps."
-tags: ["azazel","clarity","scrying","tarot-spread","desert-magic","consent","substitutions"]
-outline: ["Opening Reflection","Ingredients & Correspondences","Step-by-Step Instructions","Quick Low-Energy Variation","Deep Immersive Variation","Closing & Grounding","Safety Notes","Clarity Working Summary Checklist","Further Reading"]
-wordCount: 1018
+title: Azazel's Clarity Spellwork and Scrying Spread
+slug: azazels-clarity-spellwork-and-spread
+excerpt: >-
+  Azazel's wind carves truth from illusion in this spellwork and spread. Invoke with mirror, flame, and cards; ground in
+  journaled insight. Consent threads every step, substitutions weave validity, mundane paths parallel the arcane.
+metaTitle: Azazel's Clarity Spellwork and Scrying Spread
+metaDescription: >-
+  Whisper to Azazel amid desert embers for unyielding clarity via consensual scrying spell and three-card tarot spread.
+  Fuse sigil fire, mirror gaze, and mundane journaling to shatter confusion's veil with shadow-kissed truth and
+  practical steps.
+tags:
+  - azazel
+  - clarity
+  - scrying
+  - tarot-spread
+  - desert-magic
+  - consent
+  - substitutions
+outline:
+  - Opening Reflection
+  - Ingredients & Correspondences
+  - Step-by-Step Instructions
+  - Quick Low-Energy Variation
+  - Deep Immersive Variation
+  - Closing & Grounding
+  - Safety Notes
+  - Clarity Working Summary Checklist
+  - Further Reading
+wordCount: 1068
 readingMinutes: 5
 entities: []
 includeAds: true
 includeKofi: true
 affiliateAnchors: []
-internalLinkHints: ["tarot spread for clarity","Azazel sigil drawing","basic scrying techniques","post-ritual grounding methods","Azazel in demonology","three-card tarot spread"]
+internalLinkHints:
+  - tarot spread for clarity
+  - Azazel sigil drawing
+  - basic scrying techniques
+  - post-ritual grounding methods
+  - Azazel in demonology
+  - three-card tarot spread
 internalLinks: []
-publishedAt: "2025-11-16T21:18:04.329Z"
-canonicalUrl: "https://witchclick.space/post/azazels-clarity-spellwork-and-spread"
-heroImage: "/images/hero/azazels-clarity-spellwork-and-spread/azazel-clarity.jpg"
-heroImageSrc: "/images/hero/azazels-clarity-spellwork-and-spread/azazel-clarity.jpg"
-heroAlt: ""
+publishedAt: '2025-11-16T21:18:04.329Z'
+canonicalUrl: 'https://witchclick.space/post/azazels-clarity-spellwork-and-spread'
+heroImage: /images/hero/azazels-clarity-spellwork-and-spread/azazel-clarity.jpg
+heroImageSrc: /images/hero/azazels-clarity-spellwork-and-spread/azazel-clarity.jpg
+heroAlt: ''
 specVersion: 2
-contentType: "spellwork"
-promptMetadata: {"topic":"Azazel's Clarity Spellwork and Scrying Spread","requestedWords":1200,"deliveredWords":1018,"toggles":{"ads":"on","kofi":"on"},"generatedAt":"2025-11-16T21:18:04.328Z"}
+contentType: spellwork
+promptMetadata:
+  topic: Azazel's Clarity Spellwork and Scrying Spread
+  requestedWords: 1200
+  deliveredWords: 1018
+  toggles:
+    ads: 'on'
+    kofi: 'on'
+  generatedAt: '2025-11-16T21:18:04.328Z'
 ---
-
 ## Opening Reflection
 
 Where thorns crown the wanderer, Azazel awaits—an enigma etched in scorched parchment and star-forged iron. His clarity descends not as balm but as the scythe harvesting wheat from chaff, revealing bones beneath mirage. In this working, intent spirals like smoke: to pierce confusion's shroud with consensual fire. Begin always with sovereign breath: *I summon only echoes I choose to hear; I banish only shadows that no longer serve.* Mundane echo: in quiet corner, list three fogged dilemmas on paper. Voice them to empty air or trusted ear. This naming is the primal incantation, grounding spirit in flesh. Azazel honors the bold who claim their chaos before inviting his blade. Without this consent-first rite, no mirror will reflect truth—only distorted selves. Thus, the oracle speaks: prepare thy vessel, for clarity demands a willing forge.
@@ -92,3 +125,5 @@ As visions settle like dust on ancient tomes, enact [post-ritual grounding metho
 ## Further Reading
 
 Delve deeper into Azazel's lore via [Wikipedia: Azazel](https://en.wikipedia.org/wiki/Azazel). For [basic scrying techniques], explore occult primers. Cross-reference with goetic texts for nuanced invocation.
+
+Further reading: [Azazel's Clarity Spellwork and Spread](/post/azazels-clarity-spellwork-and-spread-2), [Gentle Heart Ritual for Navigating Atrial Septal Defects](/post/gentle-heart-ritual-for-navigating-atrial-septal-defects), [Gentle Rituals for Living With Atrial Septal Defects](/post/gentle-rituals-for-living-with-atrial-septal-defects).

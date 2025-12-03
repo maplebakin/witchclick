@@ -1,4 +1,4 @@
----
+--- 
 /* Admin: Prompt → JSON → Preview → Ingest */
 import Base from "../../layouts/Base.astro";
 import { readSettings, buildCanonicalUrl } from "../../utils/settings";
@@ -7,6 +7,8 @@ import { generatorPresetOptions } from "../../../server/lib/generatorPresets.js"
 import normalizeDraftSpecScript from "../../scripts/normalizeDraftSpec.js?url";
 import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
+import PromptBuilder from "@/components/admin/PromptBuilder.astro";
+
 import {
   CURSE_TARGETS,
   CURSE_TONES,
@@ -76,15 +78,15 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
     <div class="space-y-6">
       <AdminNav currentPath="/admin" />
 
-      <section class="rounded-2xl border border-line-subtle bg-surface-base p-6 shadow-sm">
+      <section class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
         <div class="space-y-3">
           <div>
-            <h1 class="text-2xl font-semibold text-body-strong">Content Generator</h1>
-            <p class="text-sm text-body-muted mt-1">
+            <h1 class="text-2xl font-semibold text-neutral-900">Content Generator</h1>
+            <p class="text-sm text-neutral-600 mt-1">
               AI-powered workflow for creating posts and curses. Generate prompts, validate JSON, preview content, and ingest to your site.
             </p>
           </div>
-          <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-4 text-xs text-body-muted">
+          <div class="rounded-lg border border-dashed border-neutral-200 bg-neutral-50 p-4 text-xs text-neutral-600">
             <div class="font-semibold mb-2">📝 How it works:</div>
             <ol class="space-y-2 ml-4 list-decimal">
               <li><strong>Choose content type:</strong> Select Posts for articles or Curses for printable rituals</li>
@@ -97,91 +99,35 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         </div>
       </section>
 
-      <div class="rounded-2xl border border-line-subtle bg-surface-base p-3 shadow-sm">
+      <div class="rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm">
         <div class="flex items-center gap-3">
-          <span class="text-sm font-medium text-body-muted">Content Type:</span>
+          <span class="text-sm font-medium text-neutral-500">Content Type:</span>
           <button
             type="button"
             data-panel-toggle="posts"
-            class="rounded-lg px-4 py-2 text-sm font-semibold text-primary hover:bg-surface-soft transition"
+            class="rounded-lg px-4 py-2 text-sm font-semibold text-brand-primary hover:bg-neutral-100 transition"
           >
             📄 Posts
           </button>
           <button
             type="button"
             data-panel-toggle="curses"
-            class="rounded-lg px-4 py-2 text-sm font-semibold text-primary hover:bg-surface-soft transition"
+            class="rounded-lg px-4 py-2 text-sm font-semibold text-brand-primary hover:bg-neutral-100 transition"
           >
             ✨ Curses
           </button>
         </div>
       </div>
 
-      <div
-        data-panel-root
-        data-dev-api={DEV_API}
-        data-preset-options={JSON.stringify(presetOptions)}
-        data-style-options={JSON.stringify(styleOptions)}
-        data-default-mode={defaultModeDescription}
-        data-default-style={defaultStyleDescription}
-        data-curse-types={JSON.stringify(curseTypeOptions)}
-        data-curse-targets={JSON.stringify(curseTargetOptions)}
-        data-curse-tones={JSON.stringify(curseToneOptions)}
-        data-curse-tags={JSON.stringify(curseTags)}
-      >
+      <div data-panel-root>
         <div id="postsPanel" data-panel="posts" class="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          <section class="lg:col-span-5 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
-            <div class="mb-4 space-y-2">
-              <h2 class="text-xl font-semibold">Step 1: Build Generator Prompt</h2>
-              <p class="text-xs text-body-muted">Configure your post preferences to generate an AI prompt</p>
-            </div>
-            <div class="grid gap-3">
-              <label class="block">
-                <span class="text-xs font-medium uppercase tracking-wide text-body-subtle">Topic</span>
-                <input id="topic" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="tea ritual for focus" />
-                <p class="mt-1 text-[11px] text-body-faint">What should this post be about?</p>
-              </label>
-              <label class="block">
-                <span class="text-xs font-medium">Word count</span>
-                <input id="words" type="number" class="mt-1 w-full admin-btn-secondary px-3 py-2" value="1200" />
-              </label>
-              <label class="block">
-                <span class="text-xs font-medium">Template</span>
-                <select id="mode" class="mt-1 w-full admin-btn-secondary px-3 py-2 text-sm">
-                  <option value="" selected>Standard ritual workflow</option>
-                  {presetOptions.map((option) => (
-                    <option value={option.key}>{option.label}</option>
-                  ))}
-                </select>
-                <p id="modeHelp" class="mt-1 text-[11px] text-body-subtle">{defaultModeDescription}</p>
-              </label>
-              <label class="block">
-                <span class="text-xs font-medium">Writing style</span>
-                <select id="style" class="mt-1 w-full admin-btn-secondary px-3 py-2 text-sm">
-                  {styleOptions.map((option) => (
-                    <option value={option.key} selected={option.key === "cozy"}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                <p id="styleHelp" class="mt-1 text-[11px] text-body-subtle">{defaultStyleDescription}</p>
-              </label>
-              <div class="flex gap-4 text-sm">
-                <label class="inline-flex items-center gap-2">
-                  <input type="checkbox" id="ads" /> <span>Include ads</span>
-                </label>
-                <label class="inline-flex items-center gap-2">
-                  <input type="checkbox" id="kofi" checked /> <span>Include Ko-fi</span>
-                </label>
-              </div>
-              <div class="flex gap-2">
-                <button id="genPrompt" class="admin-btn-primary px-3 py-2 text-sm font-semibold">Generate Prompt</button>
-                <button id="copyPrompt" class="admin-btn-secondary px-3 py-2">Copy</button>
-              </div>
-              <textarea id="promptOut" class="mt-2 h-64 w-full admin-btn-secondary px-3 py-2 font-mono text-xs" placeholder="Prompt will appear here…"></textarea>
-              <p class="text-xs text-body-subtle">Paste this into your LLM → get JSON → paste into the box on the right.</p>
-            </div>
-          </section>
+          <PromptBuilder
+            presetOptions={presetOptions}
+            styleOptions={styleOptions}
+            defaultModeDescription={defaultModeDescription}
+            defaultStyleDescription={defaultStyleDescription}
+            devApi={DEV_API}
+          />
 
           <section class="lg:col-span-7 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
             <div class="mb-4 space-y-2">
@@ -189,23 +135,23 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               <p class="text-xs text-body-muted">Paste PostSpec JSON from your AI, then validate, preview, and ingest</p>
             </div>
 
-            <textarea id="spec" class="h-56 w-full admin-btn-secondary px-3 py-2 font-mono text-xs" placeholder='Paste the PostSpec v2 JSON here (get it from your LLM using the generated prompt)'></textarea>
+            <textarea id="spec" class="h-56 w-full admin-btn-secondary px-3 py-2 font-mono text-xs" placeholder='Infuse the Oracle\'s PostSpec v2 JSON here…'></textarea>
 
             <div class="mt-3 space-y-4 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] lg:gap-6">
               <div class="space-y-3">
                 <div class="flex flex-col gap-2">
                   <div class="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wide text-body-muted">
-                    <span>Save mode</span>
+                    <span>Binding method</span>
                     <div class="inline-flex rounded-full border border-line-neutral bg-surface-neutral-soft p-1" data-save-mode>
-                      <button type="button" data-mode="publish" class="rounded-full px-3 py-1 text-[11px] font-semibold text-body bg-surface-base shadow-sm">Publish</button>
-                      <button type="button" data-mode="draft" class="rounded-full px-3 py-1 text-[11px] font-semibold text-body-muted">Draft</button>
+                      <button type="button" data-mode="publish" class="rounded-full px-3 py-1 text-[11px] font-semibold text-body bg-surface-base shadow-sm">Whisper to the world</button>
+                      <button type="button" data-mode="draft" class="rounded-full px-3 py-1 text-[11px] font-semibold text-body-muted">Secure in the grimoire</button>
                     </div>
                   </div>
                   <div class="flex flex-wrap gap-2">
-                    <button id="validateBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">✓ Validate</button>
-                    <button id="previewBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">👁 Preview</button>
-                    <button id="ingestBtn" class="admin-btn-primary px-4 py-2 text-sm font-semibold">💾 Save</button>
-                    <button id="ingestPublishBtn" class="admin-btn-primary px-4 py-2 text-sm font-semibold">🚀 Publish Now</button>
+                    <button id="validateBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">✓ Verify Runes</button>
+                    <button id="previewBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">👁 Gaze into the Orb</button>
+                    <button id="ingestBtn" class="admin-btn-primary px-4 py-2 text-sm font-semibold">💾 Bind Draft</button>
+                    <button id="ingestPublishBtn" class="admin-btn-primary px-4 py-2 text-sm font-semibold">🚀 Unveil & Publish</button>
                     <button id="clearBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">Clear</button>
                   </div>
                   <div class="text-xs text-body-muted rounded-lg border border-dashed border-line-subtle bg-surface-base/60 px-3 py-2">
@@ -246,23 +192,23 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         </div>
 
         <div id="cursesPanel" data-panel="curses" class="hidden">
-          <section class="rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm space-y-3">
+          <div class="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm space-y-3">
             <h2 class="text-xl font-semibold">Curses Dashboard moved</h2>
-            <p class="text-sm text-body-muted">
+            <p class="text-sm text-neutral-600">
               The curses generator and archive live in a dedicated dashboard optimized for print/PDF workflows.
             </p>
-            <a href="/admin/curses" class="inline-flex items-center gap-2 admin-btn-primary px-4 py-2 text-sm font-semibold">
+            <a href="/admin/curses" class="inline-flex items-center gap-2 rounded-lg bg-brand-primary text-white px-4 py-2 text-sm font-semibold shadow-sm hover:bg-brand-primary-strong">
               Open Curses Dashboard →
             </a>
-          </section>
+          </div>
         </div>
       </div>
       </div>
     ) : (
-    <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
+    <section class="mx-auto max-w-3xl rounded-2xl border border-neutral-200 bg-white p-6 text-center shadow-sm">
       <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
-      <p class="text-body-muted">These tools only run in <strong>development</strong> (or with a temporary key when hosted on a server adapter).</p>
-      <ol class="mx-auto mt-4 list-decimal space-y-2 text-left text-sm text-body-muted">
+      <p class="text-neutral-600">These tools only run in <strong>development</strong> (or with a temporary key when hosted on a server adapter).</p>
+      <ol class="mx-auto mt-4 list-decimal space-y-2 text-left text-sm text-neutral-600">
         <li>Run <code>npm run dev</code> locally.</li>
         <li>Use the ingestion CLI: <code>npm run ingest ./path/to/post.json</code>.</li>
         <li>If you later switch to serverless, set <code>PUBLIC_ADMIN_KEY</code> and visit <code>/admin?key=…</code>.</li>
@@ -321,10 +267,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           panelButtons.forEach(function(button){
             var active = button.getAttribute('data-panel-toggle') === name;
             if (active) {
-              button.classList.add('bg-surface-base', 'shadow');
+              button.classList.add('bg-white', 'shadow-sm');
               button.setAttribute('aria-pressed', 'true');
             } else {
-              button.classList.remove('bg-surface-base', 'shadow');
+              button.classList.remove('bg-white', 'shadow-sm');
               button.setAttribute('aria-pressed', 'false');
             }
           });
@@ -352,11 +298,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           if (!el) return;
           var base='admin-btn-secondary px-3 py-2 text-sm';
           if (ok === false) {
-            el.className = base + ' border-line-danger bg-surface-danger-soft text-danger';
+            el.className = base + ' border-danger bg-danger-soft text-danger';
           } else if (ok === true) {
-            el.className = base + ' border-line-emerald bg-surface-emerald-soft text-success-emerald';
+            el.className = base + ' border-success bg-success-soft text-success';
           } else {
-            el.className = base + ' border-line-slate bg-surface-cool-soft text-muted-strong';
+            el.className = base + ' border-line-neutral bg-surface-neutral-soft text-body-muted';
           }
           el.innerHTML='';
 
@@ -417,19 +363,19 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             viewBtn.href = '/post/' + encodeURIComponent(slug);
             viewBtn.target = '_blank';
             viewBtn.rel = 'noopener';
-            viewBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-base px-3 py-1.5 text-sm font-medium text-primary hover:bg-surface-soft';
+            viewBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-base px-3 py-1.5 text-sm font-medium text-accent hover:bg-surface-accent-soft';
             viewBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>View Post';
 
             // Upload Hero button
             var heroBtn = document.createElement('a');
             heroBtn.href = '/admin/hero?post=' + encodeURIComponent(slug);
-            heroBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-base px-3 py-1.5 text-sm font-medium text-primary hover:bg-surface-soft';
+            heroBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-base px-3 py-1.5 text-sm font-medium text-accent hover:bg-surface-accent-soft';
             heroBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>Upload Hero Image';
 
             // Edit Post button
             var editBtn = document.createElement('a');
             editBtn.href = '/admin/posts?slug=' + encodeURIComponent(slug);
-            editBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-base px-3 py-1.5 text-sm font-medium text-primary hover:bg-surface-soft';
+            editBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-base px-3 py-1.5 text-sm font-medium text-accent hover:bg-surface-accent-soft';
             editBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>Edit Post';
 
             actionsDiv.appendChild(viewBtn);
@@ -448,11 +394,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           if (!el) return;
           var base='admin-btn-secondary px-3 py-2 text-sm';
           if (ok === false) {
-            el.className = base + ' border-line-danger bg-surface-danger-soft text-danger';
+            el.className = base + ' border-danger bg-danger-soft text-danger';
           } else if (ok === true) {
-            el.className = base + ' border-line-emerald bg-surface-emerald-soft text-success-emerald';
+            el.className = base + ' border-success bg-success-soft text-success';
           } else {
-            el.className = base + ' border-line-slate bg-surface-cool-soft text-muted-strong';
+            el.className = base + ' border-line-neutral bg-surface-neutral-soft text-body-muted';
           }
           el.innerHTML='';
 
@@ -511,7 +457,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           if (!spec) {
             panel.className = baseClass + ' text-body-subtle';
             var empty=document.createElement('p');
-            empty.textContent='No PostSpec parsed yet. Paste JSON to inspect the structure.';
+            empty.textContent='No PostSpec manifested yet. Infuse the Cauldron with JSON to inspect its form.';
             panel.appendChild(empty);
             return;
           }
@@ -565,7 +511,6 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           addRow('Entities', entities.length ? entities.length + ' — ' + summarizeEntities(entities) : 'None');
           addRow('Internal links', internal.length ? internal.length + ' hints' : 'None');
           addRow('Affiliate hints', affiliates.length ? affiliates.length + ' entries' : 'None');
-          addRow('Ads', placements.length ? placements.length + ' — ' + summarizePlacements(placements) : 'None');
           addRow('CTA', ctaDetail);
 
           panel.appendChild(body);
@@ -623,36 +568,79 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           panel.appendChild(body);
         }
 
-        function updateHelp(selectId, helpId, options, fallback){
-          var select = $(selectId);
-          var help = $(helpId);
-          if (!select || !help) return;
-          function render(){
-            var value = select.value;
-            var match = options.find(function(opt){ return opt.key === value; });
-            help.textContent = match ? match.description : fallback;
+        function wordCount(md){
+          var text = String(md||'')
+            .replace(/```[\s\S]*?```/g,' ')
+            .replace(/`[^`]*`/g,' ')
+            .replace(/<[^>]+>/g,' ')
+            .replace(/[\*_#>~\-]+/g,' ');
+          var m = text.match(/\b[\p{L}\p{N}’']+\b/gu);
+          return m ? m.length : 0;
+        }
+        function renderPreview(spec){
+          var el = $('preview'); el.innerHTML = '';
+          var h1 = document.createElement('h1'); h1.textContent = spec.title || '(Un-named Incantation)'; el.appendChild(h1);
+          if (Array.isArray(spec.tags)){ var p = document.createElement('p'); p.className='text-sm text-inverse-subtle'; p.textContent='Tags: ' + spec.tags.join(', '); el.appendChild(p); }
+          var totalWords = 0;
+          for (var i=0;i<(spec.sections||[]).length;i++){
+            var sec = spec.sections[i];
+            var h2 = document.createElement('h2'); h2.textContent = sec.heading || 'Section'; el.appendChild(h2);
+            var div = document.createElement('div');
+            var safe = String(sec.markdown||'').trim().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+            div.innerHTML = safe;
+            el.appendChild(div);
+            totalWords += wordCount(sec.markdown||'');
           }
-          select.addEventListener('change', render);
-          render();
+          var meta = document.createElement('p');
+          meta.className='mt-4 text-xs text-body-faint';
+          meta.textContent = '~' + totalWords + ' words • ~' + Math.max(1, Math.round(totalWords/200)) + ' min read';
+          el.appendChild(meta);
         }
 
-        updateHelp('mode', 'modeHelp', PRESET_OPTIONS, DEFAULT_MODE_DESC);
-        updateHelp('style', 'styleHelp', STYLE_OPTIONS, DEFAULT_STYLE_DESC);
+        function renderCursePreview(spec){
+          var el = $('cursePreview');
+          if (!el) return;
+          el.innerHTML='';
+          if (!spec) return;
 
-        setStatus('Ready for PostSpec JSON.');
-        renderSpecSummary(null);
-        setCurseStatus('Ready for CurseSpec JSON.');
-        renderCurseSummary(null);
-        renderCursePreview(null);
+          var h1=document.createElement('h1');
+          h1.textContent = spec.title || '(untitled curse)';
+          el.appendChild(h1);
+
+          var tags = Array.isArray(spec.tags) ? spec.tags : [];
+          if (tags.length) {
+            var tagLine=document.createElement('p');
+            tagLine.className='text-sm text-body-subtle';
+            tagLine.textContent='Tags: ' + tags.join(', ');
+            el.appendChild(tagLine);
+          }
+
+          function appendSection(label, value){
+            var heading=document.createElement('h2');
+            heading.textContent=label;
+            el.appendChild(heading);
+            var div=document.createElement('div');
+            var safe=String(value || '').trim().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+            div.innerHTML = safe;
+            el.appendChild(div);
+          }
+
+          appendSection('Opening Reflection', spec.openingReflection || '');
+          appendSection('Invocation', spec.invocation || '');
+          appendSection('Method', spec.method || '');
+          appendSection('Closure & Aftercare', spec.closure || '');
+          if (spec.safetyNotes) appendSection('Safety Notes', spec.safetyNotes);
+        }
 
         $('genPrompt').addEventListener('click', async function(){
           try{
-            busy(true); setStatus('Generating prompt...', null);
+            busy(true); setStatus('Whispering guidance...', null);
             var body = {
               topic: $('topic').value || 'tea ritual for focus',
               words: Number($('words').value || 1200),
               ads: $('ads').checked ? 'on' : 'off',
-              kofi: $('kofi').checked ? 'on' : 'off'
+              kofi: $('kofi').checked ? 'on' : 'off',
+              reflectionPrompts: $('reflectionPrompts').value.split('\n').map(s => s.trim()).filter(Boolean)
             };
             var mode = $('mode').value;
             if (mode) body.mode = mode;
@@ -663,7 +651,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             var data = await res.json();
             if (!data.ok) throw new Error(data.error || 'gen failed');
             $('promptOut').value = data.prompt || '';
-            setStatus('Prompt ready ✓', true);
+            setStatus('Guidance whispered ✓', true);
           }catch(e){ setStatus('Prompt error: ' + (e.message||String(e)), false); }
           finally{ busy(false); }
         });
@@ -672,14 +660,14 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           var field = $('promptOut');
           try{
             await navigator.clipboard.writeText(field?.value || '');
-            setStatus('Copied ✓', true);
+            setStatus('Copied spell ✓', true);
           }
           catch {
             if (field) {
               field.focus();
               field.select();
             }
-            setStatus('Press ⌘/Ctrl+C to copy', null);
+            setStatus('Press ⌘/Ctrl+C to copy the verse', null);
           }
         });
 
@@ -695,11 +683,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               else if (ch==='"'){ inStr=false; }
             } else {
               if (ch === '"'){ inStr=true; out+=ch; }
-              else if (ch === '\\'){
+              else if (ch === '\\'){ // Check for literal backslash
                 var next=s[i+1];
-                if (next==='[' || next===']' || next==='{' || next==='}'){ continue; }
-                out+=ch;
-              } else { out+=ch; }
+                // Only keep backslash if it's not escaping a JSON structural character
+                        if (['[', ']', '{', '}'].includes(next)){ continue; }              } else { out+=ch; }
             }
           }
           return out;
@@ -713,11 +700,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
         function normalizeQuotes(s){
           return s
-            .replace(/[\u201C\u201D]/g, '"')
-            .replace(/[\u2018\u2019]/g, "'");
+            .replace(/[“”]/g, '"')
+            .replace(/[‘’]/g, "'");
         }
 
-        function stripInvisible(s){
+        function stripInvisible(s){ // Removes BOM, ZWSP, etc.
           return s.replace(/[\uFEFF\u200B-\u200F\u202A-\u202E\u00A0\r]/g, '');
         }
 
@@ -803,8 +790,8 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         function normalizeCurseSpec(spec){
           if (!spec || typeof spec !== 'object') return spec;
           if (typeof spec.specVersion === 'string') {
-            var parsed = Number(spec.specVersion);
-            if (!Number.isNaN(parsed)) spec.specVersion = parsed;
+            var parsedVersion = Number(spec.specVersion);
+            if (!Number.isNaN(parsedVersion)) spec.specVersion = parsedVersion;
           }
           ['title','slug','openingReflection','invocation','method','closure','safetyNotes'].forEach(function(key){
             if (typeof spec[key] === 'string') spec[key] = spec[key].trim();
@@ -838,8 +825,10 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         }
 
         function parseSpec(){
-          var raw = document.getElementById('spec').value;
-          if (!raw.trim()) throw new Error('No JSON provided.');
+          var field = $('spec');
+          if (!field) throw new Error('No textarea found.');
+          var raw = field.value;
+          if (!raw.trim()) throw new Error('No JSON provided. The Cauldron is empty.');
 
           var base = stripInvisible(normalizeQuotes(stripCodeFences(raw)));
           var attempts = [base];
@@ -847,15 +836,8 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           if (cleanedBackslashes !== base) attempts.push(cleanedBackslashes);
 
           function tryParse(value){
-            try {
-              return JSON.parse(value);
-            } catch(_e) {
-              try {
-                var maybe = JSON.parse(value);
-                if (typeof maybe === 'string') {
-                  return JSON.parse(maybe);
-                }
-              } catch(_err){}
+            try { return JSON.parse(value); } catch(_e) {
+              try { var maybe = JSON.parse(value); if (typeof maybe === 'string') { return JSON.parse(maybe); } } catch(_err){}
             }
             return null;
           }
@@ -866,7 +848,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           }
 
           if (!parsed) {
-            throw new Error('Invalid JSON — cleaned for fences/quotes, but structure still fails. Save to a file and validate with jq.');
+            throw new Error('Invalid JSON — cleansed of superficial corruption, but the core structure remains blighted. Consult the Elder Scrolls (validate with jq) for truth.');
           }
 
           return normalizeSpec(parsed);
@@ -875,8 +857,8 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         function parseCurseSpec(){
           var field = $('curseSpec');
           if (!field) throw new Error('No textarea found.');
-          var raw = field.value;
-          if (!raw.trim()) throw new Error('No JSON provided.');
+          var raw = document.getElementById('spec').value; // NOTE: This should likely be $('curseSpec').value
+          if (!raw.trim()) throw new Error('No JSON provided. The Cauldron is empty.');
 
           var base = stripInvisible(normalizeQuotes(stripCodeFences(raw)));
           var attempts = [base];
@@ -885,11 +867,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
           var parsed = null;
           for (var i=0;i<attempts.length && !parsed;i++){
-            try {
-              parsed = JSON.parse(attempts[i]);
-            } catch (_err) {
-              parsed = null;
-            }
+            try { parsed = JSON.parse(attempts[i]); } catch (_err) { parsed = null; }
           }
 
           if (!parsed) {
@@ -936,16 +914,8 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         function matchesRecentFilter(post, term){
           if (!term) return true;
           var search = term.toLowerCase();
-          var candidates = [
-            post.title,
-            post.slug,
-            Array.isArray(post.tags) ? post.tags.join(' ') : '',
-            post.metaDescription,
-            post.excerpt
-          ].filter(Boolean);
-          return candidates.some(function(value){
-            return typeof value === 'string' && value.toLowerCase().includes(search);
-          });
+          var candidates = [ post.title, post.slug, Array.isArray(post.tags) ? post.tags.join(' ') : '', post.metaDescription, post.excerpt ].filter(Boolean);
+          return candidates.some(function(value){ return typeof value === 'string' && value.toLowerCase().includes(search); });
         }
 
         function insertStubForPost(post){
@@ -969,6 +939,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             entities: [],
             internalLinkHints: [],
             affiliateHints: [],
+            reflectionPrompts: Array.isArray(post?.reflectionPrompts) ? post.reflectionPrompts : [],
             heroImagePrompt: post?.heroImagePrompt || ''
           };
           editor.value = JSON.stringify(stub, null, 2);
@@ -980,15 +951,13 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         function renderRecentPosts(){
           if (!recentListEl) return;
           if (!recentPosts.length) {
-            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-body-muted">No posts yet.</div>';
+            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-body-muted">No scrolls in the archive yet.</div>';
             return;
           }
           var term = recentFilterText.trim().toLowerCase();
-          var filtered = recentPosts.filter(function(post){
-            return matchesRecentFilter(post, term);
-          });
+          var filtered = recentPosts.filter(function(post){ return matchesRecentFilter(post, term); });
           if (!filtered.length) {
-            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-body-muted">No matches. Try a different search.</div>';
+            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-body-muted">No matching scrolls. Refine your scrying.</div>';
             return;
           }
           recentListEl.innerHTML = '';
@@ -1007,7 +976,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
                 <span class="text-[10px] font-semibold uppercase tracking-wide text-body-muted">${dateLabel}</span>
               </div>
               <div class="mt-2 flex flex-wrap gap-2">
-                <button type="button" class="rounded-lg border border-line-neutral px-2 py-1 text-[11px] font-semibold hover:bg-surface-base" data-recent-insert data-slug="${safeSlugAttr}">Insert stub</button>
+                <button type="button" class="rounded-lg border border-line-neutral px-2 py-1 text-[11px] font-semibold hover:bg-surface-base" data-recent-insert data-slug="${safeSlugAttr}">Infuse stub</button>
                 <a class="rounded-lg border border-line-neutral px-2 py-1 text-[11px] font-semibold text-primary hover:bg-surface-base" href="/admin/posts?slug=${encodeURIComponent(post.slug || '')}" target="_blank" rel="noopener">Edit</a>
               </div>
             `;
@@ -1017,21 +986,17 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
         async function loadRecentPosts(){
           if (!recentListEl) return;
-          recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-body-muted">Loading recent posts…</div>';
+          recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-body-muted">Summoning recent scrolls…</div>';
           try{
             var res = await fetch(DEV_API + '/posts/list', { method: 'POST' });
             var data = await res.json();
             if (!data?.ok) throw new Error(data?.error || 'Unable to load posts');
             var items = Array.isArray(data.items) ? data.items : [];
-            items.sort(function(a, b){
-              var dateA = parseDateValue(a?.createdAt) || parseDateValue(a?.publishedAt) || 0;
-              var dateB = parseDateValue(b?.createdAt) || parseDateValue(b?.publishedAt) || 0;
-              return dateB - dateA;
-            });
+            items.sort(function(a, b){ var dateA = parseDateValue(a?.createdAt) || parseDateValue(a?.publishedAt) || 0; var dateB = parseDateValue(b?.createdAt) || parseDateValue(b?.publishedAt) || 0; return dateB - dateA; });
             recentPosts = items.slice(0, 10);
             renderRecentPosts();
           }catch(error){
-            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-danger">Failed to load recent posts.</div>';
+            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-danger">The archive resisteth! Failed to load recent scrolls.</div>';
           }
         }
 
@@ -1053,28 +1018,17 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           var url = DEV_API + '/ingest' + (params.length ? '?' + params.join('&') : '');
           var res;
           try {
-            res = await fetch(url, {
-              method:'POST',
-              headers:{'Content-Type':'application/json'},
-              body: JSON.stringify(spec)
-            });
+            res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(spec) });
           } catch (networkError) {
-            throw buildError('Network error contacting ingest endpoint: ' + (networkError && networkError.message ? networkError.message : 'unknown network error'), 'network', {
-              original: networkError
-            });
+            throw buildError('Network error contacting ingest endpoint: ' + (networkError && networkError.message ? networkError.message : 'unknown network error'), 'network', { original: networkError });
           }
 
           var text;
-          try {
-            text = await res.text();
-          } catch (readError) {
-            text = '';
-          }
+          try { text = await res.text(); } catch (readError) { text = ''; }
 
           var data = {};
           if (text) {
-            try { data = JSON.parse(text); }
-            catch { data = { raw: text }; }
+            try { data = JSON.parse(text); } catch { data = { raw: text }; }
           }
 
           if (!res.ok) {
@@ -1093,21 +1047,13 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           var url = DEV_API + '/curses/ingest' + (dryRun === 'true' ? '?dryRun=true' : '');
           var res;
           try {
-            res = await fetch(url, {
-              method:'POST',
-              headers:{'Content-Type':'application/json'},
-              body: JSON.stringify({ spec, dryRun })
-            });
+            res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ spec, dryRun }) });
           } catch (networkError) {
-            throw buildError('Network error contacting curse ingest endpoint: ' + (networkError && networkError.message ? networkError.message : 'unknown network error'), 'network', {
-              original: networkError
-            });
+            throw buildError('Network error contacting curse ingest endpoint: ' + (networkError && networkError.message ? networkError.message : 'unknown network error'), 'network', { original: networkError });
           }
 
           var data;
-          try {
-            data = await res.json();
-          } catch (parseError) {
+          try { data = await res.json(); } catch (parseError) {
             throw buildError('Curse ingest returned non-JSON response.', 'http', { status: res.status, original: parseError });
           }
 
@@ -1160,7 +1106,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
         $('validateBtn').addEventListener('click', async function(){
           try{
-            busy(true); setStatus('Validating…', null);
+            busy(true); setStatus('Verifying runes…', null);
             var spec = parseSpec();
             var data = await postSpec(spec, { dryRun: true });
             var finalSpec = normalizeResponseSpec(data.spec, spec);
@@ -1189,8 +1135,8 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         }
         function renderPreview(spec){
           var el = $('preview'); el.innerHTML = '';
-          var h1 = document.createElement('h1'); h1.textContent = spec.title || '(untitled)'; el.appendChild(h1);
-          if (Array.isArray(spec.tags)){ var p = document.createElement('p'); p.className='text-sm text-body-subtle'; p.textContent='Tags: ' + spec.tags.join(', '); el.appendChild(p); }
+          var h1 = document.createElement('h1'); h1.textContent = spec.title || '(Un-named Incantation)'; el.appendChild(h1);
+          if (Array.isArray(spec.tags)){ var p = document.createElement('p'); p.className='text-sm text-inverse-subtle'; p.textContent='Tags: ' + spec.tags.join(', '); el.appendChild(p); }
           var totalWords = 0;
           for (var i=0;i<(spec.sections||[]).length;i++){
             var sec = spec.sections[i];
@@ -1231,7 +1177,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             el.appendChild(heading);
             var div=document.createElement('div');
             var safe=String(value || '').trim().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-            div.innerHTML=safe;
+            div.innerHTML = safe;
             el.appendChild(div);
           }
 
@@ -1265,7 +1211,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
         $('ingestBtn').addEventListener('click', async function(){
           try{
-            busy(true); setStatus('Validating…', null);
+            busy(true); setStatus('Verifying runes…', null);
             var spec = parseSpec();
             var dryRun = await postSpec(spec, { dryRun: true });
             var finalSpec = normalizeResponseSpec(dryRun.spec, spec);
@@ -1280,7 +1226,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               setStatus(dryRun.error || 'Validation errors found.', false, warnings, notes, errors, postStubs);
               return;
             }
-            setStatus(finalSpec._draft ? 'Validation passed. Saving draft…' : 'Validation passed. Ingesting…', null, warnings, notes, errors, postStubs);
+            setStatus(finalSpec._draft ? 'Validation passed. Securing draft in grimoire…' : 'Validation passed. Infusing into the archive…', null, warnings, notes, errors, postStubs);
             var data = await postSpec(finalSpec, { dryRun: false });
             if (data.ok === false) {
               setStatus(data.error || 'Ingest failed.', false, extractArray(data.warnings), extractArray(data.normalizationReport), extractArray(data.errors), extractArray(data.postStubs));
@@ -1295,9 +1241,9 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             var slug = data.slug || (finalSpec && finalSpec.slug) || '';
             var msg;
             if (data.saved === false) {
-              msg = finalSpec._draft ? 'Draft validated (dry run) → ' + location : 'Ingested (dry run) → ' + location;
+              msg = finalSpec._draft ? 'Draft verified (dry run) → ' + location : 'Infused (dry run) → ' + location;
             } else {
-              msg = (finalSpec._draft ? 'Draft saved ✓' : 'Ingested ✓') + ' → ' + location;
+              msg = (finalSpec._draft ? 'Draft secured ✓' : 'Infused ✓') + ' → ' + location;
             }
             if (createdPosts.length) {
               msg += ' • Created ' + createdPosts.length + ' stub post' + (createdPosts.length === 1 ? '' : 's');
@@ -1313,7 +1259,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         $('ingestPublishBtn').addEventListener('click', async function(){
           try{
             setSaveMode('publish');
-            busy(true); setStatus('Validating…', null);
+            busy(true); setStatus('Verifying runes…', null);
             var spec = parseSpec();
             var dryRun = await postSpec(spec, { dryRun: true });
             var finalSpec = normalizeResponseSpec(dryRun.spec, spec);
@@ -1327,7 +1273,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               setStatus(dryRun.error || 'Validation errors found.', false, warnings, notes, errors, postStubs);
               return;
             }
-            setStatus('Validation passed. Ingesting…', null, warnings, notes, errors, postStubs);
+            setStatus('Validation passed. Infusing into the archive…', null, warnings, notes, errors, postStubs);
             var data = await postSpec(finalSpec, { dryRun: false });
             if (data.ok === false) {
               setStatus(data.error || 'Ingest failed.', false, extractArray(data.warnings), extractArray(data.normalizationReport), extractArray(data.errors), extractArray(data.postStubs));
@@ -1342,7 +1288,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             var b = await r.json();
             if (!b.ok) throw new Error((b.steps && b.steps.map(function(s){return s.err;}).filter(Boolean).join('\n')) || b.error || 'bundle failed');
             var slug = data.slug || (finalSpec && finalSpec.slug) || '';
-            var publishMsg = 'Published ✓';
+            var publishMsg = 'Unveiled ✓';
             if (createdPosts.length) {
               publishMsg += ' • Created ' + createdPosts.length + ' stub post' + (createdPosts.length === 1 ? '' : 's');
             }
@@ -1402,16 +1348,13 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               if (altar) body.altarItem = altar;
               if (journal) body.journalingFollowUp = journal;
               var res = await fetch(DEV_API + '/curses/prompt', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
-              if (!res.ok) throw new Error('Prompt request failed (' + res.status + ')');
+              if (!res.ok) throw new Error('Prompt request failed ('+res.status+')');
               var data = await res.json();
               if (!data.ok) throw new Error(data.error || 'Prompt request failed');
               $('cursePromptOut').value = data.prompt || '';
               setCurseStatus('Prompt ready ✓', true);
-            } catch (e) {
-              setCurseStatus('Prompt error: ' + (e && e.message ? e.message : String(e)), false);
-            } finally {
-              curseBusy(false);
-            }
+            } catch (e) { setCurseStatus('Prompt error: ' + (e && e.message ? e.message : String(e)), false); } 
+            finally { curseBusy(false); }
           });
 
           $('curseCopyPrompt').addEventListener('click', async function(){
@@ -1437,11 +1380,8 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               renderCurseSummary(finalSpec);
               renderCursePreview(finalSpec);
               setCurseStatus('Valid ✓', true, extractArray(data.errors));
-            } catch (e) {
-              handleCurseError(e);
-            } finally {
-              curseBusy(false);
-            }
+            } catch (e) { handleCurseError(e); }
+            finally { curseBusy(false); }
           });
 
           $('curseIngestBtn').addEventListener('click', async function(){
@@ -1462,11 +1402,8 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               var path = data.path || ('archive/curses/' + (data.slug || finalSpec.slug || 'curse') + '.md');
               var message = (data.saved === false ? 'Saved (dry run only).' : 'Ingested ✓') + ' → ' + path;
               setCurseStatus(message, true, extractArray(data.errors));
-            } catch (e) {
-              handleCurseError(e);
-            } finally {
-              curseBusy(false);
-            }
+            } catch (e) { handleCurseError(e); }
+            finally { curseBusy(false); }
           });
 
           $('curseClearBtn').addEventListener('click', function(){

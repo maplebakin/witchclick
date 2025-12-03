@@ -2,7 +2,10 @@
 // src/components/CtaFooter.astro — fixed
 // Astro frontmatter is server-side script; don't return JSX from here.
 // We compute text/href, then render conditionally in the template below.
-import { KO_FI_URL, KOFI_CTA_VARIANTS } from "./cta";
+import { KOFI_CTA_VARIANTS } from "./cta"; // KO_FI_URL is removed
+
+// New imports
+import { readSettings } from '../utils/settings';
 
 export interface Props {
   type: 'kofi' | 'download' | 'none';
@@ -14,6 +17,11 @@ const { type, id } = Astro.props as Props;
 let text = '';
 let href = '';
 
+// Read settings to get Ko-fi username
+const settings = readSettings();
+const kofiUsername = settings.kofiUsername || 'mirash'; // Fallback to a default or generic if not set
+const baseKofiUrl = `https://ko-fi.com/${kofiUsername}`;
+
 if (type === 'kofi') {
   const fallback =
     KOFI_CTA_VARIANTS[0] ??
@@ -21,7 +29,7 @@ if (type === 'kofi') {
   const idx = Math.floor(Math.random() * KOFI_CTA_VARIANTS.length);
   const variant = KOFI_CTA_VARIANTS[idx] ?? fallback;
   text = variant;
-  href = KO_FI_URL;
+  href = baseKofiUrl; // Use dynamic URL
 } else if (type === 'download') {
   text = 'Explore cozy tools and printable rituals.';
   href = '/tools/';

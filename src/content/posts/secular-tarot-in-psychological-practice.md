@@ -2,13 +2,12 @@
 title: 'Secular Tarot in Psychological Practice: A Gentle Guide'
 slug: secular-tarot-in-psychological-practice
 excerpt: >-
-  A cozy, ethics-first guide to using tarot as a secular reflection tool beside
-  therapy or personal growth work. Includes a 5-minute check-in, a deeper
-  spread, accessibility tweaks, and a simple checklist.
+  A cozy, ethics-first guide to using tarot as a secular reflection tool beside therapy or personal growth work.
+  Includes a 5-minute check-in, a deeper spread, accessibility tweaks, and a simple checklist.
 metaTitle: 'Secular Tarot in Psychological Practice: A Gentle Guide'
 metaDescription: >-
-  How to use secular tarot as a reflective tool alongside therapy or self-care.
-  Two versions (5-minute and deep dive), plus accessibility tips and ethics.
+  How to use secular tarot as a reflective tool alongside therapy or self-care. Two versions (5-minute and deep dive),
+  plus accessibility tips and ethics.
 tags:
   - calm
   - secular tarot
@@ -24,7 +23,7 @@ outline:
   - Checklist / Summary Box
   - Safety & Ethics
   - Wrap-Up with Reflection Prompt
-wordCount: 1128
+wordCount: 1171
 readingMinutes: 6
 includeAds: true
 includeKofi: false
@@ -173,3 +172,5 @@ You didn't need prophecy to learn something today. You needed a moment of attent
 **Reflection Prompt:** What is one thing this card invites me to try in the next 24 hours, and what support would make that feel doable?
 
 If you want to keep exploring inside WitchClick, look for these anchors mentioned above: Brew a Tea Ritual for Focus, Tarot as a Secular Tool, Worldbuilding Tarot, PlayStation Tarot, Sunday Football Tarot, When Everything Feels Pointless, and Create a Calm Space During Political Unrest. Close your notebook, stretch, and consider a *cozy narrative game night* as a soft landing.
+
+Further reading: [Secular Tarot Spread When You're Seeking a Clear Sign](/post/secular-tarot-spread-for-a-sign), [Colours as Doorways: Emotional and Spiritual Inquiry](/post/colours-emotional-spiritual-inquiry), [What's the Deal with the Rapture? A Cozy Secular Tour](/post/whats-the-deal-with-the-rapture-a-cozy-secular-tour). Evidence base: [Mindfulness overview (APA)](https://www.apa.org/topics/mindfulness).

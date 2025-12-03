@@ -2,13 +2,12 @@
 title: 'When to Let Yourself Rest: A Gentle Ritual & Guide'
 slug: when-to-let-yourself-rest
 excerpt: >-
-  Not sure if you should push through or pause? Use a five-minute check-in or a
-  deeper ritual to decide when to rest—kindly, clearly, and without guilt.
+  Not sure if you should push through or pause? Use a five-minute check-in or a deeper ritual to decide when to
+  rest—kindly, clearly, and without guilt.
 metaTitle: 'When to Let Yourself Rest: A Gentle Ritual & Guide'
 metaDescription: >-
-  Feeling torn between pushing through and pausing? This cozy, secular guide
-  offers a quick check-in, a deeper ritual, and a simple checklist to decide
-  when to rest—without guilt.
+  Feeling torn between pushing through and pausing? This cozy, secular guide offers a quick check-in, a deeper ritual,
+  and a simple checklist to decide when to rest—without guilt.
 tags:
   - calm
   - rest
@@ -25,7 +24,7 @@ outline:
   - Safety & Ethics
   - Checklist / Summary Box
   - Wrap-up with Reflection Prompt
-wordCount: 1143
+wordCount: 1162
 readingMinutes: 6
 includeAds: true
 includeKofi: true
@@ -129,3 +128,5 @@ This piece is for reflection and everyday planning, not medical or therapeutic a
 You don't have to earn softness. You can choose it because you're alive. When you practice small, honest rests, the day often becomes more doable—not because you pushed harder, but because you listened sooner.
 
 Reflection Prompt: If I trusted that rest pays me back, what would I choose for the next hour—and what gentle guardrails would help me keep that promise?
+
+Further reading: [Day After Acupuncture Recovery: Gentle Body Awareness](/post/day-after-acupuncture-recovery-gentle-body-awareness), [Tarot Ritual for When Creativity Feels Pointless](/post/creativity-tarot-ritual), [When You're Sick and Home with a Sick Kiddo](/post/sick-parent-sick-child-reflection). Evidence base: [Mindfulness overview (APA)](https://www.apa.org/topics/mindfulness).

@@ -1,0 +1,66 @@
+---
+// src/components/admin/HeroAttacher.astro
+import Card from "@/components/ui/Card.astro";
+import Button from "@/components/ui/Button.astro";
+---
+<Card as="li">
+    <div class="flex items-start gap-4">
+      <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-brand-accent/10 text-sm font-semibold text-brand-primary">
+        4
+      </span>
+      <div class="flex-1 space-y-4">
+        <div class="space-y-1">
+          <h2 class="text-base font-semibold text-neutral-800">Step 4 — Attach and verify</h2>
+          <p class="text-sm text-neutral-500">
+            When the preview and alt text look right, attach the hero image to update the post everywhere.
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <Button
+            variant="primary"
+            size="sm"
+            data-submit
+            disabled
+          >
+            Upload &amp; Attach
+          </Button>
+          <span class="text-sm text-neutral-500" data-status></span>
+        </div>
+        <div
+          class="hidden rounded-lg border border-status-success-soft bg-status-success-soft px-4 py-3 text-sm text-status-success-strong"
+          data-success
+        ></div>
+      </div>
+    </div>
+</Card>
+
+<script>
+    // This script is intentionally sparse.
+    // The real implementation would move the submit logic from hero.astro here.
+    // It would depend on state from the other components (which post is selected,
+    // which file is staged for upload), further proving the need for state management.
+    document.addEventListener('DOMContentLoaded', () => {
+        const submitBtn = document.querySelector('[data-submit]');
+        if (!submitBtn) return;
+
+        submitBtn.addEventListener('click', async (event) => {
+            event.preventDefault();
+            const statusEl = document.querySelector('[data-status]');
+            if (submitBtn.hasAttribute('disabled')) {
+                if (statusEl) statusEl.textContent = 'Please complete all previous steps.';
+                return;
+            }
+
+            // Simplified logic. The real version would get the selected post slug,
+            // the file data, and the alt text from the other components' state.
+            if (statusEl) statusEl.textContent = 'Uploading and attaching...';
+            
+            // Fake delay to simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            if (statusEl) statusEl.textContent = 'Successfully attached hero image!';
+            const successEl = document.querySelector('[data-success]');
+            if(successEl) successEl.classList.remove('hidden');
+        });
+    });
+</script>

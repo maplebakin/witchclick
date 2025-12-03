@@ -58,8 +58,8 @@ const outline: OutlineItem[] = Array.isArray(spec.outline) ? spec.outline : [];
     <header class="border-b border-line-inverse pb-4">
       <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p class="text-xs uppercase tracking-[0.2em] text-muted-subtle">Slug: {slug}</p>
-          <h2 class="mt-2 text-3xl font-semibold text-inverse-soft">{spec.title ?? 'Untitled draft'}</h2>
+          <p class="text-xs uppercase tracking-[0.2em] text-inverse-subtle">Slug: {slug}</p>
+          <h2 class="mt-2 text-3xl font-semibold text-inverse-soft">{spec.title ?? 'Un-named Incantation'}</h2>
           <p class="mt-2 max-w-2xl text-sm text-inverse-subtle">{spec.metaDescription ?? spec.excerpt}</p>
         </div>
         <div class="flex flex-col items-end gap-1 text-right text-xs text-inverse-faint">
@@ -74,15 +74,15 @@ const outline: OutlineItem[] = Array.isArray(spec.outline) ? spec.outline : [];
         <h3 class="text-sm font-semibold uppercase tracking-wide text-inverse-subtle">Outline</h3>
         <ol class="mt-3 space-y-2 text-sm text-inverse-subtle">
           {outline.length === 0 ? (
-            <li class="text-muted-subtle">No outline provided.</li>
+            <li class="text-muted-subtle">This spell's path is yet unwritten.</li>
           ) : (
             outline.map((item, index) => (
-              <li class="flex items-start gap-2">
-                <span class="mt-0.5 h-5 w-5 shrink-0 rounded-full bg-surface-info-soft/20 text-center text-xs font-semibold text-info-faint">
+              <li class="flex items-start gap-3">
+                <span class="mt-0.5 h-5 w-5 shrink-0 rounded-full bg-info-faint text-info-strong">
                   {index + 1}
                 </span>
                 <div>
-                  <p class="font-medium text-inverse-soft">{item.heading ?? 'Untitled section'}</p>
+                  <p class="font-medium text-inverse-soft">{item.heading ?? 'Un-named Thread'}</p>
                   {item.id && <p class="text-xs text-muted-subtle">#{item.id}</p>}
                 </div>
               </li>
@@ -92,18 +92,18 @@ const outline: OutlineItem[] = Array.isArray(spec.outline) ? spec.outline : [];
       </div>
       <div class="space-y-8">
         {sections.length === 0 ? (
-          <p class="text-inverse-faint">No sections to display yet. Start adding ritual content to the JSON file.</p>
+          <p class="text-inverse-faint">The ritual's heart awaits its verses. Infuse the spell with content.</p>
         ) : (
           sections.map((section) => (
             <section class="rounded-lg border border-line-inverse bg-surface-inverse-soft/40 p-5 shadow-inner">
               <header class="mb-4 border-b border-line-inverse pb-2">
-                <h3 class="text-lg font-semibold text-inverse-soft">{section.heading ?? 'Untitled section'}</h3>
+                <h3 class="text-lg font-semibold text-inverse-soft">{section.heading ?? 'Un-named Verse'}</h3>
               </header>
               <div class="prose prose-invert max-w-none text-sm leading-relaxed">
                 {section.markdown ? (
                   <MarkdownRenderer content={section.markdown} />
                 ) : (
-                  <p class="italic text-muted-subtle">No markdown provided.</p>
+                  <p class="italic text-muted-subtle">This verse awaits its words.</p>
                 )}
               </div>
             </section>
@@ -119,13 +119,13 @@ const outline: OutlineItem[] = Array.isArray(spec.outline) ? spec.outline : [];
           {Array.isArray(spec.entities) && spec.entities.length > 0 ? (
             spec.entities.map((entity) => (
               <li class="rounded border border-line-inverse/60 bg-surface-inverse-soft/40 p-3">
-                <p class="font-medium text-inverse-soft">{entity.name ?? 'Unnamed entity'}</p>
+                <p class="font-medium text-inverse-soft">{entity.name ?? 'Un-named Familiar'}</p>
                 <p class="text-xs uppercase tracking-wide text-info-soft">{entity.type ?? '—'}</p>
                 {entity.summary && <p class="mt-2 text-xs text-inverse-faint">{entity.summary}</p>}
               </li>
             ))
           ) : (
-            <li class="text-muted-subtle">No entities defined.</li>
+            <li class="text-muted-subtle">No familiars summoned yet.</li>
           )}
         </ul>
       </div>
@@ -140,7 +140,7 @@ const outline: OutlineItem[] = Array.isArray(spec.outline) ? spec.outline : [];
               </li>
             ))
           ) : (
-            <li class="text-muted-subtle">No internal link hints yet.</li>
+            <li class="text-muted-subtle">No threads woven into the tapestry yet.</li>
           )}
         </ul>
       </div>
@@ -148,7 +148,7 @@ const outline: OutlineItem[] = Array.isArray(spec.outline) ? spec.outline : [];
         <h3 class="text-sm font-semibold uppercase tracking-wide text-inverse-subtle">CTA & Ads</h3>
         <div class="mt-3 space-y-3">
           <div class="rounded border border-line-info-strong/40 bg-surface-info-soft/10 p-3">
-            <p class="text-xs uppercase tracking-wide text-info-faint">{spec.cta?.type ?? 'No CTA'}</p>
+            <p class="text-xs uppercase tracking-wide text-info-faint">{spec.cta?.type ?? 'No Invitation'}</p>
             {spec.cta?.headline && <p class="mt-2 text-base font-semibold text-inverse-soft">{spec.cta.headline}</p>}
             {spec.cta?.body && <p class="mt-2 text-xs text-inverse-subtle">{spec.cta.body}</p>}
             {spec.cta?.buttonLabel && <p class="mt-2 text-xs font-semibold text-info-faint">Button: {spec.cta.buttonLabel}</p>}
@@ -158,7 +158,7 @@ const outline: OutlineItem[] = Array.isArray(spec.outline) ? spec.outline : [];
             <p class="mt-1 text-sm text-inverse-muted">
               {Array.isArray(spec.adPlacements) && spec.adPlacements.length > 0
                 ? spec.adPlacements.join(', ')
-                : 'None specified'}
+                : 'No offerings prepared'}
             </p>
           </div>
           <div class="rounded border border-line-inverse/60 bg-surface-inverse-soft/40 p-3">
@@ -167,12 +167,12 @@ const outline: OutlineItem[] = Array.isArray(spec.outline) ? spec.outline : [];
               {Array.isArray(spec.affiliateHints) && spec.affiliateHints.length > 0 ? (
                 spec.affiliateHints.map((hint) => (
                   <li class="rounded border border-line-inverse/60 bg-surface-inverse-soft/20 p-2">
-                    <p class="font-medium text-inverse-soft">{hint.product ?? hint.key ?? 'Unnamed product'}</p>
+                    <p class="font-medium text-inverse-soft">{hint.product ?? hint.key ?? 'Un-named Artifact'}</p>
                     {hint.rationale && <p class="text-xs text-inverse-faint">{hint.rationale}</p>}
                   </li>
                 ))
               ) : (
-                <li class="text-muted-subtle">No affiliate hints.</li>
+                <li class="text-muted-subtle">No potent recommendations yet.</li>
               )}
             </ul>
           </div>
@@ -182,8 +182,8 @@ const outline: OutlineItem[] = Array.isArray(spec.outline) ? spec.outline : [];
 
     <section class="rounded-lg border border-line-inverse bg-surface-inverse-soft/40 p-4 text-xs text-inverse-faint">
       <details>
-        <summary class="cursor-pointer text-sm font-semibold text-inverse-muted">Raw spec JSON</summary>
-        <pre class="mt-4 max-h-96 overflow-auto rounded bg-surface-inverse/80 p-4 text-[11px] leading-relaxed">{JSON.stringify(spec, null, 2)}</pre>
+        <summary class="cursor-pointer text-sm font-semibold text-inverse-muted">Scroll of Unveiled Truths</summary>
+        <pre class="mt-4 max-h-[50vh] overflow-auto rounded bg-surface-inverse/80 p-4 text-[11px] leading-relaxed">{JSON.stringify(spec, null, 2)}</pre>
       </details>
     </section>
   </article>

@@ -33,7 +33,7 @@ const ingestDir = resolveIngestDir();
 async function main() {
   const [, , rawSlug] = process.argv;
   if (!rawSlug) {
-    console.error('Usage: npm run promote -- <slug>');
+    console.error('Usage: summon promote -- <spell-slug> (e.g., summon promote -- whispering-hex)');
     process.exit(1);
   }
 
@@ -43,7 +43,7 @@ async function main() {
   try {
     raw = await readFile(draftPath, 'utf8');
   } catch (err) {
-    console.error(`Could not read draft at ${draftPath}:`, err.message ?? err);
+    console.error(`Blighted Scroll! Could not find or read draft at ${draftPath}:`, err.message ?? err);
     process.exit(1);
   }
 
@@ -51,13 +51,13 @@ async function main() {
   try {
     parsed = JSON.parse(raw);
   } catch (err) {
-    console.error(`Draft is not valid JSON: ${err.message ?? err}`);
+    console.error(`Corrupted Incantation! Draft is not valid JSON, check your runes: ${err.message ?? err}`);
     process.exit(1);
   }
 
   const validation = PostSpecV2Schema.safeParse(parsed);
   if (!validation.success) {
-    console.error('Draft failed PostSpec v2 validation. Fix these issues before promoting:');
+    console.error('Foul Play! Draft failed PostSpec v2 validation. Mend these broken threads before promoting:');
     for (const issue of validation.error.issues) {
       console.error(` • ${issue.path.join('.') || '(root)'}: ${issue.message}`);
     }

@@ -2,14 +2,12 @@
 title: 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore'
 slug: worldbuilding-tarot-spread-and-ritual
 excerpt: >-
-  Use tarot as a friendly world-design engine. This spread and ritual help you
-  sketch setting, power, and conflict while keeping your lore grounded and
-  playable.
+  Use tarot as a friendly world-design engine. This spread and ritual help you sketch setting, power, and conflict while
+  keeping your lore grounded and playable.
 metaTitle: 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore'
 metaDescription: >-
-  Design richer worlds with a tarot spread and mini ritual that map your
-  setting, stakes, and tone. Step-by-step prompts, timing tips, and a short
-  checklist.
+  Design richer worlds with a tarot spread and mini ritual that map your setting, stakes, and tone. Step-by-step
+  prompts, timing tips, and a short checklist.
 tags:
   - planning
   - tarot
@@ -27,7 +25,7 @@ outline:
   - Quick Checklist
   - 'Safety, accessibility, and ethics'
   - Wrap-up
-wordCount: 826
+wordCount: 917
 readingMinutes: 4
 entities:
   - type: tarot
@@ -100,7 +98,6 @@ heroImageAlt: 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore — hero
 spoonLevel: medium
 cluster: tarot-spreads
 ---
-
 ## Why tarot works for worldbuilding
 
 Tarot gives you structured surprise: clear positions plus symbolic cards. That mix is perfect for building worlds that feel alive without over-planning every brick. Instead of blocks of lore that never get used, you create playable prompts: places to visit, rules to test, tensions to explore.
@@ -214,3 +211,4 @@ Ethics: borrow from cultures with respect; change names and surface features; av
 
 Worlds don’t appear all at once; they accrete. The World Loom spread gives you just enough structure to keep moving, and the ritual makes the work feel inviting. When you return to the desk altar, pick one card and deepen it, or draw a single clarifier for tomorrow’s pacing beats. If you get stuck, reread Card 7 and start with the hook.
 
+Further reading: [Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions](/post/tarot-as-a-secular-tool), [Sunday Football Tarot: A Game-Day Spread and Ritual Guide](/post/sunday-football-tarot-spread-and-ritual), [When Life Feels on Pause: A Gentle Ritual & Guide](/post/when-life-feels-on-pause). Evidence base: [Mindfulness overview (APA)](https://www.apa.org/topics/mindfulness).

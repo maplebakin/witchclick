@@ -1,4 +1,4 @@
----
+--- 
 // src/layouts/Base.astro
 import "@/styles/base.css";
 import "@/styles/cards.css";
@@ -6,6 +6,7 @@ import "@/styles/tailwind.css";
 
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+
 import {
   primaryNavLinks,
   secondaryNavLinks,
@@ -135,12 +136,12 @@ const FALLBACK_ACCENT = '"Cormorant Garamond", "Cinzel", serif';
 const THEME_FIELD_SET = new Set<string>(ALL_FIELDS);
 
 const PLAIN_READING_ROUTE_PATTERNS = [
-  /^\/post\//,
-  /^\/entities\//,
-  /^\/curses\//,
-  /^\/tools\//,
-  /^\/about(\/|$)/,
-  /^\/privacy(\/|$)/,
+  new RegExp('^\\/post\\/'),
+  new RegExp('^\\/entities\\/'),
+  new RegExp('^\\/curses\\/'),
+  new RegExp('^\\/tools\\/'),
+  new RegExp('^\\/about(\\/|$)'),
+  new RegExp('^\\/privacy(\\/|$)'),
 ];
 
 // Utility Functions
@@ -159,8 +160,8 @@ const formatFontStack = (value: string | null | undefined, fallback: string): st
   if (!trimmed) return fallback;
 
   const sanitized = trimmed.replace(/[<>]/g, "");
-  const escaped = sanitized.replace(/["\\]/g, "\\$&");
-  const needsQuotes = /[\s,]/.test(escaped);
+  const escaped = sanitized.replace(/["\\]/g, "\\$& ");
+  const needsQuotes = /[\,]/.test(escaped);
   const primary = needsQuotes ? `"${escaped}"` : escaped;
 
   return `${primary}, ${fallback}`;
@@ -187,7 +188,7 @@ const buildThemeCss = (
   const headingStack = formatFontStack(theme?.fontHeading ?? theme?.fontSerif, FALLBACK_HEADING);
   const accentStack = formatFontStack(theme?.fontAccent ?? theme?.fontScript, FALLBACK_ACCENT);
 
-  const colorNightBase = sanitizeToken(theme?.colorNight, `color-mix(in srgb, ${background} 85%, black 15%)`);
+  const colorNightBase = sanitizeToken(theme?.colorMidnight, `color-mix(in srgb, ${background} 85%, black 15%)`);
   const colorInkBase = sanitizeToken(theme?.colorInk, `color-mix(in srgb, ${background} 18%, black 82%)`);
   const overlay = `color-mix(in srgb, ${background} 45%, transparent 55%)`;
   const overlayStrong = `color-mix(in srgb, ${background} 68%, transparent 32%)`;
@@ -483,12 +484,12 @@ function detectThemeScope(pathname: string): string | null {
   }
 
   // Individual entity detail pages
-  if (/^\/entities\/[^/]+\/[^/]+\/?$/.test(pathname)) {
+  if (/^\u002Fentities\u002F[^\/]+\u002F[^\/]+\/?$/.test(pathname)) {
     return "entity-detail";
   }
 
   // Post detail pages
-  if (/^\/post\/[^/]+\/?$/.test(pathname)) {
+  if (/^\u002Fpost\u002F[^\/]+\/?$/.test(pathname)) {
     return "post";
   }
 
@@ -590,12 +591,14 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
           const applyTheme = (theme) => {
             if (theme === 'dawn') {
               root.setAttribute('data-comfort-theme', 'dawn');
+              root.classList.remove('dark'); // REMOVE 'dark' class for dawn theme
               const dawnSlug = root.getAttribute('data-theme-dawn');
               if (dawnSlug) {
                 root.setAttribute('data-theme', dawnSlug);
               }
             } else {
               root.removeAttribute('data-comfort-theme');
+              root.classList.add('dark'); // ADD 'dark' class for midnight/dark theme
               const midnightSlug = root.getAttribute('data-theme-midnight');
               if (midnightSlug) {
                 root.setAttribute('data-theme', midnightSlug);
@@ -662,12 +665,14 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
   
   <body
     id="top"
-    class:list={[
-      "site-shell",
-      wide && "is-wide",
-      desktopWide && "is-desktop-wide",
-      isPlainReadingRoute && "site-shell--plain",
-    ].filter(Boolean)}
+    class:list={
+      [
+        "site-shell",
+        wide && "is-wide",
+        desktopWide && "is-desktop-wide",
+        isPlainReadingRoute && "site-shell--plain",
+      ].filter(Boolean)
+    }
     style={bodyStyle}
     data-entity-type={bodyDataType || undefined}
   >
@@ -784,8 +789,16 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
     <div class="site-shell__content">
       <main
         id="main"
-        class:list={mainClassList}
-        data-plain-reading={isPlainReadingRoute ? "true" : undefined}
+        class:list={
+          [
+            "site-main",
+            wide && "is-wide",
+            desktopWide && "is-desktop-wide",
+            isPlainReadingRoute && "site-main--plain",
+          ].filter(Boolean)
+        }
+        style={bodyStyle}
+        data-entity-type={bodyDataType || undefined}
       >
         <div
           class:list={containerClassList}
@@ -823,5 +836,44 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
     
     <!-- Card Animations -->
     <script type="module" src={cardAnimationsModule}></script>
+    
+    <div id="cookie-consent-banner" class="fixed bottom-0 left-0 right-0 z-50 p-4 hidden">
+      <div class="max-w-screen-md mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left p-4 sm:p-6 shadow-xl rounded-2xl border bg-white">
+        <p class="text-sm text-neutral-700">
+          This site uses cookies to ensure you get the best experience. By clicking "Accept", you agree to our use of cookies. For more information, please see our
+          <a href="/privacy" class="text-brand-primary hover:underline">Privacy Policy</a>.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button id="accept-cookies" class="inline-flex items-center justify-center rounded-lg font-semibold text-center transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-60 bg-brand-primary text-white border border-brand-primary-strong hover:bg-brand-primary-strong shadow-sm hover:shadow-md px-4 py-2 text-sm">Accept</button>
+          <button id="decline-cookies" class="inline-flex items-center justify-center rounded-lg font-semibold text-center transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-60 bg-white text-neutral-800 border border-neutral-200 hover:bg-neutral-100 hover:border-neutral-300 shadow-sm hover:shadow-md px-4 py-2 text-sm">Decline</button>
+        </div>
+      </div>
+    </div>
+
+    <script is:inline>
+      document.addEventListener('DOMContentLoaded', () => {
+        const banner = document.getElementById('cookie-consent-banner');
+        const acceptButton = document.getElementById('accept-cookies');
+        const declineButton = document.getElementById('decline-cookies');
+        const CONSENT_KEY = 'cookie_consent_status';
+
+        function setConsent(status) {
+          localStorage.setItem(CONSENT_KEY, status);
+          banner?.classList.add('hidden');
+          window.dispatchEvent(new CustomEvent('cookieConsentChanged', { detail: { status: status } }));
+        }
+
+        const consentStatus = localStorage.getItem(CONSENT_KEY);
+
+        if (consentStatus === null) {
+          banner?.classList.remove('hidden');
+        } else if (consentStatus === 'accepted') {
+          window.dispatchEvent(new CustomEvent('cookieConsentChanged', { detail: { status: 'accepted' } }));
+        }
+
+        acceptButton?.addEventListener('click', () => setConsent('accepted'));
+        declineButton?.addEventListener('click', () => setConsent('declined'));
+      });
+    </script>
   </body>
 </html>

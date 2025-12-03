@@ -1,26 +1,58 @@
 ---
-title: "Azazel's Clarity Spellwork and Spread"
-slug: "azazels-clarity-spellwork-and-spread-2"
-excerpt: "A lucid, boundary-led clarity rite that approaches Azazel as an archetype of sharp seeing rather than a commanded presence. This spellwork pairs focused ritual, a divining spread, quick and deep variants, and practical mundane follow-through so insight can become real-world change."
-metaTitle: "Azazel's Clarity Spellwork and Spread"
-metaDescription: "Consent-first clarity spellwork with the Azazel archetype, pairing a gentle divining spread, quick and deep variants, spellcraft substitutions, and grounded mundane steps for turning insight into real-world change."
-tags: ["clarity","banish-fog","focus","shadow-work","spell","divination"]
-outline: ["Opening Reflection","Ingredients & Correspondences","Step-by-Step Instructions","Quick / Low-Energy Version","Deep Clarity Descent","Variations & Substitutions","Checklist & Summary","Closing & Grounding","Safety Notes","Further Reading"]
-wordCount: 2132
+title: Azazel's Clarity Spellwork and Spread
+slug: azazels-clarity-spellwork-and-spread-2
+excerpt: >-
+  A lucid, boundary-led clarity rite that approaches Azazel as an archetype of sharp seeing rather than a commanded
+  presence. This spellwork pairs focused ritual, a divining spread, quick and deep variants, and practical mundane
+  follow-through so insight can become real-world change.
+metaTitle: Azazel's Clarity Spellwork and Spread
+metaDescription: >-
+  Consent-first clarity spellwork with the Azazel archetype, pairing a gentle divining spread, quick and deep variants,
+  spellcraft substitutions, and grounded mundane steps for turning insight into real-world change.
+tags:
+  - clarity
+  - banish-fog
+  - focus
+  - shadow-work
+  - spell
+  - divination
+outline:
+  - Opening Reflection
+  - Ingredients & Correspondences
+  - Step-by-Step Instructions
+  - Quick / Low-Energy Version
+  - Deep Clarity Descent
+  - Variations & Substitutions
+  - Checklist & Summary
+  - Closing & Grounding
+  - Safety Notes
+  - Further Reading
+wordCount: 2185
 readingMinutes: 11
 entities: []
 includeAds: true
 includeKofi: false
 affiliateAnchors: []
-internalLinkHints: ["divining spread","Azazel archetype","clarity rite","grounding practices","spellcraft substitutions"]
+internalLinkHints:
+  - divining spread
+  - Azazel archetype
+  - clarity rite
+  - grounding practices
+  - spellcraft substitutions
 internalLinks: []
-publishedAt: "2025-11-16T21:20:25.052Z"
-canonicalUrl: "https://witchclick.space/post/azazels-clarity-spellwork-and-spread-2"
+publishedAt: '2025-11-16T21:20:25.052Z'
+canonicalUrl: 'https://witchclick.space/post/azazels-clarity-spellwork-and-spread-2'
 specVersion: 2
-contentType: "spellwork"
-promptMetadata: {"topic":"Azazel's Clarity Spellwork and Spread","requestedWords":1200,"deliveredWords":2132,"toggles":{"ads":"on","kofi":"off"},"generatedAt":"2025-11-16T21:20:25.051Z"}
+contentType: spellwork
+promptMetadata:
+  topic: Azazel's Clarity Spellwork and Spread
+  requestedWords: 1200
+  deliveredWords: 2132
+  toggles:
+    ads: 'on'
+    kofi: 'off'
+  generatedAt: '2025-11-16T21:20:25.051Z'
 ---
-
 ## Opening Reflection
 
 In the thin hush between your inhale and the world's next demand, a narrow blade of awareness waits. It does not shout. It glints. It asks, quietly: What is real, and what is residue?
@@ -220,3 +252,5 @@ If you wish to explore underlying ideas in a more scholarly way, you might find 
 Treat](https://en.wikipedia.org/wiki/Jungian_archetypes
 
 Treat) any external writing as reference, not as commandment. Your own experience of the Azazel archetype and of clarity itself remains the primary text for this working.
+
+Further reading: [Azazel's Clarity Spellwork and Scrying Spread](/post/azazels-clarity-spellwork-and-spread), [Focus Tea Rituals for Gentle, Distracted Brains](/post/focus-tea-rituals-gentle-brains), [Mirror of Consequence for the One Who Chose Harm, Today](/curses/mirror-of-consequence-for-the-one-who-chose-harm-today).

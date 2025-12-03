@@ -28,6 +28,9 @@ jobs:
       - name: Type, lint, and astro checks
         run: npm run check
 
+      - name: SEO audit
+        run: npm run audit:seo
+
       - name: Build
         run: npm run build
 

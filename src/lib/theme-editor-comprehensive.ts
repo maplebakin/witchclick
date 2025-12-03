@@ -124,50 +124,7 @@ export function debounce<T extends (...args: any[]) => void>(
   return debounced;
 }
 
-export const ALL_COLOR_VARIABLES = [
-  // Page base
-  'background',
-  // Core Brand Colors
-  'colorMidnight', 'colorNight', 'colorIris', 'colorAmethyst', 'colorDusk',
-  'colorGold', 'colorRune', 'colorFog', 'colorInk',
-
-  // Header & Footer
-  'headerBackground', 'headerBorder', 'headerText', 'headerTextHover',
-  'footerBackground', 'footerBorder', 'footerText', 'footerTextMuted',
-
-  // Surface Colors
-  'surfacePlain', 'surfacePlainBorder', 'cardPanelSurface', 'cardPanelSurfaceStrong',
-  'cardPanelBorder', 'cardPanelBorderStrong', 'cardPanelBorderSoft',
-  'glassSurface', 'glassSurfaceStrong', 'glassCard', 'glassHover',
-  'glassBorder', 'glassBorderStrong', 'glassHighlight', 'glassGlow',
-  'glassShadowSoft', 'glassShadowStrong', 'glassBlur', 'glassNoiseOpacity',
-
-  // Text Colors
-  'textPrimary', 'textSecondary', 'textTertiary', 'textStrong', 'textHint', 'textDisabled',
-  'textBody', 'textSubtle', 'textAccent', 'textAccentStrong', 'textHeading',
-  'inkBody', 'inkStrong', 'inkMuted', 'linkColor',
-
-  // Card Components
-  'cardBadgeBg', 'cardBadgeBorder', 'cardBadgeText',
-  'cardTagBg', 'cardTagBorder', 'cardTagText',
-  'cardSpoonBg', 'cardSpoonBorder', 'cardSpoonText',
-
-  // Interactive
-  'focusRingColor', 'cardFocusOutline',
-
-  // Semantic Status
-  'success', 'warning', 'error', 'info',
-
-  // Entity Grimoire Specific
-  'entityCardBorder', 'entityCardGlow', 'entityCardHighlight',
-  'entityCardSurfaceTop', 'entityCardSurfaceBottom',
-  'entityCardHeading', 'entityCardText', 'entityCardLabel',
-  'entityCardCta', 'entityCardCtaHover', 'entityCardIcon', 'entityCardIconShadow',
-] as const;
-
-export const ALL_FONT_VARIABLES = [
-  'fontSerif', 'fontScript', 'fontHeading', 'fontAccent'
-] as const;
+import { ALL_COLOR_VARIABLE_KEYS, ALL_FONT_VARIABLE_KEYS } from './theme-variable-keys';
 
 /**
  * Initialize all color inputs for the comprehensive editor
@@ -180,7 +137,7 @@ type ElementValue =
   | null;
 
 export function initializeAllColorElements(elements: Record<string, ElementValue>) {
-  ALL_COLOR_VARIABLES.forEach((key) => {
+  ALL_COLOR_VARIABLE_KEYS.forEach((key) => {
     const pickers = Array.from(document.querySelectorAll<HTMLInputElement>(`[data-color-picker="${key}"]`));
     const inputs = Array.from(document.querySelectorAll<HTMLInputElement>(`[data-color-input="${key}"]`));
 
@@ -190,7 +147,7 @@ export function initializeAllColorElements(elements: Record<string, ElementValue
     elements[`${key}Inputs`] = inputs;
   });
 
-  ALL_FONT_VARIABLES.forEach((key) => {
+  ALL_FONT_VARIABLE_KEYS.forEach((key) => {
     elements[`${key}Select`] = document.getElementById(`theme${key.charAt(0).toUpperCase() + key.slice(1)}`);
   });
 }
@@ -205,7 +162,7 @@ export function setupAllColorListeners(
 ) {
   const debouncedUpdate = debounce(onUpdate, 120);
 
-  ALL_COLOR_VARIABLES.forEach((key) => {
+  ALL_COLOR_VARIABLE_KEYS.forEach((key) => {
     const pickers = Array.isArray(elements[`${key}Pickers`])
       ? (elements[`${key}Pickers`] as HTMLInputElement[])
       : elements[`${key}Picker`]
@@ -258,7 +215,7 @@ export function setupAllColorListeners(
     });
   });
 
-  ALL_FONT_VARIABLES.forEach((key) => {
+  ALL_FONT_VARIABLE_KEYS.forEach((key) => {
     const select = elements[`${key}Select`];
     if (select && !Array.isArray(select) && 'addEventListener' in select) {
       (select as HTMLSelectElement).addEventListener('change', () => {
@@ -278,7 +235,7 @@ export function populateAllFormInputs(
   defaults: Record<string, string | undefined>
 ) {
   // Colors
-  ALL_COLOR_VARIABLES.forEach((key) => {
+  ALL_COLOR_VARIABLE_KEYS.forEach((key) => {
     const value = presetVariables[key] || defaults[key] || '';
     // Use colorToHex to handle rgba/rgb values for the color picker
     const hexValue = colorToHex(value);
@@ -303,7 +260,7 @@ export function populateAllFormInputs(
   });
 
   // Fonts
-  ALL_FONT_VARIABLES.forEach((key) => {
+  ALL_FONT_VARIABLE_KEYS.forEach((key) => {
     const select = elements[`${key}Select`] as HTMLSelectElement;
     if (select) {
       select.value = presetVariables[key] || defaults[key] || '';
@@ -318,7 +275,7 @@ export function collectAllFormValues(elements: Record<string, ElementValue>): Re
   const values: Record<string, string> = {};
 
   // Colors
-  ALL_COLOR_VARIABLES.forEach((key) => {
+  ALL_COLOR_VARIABLE_KEYS.forEach((key) => {
     const inputCandidates = Array.isArray(elements[`${key}Inputs`])
       ? (elements[`${key}Inputs`] as HTMLInputElement[])
       : elements[`${key}Input`]
@@ -329,7 +286,7 @@ export function collectAllFormValues(elements: Record<string, ElementValue>): Re
   });
 
   // Fonts
-  ALL_FONT_VARIABLES.forEach((key) => {
+  ALL_FONT_VARIABLE_KEYS.forEach((key) => {
     const select = elements[`${key}Select`] as HTMLSelectElement;
     if (select && select.value) {
       values[key] = select.value;
@@ -349,7 +306,7 @@ export function updateAllPreviewVariables(
 ) {
   const resolved: Record<string, string> = {};
 
-  ALL_COLOR_VARIABLES.forEach((key) => {
+  ALL_COLOR_VARIABLE_KEYS.forEach((key) => {
     const resolvedValue = variables[key] || defaults[key] || '';
     resolved[key] = resolvedValue;
 
@@ -370,7 +327,7 @@ export function updateAllPreviewVariables(
     }
   });
 
-  ALL_FONT_VARIABLES.forEach((key) => {
+  ALL_FONT_VARIABLE_KEYS.forEach((key) => {
     const resolvedValue = variables[key] || defaults[key] || '';
 
     if (resolvedValue) {
@@ -393,123 +350,122 @@ export function updateAllPreviewVariables(
   });
 
   // Maintain legacy preview variables so older markup still renders gracefully
-  previewRoot.style.setProperty(
-    '--preview-card-surface',
-    resolved.cardPanelSurface || defaults.cardPanelSurface || '#1a0d2e'
+  previewRoot.style.setProperty('--preview-card-surface',
+    resolved.cardPanelSurface || defaults.cardPanelSurface || ''
   );
   previewRoot.style.setProperty(
     '--preview-card-border',
-    resolved.cardPanelBorder || defaults.cardPanelBorder || '#d4af37'
+    resolved.cardPanelBorder || defaults.cardPanelBorder || ''
   );
   previewRoot.style.setProperty(
     '--preview-text-primary',
-    resolved.textBody || defaults.textBody || resolved.textPrimary || defaults.textPrimary || '#f4f1ff'
+    resolved.textBody || defaults.textBody || resolved.textPrimary || defaults.textPrimary || ''
   );
   previewRoot.style.setProperty(
     '--preview-text-secondary',
-    resolved.textSecondary || defaults.textSecondary || '#f4f1ff'
+    resolved.textSecondary || defaults.textSecondary || ''
   );
   previewRoot.style.setProperty(
     '--preview-text-heading',
-    resolved.textHeading || defaults.textHeading || resolved.textStrong || defaults.textStrong || resolved.inkStrong || defaults.inkStrong || '#ffffff'
+    resolved.textHeading || defaults.textHeading || resolved.textStrong || defaults.textStrong || resolved.inkStrong || defaults.inkStrong || ''
   );
   previewRoot.style.setProperty(
     '--preview-text-muted',
-    resolved.textMuted || defaults.textMuted || resolved.inkMuted || defaults.inkMuted || '#d9b2c4'
+    resolved.textMuted || defaults.textMuted || resolved.inkMuted || defaults.inkMuted || ''
   );
   previewRoot.style.setProperty(
     '--preview-link',
-    resolved.linkColor || defaults.linkColor || '#e0c07d'
+    resolved.linkColor || defaults.linkColor || ''
   );
 
   previewRoot.style.setProperty(
     '--preview-cardBadgeBg',
-    resolved.cardBadgeBg || defaults.cardBadgeBg || '#d4af37'
+    resolved.cardBadgeBg || defaults.cardBadgeBg || ''
   );
   previewRoot.style.setProperty(
     '--preview-cardBadgeBorder',
-    resolved.cardBadgeBorder || defaults.cardBadgeBorder || '#d4af37'
+    resolved.cardBadgeBorder || defaults.cardBadgeBorder || ''
   );
   previewRoot.style.setProperty(
     '--preview-cardBadgeText',
-    resolved.cardBadgeText || defaults.cardBadgeText || '#f8f3ff'
+    resolved.cardBadgeText || defaults.cardBadgeText || ''
   );
   previewRoot.style.setProperty(
     '--preview-cardTagBg',
-    resolved.cardTagBg || defaults.cardTagBg || '#d18c47'
+    resolved.cardTagBg || defaults.cardTagBg || ''
   );
   previewRoot.style.setProperty(
     '--preview-cardTagBorder',
-    resolved.cardTagBorder || defaults.cardTagBorder || '#d18c47'
+    resolved.cardTagBorder || defaults.cardTagBorder || ''
   );
   previewRoot.style.setProperty(
     '--preview-cardTagText',
-    resolved.cardTagText || defaults.cardTagText || '#f4f1ff'
+    resolved.cardTagText || defaults.cardTagText || ''
   );
 
   previewRoot.style.setProperty(
     '--preview-success',
-    resolved.success || defaults.success || '#4ade80'
+    resolved.success || defaults.success || ''
   );
   previewRoot.style.setProperty(
     '--preview-warning',
-    resolved.warning || defaults.warning || '#fbbf24'
+    resolved.warning || defaults.warning || ''
   );
   previewRoot.style.setProperty(
     '--preview-error',
-    resolved.error || defaults.error || '#f87171'
+    resolved.error || defaults.error || ''
   );
   previewRoot.style.setProperty(
     '--preview-info',
-    resolved.info || defaults.info || '#60a5fa'
+    resolved.info || defaults.info || ''
   );
 
   previewRoot.style.setProperty(
     '--preview-entityCardBorder',
-    resolved.entityCardBorder || defaults.entityCardBorder || '#d4af37'
+    resolved.entityCardBorder || defaults.entityCardBorder || ''
   );
   previewRoot.style.setProperty(
     '--preview-entityCardGlow',
-    resolved.entityCardGlow || defaults.entityCardGlow || '#d4af37'
+    resolved.entityCardGlow || defaults.entityCardGlow || ''
   );
   previewRoot.style.setProperty(
     '--preview-entityCardHighlight',
-    resolved.entityCardHighlight || defaults.entityCardHighlight || '#d4af37'
+    resolved.entityCardHighlight || defaults.entityCardHighlight || ''
   );
   previewRoot.style.setProperty(
     '--preview-entityCardSurfaceTop',
-    resolved.entityCardSurfaceTop || defaults.entityCardSurfaceTop || '#1a0d2e'
+    resolved.entityCardSurfaceTop || defaults.entityCardSurfaceTop || ''
   );
   previewRoot.style.setProperty(
     '--preview-entityCardSurfaceBottom',
-    resolved.entityCardSurfaceBottom || defaults.entityCardSurfaceBottom || '#120725'
+    resolved.entityCardSurfaceBottom || defaults.entityCardSurfaceBottom || ''
   );
   previewRoot.style.setProperty(
     '--preview-entityCardHeading',
-    resolved.entityCardHeading || defaults.entityCardHeading || '#ffffff'
+    resolved.entityCardHeading || defaults.entityCardHeading || ''
   );
   previewRoot.style.setProperty(
     '--preview-entityCardText',
-    resolved.entityCardText || defaults.entityCardText || '#f4f1ff'
+    resolved.entityCardText || defaults.entityCardText || ''
   );
   previewRoot.style.setProperty(
     '--preview-entityCardLabel',
-    resolved.entityCardLabel || defaults.entityCardLabel || '#d4af37'
+    resolved.entityCardLabel || defaults.entityCardLabel || ''
   );
   previewRoot.style.setProperty(
     '--preview-entityCardCta',
-    resolved.entityCardCta || defaults.entityCardCta || '#3d2914'
+    resolved.entityCardCta || defaults.entityCardCta || ''
   );
   previewRoot.style.setProperty(
     '--preview-entityCardCtaHover',
-    resolved.entityCardCtaHover || defaults.entityCardCtaHover || '#452e17'
+    resolved.entityCardCtaHover || defaults.entityCardCtaHover || ''
   );
   previewRoot.style.setProperty(
     '--preview-entityCardIcon',
-    resolved.entityCardIcon || defaults.entityCardIcon || '#d4af37'
+    resolved.entityCardIcon || defaults.entityCardIcon || ''
   );
   previewRoot.style.setProperty(
     '--preview-entityCardIconShadow',
-    resolved.entityCardIconShadow || defaults.entityCardIconShadow || '#d4af37'
+    resolved.entityCardIconShadow || defaults.entityCardIconShadow || ''
   );
 }

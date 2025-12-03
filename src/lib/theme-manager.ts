@@ -186,8 +186,8 @@ const DEFAULT_VARIABLES: Record<ThemeMode, ThemeVariables> = {
     glassBorderStrong: '#f2bf8c',
     glassHighlight: '#d4af37',
     glassGlow: '#f2bf8c',
-    glassShadowSoft: '0 22px 55px -32px rgba(11, 6, 20, 0.65)',
-    glassShadowStrong: '0 32px 85px -36px rgba(3, 2, 12, 0.78)',
+    glassShadowSoft: '0 22px 55px -32px hsl(260 26% 8% / 0.65)',
+    glassShadowStrong: '0 32px 85px -36px hsl(260 26% 8% / 0.78)',
     glassBlur: '16px',
     glassNoiseOpacity: '0.08',
 
@@ -227,7 +227,7 @@ const DEFAULT_VARIABLES: Record<ThemeMode, ThemeVariables> = {
     success: '#4ade80',
     warning: '#fbbf24',
     error: '#f87171',
-    info: '#60a5fa',
+    info: '#9b86c8',
 
     // Header & Footer
     headerBackground: '#261a0d',
@@ -281,8 +281,8 @@ const DEFAULT_VARIABLES: Record<ThemeMode, ThemeVariables> = {
     glassBorderStrong: '#9b86c8',
     glassHighlight: '#9b86c8',
     glassGlow: '#caa043',
-    glassShadowSoft: '0 22px 55px -32px rgba(63, 49, 86, 0.28)',
-    glassShadowStrong: '0 32px 85px -36px rgba(99, 80, 128, 0.35)',
+    glassShadowSoft: '0 22px 55px -32px hsl(260 26% 8% / 0.28)',
+    glassShadowStrong: '0 32px 85px -36px hsl(260 26% 8% / 0.35)',
     glassBlur: '16px',
     glassNoiseOpacity: '0.08',
 
@@ -321,10 +321,10 @@ const DEFAULT_VARIABLES: Record<ThemeMode, ThemeVariables> = {
     fontAccent: 'Cormorant Garamond',
 
     // Semantic
-    success: '#22c55e',
-    warning: '#f59e0b',
-    error: '#ef4444',
-    info: '#3b82f6',
+    success: '#047857',
+    warning: '#b45309',
+    error: '#b91c1c',
+    info: '#9b86c8',
 
     // Header & Footer
     headerBackground: '#ede5dc',
@@ -684,16 +684,7 @@ export class ThemeManager {
     console.log('[convertToRuntimeTokens] After base generation, pageBackground:', tokens.pageBackground);
 
     // Allow explicit overrides for each token
-    // Accent scale
-    if (variables.colorAmethyst) {
-      tokens.accent1 = this.hexToHSL(variables.colorAmethyst);
-    }
-    if (variables.colorIris || variables.primary) {
-      tokens.accent2 = this.hexToHSL(variables.colorIris || variables.primary!);
-    }
-    if (variables.colorDusk) {
-      tokens.accent3 = this.hexToHSL(variables.colorDusk);
-    }
+
 
     // Surface hierarchy overrides
     // Cards can have explicit colors for visual accent (e.g., warm pinkish cards on cool blue bg)
@@ -874,7 +865,7 @@ export class ThemeManager {
     const tokens: Record<string, string> = {};
 
     // Get base colors (with fallbacks)
-    const background = variables.background || variables.colorMidnight || '#0f0820';
+    const background = variables.background || variables.colorMidnight || DEFAULT_VARIABLES.midnight.background;
     const primary = variables.primary || variables.colorAmethyst || '#d18c47';
     const accent = variables.accent || variables.colorGold || '#d4af37';
 
@@ -922,10 +913,10 @@ export class ThemeManager {
     tokens.footerBorder = this.hexToHSL(this.mixColors(background, primary, isDark ? 0.25 : 0.20));
 
     // Status colors (keep as-is or use defaults)
-    tokens.success = variables.success || (isDark ? '#4ade80' : '#22c55e');
-    tokens.warning = variables.warning || (isDark ? '#fbbf24' : '#f59e0b');
-    tokens.error = variables.error || (isDark ? '#f87171' : '#ef4444');
-    tokens.info = variables.info || (isDark ? '#60a5fa' : '#3b82f6');
+    tokens.success = variables.success || (isDark ? '#4ade80' : '#047857');
+    tokens.warning = variables.warning || (isDark ? '#fbbf24' : '#b45309');
+    tokens.error = variables.error || (isDark ? '#f87171' : '#b91c1c');
+    tokens.info = variables.info || '#9b86c8';
 
     console.log('[generateTokensFromBase] Generated tokens:', {
       pageBackground: tokens.pageBackground,

@@ -1,6 +1,6 @@
 {
-  "generated": "2025-11-29T18:52:04.426Z",
-  "count": 7,
+  "generated": "2025-12-03T20:16:41.498Z",
+  "count": 9,
   "themes": [
     {
       "slug": "cozy-dawn",
@@ -11,6 +11,12 @@
     {
       "slug": "golden-harvest",
       "label": "Golden Harvest",
+      "mode": "dawn",
+      "category": "seasonal"
+    },
+    {
+      "slug": "yule-dawn",
+      "label": "Yule Dawn",
       "mode": "dawn",
       "category": "seasonal"
     },
@@ -43,6 +49,12 @@
       "label": "Scope Test Theme",
       "mode": "midnight",
       "category": "custom"
+    },
+    {
+      "slug": "yule-midnight",
+      "label": "Yule Midnight",
+      "mode": "midnight",
+      "category": "seasonal"
     }
   ]
 }

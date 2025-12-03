@@ -2,14 +2,12 @@
 title: 'Inner Compass Spell: Trusting Your Inner Direction'
 slug: inner-compass-spell-trusting-inner-direction
 excerpt: >-
-  When external maps vanish, light a candle or take a quiet walk to hear your
-  inner compass. Magical and mundane steps nurture self-trust with kind
-  substitutions and full consent.
+  When external maps vanish, light a candle or take a quiet walk to hear your inner compass. Magical and mundane steps
+  nurture self-trust with kind substitutions and full consent.
 metaTitle: 'Inner Compass Spell: Trusting Your Inner Direction'
 metaDescription: >-
-  Tune gently into your inner voice when outer guidance fades away. This spell
-  blends candle ritual, journaling, and nature walks with easy swaps, always
-  centering consent and everyday self-trust.
+  Tune gently into your inner voice when outer guidance fades away. This spell blends candle ritual, journaling, and
+  nature walks with easy swaps, always centering consent and everyday self-trust.
 tags:
   - inner guidance
   - self-trust
@@ -27,7 +25,7 @@ outline:
   - Closing & Grounding
   - Safety Notes
   - Inner Compass Checklist Summary
-wordCount: 755
+wordCount: 812
 readingMinutes: 4
 entities: []
 includeAds: true
@@ -37,10 +35,8 @@ internalLinkHints: []
 internalLinks: []
 publishedAt: '2025-11-07T14:38:07.106Z'
 canonicalUrl: 'https://witchclick.space/post/inner-compass-spell-trusting-inner-direction'
-heroImage: >-
-  /images/hero/inner-compass-spell-trusting-inner-direction/individual-direction-source.jpg
-heroImageSrc: >-
-  /images/hero/inner-compass-spell-trusting-inner-direction/individual-direction-source.jpg
+heroImage: /images/hero/inner-compass-spell-trusting-inner-direction/individual-direction-source.jpg
+heroImageSrc: /images/hero/inner-compass-spell-trusting-inner-direction/individual-direction-source.jpg
 heroAlt: ''
 specVersion: 2
 promptMetadata:
@@ -53,7 +49,6 @@ promptMetadata:
   generatedAt: '2025-11-07T14:38:07.105Z'
 cluster: spellcraft-theory
 ---
-
 ## Opening Reflection
 
 Picture your life like a foggy morning drive with no GPS—suddenly the only signal comes from that quiet hum in your chest. This spell is a cozy cup of tea with your deeper self, inviting direction without force. We start with consent because your inner voice deserves a willing ear. Ask softly: 'Am I ready to listen today?' If the answer is yes, we'll blend candle glow, honest words, and simple walks. Magic and mundane twine here like old friends on a porch swing. No pressure, just gentle opening. External advice might vanish, but your compass was always spinning true.
@@ -151,3 +146,5 @@ This working supports your journey, never overrides medical or mental health nee
 - [ ] One truth noted for tomorrow
 
 Tick as you go, or glance back—like a trail of breadcrumbs proving you listened.
+
+Further reading: [Letting Yourself Soften Into Interpretation of Colour](/post/soften-into-interpretation-of-colour), [Mirror of Consequence for the One Who Chose Harm, Today](/curses/mirror-of-consequence-for-the-one-who-chose-harm-today), [Severance Ritual: Cut the Cord with Clean Precision](/curses/severance-ritual-cut-cord-clean-precision). Evidence base: [Mindfulness overview (APA)](https://www.apa.org/topics/mindfulness).

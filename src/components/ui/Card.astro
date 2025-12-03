@@ -1,0 +1,56 @@
+---
+// src/components/ui/Card.astro
+import type { HTMLAttributes } from 'astro/types';
+
+type Props = {
+  variant?: 'default' | 'interactive';
+  padding?: 'sm' | 'md' | 'lg';
+  class?: string;
+  as?: 'div' | 'article' | 'section' | 'li';
+} & HTMLAttributes<'div'>;
+
+const {
+  variant = 'default',
+  padding = 'md',
+  as: Tag = 'div',
+  class: className,
+  ...props
+} = Astro.props;
+
+const baseClasses = [
+  'rounded-2xl',
+  'border',
+  'bg-surface-base',
+  'shadow-sm',
+  'transition-all',
+];
+
+const variantClasses = {
+  default: [
+    'border-line-neutral',
+  ],
+  interactive: [
+    'border-line-neutral',
+    'hover:border-primary',
+    'hover:shadow-md',
+    'hover:-translate-y-px',
+  ],
+};
+
+const paddingClasses = {
+  sm: 'p-3',
+  md: 'p-4 md:p-6',
+  lg: 'p-6 md:p-8',
+};
+
+const classes = [
+  ...baseClasses,
+  ...variantClasses[variant],
+  ...paddingClasses[padding],
+  className,
+].join(' ');
+---
+
+<Tag class={classes} {...props}>
+  <slot />
+</Tag>

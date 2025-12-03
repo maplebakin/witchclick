@@ -494,11 +494,11 @@ export class ThemeEditor {
     // Legacy fonts
     const fontSerifSelect = this.getEl<HTMLSelectElement>('fontSerifSelect');
     if (fontSerifSelect) {
-      fontSerifSelect.value = preset?.variables.fontSerif || defaults.fontSerif || 'Literata';
+      fontSerifSelect.value = preset?.variables.fontSerif || defaults.fontSerif || '';
     }
     const fontScriptSelect = this.getEl<HTMLSelectElement>('fontScriptSelect');
     if (fontScriptSelect) {
-      fontScriptSelect.value = preset?.variables.fontScript || defaults.fontScript || 'Parisienne';
+      fontScriptSelect.value = preset?.variables.fontScript || defaults.fontScript || '';
     }
 
     // Update button states
@@ -695,12 +695,12 @@ export class ThemeEditor {
 
     // Legacy variables for backwards compatibility
     const legacyVariables = {
-      primary: this.getInputValue('primaryInput') || defaults.primary || '#6b21a8',
-      accent: this.getInputValue('accentInput') || defaults.accent || '#d9b2c4',
-      background: this.getInputValue('backgroundInput') || defaults.background || '#0f0820',
-      textPrimary: this.getInputValue('textPrimaryInput') || defaults.textPrimary || '#fdfcfe',
-      textHeading: this.getInputValue('textHeadingInput') || defaults.textHeading || '#ffffff',
-      textMuted: this.getInputValue('textMutedInput') || defaults.textMuted || '#d9b2c4',
+      primary: this.getInputValue('primaryInput') || defaults.primary || '',
+      accent: this.getInputValue('accentInput') || defaults.accent || '',
+      background: this.getInputValue('backgroundInput') || defaults.background || '',
+      textPrimary: this.getInputValue('textPrimaryInput') || defaults.textPrimary || '',
+      textHeading: this.getInputValue('textHeadingInput') || defaults.textHeading || '',
+      textMuted: this.getInputValue('textMutedInput') || defaults.textMuted || '',
     };
 
     // Apply legacy CSS variables to preview
@@ -733,9 +733,9 @@ export class ThemeEditor {
     const display = this.getEl('contrastDisplay');
     if (!display) return;
 
-    const background = this.getInputValue('backgroundInput') || '#0f0820';
-    const textPrimary = this.getInputValue('textPrimaryInput') || '#fdfcfe';
-    const textHeading = this.getInputValue('textHeadingInput') || '#ffffff';
+    const background = this.getInputValue('backgroundInput') || defaults.background || '';
+    const textPrimary = this.getInputValue('textPrimaryInput') || defaults.textPrimary || '';
+    const textHeading = this.getInputValue('textHeadingInput') || defaults.textHeading || '';
 
     const result1 = checkContrast(textPrimary, background);
     const result2 = checkContrast(textHeading, background);
@@ -1167,7 +1167,7 @@ export class ThemeEditor {
     if (!isActive) {
       const activateBtn = document.createElement('button');
       activateBtn.type = 'button';
-      activateBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-amber-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-amber-700 transition shadow-sm';
+      activateBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-accent-bolder px-3 py-1.5 text-sm font-semibold text-inverse hover:bg-surface-accent-deep transition shadow-sm';
       activateBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Set as Active`;
         activateBtn.addEventListener('click', () => {
           void this.setActive();

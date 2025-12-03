@@ -8,11 +8,11 @@ const LOCAL_STORAGE_KEY = 'cauldron.promptEngine.drafts.v1';
 
 const DEFAULT_BLUEPRINT: PromptBlueprint = {
   topic: '',
-  audience: 'Cozy witches and slow-life seekers',
-  tone: 'Warm, encouraging, and lightly mystical while staying practical',
-  primaryGoal: 'Produce a WitchClick PostSpec v2 with clear sections and ready-to-publish metadata',
-  affiliateFocus: 'Suggest affiliate ideas that feel sincere and useful',
-  ritualFocus: 'Highlight mindful rituals or gentle routines to anchor the piece',
+  audience: 'Secular witches and seekers of gentle magic',
+  tone: 'Empathetic, authentic, and subtly magical',
+  primaryGoal: 'Craft a WitchClick essay or ritual, deeply engaging and aligned with PostSpec v2 standards for publication',
+  affiliateFocus: 'Integrate resource recommendations that genuinely benefit the reader',
+  ritualFocus: 'Weave in mindful rituals or gentle routines to ground the content',
   extraNotes: '',
 };
 
@@ -121,12 +121,12 @@ function sanitizeSpec(spec: DraftSpec, tagsInput: string, outlineInput: string):
 
 function buildPrompt(blueprint: PromptBlueprint, spec: DraftSpec, outlineInput: string): string {
   const lines: string[] = [];
-  const title = blueprint.topic || spec.title || 'Untitled concept';
+  const title = blueprint.topic || spec.title || 'Un-named Incantation';
 
   lines.push('You are preparing a WitchClick PostSpec v2 draft.');
   lines.push(`Topic: ${title}`);
-  lines.push(`Audience: ${blueprint.audience || 'WitchClick readers'}`);
-  lines.push(`Tone: ${blueprint.tone || 'Warm and grounded with subtle magic'}`);
+  lines.push(`Audience: ${blueprint.audience || 'Seekers of gentle magic'}`);
+  lines.push(`Tone: ${blueprint.tone || 'Mystical, empathetic, and practical'}`);
   lines.push(`Primary goal: ${blueprint.primaryGoal}`);
   if (blueprint.ritualFocus) lines.push(`Ritual focus: ${blueprint.ritualFocus}`);
   if (blueprint.affiliateFocus) lines.push(`Affiliate focus: ${blueprint.affiliateFocus}`);
@@ -261,11 +261,11 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
     if (typeof navigator === 'undefined' || !navigator.clipboard) return;
     try {
       await navigator.clipboard.writeText(JSON.stringify(sanitizedSpec, null, 2));
-      setStatusMessage('Copied JSON');
+      setStatusMessage('Incantation copied to clipboard!');
       resetStatus();
     } catch (error) {
       console.error('Copy failed', error);
-      setStatusMessage('Copy failed');
+      'Incantation fizzled... copy failed.'
       resetStatus();
     }
   }
@@ -287,7 +287,7 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
     }
     persistLocal(sanitizedSpec);
     setSelection({ source: 'local', slug: sanitizedSpec.slug });
-    setStatusMessage(`Saved ${sanitizedSpec.slug}`);
+    setStatusMessage(`Spellbound: ${sanitizedSpec.slug} secured!`);
     resetStatus();
   }
 
@@ -302,7 +302,7 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    setStatusMessage('Draft downloaded');
+    setStatusMessage('Scroll manifested!');
     resetStatus();
   }
 
@@ -331,7 +331,7 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
               <span>Local drafts</span>
               <button
                 type="button"
-                class="rounded border border-line-inverse/80 px-2 py-1 text-[0.6rem] tracking-[0.3em] text-inverse-faint hover:text-inverse"
+                class="rounded border border-line-inverse/80 px-2 py-1 text-[0.6rem] tracking-[0.3em] text-inverse-subtle hover:text-inverse"
                 onClick={() => setSelection({ source: 'new', slug: 'fresh-draft' })}
               >
                 New
@@ -428,7 +428,7 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
                 <header>
                   <p class="text-[0.65rem] uppercase tracking-[0.35em] text-muted-subtle">Prompt Blueprint</p>
                   <h2 class="text-lg font-semibold text-inverse-soft">Shape the generation request</h2>
-                  <p class="text-sm text-inverse-faint">
+                  <p class="text-sm text-inverse-subtle">
                     Capture the intent before you ask an AI for help. The prompt is tailored as you tweak metadata and outline
                     details.
                   </p>
@@ -590,7 +590,7 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
                 <div class="space-y-4">
                   <header class="flex items-center justify-between">
                     <div>
-                      <h3 class="text-sm font-semibold uppercase tracking-[0.3em] text-inverse-faint">Sections</h3>
+                      <h3 class="text-sm font-semibold uppercase tracking-[0.3em] text-inverse-subtle">Sections</h3>
                       <p class="text-xs text-muted-subtle">Markdown will appear in the live preview.</p>
                     </div>
                     <button
@@ -710,22 +710,22 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
               </section>
             </div>
           </div>
-          <aside class="w-full min-w-[320px] border-t border-line-night/60 bg-surface-inverse/35 px-6 py-6 text-inverse-muted lg:w-[360px] lg:border-t-0 lg:border-l">
+          <aside class="w-full min-w-[320px] border-t border-line-night/60 bg-surface-inverse/35 px-6 py-6 text-inverse-muted lg:w-96 lg:border-t-0 lg:border-l">
             <header class="space-y-1">
               <p class="text-[0.7rem] uppercase tracking-[0.35em] text-muted-subtle">Preview</p>
               <h2 class="text-lg font-semibold text-inverse-soft">Live PostSpec rendering</h2>
-              <p class="text-sm text-inverse-faint">Update fields on the left to see this preview refresh instantly.</p>
+              <p class="text-sm text-inverse-subtle">Update fields on the left to see this preview refresh instantly.</p>
             </header>
-            <article class="mt-6 space-y-5 rounded-xl border border-line-inverse-strong/60 bg-surface-inverse/40 px-5 py-5 shadow-[0_12px_30px_rgba(15,23,42,0.45)]">
+            <article class="mt-6 space-y-5 rounded-xl border border-line-inverse-strong/60 bg-surface-inverse/40 px-5 py-5 shadow-[var(--wc-shadow-soft)]">
               <div class="space-y-2">
-                <h1 class="text-2xl font-semibold text-inverse-soft">{sanitizedSpec.title || 'Untitled draft'}</h1>
-                <p class="text-sm text-inverse-faint">{sanitizedSpec.excerpt || 'Add an excerpt to set the hook.'}</p>
+                <h1 class="text-2xl font-semibold text-inverse-soft">{sanitizedSpec.title || 'Un-named Incantation'}</h1>
+                <p class="text-sm text-inverse-subtle">{sanitizedSpec.excerpt || 'Add an excerpt to set the hook.'}</p>
                 <p class="text-xs uppercase tracking-[0.35em] text-muted-subtle">Slug: {sanitizedSpec.slug || 'pending'}</p>
               </div>
               <div class="space-y-4 text-sm leading-relaxed">
                 {(sanitizedSpec.sections ?? []).map((section) => (
                   <section class="rounded-lg border border-line-inverse-strong/60 bg-surface-inverse/50 px-4 py-3">
-                    <h3 class="text-base font-semibold text-inverse-soft">{section.heading || 'Untitled section'}</h3>
+                    <h3 class="text-base font-semibold text-inverse-soft">{section.heading || 'Un-named Verse'}</h3>
                     <div
                       class="prose prose-invert prose-sm mt-2 max-w-none text-inverse-subtle"
                       dangerouslySetInnerHTML={{ __html: renderMarkdown(section.markdown ?? '') }}
@@ -733,14 +733,14 @@ export default function PromptEngineIsland({ drafts }: PromptEngineProps) {
                   </section>
                 ))}
               </div>
-              <section class="space-y-2 text-xs text-inverse-faint">
+              <section class="space-y-2 text-xs text-inverse-subtle">
                 <p><span class="font-semibold text-inverse-subtle">Tags:</span> {sanitizedSpec.tags?.join(', ') || '—'}</p>
                 <p><span class="font-semibold text-inverse-subtle">Ad placements:</span> {sanitizedSpec.adPlacements?.join(', ') || '—'}</p>
                 <p><span class="font-semibold text-inverse-subtle">CTA:</span> {sanitizedSpec.cta?.type || '—'}</p>
               </section>
-              <details class="rounded border border-line-inverse-strong/60 bg-surface-inverse/40 px-4 py-3 text-xs text-inverse-faint">
+              <details class="rounded border border-line-inverse-strong/60 bg-surface-inverse/40 px-4 py-3 text-xs text-inverse-subtle">
                 <summary class="cursor-pointer text-inverse-muted">Raw JSON</summary>
-                <pre class="mt-3 max-h-72 overflow-auto text-[11px] leading-relaxed text-inverse-subtle">{JSON.stringify(sanitizedSpec, null, 2)}</pre>
+                <pre class="mt-3 max-h-[50vh] overflow-auto text-[11px] leading-relaxed text-inverse-subtle">{JSON.stringify(sanitizedSpec, null, 2)}</pre>
               </details>
             </article>
           </aside>

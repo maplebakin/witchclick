@@ -2,13 +2,12 @@
 title: 'Create a Calm Space During Political Unrest: A Gentle Guide'
 slug: calm-space-during-political-unrest-2
 excerpt: >-
-  When news is heavy, a small ritualized corner can help you pause without
-  shutting down. Here’s a simple, cozy framework you can adapt to your home and
-  needs.
+  When news is heavy, a small ritualized corner can help you pause without shutting down. Here’s a simple, cozy
+  framework you can adapt to your home and needs.
 metaTitle: 'Create a Calm Space During Political Unrest: A Gentle Guide'
 metaDescription: >-
-  Create a refuge at home when the world feels loud. Step-by-step setup, sensory
-  anchors, and a checklist to make a calm corner you can return to anytime.
+  Create a refuge at home when the world feels loud. Step-by-step setup, sensory anchors, and a checklist to make a calm
+  corner you can return to anytime.
 tags:
   - calm
   - calm space
@@ -28,7 +27,7 @@ outline:
   - Quick Checklist
   - 'Safety, accessibility, and ethics'
   - Wrap-up
-wordCount: 1137
+wordCount: 1179
 readingMinutes: 6
 includeAds: true
 includeKofi: false
@@ -169,3 +168,5 @@ Ethics matters: a calm space is for steadiness, not avoidance. If you have capac
 You are allowed a quiet corner even when the world is loud. Keep the steps short. Keep the corner simple. Let this practice be a reliable doorway back to yourself.
 
 When you return tomorrow, read yesterday’s line in your journal, touch the token, breathe once, and begin again. If you like tools, treat notebooks as little containers for thoughts you do not want to carry in your head.
+
+Further reading: [Pre-Interview Grounding Ritual: Quick and Deep Guide](/post/pre-interview-grounding-ritual), [PlayStation Tarot: Cozy Game-Night Spread & Ritual](/post/playstation-tarot-spread-and-ritual), [Sunday Football Tarot: A Game-Day Spread and Ritual Guide](/post/sunday-football-tarot-spread-and-ritual). Evidence base: [Mindfulness overview (APA)](https://www.apa.org/topics/mindfulness).

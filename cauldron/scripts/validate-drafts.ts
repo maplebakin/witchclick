@@ -54,9 +54,9 @@ async function validateDrafts() {
   const { summaries, payloads } = await collectDrafts();
 
   if (listOnly) {
-    console.log('Drafts on file:');
+    console.log('Scrolls in the Cauldron:');
     for (const draft of summaries) {
-      console.log(` • ${draft.slug.padEnd(24)} ${draft.title} [${draft.status}]`);
+      console.log(` • ${draft.slug.padEnd(24)} ${draft.title} [Status: ${draft.status}]`);
     }
     return;
   }
@@ -67,21 +67,21 @@ async function validateDrafts() {
   for (const slug of slugsToValidate) {
     const payload = payloads.get(slug);
     if (!payload) {
-      console.error(`✖ ${slug}: missing or unreadable draft.`);
+      console.error(`✖ ${slug}: Blighted thread! Scroll is missing or unreadable.`);
       failures += 1;
       continue;
     }
 
     const result = PostSpecV2Schema.safeParse(payload);
     if (!result.success) {
-      console.error(`✖ ${slug}: ${result.error.issues.length} issue(s)`);
+      console.error(`✖ ${slug}: Corrupted runes! ${result.error.issues.length} thread(s) unravelled.`);
       for (const issue of result.error.issues) {
-        console.error(`   • ${issue.path.join('.') || '(root)'} — ${issue.message}`);
+        console.error(`   • ${issue.path.join('.') || '(root)'} — ${issue.message} (Mend this!)`);
       }
       failures += 1;
     } else {
       const summary = summaries.find((item) => item.slug === slug);
-      console.log(`✔ ${slug}: ${summary?.title ?? 'Untitled draft'}`);
+      console.log(`✔ ${slug}: ${summary?.title ?? 'Un-named spell'} (Thread secure)`);
     }
   }
 
@@ -91,6 +91,6 @@ async function validateDrafts() {
 }
 
 validateDrafts().catch((err) => {
-  console.error('Unexpected error while validating drafts:', err);
+  console.error('An unknown blight has fallen upon the validation ritual:', err);
   process.exit(1);
 });

@@ -1,9 +1,40 @@
 ---
+import { readSettings } from '../utils/settings';
+
+const settings = readSettings();
 const {
   title = "Printable Planner",
   description = "",
-  accent = "#7c3aed",
+  accent: propAccent,
 } = Astro.props;
+
+// Determine active theme's accent for a dynamic accent
+const activeMidnight = settings.activeThemes?.midnight;
+const activeDawn = settings.activeThemes?.dawn;
+const themeAccent = activeMidnight?.accent || activeDawn?.accent || propAccent || '#B04F5C'; // Use Yule Cranberry Red as default fallback if no theme accent
+const accent = themeAccent;
+
+// Get thematic fonts and colors
+const defaultAccent = '#B04F5C'; // Cranberry Red
+const defaultText = '#2C3E50'; // Dark Charcoal
+const defaultMuted = '#6A807E'; // Muted Green-Gray
+const defaultPlainSurface = '#F5F8F7'; // Pale Icy Blue/White
+const defaultCardSurface = '#E8ECEB'; // Slightly darker surface
+const defaultElevatedSurface = '#D9DFDE'; // More elevated surface
+const defaultBorder = '#CCD3D2'; // Pale Border
+const defaultShadow = '0 8px 24px rgba(44, 62, 80, 0.1)'; // Subtle dark shadow
+
+const currentFontHeading = activeMidnight?.fontHeading || activeDawn?.fontHeading || 'Cinzel';
+const currentFontBody = activeMidnight?.fontSerif || activeDawn?.fontSerif || 'Cormorant Garamond';
+
+const currentSurfacePlain = activeMidnight?.surfacePlain || activeDawn?.surfacePlain || defaultPlainSurface;
+const currentSurfaceCard = activeMidnight?.cardPanelSurface || activeDawn?.cardPanelSurface || defaultCardSurface;
+const currentSurfaceElevated = activeMidnight?.cardPanelSurfaceStrong || activeDawn?.cardPanelSurfaceStrong || defaultElevatedSurface;
+const currentBorderSubtle = activeMidnight?.cardPanelBorderSoft || activeDawn?.cardPanelBorderSoft || defaultBorder;
+const currentShadowSoft = activeMidnight?.shadowSoft || activeDawn?.shadowSoft || defaultShadow;
+
+const currentText = activeMidnight?.textBody || activeDawn?.textBody || defaultText;
+const currentTextMuted = activeMidnight?.textMuted || activeDawn?.textMuted || defaultMuted;
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -20,10 +51,17 @@ const {
 
       :root {
         color-scheme: light;
-        font-family: "Crimson Pro", "Georgia", serif;
-        --accent: #7c3aed;
-        --text: #1f1f1f;
-        --muted: #6b7280;
+        font-family: "${currentFontHeading}", serif;
+        --accent: ${accent};
+        --text: ${currentText};
+        --muted: ${currentTextMuted};
+        --surface-plain: ${currentSurfacePlain};
+        --surface-card: ${currentSurfaceCard};
+        --surface-elevated: ${currentSurfaceElevated};
+        --border-subtle: ${currentBorderSubtle};
+        --shadow-soft: ${currentShadowSoft};
+        --font-heading: "${currentFontHeading}", serif;
+        --font-body: "${currentFontBody}", serif;
       }
 
       * {
@@ -33,27 +71,27 @@ const {
       body {
         margin: 0;
         color: var(--text);
-        background: #f9f9fb;
-        font-family: "Inter", "Helvetica Neue", sans-serif;
+        background: var(--surface-plain);
+        font-family: var(--font-body);
       }
 
       main {
-        background: white;
+        background: var(--surface-card);
         border-radius: 16px;
         padding: 2.5rem;
-        box-shadow: 0 15px 45px rgba(67, 56, 202, 0.08);
+        box-shadow: var(--shadow-soft);
         min-height: calc(100vh - 2rem);
       }
 
       h1 {
-        font-family: "Crimson Pro", "Georgia", serif;
+        font-family: var(--font-heading);
         font-size: 2.5rem;
         margin-bottom: 0.5rem;
         color: var(--accent);
       }
 
       :global(h2) {
-        font-family: "Crimson Pro", "Georgia", serif;
+        font-family: var(--font-heading);
         font-size: 1.75rem;
         margin-top: 2.5rem;
         margin-bottom: 0.75rem;
@@ -76,10 +114,10 @@ const {
       }
 
       :global(.card) {
-        border: 2px solid rgba(124, 58, 237, 0.25);
+        border: 2px solid var(--border-subtle);
         border-radius: 16px;
         padding: 1.25rem;
-        background: rgba(124, 58, 237, 0.05);
+        background: var(--surface-elevated);
         min-height: 100%;
         display: flex;
         flex-direction: column;
@@ -113,6 +151,7 @@ const {
         width: 20px;
         border: 2px solid var(--accent);
         border-radius: 6px;
+        background: var(--surface-plain);
       }
 
       footer {
@@ -141,7 +180,7 @@ const {
         {description && <p>{description}</p>}
       </header>
       <slot />
-      <footer>Crafted for WitchClick ritual lab printables. Print to PDF or keep as a reusable digital planner.</footer>
+      <footer>Crafted by Mira Ash, for the WitchClick coven. May your rituals be kind and your spells true.</footer>
     </main>
   </body>
 </html>

@@ -1,0 +1,188 @@
+--- 
+// src/components/admin/PromptBuilder.astro
+import Card from "@/components/ui/Card.astro";
+import Input from "@/components/ui/Input.astro";
+import Select from "@/components/ui/Select.astro";
+import Textarea from "@/components/ui/Textarea.astro";
+import Button from "@/components/ui/Button.astro";
+
+interface PresetOption {
+  key: string;
+  label: string;
+  description: string;
+}
+
+interface StyleOption {
+  key: string;
+  label: string;
+  description: string;
+}
+
+interface Props {
+  presetOptions: PresetOption[];
+  styleOptions: StyleOption[];
+  defaultModeDescription: string;
+  defaultStyleDescription: string;
+  devApi: string;
+}
+
+const { 
+  presetOptions,
+  styleOptions,
+  defaultModeDescription,
+  defaultStyleDescription,
+  devApi
+} = Astro.props;
+---
+
+<Card as="section" class="lg:col-span-5">
+  <div class="mb-4 space-y-2">
+    <h2 class="text-xl font-semibold">Step 1: Build Generator Prompt</h2>
+    <p class="text-xs text-body-muted">Configure your post preferences to generate an AI prompt</p>
+  </div>
+  <div class="grid gap-4">
+    <label class="block">
+      <span class="text-xs font-medium uppercase tracking-wide text-body-subtle">Topic</span>
+      <Input id="topic" placeholder="tea ritual for focus" />
+      <p class="mt-1 text-[11px] text-body-faint">What should this post be about?</p>
+    </label>
+    <label class="block">
+      <span class="text-xs font-medium">Word count</span>
+      <Input id="words" type="number" placeholder="1000-1500 words (approx)" />
+    </label>
+    <label class="block">
+      <span class="text-xs font-medium">Template</span>
+      <Select id="mode">
+        <option value="" selected>The Grand Arcane Template</option>
+        {presetOptions.map((option) => (
+          <option value={option.key}>{option.label}</option>
+        ))}
+      </Select>
+      <p class="mt-1 text-[11px] text-body-subtle" id="modeHelp">{defaultModeDescription}</p>
+    </label>
+    <label class="block">
+      <span class="text-xs font-medium">Writing style</span>
+      <Select id="style">
+        {styleOptions.map((option) => (
+          <option value={option.key}>{option.label}</option>
+        ))}
+      </Select>
+      <p id="styleHelp" class="mt-1 text-[11px] text-body-subtle">{defaultStyleDescription}</p>
+    </label>
+    <label class="block">
+      <span class="text-xs font-medium">Reflection Prompts (one per line)</span>
+      <Textarea id="reflectionPrompts" placeholder="e.g., How does this ritual connect you to nature?" />
+      <p class="mt-1 text-[11px] text-body-faint">List specific prompts for personal reflection related to this post.</p>
+    </label>
+    <div class="flex gap-4 text-sm">
+      <label class="inline-flex items-center gap-2">
+        <Input type="checkbox" id="ads" class="w-4 h-4" />
+        <span>Weave in supportive enchantments</span>
+      </label>
+      <label class="inline-flex items-center gap-2">
+        <Input type="checkbox" id="kofi" checked class="w-4 h-4" />
+        <span>Nourish the Cauldron (Ko-fi)</span>
+      </label>
+    </div>
+    <div class="flex gap-2">
+      <Button id="genPrompt" variant="secondary" size="sm">Generate Prompt</Button>
+      <Button id="copyPrompt" variant="primary" size="sm">Copy</Button>
+    </div>
+    <Textarea id="promptOut" class="font-mono text-xs h-64" placeholder="The AI's whispered guidance will manifest here…"></Textarea>
+    <p class="text-xs text-body-muted">Offer this parchment to your Oracle (LLM) → receive the structured spell → infuse it into the content cauldron on the right.</p>
+  </div>
+</Card>
+
+<script define:vars={{
+  presetOptions,
+  styleOptions,
+  defaultModeDescription,
+  defaultStyleDescription,
+  devApi,
+}}>
+  const $ = (id) => document.getElementById(id);
+
+  function updateHelp(selectId, helpId, options, fallback) {
+    const select = $(selectId);
+    const help = $(helpId);
+    if (!select || !help) return;
+    function render() {
+      const value = select.value;
+      const match = options.find((opt) => opt.key === value);
+      help.textContent = match ? match.description : fallback;
+    }
+    select.addEventListener('change', render);
+    render();
+  }
+
+  updateHelp('mode', 'modeHelp', presetOptions, defaultModeDescription);
+  updateHelp('style', 'styleHelp', styleOptions, defaultStyleDescription);
+
+  const genPromptBtn = $('genPrompt');
+  const copyPromptBtn = $('copyPrompt');
+  const promptOut = $('promptOut');
+  let isBusy = false;
+
+  function setBusy(busy) {
+    isBusy = busy;
+    genPromptBtn.disabled = isBusy;
+    copyPromptBtn.disabled = isBusy;
+    genPromptBtn.style.opacity = isBusy ? 0.6 : 1;
+    copyPromptBtn.style.opacity = isBusy ? 0.6 : 1;
+  }
+
+  genPromptBtn.addEventListener('click', async () => {
+    try {
+      setBusy(true);
+      // This is a simplified version of the status update.
+      // A more robust solution would use a shared state manager or event bus.
+      const statusEl = document.getElementById('status');
+      if (statusEl) statusEl.textContent = 'Whispering guidance...';
+
+      const body = {
+        topic: $('topic').value || 'tea ritual for focus',
+        words: Number($('words').value || 1200),
+        ads: $('ads').checked ? 'on' : 'off',
+        kofi: $('kofi').checked ? 'on' : 'off',
+        reflectionPrompts: $('reflectionPrompts').value.split('\n').map(s => s.trim()).filter(Boolean)
+      };
+      const mode = $('mode').value;
+      if (mode) body.mode = mode;
+      const style = $('style').value || 'cozy';
+      body.style = style;
+
+      const res = await fetch(`${devApi}/genprompt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (!res.ok) throw new Error(`gen failed (${res.status})`);
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'gen failed');
+      
+      promptOut.value = data.prompt || '';
+      if (statusEl) statusEl.textContent = 'Guidance whispered ✓';
+    } catch (e) {
+      const statusEl = document.getElementById('status');
+      if (statusEl) statusEl.textContent = `Prompt error: ${e.message || String(e)}`;
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  copyPromptBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(promptOut?.value || '');
+      const statusEl = document.getElementById('status');
+      if (statusEl) statusEl.textContent = 'Copied spell ✓';
+    } catch {
+      if (promptOut) {
+        promptOut.focus();
+        promptOut.select();
+      }
+      const statusEl = document.getElementById('status');
+      if (statusEl) statusEl.textContent = 'Press ⌘/Ctrl+C to copy the verse';
+    }
+  });
+</script>

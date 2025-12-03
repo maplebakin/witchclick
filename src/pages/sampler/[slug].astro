@@ -1,0 +1,49 @@
+--- 
+import RitualSampler from '../../components/RitualSampler.astro';
+import { CollectionEntry, getCollection } from 'astro:content';
+import { marked } from 'marked';
+
+export async function getStaticPaths() {
+    // Utility to extract reflection prompts from markdown if not explicitly in data
+    // This is a fallback/transitional approach if posts haven't been updated with the new field yet
+    function extractReflectionPrompts(markdownContent: string): string[] {
+        const prompts: string[] = [];
+        const reflectionHeadingPattern = /^(##+|###+)\s*Reflection Prompts\s*\n([\s\S]*?)(?=^##+|^###+|$)/gim;
+        let match;
+
+        while ((match = reflectionHeadingPattern.exec(markdownContent)) !== null) {
+            const promptsBlock = match[2];
+            const promptLinePattern = /^\s*[-*]\s*(.+)$/gim; // Matches bullet points
+            let lineMatch;
+            while ((lineMatch = promptLinePattern.exec(promptsBlock)) !== null) {
+                prompts.push(lineMatch[1].trim());
+            }
+        }
+        return prompts;
+    }
+
+    const posts = await getCollection('posts');
+    return posts.map((post) => {
+        // Prioritize explicit reflectionPrompts field
+        let reflectionPrompts = post.data.reflectionPrompts || [];
+
+        // Fallback: Try to extract from markdown if the field is empty or absent
+        if (reflectionPrompts.length === 0 && post.body) {
+            reflectionPrompts = extractReflectionPrompts(post.body);
+        }
+
+        return {
+            params: { slug: post.slug },
+            props: {
+                title: post.data.title,
+                description: post.data.description,
+                reflectionPrompts: reflectionPrompts,
+            },
+        };
+    });
+}
+
+const { title, description, reflectionPrompts } = Astro.props;
+---
+
+<RitualSampler title={title} description={description} reflectionPrompts={reflectionPrompts} />

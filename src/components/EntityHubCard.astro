@@ -1,0 +1,69 @@
+---
+// src/components/EntityHubCard.astro
+import { toRgba, mixColors, resolveTailwindColor } from "@/utils/color";
+
+interface Section {
+  type: string;
+  title: string;
+  subtitle: string;
+  icon: string;
+  href: string;
+  themeColor: string;
+}
+
+interface Props {
+  section: Section;
+}
+
+const { section } = Astro.props;
+
+const labelFor = (type: string) =>
+  type
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (char) => char.toUpperCase());
+
+// All the color generation logic is now encapsulated within this component.
+const accent = resolveTailwindColor(section.themeColor);
+const styles = {
+  '--entity-card-border': toRgba(accent, 0.32),
+  '--entity-card-glow': toRgba(accent, 0.16),
+  '--entity-card-highlight': mixColors("#ffffff", accent, 0.12),
+  '--entity-card-surface-top': mixColors("#ffffff", accent, 0.08),
+  '--entity-card-surface-bottom': mixColors("#f3edff", accent, 0.22),
+  '--entity-card-heading': mixColors(accent, "#140b1e", 0.28),
+  '--entity-card-text': mixColors(accent, "#1a102b", 0.18),
+  '--entity-card-label': mixColors(accent, "#ffffff", 0.48),
+  '--entity-card-cta': mixColors(accent, "#201333", 0.32),
+  '--entity-card-cta-hover': mixColors(accent, "#120824", 0.18),
+  '--entity-card-icon': accent,
+  '--entity-card-icon-shadow': toRgba(accent, 0.35),
+  '--card-hover-translate': '-0.4rem',
+};
+---
+<a
+  href={section.href}
+  class="group grid min-h-full gap-6 rounded-2xl border bg-neutral-900 p-6 text-white shadow-lg transition-all duration-200 ease-in-out hover:border-[var(--entity-card-border)] hover:shadow-2xl hover:-translate-y-1 focus-visible:border-[var(--entity-card-border)] focus-visible:shadow-2xl focus-visible:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--entity-card-border)]"
+  style={Object.entries(styles).map(([key, value]) => `${key}: ${value}`).join(';')}
+>
+  <div class="grid items-start gap-4 lg:grid-cols-[minmax(0,0.4fr)_minmax(0,1fr)] lg:gap-2">
+    <div class="flex flex-col items-start gap-2 text-[var(--entity-card-label)]">
+      <span class="text-4xl text-[var(--entity-card-icon)]" style={`filter: drop-shadow(0 6px 18px var(--entity-card-icon-shadow));`}>
+        {section.icon}
+      </span>
+      <span class="text-xs font-bold uppercase tracking-widest break-words">
+        {labelFor(section.type)}
+      </span>
+    </div>
+    <div class="space-y-2">
+      <h2 class="font-serif text-2xl font-bold uppercase tracking-wider text-[var(--entity-card-heading)] sm:text-3xl">
+        {section.title}
+      </h2>
+      <p class="text-base leading-relaxed text-[var(--entity-card-text)]">
+        {section.subtitle}
+      </p>
+    </div>
+  </div>
+  <span class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[var(--entity-card-cta)] transition-colors group-hover:text-[var(--entity-card-cta-hover)]">
+    Explore <span aria-hidden="true">→</span>
+  </span>
+</a>

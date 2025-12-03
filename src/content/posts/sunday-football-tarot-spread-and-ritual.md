@@ -2,14 +2,12 @@
 title: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
 slug: sunday-football-tarot-spread-and-ritual
 excerpt: >-
-  A cozy, sports-night twist on tarot: use this 7-card spread and tiny ritual to
-  track momentum, read defenses, and spot turning points—without pressure or
-  predictions.
+  A cozy, sports-night twist on tarot: use this 7-card spread and tiny ritual to track momentum, read defenses, and spot
+  turning points—without pressure or predictions.
 metaTitle: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide'
 metaDescription: >-
-  Blend game-day vibes with a playful tarot spread and simple ritual for Sunday
-  football. Map momentum, defense, and turning points with clear steps, timing
-  tips, and a short checklist.
+  Blend game-day vibes with a playful tarot spread and simple ritual for Sunday football. Map momentum, defense, and
+  turning points with clear steps, timing tips, and a short checklist.
 tags:
   - calm
   - tarot
@@ -27,7 +25,7 @@ outline:
   - Quick Checklist
   - 'Safety, accessibility, and ethics'
   - Wrap-up
-wordCount: 682
+wordCount: 768
 readingMinutes: 3
 entities:
   - type: tarot
@@ -90,7 +88,6 @@ heroImageAlt: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide — her
 spoonLevel: low
 cluster: tarot-spreads
 ---
-
 ## Why tarot + football works
 
 Rituals make game day feel special. Tarot adds structure and surprise—great for tracking story beats without guessing scores. Each card becomes a lens: energy, obstacles, momentum, and adjustment.
@@ -200,3 +197,4 @@ Respect boundaries: you don’t have to read for anyone who pushes. Hydrate, sna
 
 Sports are stories in pads. The Sunday Drive spread lets you track the story without predicting the scoreboard. If this guide made your watch party cozier, a small Ko-fi tip helps keep WitchClick ad-light and reader-powered. Thanks for hanging out, and may your snacks be legendary.
 
+Further reading: [PlayStation Tarot: Cozy Game-Night Spread & Ritual](/post/playstation-tarot-spread-and-ritual), [When Life Feels on Pause: A Gentle Ritual & Guide](/post/when-life-feels-on-pause), [Create a Calm Space During Political Unrest: A Gentle Guide](/post/calm-space-during-political-unrest-2). Evidence base: [Mindfulness overview (APA)](https://www.apa.org/topics/mindfulness).

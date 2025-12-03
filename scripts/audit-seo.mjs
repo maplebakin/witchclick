@@ -11,10 +11,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 
-const contentDirs = [
-  'content/white-magic-curses',
-  'content/posts',
-].map(dir => path.join(rootDir, dir));
+const defaultContentDirs = [
+  'content/white-magic-curses', // legacy curses archive
+  'content/posts',              // legacy meanderings path
+  'src/content/posts',          // primary Astro content collection
+];
+
+function resolveContentDirs() {
+  const inputDirs = process.argv.slice(2).filter(Boolean);
+  const dirs = inputDirs.length > 0 ? inputDirs : defaultContentDirs;
+  return dirs.map((dir) => (path.isAbsolute(dir) ? dir : path.join(rootDir, dir)));
+}
+
+const contentDirs = resolveContentDirs();
 
 function countInternalLinks(markdown) {
   // Count markdown links that point to internal paths
@@ -124,6 +133,9 @@ function main() {
   console.log('🔍 SEO Audit Report\n');
   console.log('=' .repeat(80));
 
+  console.log('Scanning directories:');
+  contentDirs.forEach((dir) => console.log(` - ${dir}`));
+
   const files = contentDirs.flatMap(dir => {
     if (!fs.existsSync(dir)) {
       // It's okay for a content directory not to exist (e.g., /posts is often empty)
@@ -171,8 +183,21 @@ function main() {
   }
 
   console.log('\n' + '='.repeat(80));
-  console.log(`\n✅ ${publishedResults.filter(r => r.issues.length === 0).length} posts are fully compliant`);
+  const compliantCount = publishedResults.filter(r => r.issues.length === 0).length;
+  console.log(`\n✅ ${compliantCount} posts are fully compliant`);
   console.log(`⚠️  ${postsWithIssues.length} posts need updates\n`);
+
+  if (publishedResults.length === 0) {
+    console.log('ℹ️  No published posts found to audit (drafts or low-wordcount posts are ignored).');
+    return;
+  }
+
+  if (postsWithIssues.length > 0) {
+    console.log('❌ SEO audit failed: fix the issues above.');
+    process.exitCode = 1;
+  } else {
+    console.log('🎉 SEO audit passed with no issues.');
+  }
 }
 
 main();
