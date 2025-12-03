@@ -237,7 +237,7 @@ const contentSummary = contentItems.join(' • ');
     font-size: 0.85rem;
     letter-spacing: 0.26em;
     text-transform: uppercase;
-    color: rgba(249, 245, 255, 0.75);
+    color: var(--theme-text-muted, rgba(249, 245, 255, 0.75));
   }
 
   .post-rail__cards {
@@ -283,12 +283,13 @@ const contentSummary = contentItems.join(' • ');
   .post-rail__card-title {
     font-weight: 600;
     font-size: 0.98rem;
+    color: var(--theme-text-strong);
   }
 
   .post-rail__card-excerpt {
     font-size: 0.85rem;
     line-height: 1.5;
-    color: var(--text-muted);
+    color: var(--theme-text-muted);
   }
 
   .post-rail__card-meta {
@@ -298,7 +299,7 @@ const contentSummary = contentItems.join(' • ');
     font-size: 0.7rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--text-accent);
+    color: var(--theme-text-accent);
   }
 
   .post-rail__entities {
@@ -343,11 +344,12 @@ const contentSummary = contentItems.join(' • ');
   .post-rail__entity-name {
     font-weight: 600;
     font-size: 0.9rem;
+    color: var(--theme-text-strong);
   }
 
   .post-rail__entity-description {
     font-size: 0.8rem;
-    color: var(--text-subtle);
+    color: var(--theme-text-subtle);
     line-height: 1.45;
   }
 

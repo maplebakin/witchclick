@@ -1,5 +1,7 @@
 ---
-// src/pages/post/[slug].astro — drop‑in replacement with Entities sidebar + Ko‑fi CTA randomizer
+// src/pages/post/[slug].astro
+import fs from 'node:fs';
+import path from 'node:path';
 import Base from "../../layouts/Base.astro";
 import AdSlot from "../../components/AdSlot.astro";
 import Disclosure from "../../components/Disclosure.astro";
@@ -10,88 +12,56 @@ import PostRail from "../../components/PostRail.astro";
 import ReadingProgress from "../../components/ReadingProgress.astro";
 import TldrCallout from "../../components/TldrCallout.astro";
 import BackToTop from "../../components/BackToTop.astro";
-import { readEntity } from "../../utils/entities";
+import ShareButtons from "../../components/ShareButtons.astro";
 import HeadSlot from "@/components/HeadSlot.astro";
-
-import fs from "node:fs";
-import path from "node:path";
-import { marked } from "marked";
-import createDOMPurify from "dompurify";
-import { JSDOM } from "jsdom";
-
-// Simple Slugger class to replace marked.Slugger (removed in marked v16)
-class Slugger {
-  private seen: Record<string, number> = {};
-
-  slug(text: string): string {
-    let slug = text
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/[\s_-]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-
-    const originalSlug = slug;
-    let count = this.seen[originalSlug] || 0;
-
-    if (count > 0) {
-      slug = `${originalSlug}-${count}`;
-    }
-
-    this.seen[originalSlug] = count + 1;
-    return slug;
-  }
-}
-
-import { autoLinkAffiliates } from "../../../tools/src/auto-affiliate";
-import { readSettings, getSiteOrigin, buildCanonicalUrl, toAbsoluteUrl } from "../../utils/settings";
+import { readSettings, buildCanonicalUrl, getSiteOrigin } from "../../utils/settings";
 import { normalizeSpoonLevel } from "../../utils/augment";
-import {
-  loadAllPosts,
-  estimateReadingMinutes,
-  firstParagraph,
-  extractAuthorSlugs,
-  extractHeadingOutline,
-} from "../../utils/posts";
 import { getAuthorBySlug, normalizeAuthorSlug, type AuthorProfile } from "../../utils/authors";
-import { getRelatedPosts } from "../../utils/recommendations";
+import { readEntity } from "../../utils/entities";
 
-const dom = new JSDOM("<body></body>");
-const DOMPurify = createDOMPurify(dom.window);
 
 export const prerender = true;
 
-type PostData = Record<string, any>;
-
 export async function getStaticPaths() {
-  const posts = loadAllPosts();
-
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-    props: {
-      data: post.data,
-      content: post.content,
-      effectiveSlug: post.slug,
-      tldr: post.tldr,
-      spoons: post.spoons,
-    },
+  const CACHE_DIR = path.join(process.cwd(), '.cache/post-data');
+  if (!fs.existsSync(CACHE_DIR)) {
+    return [];
+  }
+  const files = fs.readdirSync(CACHE_DIR);
+  return files.map((file) => ({
+    params: { slug: file.replace(/\.json$/, '') },
   }));
 }
 
+const { slug } = Astro.params;
+const CACHE_DIR = path.join(process.cwd(), '.cache/post-data');
+const postFilePath = path.join(CACHE_DIR, `${slug}.json`);
+
+if (!fs.existsSync(postFilePath)) {
+  return new Response(null, {
+    status: 404,
+    statusText: 'Not Found'
+  });
+}
+
+const post = JSON.parse(fs.readFileSync(postFilePath, 'utf-8'));
+
 const {
-  data = {} as PostData,
-  content = "",
-  effectiveSlug = Astro.params.slug as string,
-  tldr: injectedTldr,
-  spoons: injectedSpoons,
-} = Astro.props;
+  data,
+  content: html,
+  hasAffiliates,
+  relatedPosts: recommendations,
+  headingOutline,
+} = post;
+
+const effectiveSlug = post.slug;
+const reflectionPrompts = Array.isArray(data.reflectionPrompts) ? data.reflectionPrompts : [];
 
 const settings = readSettings();
-const showEndAd = Boolean(settings.ads?.provider);
+const showEndAd = Boolean(settings.ads?.provider) && data.includeAds !== false;
 const siteOrigin = getSiteOrigin(settings);
 const title = data.title ?? "Untitled";
-const description =
-  data.metaDescription ?? data.description ?? data.excerpt ?? firstParagraph(content);
+const description = data.metaDescription ?? data.description ?? data.excerpt ?? '';
 
 const publishedAt = data.publishedAt ?? data.pubDate ?? data.date ?? undefined;
 const modifiedAt = data.updatedAt ?? publishedAt ?? undefined;
@@ -103,294 +73,56 @@ const breadcrumbs = [
   { label: title },
 ];
 
-const readingMinutes = data.readingMinutes ?? estimateReadingMinutes(content);
-const topicCluster = data.cluster || data.contentType || null;
-const clusterLabels: Record<string, string> = {
-  'tarot-spreads': 'Tarot Spreads',
-  'rituals-practices': 'Rituals & Practices',
-  'clean-cursing': 'Clean Cursing',
-  'ai-narrative-magic': 'AI & Narrative Magic',
-  'shadow-work': 'Shadow Work',
-  'cozy-witchcraft': 'Cozy Witchcraft',
-  'motherquest': 'Motherquest',
-  'spellcraft-theory': 'Spellcraft & Theory',
-  'magical-productivity': 'Magical Productivity',
-  'ritual': 'Rituals',
-  'guide': 'Guides',
-  'spread': 'Tarot Spreads',
-  'reflection': 'Reflections',
-  'story': 'Stories',
-  'tarotSpread': 'Tarot Spreads',
-  'spellwork': 'Spellwork',
-  'crystals': 'Crystals',
-};
-const clusterLabel = topicCluster ? clusterLabels[topicCluster] || topicCluster : null;
-
-const htmlRaw = marked.parse(content || "");
-let html = DOMPurify.sanitize(String(htmlRaw), { USE_PROFILES: { html: true } });
-
-const wrapper = dom.window.document.createElement("div");
-wrapper.innerHTML = html;
-const slugger = new Slugger();
-const headingNodes = wrapper.querySelectorAll<HTMLHeadingElement>("h2, h3, h4");
-headingNodes.forEach((node) => {
-  const text = node.textContent?.trim();
-  if (!text) return;
-  const existing = node.getAttribute("id");
-  const id = existing && existing.trim().length ? existing : slugger.slug(text);
-  node.setAttribute("id", id);
-});
-html = wrapper.innerHTML;
-const headingOutline = extractHeadingOutline(content, { minLevel: 2, maxLevel: 3 });
-
-const heroImage = typeof data.heroImage === "string" ? data.heroImage.trim() : "";
-const heroAlt =
-  typeof data.heroAlt === "string" && data.heroAlt.trim().length
-    ? data.heroAlt.trim()
-    : title;
-
-const providedTldr =
-  typeof data.tldr === "string"
-    ? data.tldr
-    : typeof injectedTldr === "string"
-      ? injectedTldr
-      : "";
-const tldr = providedTldr.trim();
-const tldrBullets = Array.isArray((data as any).tldrBullets)
-  ? (data as any).tldrBullets
-      .map((entry: any) => (typeof entry === "string" ? entry : String(entry ?? "")))
-      .filter((entry: string) => entry.trim().length > 0)
-  : [];
-
-const spoonsRaw = data.spoons ?? data.spoonLevel ?? injectedSpoons ?? null;
-const spoonLevel = normalizeSpoonLevel(spoonsRaw);
+const readingMinutes = data.readingMinutes;
+const spoonLevel = normalizeSpoonLevel(data.spoons ?? data.spoonLevel);
+const tldr = data.tldr || '';
+const heroImage = data.heroImage || '';
+const heroAlt = data.heroAlt || title;
 
 let ctaType: "kofi" | "download" | "none" = "none";
 let ctaId: string | undefined;
 
-if (data && typeof data === "object") {
-  if (data.downloadId) {
-    ctaType = "download";
-    ctaId = String(data.downloadId);
-  } else if (data.includeKofi) {
-    ctaType = "kofi";
+if (data.downloadId) {
+  ctaType = "download";
+  ctaId = String(data.downloadId);
+} else if (data.includeKofi) {
+  ctaType = "kofi";
+}
+
+const authorSlugs = Array.isArray(data.authors) ? data.authors.map(s => normalizeAuthorSlug(s)) : [];
+const pageAuthors = authorSlugs.map(slug => {
+  const profile = getAuthorBySlug(slug);
+  return {
+    slug,
+    name: profile?.name || slug,
+    profile,
   }
-}
-
-const productsFilePath = "./content/products.json";
-const productsDoc = fs.existsSync(productsFilePath)
-  ? JSON.parse(fs.readFileSync(productsFilePath, "utf8"))
-  : { products: [] };
-const allProducts = Array.isArray(productsDoc) ? productsDoc : productsDoc.products || [];
-
-const postTagsRaw = Array.isArray(data.tags)
-  ? data.tags
-  : typeof data.tags === "string"
-    ? data.tags.split(",")
-    : [];
-
-const postTags = Array.from(
-  new Set(
-    postTagsRaw
-      .map((tag: any) => String(tag ?? "").split(","))
-      .flat()
-      .map((tag: string) => tag.trim().toLowerCase())
-      .filter(Boolean),
-  ),
-);
-
-const productRecommendations = (postTags.length
-  ? allProducts.filter((product: any) => {
-      if (!product || typeof product !== "object") return false;
-      const tags = Array.isArray(product.tags)
-        ? product.tags
-            .map((tag: any) => String(tag ?? "").trim().toLowerCase())
-            .filter(Boolean)
-        : [];
-      if (tags.length === 0) return false;
-      return tags.some((tag: string) => postTags.includes(tag));
-    })
-  : [])
-  .filter((product: any, index: number, list: any[]) => {
-    const key = product?.key ? String(product.key) : null;
-    if (!key) return true;
-    return index === list.findIndex((item: any) => item?.key && String(item.key) === key);
-  });
-
-const authorEntriesRaw: unknown[] = [];
-if (Array.isArray((data as any).authors)) {
-  authorEntriesRaw.push(...((data as any).authors as unknown[]));
-}
-if ((data as any).author) {
-  authorEntriesRaw.push((data as any).author);
-}
-
-type PageAuthor = { slug: string; name: string; profile: AuthorProfile | null };
-
-const authorSlugs = extractAuthorSlugs(data ?? {});
-const seenAuthorSlugs = new Set<string>();
-
-const pageAuthors: PageAuthor[] = authorSlugs
-  .filter((slug) => {
-    if (!slug) return false;
-    if (seenAuthorSlugs.has(slug)) return false;
-    seenAuthorSlugs.add(slug);
-    return true;
-  })
-  .map((slug) => {
-    const profile = getAuthorBySlug(slug);
-    let label = profile?.name ?? "";
-
-    if (!label) {
-      const match = authorEntriesRaw.find((entry) => {
-        if (!entry) return false;
-        if (typeof entry === "string") {
-          return normalizeAuthorSlug(entry) === slug;
-        }
-
-        if (typeof entry === "object") {
-          const record = entry as Record<string, any>;
-          if (typeof record.slug === "string" && normalizeAuthorSlug(record.slug) === slug) {
-            return true;
-          }
-          if (typeof record.name === "string" && normalizeAuthorSlug(record.name) === slug) {
-            return true;
-          }
-        }
-
-        return false;
-      });
-
-      if (typeof match === "string") {
-        label = match;
-      } else if (match && typeof match === "object") {
-        const record = match as Record<string, any>;
-        if (typeof record.name === "string" && record.name.trim()) {
-          label = record.name;
-        } else if (typeof record.title === "string" && record.title.trim()) {
-          label = record.title;
-        }
-      }
-    }
-
-    if (!label) {
-      label = slug
-        .split("-")
-        .filter(Boolean)
-        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-        .join(" ");
-    }
-
-    return { slug, name: label, profile } satisfies PageAuthor;
-  });
-
-interface AuthorLinkEntry {
-  href: string | null;
-  label: string;
-  slug: string;
-}
-
-type AuthorSeparator = "ampersand" | "comma" | "commaAmpersand" | null;
-
-const authorLinks: AuthorLinkEntry[] = pageAuthors.map((author) => ({
-  href: author.profile ? `/author/${author.profile.slug}/` : null,
-  label: author.name,
-  slug: author.slug,
-}));
-
-const authorSegments = authorLinks.map((author, index) => {
-  let separator: AuthorSeparator = null;
-  if (index > 0) {
-    const isLast = index === authorLinks.length - 1;
-    if (authorLinks.length === 2) {
-      separator = "ampersand";
-    } else if (isLast) {
-      separator = "commaAmpersand";
-    } else {
-      separator = "comma";
-    }
-  }
-  return { ...author, separator };
 });
 
-const jsonLdAuthors = pageAuthors
-  .map((author) => ({
+const authorSegments = pageAuthors.map((author, index) => {
+    let separator = null;
+    if (index > 0) {
+        separator = pageAuthors.length === 2 || index === pageAuthors.length - 1 ? 'ampersand' : 'comma';
+    }
+    return { ...author, href: author.profile ? `/author/${author.profile.slug}/` : null, label: author.name, separator };
+});
+
+const jsonLdAuthors = pageAuthors.map(author => ({
     "@type": "Person",
     name: author.name,
     url: author.profile ? `${siteOrigin}/author/${author.profile.slug}` : undefined,
-    description: author.profile?.bio,
-  }))
-  .filter((person) => Boolean(person.name));
-
-const jsonLdAuthor =
-  jsonLdAuthors.length === 0
-    ? { "@type": "Organization", name: settings.brandName || "WitchClick" }
-    : jsonLdAuthors.length === 1
-      ? jsonLdAuthors[0]
-      : jsonLdAuthors;
-
-const ogCandidate = path.join(process.cwd(), "public", "og", `${effectiveSlug}.jpg`);
-const ogImage = data.ogImage
-  ? toAbsoluteUrl(data.ogImage, settings)
-  : fs.existsSync(ogCandidate)
-    ? `${siteOrigin}/og/${effectiveSlug}.jpg`
-    : "";
-
-let hasAffiliates = false;
-
-const frontAnchors = Array.isArray(data.affiliateAnchors) ? data.affiliateAnchors : [];
-if (frontAnchors.length > 0) {
-  const declared = frontAnchors
-    .map((a: any) => ({ key: String(a.key || ""), text: String(a.text || "") }))
-    .filter((a: any) => a.key && a.text);
-
-  for (const d of declared) {
-    const prod = allProducts.find((p: any) => String(p.key) === d.key);
-    if (!prod || !prod.url) continue;
-    const { html: nextHtml, count } = autoLinkAffiliates(html, [{ ...prod }], { maxLinksPerPost: 1 });
-    if (count > 0 && nextHtml !== html) {
-      html = nextHtml;
-      hasAffiliates = true;
-    }
-  }
-} else {
-  const { html: nextHtml, count } = autoLinkAffiliates(html, allProducts, { maxLinksPerPost: 3 });
-  if (count > 0) {
-    html = nextHtml;
-    hasAffiliates = true;
-  }
-}
-
-const entList = Array.isArray(data.entities) ? data.entities : [];
-const resolvedEntities = entList
-  .map((e: any) => {
-    const entity = readEntity(String(e.type || ""), String(e.slug || ""));
-    if (!entity) return null;
-
-    return {
-      ...entity,
-      href: `/entities/${entity.type}/${entity.slug}`,
-      description: entity.summary,
-    };
-  })
-  .filter(Boolean);
-
-const railEntities = (resolvedEntities as any[]).map((entity) => ({
-  name: entity.name,
-  href: entity.href,
-  description: entity.description,
 }));
 
-const recommendations = getRelatedPosts({
-  currentSlug: effectiveSlug,
-  currentData: data,
-  limit: 4,
-}).map((item) => ({
-  title: item.title,
-  href: item.href,
-  excerpt: item.excerpt,
-  readingMinutes: item.readingMinutes,
-  spoonLevel: item.spoonLevel,
+const jsonLdAuthor = jsonLdAuthors.length === 0 ? { "@type": "Organization", name: settings.brandName || "WitchClick" } : jsonLdAuthors.length === 1 ? jsonLdAuthors[0] : jsonLdAuthors;
+
+const ogImage = data.ogImage ? toAbsoluteUrl(data.ogImage, settings) : `${siteOrigin}/og/${effectiveSlug}.jpg`;
+
+const entList = Array.isArray(data.entities) ? data.entities : [];
+const resolvedEntities = entList.map((e) => readEntity(String(e.type || ""), String(e.slug || ""))).filter(Boolean);
+const railEntities = resolvedEntities.map((entity: any) => ({
+  name: entity.name,
+  href: `/entities/${entity.type}/${entity.slug}`,
+  description: entity.summary,
 }));
 
 const jsonLd = {
@@ -410,12 +142,8 @@ const jsonLd = {
 
 <Base title={title} description={description} canon={canonical} wide={true} ogImage={ogImage} ogType="article">
   <HeadSlot slot="head">
-    {publishedAt && (
-      <meta property="article:published_time" content={new Date(publishedAt).toISOString()} />
-    )}
-    {modifiedAt && (
-      <meta property="article:modified_time" content={new Date(modifiedAt).toISOString()} />
-    )}
+    {publishedAt && <meta property="article:published_time" content={new Date(publishedAt).toISOString()} />}
+    {modifiedAt && <meta property="article:modified_time" content={new Date(modifiedAt).toISOString()} />}
     <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
   </HeadSlot>
 
@@ -430,63 +158,31 @@ const jsonLd = {
         data-reading-target="article"
       >
           <header class="card-panel card-tier-2 card-panel-strong card-panel-static overflow-hidden p-6 sm:p-8 lg:p-10">
-            <div
-              class:list={["flex flex-col gap-8 lg:gap-10", heroImage ? "lg:flex-row lg:items-start" : "lg:max-w-3xl"]}
-            >
+            <div class:list={["flex flex-col gap-8 lg:gap-10", heroImage && "lg:flex-row lg:items-start"]}>
               {heroImage && (
-                <figure
-                  class="relative aspect-[4/3] overflow-hidden rounded-[calc(var(--card-radius,1.5rem)-0.5rem)] border border-line-muted/60 bg-surface-overlay/10 shadow-[var(--wc-shadow-soft)] lg:w-[42%]"
-                >
+                <figure class="relative aspect-[4/3] overflow-hidden rounded-xl border border-neutral-300/60 bg-neutral-100 shadow-sm lg:w-[42%]">
                   <img class="h-full w-full object-cover" src={heroImage} alt={heroAlt} loading="eager" />
                 </figure>
               )}
               <div class="flex flex-1 flex-col gap-6">
-                {clusterLabel && (
-                  <div class="inline-flex">
-                    <span class="card-pill card-cluster inline-block bg-accent-soft/10 text-accent-soft border border-accent-soft/20 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
-                      {clusterLabel}
-                    </span>
-                  </div>
-                )}
-
-                <p class="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-[0.28em] text-muted">
-                  {publishedAt && (
-                    <time datetime={new Date(publishedAt).toISOString()}>
-                      {new Date(publishedAt).toLocaleDateString(undefined, {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </time>
-                  )}
+                <p class="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-widest text-neutral-500">
+                  {publishedAt && <time datetime={new Date(publishedAt).toISOString()}>{new Date(publishedAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}</time>}
                   {(publishedAt || readingMinutes) && <span aria-hidden="true">•</span>}
                   {readingMinutes && <span>{readingMinutes} minute read</span>}
                 </p>
 
-                <h1 id="post-title" class="font-serif text-3xl leading-tight sm:text-4xl lg:text-5xl">
+                <h1 id="post-title" class="font-serif text-3xl leading-tight sm:text-4xl lg:text-5xl text-body-strong">
                   {title}
                 </h1>
 
                 {authorSegments.length > 0 && (
-                  <p class="flex flex-wrap items-center gap-y-2 text-sm text-soft">
+                  <p class="flex flex-wrap items-center gap-y-2 text-sm text-neutral-600">
                     By
                     {authorSegments.map((author) => (
                       <span class="inline-flex items-center">
-                        {author.separator === "comma" && <span class="px-1 text-muted">,</span>}
-                        {author.separator === "ampersand" && <span class="px-1 text-muted">&amp;</span>}
-                        {author.separator === "commaAmpersand" && (
-                          <span class="px-1 text-muted">,&nbsp;&amp;&nbsp;</span>
-                        )}
-                        {author.href ? (
-                          <a
-                            class="font-semibold transition-colors hover:text-accent-soft focus-visible:text-accent-soft"
-                            href={author.href}
-                          >
-                            {author.label}
-                          </a>
-                        ) : (
-                          <span class="font-semibold">{author.label}</span>
-                        )}
+                        {author.separator === 'comma' && <span class="px-1">,</span>}
+                        {author.separator === 'ampersand' && <span class="px-1">&amp;</span>}
+                        <a class="font-semibold transition-colors hover:text-brand-primary" href={author.href}>{author.label}</a>
                       </span>
                     ))}
                   </p>
@@ -495,16 +191,14 @@ const jsonLd = {
                 {Array.isArray(data.tags) && data.tags.length > 0 && (
                   <ul class="mt-6 flex flex-wrap gap-2">
                     {data.tags.map((tag: any) => (
-                      <li>
-                        <span class="card-pill card-tag">#{String(tag).toLowerCase()}</span>
-                      </li>
+                      <li><span class="rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-600">#{String(tag).toLowerCase()}</span></li>
                     ))}
                   </ul>
                 )}
 
-                {(tldr || tldrBullets.length > 0 || spoonLevel) && (
+                {(tldr || (data.tldrBullets && data.tldrBullets.length > 0) || spoonLevel) && (
                   <div class="mt-6">
-                    <TldrCallout summary={tldr} bullets={tldrBullets} spoonLevel={spoonLevel} />
+                    <TldrCallout summary={tldr} bullets={data.tldrBullets || []} spoonLevel={spoonLevel} />
                   </div>
                 )}
               </div>
@@ -512,16 +206,10 @@ const jsonLd = {
           </header>
 
           <div class="card-panel card-panel-strong card-panel-static flex flex-col gap-8 p-6 sm:p-8 lg:p-10">
-            <div
-              class="prose prose-lg max-w-none prose-headings:font-serif prose-a:text-accent-soft prose-a:font-semibold prose-blockquote:border-accent-soft/30 prose-hr:border-line/30 prose-code:text-accent-soft prose-code:bg-surface-muted/30 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-surface-muted"
-              set:html={html}
-            />
-
+            <div class="prose prose-lg max-w-none prose-headings:font-serif prose-a:text-brand-primary prose-blockquote:border-brand-primary/30" set:html={html} />
             <Disclosure show={hasAffiliates} />
-
-            {Array.isArray(data.downloadId) ? null : data.downloadId ? (
-              <DownloadCard id={String(data.downloadId)} />
-            ) : null}
+            {ctaType === 'download' && ctaId && <DownloadCard id={ctaId} />}
+            <ShareButtons title={title} url={canonical} />
           </div>
       </article>
 
@@ -534,25 +222,6 @@ const jsonLd = {
       />
     </div>
 
-      {productRecommendations.length > 0 && (
-        <div class="card-panel card-panel-strong card-panel-static p-6 sm:p-8 lg:p-10">
-          <ProductRecommendations products={productRecommendations} />
-        </div>
-      )}
-
-      {showEndAd && (
-        <div class="card-panel card-panel-strong card-panel-static p-6 sm:p-8 lg:p-10">
-          <AdSlot />
-        </div>
-      )}
     </div>
-
   <BackToTop />
-  <style>
-    .post-body :is(h1, h2) {
-      color: var(--ink-strong, var(--text-strong));
-      letter-spacing: 0.02em;
-      text-transform: none;
-    }
-  </style>
 </Base>
