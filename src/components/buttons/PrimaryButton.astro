@@ -50,9 +50,9 @@ if (target === "_blank") {
 
 <style>
   .wc-button {
-    --btn-bg: color-mix(in srgb, var(--surface-panel-primary) 78%, var(--text-accent, var(--color-gold)) 22%);
-    --btn-bg-hover: color-mix(in srgb, var(--surface-panel-primary) 68%, var(--text-accent, var(--color-gold)) 32%);
-    --btn-text: var(--text-strong);
+    --btn-bg: color-mix(in srgb, var(--surface-panel-primary) 78%, var(--text-accent, var(--theme-color-gold)) 22%);
+    --btn-bg-hover: color-mix(in srgb, var(--surface-panel-primary) 68%, var(--text-accent, var(--theme-color-gold)) 32%);
+    --btn-text: var(--theme-text-strong);
     --btn-border: color-mix(in srgb, var(--border-accent-strong) 40%, transparent 60%);
     display: inline-flex;
     align-items: center;
@@ -101,9 +101,9 @@ if (target === "_blank") {
   }
 
   :global(:root[data-comfort-theme="dawn"]) .wc-button {
-    --btn-bg: color-mix(in srgb, var(--text-strong) 18%, var(--text-accent, var(--color-gold)) 82%);
-    --btn-bg-hover: color-mix(in srgb, var(--text-strong) 24%, var(--text-accent, var(--color-gold)) 76%);
-    --btn-text: color-mix(in srgb, var(--text-strong) 92%, white 8%);
+    --btn-bg: color-mix(in srgb, var(--theme-text-strong) 18%, var(--text-accent, var(--theme-color-gold)) 82%);
+    --btn-bg-hover: color-mix(in srgb, var(--theme-text-strong) 24%, var(--text-accent, var(--theme-color-gold)) 76%);
+    --btn-text: color-mix(in srgb, var(--theme-text-strong) 92%, white 8%);
     --btn-border: color-mix(in srgb, var(--border-accent-strong) 45%, transparent 55%);
   }
 </style>

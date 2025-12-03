@@ -104,8 +104,8 @@ const jsonLd = createCollectionPageSchema(
     padding: clamp(2rem, 6vw, 3.5rem);
     border-radius: 3rem;
     background:
-      radial-gradient(circle at top right, rgba(192, 132, 252, 0.2), transparent 65%),
-      linear-gradient(135deg, rgba(253, 246, 255, 0.95), rgba(237, 233, 254, 0.92));
+      radial-gradient(circle at top right, color-mix(in srgb, var(--theme-color-amethyst) 20%, transparent), transparent 65%),
+      linear-gradient(135deg, var(--theme-surface-base) 95%, var(--theme-surface-panel) 92%);
   }
 
   .author-page-hero__inner {

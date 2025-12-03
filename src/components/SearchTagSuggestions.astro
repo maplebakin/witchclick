@@ -69,7 +69,7 @@ const tags = sorted.map(([value, count]) => ({
     font-size: 0.7rem;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--text-hint, rgba(244, 241, 255, 0.65)) 95%, transparent 5%);
+    color: color-mix(in srgb, var(--text-hint, var(--theme-text-hint)) 95%, transparent 5%);
   }
 
   .search-tags__list {
@@ -79,32 +79,32 @@ const tags = sorted.map(([value, count]) => ({
   }
 
   .search-tags__chip {
-    border: 1px solid color-mix(in srgb, var(--text-accent, var(--color-gold)) 42%, transparent 58%);
+    border: 1px solid color-mix(in srgb, var(--text-accent, var(--theme-color-gold)) 42%, transparent 58%);
     background: color-mix(in srgb, hsl(var(--surface-panel-primary)) 88%, transparent 12%);
     border-radius: 999px;
     font-size: 0.75rem;
     padding: 0.4rem 0.85rem;
-    color: color-mix(in srgb, var(--text-secondary, rgba(244, 241, 255, 0.85)) 92%, transparent 8%);
+    color: color-mix(in srgb, var(--theme-text-secondary) 92%, transparent 8%);
     transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
   }
 
   .search-tags__chip:hover,
   .search-tags__chip:focus-visible {
-    border-color: color-mix(in srgb, var(--text-accent, var(--color-gold)) 55%, transparent 45%);
+    border-color: color-mix(in srgb, var(--text-accent, var(--theme-color-gold)) 55%, transparent 45%);
     background: color-mix(in srgb, hsl(var(--surface-panel-primary)) 94%, transparent 6%);
-    color: color-mix(in srgb, var(--link-color, #d4af37) 65%, var(--text-secondary, rgba(244, 241, 255, 0.85)) 35%);
+    color: color-mix(in srgb, var(--link-color, var(--theme-color-gold)) 65%, var(--theme-text-secondary) 35%);
   }
 
   :root[data-comfort-theme="dawn"] .search-tags__chip {
-    border-color: color-mix(in srgb, var(--text-accent, var(--color-gold)) 30%, transparent 70%);
+    border-color: color-mix(in srgb, var(--text-accent, var(--theme-color-gold)) 30%, transparent 70%);
     background: color-mix(in srgb, hsl(var(--surface-panel-primary)) 96%, transparent 4%);
-    color: color-mix(in srgb, var(--text-body) 90%, white 10%);
+    color: color-mix(in srgb, var(--theme-text-body) 90%, white 10%);
   }
 
   :root[data-comfort-theme="dawn"] .search-tags__chip:hover,
   :root[data-comfort-theme="dawn"] .search-tags__chip:focus-visible {
-    border-color: color-mix(in srgb, var(--text-accent, var(--color-gold)) 40%, transparent 60%);
+    border-color: color-mix(in srgb, var(--text-accent, var(--theme-color-gold)) 40%, transparent 60%);
     background: color-mix(in srgb, hsl(var(--surface-panel-primary)) 98%, transparent 2%);
-    color: color-mix(in srgb, var(--link-color, #caa043) 60%, var(--text-body) 40%);
+    color: color-mix(in srgb, var(--theme-link-color, #caa043) 60%, var(--theme-text-body) 40%);
   }
 </style>

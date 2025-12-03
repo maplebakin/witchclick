@@ -56,8 +56,8 @@ if (type === 'kofi') {
   .cta-footer {
     margin-top: 2.5rem;
     border-radius: clamp(1.5rem, 3vw, 1.85rem);
-    border: 1px solid color-mix(in srgb, var(--glass-panel-border, rgba(124, 58, 237, 0.32)) 70%, transparent);
-    background: linear-gradient(160deg, color-mix(in srgb, var(--glass-panel-overlay, rgba(124, 58, 237, 0.16)) 88%, transparent) 0%, rgba(255, 255, 255, 0.94) 100%);
+    border: 1px solid color-mix(in srgb, var(--glass-panel-border, color-mix(in srgb, var(--theme-color-amethyst) 32%, transparent)) 70%, transparent);
+    background: linear-gradient(160deg, color-mix(in srgb, var(--glass-panel-overlay, color-mix(in srgb, var(--theme-color-amethyst) 16%, transparent)) 88%, transparent) 0%, var(--theme-surface-base) 100%);
     padding: clamp(1.25rem, 3vw, 1.75rem);
   }
 

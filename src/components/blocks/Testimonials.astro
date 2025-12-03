@@ -52,8 +52,8 @@ if (!Array.isArray(testimonials) || testimonials.length === 0) {
     margin: 0;
     padding: clamp(1.25rem, 3vw, 1.75rem);
     border-radius: 1.5rem;
-    background: color-mix(in srgb, rgba(255, 255, 255, 0.9) 70%, var(--glass-panel-overlay, rgba(124, 58, 237, 0.12)) 30%);
-    border: 1px solid color-mix(in srgb, var(--glass-panel-border, rgba(124, 58, 237, 0.32)) 70%, transparent);
+    background: color-mix(in srgb, var(--theme-surface-base) 70%, var(--glass-panel-overlay, color-mix(in srgb, var(--theme-color-amethyst) 12%, transparent)) 30%);
+    border: 1px solid color-mix(in srgb, var(--glass-panel-border, color-mix(in srgb, var(--theme-color-amethyst) 32%, transparent)) 70%, transparent);
     box-shadow: var(--elevation-tier-1);
     display: grid;
     gap: 1rem;
@@ -73,7 +73,7 @@ if (!Array.isArray(testimonials) || testimonials.length === 0) {
     left: 0;
     top: -0.6rem;
     font-size: 2.5rem;
-    color: color-mix(in srgb, var(--glass-pill-border-active, rgba(91, 33, 182, 0.48)) 80%, white 20%);
+    color: color-mix(in srgb, var(--glass-pill-border-active, color-mix(in srgb, var(--theme-color-amethyst) 48%, transparent)) 80%, white 20%);
   }
 
   figcaption {

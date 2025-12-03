@@ -26,7 +26,7 @@ const defaultPlainSurface = '#F5F8F7'; // Pale Icy Blue/White
 const defaultCardSurface = '#E8ECEB'; // Slightly darker surface
 const defaultElevatedSurface = '#D9DFDE'; // More elevated surface
 const defaultBorder = '#CCD3D2'; // Pale Border
-const defaultShadow = '0 8px 24px rgba(44, 62, 80, 0.1)'; // Subtle dark shadow
+const defaultShadow = 'var(--theme-shadow-soft)'; // Subtle dark shadow
 
 const currentSurfacePlain = activeMidnight?.surfacePlain || activeDawn?.surfacePlain || defaultPlainSurface;
 const currentSurfaceCard = activeMidnight?.cardPanelSurface || activeDawn?.cardPanelSurface || defaultCardSurface;
@@ -72,12 +72,12 @@ const currentTextMuted = activeMidnight?.textMuted || activeDawn?.textMuted || d
       body {
         margin: 0;
         color: var(--text);
-        background: var(--surface-plain);
+        background: var(--theme-surface-plain);
         font-family: var(--font-body);
       }
 
       main {
-        background: var(--surface-card);
+        background: var(--theme-surface-card);
         border-radius: 16px;
         padding: 2.5rem;
         box-shadow: var(--shadow-soft);
@@ -108,7 +108,7 @@ const currentTextMuted = activeMidnight?.textMuted || activeDawn?.textMuted || d
         border: 2px solid var(--border-subtle);
         border-radius: 16px;
         padding: 1.25rem;
-        background: var(--surface-elevated);
+        background: var(--theme-surface-elevated);
         margin-top: 1.5rem;
       }
 

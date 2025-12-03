@@ -94,7 +94,7 @@ const { class: className = "" } = Astro.props as Props;
     border-radius: 999px;
     border: 1px solid var(--accent);
     background: var(--primary);
-    color: var(--text-strong);
+    color: var(--theme-text-strong);
     transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
   }
 
@@ -126,7 +126,7 @@ const { class: className = "" } = Astro.props as Props;
 
   :global(.theme-toggle[data-theme='dawn']) {
     background: var(--primary);
-    color: var(--text-body);
+    color: var(--theme-text-body);
     border-color: var(--accent);
   }
 

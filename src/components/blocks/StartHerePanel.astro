@@ -87,12 +87,12 @@ const steps = [
     margin: 0;
     font-family: var(--font-heading, var(--font-body));
     font-size: clamp(1.9rem, 4vw, 2.45rem);
-    color: color-mix(in srgb, var(--ink-strong) 92%, white 8%);
+    color: color-mix(in srgb, var(--theme-ink-strong) 92%, white 8%);
   }
 
   .start-here__lead {
     margin: 0;
-    color: color-mix(in srgb, var(--text-secondary) 96%, transparent 4%);
+    color: color-mix(in srgb, var(--theme-text-secondary) 96%, transparent 4%);
     max-width: 32rem;
   }
 
@@ -125,7 +125,7 @@ const steps = [
     width: 2rem;
     height: 2rem;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--text-accent-strong, var(--color-gold)) 70%, var(--color-night, #261a0d) 30%);
+    background: color-mix(in srgb, var(--text-accent-strong, var(--theme-color-gold)) 70%, var(--color-night, #261a0d) 30%);
     color: color-mix(in srgb, white 92%, var(--surface-panel-primary) 8%);
     font-weight: 600;
     display: grid;
@@ -136,12 +136,12 @@ const steps = [
   .start-here__card-title {
     margin: 0;
     font-size: 1.25rem;
-    color: color-mix(in srgb, var(--ink-strong) 90%, white 10%);
+    color: color-mix(in srgb, var(--theme-ink-strong) 90%, white 10%);
   }
 
   .start-here__card-text {
     margin: 0;
-    color: color-mix(in srgb, var(--text-secondary) 92%, transparent 8%);
+    color: color-mix(in srgb, var(--theme-text-secondary) 92%, transparent 8%);
     font-size: 0.95rem;
   }
 
@@ -149,20 +149,20 @@ const steps = [
     justify-self: flex-start;
     font-size: 0.9rem;
     font-weight: 600;
-    color: color-mix(in srgb, var(--link-color) 65%, var(--text-accent-strong) 35%);
+    color: color-mix(in srgb, var(--theme-link-color) 65%, var(--theme-text-accent-strong) 35%);
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
     padding: 0.4rem 0.85rem;
     border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--text-accent, var(--color-gold)) 42%, transparent 58%);
+    border: 1px solid color-mix(in srgb, var(--text-accent, var(--theme-color-gold)) 42%, transparent 58%);
     background: color-mix(in srgb, var(--surface-panel-primary) 85%, transparent 15%);
   }
 
   .start-here__link:hover,
   .start-here__link:focus-visible {
-    color: color-mix(in srgb, var(--link-color) 55%, var(--text-accent-strong) 45%);
-    border-color: color-mix(in srgb, var(--text-accent, var(--color-gold)) 52%, transparent 48%);
+    color: color-mix(in srgb, var(--theme-link-color) 55%, var(--theme-text-accent-strong) 45%);
+    border-color: color-mix(in srgb, var(--text-accent, var(--theme-color-gold)) 52%, transparent 48%);
     background: color-mix(in srgb, var(--surface-panel-primary) 92%, transparent 8%);
   }
 

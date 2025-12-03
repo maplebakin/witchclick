@@ -153,14 +153,14 @@ const typeLabel =
 
 <style>
   .entity-card {
-    background-color: var(--entity-surface, rgba(255, 255, 255, 0.85));
-    border-color: var(--entity-border, rgba(124, 58, 237, 0.28));
+    background-color: var(--entity-surface, var(--theme-surface-base));
+    border-color: var(--entity-border, color-mix(in srgb, var(--theme-color-amethyst) 28%, transparent));
     overflow: hidden; /* <-- stop clipping */
     height: auto; /* <-- let content determine height */
   }
 
   .entity-card-overlay {
-    background: radial-gradient(circle at top, var(--entity-overlay, rgba(124, 58, 237, 0.22)), transparent 65%);
+    background: radial-gradient(circle at top, var(--entity-overlay, color-mix(in srgb, var(--theme-color-amethyst) 22%, transparent)), transparent 65%);
   }
 
   .entity-card-orb {
@@ -170,15 +170,15 @@ const typeLabel =
   }
 
   .entity-card-glow {
-    background: linear-gradient(135deg, var(--entity-overlay, rgba(124, 58, 237, 0.18)) 0%, transparent 80%);
+    background: linear-gradient(135deg, var(--entity-overlay, color-mix(in srgb, var(--theme-color-amethyst) 18%, transparent)) 0%, transparent 80%);
   }
 
   .entity-card-star {
-    color: var(--entity-star, rgba(124, 58, 237, 0.4));
+    color: var(--entity-star, color-mix(in srgb, var(--theme-color-amethyst) 40%, transparent));
   }
 
     .entity-card-label {
-    color: var(--entity-label, rgba(124, 58, 237, 0.65));
+    color: var(--entity-label, color-mix(in srgb, var(--theme-color-amethyst) 65%, transparent));
     letter-spacing: 0.18em;   /* gentle, still “label-y” but not absurd */
     font-size: 0.7rem;        /* slightly small to keep it compact */
     overflow-wrap: anywhere;
@@ -188,9 +188,9 @@ const typeLabel =
   }
 
   .entity-card-badge {
-    background: var(--entity-badge-bg, rgba(124, 58, 237, 0.18));
-    border-color: var(--entity-badge-border, rgba(124, 58, 237, 0.35));
-    color: var(--entity-badge-text, rgba(88, 28, 135, 0.85));
+    background: var(--entity-badge-bg, color-mix(in srgb, var(--theme-color-amethyst) 18%, transparent));
+    border-color: var(--entity-badge-border, color-mix(in srgb, var(--theme-color-amethyst) 35%, transparent));
+    color: var(--entity-badge-text, color-mix(in srgb, var(--theme-color-amethyst) 85%, transparent));
   }
 
   .entity-card-title {
@@ -198,7 +198,7 @@ const typeLabel =
   }
 
   .entity-card-summary {
-    color: var(--entity-summary, rgba(88, 28, 135, 0.85));
+    color: var(--entity-summary, color-mix(in srgb, var(--theme-color-amethyst) 85%, transparent));
     line-height: 1.5;
     overflow: visible;
     text-overflow: clip;
@@ -208,16 +208,16 @@ const typeLabel =
   }
 
   .entity-card-placeholder {
-    color: var(--entity-placeholder, rgba(124, 58, 237, 0.5));
+    color: var(--entity-placeholder, color-mix(in srgb, var(--theme-color-amethyst) 50%, transparent));
   }
 
   .entity-card-tag {
     --card-pill-text: var(--entity-keyword-text, rgba(88, 28, 135, 0.85));
-    --card-pill-bg: var(--entity-keyword-bg, rgba(124, 58, 237, 0.16));
-    --card-pill-border: var(--entity-keyword-border, rgba(124, 58, 237, 0.35));
+    --card-pill-bg: var(--entity-keyword-bg, color-mix(in srgb, var(--theme-color-amethyst) 16%, transparent));
+    --card-pill-border: var(--entity-keyword-border, color-mix(in srgb, var(--theme-color-amethyst) 35%, transparent));
   }
 
   .entity-card-empty-keywords {
-    color: var(--entity-placeholder, rgba(124, 58, 237, 0.45));
+    color: var(--entity-placeholder, color-mix(in srgb, var(--theme-color-amethyst) 45%, transparent));
   }
 </style>

@@ -48,8 +48,8 @@ const authorSummaries = authors.map((author) => {
     padding: clamp(2rem, 6vw, 3.5rem);
     border-radius: 3rem;
     background:
-      radial-gradient(circle at top right, rgba(168, 85, 247, 0.18), transparent 60%),
-      linear-gradient(140deg, rgba(250, 245, 255, 0.94), rgba(237, 233, 254, 0.92));
+      radial-gradient(circle at top right, color-mix(in srgb, var(--theme-color-amethyst) 18%, transparent), transparent 60%),
+      linear-gradient(140deg, var(--theme-surface-base) 94%, var(--theme-surface-panel) 92%);
   }
 
   .author-index-hero__inner {

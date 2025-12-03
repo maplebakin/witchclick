@@ -473,20 +473,20 @@ function isActive(href: string): boolean {
 
   .site-nav__button--utility:hover,
   .site-nav__button--utility:focus-visible {
-    background: color-mix(in srgb, var(--glass-hover, var(--header-background)) 82%, var(--glass-highlight, var(--color-iris)) 18%);
-    border-color: color-mix(in srgb, var(--glass-border, var(--header-border)) 65%, var(--glass-highlight, var(--color-iris)) 35%);
+    background: color-mix(in srgb, var(--glass-hover, var(--header-background)) 82%, var(--glass-highlight, var(--theme-color-iris)) 18%);
+    border-color: color-mix(in srgb, var(--glass-border, var(--header-border)) 65%, var(--glass-highlight, var(--theme-color-iris)) 35%);
   }
 
   .site-nav__button--admin {
-    background: color-mix(in srgb, var(--glass-surface-strong, var(--header-background)) 78%, var(--glass-highlight, var(--color-gold)) 22%);
+    background: color-mix(in srgb, var(--glass-surface-strong, var(--header-background)) 78%, var(--glass-highlight, var(--theme-color-gold)) 22%);
     border-color: color-mix(in srgb, var(--glass-border-strong, var(--header-border)) 82%, transparent 18%);
     color: color-mix(in srgb, var(--layout-shell-ink) 95%, white 5%);
   }
 
   .site-nav__button--admin:hover,
   .site-nav__button--admin:focus-visible {
-    background: color-mix(in srgb, var(--glass-hover, var(--header-background)) 76%, var(--glass-highlight, var(--color-gold)) 24%);
-    border-color: color-mix(in srgb, var(--glass-border-strong, var(--header-border)) 68%, var(--glass-highlight, var(--color-gold)) 32%);
+    background: color-mix(in srgb, var(--glass-hover, var(--header-background)) 76%, var(--glass-highlight, var(--theme-color-gold)) 24%);
+    border-color: color-mix(in srgb, var(--glass-border-strong, var(--header-border)) 68%, var(--glass-highlight, var(--theme-color-gold)) 32%);
   }
 
   .site-nav__item--submenu {
@@ -497,15 +497,15 @@ function isActive(href: string): boolean {
     padding-inline: calc(var(--header-link-padding-inline) * 1.05);
     font-weight: 600;
     letter-spacing: 0.04em;
-    background: color-mix(in srgb, var(--header-background) 40%, var(--color-gold) 60%);
-    border-color: color-mix(in srgb, var(--header-border) 35%, var(--color-gold) 65%);
+    background: color-mix(in srgb, var(--header-background) 40%, var(--theme-color-gold) 60%);
+    border-color: color-mix(in srgb, var(--header-border) 35%, var(--theme-color-gold) 65%);
     color: color-mix(in srgb, var(--layout-shell-ink) 96%, white 4%);
   }
 
   .site-nav__link--pill:hover,
   .site-nav__link--pill:focus-visible {
-    background: color-mix(in srgb, var(--header-background) 32%, var(--color-gold) 68%);
-    border-color: color-mix(in srgb, var(--header-border) 28%, var(--color-gold) 72%);
+    background: color-mix(in srgb, var(--header-background) 32%, var(--theme-color-gold) 68%);
+    border-color: color-mix(in srgb, var(--header-border) 28%, var(--theme-color-gold) 72%);
   }
 
   .site-nav__button--more {
@@ -629,9 +629,9 @@ function isActive(href: string): boolean {
 
   .site-nav__admin-link:hover,
   .site-nav__admin-link:focus-visible {
-    border-color: color-mix(in srgb, var(--glass-border, var(--header-border)) 65%, var(--glass-highlight, var(--color-iris)) 35%);
-    background: color-mix(in srgb, var(--glass-hover, var(--header-background)) 80%, var(--glass-highlight, var(--color-iris)) 20%);
-    color: var(--comfort-chip-text-strong, var(--text-accent-strong));
+    border-color: color-mix(in srgb, var(--glass-border, var(--header-border)) 65%, var(--glass-highlight, var(--theme-color-iris)) 35%);
+    background: color-mix(in srgb, var(--glass-hover, var(--header-background)) 80%, var(--glass-highlight, var(--theme-color-iris)) 20%);
+    color: var(--comfort-chip-text-strong, var(--theme-text-accent-strong));
     transform: translateX(0.125rem);
   }
 
@@ -710,7 +710,7 @@ function isActive(href: string): boolean {
   .site-search-panel__backdrop {
     position: absolute;
     inset: 0;
-    background: color-mix(in srgb, var(--glass-glow, var(--color-night)) 72%, transparent 28%);
+    background: color-mix(in srgb, var(--glass-glow, var(--theme-color-night)) 72%, transparent 28%);
     backdrop-filter: blur(var(--glass-blur, 16px));
   }
 

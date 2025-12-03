@@ -33,12 +33,10 @@ const { class: className } = Astro.props as Props;
     gap: 0.9rem;
     padding: clamp(1.6rem, 4vw, 2.3rem);
     border-radius: clamp(1.5rem, 3vw, 2rem);
-    background:
-      radial-gradient(120% 120% at 12% 18%, color-mix(in srgb, var(--color-iris, #4b2a63) 22%, transparent) 0%, transparent 70%),
-      rgba(18, 7, 37, 0.9);
-    border: 1px solid rgba(212, 175, 55, 0.28);
-    box-shadow: 0 22px 55px -32px rgba(11, 6, 20, 0.55);
-    color: rgba(249, 245, 255, 0.92);
+    background: radial-gradient(120% 120% at 12% 18%, color-mix(in srgb, var(--color-iris, #4b2a63) 22%, transparent) 0%, transparent 70%), var(--theme-background);
+    border: 1px solid var(--theme-border-subtle);
+    box-shadow: var(--theme-shadow-soft);
+    color: var(--theme-text-primary);
   }
 
   .witchclick-blurb__title {
@@ -66,8 +64,8 @@ const { class: className } = Astro.props as Props;
     gap: 0.35rem;
     padding: 0.55rem 1.1rem;
     border-radius: 999px;
-    border: 1px solid rgba(212, 175, 55, 0.45);
-    background: rgba(24, 12, 40, 0.68);
+    border: 1px solid var(--theme-border-subtle);
+    background: var(--theme-surface-panel);
     font-size: 0.85rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -78,27 +76,25 @@ const { class: className } = Astro.props as Props;
   .witchclick-blurb__link:hover,
   .witchclick-blurb__link:focus-visible {
     transform: translateY(-1px);
-    background: rgba(33, 15, 52, 0.82);
-    border-color: rgba(212, 175, 55, 0.58);
+    background: var(--theme-surface-hover);
+    border-color: var(--theme-border-strong);
   }
 
   :root[data-comfort-theme="dawn"] .witchclick-blurb__inner {
-    background:
-      radial-gradient(120% 120% at 12% 18%, rgba(180, 154, 217, 0.2), transparent 72%),
-      rgba(252, 248, 242, 0.96);
-    border-color: rgba(155, 134, 200, 0.32);
-    color: rgba(58, 40, 84, 0.9);
+    background: radial-gradient(120% 120% at 12% 18%, color-mix(in srgb, var(--theme-color-amethyst) 20%, transparent) 72%), var(--theme-surface-base);
+    border-color: var(--theme-border-subtle);
+    color: var(--theme-text-primary);
   }
 
   :root[data-comfort-theme="dawn"] .witchclick-blurb__link {
-    background: rgba(255, 255, 255, 0.9);
-    border-color: rgba(180, 154, 217, 0.35);
-    color: rgba(87, 63, 115, 0.9);
+    background: var(--theme-surface-base);
+    border-color: var(--theme-border-subtle);
+    color: var(--theme-text-primary);
   }
 
   :root[data-comfort-theme="dawn"] .witchclick-blurb__link:hover,
   :root[data-comfort-theme="dawn"] .witchclick-blurb__link:focus-visible {
-    background: rgba(255, 255, 255, 0.98);
-    border-color: rgba(212, 175, 55, 0.42);
+    background: var(--theme-surface-hover);
+    border-color: var(--theme-border-strong);
   }
 </style>

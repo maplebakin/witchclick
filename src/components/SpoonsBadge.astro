@@ -49,7 +49,7 @@ const tooltipId = spoonLevel ? `spoons-tip-${randomUUID().slice(0, 8)}` : "";
   }
 
   .spoons-badge:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--text-accent, var(--color-gold)) 65%, transparent);
+    outline: 2px solid color-mix(in srgb, var(--text-accent, var(--theme-color-gold)) 65%, transparent);
     outline-offset: 2px;
   }
 
@@ -78,9 +78,9 @@ const tooltipId = spoonLevel ? `spoons-tip-${randomUUID().slice(0, 8)}` : "";
     line-height: 1.4;
     text-transform: none;
     letter-spacing: normal;
-    color: var(--text-body);
-    background: color-mix(in srgb, hsl(var(--surface-card)) 85%, var(--text-accent, var(--color-gold)) 15%);
-    border: 1px solid color-mix(in srgb, var(--text-accent, var(--color-gold)) 20%, transparent);
+    color: var(--theme-text-body);
+    background: color-mix(in srgb, hsl(var(--theme-surface-card)) 85%, var(--text-accent, var(--theme-color-gold)) 15%);
+    border: 1px solid color-mix(in srgb, var(--text-accent, var(--theme-color-gold)) 20%, transparent);
     box-shadow: 0 10px 28px -22px rgba(17, 24, 39, 0.55);
     pointer-events: none;
     opacity: 0;

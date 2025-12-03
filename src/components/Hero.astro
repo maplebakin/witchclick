@@ -94,11 +94,11 @@ const heroFetchPriority = hasHeroImage ? 'high' : undefined;
   .home-hero {
     --hero-surface: var(
       --hero-surface-layer,
-      var(--glass-card, color-mix(in srgb, var(--surface-panel) 88%, transparent 12%))
+      var(--glass-card, color-mix(in srgb, var(--theme-surface-panel) 88%, transparent 12%))
     );
     --hero-border-color: var(
       --hero-border-color-layer,
-      color-mix(in srgb, var(--glass-border, var(--color-gold, #d4af37)) 82%, transparent 18%)
+      color-mix(in srgb, var(--glass-border, var(--theme-color-gold, #d4af37)) 82%, transparent 18%)
     );
     --hero-shadow-layer: var(
       --hero-shadow-layer-fallback,
@@ -108,7 +108,7 @@ const heroFetchPriority = hasHeroImage ? 'high' : undefined;
       --hero-backdrop,
       radial-gradient(
         circle at 18% 18%,
-        color-mix(in srgb, var(--glass-highlight, var(--color-gold, #d4af37)) 30%, transparent 70%),
+        color-mix(in srgb, var(--glass-highlight, var(--theme-color-gold, #d4af37)) 30%, transparent 70%),
         transparent 56%
       )
     );
@@ -151,7 +151,7 @@ const heroFetchPriority = hasHeroImage ? 'high' : undefined;
     font-size: 0.75rem;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: var(--hero-eyebrow-color, var(--text-tertiary));
+    color: var(--hero-eyebrow-color, var(--theme-text-tertiary));
   }
 
   .home-hero__title {
@@ -159,7 +159,7 @@ const heroFetchPriority = hasHeroImage ? 'high' : undefined;
     font-family: var(--font-heading);
     font-size: clamp(2.9rem, 6.2vw, 4.5rem);
     line-height: 1.05;
-    color: var(--comfort-chip-text-strong, var(--text-primary));
+    color: var(--comfort-chip-text-strong, var(--theme-text-primary));
     text-transform: none;
     letter-spacing: 0.015em;
     font-weight: 600;
@@ -170,7 +170,7 @@ const heroFetchPriority = hasHeroImage ? 'high' : undefined;
     max-width: 60ch;
     font-size: clamp(1.05rem, 2.6vw, 1.25rem);
     line-height: 1.75;
-    color: var(--hero-blurb-color, var(--text-secondary));
+    color: var(--hero-blurb-color, var(--theme-text-secondary));
   }
 
   .home-hero__actions {
@@ -183,7 +183,7 @@ const heroFetchPriority = hasHeroImage ? 'high' : undefined;
     margin: 0;
     font-size: 0.95rem;
     line-height: 1.65;
-    color: var(--hero-note-color, var(--text-tertiary));
+    color: var(--hero-note-color, var(--theme-text-tertiary));
     max-width: 52ch;
   }
 
@@ -200,7 +200,7 @@ const heroFetchPriority = hasHeroImage ? 'high' : undefined;
     border-radius: 2rem;
     background: radial-gradient(
       circle at 30% 20%,
-      color-mix(in srgb, var(--glass-highlight, var(--color-gold)) 32%, transparent 68%),
+      color-mix(in srgb, var(--glass-highlight, var(--theme-color-gold)) 32%, transparent 68%),
       transparent 65%
     );
     pointer-events: none;
@@ -210,7 +210,7 @@ const heroFetchPriority = hasHeroImage ? 'high' : undefined;
   .home-hero__image {
     width: min(100%, 24rem);
     border-radius: 2rem;
-    border: var(--hero-image-border, 1px solid color-mix(in srgb, var(--color-gold, #d4af37) 35%, var(--color-iris, #4b2a63) 25%));
+    border: var(--hero-image-border, 1px solid color-mix(in srgb, var(--theme-color-gold, #d4af37) 35%, var(--theme-color-iris, #4b2a63) 25%));
     background: var(--hero-image-surface, rgba(24, 14, 34, 0.65));
     box-shadow: var(--hero-media-shadow, var(--glass-shadow-strong, 0 32px 70px -40px rgba(11, 6, 20, 0.6)));
     aspect-ratio: 4 / 5;

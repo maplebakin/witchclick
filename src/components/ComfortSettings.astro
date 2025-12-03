@@ -126,9 +126,9 @@ const themeToggleId = `comfort-theme-${variant}`;
     gap: var(--space-2, 0.5rem);
     padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
     border-radius: 999px;
-    border: 1px solid var(--comfort-chip-border, color-mix(in srgb, var(--color-gold, #d4af37) 28%, var(--color-iris, #4b2a63) 22%));
+    border: 1px solid var(--comfort-chip-border, color-mix(in srgb, var(--theme-color-gold, #d4af37) 28%, var(--theme-color-iris, #4b2a63) 22%));
     background: var(--comfort-chip-bg, rgba(12, 5, 23, 0.45));
-    color: var(--comfort-chip-text, var(--ink-strong));
+    color: var(--comfort-chip-text, var(--theme-ink-strong));
     font-family: var(--font-accent);
     font-size: 0.78rem;
     letter-spacing: 0.18em;
@@ -145,8 +145,8 @@ const themeToggleId = `comfort-theme-${variant}`;
   .comfort-settings__summary:hover,
   .comfort-settings__summary:focus-visible {
     background: var(--comfort-chip-bg-hover, color-mix(in srgb, var(--comfort-chip-bg) 85%, white 15%));
-    border-color: var(--comfort-chip-border-strong, color-mix(in srgb, var(--color-gold, #d4af37) 45%, var(--color-iris, #4b2a63) 35%));
-    color: var(--comfort-chip-text-strong, var(--text-strong));
+    border-color: var(--comfort-chip-border-strong, color-mix(in srgb, var(--theme-color-gold, #d4af37) 45%, var(--theme-color-iris, #4b2a63) 35%));
+    color: var(--comfort-chip-text-strong, var(--theme-text-strong));
   }
 
   .comfort-settings__sparkle {
@@ -170,7 +170,7 @@ const themeToggleId = `comfort-theme-${variant}`;
     margin-top: var(--space-2, 0.5rem);
     padding: var(--space-5, 1.5rem);
     border-radius: 1.5rem;
-    border: 1px solid var(--comfort-tray-border, color-mix(in srgb, var(--color-gold, #d4af37) 28%, var(--color-iris, #4b2a63) 22%));
+    border: 1px solid var(--comfort-tray-border, color-mix(in srgb, var(--theme-color-gold, #d4af37) 28%, var(--theme-color-iris, #4b2a63) 22%));
     background: var(--comfort-tray-surface, rgba(18, 7, 37, 0.78));
     box-shadow: var(--comfort-tray-shadow, 0 28px 60px -32px rgba(3, 2, 12, 0.65));
     min-width: 18rem;
@@ -186,7 +186,7 @@ const themeToggleId = `comfort-theme-${variant}`;
 
   .comfort-settings__hint {
     font-size: 0.9rem;
-    color: var(--comfort-tray-hint, var(--text-tertiary));
+    color: var(--comfort-tray-hint, var(--theme-text-tertiary));
     margin: 0;
   }
 
@@ -201,9 +201,9 @@ const themeToggleId = `comfort-theme-${variant}`;
     width: 1.1rem;
     height: 1.1rem;
     border-radius: 0.35rem;
-    border: 1px solid var(--comfort-tray-border-strong, color-mix(in srgb, var(--color-gold, #d4af37) 45%, var(--color-iris, #4b2a63) 30%));
+    border: 1px solid var(--comfort-tray-border-strong, color-mix(in srgb, var(--theme-color-gold, #d4af37) 45%, var(--theme-color-iris, #4b2a63) 30%));
     background: var(--comfort-chip-surface, rgba(24, 14, 34, 0.65));
-    accent-color: var(--comfort-chip-accent, var(--color-amethyst));
+    accent-color: var(--comfort-chip-accent, var(--theme-color-amethyst));
   }
 
   .comfort-settings__label {
@@ -222,7 +222,7 @@ const themeToggleId = `comfort-theme-${variant}`;
   .comfort-settings__description {
     font-size: 0.82rem;
     line-height: 1.6;
-    color: var(--comfort-tray-hint, var(--text-tertiary));
+    color: var(--comfort-tray-hint, var(--theme-text-tertiary));
   }
 
   @media (max-width: 920px) {

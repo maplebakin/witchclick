@@ -142,8 +142,8 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
     padding: clamp(2rem, 6vw, 3.5rem);
     border-radius: 3rem;
     background:
-      radial-gradient(circle at top right, rgba(99, 102, 241, 0.2), transparent 60%),
-      linear-gradient(135deg, rgba(245, 243, 255, 0.94), rgba(219, 234, 254, 0.92));
+      radial-gradient(circle at top right, var(--theme-color-iris) 20%, transparent 60%),
+      linear-gradient(135deg, var(--theme-surface-base) 94%, var(--theme-surface-panel) 92%);
   }
 
   .partners-hero__inner {
@@ -192,9 +192,9 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
   .partners-hero__stale {
     padding: 0.15rem 0.6rem;
     border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--color-gold) 45%, transparent 55%);
-    background: color-mix(in srgb, var(--color-night) 70%, var(--color-gold) 30%);
-    color: var(--color-ink);
+    border: 1px solid color-mix(in srgb, var(--theme-color-gold) 45%, transparent 55%);
+    background: color-mix(in srgb, var(--theme-color-night) 70%, var(--theme-color-gold) 30%);
+    color: var(--theme-color-ink);
     font-size: 0.7rem;
     letter-spacing: 0.16em;
   }
@@ -232,9 +232,9 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
     --card-elevation-base: var(--elevation-tier-1);
     --card-elevation-hover: var(--elevation-tier-2);
     padding: clamp(1.35rem, 3vw, 1.85rem);
-    border: 1px solid color-mix(in srgb, rgba(99, 102, 241, 0.85) 32%, var(--card-panel-border, currentColor) 68%);
+    border: 1px solid color-mix(in srgb, var(--theme-color-iris) 32%, var(--card-panel-border, currentColor) 68%);
     background:
-      radial-gradient(circle at top right, color-mix(in srgb, rgba(99, 102, 241, 0.45) 28%, transparent 72%), transparent),
+      radial-gradient(circle at top right, color-mix(in srgb, var(--theme-color-iris) 28%, transparent 72%), transparent),
       var(--card-panel-surface);
     box-shadow: var(--card-elevation-base, var(--elevation-tier-1));
     display: grid;
@@ -243,14 +243,14 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
 
   .partner-card:hover,
   .partner-card:focus-visible {
-    border-color: color-mix(in srgb, rgba(99, 102, 241, 0.88) 45%, transparent 55%);
+    border-color: color-mix(in srgb, var(--theme-color-iris) 45%, transparent 55%);
   }
 
   .partner-card__media {
     border-radius: calc(var(--card-radius, 1.5rem) - 0.5rem);
     overflow: hidden;
-    border: 1px solid color-mix(in srgb, var(--color-iris) 35%, transparent 65%);
-    background: color-mix(in srgb, var(--color-night) 60%, var(--color-ink) 40%);
+    border: 1px solid color-mix(in srgb, var(--theme-color-iris) 35%, transparent 65%);
+    background: color-mix(in srgb, var(--theme-color-night) 60%, var(--theme-color-ink) 40%);
     aspect-ratio: 4 / 3;
   }
 
@@ -280,8 +280,8 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
     font-size: 0.75rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    background: rgba(99, 102, 241, 0.1);
-    color: color-mix(in srgb, rgba(79, 70, 229, 0.9) 70%, var(--ink-strong, #1f1a2b) 30%);
+    background: color-mix(in srgb, var(--theme-color-iris) 10%, transparent);
+    color: color-mix(in srgb, var(--theme-color-iris) 90%, var(--ink-strong, #1f1a2b) 30%);
   }
 
   .partner-card__description {
@@ -318,8 +318,8 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
   }
 
   :global(.partner-card__actions .wc-button) {
-    --btn-bg: color-mix(in srgb, rgba(99, 102, 241, 0.85) 55%, var(--color-night) 45%);
-    --btn-bg-hover: color-mix(in srgb, rgba(99, 102, 241, 0.9) 65%, var(--color-night) 35%);
+    --btn-bg: color-mix(in srgb, rgba(99, 102, 241, 0.85) 55%, var(--theme-color-night) 45%);
+    --btn-bg-hover: color-mix(in srgb, rgba(99, 102, 241, 0.9) 65%, var(--theme-color-night) 35%);
   }
 
   .partner-card__empty {
@@ -328,7 +328,7 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
     color: color-mix(in srgb, var(--ink-muted, currentColor) 80%, white 20%);
     padding: 1.25rem;
     border-radius: var(--card-radius, 1.5rem);
-    border: 1px dashed color-mix(in srgb, rgba(99, 102, 241, 0.45) 60%, transparent 40%);
+    border: 1px dashed color-mix(in srgb, var(--theme-color-iris) 60%, transparent 40%);
     text-align: center;
   }
 
@@ -337,8 +337,8 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
     padding: clamp(2rem, 6vw, 3.5rem);
     border-radius: 3rem;
     background:
-      radial-gradient(circle at top left, rgba(20, 184, 166, 0.16), transparent 60%),
-      linear-gradient(140deg, rgba(240, 253, 250, 0.94), rgba(236, 254, 255, 0.9));
+      radial-gradient(circle at top left, var(--theme-color-amethyst) 16%, transparent 60%),
+      linear-gradient(140deg, var(--theme-surface-base) 94%, var(--theme-surface-panel) 90%);
     display: grid;
     gap: clamp(1.5rem, 4vw, 2.5rem);
   }

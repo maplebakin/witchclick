@@ -166,16 +166,16 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url);
     .salon-hero {
       margin-top: clamp(1.5rem, 5vw, 2.5rem);
       border-radius: 2.5rem;
-      background: linear-gradient(125deg, rgba(37, 99, 235, 0.18), rgba(191, 219, 254, 0.95));
+      background: linear-gradient(125deg, var(--theme-color-iris) 18%, var(--theme-surface-panel) 95%);
       padding: clamp(2rem, 6vw, 3.75rem);
-      box-shadow: 0 35px 80px -45px rgba(37, 99, 235, 0.45);
+      box-shadow: var(--theme-shadow-strong);
     }
 
     .salon-hero__eyebrow {
       text-transform: uppercase;
       letter-spacing: 0.32em;
       font-size: 0.75rem;
-      color: rgba(37, 99, 235, 0.8);
+      color: var(--theme-text-accent);
       margin-bottom: 0.75rem;
     }
 
@@ -214,9 +214,9 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url);
     .salon-hero__stale {
       padding: 0.15rem 0.6rem;
       border-radius: 999px;
-      border: 1px solid color-mix(in srgb, var(--color-gold) 45%, transparent 55%);
-      background: color-mix(in srgb, var(--color-night) 70%, var(--color-gold) 30%);
-      color: var(--color-ink);
+      border: 1px solid color-mix(in srgb, var(--theme-color-gold) 45%, transparent 55%);
+      background: color-mix(in srgb, var(--theme-color-night) 70%, var(--theme-color-gold) 30%);
+      color: var(--theme-color-ink);
       font-size: 0.7rem;
       letter-spacing: 0.16em;
     }
@@ -230,12 +230,12 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url);
     .salon-section__header h2 {
       margin: 0;
       font-size: 1.5rem;
-      color: rgba(37, 99, 235, 0.95);
+      color: var(--theme-text-strong);
     }
 
     .salon-section__header p {
       margin: 0.35rem 0 0;
-      color: rgba(30, 64, 175, 0.8);
+      color: var(--theme-text-body);
     }
 
     .salon-schedule__grid {
@@ -256,38 +256,37 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url);
       padding: 1.5rem;
       display: grid;
       gap: 0.9rem;
-      border: 1px solid color-mix(in srgb, rgba(191, 219, 254, 0.9) 55%, transparent 45%);
-      background:
-        radial-gradient(circle at top right, color-mix(in srgb, rgba(191, 219, 254, 0.45) 35%, transparent 65%), transparent),
+      border: 1px solid color-mix(in srgb, var(--theme-border-strong) 55%, transparent 45%);
+      background: radial-gradient(circle at top right, color-mix(in srgb, var(--theme-surface-panel) 35%, transparent 65%), transparent),
         var(--card-panel-surface);
     }
 
     .salon-card:focus-within {
-      box-shadow: var(--card-focus-ring, 0 0 0 3px rgba(37, 99, 235, 0.35)), var(--card-elevation-hover, var(--elevation-tier-2));
+      box-shadow: var(--card-focus-ring, 0 0 0 3px var(--theme-focus-ring-color)), var(--card-elevation-hover, var(--elevation-tier-2));
     }
 
     .salon-card:hover,
     .salon-card:focus-visible {
-      border-color: color-mix(in srgb, rgba(37, 99, 235, 0.45) 65%, transparent 35%);
+      border-color: var(--theme-border-strong);
     }
 
     .salon-card__header h3 {
       margin: 0;
       font-size: 1.15rem;
-      color: rgba(30, 64, 175, 0.95);
+      color: var(--theme-text-strong);
     }
 
     .salon-card__time {
       margin: 0.4rem 0 0;
       font-size: 0.95rem;
-      color: rgba(30, 64, 175, 0.75);
+      color: var(--theme-text-muted);
     }
 
     .salon-card__focus {
       margin: 0;
       font-size: 0.95rem;
       line-height: 1.6;
-      color: rgba(51, 65, 85, 0.95);
+      color: var(--theme-text-body);
     }
 
     .salon-card__actions {
@@ -303,21 +302,21 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url);
       font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
-      background: rgba(37, 99, 235, 0.12);
-      color: rgba(30, 64, 175, 0.95);
+      background: color-mix(in srgb, var(--theme-color-iris) 12%, transparent);
+      color: var(--theme-text-strong);
       text-decoration: none;
       transition: background 0.15s ease, color 0.15s ease;
     }
 
     .salon-card__action:hover,
     .salon-card__action:focus-visible {
-      background: rgba(37, 99, 235, 0.2);
-      color: rgba(30, 64, 175, 1);
+      background: color-mix(in srgb, var(--theme-color-iris) 20%, transparent);
+      color: var(--theme-text-strong);
     }
 
     :global(.salon-card__action.is-copied) {
-      background: rgba(74, 222, 128, 0.2);
-      color: rgba(22, 163, 74, 0.95);
+      background: color-mix(in srgb, var(--theme-success) 20%, transparent);
+      color: var(--theme-success);
     }
 
     .salon-embeds {
@@ -336,9 +335,8 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url);
       padding: clamp(1.5rem, 4vw, 2rem);
       display: grid;
       gap: 1rem;
-      border: 1px solid color-mix(in srgb, rgba(191, 219, 254, 0.8) 55%, transparent 45%);
-      background:
-        radial-gradient(circle at top left, color-mix(in srgb, rgba(191, 219, 254, 0.35) 30%, transparent 70%), transparent),
+      border: 1px solid color-mix(in srgb, var(--theme-border-strong) 55%, transparent 45%);
+      background: radial-gradient(circle at top left, color-mix(in srgb, var(--theme-surface-panel) 30%, transparent 70%), transparent),
         var(--card-panel-surface);
     }
 
@@ -346,7 +344,7 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url);
       aspect-ratio: 16 / 9;
       border-radius: calc(var(--card-radius, 1.5rem) - 0.35rem);
       overflow: hidden;
-      background: rgba(226, 232, 240, 0.6);
+      background: var(--theme-surface-panel);
       position: relative;
     }
 
@@ -372,29 +370,22 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url);
       padding: clamp(1.75rem, 4vw, 2.25rem);
       display: grid;
       gap: 0.9rem;
-      border: 1px solid color-mix(in srgb, rgba(148, 163, 184, 0.35) 65%, transparent 35%);
-      background:
-        radial-gradient(circle at top right, color-mix(in srgb, rgba(148, 163, 184, 0.3) 35%, transparent 65%), transparent),
+      border: 1px solid color-mix(in srgb, var(--theme-border-subtle) 65%, transparent 35%);
+      background: radial-gradient(circle at top right, color-mix(in srgb, var(--theme-surface-panel) 35%, transparent 65%), transparent),
         var(--card-panel-surface);
     }
 
     .salon-prep__card h2 {
       margin: 0;
       font-size: 1.25rem;
-      color: rgba(30, 64, 175, 0.95);
+      color: var(--theme-text-strong);
     }
 
-    .salon-prep__card ul {
-      margin: 0;
-      padding-left: 1.1rem;
-      color: rgba(51, 65, 85, 0.95);
-      display: grid;
-      gap: 0.6rem;
-    }
+color: var(--theme-text-body);
 
     .salon-prep__card p {
       margin: 0;
-      color: rgba(51, 65, 85, 0.95);
+      color: var(--theme-text-body);
       line-height: 1.65;
     }
   </style>
