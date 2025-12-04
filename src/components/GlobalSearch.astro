@@ -468,7 +468,8 @@ color: var(--theme-text-primary);
   }
 
   :global(.global-search-result:hover),
-background: var(--theme-surface-soft);
+  :global(.global-search-result.is-selected) {
+    background: var(--theme-surface-soft);
   }
 
   :global(.global-search-result-icon) {
