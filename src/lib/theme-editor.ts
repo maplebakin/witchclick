@@ -15,6 +15,7 @@ import {
   colorToHex,
 } from './theme-editor-comprehensive';
 import { THEME_SCOPES } from './theme-scopes';
+import { ALL_COLOR_VARIABLE_KEYS, ALL_FONT_VARIABLE_KEYS } from './theme-variable-keys';
 
 export interface ThemeEditorOptions {
   /**
@@ -1116,11 +1117,17 @@ export class ThemeEditor {
         await this.manager.importAll(text, merge);
         this.render();
         this.setStatus('Imported themes', 'success');
-      } else {
+      } else if (this.isPresetShape(parsed)) {
         const overwrite = confirm('Overwrite if theme already exists?');
         const imported = await this.manager.importPreset(text, overwrite);
         this.loadPreset(imported, true);
         this.setStatus(`Imported "${imported.name}"`, 'success');
+      } else if (this.isTokenBundleShape(parsed)) {
+        const imported = await this.importTokenBundle(parsed, file.name || 'imported-theme.json');
+        this.loadPreset(imported, true);
+        this.setStatus(`Imported "${imported.name}" from bundle`, 'success');
+      } else {
+        throw new Error('Unrecognized theme JSON shape');
       }
     } catch (error) {
       console.error('Failed to import theme data', error);
@@ -1136,6 +1143,331 @@ export class ThemeEditor {
     a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  private isPresetShape(candidate: unknown): candidate is ThemePreset {
+    if (!candidate || typeof candidate !== 'object') return false;
+    const obj = candidate as Record<string, unknown>;
+    return typeof obj.name === 'string' && typeof obj.slug === 'string' && typeof obj.mode === 'string' && typeof obj.variables === 'object';
+  }
+
+  private isTokenBundleShape(candidate: unknown): candidate is Record<string, unknown> {
+    if (!candidate || typeof candidate !== 'object') return false;
+    const obj = candidate as Record<string, unknown>;
+    return Boolean(obj.foundation || obj.brand || obj.typography || obj.surfaces || obj.cards || obj.glass || obj.named || obj.textPalette);
+  }
+
+  private toCamelKey(parts: string[]): string {
+    return parts
+      .map((segment, index) => {
+        const clean = segment.replace(/[^a-z0-9]+/gi, ' ').trim().toLowerCase();
+        if (!clean) return '';
+        return index === 0 ? clean : clean.charAt(0).toUpperCase() + clean.slice(1);
+      })
+      .join('');
+  }
+
+  private ensureUniqueSlug(mode: ThemeMode, baseSlug: string): string {
+    const existing = new Set(this.manager.getPresets(mode).map((p) => p.slug));
+    if (!existing.has(baseSlug)) return baseSlug;
+    let counter = 2;
+    let attempt = `${baseSlug}-${counter}`;
+    while (existing.has(attempt)) {
+      counter += 1;
+      attempt = `${baseSlug}-${counter}`;
+    }
+    return attempt;
+  }
+
+  private async importTokenBundle(raw: Record<string, unknown>, fileName: string): Promise<ThemePreset> {
+    const variables: Record<string, string> = {};
+    const knownKeys = new Map<string, string>();
+    const allowList = [
+      ...ALL_COLOR_VARIABLE_KEYS,
+      ...ALL_FONT_VARIABLE_KEYS,
+      'primary',
+      'accent',
+      'background',
+      'textPrimary',
+      'textHeading',
+      'textMuted',
+    ];
+    allowList.forEach((k) => knownKeys.set(k.toLowerCase(), k));
+
+    const aliasMap = new Map<string, string>([
+      // Surfaces / page
+      ['surfacesbackground', 'background'],
+      ['surfacespagebackground', 'background'],
+      ['surfacesheaderbackground', 'headerBackground'],
+      ['surfacessurfaceplain', 'surfacePlain'],
+      ['surfacessurfaceplainborder', 'surfacePlainBorder'],
+
+      // Cards
+      ['cardscardpanelsurface', 'cardPanelSurface'],
+      ['cardscardpanelsurfacestrong', 'cardPanelSurfaceStrong'],
+      ['cardscardpanelborder', 'cardPanelBorder'],
+      ['cardscardpanelborderstrong', 'cardPanelBorderStrong'],
+      ['cardscardpanelbordersoft', 'cardPanelBorderSoft'],
+      ['cardscardtagbg', 'cardTagBg'],
+      ['cardscardtagtext', 'cardTagText'],
+      ['cardscardtagborder', 'cardTagBorder'],
+      ['cardscardbadgebg', 'cardBadgeBg'],
+      ['cardscardbadgetext', 'cardBadgeText'],
+      ['cardscardbadgeborder', 'cardBadgeBorder'],
+
+      // Glass
+      ['glassglasssurface', 'glassSurface'],
+      ['glassglasssurfacestrong', 'glassSurfaceStrong'],
+      ['glassglassborder', 'glassBorder'],
+      ['glassglassborderstrong', 'glassBorderStrong'],
+      ['glassglasshover', 'glassHover'],
+      ['glassglasshighlight', 'glassHighlight'],
+      ['glassglassglow', 'glassGlow'],
+      ['glassglassshadow', 'glassShadowSoft'],
+      ['glassglassshadowsoft', 'glassShadowSoft'],
+      ['glassglassshadowstrong', 'glassShadowStrong'],
+      ['glassglassblur', 'glassBlur'],
+      ['glassglassnoiseopacity', 'glassNoiseOpacity'],
+
+      // Typography / text
+      ['typographyheading', 'textHeading'],
+      ['typographytextstrong', 'textStrong'],
+      ['typographytextbody', 'textBody'],
+      ['typographytextmuted', 'textSubtle'],
+      ['typographytexthint', 'textHint'],
+      ['typographytextdisabled', 'textDisabled'],
+      ['typographytextaccent', 'textAccent'],
+      ['typographytextaccentstrong', 'textAccentStrong'],
+      ['typographyfootertext', 'footerText'],
+      ['typographyfootertextmuted', 'footerTextMuted'],
+
+      ['textpalettetextprimary', 'textPrimary'],
+      ['textpalettetextsecondary', 'textSecondary'],
+      ['textpalettetexttertiary', 'textTertiary'],
+      ['textpalettetexthint', 'textHint'],
+      ['textpalettetextdisabled', 'textDisabled'],
+      ['textpalettetextaccent', 'textAccent'],
+      ['textpalettetextaccentstrong', 'textAccentStrong'],
+      ['textpalettelinkcolor', 'linkColor'],
+
+      // Brand
+      ['brandprimary', 'primary'],
+      ['brandsecondary', 'accent'],
+      ['brandaccent', 'accent'],
+      ['brandaccentstrong', 'colorAmethyst'],
+      ['brandcta', 'cardFocusOutline'],
+      ['brandctahover', 'focusRingColor'],
+      ['brandgradientstart', 'colorAmethyst'],
+      ['brandgradientend', 'colorGold'],
+      ['brandlinkcolor', 'linkColor'],
+      ['brandfocusring', 'focusRingColor'],
+
+      // Borders
+      ['bordersbordersubtle', 'surfacePlainBorder'],
+      ['bordersborderstrong', 'cardPanelBorder'],
+      ['bordersborderaccentsubtle', 'cardPanelBorderSoft'],
+      ['bordersborderaccentmedium', 'cardPanelBorder'],
+      ['bordersborderaccentstrong', 'cardPanelBorderStrong'],
+      ['bordersborderaccenthover', 'cardPanelBorderStrong'],
+
+      // Named palette → core colors
+      ['namedcolormidnight', 'colorMidnight'],
+      ['namedcolornight', 'colorNight'],
+      ['namedcolordusk', 'colorDusk'],
+      ['namedcolorink', 'colorInk'],
+      ['namedcoloramethyst', 'colorAmethyst'],
+      ['namedcoloriris', 'colorIris'],
+      ['namedcolorgold', 'colorGold'],
+      ['namedcolorrune', 'colorRune'],
+      ['namedcolorfog', 'colorFog'],
+
+      // Status
+      ['statussuccess', 'success'],
+      ['statuswarning', 'warning'],
+      ['statuserror', 'error'],
+      ['statusinfo', 'info'],
+      ['statussuccessstrong', 'success'],
+      ['statuswarningstrong', 'warning'],
+      ['statuserrorstrong', 'error'],
+
+      // Entity
+      ['entityentitycardsurface', 'entityCardSurfaceTop'],
+      ['entityentitycardborder', 'entityCardBorder'],
+      ['entityentitycardglow', 'entityCardGlow'],
+      ['entityentitycardhighlight', 'entityCardHighlight'],
+      ['entityentitycardheading', 'entityCardHeading'],
+      ['entityentitycardtext', 'entityCardText'],
+      ['entityentitycardlabel', 'entityCardLabel'],
+      ['entityentitycardcta', 'entityCardCta'],
+      ['entityentitycardctahover', 'entityCardCtaHover'],
+      ['entityentitycardicon', 'entityCardIcon'],
+      ['entityentitycardiconshadow', 'entityCardIconShadow'],
+
+      // Aliases to existing surfaces/borders
+      ['aliasessurfacepanelprimary', 'surfacePlain'],
+      ['aliasessurfacepanelsecondary', 'surfacePlain'],
+      ['aliasessurfacecardhover', 'cardPanelSurface'],
+      ['aliasessurfacemuted', 'cardPanelSurfaceStrong'],
+      ['aliasesborderpurplesubtle', 'cardPanelBorderSoft'],
+      ['aliasesborderpurplemedium', 'cardPanelBorder'],
+      ['aliasesborderaccentsubtle', 'cardPanelBorderSoft'],
+      ['aliasesborderaccentmedium', 'cardPanelBorder'],
+      ['aliasesborderaccentstrong', 'cardPanelBorderStrong'],
+      ['aliasesborderaccenthover', 'cardPanelBorderStrong'],
+      ['aliasestextsubtle', 'textSubtle'],
+      ['aliasestextaccentstrong', 'textAccentStrong'],
+      ['aliasesaccentpurplestrong', 'colorAmethyst'],
+      ['aliasesaccentpurplesoft', 'colorRune'],
+      ['aliasesoverlaypanel', 'surfacePlain'],
+      ['aliasesoverlaypanelstrong', 'surfacePlain'],
+      ['aliasesfocusring', 'focusRingColor'],
+      ['aliaseschipbackground', 'cardSpoonBg'],
+      ['aliaseschipborder', 'cardSpoonBorder'],
+      ['aliaseschiptext', 'cardSpoonText'],
+
+      // Dawn-specific convenience
+      ['dawnsurfacebase', 'background'],
+      ['dawnsurfacepanel', 'cardPanelSurface'],
+      ['dawnsurfacecard', 'cardPanelSurfaceStrong'],
+      ['dawnsurfaceelevated', 'glassSurface'],
+      ['dawnsurfacehover', 'glassHover'],
+      ['dawntextstrong', 'textStrong'],
+      ['dawntextbody', 'textBody'],
+      ['dawntextmuted', 'textSubtle'],
+      ['dawnbordersubtle', 'surfacePlainBorder'],
+      ['dawnborderstrong', 'cardPanelBorder'],
+      ['dawnaccentlink', 'linkColor'],
+      ['dawnaccentcode', 'textAccentStrong'],
+      ['dawnprosebgsoft', 'surfacePlain'],
+      ['dawnprosebgstrong', 'cardPanelSurface'],
+      // Handoff aliases (partial coverage for common card/header/footer mappings)
+      ['handoffcardpanelborder', 'cardPanelBorder'],
+      ['handoffcardpanelborderstrong', 'cardPanelBorderStrong'],
+      ['handoffcardpanelbordersoft', 'cardPanelBorderSoft'],
+      ['handoffcardpanelsurface', 'cardPanelSurface'],
+      ['handoffcardpanelstrong', 'cardPanelSurfaceStrong'],
+      ['handoffcardtagbg', 'cardTagBg'],
+      ['handoffcardtagtext', 'cardTagText'],
+      ['handoffcardtagborder', 'cardTagBorder'],
+      ['handoffcardbadgebg', 'cardBadgeBg'],
+      ['handoffcardbadgetext', 'cardBadgeText'],
+      ['handoffcardbadgeborder', 'cardBadgeBorder'],
+      ['handoffheaderbackground', 'headerBackground'],
+      ['handoffheaderborder', 'headerBorder'],
+      ['handofffooterbackground', 'footerBackground'],
+      ['handofffooterborder', 'footerBorder'],
+      ['handoffheadertext', 'headerText'],
+      ['handoffheadertexthover', 'headerTextHover'],
+      ['handofffootertext', 'footerText'],
+      ['handofffootermutedtext', 'footerTextMuted'],
+      ['handoffcardspoonbg', 'cardSpoonBg'],
+      ['handoffcardspoonborder', 'cardSpoonBorder'],
+      ['handoffcardspoontext', 'cardSpoonText'],
+      ['handoffcardfocusoutline', 'cardFocusOutline'],
+      ['handoffglassbase', 'glassSurface'],
+      ['handoffglassstrong', 'glassSurfaceStrong'],
+      ['handoffglassborder', 'glassBorder'],
+      ['handoffglassborderstrong', 'glassBorderStrong'],
+      ['handoffglasshighlight', 'glassHighlight'],
+      ['handoffglassglow', 'glassGlow'],
+      ['handoffglassshadowsoft', 'glassShadowSoft'],
+      ['handoffglassshadowstrong', 'glassShadowStrong'],
+      ['handoffglassblurradius', 'glassBlur'],
+      ['handoffglassnoiseopacity', 'glassNoiseOpacity'],
+    ]);
+
+    const resolveKey = (candidate: string): string | null => {
+      const direct = knownKeys.get(candidate.toLowerCase());
+      if (direct) return direct;
+      return null;
+    };
+
+    const resolveAlias = (pathParts: string[], key: string, camel: string): string | null => {
+      const flat = [...pathParts, key].join('').replace(/[^a-z0-9]/gi, '').toLowerCase();
+      return aliasMap.get(flat) ?? aliasMap.get(camel.toLowerCase()) ?? null;
+    };
+
+    const collect = (node: unknown, path: string[] = []) => {
+      if (!node || typeof node !== 'object') return;
+      for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+        if (value && typeof value === 'object' && 'value' in (value as Record<string, unknown>)) {
+          const val = (value as { value?: unknown }).value;
+          if (typeof val === 'string' || typeof val === 'number') {
+            const source = (value as { source?: unknown }).source;
+            if (typeof source === 'string') {
+              const srcKey = this.toCamelKey(source.split(/[./]/));
+              const srcAlias = resolveAlias([], source, srcKey);
+              const srcResolved = srcAlias ?? resolveKey(srcKey) ?? resolveKey(source);
+              if (srcResolved) {
+                variables[srcResolved] = String(val);
+                continue;
+              }
+            }
+
+            const k = this.toCamelKey([...path, key]);
+            const alias = resolveAlias(path, key, k);
+            const resolved = alias ?? resolveKey(k) ?? resolveKey(key) ?? k;
+            if (resolved) variables[resolved] = String(val);
+          }
+        } else {
+          collect(value, [...path, key]);
+        }
+      }
+    };
+
+    collect(raw);
+
+    // Heuristics to backfill related keys
+    const ifMissing = (key: string, value: string) => {
+      if (!variables[key]) variables[key] = value;
+    };
+
+    if (variables.colorInk) {
+      ifMissing('inkBody', variables.colorInk);
+    }
+    if (variables.colorMidnight) {
+      ifMissing('inkStrong', variables.colorMidnight);
+    }
+    if (variables.colorDusk) {
+      ifMissing('inkMuted', variables.colorDusk);
+    }
+
+    if (variables.entityCardSurfaceTop && !variables.entityCardSurfaceBottom) {
+      variables.entityCardSurfaceBottom = variables.entityCardSurfaceTop;
+    }
+    if (variables.entityCardSurfaceBottom && !variables.entityCardSurfaceTop) {
+      variables.entityCardSurfaceTop = variables.entityCardSurfaceBottom;
+    }
+
+    if (variables.cardSpoonBg && !variables.cardSpoonBorder && variables.cardPanelBorder) {
+      variables.cardSpoonBorder = variables.cardPanelBorder;
+    }
+    if (variables.cardSpoonBg && !variables.cardSpoonText && variables.textStrong) {
+      variables.cardSpoonText = variables.textStrong;
+    }
+
+    const baseName = fileName.replace(/\.json$/i, '') || 'Imported Theme';
+    const isDark = typeof raw?.meta === 'object' && (raw.meta as Record<string, unknown>)?.isDark === true;
+    const inferredMode: ThemeMode =
+      isDark
+        ? 'midnight'
+        : baseName.toLowerCase().includes('light') || baseName.toLowerCase().includes('dawn')
+          ? 'dawn'
+          : 'midnight';
+    const baseSlug = slugify(baseName || 'imported-theme');
+    const slug = this.ensureUniqueSlug(inferredMode, baseSlug || 'imported-theme');
+    const name = baseName.replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+    // If bundle clearly targets light palette, force dawn
+    const preset = await this.manager.createPreset({
+      name,
+      slug,
+      mode: inferredMode,
+      category: 'imported',
+      variables,
+    });
+
+    return preset;
   }
 
   private setStatus(message: string, type: 'success' | 'error' | 'info', actions?: { theme?: string; mode?: string }): void {

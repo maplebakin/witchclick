@@ -97,7 +97,7 @@ const breadcrumbs = [
 <Base
   title="Hub Constellation — Release, Focus, Calm"
   description="Navigate WitchClick's hubs: Release, Focus, and Calm. Explore curated rituals, seasonal stories, and collaborative offerings."
-  ambientColor="#7c3aed"
+  ambientColor="var(--theme-color-amethyst)"
 >
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <HeadSlot slot="head">
@@ -202,10 +202,10 @@ const breadcrumbs = [
     margin: clamp(2rem, 6vw, 3.5rem) auto;
     padding: clamp(2rem, 6vw, 3.5rem);
     border-radius: clamp(1.75rem, 4vw, 2.5rem);
-    background: #0f0820;
-    color: #f4f1ff;
-    border: 1px solid rgba(124, 58, 237, 0.35);
-    box-shadow: 0 20px 52px -30px rgba(0, 0, 0, 0.6);
+    background: var(--theme-background);
+    color: var(--theme-text-primary);
+    border: 1px solid var(--theme-color-amethyst);
+    box-shadow: var(--theme-shadow-strong);
   }
 
   .hub-index-hero__inner {
@@ -219,20 +219,20 @@ const breadcrumbs = [
     text-transform: uppercase;
     letter-spacing: 0.24em;
     font-size: 0.85rem;
-    color: rgba(212, 175, 55, 0.85);
+    color: var(--theme-color-gold);
   }
 
   .hub-index-hero__title {
     margin: 0;
     font-size: clamp(2.25rem, 5vw, 3rem);
-    color: #f4f1ff;
+    color: var(--theme-text-strong);
   }
 
   .hub-index-hero__lead {
     margin: 0;
     font-size: 1.05rem;
     line-height: 1.7;
-    color: rgba(244, 241, 255, 0.88);
+    color: var(--theme-text-body);
   }
 
   .hub-index-grid {
@@ -252,14 +252,14 @@ const breadcrumbs = [
     display: grid;
     gap: clamp(1rem, 3vw, 1.5rem);
     padding: clamp(1.75rem, 4vw, 2.5rem);
-    border: 1px solid rgba(124, 58, 237, 0.35);
-    background: #0f0820;
-    box-shadow: 0 20px 52px -30px rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--theme-border-subtle);
+    background: var(--theme-background);
+    box-shadow: var(--theme-shadow-strong);
   }
 
   .hub-card:hover,
   .hub-card:focus-visible {
-    border-color: rgba(124, 58, 237, 0.55);
+    border-color: var(--theme-border-strong);
     transform: translateY(var(--card-hover-translate));
   }
 
@@ -273,20 +273,20 @@ const breadcrumbs = [
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.22em;
-    color: color-mix(in srgb, var(--hub-accent, #a855f7) 65%, var(--ink-strong, currentColor) 35%);
+    color: color-mix(in srgb, var(--hub-accent, var(--theme-color-amethyst)) 65%, var(--theme-ink-strong, currentColor) 35%);
   }
 
   .hub-card__title {
     margin: 0;
     font-size: clamp(1.75rem, 4vw, 2.3rem);
-    color: color-mix(in srgb, var(--ink-strong, currentColor) 88%, white 12%);
+    color: var(--theme-text-strong);
   }
 
   .hub-card__description {
     margin: 0;
     font-size: 1rem;
     line-height: 1.7;
-    color: color-mix(in srgb, var(--ink-body, currentColor) 80%, white 20%);
+    color: var(--theme-text-body);
   }
 
   .hub-card__actions {
@@ -296,8 +296,8 @@ const breadcrumbs = [
 
   :global(.hub-card__actions .wc-button) {
     justify-self: start;
-    --btn-bg: color-mix(in srgb, var(--hub-accent, #a855f7) 60%, var(--color-night, #120725) 40%);
-    --btn-bg-hover: color-mix(in srgb, var(--hub-accent, #a855f7) 68%, var(--color-night, #120725) 32%);
+    --btn-bg: color-mix(in srgb, var(--hub-accent, #a855f7) 60%, var(--theme-color-night, #120725) 40%);
+    --btn-bg-hover: color-mix(in srgb, var(--hub-accent, #a855f7) 68%, var(--theme-color-night, #120725) 32%);
     --btn-border: color-mix(in srgb, var(--hub-accent, #a855f7) 45%, transparent 55%);
   }
 
@@ -309,7 +309,7 @@ const breadcrumbs = [
     margin: clamp(2rem, 6vw, 4rem) auto;
     padding: clamp(2rem, 6vw, 3.5rem);
     border-radius: clamp(1.75rem, 4vw, 2.5rem);
-    background: #0a0615;
+    background: var(--theme-background);
     border: 1px solid rgba(124, 58, 237, 0.35);
     box-shadow: 0 24px 40px rgba(0, 0, 0, 0.6);
   }

@@ -52,11 +52,16 @@ import {
   persistPreparedCurse,
 } from './server/lib/cursePreparation.js';
 
+const MAX_BODY_BYTES = Number.parseInt(process.env.DEV_API_MAX_BODY_BYTES || '', 10) || 5 * 1024 * 1024; // 5MB default
+const MAX_UPLOAD_BYTES = Number.parseInt(process.env.DEV_API_MAX_UPLOAD_BYTES || '', 10) || 10 * 1024 * 1024; // 10MB default
+const DEV_API_TOKEN = process.env.DEV_API_TOKEN || '';
+
 const rawPort = process.env.DEV_API_PORT ?? process.env.PORT;
 const PORT = rawPort && Number.parseInt(rawPort, 10) > 0 ? Number.parseInt(rawPort, 10) : 8787;
 const HOST = process.env.HOST ?? process.env.DEV_API_HOST ?? 'localhost';
 const CWD = process.cwd();
 let parsedUrl = null;
+const writeLocks = new Map();
 
 function listPostDirsForCollisions() {
   return resolvePostsDirectories({ root: CWD });
@@ -77,6 +82,21 @@ function readJSON(p) {
   try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return null; }
 }
 function ensureDir(p) { fs.mkdirSync(p, { recursive: true }); }
+function writeFileAtomic(filePath, contents, encoding = 'utf8') {
+  const dir = path.dirname(filePath);
+  ensureDir(dir);
+  const tmp = path.join(dir, `.${path.basename(filePath)}.${Date.now()}.tmp`);
+  return fsp.writeFile(tmp, contents, encoding).then(() => fsp.rename(tmp, filePath));
+}
+
+function withLock(key, fn) {
+  const prev = writeLocks.get(key) || Promise.resolve();
+  const next = prev.then(() => fn()).finally(() => {
+    if (writeLocks.get(key) === next) writeLocks.delete(key);
+  });
+  writeLocks.set(key, next);
+  return next;
+}
 
 function listCurseDirectories() {
   return [CURSE_ARCHIVE_DIR, CURSE_LEGACY_DIR];
@@ -214,7 +234,11 @@ async function saveCurseFromEditor(payload) {
   ensureDir(targetDir);
   const targetFile = path.join(targetDir, `${normalizedSlug}.md`);
 
-  if (fs.existsSync(targetFile) && (!existing || path.resolve(targetFile) !== path.resolve(existing.file))) {
+  const legacyFile = path.join(CURSE_LEGACY_DIR, `${normalizedSlug}.md`);
+  if (
+    (fs.existsSync(targetFile) && (!existing || path.resolve(targetFile) !== path.resolve(existing.file))) ||
+    (fs.existsSync(legacyFile) && (!existing || path.resolve(legacyFile) !== path.resolve(existing.file)))
+  ) {
     const err = new Error(`Another curse already uses the slug "${normalizedSlug}".`);
     err.code = 'SLUG_CONFLICT';
     throw err;
@@ -239,7 +263,7 @@ async function saveCurseFromEditor(payload) {
   if (bodyBlock && !bodyBlock.endsWith('\\n')) bodyBlock += '\\n';
 
   const fileContents = `---${newline}${fmBlock ? `${fmBlock}${newline}` : ''}---${newline}${bodyBlock ? bodyBlock.replace(/\n/g, newline) : ''}`;
-  await fsp.writeFile(targetFile, fileContents, 'utf8');
+  await withLock(`curse:${normalizedSlug}`, () => writeFileAtomic(targetFile, fileContents, 'utf8'));
 
   if (existing && path.resolve(existing.file) !== path.resolve(targetFile) && fs.existsSync(existing.file)) {
     try { await fsp.rm(existing.file); } catch { /* ignore */ }
@@ -539,6 +563,19 @@ function parseDataUrl(value) {
   return { mime, base64 };
 }
 
+function sniffImageHeader(buffer) {
+  if (buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) return 'image/jpeg';
+  if (buffer.length >= 8 && buffer.slice(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return 'image/png';
+  if (
+    buffer.length >= 12 &&
+    buffer.slice(0, 4).equals(Buffer.from([0x52, 0x49, 0x46, 0x46])) &&
+    buffer.slice(8, 12).equals(Buffer.from([0x57, 0x45, 0x42, 0x50]))
+  ) {
+    return 'image/webp';
+  }
+  return null;
+}
+
 async function listPostsForHero() {
   const directories = resolvePostsDirectories({ root: CWD });
   const itemsBySlug = new Map();
@@ -756,7 +793,7 @@ async function attachHeroToPost({ slug, heroImage, heroAlt }) {
   const next = `${nextBlock}${cleanRemainder}`;
 
   if (next !== raw) {
-    await fsp.writeFile(found.file, next, 'utf8');
+    await withLock(`post:${normalizedSlug}`, () => writeFileAtomic(found.file, next, 'utf8'));
   }
 
   return { path: path.relative(CWD, found.file).replace(/\\/g, '/') };
@@ -903,11 +940,11 @@ async function updatePostFromEditor(payload) {
   let targetFile = found.file;
   if (nextSlug !== originalSlug) {
     const nextFile = path.join(path.dirname(found.file), `${nextSlug}.md`);
-    await fsp.writeFile(nextFile, fileContents, 'utf8');
+    await withLock(`post:${nextSlug}`, () => writeFileAtomic(nextFile, fileContents, 'utf8'));
     await fsp.unlink(found.file);
     targetFile = nextFile;
   } else {
-    await fsp.writeFile(found.file, fileContents, 'utf8');
+    await withLock(`post:${nextSlug}`, () => writeFileAtomic(found.file, fileContents, 'utf8'));
   }
 
   const relativePath = path.relative(CWD, targetFile).replace(/\\/g, '/');
@@ -947,13 +984,14 @@ function parseBody(req) {
     let buf = '';
     let size = 0;
     req.on('data', (chunk) => {
-      if (typeof chunk === 'string') {
-        size += Buffer.byteLength(chunk);
-        buf += chunk;
-      } else {
-        size += chunk.length;
-        buf += chunk.toString();
+      size += typeof chunk === 'string' ? Buffer.byteLength(chunk) : chunk.length;
+      if (size > MAX_BODY_BYTES) {
+        req.destroy();
+        const err = new Error(`Payload too large (${size} > ${MAX_BODY_BYTES})`);
+        err.status = 413;
+        return reject(err);
       }
+      buf += typeof chunk === 'string' ? chunk : chunk.toString();
     });
     req.on('end', () => {
       req._observedBodySize = size;
@@ -1102,6 +1140,12 @@ function normalizeTags(input) {
   return tags;
 }
 
+function assertMaxLen(label, value, max) {
+  if (typeof value === 'string' && value.length > max) {
+    throw new Error(`${label} exceeds ${max} characters`);
+  }
+}
+
 // ---------- GENPROMPT (shared with CLI) ----------
 function buildGenprompt({ topic, words, ads, kofi }) {
   const context = loadPromptContext({ cwd: CWD });
@@ -1171,6 +1215,7 @@ function wordCount(md) {
 async function savePostFromWrite(payload) {
   const title = String(payload.title || '').trim();
   if (!title) throw new Error('title is required');
+  assertMaxLen('title', title, 140);
   const desiredSlug = payload.slug ? slugify(payload.slug) : slugify(title);
   if (!desiredSlug) throw new Error('slug could not be derived');
 
@@ -1190,6 +1235,10 @@ async function savePostFromWrite(payload) {
   const canonical = `${site}/post/${slug}`;
 
   const tags = normalizeTags(payload.tags);
+  if (tags.length < 4 || tags.length > 7) {
+    throw new Error(`tags count must be between 4 and 7 (got ${tags.length})`);
+  }
+  tags.forEach((tag) => assertMaxLen('tag', tag, 40));
 
   const entitiesInput = payload.entities;
   const entities = [];
@@ -1231,6 +1280,7 @@ async function savePostFromWrite(payload) {
   const includeKofi = !!payload.includeKofi;
   const markdown = String(payload.markdown||'').trim();
   if (!markdown) throw new Error('markdown is required');
+  assertMaxLen('markdown', markdown, 20000);
 
   const warnings = [];
   const { value: excerpt, auto: excerptAuto } = generateExcerpt(markdown, payload.excerpt);
@@ -1239,9 +1289,10 @@ async function savePostFromWrite(payload) {
     payload.metaDescription,
     excerpt || markdown,
   );
+  assertMaxLen('excerpt', excerpt, 300);
+  assertMaxLen('metaDescription', metaDescription, 300);
   if (excerptAuto && excerpt) warnings.push('Excerpt auto-generated from Markdown.');
   if (metaAuto && metaDescription) warnings.push('Meta description auto-generated from Markdown.');
-  if (tags.length < 4 || tags.length > 7) warnings.push(`Tags ideal range is 4–7 (currently ${tags.length}).`);
 
   const readingMinutes = Math.max(1, Math.round(wordCount(markdown)/200));
   const category = String(payload.category || 'meandering').trim();
@@ -1272,7 +1323,8 @@ async function savePostFromWrite(payload) {
   ].filter(line => line !== null).join('\n');
 
   const filePath = path.join(postsDir, `${slug}.md`);
-  await fsp.writeFile(filePath, fm + '\n' + markdown + '\n', 'utf8');
+  const contents = `${fm}\n${markdown}\n`;
+  await withLock(`post:${slug}`, () => writeFileAtomic(filePath, contents, 'utf8'));
 
   const result = { slug, path: path.relative(CWD, filePath) };
   if (entities.length) {
@@ -1598,8 +1650,28 @@ async function saveDownload({ slug, name, price, currency, summary, cover, file,
   if (!slug && !name) throw new Error('slug or name required');
   const s = slugify(slug || name);
   if (!s) throw new Error('invalid slug');
+  assertMaxLen('download name', name || s, 140);
+  assertMaxLen('download summary', summary || '', 400);
   const filePath = path.join(CWD, 'content', 'downloads', `${s}.json`);
   ensureDir(path.dirname(filePath));
+
+  const coverPath = String(cover || '').trim();
+  if (coverPath && !coverPath.startsWith(`/downloads/${s}/`)) {
+    throw new Error('cover path must live under /downloads/<slug>/');
+  }
+  if (coverPath) {
+    const disk = path.join(CWD, 'public', coverPath.replace(/^\//, ''));
+    if (!fs.existsSync(disk)) throw new Error('cover file missing on disk');
+  }
+
+  const fileRef = String(file || '').trim();
+  if (fileRef && !fileRef.startsWith(`/downloads/${s}/`)) {
+    throw new Error('file path must live under /downloads/<slug>/');
+  }
+  if (fileRef) {
+    const disk = path.join(CWD, 'public', fileRef.replace(/^\//, ''));
+    if (!fs.existsSync(disk)) throw new Error('download file missing on disk');
+  }
 
   const payload = {
     slug: s,
@@ -1607,8 +1679,8 @@ async function saveDownload({ slug, name, price, currency, summary, cover, file,
     price: price == null ? '' : String(price),
     currency: String(currency || 'USD').trim() || 'USD',
     summary: String(summary || ''),
-    cover: String(cover || ''),
-    file: String(file || ''),
+    cover: coverPath,
+    file: fileRef,
     url: String(url || ''),
     features: Array.isArray(features) ? features.map(v => String(v)).filter(Boolean) : [],
     tags: Array.isArray(tags) ? tags.map(v => String(v)).filter(Boolean) : []
@@ -1683,14 +1755,19 @@ async function saveEntity({ type, slug, name, summary, properties, related }) {
   if (!slug && !name) throw new Error('slug or name required');
   const s = slugify(slug || name);
   if (!s) throw new Error('invalid slug');
+  assertMaxLen('entity name', name || s, 140);
+  assertMaxLen('entity summary', summary || '', 400);
   const file = path.join(CWD, 'content', 'entities', String(type), `${s}.json`);
   ensureDir(path.dirname(file));
+  const props = properties && typeof properties === 'object' && !Array.isArray(properties) ? properties : {};
+  const propsJson = JSON.stringify(props);
+  if (propsJson.length > 4000) throw new Error('properties too large');
   const payload = {
     type: String(type),
     slug: s,
     name: String(name || '').trim() || s.replace(/-/g,' ').replace(/\b\w/g, m=>m.toUpperCase()),
     summary: String(summary || ''),
-    properties: properties && typeof properties === 'object' ? properties : {},
+    properties: props,
     related: Array.isArray(related) ? related.map(String) : []
   };
   await fsp.writeFile(file, JSON.stringify(payload, null, 2), 'utf8');
@@ -1759,6 +1836,18 @@ async function withRequestBoundary(req, res, handler) {
   const server = http.createServer(async (req, res) => {
     await withRequestBoundary(req, res, async () => {
       parsedUrl = null;
+    const remote = req.socket?.remoteAddress || '';
+    const loopback = remote === '127.0.0.1' || remote === '::1' || remote.startsWith('::ffff:127.');
+    if (!loopback && !DEV_API_TOKEN) {
+      return send(res, 403, { ok: false, error: 'Forbidden (dev API is loopback-only without DEV_API_TOKEN)' });
+    }
+    if (DEV_API_TOKEN) {
+      const token = req.headers['x-wc-dev-key'] || req.headers['authorization'];
+      const tokenValue = Array.isArray(token) ? token[0] : (token || '').replace(/^Bearer\s+/i, '');
+      if (tokenValue !== DEV_API_TOKEN) {
+        return send(res, 401, { ok: false, error: 'Unauthorized' });
+      }
+    }
     if (req.method === 'OPTIONS') return send(res, 204, { ok: true });
 
     if (req.method === 'POST' && req.url === '/ping') {
@@ -1785,7 +1874,7 @@ async function withRequestBoundary(req, res, handler) {
         : buildGenprompt({ topic, words, ads, kofi });
 
       // loud guard so stale prompts never slip through
-      if (!preset && (!prompt.includes('opening-reflection') || !prompt.includes('The FIRST outline item must be exactly {"heading":"Opening Reflection","id":"opening-reflection"}'))) {
+      if (!prompt.includes('opening-reflection') || !prompt.includes('The FIRST outline item must be exactly {"heading":"Opening Reflection","id":"opening-reflection"}')) {
         return send(res, 500, { ok: false, error: 'Stale prompt detected (missing Opening Reflection guards). Check dev-api.js.' });
       }
       return send(res, 200, {
@@ -2120,12 +2209,19 @@ async function withRequestBoundary(req, res, handler) {
         if (!buffer.length) {
           return send(res, 400, { ok: false, error: 'Image data was empty' });
         }
+        if (buffer.length > MAX_UPLOAD_BYTES) {
+          return send(res, 413, { ok: false, error: `Image exceeds limit (${buffer.length} > ${MAX_UPLOAD_BYTES})` });
+        }
+        const sniffed = sniffImageHeader(buffer);
+        if (sniffed && sniffed !== parsed.mime) {
+          return send(res, 400, { ok: false, error: 'Image header mismatch' });
+        }
         const targetDir = path.join(HERO_IMAGE_ROOT, slug);
         ensureDir(targetDir);
         const finalName = ensureUniqueFilename(targetDir, base, ext);
         const filePath = path.join(targetDir, finalName);
         const relativePath = `/images/hero/${slug}/${finalName}`.replace(/\\+/g, '/');
-        await fsp.writeFile(filePath, buffer);
+        await withLock(`hero:${slug}`, () => fsp.writeFile(filePath, buffer));
         return send(res, 200, { ok: true, path: relativePath });
       } catch (e) {
         return send(res, 500, { ok: false, error: e?.message || String(e) });
@@ -2179,12 +2275,15 @@ async function withRequestBoundary(req, res, handler) {
         const { base, ext } = sanitizeHeroFilename(body.filename, fallbackExt);
         const buffer = Buffer.from(parsed.base64, 'base64');
         if (!buffer.length) return send(res, 400, { ok: false, error: 'File data was empty' });
+        if (buffer.length > MAX_UPLOAD_BYTES) {
+          return send(res, 413, { ok: false, error: `File exceeds limit (${buffer.length} > ${MAX_UPLOAD_BYTES})` });
+        }
 
         const targetDir = path.join(DOWNLOADS_ROOT, slug, 'files');
         ensureDir(targetDir);
         const finalName = ensureUniqueFilename(targetDir, base, ext);
         const filePath = path.join(targetDir, finalName);
-        await fsp.writeFile(filePath, buffer);
+        await withLock(`download:${slug}`, () => fsp.writeFile(filePath, buffer));
 
         const relativePath = `/downloads/${slug}/files/${finalName}`.replace(/\\+/g, '/');
         return send(res, 200, { ok: true, path: relativePath });
@@ -2215,12 +2314,19 @@ async function withRequestBoundary(req, res, handler) {
         const { base, ext } = sanitizeHeroFilename(body.filename, fallbackExt);
         const buffer = Buffer.from(parsed.base64, 'base64');
         if (!buffer.length) return send(res, 400, { ok: false, error: 'Image data was empty' });
+        if (buffer.length > MAX_UPLOAD_BYTES) {
+          return send(res, 413, { ok: false, error: `Image exceeds limit (${buffer.length} > ${MAX_UPLOAD_BYTES})` });
+        }
+        const sniffed = sniffImageHeader(buffer);
+        if (sniffed && !sniffed.startsWith('image/')) {
+          return send(res, 400, { ok: false, error: 'Invalid image header' });
+        }
 
         const targetDir = path.join(DOWNLOADS_ROOT, slug, 'cover');
         ensureDir(targetDir);
         const finalName = ensureUniqueFilename(targetDir, base, ext);
         const filePath = path.join(targetDir, finalName);
-        await fsp.writeFile(filePath, buffer);
+        await withLock(`download:${slug}`, () => fsp.writeFile(filePath, buffer));
 
         const relativePath = `/downloads/${slug}/cover/${finalName}`.replace(/\\+/g, '/');
         return send(res, 200, { ok: true, path: relativePath });

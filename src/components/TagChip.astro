@@ -14,15 +14,15 @@ const slug = String(tag).toLowerCase();
 <style>
   .tag-chip {
     border: 1px solid color-mix(in srgb, var(--glass-border, var(--border-purple-medium)) 92%, transparent 8%);
-    background: color-mix(in srgb, var(--glass-surface, var(--surface-card)) 94%, transparent 6%);
+    background: color-mix(in srgb, var(--glass-surface, var(--theme-surface-card)) 94%, transparent 6%);
     box-shadow: var(--glass-shadow-soft, 0 10px 24px -14px rgba(9, 5, 18, 0.35));
     transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease, box-shadow 200ms ease;
   }
 
   .tag-chip:hover,
   .tag-chip:focus-visible {
-    border-color: color-mix(in srgb, var(--glass-border-strong, var(--border-purple-medium)) 82%, var(--glass-highlight, var(--text-accent)) 18%);
-    background: color-mix(in srgb, var(--glass-hover, var(--surface-hover)) 86%, transparent 14%);
+    border-color: color-mix(in srgb, var(--glass-border-strong, var(--border-purple-medium)) 82%, var(--glass-highlight, var(--theme-text-accent)) 18%);
+    background: color-mix(in srgb, var(--glass-hover, var(--theme-surface-hover)) 86%, transparent 14%);
     box-shadow: var(--glass-shadow-strong, 0 16px 35px -18px rgba(6, 4, 16, 0.4));
     transform: translateY(-1px);
   }

@@ -6,6 +6,7 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 
 import { ensureUniqueSlug, slugify } from '../../scripts/lib/slug.js';
+import { readSlugHistory, writeSlugHistory } from '../../scripts/lib/slugHistory.js';
 import { normalizePostSpec } from './ingestionAdapter.js';
 import { PostSpecV2Schema } from './postSpecSchema.js';
 import { validatePostSpec } from './postSpecValidator.js';
@@ -23,6 +24,14 @@ function readJSON(file) {
 
 function ensureDirSync(dir) {
   fs.mkdirSync(dir, { recursive: true });
+}
+
+async function writeFileAtomic(filePath, contents) {
+  const dir = path.dirname(filePath);
+  ensureDirSync(dir);
+  const tmp = path.join(dir, `.${path.basename(filePath)}.${Date.now()}.tmp`);
+  await fsp.writeFile(tmp, contents, 'utf8');
+  await fsp.rename(tmp, filePath);
 }
 
 function readingMinutes(words) {
@@ -464,6 +473,21 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
   const combinedWarnings = dedupe([...normalizationWarningsList, ...enforcement.warnings, ...structure.warnings]);
 
   const baseSlug = slugify(spec.slug || spec.title);
+  const existingPath = postsDirectories
+    .map((dir) => path.join(dir, `${baseSlug}.md`))
+    .find((candidate) => fs.existsSync(candidate));
+  if (existingPath) {
+    const error = new Error(`Slug "${baseSlug}" already exists at ${existingPath}. Refusing to overwrite. Provide a new slug.`);
+    error.errors = ['Slug already exists'];
+    error.normalizations = normalizationReport;
+    throw error;
+  }
+
+  const slugHistory = readSlugHistory(cwd);
+  if (slugHistory.includes(baseSlug)) {
+    normalizationReport.push(`slug-reuse:${baseSlug}`);
+  }
+
   const uniqueSlug = ensureUniqueSlug(baseSlug, postsDirectories, { fallback: 'post' });
   if (uniqueSlug !== spec.slug) {
     normalizationReport.push(`slug→${uniqueSlug}`);
@@ -545,18 +569,24 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
     entityStubs,
     postStubs,
     promptMetadata,
+    cwd,
   };
 }
 
 export async function persistPreparedSpec(prepared) {
   ensureDirSync(path.dirname(prepared.post.filePath));
-  fs.writeFileSync(prepared.post.filePath, prepared.post.contents, 'utf8');
+  if (fs.existsSync(prepared.post.filePath)) {
+    const error = new Error(`Refusing to overwrite existing post at ${prepared.post.filePath}`);
+    error.code = 'SLUG_CONFLICT';
+    throw error;
+  }
+  await writeFileAtomic(prepared.post.filePath, prepared.post.contents);
 
   const createdEntities = [];
   for (const stub of prepared.entityStubs) {
     ensureDirSync(path.dirname(stub.file));
     if (!fs.existsSync(stub.file)) {
-      await fsp.writeFile(stub.file, JSON.stringify(stub.payload, null, 2), 'utf8');
+      await writeFileAtomic(stub.file, JSON.stringify(stub.payload, null, 2));
       createdEntities.push(stub.file);
     }
   }
@@ -565,10 +595,16 @@ export async function persistPreparedSpec(prepared) {
   for (const stub of prepared.postStubs || []) {
     ensureDirSync(path.dirname(stub.file));
     if (!fs.existsSync(stub.file)) {
-      await fsp.writeFile(stub.file, stub.contents, 'utf8');
+      await writeFileAtomic(stub.file, stub.contents);
       createdPosts.push(stub.file);
     }
   }
+
+  // Update slug history after successful persistence
+  const historyRoot = prepared.cwd || process.cwd();
+  const history = readSlugHistory(historyRoot);
+  const nextHistory = Array.from(new Set([...(history || []), prepared.spec.slug])).filter(Boolean);
+  writeSlugHistory(historyRoot, nextHistory);
 
   return {
     postPath: prepared.post.filePath,

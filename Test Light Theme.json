@@ -1,0 +1,574 @@
+{
+  "foundation": {
+    "hue": {
+      "type": "number",
+      "value": 0
+    },
+    "neutrals.neutral0": {
+      "type": "color",
+      "value": "#ffffff"
+    },
+    "neutrals.neutral1": {
+      "type": "color",
+      "value": "#f5f4f4"
+    },
+    "neutrals.neutral2": {
+      "type": "color",
+      "value": "#e7e4e4"
+    },
+    "neutrals.neutral3": {
+      "type": "color",
+      "value": "#cac4c4"
+    },
+    "neutrals.neutral4": {
+      "type": "color",
+      "value": "#ada3a3"
+    },
+    "neutrals.neutral5": {
+      "type": "color",
+      "value": "#8c7d7d"
+    },
+    "neutrals.neutral6": {
+      "type": "color",
+      "value": "#675a5a"
+    },
+    "neutrals.neutral7": {
+      "type": "color",
+      "value": "#473e3e"
+    },
+    "neutrals.neutral8": {
+      "type": "color",
+      "value": "#2c2626"
+    },
+    "neutrals.neutral9": {
+      "type": "color",
+      "value": "#1c1717"
+    },
+    "accents.accent1": {
+      "type": "color",
+      "value": "#9e9e9e"
+    },
+    "accents.accent2": {
+      "type": "color",
+      "value": "#8f8f8f"
+    },
+    "accents.accent3": {
+      "type": "color",
+      "value": "#808080"
+    },
+    "accents.accentink": {
+      "type": "color",
+      "value": "#575757"
+    },
+    "status.success": {
+      "type": "color",
+      "value": "#24a85b"
+    },
+    "status.warning": {
+      "type": "color",
+      "value": "#daa60b"
+    },
+    "status.error": {
+      "type": "color",
+      "value": "#d92626"
+    },
+    "status.info": {
+      "type": "color",
+      "value": "#1980e6"
+    }
+  },
+  "brand": {
+    "primary": {
+      "type": "color",
+      "value": "#808080"
+    },
+    "secondary": {
+      "type": "color",
+      "value": "#808080"
+    },
+    "accent": {
+      "type": "color",
+      "value": "#8c8c8c"
+    },
+    "accentstrong": {
+      "type": "color",
+      "value": "#999999"
+    },
+    "cta": {
+      "type": "color",
+      "value": "#858585"
+    },
+    "ctahover": {
+      "type": "color",
+      "value": "#7a7a7a"
+    },
+    "gradientstart": {
+      "type": "color",
+      "value": "#949494"
+    },
+    "gradientend": {
+      "type": "color",
+      "value": "#7a7a7a"
+    },
+    "linkcolor": {
+      "type": "color",
+      "value": "#737373"
+    },
+    "focusring": {
+      "type": "color",
+      "value": "#b3b3b3"
+    }
+  },
+  "typography": {
+    "heading": {
+      "type": "color",
+      "value": "#1a1a1a"
+    },
+    "textstrong": {
+      "type": "color",
+      "value": "#262626"
+    },
+    "textbody": {
+      "type": "color",
+      "value": "#404040"
+    },
+    "textmuted": {
+      "type": "color",
+      "value": "#666666"
+    },
+    "texthint": {
+      "type": "color",
+      "value": "#999999"
+    },
+    "textdisabled": {
+      "type": "color",
+      "value": "#cccccc"
+    },
+    "textaccent": {
+      "type": "color",
+      "value": "#666666"
+    },
+    "textaccentstrong": {
+      "type": "color",
+      "value": "#4d4d4d"
+    },
+    "footertext": {
+      "type": "color",
+      "value": "#d9d9d9"
+    },
+    "footertextmuted": {
+      "type": "color",
+      "value": "#999999"
+    }
+  },
+  "textPalette": {
+    "textprimary": {
+      "type": "color",
+      "value": "#2e2e2e"
+    },
+    "textsecondary": {
+      "type": "color",
+      "value": "#3d3d3d"
+    },
+    "texttertiary": {
+      "type": "color",
+      "value": "#525252"
+    },
+    "texthint": {
+      "type": "color",
+      "value": "#808080"
+    },
+    "textdisabled": {
+      "type": "color",
+      "value": "#cccccc"
+    },
+    "textaccent": {
+      "type": "color",
+      "value": "#666666"
+    },
+    "textaccentstrong": {
+      "type": "color",
+      "value": "#4d4d4d"
+    },
+    "linkcolor": {
+      "type": "color",
+      "value": "#737373"
+    }
+  },
+  "borders": {
+    "bordersubtle": {
+      "type": "color",
+      "value": "#ebe0e0"
+    },
+    "borderstrong": {
+      "type": "color",
+      "value": "#d3bbbb"
+    },
+    "borderaccentsubtle": {
+      "type": "color",
+      "value": "#d9d9d9"
+    },
+    "borderaccentmedium": {
+      "type": "color",
+      "value": "#cccccc"
+    },
+    "borderaccentstrong": {
+      "type": "color",
+      "value": "#b8b8b8"
+    },
+    "borderaccenthover": {
+      "type": "color",
+      "value": "#adadad"
+    }
+  },
+  "surfaces": {
+    "background": {
+      "type": "color",
+      "value": "#fbf8f8"
+    },
+    "pagebackground": {
+      "type": "color",
+      "value": "#f8f2f2"
+    },
+    "headerbackground": {
+      "type": "color",
+      "value": "#fdfcfc"
+    },
+    "surfaceplain": {
+      "type": "color",
+      "value": "#f1e9e9"
+    },
+    "surfaceplainborder": {
+      "type": "color",
+      "value": "#ecdfdf"
+    }
+  },
+  "cards": {
+    "cardpanelsurface": {
+      "type": "color",
+      "value": "#f1e9e9"
+    },
+    "cardpanelsurfacestrong": {
+      "type": "color",
+      "value": "#f9f6f6"
+    },
+    "cardpanelborder": {
+      "type": "color",
+      "value": "#ecdfdf"
+    },
+    "cardpanelbordersoft": {
+      "type": "color",
+      "value": "#f5efef"
+    },
+    "cardpanelborderstrong": {
+      "type": "color",
+      "value": "#e2d0d0"
+    },
+    "cardtagbg": {
+      "type": "color",
+      "value": "#f0f0f0"
+    },
+    "cardtagtext": {
+      "type": "color",
+      "value": "#4d4d4d"
+    },
+    "cardtagborder": {
+      "type": "color",
+      "value": "#d9d9d9"
+    }
+  },
+  "glass": {
+    "glasssurface": {
+      "type": "color",
+      "value": "#f2f2f2"
+    },
+    "glasssurfacestrong": {
+      "type": "color",
+      "value": "#e6e6e6"
+    },
+    "glassborder": {
+      "type": "color",
+      "value": "#d9d9d9"
+    },
+    "glassborderstrong": {
+      "type": "color",
+      "value": "#cccccc"
+    },
+    "glasshover": {
+      "type": "color",
+      "value": "#f2f2f2"
+    },
+    "glassshadow": {
+      "type": "color",
+      "value": "#cccccc"
+    },
+    "glasshighlight": {
+      "type": "color",
+      "value": "#fcfcfc"
+    },
+    "glassglow": {
+      "type": "color",
+      "value": "#b8b8b8"
+    },
+    "glassshadowsoft": {
+      "type": "color",
+      "value": "rgba(0,0,0,0.1)"
+    },
+    "glassshadowstrong": {
+      "type": "color",
+      "value": "rgba(0,0,0,0.18)"
+    },
+    "glassblur": {
+      "type": "dimension",
+      "value": "16px"
+    },
+    "glassnoiseopacity": {
+      "type": "opacity",
+      "value": "0.04"
+    }
+  },
+  "entity": {
+    "entitycardsurface": {
+      "type": "color",
+      "value": "#fafafa"
+    },
+    "entitycardborder": {
+      "type": "color",
+      "value": "#d9d9d9"
+    },
+    "entitycardglow": {
+      "type": "color",
+      "value": "#e6e6e6"
+    },
+    "entitycardhighlight": {
+      "type": "color",
+      "value": "#f2f2f2"
+    },
+    "entitycardheading": {
+      "type": "color",
+      "value": "#333333"
+    }
+  },
+  "named": {
+    "colormidnight": {
+      "type": "color",
+      "value": "#1a1a1a"
+    },
+    "colornight": {
+      "type": "color",
+      "value": "#262626"
+    },
+    "colordusk": {
+      "type": "color",
+      "value": "#4d4d4d"
+    },
+    "colorink": {
+      "type": "color",
+      "value": "#333333"
+    },
+    "coloramethyst": {
+      "type": "color",
+      "value": "#999999"
+    },
+    "coloriris": {
+      "type": "color",
+      "value": "#bfbfbf"
+    },
+    "colorgold": {
+      "type": "color",
+      "value": "#999999"
+    },
+    "colorrune": {
+      "type": "color",
+      "value": "#d9d9d9"
+    },
+    "colorfog": {
+      "type": "color",
+      "value": "#e6e6e6"
+    }
+  },
+  "status": {
+    "success": {
+      "type": "color",
+      "value": "#24a85b"
+    },
+    "warning": {
+      "type": "color",
+      "value": "#daa60b"
+    },
+    "error": {
+      "type": "color",
+      "value": "#d92626"
+    },
+    "info": {
+      "type": "color",
+      "value": "#1980e6"
+    },
+    "successstrong": {
+      "type": "color",
+      "value": "#2bca6d"
+    },
+    "warningstrong": {
+      "type": "color",
+      "value": "#f2b90d"
+    },
+    "errorstrong": {
+      "type": "color",
+      "value": "#dd2c2c"
+    }
+  },
+  "admin": {
+    "adminsurfacebase": {
+      "type": "color",
+      "value": "#fdfcfc"
+    },
+    "adminaccent": {
+      "type": "color",
+      "value": "#8a8a8a"
+    }
+  },
+  "aliases": {
+    "surfacepanelprimary": {
+      "type": "color",
+      "value": "#f1e9e9"
+    },
+    "surfacepanelsecondary": {
+      "type": "color",
+      "value": "#eee3e3"
+    },
+    "surfacecardhover": {
+      "type": "color",
+      "value": "#eadcdc"
+    },
+    "surfacemuted": {
+      "type": "color",
+      "value": "#f5efef"
+    },
+    "borderpurplesubtle": {
+      "type": "color",
+      "value": "#e6e6e6"
+    },
+    "borderpurplemedium": {
+      "type": "color",
+      "value": "#d1d1d1"
+    },
+    "borderaccentsubtle": {
+      "type": "color",
+      "value": "#d9d9d9"
+    },
+    "borderaccentmedium": {
+      "type": "color",
+      "value": "#cccccc"
+    },
+    "borderaccentstrong": {
+      "type": "color",
+      "value": "#b8b8b8"
+    },
+    "borderaccenthover": {
+      "type": "color",
+      "value": "#adadad"
+    },
+    "textsubtle": {
+      "type": "color",
+      "value": "#666666"
+    },
+    "textaccentstrong": {
+      "type": "color",
+      "value": "#575757"
+    },
+    "accentpurplestrong": {
+      "type": "color",
+      "value": "#999999"
+    },
+    "accentpurplesoft": {
+      "type": "color",
+      "value": "#b3b3b3"
+    },
+    "overlaypanel": {
+      "type": "color",
+      "value": "#f1e9e9"
+    },
+    "overlaypanelstrong": {
+      "type": "color",
+      "value": "#eee3e3"
+    },
+    "focusring": {
+      "type": "color",
+      "value": "#b3b3b3"
+    },
+    "shadowcard": {
+      "type": "string",
+      "value": "0 12px 30px -18px rgba(0,0,0,0.15)"
+    },
+    "shadowcardhover": {
+      "type": "string",
+      "value": "0 14px 40px -20px rgba(0,0,0,0.2)"
+    },
+    "chipbackground": {
+      "type": "color",
+      "value": "#f5efef"
+    },
+    "chipborder": {
+      "type": "color",
+      "value": "#e0cccc"
+    }
+  },
+  "dawn": {
+    "surfacebase": {
+      "type": "color",
+      "value": "#fbf9f9"
+    },
+    "surfacepanel": {
+      "type": "color",
+      "value": "#fbf9f9"
+    },
+    "surfacecard": {
+      "type": "color",
+      "value": "#f8f6f6"
+    },
+    "surfaceelevated": {
+      "type": "color",
+      "value": "#f6f3f3"
+    },
+    "surfacehover": {
+      "type": "color",
+      "value": "#f2eeee"
+    },
+    "textstrong": {
+      "type": "color",
+      "value": "#2e2e2e"
+    },
+    "textbody": {
+      "type": "color",
+      "value": "#424242"
+    },
+    "textmuted": {
+      "type": "color",
+      "value": "#5c5c5c"
+    },
+    "bordersubtle": {
+      "type": "color",
+      "value": "#ecdfdf"
+    },
+    "borderstrong": {
+      "type": "color",
+      "value": "#d4b9b9"
+    },
+    "accentlink": {
+      "type": "color",
+      "value": "#737373"
+    },
+    "accentcode": {
+      "type": "color",
+      "value": "#6b6b6b"
+    },
+    "prosebgsoft": {
+      "type": "color",
+      "value": "#f3ecec"
+    },
+    "prosebgstrong": {
+      "type": "color",
+      "value": "#efe6e6"
+    }
+  }
+}
