@@ -1,0 +1,102 @@
+{
+  "slug": "mindfulness-journal",
+  "data": {
+    "title": "Mindfulness Journal",
+    "slug": "mindfulness-journal",
+    "excerpt": "Placeholder post for \"Mindfulness Journal\".",
+    "metaDescription": "A mindfulness journal setup—soft prompts, low-spoon entries, and gentle structure to keep awareness kind.",
+    "tags": [
+      "gentle-rituals",
+      "everyday-magic",
+      "self-trust",
+      "inner-guidance",
+      "gentle-productivity"
+    ],
+    "spoonLevel": "low",
+    "category": "guide",
+    "contentType": "reflection",
+    "cluster": "magical-productivity",
+    "heroImagePrompt": "Open mindfulness journal with pen, tea, and candle on a wooden table, morning light coming in.",
+    "altTexts": [
+      "Open mindfulness journal with pen and tea in morning light.",
+      "Candle and mug beside a small notebook on a wooden table.",
+      "Hands writing in a soft-lit mindfulness journal."
+    ],
+    "outline": [
+      "Placeholder"
+    ],
+    "wordCount": 50,
+    "readingMinutes": 1,
+    "entities": [],
+    "includeAds": false,
+    "includeKofi": false,
+    "affiliateHints": [],
+    "internalLinkHints": [
+      {
+        "anchor": "reflection-journal",
+        "rationale": "Keep all notes in one place to spot patterns."
+      },
+      {
+        "anchor": "present-moment-journaling",
+        "rationale": "Use one-line entries when spoons are scarce."
+      },
+      {
+        "anchor": "journaling",
+        "rationale": "Pair with broader journaling tips for flow."
+      },
+      {
+        "anchor": "gentle-attention",
+        "rationale": "Let focus stay soft as you write."
+      },
+      {
+        "anchor": "tiny-gratitude-rituals",
+        "rationale": "Close each entry with a quick gratitude spark."
+      }
+    ],
+    "internalLinks": [],
+    "publishedAt": "2025-12-10T16:05:27.763Z",
+    "canonicalUrl": "https://witchclick.space/post/mindfulness-journal",
+    "specVersion": 2,
+    "draft": false
+  },
+  "content": "<h2 id=\"placeholder\">Placeholder</h2>\n<p>This post was automatically created as a stub from an internal link reference. Please replace this content.</p>\n",
+  "hasAffiliates": false,
+  "relatedPosts": [],
+  "headingOutline": [
+    {
+      "id": "placeholder",
+      "label": "Placeholder",
+      "level": 2
+    }
+  ],
+  "heroPrompt": null,
+  "altTexts": [
+    "Open mindfulness journal with pen and tea in morning light.",
+    "Candle and mug beside a small notebook on a wooden table.",
+    "Hands writing in a soft-lit mindfulness journal."
+  ],
+  "affiliateHints": [],
+  "internalLinkHints": [
+    {
+      "anchor": "reflection-journal",
+      "rationale": "Keep all notes in one place to spot patterns."
+    },
+    {
+      "anchor": "present-moment-journaling",
+      "rationale": "Use one-line entries when spoons are scarce."
+    },
+    {
+      "anchor": "journaling",
+      "rationale": "Pair with broader journaling tips for flow."
+    },
+    {
+      "anchor": "gentle-attention",
+      "rationale": "Let focus stay soft as you write."
+    },
+    {
+      "anchor": "tiny-gratitude-rituals",
+      "rationale": "Close each entry with a quick gratitude spark."
+    }
+  ],
+  "ogImage": "https://witchclick.space/og/mindfulness-journal.jpg"
+}

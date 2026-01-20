@@ -76,11 +76,11 @@ const {
     </label>
     <div class="flex gap-4 text-sm">
       <label class="inline-flex items-center gap-2">
-        <Input type="checkbox" id="ads" class="w-4 h-4" />
+        <input type="checkbox" id="ads" class="w-4 h-4 rounded border-line-neutral text-primary focus:ring-primary/40" />
         <span>Weave in supportive enchantments</span>
       </label>
       <label class="inline-flex items-center gap-2">
-        <Input type="checkbox" id="kofi" checked class="w-4 h-4" />
+        <input type="checkbox" id="kofi" checked class="w-4 h-4 rounded border-line-neutral text-primary focus:ring-primary/40" />
         <span>Nourish the Cauldron (Ko-fi)</span>
       </label>
     </div>
@@ -157,11 +157,19 @@ const {
         body: JSON.stringify(body)
       });
 
-      if (!res.ok) throw new Error(`gen failed (${res.status})`);
-      const data = await res.json();
-      if (!data.ok) throw new Error(data.error || 'gen failed');
+      let data = null;
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
+      }
+      if (!res.ok) {
+        const message = data?.error || `gen failed (${res.status})`;
+        throw new Error(message);
+      }
+      if (!data?.ok) throw new Error(data?.error || 'gen failed');
       
-      promptOut.value = data.prompt || '';
+      promptOut.value = data?.prompt || '';
       if (statusEl) statusEl.textContent = 'Guidance whispered ✓';
     } catch (e) {
       const statusEl = document.getElementById('status');

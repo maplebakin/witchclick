@@ -1,0 +1,44 @@
+{
+  "slug": "stray",
+  "data": {
+    "title": "Stray",
+    "slug": "stray",
+    "excerpt": "Placeholder post for \"Stray\".",
+    "metaTitle": "Stray",
+    "metaDescription": "This is a placeholder post that was auto-generated from an internal link reference. Content coming soon.",
+    "tags": [
+      "placeholder",
+      "stub"
+    ],
+    "outline": [
+      "Placeholder"
+    ],
+    "wordCount": 50,
+    "readingMinutes": 1,
+    "entities": [],
+    "includeAds": false,
+    "includeKofi": false,
+    "affiliateAnchors": [],
+    "internalLinkHints": [],
+    "internalLinks": [],
+    "publishedAt": "2025-11-22T13:43:05.657Z",
+    "canonicalUrl": "https://witchclick.space/post/stray",
+    "specVersion": 2,
+    "draft": true
+  },
+  "content": "<h2 id=\"placeholder\">Placeholder</h2>\n<p>This post was automatically created as a stub from an internal link reference. Please replace this content.</p>\n",
+  "hasAffiliates": false,
+  "relatedPosts": [],
+  "headingOutline": [
+    {
+      "id": "placeholder",
+      "label": "Placeholder",
+      "level": 2
+    }
+  ],
+  "heroPrompt": null,
+  "altTexts": [],
+  "affiliateHints": [],
+  "internalLinkHints": [],
+  "ogImage": "https://witchclick.space/og/stray.jpg"
+}

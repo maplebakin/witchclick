@@ -198,7 +198,7 @@ import Button from "@/components/ui/Button.astro";
       const changeEvent = new Event('change', { bubbles: true });
       select.dispatchEvent(changeEvent);
 
-      const uploadCard = heroUploaderRoot.querySelector('[data-upload-card]');
+      const uploadCard = heroUploaderRoot?.querySelector('[data-upload-card]');
       if (uploadCard) {
         uploadCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
@@ -227,9 +227,9 @@ import Button from "@/components/ui/Button.astro";
         const data = await response.json();
         posts = Array.isArray(data.items) ? data.items : [];
         
-        const alphabeticalSort = (a, b) => (a.title || a.slug).localeCompare(b.title || b.slug, undefined, { sensitivity: 'base' });
-        
-        const parseDateValue = (value) => {
+        const alphabeticalSort = (a: any, b: any) => (a.title || a.slug).localeCompare(b.title || b.slug, undefined, { sensitivity: 'base' });
+
+        const parseDateValue = (value: unknown): number | null => {
           if (typeof value !== 'string' || !value.trim()) return null;
           const parsed = Date.parse(value);
           return Number.isFinite(parsed) ? parsed : null;

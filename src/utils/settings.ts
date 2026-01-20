@@ -32,6 +32,25 @@ export interface ObservabilitySettings {
   environment?: ObservabilityEnvironment;
 }
 
+export interface ThemeColors {
+  accent?: string;
+  primary?: string;
+  fontHeading?: string;
+  fontSerif?: string;
+  surfacePlain?: string;
+  cardPanelSurface?: string;
+  cardPanelSurfaceStrong?: string;
+  cardPanelBorderSoft?: string;
+  shadowSoft?: string;
+  textBody?: string;
+  textMuted?: string;
+}
+
+export interface ActiveThemes {
+  midnight?: ThemeColors;
+  dawn?: ThemeColors;
+}
+
 export interface SiteSettings {
   siteUrl: string;
   brandName?: string;
@@ -44,6 +63,7 @@ export interface SiteSettings {
   clientErrorEndpoint?: string | null;
   autoSummaries?: boolean;
   autoSpoons?: boolean;
+  activeThemes?: ActiveThemes;
 }
 
 const DEFAULT_SETTINGS: SiteSettings = {

@@ -2,6 +2,9 @@
 // src/pages/post/[slug].astro
 import fs from 'node:fs';
 import path from 'node:path';
+import { marked } from 'marked';
+import createDOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
 import Base from "../../layouts/Base.astro";
 import AdSlot from "../../components/AdSlot.astro";
 import Disclosure from "../../components/Disclosure.astro";
@@ -14,37 +17,143 @@ import TldrCallout from "../../components/TldrCallout.astro";
 import BackToTop from "../../components/BackToTop.astro";
 import ShareButtons from "../../components/ShareButtons.astro";
 import HeadSlot from "@/components/HeadSlot.astro";
-import { readSettings, buildCanonicalUrl, getSiteOrigin } from "../../utils/settings";
+import { readSettings, buildCanonicalUrl, getSiteOrigin, toAbsoluteUrl } from "../../utils/settings";
 import { normalizeSpoonLevel } from "../../utils/augment";
 import { getAuthorBySlug, normalizeAuthorSlug, type AuthorProfile } from "../../utils/authors";
 import { readEntity } from "../../utils/entities";
+import { loadAllPosts, extractHeadingOutline } from "../../utils/posts";
+import { getRelatedPosts } from "../../utils/recommendations";
+import { autoLinkAffiliates } from "../../../tools/src/auto-affiliate.js";
 
 
 export const prerender = true;
 
 export async function getStaticPaths() {
   const CACHE_DIR = path.join(process.cwd(), '.cache/post-data');
-  if (!fs.existsSync(CACHE_DIR)) {
+  const slugs = new Set<string>();
+  if (fs.existsSync(CACHE_DIR)) {
+    const files = fs.readdirSync(CACHE_DIR);
+    for (const file of files) {
+      if (file.endsWith('.json')) {
+        slugs.add(file.replace(/\.json$/, ''));
+      }
+    }
+  }
+  if (slugs.size === 0 || import.meta.env.DEV) {
+    loadAllPosts().forEach((post) => slugs.add(post.slug));
+  }
+  return Array.from(slugs).map((slug) => ({ params: { slug } }));
+}
+
+const PRODUCTS_FILE = path.join(process.cwd(), 'content', 'products.json');
+
+class Slugger {
+  private seen: Record<string, number> = {};
+
+  slug(text: string): string {
+    let slug = text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+    const originalSlug = slug;
+    const count = this.seen[originalSlug] || 0;
+
+    if (count > 0) {
+      slug = `${originalSlug}-${count}`;
+    }
+
+    this.seen[originalSlug] = count + 1;
+    return slug;
+  }
+}
+
+function loadProducts() {
+  try {
+    const raw = fs.readFileSync(PRODUCTS_FILE, 'utf8');
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed?.products) ? parsed.products : [];
+  } catch {
     return [];
   }
-  const files = fs.readdirSync(CACHE_DIR);
-  return files.map((file) => ({
-    params: { slug: file.replace(/\.json$/, '') },
-  }));
+}
+
+async function buildPostFromSource(slug: string) {
+  const normalized = slug.toLowerCase();
+  const post = loadAllPosts().find((item) => item.slug === normalized);
+  if (!post) return null;
+
+  const markdown = post.content || '';
+  let html = marked.parse(markdown || '') as string;
+  let hasAffiliates = false;
+
+  try {
+    const dom = new JSDOM('<body></body>');
+    const DOMPurify = createDOMPurify(dom.window);
+    const safeHtml = DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
+    const wrapper = dom.window.document.createElement('div');
+    wrapper.innerHTML = safeHtml;
+    const slugger = new Slugger();
+    const headingNodes = wrapper.querySelectorAll('h2, h3, h4');
+    headingNodes.forEach((node) => {
+      const text = node.textContent?.trim();
+      if (!text) return;
+      const existing = node.getAttribute('id');
+      const id = existing && existing.trim().length ? existing : slugger.slug(text);
+      node.setAttribute('id', id);
+    });
+    html = wrapper.innerHTML;
+  } catch {
+    /* fall back to raw marked output */
+  }
+
+  try {
+    const products = loadProducts();
+    const linked = autoLinkAffiliates(html, products, { maxLinksPerPost: 3 });
+    html = linked.html;
+    hasAffiliates = linked.count > 0;
+  } catch {
+    /* ignore affiliate linking failures in dev */
+  }
+
+  const relatedPosts = getRelatedPosts({
+    currentSlug: post.slug,
+    currentData: post.data,
+    limit: 4,
+  });
+  const headingOutline = extractHeadingOutline(markdown, { minLevel: 2, maxLevel: 3 });
+
+  return {
+    slug: post.slug,
+    data: post.data,
+    tldr: post.tldr,
+    spoons: post.spoons,
+    content: html,
+    hasAffiliates,
+    relatedPosts,
+    headingOutline,
+  };
 }
 
 const { slug } = Astro.params;
 const CACHE_DIR = path.join(process.cwd(), '.cache/post-data');
 const postFilePath = path.join(CACHE_DIR, `${slug}.json`);
 
-if (!fs.existsSync(postFilePath)) {
+let post = null;
+if (fs.existsSync(postFilePath)) {
+  post = JSON.parse(fs.readFileSync(postFilePath, 'utf-8'));
+} else {
+  post = await buildPostFromSource(slug);
+}
+
+if (!post) {
   return new Response(null, {
     status: 404,
     statusText: 'Not Found'
   });
 }
-
-const post = JSON.parse(fs.readFileSync(postFilePath, 'utf-8'));
 
 const {
   data,
@@ -89,8 +198,8 @@ if (data.downloadId) {
   ctaType = "kofi";
 }
 
-const authorSlugs = Array.isArray(data.authors) ? data.authors.map(s => normalizeAuthorSlug(s)) : [];
-const pageAuthors = authorSlugs.map(slug => {
+const authorSlugs = Array.isArray(data.authors) ? data.authors.map((s: string) => normalizeAuthorSlug(s)) : [];
+const pageAuthors = authorSlugs.map((slug: string) => {
   const profile = getAuthorBySlug(slug);
   return {
     slug,
@@ -99,16 +208,25 @@ const pageAuthors = authorSlugs.map(slug => {
   }
 });
 
-const authorSegments = pageAuthors.map((author, index) => {
-    let separator = null;
+interface AuthorSegment {
+    slug: string;
+    name: string;
+    profile: AuthorProfile | undefined;
+    href: string | null;
+    label: string;
+    separator: string | null;
+}
+
+const authorSegments: AuthorSegment[] = pageAuthors.map((author: { slug: string; name: string; profile: AuthorProfile | undefined }, index: number) => {
+    let separator: string | null = null;
     if (index > 0) {
         separator = pageAuthors.length === 2 || index === pageAuthors.length - 1 ? 'ampersand' : 'comma';
     }
     return { ...author, href: author.profile ? `/author/${author.profile.slug}/` : null, label: author.name, separator };
 });
 
-const jsonLdAuthors = pageAuthors.map(author => ({
-    "@type": "Person",
+const jsonLdAuthors = pageAuthors.map((author: { slug: string; name: string; profile: AuthorProfile | undefined }) => ({
+    "@type": "Person" as const,
     name: author.name,
     url: author.profile ? `${siteOrigin}/author/${author.profile.slug}` : undefined,
 }));
@@ -118,7 +236,7 @@ const jsonLdAuthor = jsonLdAuthors.length === 0 ? { "@type": "Organization", nam
 const ogImage = data.ogImage ? toAbsoluteUrl(data.ogImage, settings) : `${siteOrigin}/og/${effectiveSlug}.jpg`;
 
 const entList = Array.isArray(data.entities) ? data.entities : [];
-const resolvedEntities = entList.map((e) => readEntity(String(e.type || ""), String(e.slug || ""))).filter(Boolean);
+const resolvedEntities = entList.map((e: { type?: string; slug?: string }) => readEntity(String(e.type || ""), String(e.slug || ""))).filter(Boolean);
 const railEntities = resolvedEntities.map((entity: any) => ({
   name: entity.name,
   href: `/entities/${entity.type}/${entity.slug}`,

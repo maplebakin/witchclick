@@ -1,0 +1,89 @@
+{
+  "slug": "quick-co-play-check-in",
+  "data": {
+    "title": "Quick Co-Play Check In",
+    "slug": "quick-co-play-check-in",
+    "excerpt": "Safe sign that you (and your co-player) are still present when quick co-play is the ritual.",
+    "metaDescription": "Low-spoon co-play check-in for gentle parents and kids who need a quick grounding ally.",
+    "tags": [
+      "low-spoons",
+      "gentle-productivity",
+      "grounding",
+      "calming-rituals",
+      "cozy-witchcraft"
+    ],
+    "outline": [
+      "Agree on the Check-In",
+      "Name Your Feeling",
+      "Share One Need",
+      "Close With Breath"
+    ],
+    "wordCount": 50,
+    "readingMinutes": 1,
+    "entities": [],
+    "includeAds": false,
+    "includeKofi": false,
+    "internalLinkHints": [
+      {
+        "anchor": "gaming-with-kids",
+        "rationale": "Layer this check-in over sweeter co-play rituals."
+      },
+      {
+        "anchor": "gentle-rituals",
+        "rationale": "Use forgiving rituals whenever the electronics feel loud."
+      },
+      {
+        "anchor": "quiet-progress",
+        "rationale": "Track small co-play wins without judgment."
+      }
+    ],
+    "internalLinks": [],
+    "publishedAt": "2025-12-10T16:05:27.763Z",
+    "canonicalUrl": "https://witchclick.space/post/quick-co-play-check-in",
+    "specVersion": 2,
+    "draft": false,
+    "spoonLevel": "low",
+    "category": "ritual",
+    "contentType": "ritual",
+    "cluster": "magical-productivity",
+    "heroImagePrompt": "Controller rests on a fuzzy blanket, soft lamplight spilling onto two mugs and a small bowl of stones.",
+    "altTexts": [
+      "Video game controller on a blanket with two mugs beside it.",
+      "Soft light hitting mugs and co-play space.",
+      "Hands hovering above a controller near candles."
+    ],
+    "affiliateHints": []
+  },
+  "content": "<h2 id=\"placeholder\">Placeholder</h2>\n<p>This post was automatically created as a stub from an internal link reference. Please replace this content.</p>\n",
+  "hasAffiliates": false,
+  "relatedPosts": [],
+  "headingOutline": [
+    {
+      "id": "placeholder",
+      "label": "Placeholder",
+      "level": 2
+    }
+  ],
+  "heroPrompt": null,
+  "altTexts": [
+    "Video game controller on a blanket with two mugs beside it.",
+    "Soft light hitting mugs and co-play space.",
+    "Hands hovering above a controller near candles."
+  ],
+  "affiliateHints": [],
+  "internalLinkHints": [
+    {
+      "anchor": "gaming-with-kids",
+      "rationale": "Layer this check-in over sweeter co-play rituals."
+    },
+    {
+      "anchor": "gentle-rituals",
+      "rationale": "Use forgiving rituals whenever the electronics feel loud."
+    },
+    {
+      "anchor": "quiet-progress",
+      "rationale": "Track small co-play wins without judgment."
+    }
+  ],
+  "ogImage": "https://witchclick.space/og/quick-co-play-check-in.jpg"
+}

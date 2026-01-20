@@ -734,6 +734,7 @@ export class ThemeEditor {
     const display = this.getEl('contrastDisplay');
     if (!display) return;
 
+    const defaults = this.getBaseVariables();
     const background = this.getInputValue('backgroundInput') || defaults.background || '';
     const textPrimary = this.getInputValue('textPrimaryInput') || defaults.textPrimary || '';
     const textHeading = this.getInputValue('textHeadingInput') || defaults.textHeading || '';
@@ -1192,7 +1193,7 @@ export class ThemeEditor {
       'textHeading',
       'textMuted',
     ];
-    allowList.forEach((k) => knownKeys.set(k.toLowerCase(), k));
+    allowList.forEach((k) => knownKeys.set(String(k).toLowerCase(), String(k)));
 
     const aliasMap = new Map<string, string>([
       // Surfaces / page

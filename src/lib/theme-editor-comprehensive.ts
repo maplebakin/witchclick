@@ -148,7 +148,8 @@ export function initializeAllColorElements(elements: Record<string, ElementValue
   });
 
   ALL_FONT_VARIABLE_KEYS.forEach((key) => {
-    elements[`${key}Select`] = document.getElementById(`theme${key.charAt(0).toUpperCase() + key.slice(1)}`);
+    const keyStr = String(key);
+    elements[`${keyStr}Select`] = document.getElementById(`theme${keyStr.charAt(0).toUpperCase() + keyStr.slice(1)}`);
   });
 }
 

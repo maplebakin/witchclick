@@ -647,10 +647,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             var style = $('style').value || 'cozy';
             body.style = style;
             var res = await fetch(DEV_API + '/genprompt', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
-            if(!res.ok) throw new Error('gen failed ('+res.status+')');
-            var data = await res.json();
-            if (!data.ok) throw new Error(data.error || 'gen failed');
-            $('promptOut').value = data.prompt || '';
+            var data = null;
+            try { data = await res.json(); } catch { data = null; }
+            if(!res.ok) throw new Error((data && data.error) || ('gen failed ('+res.status+')'));
+            if (!data || !data.ok) throw new Error((data && data.error) || 'gen failed');
+            $('promptOut').value = (data && data.prompt) || '';
             setStatus('Guidance whispered ✓', true);
           }catch(e){ setStatus('Prompt error: ' + (e.message||String(e)), false); }
           finally{ busy(false); }

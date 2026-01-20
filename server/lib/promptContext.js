@@ -43,16 +43,35 @@ export function loadPromptContext(options = {}) {
 
   const allowedAffiliateKeys = listAllowedAffiliateKeys(products);
 
-  const metadata = collectPostMetadata(cwd);
+  let metadata = [];
+  try {
+    metadata = collectPostMetadata(cwd);
+  } catch {
+    metadata = [];
+  }
   const existingPostTitles = metadata.map((item) => item.title).filter(Boolean);
   const currentSlugs = metadata.map((item) => item.slug).filter(Boolean);
 
-  const historicSlugs = readSlugHistory(cwd);
+  let historicSlugs = [];
+  try {
+    historicSlugs = readSlugHistory(cwd);
+  } catch {
+    historicSlugs = [];
+  }
   const mergedSlugSet = new Set([...historicSlugs, ...currentSlugs]);
   const mergedSlugs = Array.from(mergedSlugSet);
-  writeSlugHistory(cwd, mergedSlugs);
+  try {
+    writeSlugHistory(cwd, mergedSlugs);
+  } catch {
+    /* non-fatal */
+  }
 
-  const engagementSignals = loadEngagementSignals({ cwd, settings });
+  let engagementSignals = null;
+  try {
+    engagementSignals = loadEngagementSignals({ cwd, settings });
+  } catch {
+    engagementSignals = null;
+  }
 
   return {
     brandName: normalizeBrandName(settings.brandName),

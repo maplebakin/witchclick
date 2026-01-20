@@ -1873,8 +1873,9 @@ async function withRequestBoundary(req, res, handler) {
         ? buildPresetPrompt({ preset, topic, strict, styleDirective, contentType: resolvedModeKey })
         : buildGenprompt({ topic, words, ads, kofi });
 
-      // loud guard so stale prompts never slip through
-      if (!prompt.includes('opening-reflection') || !prompt.includes('The FIRST outline item must be exactly {"heading":"Opening Reflection","id":"opening-reflection"}')) {
+      const hasPreset = Boolean(resolvedModeKey);
+      // loud guard so stale prompts never slip through (master prompt only)
+      if (!hasPreset && (!prompt.includes('opening-reflection') || !prompt.includes('REQUIRED: The first outline item'))) {
         return send(res, 500, { ok: false, error: 'Stale prompt detected (missing Opening Reflection guards). Check dev-api.js.' });
       }
       return send(res, 200, {

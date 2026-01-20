@@ -45,8 +45,8 @@ const paddingClasses = {
 
 const classes = [
   ...baseClasses,
-  ...variantClasses[variant],
-  ...paddingClasses[padding],
+  ...variantClasses[variant as keyof typeof variantClasses],
+  paddingClasses[padding as keyof typeof paddingClasses],
   className,
 ].join(' ');
 ---
