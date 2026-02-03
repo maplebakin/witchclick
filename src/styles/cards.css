@@ -9,9 +9,9 @@
 
 :root {
   /* Card Geometry */
-  --card-radius: clamp(1.3rem, 3vw, 1.8rem);
-  --card-hover-translate: -0.22rem;
-  --card-transition: 200ms ease;
+  --card-radius: clamp(1.4rem, 3vw, 2rem);
+  --card-hover-translate: -0.18rem;
+  --card-transition: 220ms var(--ease-out-curve, ease);
   --card-focus-offset: 5px;
 
   /* Card Surfaces */
@@ -28,6 +28,20 @@
   --card-panel-border: color-mix(in srgb, var(--glass-border, var(--border-accent-subtle, var(--border-subtle))) 92%, transparent 8%);
   --card-panel-border-strong: color-mix(in srgb, var(--glass-border-strong, var(--border-accent-medium, var(--border-strong))) 92%, transparent 8%);
   --card-panel-border-soft: color-mix(in srgb, var(--glass-border, var(--border-accent-subtle, var(--border-subtle))) 75%, transparent 25%);
+
+  /* Cozy Panel Surfaces */
+  --card-panel-surface-cozy: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--card-panel-surface) 88%, var(--color-iris, #f2bf8c) 12%) 0%,
+    color-mix(in srgb, var(--card-panel-surface) 82%, var(--color-gold, #e4a667) 18%) 100%
+  );
+  --card-panel-surface-strong-cozy: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--card-panel-surface-strong) 90%, var(--color-iris, #f2bf8c) 10%) 0%,
+    color-mix(in srgb, var(--card-panel-surface-strong) 84%, var(--color-gold, #e4a667) 16%) 100%
+  );
+  --card-panel-shadow: 0 24px 60px -38px color-mix(in srgb, var(--color-night, #261a0d) 65%, transparent 35%);
+  --card-panel-shadow-hover: 0 32px 70px -40px color-mix(in srgb, var(--color-night, #261a0d) 55%, transparent 45%);
 
   /* Focus Ring Styles */
   --card-focus-outline: var(--focus-ring, rgba(212, 175, 55, 0.6));
@@ -48,9 +62,9 @@
   );
 
   /* Elevation Tiers */
-  --elevation-tier-1: var(--shadow-card, 0 20px 45px -25px rgba(11, 6, 20, 0.45));
-  --elevation-tier-2: var(--glass-shadow-soft, 0 28px 60px -32px rgba(9, 5, 18, 0.58));
-  --elevation-tier-3: var(--glass-shadow-strong, 0 36px 82px -36px rgba(6, 4, 16, 0.62));
+  --elevation-tier-1: var(--shadow-card, 0 20px 45px -28px rgba(11, 6, 20, 0.42));
+  --elevation-tier-2: var(--glass-shadow-soft, 0 28px 60px -34px rgba(9, 5, 18, 0.5));
+  --elevation-tier-3: var(--glass-shadow-strong, 0 36px 82px -38px rgba(6, 4, 16, 0.56));
   --elevation-tier-ambient: 0 18px 48px -30px color-mix(in srgb, var(--glass-shadow-soft, rgba(10, 6, 20, 0.45)) 85%, transparent 15%);
 
   /* Badge & Tag Styles */
@@ -73,6 +87,19 @@
   /* Card Surfaces */
   --card-panel-surface: var(--theme-card-panel-surface, color-mix(in srgb, hsl(var(--surface-card)) 95%, white 5%));
   --card-panel-surface-strong: var(--theme-card-panel-surface-strong, color-mix(in srgb, hsl(var(--surface-panel-primary)) 94%, white 6%));
+
+  --card-panel-surface-cozy: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--card-panel-surface) 94%, white 6%) 0%,
+    color-mix(in srgb, var(--card-panel-surface) 86%, var(--color-gold, #e4a667) 14%) 100%
+  );
+  --card-panel-surface-strong-cozy: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--card-panel-surface-strong) 92%, white 8%) 0%,
+    color-mix(in srgb, var(--card-panel-surface-strong) 84%, var(--color-gold, #e4a667) 16%) 100%
+  );
+  --card-panel-shadow: 0 20px 55px -38px rgba(93, 76, 128, 0.28);
+  --card-panel-shadow-hover: 0 28px 65px -40px rgba(93, 76, 128, 0.26);
 
   /* Card Borders */
   --card-panel-border: color-mix(in srgb, var(--border-accent-subtle, var(--border-subtle)) 92%, transparent 8%);
@@ -141,26 +168,26 @@
   border-radius: var(--wc-radius-lg, var(--card-radius));
   padding: 0;
   border: 1px solid var(--card-panel-border);
-  background: var(--card-panel-surface);
+  background: var(--card-panel-surface-cozy, var(--card-panel-surface));
   color: var(--text-body);
   overflow: hidden;
   isolation: isolate;
   backdrop-filter: blur(var(--glass-blur, 16px));
   transform: translateZ(0);
-  box-shadow: var(--card-elevation-base, var(--wc-shadow-soft, var(--elevation-tier-1)));
+  box-shadow: var(--card-elevation-base, var(--card-panel-shadow, var(--wc-shadow-soft, var(--elevation-tier-1))));
   transition:
     transform var(--card-transition),
     box-shadow var(--card-transition),
     border-color var(--card-transition),
     background 260ms ease;
-  background: var(--card-panel-surface);
+  background: var(--card-panel-surface-cozy, var(--card-panel-surface));
 }
 
 .card-panel:hover,
 .card-panel:focus-visible {
   transform: translateY(var(--card-hover-translate));
   border-color: var(--card-panel-border-strong);
-  box-shadow: var(--card-elevation-hover, var(--elevation-tier-2));
+  box-shadow: var(--card-elevation-hover, var(--card-panel-shadow-hover, var(--elevation-tier-2)));
 }
 
 .card-panel:active {
@@ -197,7 +224,7 @@
    --------------------------------------------------------------------------- */
 
 .card-panel-strong {
-  background: var(--card-panel-surface-strong);
+  background: var(--card-panel-surface-strong-cozy, var(--card-panel-surface-strong));
   border-color: var(--card-panel-border-strong);
 }
 

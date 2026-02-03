@@ -64,13 +64,13 @@ import Textarea from "@/components/ui/Textarea.astro";
     const heroUploaderRoot = root.closest('#heroUploader');
     if (!heroUploaderRoot) return;
 
-    const DEV_API = heroUploaderRoot.getAttribute('data-dev-api') || 'http://localhost:8787';
     const select = heroUploaderRoot.querySelector('[data-post-select]') as HTMLSelectElement;
 
     const promptField = root.querySelector('[data-hero-prompt]') as HTMLTextAreaElement;
     const promptHint = root.querySelector('[data-hero-prompt-hint]');
     const copyPromptButton = root.querySelector('[data-copy-prompt]');
     const themeSummary = root.querySelector('[data-hero-theme]');
+    const defaultHint = promptHint?.textContent?.trim() || 'Select a post to load its hero prompt.';
     
     // This component needs to listen to changes on the post selector,
     // which is outside its own scope. This is an anti-pattern, but necessary
@@ -85,37 +85,113 @@ import Textarea from "@/components/ui/Textarea.astro";
       });
     }
 
-    // ... (All the functions related to prompt building, theme fetching, etc. would go here)
-    // buildHeroPrompt, getActivePalette, updateThemeSummary, etc.
-    function updateHeroPromptUI(posts: any[]) {
+    document.addEventListener('post-selected', (event: Event) => {
+        const detail = (event as CustomEvent).detail || {};
+        const posts = (window as any).heroUploaderPosts || [];
+        updateHeroPromptUI(posts, detail.slug);
+    });
+
+    document.addEventListener('hero-posts-loaded', () => {
+        const posts = (window as any).heroUploaderPosts || [];
+        updateHeroPromptUI(posts);
+    });
+
+    if (copyPromptButton) {
+        copyPromptButton.addEventListener('click', async () => {
+            if (!promptField || !promptField.value) return;
+            try {
+                await navigator.clipboard.writeText(promptField.value);
+                if (promptHint) {
+                    promptHint.textContent = 'Prompt copied to clipboard.';
+                }
+            } catch {
+                if (promptHint) {
+                    promptHint.textContent = 'Could not copy prompt. Select and copy manually.';
+                }
+            }
+        });
+    }
+
+    function resolvePrompt(post: any) {
+        const candidates = [
+            { value: post?.heroImagePrompt, source: 'hero prompt' },
+            { value: post?.heroAlt, source: 'hero alt text' },
+            { value: post?.heroImageAlt, source: 'legacy alt text' },
+        ];
+        for (const candidate of candidates) {
+            if (typeof candidate.value === 'string' && candidate.value.trim()) {
+                return { prompt: candidate.value.trim(), source: candidate.source };
+            }
+        }
+        return { prompt: '', source: '' };
+    }
+
+    function updateThemeSummary(post: any) {
+        if (!themeSummary) return;
+        themeSummary.innerHTML = '';
+        if (!post) return;
+        const fragments: string[] = [];
+        if (typeof post.mood === 'string' && post.mood.trim()) {
+            fragments.push(`Mood: ${post.mood.trim()}`);
+        }
+        if (Array.isArray(post.tags) && post.tags.length) {
+            fragments.push(`Tags: ${post.tags.join(', ')}`);
+        }
+        if (!fragments.length) return;
+        const badge = document.createElement('span');
+        badge.className = 'rounded-full border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-[10px] font-medium text-neutral-600';
+        badge.textContent = fragments.join(' · ');
+        themeSummary.appendChild(badge);
+    }
+
+    function updateHeroPromptUI(posts: any[], forcedSlug?: string) {
         if (!promptField || !copyPromptButton) {
             return;
         }
+        const activeSlug = typeof forcedSlug === 'string' && forcedSlug.trim()
+            ? forcedSlug.trim()
+            : (select?.value || '');
         if (!posts.length) {
             promptField.value = '';
             promptField.classList.add('hidden');
             if(copyPromptButton) copyPromptButton.setAttribute('disabled', 'true');
+            if (promptHint) promptHint.textContent = defaultHint;
+            updateThemeSummary(null);
             return;
         }
-        if (!select || !select.value) {
+        if (!activeSlug) {
             promptField.value = '';
             promptField.classList.add('hidden');
             if(copyPromptButton) copyPromptButton.setAttribute('disabled', 'true');
+            if (promptHint) promptHint.textContent = defaultHint;
+            updateThemeSummary(null);
             return;
         }
-        const current = posts.find((post) => post.slug === select.value);
-        // Simplified for brevity. The real implementation is much larger.
-        const promptText = `Generated prompt for ${current?.title || 'post'}`; 
+        const current = posts.find((post) => post.slug === activeSlug);
+        const resolved = resolvePrompt(current);
+        const promptText = resolved.prompt;
         
         if (promptText) {
             promptField.value = promptText;
             promptField.classList.remove('hidden');
             if(copyPromptButton) copyPromptButton.removeAttribute('disabled');
+            if (promptHint) {
+                promptHint.textContent = resolved.source
+                    ? `Loaded ${resolved.source} for “${current?.title || current?.slug || 'post'}”.`
+                    : `Loaded prompt for “${current?.title || current?.slug || 'post'}”.`;
+            }
+            updateThemeSummary(current);
         } else {
             promptField.value = '';
             promptField.classList.add('hidden');
             if(copyPromptButton) copyPromptButton.setAttribute('disabled', 'true');
+            if (promptHint) {
+                promptHint.textContent = `No hero prompt or alt text saved for “${current?.title || current?.slug || 'post'}”.`;
+            }
+            updateThemeSummary(current);
         }
     }
+
+    updateHeroPromptUI((window as any).heroUploaderPosts || []);
   });
 </script>

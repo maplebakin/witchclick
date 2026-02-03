@@ -15,6 +15,7 @@ const keyOk = ADMIN_KEY && url.searchParams.get('key') === ADMIN_KEY;
 const canUse = isDev || !!keyOk;
 
 const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || '';
 ---
 <Base
   title="WitchClick — Authors Dashboard"
@@ -31,7 +32,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
     <div class="space-y-6">
       <AdminNav currentPath="/admin/authors" />
 
-      <div class="mx-auto max-w-4xl space-y-6" data-authors-admin data-dev-api={DEV_API}>
+      <div class="mx-auto max-w-4xl space-y-6" data-authors-admin data-dev-api={DEV_API} data-dev-key={DEV_KEY}>
       <section class="rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm">
         <header class="mb-6 flex items-center justify-between">
           <div>
@@ -103,7 +104,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             <button type="button" id="deleteBtn" class="hidden admin-btn-secondary px-5 py-2.5 text-sm font-medium text-danger hover:bg-surface-danger hover:text-inverse">
               Delete Author
             </button>
-            <p class="ml-auto text-sm" data-status></p>
+            <p class="ml-auto text-sm" data-status role="status" aria-live="polite" aria-atomic="true"></p>
           </div>
         </form>
       </section>
@@ -122,6 +123,12 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         const root = document.querySelector('[data-authors-admin]');
         if (!root) return;
         const devApi = root.getAttribute('data-dev-api');
+        const devKey = root.getAttribute('data-dev-key');
+        function apiFetch(path, options = {}) {
+          const headers = { ...(options.headers || {}) };
+          if (devKey) headers['X-WC-Dev-Key'] = devKey;
+          return fetch(devApi + path, { ...options, headers });
+        }
         const authorSelect = root.querySelector('#authorSelect');
         const authorForm = root.querySelector('#authorForm');
         const newAuthorBtn = root.querySelector('#newAuthorBtn');
@@ -197,7 +204,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
         async function loadAuthors() {
           try {
-            const res = await fetch(devApi + '/authors/list', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+            const res = await apiFetch('/authors/list', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
             const json = await res.json();
             if (!json?.ok) throw new Error(json?.error || 'Failed to load authors');
             authors = json.authors || [];
@@ -218,7 +225,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         async function loadAuthor(slug) {
           try {
             setStatus('Loading…');
-            const res = await fetch(devApi + '/authors/get', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug }) });
+            const res = await apiFetch('/authors/get', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug }) });
             const json = await res.json();
             if (!json?.ok) throw new Error(json?.error || 'Failed to load author');
             populateForm(json.data);
@@ -232,7 +239,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         async function saveAuthor(data) {
           try {
             setStatus('Saving…');
-            const res = await fetch(devApi + '/authors/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            const res = await apiFetch('/authors/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
             const json = await res.json();
             if (!json?.ok) throw new Error(json?.error || 'Failed to save');
             setStatus('Saved!', 'success');
@@ -248,7 +255,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           if (!confirm('Delete this author? This cannot be undone.')) return;
           try {
             setStatus('Deleting…');
-            const res = await fetch(devApi + '/authors/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug }) });
+            const res = await apiFetch('/authors/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug }) });
             const json = await res.json();
             if (!json?.ok) throw new Error(json?.error || 'Failed to delete');
             setStatus('Deleted.', 'success');

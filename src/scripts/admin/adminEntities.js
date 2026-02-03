@@ -42,6 +42,13 @@ var SUGGEST = {
 function initEntitiesAdmin() {
   const root = document.querySelector("[data-dev-api]");
   const DEV_API = root?.getAttribute("data-dev-api") || "http://localhost:8787";
+  const DEV_KEY = root?.getAttribute("data-dev-key") || "";
+  const baseHeaders = DEV_KEY ? { "X-WC-Dev-Key": DEV_KEY } : {};
+  const jsonHeaders = { "Content-Type": "application/json", ...baseHeaders };
+  function apiFetch(path, options = {}) {
+    const headers = { ...baseHeaders, ...(options.headers || {}) };
+    return fetch(`${DEV_API}${path}`, { ...options, headers });
+  }
   const $ = (id) => document.getElementById(id);
   const statusEl = $("status");
   const nameInput = $("name");
@@ -133,7 +140,7 @@ function initEntitiesAdmin() {
   async function refreshList() {
     if (!listEl) return;
     try {
-      const res = await fetch(`${DEV_API}/entities/list`, { method: "POST" });
+      const res = await apiFetch("/entities/list", { method: "POST" });
       const data = await res.json();
       if (!data.ok) {
         setStatus(`List error: ${data.error || "unknown"}`, false);
@@ -176,9 +183,9 @@ function initEntitiesAdmin() {
     if (!propsHolder || !typeInput || !slugInput || !nameInput || !summaryInput || !relatedInput) return;
     try {
       busy(true);
-      const res = await fetch(`${DEV_API}/entities/get`, {
+      const res = await apiFetch("/entities/get", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: jsonHeaders,
         body: JSON.stringify({ type, slug })
       });
       const data = await res.json();
@@ -243,9 +250,9 @@ function initEntitiesAdmin() {
         related: (relatedInput.value || "").split(",").map((s) => s.trim()).filter(Boolean)
       };
       try {
-        const existingRes = await fetch(`${DEV_API}/entities/get`, {
+        const existingRes = await apiFetch("/entities/get", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: jsonHeaders,
           body: JSON.stringify({ type, slug })
         });
         const existing = await existingRes.json();
@@ -259,9 +266,9 @@ function initEntitiesAdmin() {
         }
       } catch {
       }
-      const res = await fetch(`${DEV_API}/entities/save`, {
+      const res = await apiFetch("/entities/save", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: jsonHeaders,
         body: JSON.stringify(payload)
       });
       const data = await res.json();

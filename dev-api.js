@@ -55,13 +55,36 @@ import {
 const MAX_BODY_BYTES = Number.parseInt(process.env.DEV_API_MAX_BODY_BYTES || '', 10) || 5 * 1024 * 1024; // 5MB default
 const MAX_UPLOAD_BYTES = Number.parseInt(process.env.DEV_API_MAX_UPLOAD_BYTES || '', 10) || 10 * 1024 * 1024; // 10MB default
 const DEV_API_TOKEN = process.env.DEV_API_TOKEN || '';
+const DEV_API_CORS_ORIGIN = process.env.DEV_API_CORS_ORIGIN || '*';
+const DEV_API_LOG = process.env.DEV_API_LOG !== 'false';
 
 const rawPort = process.env.DEV_API_PORT ?? process.env.PORT;
 const PORT = rawPort && Number.parseInt(rawPort, 10) > 0 ? Number.parseInt(rawPort, 10) : 8787;
-const HOST = process.env.HOST ?? process.env.DEV_API_HOST ?? 'localhost';
+const HOST = process.env.HOST ?? process.env.DEV_API_HOST ?? '127.0.0.1';
 const CWD = process.cwd();
 let parsedUrl = null;
 const writeLocks = new Map();
+const ENTITY_SUBSCRIPTIONS_PATH = path.join(CWD, 'content', 'notifications', 'entity-subscriptions.json');
+const ENTITY_NOTIFICATIONS_PATH = path.join(CWD, 'content', 'notifications', 'entity-notifications.json');
+const rateBuckets = new Map();
+
+const PUBLIC_ENDPOINTS = new Set([
+  '/ping',
+  '/entities/subscribe',
+]);
+
+const RATE_LIMITS = [
+  { route: '/genprompt', windowMs: 60_000, max: 20 },
+  { route: '/ingest', windowMs: 60_000, max: 6 },
+  { route: '/bundle', windowMs: 60_000, max: 4 },
+  { route: '/posts/save', windowMs: 60_000, max: 20 },
+  { route: '/posts/update', windowMs: 60_000, max: 20 },
+  { route: '/posts/delete', windowMs: 60_000, max: 10 },
+  { route: '/entities/save', windowMs: 60_000, max: 30 },
+  { route: '/entities/subscribe', windowMs: 60_000, max: 60 },
+  { route: '/curses/prompt', windowMs: 60_000, max: 20 },
+  { route: '/curses/ingest', windowMs: 60_000, max: 6 },
+];
 
 function listPostDirsForCollisions() {
   return resolvePostsDirectories({ root: CWD });
@@ -71,8 +94,8 @@ function send(res, code, data) {
   const body = JSON.stringify(data);
   res.writeHead(code, {
     'Content-Type': 'application/json; charset=utf-8',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Origin': DEV_API_CORS_ORIGIN,
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-WC-Dev-Key',
     'Access-Control-Allow-Methods': 'POST, OPTIONS'
   });
   res.end(body);
@@ -96,6 +119,45 @@ function withLock(key, fn) {
   });
   writeLocks.set(key, next);
   return next;
+}
+
+function getRateLimitConfig(route) {
+  if (!route) return null;
+  return RATE_LIMITS.find((limit) => limit.route === route) || null;
+}
+
+function checkRateLimit(ip, route) {
+  const config = getRateLimitConfig(route);
+  if (!config) return { ok: true };
+  const key = `${ip}:${route}`;
+  const now = Date.now();
+  const entry = rateBuckets.get(key);
+  if (!entry || now > entry.resetAt) {
+    rateBuckets.set(key, { count: 1, resetAt: now + config.windowMs });
+    return { ok: true, remaining: config.max - 1, resetAt: now + config.windowMs };
+  }
+  if (entry.count >= config.max) {
+    return { ok: false, remaining: 0, resetAt: entry.resetAt };
+  }
+  entry.count += 1;
+  rateBuckets.set(key, entry);
+  return { ok: true, remaining: config.max - entry.count, resetAt: entry.resetAt };
+}
+
+function logRequest(req, statusCode, durationMs) {
+  if (!DEV_API_LOG) return;
+  const method = req.method || 'UNKNOWN';
+  const route = req.url || '';
+  const remote = req.socket?.remoteAddress || 'unknown';
+  const size = getObservedSize(req);
+  console.log('[dev-api]', {
+    method,
+    route,
+    statusCode,
+    durationMs,
+    remote,
+    inputSize: size,
+  });
 }
 
 function listCurseDirectories() {
@@ -1758,6 +1820,15 @@ async function saveEntity({ type, slug, name, summary, properties, related }) {
   assertMaxLen('entity name', name || s, 140);
   assertMaxLen('entity summary', summary || '', 400);
   const file = path.join(CWD, 'content', 'entities', String(type), `${s}.json`);
+  let wasStub = false;
+  if (fs.existsSync(file)) {
+    try {
+      const existing = JSON.parse(fs.readFileSync(file, 'utf8'));
+      wasStub = isStubSummary(existing?.summary);
+    } catch {
+      wasStub = false;
+    }
+  }
   ensureDir(path.dirname(file));
   const props = properties && typeof properties === 'object' && !Array.isArray(properties) ? properties : {};
   const propsJson = JSON.stringify(props);
@@ -1771,7 +1842,132 @@ async function saveEntity({ type, slug, name, summary, properties, related }) {
     related: Array.isArray(related) ? related.map(String) : []
   };
   await fsp.writeFile(file, JSON.stringify(payload, null, 2), 'utf8');
-  return { path: `content/entities/${type}/${s}.json`, slug: s, type };
+  const isNowStub = isStubSummary(payload.summary);
+  let notified = [];
+  if (wasStub && !isNowStub) {
+    const result = await notifyEntitySubscribers({
+      type: String(type),
+      slug: s,
+      name: payload.name,
+      summary: payload.summary,
+    });
+    notified = result.notified;
+  }
+  return { path: `content/entities/${type}/${s}.json`, slug: s, type, notified };
+}
+
+function isStubSummary(value) {
+  const summary = typeof value === 'string' ? value.trim() : '';
+  return !summary || /stub/i.test(summary);
+}
+
+function getEntityStubStatus(type, slug) {
+  if (!type || !slug) return 'missing';
+  const file = path.join(CWD, 'content', 'entities', String(type), `${String(slug)}.json`);
+  if (!fs.existsSync(file)) return 'missing';
+  try {
+    const existing = JSON.parse(fs.readFileSync(file, 'utf8'));
+    return isStubSummary(existing?.summary) ? 'stub' : 'complete';
+  } catch {
+    return 'missing';
+  }
+}
+
+function readEntitySubscriptions() {
+  const data = readJSON(ENTITY_SUBSCRIPTIONS_PATH);
+  if (data && typeof data === 'object' && data.entities) return data;
+  return { entities: {}, updatedAt: null };
+}
+
+function writeEntitySubscriptions(data) {
+  ensureDir(path.dirname(ENTITY_SUBSCRIPTIONS_PATH));
+  return writeFileAtomic(ENTITY_SUBSCRIPTIONS_PATH, JSON.stringify(data, null, 2));
+}
+
+function readEntityNotifications() {
+  const data = readJSON(ENTITY_NOTIFICATIONS_PATH);
+  if (data && typeof data === 'object' && Array.isArray(data.notifications)) return data;
+  return { notifications: [] };
+}
+
+function writeEntityNotifications(data) {
+  ensureDir(path.dirname(ENTITY_NOTIFICATIONS_PATH));
+  return writeFileAtomic(ENTITY_NOTIFICATIONS_PATH, JSON.stringify(data, null, 2));
+}
+
+function normalizeEmail(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function isValidEmail(value) {
+  return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value);
+}
+
+async function subscribeToEntity({ type, slug, email, source }) {
+  if (!type || !slug) throw new Error('type and slug are required');
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) throw new Error('email is required');
+  if (!isValidEmail(normalizedEmail)) throw new Error('invalid email');
+
+  const status = getEntityStubStatus(type, slug);
+  if (status === 'complete') {
+    return { status: 'complete' };
+  }
+
+  const data = readEntitySubscriptions();
+  const key = `${type}:${slug}`;
+  const now = new Date().toISOString();
+  const entry = data.entities[key] || { type, slug, subscribers: [] };
+  const already = entry.subscribers.some((subscriber) => subscriber.email === normalizedEmail);
+  if (!already) {
+    entry.subscribers.push({
+      email: normalizedEmail,
+      createdAt: now,
+      source: String(source || 'entity-stub'),
+    });
+    data.entities[key] = entry;
+    data.updatedAt = now;
+    await writeEntitySubscriptions(data);
+  }
+
+  return { status: already ? 'existing' : 'subscribed' };
+}
+
+async function notifyEntitySubscribers({ type, slug, name, summary }) {
+  const data = readEntitySubscriptions();
+  const key = `${type}:${slug}`;
+  const entry = data.entities[key];
+  if (!entry || !Array.isArray(entry.subscribers) || entry.subscribers.length === 0) {
+    return { notified: [] };
+  }
+
+  const outbox = readEntityNotifications();
+  const now = new Date().toISOString();
+  const notified = [];
+
+  entry.subscribers.forEach((subscriber) => {
+    if (subscriber.notifiedAt) return;
+    subscriber.notifiedAt = now;
+    notified.push(subscriber.email);
+    outbox.notifications.push({
+      email: subscriber.email,
+      type,
+      slug,
+      name: String(name || slug),
+      summary: String(summary || ''),
+      sentAt: now,
+    });
+  });
+
+  if (notified.length) {
+    data.entities[key] = entry;
+    data.updatedAt = now;
+    await writeEntitySubscriptions(data);
+    await writeEntityNotifications(outbox);
+    console.log('[dev-api:notify]', { type, slug, notified });
+  }
+
+  return { notified };
 }
 
 function getObservedSize(req) {
@@ -1836,19 +2032,39 @@ async function withRequestBoundary(req, res, handler) {
   const server = http.createServer(async (req, res) => {
     await withRequestBoundary(req, res, async () => {
       parsedUrl = null;
+    const startTime = Date.now();
+    res.on('finish', () => {
+      logRequest(req, res.statusCode, Date.now() - startTime);
+    });
+
     const remote = req.socket?.remoteAddress || '';
+    const route = req.url || '';
+    const isPublicEndpoint = PUBLIC_ENDPOINTS.has(route);
     const loopback = remote === '127.0.0.1' || remote === '::1' || remote.startsWith('::ffff:127.');
-    if (!loopback && !DEV_API_TOKEN) {
-      return send(res, 403, { ok: false, error: 'Forbidden (dev API is loopback-only without DEV_API_TOKEN)' });
-    }
-    if (DEV_API_TOKEN) {
-      const token = req.headers['x-wc-dev-key'] || req.headers['authorization'];
-      const tokenValue = Array.isArray(token) ? token[0] : (token || '').replace(/^Bearer\s+/i, '');
-      if (tokenValue !== DEV_API_TOKEN) {
-        return send(res, 401, { ok: false, error: 'Unauthorized' });
+
+    if (!isPublicEndpoint) {
+      if (!loopback && !DEV_API_TOKEN) {
+        return send(res, 403, { ok: false, error: 'Forbidden (dev API is loopback-only without DEV_API_TOKEN)' });
+      }
+      if (DEV_API_TOKEN) {
+        const token = req.headers['x-wc-dev-key'] || req.headers['authorization'];
+        const tokenValue = Array.isArray(token) ? token[0] : (token || '').replace(/^Bearer\\s+/i, '');
+        if (tokenValue !== DEV_API_TOKEN) {
+          return send(res, 401, { ok: false, error: 'Unauthorized' });
+        }
       }
     }
+
     if (req.method === 'OPTIONS') return send(res, 204, { ok: true });
+
+    const rateResult = checkRateLimit(remote || 'unknown', route);
+    if (!rateResult.ok) {
+      return send(res, 429, {
+        ok: false,
+        error: 'Rate limit exceeded',
+        resetAt: new Date(rateResult.resetAt).toISOString(),
+      });
+    }
 
     if (req.method === 'POST' && req.url === '/ping') {
       return send(res, 200, { ok: true, got: null });
@@ -2585,6 +2801,16 @@ async function withRequestBoundary(req, res, handler) {
         return send(res, 200, { ok: true, total: stubs.length, stubs });
       } catch (e) {
         return send(res, 500, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/entities/subscribe') {
+      try {
+        const body = await parseBody(req);
+        const result = await subscribeToEntity(body || {});
+        return send(res, 200, { ok: true, ...result });
+      } catch (e) {
+        return send(res, 400, { ok: false, error: e.message || String(e) });
       }
     }
 

@@ -222,6 +222,12 @@ textarea {
   color: var(--admin-text-body, #111827) !important;
   background-color: var(--admin-surface-base, #ffffff) !important;
   border-color: var(--admin-border-subtle, #d1d5db) !important;
+  border-radius: var(--wc-radius-md, 0.75rem);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--admin-surface-base, #ffffff) 92%, #f7f2ec 8%) 0%,
+    color-mix(in srgb, var(--admin-surface-base, #ffffff) 84%, #f2e8dd 16%) 100%
+  );
 }
 
 /* Select Dropdown Styling */
@@ -278,7 +284,7 @@ textarea:focus {
 
 button {
   color: var(--admin-text-strong, #111827) !important;
-  border-radius: 0.75rem;
+  border-radius: var(--wc-radius-md, 0.75rem);
   padding: 0.45rem 0.85rem;
   font-weight: 600;
 }
@@ -297,7 +303,11 @@ a:focus-visible {
 
 /* Primary/Secondary Buttons */
 .admin-btn-primary {
-  background: color-mix(in srgb, var(--text-accent, #7c3aed) 92%, transparent 8%) !important;
+  background: linear-gradient(
+    140deg,
+    color-mix(in srgb, var(--text-accent, #7c3aed) 90%, white 10%) 0%,
+    color-mix(in srgb, var(--text-accent, #7c3aed) 78%, white 22%) 100%
+  ) !important;
   color: hsl(var(--text-heading, var(--text-strong, 0 0% 100% / 1))) !important;
   border: 1px solid color-mix(in srgb, var(--text-accent, #7c3aed) 45%, transparent 55%) !important;
   box-shadow: var(--glass-shadow-soft, 0 10px 25px -18px rgba(15, 23, 42, 0.35)) !important;
@@ -305,12 +315,20 @@ a:focus-visible {
 
 .admin-btn-primary:hover,
 .admin-btn-primary:focus-visible {
-  background: color-mix(in srgb, var(--text-accent, #7c3aed) 86%, hsl(var(--text-strong, 0 0% 100% / 1)) 14%) !important;
+  background: linear-gradient(
+    140deg,
+    color-mix(in srgb, var(--text-accent, #7c3aed) 86%, white 14%) 0%,
+    color-mix(in srgb, var(--text-accent, #7c3aed) 72%, white 28%) 100%
+  ) !important;
   border-color: color-mix(in srgb, var(--text-accent, #7c3aed) 60%, transparent 40%) !important;
 }
 
 .admin-btn-secondary {
-  background: color-mix(in srgb, var(--admin-surface-base, var(--surface-base, #ffffff)) 92%, transparent 8%) !important;
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--admin-surface-base, var(--surface-base, #ffffff)) 94%, #f7f2ec 6%) 0%,
+    color-mix(in srgb, var(--admin-surface-base, var(--surface-base, #ffffff)) 88%, #f0e7da 12%) 100%
+  ) !important;
   color: var(--admin-text-body, var(--text-body, #1f2937)) !important;
   border: 1px solid color-mix(in srgb, var(--admin-border-subtle, var(--border-subtle, #d1d5db)) 85%, transparent 15%) !important;
   box-shadow: var(--glass-shadow-soft, 0 8px 20px -16px rgba(15, 23, 42, 0.25)) !important;
@@ -332,7 +350,7 @@ a:focus-visible {
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
   font-weight: 600;
-  border-radius: 0.375rem;
+  border-radius: var(--wc-radius-sm, 0.75rem);
 }
 
 .admin-badge--success {
@@ -389,7 +407,7 @@ a:focus-visible {
 
 .admin-status {
   padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
+  border-radius: var(--wc-radius-sm, 0.75rem);
   font-size: 0.875rem;
   border: 1px solid;
 }
@@ -410,6 +428,14 @@ a:focus-visible {
   background-color: color-mix(in srgb, var(--warning, #f59e0b) 12%, white 88%);
   border-color: color-mix(in srgb, var(--warning, #f59e0b) 42%, transparent 58%);
   color: color-mix(in srgb, var(--warning, #92400e) 90%, black 10%);
+}
+
+/* ---------------------------------------------------------------------------
+   Cozy Admin Overrides
+   --------------------------------------------------------------------------- */
+
+.theme-swatch {
+  border-radius: var(--wc-radius-sm, 0.75rem) !important;
 }
 
 .admin-status--info {

@@ -15,7 +15,6 @@ const themeAccent = activeMidnight?.accent || activeDawn?.accent || propAccent |
 const accent = themeAccent;
 
 // Get thematic fonts and colors
-const defaultAccent = '#B04F5C'; // Cranberry Red
 const defaultText = '#2C3E50'; // Dark Charcoal
 const defaultMuted = '#6A807E'; // Muted Green-Gray
 const defaultPlainSurface = '#F5F8F7'; // Pale Icy Blue/White
@@ -35,9 +34,22 @@ const currentShadowSoft = activeMidnight?.shadowSoft || activeDawn?.shadowSoft |
 
 const currentText = activeMidnight?.textBody || activeDawn?.textBody || defaultText;
 const currentTextMuted = activeMidnight?.textMuted || activeDawn?.textMuted || defaultMuted;
+
+const rootStyle = {
+  '--accent': accent,
+  '--text': currentText,
+  '--muted': currentTextMuted,
+  '--surface-plain': currentSurfacePlain,
+  '--surface-card': currentSurfaceCard,
+  '--surface-elevated': currentSurfaceElevated,
+  '--border-subtle': currentBorderSubtle,
+  '--shadow-soft': currentShadowSoft,
+  '--font-heading': `"${currentFontHeading}", serif`,
+  '--font-body': `"${currentFontBody}", serif`,
+};
 ---
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style={rootStyle}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -51,17 +63,7 @@ const currentTextMuted = activeMidnight?.textMuted || activeDawn?.textMuted || d
 
       :root {
         color-scheme: light;
-        font-family: "${currentFontHeading}", serif;
-        --accent: ${accent};
-        --text: ${currentText};
-        --muted: ${currentTextMuted};
-        --surface-plain: ${currentSurfacePlain};
-        --surface-card: ${currentSurfaceCard};
-        --surface-elevated: ${currentSurfaceElevated};
-        --border-subtle: ${currentBorderSubtle};
-        --shadow-soft: ${currentShadowSoft};
-        --font-heading: "${currentFontHeading}", serif;
-        --font-body: "${currentFontBody}", serif;
+        font-family: var(--font-heading);
       }
 
       * {

@@ -15,6 +15,7 @@ const keyOk = ADMIN_KEY && url.searchParams.get('key') === ADMIN_KEY;
 const canUse = isDev || !!keyOk;
 
 const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || '';
 ---
 <Base
   title="WitchClick — Editorial Calendar"
@@ -31,7 +32,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
     <div class="space-y-6">
       <AdminNav currentPath="/admin/calendar" />
 
-      <div class="mx-auto max-w-6xl space-y-6" data-calendar-admin data-dev-api={DEV_API}>
+      <div class="mx-auto max-w-6xl space-y-6" data-calendar-admin data-dev-api={DEV_API} data-dev-key={DEV_KEY}>
       <header>
         <h1 class="text-2xl font-semibold text-primary">Editorial Calendar</h1>
         <p class="mt-2 text-sm text-body-muted">
@@ -70,7 +71,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           <button type="button" id="validateBtn" class="admin-btn-secondary px-5 py-2.5 text-sm font-medium">
             Validate seasons
           </button>
-          <p class="ml-auto text-sm" data-status></p>
+          <p class="ml-auto text-sm" data-status role="status" aria-live="polite" aria-atomic="true"></p>
         </div>
       </section>
       </div>
@@ -88,6 +89,12 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         const root = document.querySelector('[data-calendar-admin]');
         if (!root) return;
         const devApi = root.getAttribute('data-dev-api');
+        const devKey = root.getAttribute('data-dev-key');
+        function apiFetch(path, options = {}) {
+          const headers = { ...(options.headers || {}) };
+          if (devKey) headers['X-WC-Dev-Key'] = devKey;
+          return fetch(devApi + path, { ...options, headers });
+        }
         const seasonsListEl = root.querySelector('[data-season-list]');
         const addSeasonBtn = root.querySelector('#addSeasonBtn');
         const updatedAtEl = root.querySelector('[data-updated-at]');
@@ -394,7 +401,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         async function loadData() {
           try {
             setStatus('Loading…');
-            const res = await fetch(devApi + '/calendar/get', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+            const res = await apiFetch('/calendar/get', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
             const json = await res.json();
             if (!json?.ok) throw new Error(json?.error || 'Failed to load');
             const data = json.data || {};
@@ -417,7 +424,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             setStatus('Saving…');
             const sanitized = sanitizeSeasons();
             const data = { seasons: sanitized };
-            const res = await fetch(devApi + '/calendar/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            const res = await apiFetch('/calendar/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
             const json = await res.json();
             if (!json?.ok) throw new Error(json?.error || 'Failed to save');
             seasons = sanitized.map((season) => normalizeSeason(season));

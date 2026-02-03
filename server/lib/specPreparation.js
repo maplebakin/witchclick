@@ -473,16 +473,6 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
   const combinedWarnings = dedupe([...normalizationWarningsList, ...enforcement.warnings, ...structure.warnings]);
 
   const baseSlug = slugify(spec.slug || spec.title);
-  const existingPath = postsDirectories
-    .map((dir) => path.join(dir, `${baseSlug}.md`))
-    .find((candidate) => fs.existsSync(candidate));
-  if (existingPath) {
-    const error = new Error(`Slug "${baseSlug}" already exists at ${existingPath}. Refusing to overwrite. Provide a new slug.`);
-    error.errors = ['Slug already exists'];
-    error.normalizations = normalizationReport;
-    throw error;
-  }
-
   const slugHistory = readSlugHistory(cwd);
   if (slugHistory.includes(baseSlug)) {
     normalizationReport.push(`slug-reuse:${baseSlug}`);

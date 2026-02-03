@@ -1731,44 +1731,6 @@ export class ThemeEditor {
   }
 
   /**
-   * Update variables for the current scope
-   */
-  private updateScopeVariables(variables: ThemeVariables): void {
-    if (!this.state.currentPreset) return;
-
-    const preset = this.state.currentPreset;
-    const scope = this.state.editingScope;
-
-    if (scope === 'global') {
-      // Update global variables
-      preset.variables = { ...preset.variables, ...variables };
-    } else {
-      // Update or create scope override
-      if (!preset.overrides) {
-        preset.overrides = [];
-      }
-
-      const existingIndex = preset.overrides.findIndex((o) => o.scope === scope);
-
-      if (existingIndex >= 0 && preset.overrides[existingIndex]) {
-        // Update existing override
-        preset.overrides[existingIndex].variables = {
-          ...preset.overrides[existingIndex].variables,
-          ...variables,
-        };
-      } else {
-        // Create new override
-        preset.overrides.push({
-          scope,
-          variables,
-        });
-      }
-    }
-
-    this.pushState({ ...this.state, currentPreset: preset });
-  }
-
-  /**
    * Get the current preset's global variables merged with defaults for the active mode.
    */
   private getBaseVariables(): ThemeVariables {

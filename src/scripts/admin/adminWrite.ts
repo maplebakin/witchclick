@@ -3,6 +3,14 @@ import { analyzeSlug } from '../../../shared/slugify.js';
 function initWriteAdmin() {
   const root = document.querySelector('[data-dev-api]');
   const DEV_API = root?.getAttribute('data-dev-api') || 'http://localhost:8787';
+  const DEV_KEY = root?.getAttribute('data-dev-key') || '';
+  const baseHeaders: Record<string, string> = DEV_KEY ? { 'X-WC-Dev-Key': DEV_KEY } : {};
+  const jsonHeaders = { 'Content-Type': 'application/json', ...baseHeaders };
+
+  function apiFetch(path: string, options: RequestInit = {}) {
+    const headers = { ...baseHeaders, ...(options.headers || {}) };
+    return fetch(`${DEV_API}${path}`, { ...options, headers });
+  }
   const $ = <T extends HTMLElement = HTMLElement>(id: string) =>
     document.getElementById(id) as T | null;
 
@@ -138,9 +146,9 @@ function initWriteAdmin() {
       const checks = await Promise.all(
         entities.map(async (entity) => {
           try {
-            const res = await fetch(`${DEV_API}/entities/get`, {
+            const res = await apiFetch('/entities/get', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: jsonHeaders,
               body: JSON.stringify({ type: entity.type, slug: entity.slug }),
             });
             const data = await res.json();
@@ -388,9 +396,9 @@ function initWriteAdmin() {
       markdown: ($<HTMLTextAreaElement>('markdown')?.value ?? ''),
     };
 
-    const res = await fetch(`${DEV_API}/posts/save`, {
+    const res = await apiFetch('/posts/save', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: jsonHeaders,
       body: JSON.stringify(payload),
     });
     const data = await res.json();
@@ -419,7 +427,7 @@ function initWriteAdmin() {
       const data = await savePost();
       const summary = summarizeEntities(data.entities);
       setStatus('Saved. Publishing...', true, data.warnings);
-      const res = await fetch(`${DEV_API}/bundle`, { method: 'POST' });
+      const res = await apiFetch('/bundle', { method: 'POST' });
       const bundle = await res.json();
       if (!bundle.ok) {
         const errors = Array.isArray(bundle.steps)

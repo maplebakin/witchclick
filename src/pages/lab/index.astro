@@ -239,7 +239,7 @@ function toLabel(value: string): string {
     <header class="space-y-2 text-center">
       <h2 class="font-serif text-3xl">Printables & Planner Exports</h2>
       <p class="mx-auto max-w-2xl text-base opacity-80">
-        Download ready-to-print planners or open them in your browser, then export to PDF. Leave your email if you want updates when new printables land—skipping is perfectly fine.
+        Download ready-to-print planners or open them in your browser, then export to PDF. Share what you want next and leave your email if you would like updates when new printables land.
       </p>
     </header>
 
@@ -250,6 +250,15 @@ function toLabel(value: string): string {
       data-netlify="true"
     >
       <input type="hidden" name="form-name" value="ritual-lab-downloads" />
+      <label class="block text-sm font-medium text-primary dark:text-accent-ghost">
+        What printable would help right now? (optional)
+        <textarea
+          name="request"
+          rows="3"
+          placeholder="Example: A ritual check-in page or a gentle habit tracker for low-spoons mornings."
+          class="mt-2 w-full rounded-2xl border border-line-muted bg-surface-base px-4 py-3 text-sm shadow-sm focus:border-line-bold focus:outline-none focus:ring-2 focus:ring-focus/60 dark:border-line-accent dark:bg-surface-backdrop dark:text-accent-ghost"
+        ></textarea>
+      </label>
       <label class="block text-sm font-medium text-primary dark:text-accent-ghost">
         Email (optional)
         <input

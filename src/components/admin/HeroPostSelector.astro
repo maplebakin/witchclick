@@ -87,6 +87,20 @@ import Button from "@/components/ui/Button.astro";
     if (!heroUploaderRoot) return;
     
     const DEV_API = heroUploaderRoot.getAttribute('data-dev-api') || 'http://localhost:8787';
+    const DEV_KEY = heroUploaderRoot.getAttribute('data-dev-key') || '';
+    const baseHeaders: Record<string, string> = DEV_KEY ? { 'X-WC-Dev-Key': DEV_KEY } : {};
+
+    function apiFetch(path: string, options: RequestInit = {}) {
+      const headerOverrides = options.headers
+        ? options.headers instanceof Headers
+          ? Object.fromEntries(options.headers.entries())
+          : Array.isArray(options.headers)
+            ? Object.fromEntries(options.headers)
+            : options.headers
+        : {};
+      const headers = { ...baseHeaders, ...headerOverrides };
+      return fetch(`${DEV_API}${path}`, { ...options, headers });
+    }
 
     const select = root.querySelector('[data-post-select]') as HTMLSelectElement;
     const recentPostsList = root.querySelector('[data-recent-posts]');
@@ -216,16 +230,14 @@ import Button from "@/components/ui/Button.astro";
       select.dispatchEvent(changeEvent);
     }
     
-    function renderOptions() {
-      if (!select || !recentPostsList || !missingHeroPostsList) return;
-      // ... (rest of the renderOptions logic)
-    }
-
     async function loadPosts() {
       try {
-        const response = await fetch(`${DEV_API}/posts/list`, { method: 'POST' });
+        const response = await apiFetch('/posts/list', { method: 'POST' });
         const data = await response.json();
         posts = Array.isArray(data.items) ? data.items : [];
+        const win = window as typeof window & { heroUploaderPosts?: any[] };
+        win.heroUploaderPosts = posts;
+        document.dispatchEvent(new CustomEvent('hero-posts-loaded', { detail: { posts } }));
         
         const alphabeticalSort = (a: any, b: any) => (a.title || a.slug).localeCompare(b.title || b.slug, undefined, { sensitivity: 'base' });
 

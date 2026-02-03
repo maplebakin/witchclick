@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 
-const devApiHost = (process.env.DEV_API_HOST ?? "localhost").trim() || "localhost";
+const devApiHost = (process.env.DEV_API_HOST ?? "127.0.0.1").trim() || "127.0.0.1";
 const devApiPortRaw = (process.env.DEV_API_PORT ?? "8787").trim();
 const devApiPortNumber = Number.parseInt(devApiPortRaw, 10);
 

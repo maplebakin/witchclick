@@ -87,6 +87,13 @@ const themeVarString = toCssVariables({
 const summaryText = typeof ent.summary === "string" ? ent.summary.trim() : "";
 const isStub = summaryText ? /stub/i.test(summaryText) : false;
 
+const DEV_API = import.meta.env.PUBLIC_DEV_API || "";
+const isDev = import.meta.env.DEV;
+const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
+const requestKey = Astro.url?.searchParams?.get("key") || "";
+const canEditStub = isDev || (!!ADMIN_KEY && requestKey === ADMIN_KEY);
+const stubAdminHref = requestKey ? `/admin/stubs?key=${encodeURIComponent(requestKey)}` : "/admin/stubs";
+
 const typeLabel = ent.type
   .split(/[-_\s]+/)
   .map((part) => (part ? part.charAt(0).toUpperCase() + part.slice(1) : ""))
@@ -200,7 +207,44 @@ function pretty(v: unknown) {
       <section class="card-panel card-tier-2 card-panel-soft entity-stub-card" aria-live="polite">
         <h2 class="entity-stub-heading">Lore in Progress</h2>
         <p class="entity-stub-copy">{metadata.stubLine}</p>
-        {/* Future: add subscription/notification CTA when lore completes. */}
+        <div
+          class="entity-stub-subscribe"
+          data-entity-subscribe
+          data-dev-api={DEV_API}
+          data-entity-type={ent.type}
+          data-entity-slug={ent.slug}
+          data-entity-name={entityDisplayName}
+        >
+          <p class="entity-stub-subscribe-title">Want a gentle heads-up when this lore is ready?</p>
+          <form class="entity-stub-subscribe-form">
+            <label class="entity-stub-subscribe-label">
+              Email address
+              <input
+                type="email"
+                name="email"
+                required
+                autocomplete="email"
+                placeholder="you@example.com"
+                class="entity-stub-subscribe-input"
+              />
+            </label>
+            <button type="submit" class="wc-button wc-button--sm entity-stub-subscribe-button">
+              Notify me
+            </button>
+          </form>
+          <p class="entity-stub-subscribe-help">We’ll only email when this entry is completed. No spam, no fluff.</p>
+          <p class="entity-stub-subscribe-status" data-subscribe-status aria-live="polite"></p>
+        </div>
+        {canEditStub && (
+          <div class="entity-stub-actions">
+            <p class="entity-stub-note">
+              Content keepers: open the stub dashboard to finish this entry.
+            </p>
+            <a class="wc-button wc-button--sm" href={stubAdminHref}>
+              Open Stub Dashboard
+            </a>
+          </div>
+        )}
       </section>
     ) : (
       <section class="entity-detail">
@@ -545,6 +589,83 @@ function pretty(v: unknown) {
     color: var(--ink-body, #111827);
   }
 
+  .entity-stub-subscribe {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: var(--wc-radius-lg, 1.25rem);
+    border: 1px solid color-mix(in srgb, var(--entity-accent-border, rgba(76, 29, 149, 0.2)) 65%, transparent 35%);
+    background: color-mix(in srgb, var(--card-panel-surface, #fffaf4) 82%, var(--entity-accent-surface, rgba(76, 29, 149, 0.08)) 18%);
+  }
+
+  .entity-stub-subscribe-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink-strong, #1f2937);
+  }
+
+  .entity-stub-subscribe-form {
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .entity-stub-subscribe-label {
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted, #6b7280);
+  }
+
+  .entity-stub-subscribe-input {
+    width: 100%;
+    border-radius: var(--wc-radius-md, 0.9rem);
+    border: 1px solid color-mix(in srgb, var(--entity-accent-border, rgba(76, 29, 149, 0.25)) 70%, transparent 30%);
+    background: var(--cozy-input-bg, #fffaf5);
+    padding: 0.65rem 0.85rem;
+    font-size: 0.95rem;
+    color: var(--ink-strong, #1f2937);
+  }
+
+  .entity-stub-subscribe-input:focus-visible {
+    outline: var(--focus-ring-width, 3px) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset, 3px);
+    box-shadow: var(--focus-ring-shadow);
+  }
+
+  .entity-stub-subscribe-button {
+    width: 100%;
+  }
+
+  .entity-stub-subscribe-help {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--ink-muted, #6b7280);
+  }
+
+  .entity-stub-subscribe-status {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--ink-muted, #6b7280);
+  }
+
+  .entity-stub-actions {
+    display: grid;
+    gap: 0.75rem;
+    align-items: center;
+    justify-items: center;
+    margin-top: 0.5rem;
+  }
+
+  .entity-stub-note {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--ink-muted, #4b5563);
+  }
+
   .entity-related {
     --card-hover-translate: 0;
     --card-elevation-base: var(--elevation-tier-1);
@@ -783,10 +904,95 @@ function pretty(v: unknown) {
     });
   }
 
+  function initEntitySubscribe() {
+    const root = document.querySelector('[data-entity-subscribe]');
+    if (!(root instanceof HTMLElement)) return;
+
+    const form = root.querySelector('form');
+    const input = root.querySelector('input[type="email"]');
+    const status = root.querySelector('[data-subscribe-status]');
+    const submit = root.querySelector('button[type="submit"]');
+
+    if (!(form instanceof HTMLFormElement) || !(input instanceof HTMLInputElement)) return;
+
+    const devApi = root.getAttribute('data-dev-api') || '';
+    const type = root.getAttribute('data-entity-type') || '';
+    const slug = root.getAttribute('data-entity-slug') || '';
+    const name = root.getAttribute('data-entity-name') || 'This entry';
+
+    const setStatus = (message: string, variant: 'success' | 'error' | 'warning' | '' = '') => {
+      if (!(status instanceof HTMLElement)) return;
+      status.textContent = message;
+      status.classList.remove('text-success', 'text-danger', 'text-warning');
+      if (variant === 'success') status.classList.add('text-success');
+      if (variant === 'error') status.classList.add('text-danger');
+      if (variant === 'warning') status.classList.add('text-warning');
+    };
+
+    if (!devApi || !type || !slug) {
+      if (submit instanceof HTMLButtonElement) submit.disabled = true;
+      setStatus('Notifications open soon. Check back when the cozy mail room is ready.', 'warning');
+      return;
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const email = input.value.trim();
+      if (!email) {
+        setStatus('Please enter an email address to continue.', 'error');
+        return;
+      }
+
+      if (submit instanceof HTMLButtonElement) submit.disabled = true;
+      setStatus('Saving your spot...', '');
+
+      try {
+        const response = await fetch(`${devApi}/entities/subscribe`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type, slug, email, name, source: 'entity-stub' }),
+        });
+        const data = await response.json();
+        if (!response.ok || data?.ok === false) {
+          throw new Error(data?.error || 'Unable to save subscription');
+        }
+
+        if (data.status === 'complete') {
+          setStatus('This lore is already complete. Refresh to see the latest.', 'warning');
+        } else if (data.status === 'existing') {
+          setStatus(`You are already on the list for ${name}.`, 'success');
+        } else {
+          setStatus(`You are all set. We will email when ${name} is complete.`, 'success');
+        }
+
+        const callback = (window as Window & {
+          wcEntitySubscribeCallback?: (payload: { type: string; slug: string; email: string; status: string }) => void;
+        }).wcEntitySubscribeCallback;
+        if (typeof callback === 'function') {
+          callback({ type, slug, email, status: data.status || 'subscribed' });
+        }
+        document.dispatchEvent(
+          new CustomEvent('entity:subscribe', {
+            detail: { type, slug, email, status: data.status || 'subscribed' },
+          }),
+        );
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unable to save subscription';
+        setStatus(message, 'error');
+      } finally {
+        if (submit instanceof HTMLButtonElement) submit.disabled = false;
+      }
+    });
+  }
+
   // Init on page load
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initGraphHelp);
+    document.addEventListener('DOMContentLoaded', () => {
+      initGraphHelp();
+      initEntitySubscribe();
+    });
   } else {
     initGraphHelp();
+    initEntitySubscribe();
   }
 </script>

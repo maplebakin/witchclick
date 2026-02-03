@@ -17,6 +17,7 @@ const canUse = isDev || !!keyOk;
 
 // Dev API base (falls back to localhost if not set)
 const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
+const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || "";
 ---
 <Base
   title="WitchClick — Downloads Admin"
@@ -32,7 +33,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
     <div class="space-y-6">
       <AdminNav currentPath="/admin/downloads" />
 
-      <div class="grid grid-cols-1 gap-6 lg:grid-cols-12" data-dev-api={DEV_API}>
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-12" data-dev-api={DEV_API} data-dev-key={DEV_KEY}>
       <section class="lg:col-span-4 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
         <div class="mb-3 flex items-center justify-between gap-2">
           <h1 class="text-xl font-semibold">Downloads</h1>
@@ -96,6 +97,15 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
       (function(){
         var root = document.querySelector('[data-dev-api]');
         var API = root?.getAttribute('data-dev-api') || 'http://localhost:8787';
+        var DEV_KEY = root?.getAttribute('data-dev-key') || '';
+        function withDevKey(options){
+          var headers = options && options.headers ? Object.assign({}, options.headers) : {};
+          if (DEV_KEY) headers['X-WC-Dev-Key'] = DEV_KEY;
+          return Object.assign({}, options || {}, { headers: headers });
+        }
+        function apiFetch(path, options){
+          return fetch(API + path, withDevKey(options));
+        }
         var $ = function(id){ return document.getElementById(id); };
 
         var currentSlug = null;
@@ -148,7 +158,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
         function fromCSV(txt){ return String(txt||'').split(',').map(function(s){return s.trim();}).filter(Boolean); }
 
         async function refresh(){
-          var res = await fetch(API+'/downloads/list',{method:'POST'});
+          var res = await apiFetch('/downloads/list',{method:'POST'});
           var data = await res.json();
           var q = ($('search').value||'').toLowerCase().trim();
           var list = $('list'); list.innerHTML='';
@@ -168,7 +178,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
         }
 
         async function load(slug){
-          var res = await fetch(API+'/downloads/get',{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({slug})});
+          var res = await apiFetch('/downloads/get',{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({slug})});
           var data = await res.json();
           if (!data.ok) return setStatus('Load error: '+(data.error||'unknown'), false);
           var d = data.data;
@@ -207,7 +217,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
               features: fromLines($('features').value),
               tags: fromCSV($('tags').value)
             };
-            var res = await fetch(API+'/downloads/save',{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+            var res = await apiFetch('/downloads/save',{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
             var data = await res.json();
             if (!data.ok) throw new Error(data.error||'save failed');
             setStatus('Saved → '+data.path);
@@ -225,7 +235,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           var promptMsg = archive ? ('Archive '+slug+'? The file will move to content/downloads/_archive.') : ('Delete '+slug+'? This removes the JSON file.');
           if (!confirm(promptMsg)) return setStatus('Deletion cancelled');
           try {
-            var res = await fetch(API+'/downloads/delete',{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({slug, archive})});
+            var res = await apiFetch('/downloads/delete',{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({slug, archive})});
             var data = await res.json();
             if (!data.ok) throw new Error(data.error||'delete failed');
             var msg = archive && data.archivePath ? ('Archived '+slug+' → '+data.archivePath) : ('Deleted '+slug+'. Restore from version control if needed.');

@@ -87,6 +87,34 @@ const recentPosts = cardPosts.slice(1);
     </section>
   )}
 
+  <section class="meanderings-signup" aria-labelledby="meanderings-signup-heading">
+    <div class="meanderings-signup__content">
+      <h3 id="meanderings-signup-heading" class="meanderings-signup__title">Get the next meandering</h3>
+      <p class="meanderings-signup__text">
+        If you want a gentle ping when a new non-magickal post goes live, leave your email below.
+        You can also subscribe by RSS.
+      </p>
+      <form class="meanderings-signup__form" name="meanderings-updates" method="POST" data-netlify="true">
+        <input type="hidden" name="form-name" value="meanderings-updates" />
+        <div class="meanderings-signup__fields">
+          <input
+            type="email"
+            name="email"
+            inputmode="email"
+            autocomplete="email"
+            placeholder="you@example.com"
+            class="meanderings-signup__input"
+          />
+          <button type="submit" class="meanderings-signup__button">Notify me</button>
+        </div>
+      </form>
+      <div class="meanderings-signup__links">
+        <a href="/rss.xml">RSS feed</a>
+        <a href="/feed.json">JSON feed</a>
+      </div>
+    </div>
+  </section>
+
   <aside class="sidebar-cta">
     <div class="sidebar-cta__content">
       <h3 class="sidebar-cta__title">Looking for rituals?</h3>
@@ -256,6 +284,94 @@ color: var(--theme-text-strong);
     display: grid;
     gap: clamp(1.5rem, 3vw, 2.25rem);
     grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  }
+
+  /* Meanderings Signup */
+  .meanderings-signup {
+    margin: clamp(2.5rem, 5vw, 4rem) 0;
+  }
+
+  .meanderings-signup__content {
+    border-radius: clamp(1.2rem, 3vw, 2rem);
+    border: 1px solid color-mix(in srgb, var(--theme-color-gold, #d4af37) 25%, transparent 75%);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--theme-surface-panel-primary) 90%, transparent 10%) 0%, var(--surface-panel-primary) 100%);
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    display: grid;
+    gap: 1rem;
+  }
+
+  .meanderings-signup__title {
+    margin: 0;
+    font-size: clamp(1.4rem, 3vw, 1.8rem);
+    color: var(--theme-text-strong);
+  }
+
+  .meanderings-signup__text {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--theme-text-body);
+    opacity: 0.9;
+  }
+
+  .meanderings-signup__form {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .meanderings-signup__fields {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .meanderings-signup__input {
+    width: 100%;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--theme-color-gold, #d4af37) 35%, transparent 65%);
+    background: var(--cozy-input-bg, rgba(255, 250, 245, 0.85));
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    color: var(--theme-text-strong);
+  }
+
+  .meanderings-signup__button {
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--theme-color-gold, #d4af37) 45%, transparent 55%);
+    background: var(--cozy-button-bg, color-mix(in srgb, var(--theme-color-gold, #d4af37) 75%, transparent 25%));
+    color: var(--theme-text-strong);
+    font-weight: 600;
+    padding: 0.7rem 1.1rem;
+    cursor: pointer;
+    transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  }
+
+  .meanderings-signup__button:hover,
+  .meanderings-signup__button:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: var(--elevation-tier-1);
+  }
+
+  .meanderings-signup__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .meanderings-signup__links a {
+    color: var(--theme-text-accent);
+    text-decoration: none;
+  }
+
+  .meanderings-signup__links a:hover,
+  .meanderings-signup__links a:focus-visible {
+    color: var(--theme-text-strong);
+  }
+
+  @media (min-width: 640px) {
+    .meanderings-signup__fields {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+    }
   }
 
   /* Responsive adjustments */

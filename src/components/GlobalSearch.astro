@@ -21,12 +21,14 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         placeholder="Search posts, entities, authors..."
         autocomplete="off"
         spellcheck="false"
+        aria-controls="global-search-results"
+        aria-expanded="false"
       />
       <kbd class="global-search-kbd">ESC</kbd>
     </div>
 
-    <div class="global-search-body" data-global-search-body>
-      <div class="global-search-empty" data-global-search-empty>
+    <div class="global-search-body" data-global-search-body aria-live="polite" aria-atomic="true" aria-busy="false">
+      <div class="global-search-empty" data-global-search-empty role="status" aria-live="polite">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"></circle>
           <path d="m21 21-4.35-4.35"></path>
@@ -34,9 +36,9 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         <p>Type to search across all content</p>
       </div>
 
-      <div class="global-search-results" data-global-search-results></div>
+      <div class="global-search-results" data-global-search-results id="global-search-results" role="listbox" aria-label="Search results"></div>
 
-      <div class="global-search-loading" data-global-search-loading>
+      <div class="global-search-loading" data-global-search-loading role="status" aria-live="polite">
         <div class="global-search-spinner"></div>
         <p>Searching...</p>
       </div>
@@ -89,6 +91,9 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         overlay.classList.add('is-visible');
         setTimeout(() => input.focus(), 100);
       });
+      if (input instanceof HTMLElement) {
+        input.setAttribute('aria-expanded', 'true');
+      }
       if (body instanceof HTMLElement) {
         body.scrollTop = 0;
       }
@@ -105,6 +110,9 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         results = [];
         selectedIndex = -1;
         showEmpty();
+        if (input instanceof HTMLElement) {
+          input.setAttribute('aria-expanded', 'false');
+        }
         if (body instanceof HTMLElement) {
           body.scrollTop = 0;
         }
@@ -112,18 +120,27 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
     }
 
     function showEmpty() {
+      if (body instanceof HTMLElement) {
+        body.setAttribute('aria-busy', 'false');
+      }
       if (emptyState) emptyState.style.display = 'flex';
       if (loadingState) loadingState.style.display = 'none';
       resultsContainer.style.display = 'none';
     }
 
     function showLoading() {
+      if (body instanceof HTMLElement) {
+        body.setAttribute('aria-busy', 'true');
+      }
       if (emptyState) emptyState.style.display = 'none';
       if (loadingState) loadingState.style.display = 'flex';
       resultsContainer.style.display = 'none';
     }
 
     function showResults() {
+      if (body instanceof HTMLElement) {
+        body.setAttribute('aria-busy', 'false');
+      }
       if (emptyState) emptyState.style.display = 'none';
       if (loadingState) loadingState.style.display = 'none';
       resultsContainer.style.display = 'block';
@@ -407,7 +424,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
     padding: 0.25rem 0.5rem;
     background: var(--theme-surface-soft);
     border: 1px solid #d1d5db;
-    border-radius: 0.25rem;
+    border-radius: var(--wc-radius-sm, 0.75rem);
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--theme-text-muted);
@@ -480,7 +497,7 @@ color: var(--theme-text-primary);
     width: 2rem;
     height: 2rem;
     background: var(--theme-surface-soft);
-    border-radius: 0.5rem;
+    border-radius: var(--wc-radius-sm, 0.75rem);
     color: var(--theme-text-muted);
   }
 
@@ -516,7 +533,7 @@ color: var(--theme-text-primary);
     flex-shrink: 0;
     padding: 0.125rem 0.5rem;
     background: var(--theme-surface-soft);
-    border-radius: 0.25rem;
+    border-radius: var(--wc-radius-sm, 0.75rem);
     font-size: 0.6875rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -556,7 +573,7 @@ color: var(--theme-text-primary);
     padding: 0.125rem 0.375rem;
     background: var(--theme-surface-base);
     border: 1px solid #d1d5db;
-    border-radius: 0.25rem;
+    border-radius: var(--wc-radius-sm, 0.75rem);
     font-size: 0.6875rem;
     font-weight: 600;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);

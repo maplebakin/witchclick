@@ -9,13 +9,6 @@ import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
 import PromptBuilder from "@/components/admin/PromptBuilder.astro";
 
-import {
-  CURSE_TARGETS,
-  CURSE_TONES,
-  CURSE_TYPES,
-  CURSE_TAGS,
-} from "../../../server/lib/curseSpecSchema.js";
-
 
 const settings = readSettings();
 const canonical = buildCanonicalUrl(settings, { path: "/admin" });
@@ -48,11 +41,6 @@ const defaultStyleDescription =
   styleOptions.find((option) => option.key === "cozy")?.description ??
   "Write like a gentle, imperfect friend: warm, soft, everyday metaphors.";
 
-const curseTypeOptions = CURSE_TYPES;
-const curseTargetOptions = CURSE_TARGETS;
-const curseToneOptions = CURSE_TONES;
-const curseTags = CURSE_TAGS;
-
 // Gate: dev OR query ?key=PUBLIC_ADMIN_KEY (useful if you later switch to a server adapter)
 const isDev = import.meta.env.DEV;
 const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
@@ -62,6 +50,7 @@ const canUse = isDev || !!keyOk;
 
 // Dev API base (falls back to localhost if not set)
 const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || '';
 ---
 <Base
   title="WitchClick — Admin"
@@ -119,7 +108,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         </div>
       </div>
 
-      <div data-panel-root>
+      <div data-panel-root data-dev-api={DEV_API} data-dev-key={DEV_KEY}>
         <div id="postsPanel" data-panel="posts" class="grid grid-cols-1 gap-6 lg:grid-cols-12">
           <PromptBuilder
             presetOptions={presetOptions}
@@ -127,6 +116,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             defaultModeDescription={defaultModeDescription}
             defaultStyleDescription={defaultStyleDescription}
             devApi={DEV_API}
+            devKey={DEV_KEY}
           />
 
           <section class="lg:col-span-7 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
@@ -135,7 +125,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               <p class="text-xs text-body-muted">Paste PostSpec JSON from your AI, then validate, preview, and ingest</p>
             </div>
 
-            <textarea id="spec" class="h-56 w-full admin-btn-secondary px-3 py-2 font-mono text-xs" placeholder='Infuse the Oracle\'s PostSpec v2 JSON here…'></textarea>
+            <textarea id="spec" class="h-56 w-full admin-btn-secondary px-3 py-2 font-mono text-xs" placeholder="Infuse the Oracle's PostSpec v2 JSON here…"></textarea>
 
             <div class="mt-3 space-y-4 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] lg:gap-6">
               <div class="space-y-3">
@@ -223,15 +213,19 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
       (function(){
         var root = document.querySelector('[data-panel-root]');
         var DEV_API = root?.getAttribute('data-dev-api') || 'http://localhost:8787';
+        var DEV_KEY = root?.getAttribute('data-dev-key') || '';
+        function withDevKey(options){
+          var headers = options && options.headers ? Object.assign({}, options.headers) : {};
+          if (DEV_KEY) headers['X-WC-Dev-Key'] = DEV_KEY;
+          return Object.assign({}, options || {}, { headers: headers });
+        }
+        function apiFetch(path, options){
+          return fetch(DEV_API + path, withDevKey(options));
+        }
         var $ = function(id){ return document.getElementById(id); };
-        var rawPresets = root?.getAttribute('data-preset-options') || '[]';
-        var rawStyles = root?.getAttribute('data-style-options') || '[]';
-        var DEFAULT_MODE_DESC = root?.getAttribute('data-default-mode') || '';
-        var DEFAULT_STYLE_DESC = root?.getAttribute('data-default-style') || '';
         var rawCurseTypes = root?.getAttribute('data-curse-types') || '[]';
         var rawCurseTargets = root?.getAttribute('data-curse-targets') || '[]';
         var rawCurseTones = root?.getAttribute('data-curse-tones') || '[]';
-        var rawCurseTags = root?.getAttribute('data-curse-tags') || '[]';
         var saveModeContainer = root?.querySelector('[data-save-mode]');
         var currentSaveMode = 'publish';
         var recentPanel = root?.querySelector('[data-recent-panel]');
@@ -240,18 +234,12 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         var recentFilterInput = root?.querySelector('[data-recent-filter]');
         var recentPosts = [];
         var recentFilterText = '';
-        var PRESET_OPTIONS = [];
-        var STYLE_OPTIONS = [];
         var CURSE_TYPES = [];
         var CURSE_TARGETS = [];
         var CURSE_TONES = [];
-        var CURSE_TAGS = [];
-        try { PRESET_OPTIONS = JSON.parse(rawPresets); } catch {}
-        try { STYLE_OPTIONS = JSON.parse(rawStyles); } catch {}
         try { CURSE_TYPES = JSON.parse(rawCurseTypes); } catch {}
         try { CURSE_TARGETS = JSON.parse(rawCurseTargets); } catch {}
         try { CURSE_TONES = JSON.parse(rawCurseTones); } catch {}
-        try { CURSE_TAGS = JSON.parse(rawCurseTags); } catch {}
 
         var panelButtons = Array.from(document.querySelectorAll('[data-panel-toggle]'));
         var panels = Array.from(document.querySelectorAll('[data-panel]'));
@@ -444,10 +432,6 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           return sample.join(', ');
         }
 
-        function summarizePlacements(list){
-          if (!Array.isArray(list) || !list.length) return 'None';
-          return list.join(', ');
-        }
 
         function renderSpecSummary(spec){
           var panel = $('specSummary');
@@ -474,7 +458,6 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           var entities=Array.isArray(spec.entities) ? spec.entities : [];
           var internal=Array.isArray(spec.internalLinkHints) ? spec.internalLinkHints : [];
           var affiliates=Array.isArray(spec.affiliateHints) ? spec.affiliateHints : [];
-          var placements=Array.isArray(spec.adPlacements) ? spec.adPlacements : [];
           var altTexts=Array.isArray(spec.altTexts) ? spec.altTexts : [];
           var totalWords=sections.reduce(function(sum, section){ return sum + wordCount(section && section.markdown || ''); }, 0);
           var reading=Math.max(1, Math.round(totalWords / 200));
@@ -646,7 +629,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             if (mode) body.mode = mode;
             var style = $('style').value || 'cozy';
             body.style = style;
-            var res = await fetch(DEV_API + '/genprompt', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+            var res = await apiFetch('/genprompt', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
             var data = null;
             try { data = await res.json(); } catch { data = null; }
             if(!res.ok) throw new Error((data && data.error) || ('gen failed ('+res.status+')'));
@@ -989,7 +972,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           if (!recentListEl) return;
           recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-body-muted">Summoning recent scrolls…</div>';
           try{
-            var res = await fetch(DEV_API + '/posts/list', { method: 'POST' });
+            var res = await apiFetch('/posts/list', { method: 'POST' });
             var data = await res.json();
             if (!data?.ok) throw new Error(data?.error || 'Unable to load posts');
             var items = Array.isArray(data.items) ? data.items : [];
@@ -1019,7 +1002,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           var url = DEV_API + '/ingest' + (params.length ? '?' + params.join('&') : '');
           var res;
           try {
-            res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(spec) });
+            res = await fetch(url, withDevKey({ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(spec) }));
           } catch (networkError) {
             throw buildError('Network error contacting ingest endpoint: ' + (networkError && networkError.message ? networkError.message : 'unknown network error'), 'network', { original: networkError });
           }
@@ -1048,7 +1031,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           var url = DEV_API + '/curses/ingest' + (dryRun === 'true' ? '?dryRun=true' : '');
           var res;
           try {
-            res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ spec, dryRun }) });
+            res = await fetch(url, withDevKey({ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ spec, dryRun }) }));
           } catch (networkError) {
             throw buildError('Network error contacting curse ingest endpoint: ' + (networkError && networkError.message ? networkError.message : 'unknown network error'), 'network', { original: networkError });
           }
@@ -1285,7 +1268,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             var createdPosts = extractArray(data.createdPosts);
             var slug = data.slug || (finalSpec && finalSpec.slug) || '';
             setStatus('Ingested. Publishing…', true, ingestWarnings.length ? ingestWarnings : warnings, ingestNotes.length ? ingestNotes : notes, extractArray(data.errors), createdPosts.map(function(p){ return {path: p}; }));
-            var r = await fetch(DEV_API + '/bundle', { method:'POST' });
+            var r = await apiFetch('/bundle', { method:'POST' });
             var b = await r.json();
             if (!b.ok) throw new Error((b.steps && b.steps.map(function(s){return s.err;}).filter(Boolean).join('\n')) || b.error || 'bundle failed');
             var slug = data.slug || (finalSpec && finalSpec.slug) || '';
@@ -1348,7 +1331,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
               if (sigil) body.sigilName = sigil;
               if (altar) body.altarItem = altar;
               if (journal) body.journalingFollowUp = journal;
-              var res = await fetch(DEV_API + '/curses/prompt', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+              var res = await apiFetch('/curses/prompt', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
               if (!res.ok) throw new Error('Prompt request failed ('+res.status+')');
               var data = await res.json();
               if (!data.ok) throw new Error(data.error || 'Prompt request failed');

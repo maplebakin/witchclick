@@ -24,6 +24,7 @@ interface Props {
   defaultModeDescription: string;
   defaultStyleDescription: string;
   devApi: string;
+  devKey?: string;
 }
 
 const { 
@@ -31,7 +32,8 @@ const {
   styleOptions,
   defaultModeDescription,
   defaultStyleDescription,
-  devApi
+  devApi,
+  devKey
 } = Astro.props;
 ---
 
@@ -93,14 +95,16 @@ const {
   </div>
 </Card>
 
-<script define:vars={{
+<script is:inline define:vars={{
   presetOptions,
   styleOptions,
   defaultModeDescription,
   defaultStyleDescription,
   devApi,
+  devKey,
 }}>
   const $ = (id) => document.getElementById(id);
+  const baseHeaders = devKey ? { 'X-WC-Dev-Key': devKey } : {};
 
   function updateHelp(selectId, helpId, options, fallback) {
     const select = $(selectId);
@@ -153,7 +157,7 @@ const {
 
       const res = await fetch(`${devApi}/genprompt`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...baseHeaders },
         body: JSON.stringify(body)
       });
 

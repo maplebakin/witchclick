@@ -93,7 +93,29 @@ const jsonLd = createCollectionPageSchema(
         ))}
       </div>
     ) : (
-      <p class="author-page-posts__empty">Circle back soon—new work is on the way.</p>
+      <div class="author-page-posts__empty">
+        <p>Circle back soon—new work is on the way. Until then, explore the latest rituals or drop a note for updates.</p>
+        <div class="author-page-posts__actions">
+          <a href="/post" class="author-page-posts__link">Browse latest posts</a>
+          <a href="/hub" class="author-page-posts__link">Explore hubs</a>
+        </div>
+        <form class="author-page-posts__form" name="author-updates" method="POST" data-netlify="true">
+          <input type="hidden" name="form-name" value="author-updates" />
+          <input type="hidden" name="author" value={author.slug} />
+          <label class="author-page-posts__label">
+            Get notified when {author.name} publishes
+            <input
+              type="email"
+              name="email"
+              inputmode="email"
+              autocomplete="email"
+              placeholder="you@example.com"
+              class="author-page-posts__input"
+            />
+          </label>
+          <button type="submit" class="author-page-posts__button">Notify me</button>
+        </form>
+      </div>
     )}
   </section>
 </Base>
@@ -167,6 +189,80 @@ const jsonLd = createCollectionPageSchema(
 
   .author-page-posts__empty {
     font-size: 0.95rem;
+    display: grid;
+    gap: 0.9rem;
+    padding: 1.5rem;
+    border-radius: clamp(1.1rem, 3vw, 1.75rem);
+    border: 1px solid color-mix(in srgb, var(--theme-border-subtle) 70%, transparent 30%);
+    background: color-mix(in srgb, var(--theme-surface-panel) 92%, transparent 8%);
+  }
+
+  .author-page-posts__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .author-page-posts__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--theme-color-gold) 35%, transparent 65%);
+    text-decoration: none;
+    color: var(--theme-text-strong);
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .author-page-posts__link:hover,
+  .author-page-posts__link:focus-visible {
+    background: color-mix(in srgb, var(--theme-color-gold) 15%, transparent 85%);
+  }
+
+  .author-page-posts__form {
+    display: grid;
+    gap: 0.65rem;
+    max-width: 24rem;
+  }
+
+  .author-page-posts__label {
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 80%, white 20%);
+  }
+
+  .author-page-posts__input {
+    width: 100%;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--theme-border-subtle) 70%, transparent 30%);
+    background: var(--cozy-input-bg, rgba(255, 250, 245, 0.9));
+    padding: 0.6rem 0.9rem;
+    font-size: 0.9rem;
+    color: var(--theme-text-strong);
+  }
+
+  .author-page-posts__button {
+    justify-self: start;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--theme-color-gold) 45%, transparent 55%);
+    background: var(--cozy-button-bg, color-mix(in srgb, var(--theme-color-gold) 75%, transparent 25%));
+    color: var(--theme-text-strong);
+    font-weight: 600;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  }
+
+  .author-page-posts__button:hover,
+  .author-page-posts__button:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: var(--elevation-tier-1);
   }
 
   @media (min-width: 720px) {

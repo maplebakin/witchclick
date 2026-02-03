@@ -15,7 +15,7 @@ const {
   as: Tag = 'div',
   class: className,
   ...props
-} = Astro.props;
+} = Astro.props as Props;
 
 const baseClasses = [
   'rounded-2xl',

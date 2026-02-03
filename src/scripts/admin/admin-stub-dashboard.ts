@@ -26,6 +26,9 @@ type SavePayload = {
 class StubDashboard {
   private root: HTMLElement;
   private devApi: string;
+  private devKey: string;
+  private baseHeaders: Record<string, string>;
+  private jsonHeaders: Record<string, string>;
   private stubs: StubEntry[] = [];
   private filtered: StubEntry[] = [];
   private selectedKey: string | null = null;
@@ -55,11 +58,20 @@ class StubDashboard {
   constructor(root: HTMLElement) {
     this.root = root;
     this.devApi = root.getAttribute('data-dev-api') || 'http://localhost:8787';
+    this.devKey = root.getAttribute('data-dev-key') || '';
+    this.baseHeaders = this.devKey ? { 'X-WC-Dev-Key': this.devKey } : {};
+    this.jsonHeaders = { 'Content-Type': 'application/json', ...this.baseHeaders };
     this.bootstrapData();
     this.cacheElements();
     this.attachEvents();
     this.renderList();
     this.updateCounts();
+    this.fetchStubs(false);
+  }
+
+  private apiFetch(path: string, options: RequestInit = {}) {
+    const headers = { ...this.baseHeaders, ...(options.headers || {}) };
+    return fetch(`${this.devApi}${path}`, { ...options, headers });
   }
 
   private bootstrapData() {
@@ -257,7 +269,10 @@ class StubDashboard {
   private fallbackCopy(_value: string) {
     if (!this.promptTextArea) return;
     this.promptTextArea.select();
-    document.execCommand('copy');
+    const execCommand = (document as unknown as {
+      execCommand?: (commandId: string) => boolean;
+    }).execCommand;
+    if (execCommand) execCommand('copy');
     this.setStatus('Prompt copied to clipboard.', 'success');
   }
 
@@ -349,9 +364,9 @@ class StubDashboard {
     this.setStatus('Saving entity…', 'info');
 
     try {
-      const response = await fetch(`${this.devApi}/entities/save`, {
+      const response = await this.apiFetch('/entities/save', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: this.jsonHeaders,
         body: JSON.stringify(entity),
       });
       const data = await response.json();
@@ -388,9 +403,9 @@ class StubDashboard {
       this.setStatus('Refreshing stub list…', 'info');
     }
     try {
-      const response = await fetch(`${this.devApi}/entities/stubs`, {
+      const response = await this.apiFetch('/entities/stubs', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: this.jsonHeaders,
       });
       const data = await response.json();
       if (!response.ok || data?.ok === false) {

@@ -41,12 +41,14 @@ class MockRequest extends EventEmitter {
   method: string;
   url: string;
   headers: Record<string, string>;
+  socket: { remoteAddress: string };
 
   constructor(method: string, url: string) {
     super();
     this.method = method;
     this.url = url;
     this.headers = {};
+    this.socket = { remoteAddress: '127.0.0.1' };
   }
 }
 

@@ -15,6 +15,7 @@ describe('content pipeline integration', () => {
     originalCwd = process.cwd();
     tempDir = await mkdtemp(TMP_PREFIX);
     process.chdir(tempDir);
+    await mkdir(path.join(tempDir, 'content'), { recursive: true });
     await mkdir(path.join(tempDir, 'src', 'content', 'posts'), { recursive: true });
     process.exitCode = undefined;
     vi.resetModules();
@@ -119,7 +120,10 @@ describe('content pipeline integration', () => {
 function linkifyFirst(html: string, text: string, replacementHtml: string) {
   const esc = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const re = new RegExp(`(>[^<]*)\\b(${esc})\\b`, 'i');
-  return html.replace(re, (m, pre, word) => m.replace(word, replacementHtml));
+  return html.replace(re, (match, ...groups) => {
+    const word = String(groups[1] ?? '');
+    return match.replace(word, replacementHtml);
+  });
 }
 
 describe('linkifyFirst', () => {

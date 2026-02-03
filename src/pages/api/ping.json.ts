@@ -9,7 +9,7 @@ export async function ALL({ request }: { request: Request }) {
   if (method === 'OPTIONS') {
     return new Response(null, {
       status: 204,
-      headers: corsHeaders(request, {
+      headers: corsHeaders({
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
       }),
@@ -20,15 +20,14 @@ export async function ALL({ request }: { request: Request }) {
     return json(
       { ok: false, error: 'Method not allowed' },
       405,
-      { Allow: 'POST, OPTIONS' },
-      request
+      { Allow: 'POST, OPTIONS' }
     );
   }
 
   // Soft size guard (best-effort using Content-Length)
   const cl = Number(request.headers.get('content-length') || '0');
   if (Number.isFinite(cl) && cl > MAX_BYTES) {
-    return json({ ok: false, error: 'Payload too large' }, 413, {}, request);
+    return json({ ok: false, error: 'Payload too large' }, 413, {});
   }
 
   let mode: 'json' | 'form' | 'text' = 'text';
@@ -78,22 +77,20 @@ export async function ALL({ request }: { request: Request }) {
         bytes: typeof bytes === 'number' ? bytes : null,
       },
       200,
-      {},
-      request
+      {}
     );
   } catch (e: any) {
     return json(
       { ok: false, error: e?.message || String(e) },
       500,
-      {},
-      request
+      {}
     );
   }
 }
 
 /* ---------------- helpers ---------------- */
 
-function corsHeaders(req: Request, extra: Record<string, string> = {}) {
+function corsHeaders(extra: Record<string, string> = {}) {
   // For dev tools, a permissive policy is fine; scope it if you deploy this public.
   return {
     'Access-Control-Allow-Origin': '*',
@@ -105,14 +102,13 @@ function corsHeaders(req: Request, extra: Record<string, string> = {}) {
 function json(
   obj: any,
   status = 200,
-  extraHeaders: Record<string, string> = {},
-  req?: Request
+  extraHeaders: Record<string, string> = {}
 ) {
   return new Response(JSON.stringify(obj), {
     status,
     headers: {
       'Content-Type': 'application/json',
-      ...corsHeaders(req!, extraHeaders),
+      ...corsHeaders(extraHeaders),
     },
   });
 }

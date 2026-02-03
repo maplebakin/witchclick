@@ -50,7 +50,7 @@ const {
   noindex = false,
   ambientColor = "",
   bodyDataType = "",
-  mainClass: mainClassProp,
+  mainClass: _mainClassProp,
   containerClass: containerClassProp,
   contentClass: contentClassProp,
 } = Astro.props as LayoutProps;
@@ -414,12 +414,6 @@ const canonicalUrl = buildCanonicalUrl(settings, { canonical: canon, astroUrl: A
 // Navigation Configuration
 const currentPath = Astro.url?.pathname ?? "/";
 const isPlainReadingRoute = PLAIN_READING_ROUTE_PATTERNS.some((pattern) => pattern.test(currentPath));
-
-const mainClassList = [
-  "site-main",
-  isPlainReadingRoute && "site-main--plain",
-  ...normalizeClassList(mainClassProp),
-].filter(Boolean);
 
 const containerClassList = [
   "site-main__container",
@@ -789,6 +783,7 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
     <div class="site-shell__content">
       <main
         id="main"
+        tabindex="-1"
         class:list={
           [
             "site-main",
@@ -835,7 +830,7 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
     )}
     
     <!-- Card Animations -->
-    <script type="module" src={cardAnimationsModule}></script>
+    <script type="module" is:inline src={cardAnimationsModule}></script>
     
     <div id="cookie-consent-banner" class="fixed bottom-0 left-0 right-0 z-50 p-4 hidden">
       <div class="max-w-screen-md mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left p-4 sm:p-6 shadow-xl rounded-2xl border bg-white">

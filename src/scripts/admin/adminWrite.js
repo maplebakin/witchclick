@@ -22,6 +22,13 @@ function analyzeSlug(value) {
 function initWriteAdmin() {
   const root = document.querySelector("[data-dev-api]");
   const DEV_API = root?.getAttribute("data-dev-api") || "http://localhost:8787";
+  const DEV_KEY = root?.getAttribute("data-dev-key") || "";
+  const baseHeaders = DEV_KEY ? { "X-WC-Dev-Key": DEV_KEY } : {};
+  const jsonHeaders = { "Content-Type": "application/json", ...baseHeaders };
+  function apiFetch(path, options = {}) {
+    const headers = { ...baseHeaders, ...(options.headers || {}) };
+    return fetch(`${DEV_API}${path}`, { ...options, headers });
+  }
   const $ = (id) => document.getElementById(id);
   const titleInput = $("title");
   const slugInput = $("slug");
@@ -137,9 +144,9 @@ function initWriteAdmin() {
       const checks = await Promise.all(
         entities.map(async (entity) => {
           try {
-            const res = await fetch(`${DEV_API}/entities/get`, {
+            const res = await apiFetch("/entities/get", {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: jsonHeaders,
               body: JSON.stringify({ type: entity.type, slug: entity.slug })
             });
             const data = await res.json();
@@ -347,9 +354,9 @@ function initWriteAdmin() {
       entities: $("entities")?.value ?? "",
       markdown: $("markdown")?.value ?? ""
     };
-    const res = await fetch(`${DEV_API}/posts/save`, {
+    const res = await apiFetch("/posts/save", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: jsonHeaders,
       body: JSON.stringify(payload)
     });
     const data = await res.json();
@@ -375,7 +382,7 @@ function initWriteAdmin() {
       const data = await savePost();
       const summary = summarizeEntities(data.entities);
       setStatus("Saved. Publishing...", true, data.warnings);
-      const res = await fetch(`${DEV_API}/bundle`, { method: "POST" });
+      const res = await apiFetch("/bundle", { method: "POST" });
       const bundle = await res.json();
       if (!bundle.ok) {
         const errors = Array.isArray(bundle.steps) ? bundle.steps.map((s) => s?.err).filter(Boolean).join("\n") : bundle.error;

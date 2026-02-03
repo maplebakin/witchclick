@@ -73,6 +73,8 @@
   --action-secondary-text: color-mix(in srgb, var(--ambient-color, var(--color-primary)) 62%, var(--ink-body) 38%);
 
   /* Border Radii */
+  --wc-radius-sm: 0.75rem;
+  --wc-radius-md: 0.9rem;
   --wc-radius-lg: 1.5rem;
   --wc-radius-xl: 1.75rem;
   --wc-radius-xxl: 2rem;
@@ -96,6 +98,42 @@
   --section-surface-bottom: color-mix(in srgb, white 94%, var(--color-iris, #f2bf8c) 6%);
   --section-text: color-mix(in srgb, var(--color-night, #120725) 82%, var(--color-iris, #f2bf8c) 18%);
   --section-veil: color-mix(in srgb, white 32%, var(--color-gold, #d4af37) 8%);
+
+  /* Cozy UI Surfaces */
+  --cozy-warmth: color-mix(in srgb, var(--color-gold, #e4a667) 55%, var(--color-iris, #f2bf8c) 45%);
+  --cozy-surface-soft: color-mix(in srgb, var(--color-overlay, #22170b) 68%, var(--cozy-warmth) 32%);
+  --cozy-surface-strong: color-mix(in srgb, var(--color-overlay-strong, #261a0d) 64%, var(--cozy-warmth) 36%);
+  --cozy-surface-gradient: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--cozy-surface-soft) 88%, transparent 12%) 0%,
+    color-mix(in srgb, var(--cozy-surface-strong) 92%, transparent 8%) 100%
+  );
+  --cozy-border: color-mix(in srgb, var(--color-border, #452e17) 60%, var(--color-gold, #e4a667) 40%);
+  --cozy-shadow: 0 22px 55px -34px color-mix(in srgb, var(--color-night, #261a0d) 65%, transparent 35%);
+  --cozy-shadow-hover: 0 28px 65px -36px color-mix(in srgb, var(--color-night, #261a0d) 58%, transparent 42%);
+  --cozy-input-bg: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--cozy-surface-soft) 88%, transparent 12%) 0%,
+    color-mix(in srgb, var(--cozy-surface-soft) 72%, transparent 28%) 100%
+  );
+  --cozy-input-bg-hover: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--cozy-surface-soft) 82%, transparent 18%) 0%,
+    color-mix(in srgb, var(--cozy-surface-strong) 68%, transparent 32%) 100%
+  );
+  --cozy-input-border: color-mix(in srgb, var(--cozy-border) 70%, transparent 30%);
+  --cozy-input-border-focus: color-mix(in srgb, var(--color-gold, #e4a667) 65%, var(--color-iris, #f2bf8c) 35%);
+  --cozy-input-shadow: 0 16px 38px -30px color-mix(in srgb, var(--color-night, #261a0d) 62%, transparent 38%);
+  --cozy-button-bg: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--color-iris, #f2bf8c) 65%, var(--color-night, #261a0d) 35%) 0%,
+    color-mix(in srgb, var(--color-gold, #e4a667) 62%, var(--color-night, #261a0d) 38%) 100%
+  );
+  --cozy-button-bg-hover: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--color-iris, #f2bf8c) 72%, var(--color-night, #261a0d) 28%) 0%,
+    color-mix(in srgb, var(--color-gold, #e4a667) 70%, var(--color-night, #261a0d) 30%) 100%
+  );
 }
 
 .dark {
@@ -108,12 +146,49 @@
   --section-veil: color-mix(in srgb, var(--surface-inverse-soft) 32%, black 8%); /* Dark veil */
 }
 
+:root[data-comfort-theme="dawn"] {
+  --cozy-warmth: color-mix(in srgb, var(--color-gold, #e4a667) 45%, var(--color-iris, #f2bf8c) 55%);
+  --cozy-surface-soft: color-mix(in srgb, white 90%, var(--cozy-warmth) 10%);
+  --cozy-surface-strong: color-mix(in srgb, white 84%, var(--cozy-warmth) 16%);
+  --cozy-surface-gradient: linear-gradient(
+    160deg,
+    color-mix(in srgb, white 92%, var(--cozy-warmth) 8%) 0%,
+    color-mix(in srgb, white 86%, var(--cozy-warmth) 14%) 100%
+  );
+  --cozy-border: color-mix(in srgb, var(--color-fog, #cc9966) 40%, var(--color-gold, #e4a667) 60%);
+  --cozy-shadow: 0 18px 50px -34px color-mix(in srgb, rgba(86, 64, 132, 0.25) 70%, transparent 30%);
+  --cozy-shadow-hover: 0 24px 60px -36px color-mix(in srgb, rgba(86, 64, 132, 0.22) 65%, transparent 35%);
+  --cozy-input-bg: linear-gradient(
+    180deg,
+    color-mix(in srgb, white 94%, var(--cozy-warmth) 6%) 0%,
+    color-mix(in srgb, white 90%, var(--cozy-warmth) 10%) 100%
+  );
+  --cozy-input-bg-hover: linear-gradient(
+    180deg,
+    color-mix(in srgb, white 92%, var(--cozy-warmth) 8%) 0%,
+    color-mix(in srgb, white 88%, var(--cozy-warmth) 12%) 100%
+  );
+  --cozy-input-border: color-mix(in srgb, var(--cozy-border) 65%, transparent 35%);
+  --cozy-input-border-focus: color-mix(in srgb, var(--color-gold, #e4a667) 55%, var(--color-iris, #f2bf8c) 45%);
+  --cozy-input-shadow: 0 12px 30px -26px color-mix(in srgb, rgba(86, 64, 132, 0.2) 70%, transparent 30%);
+  --cozy-button-bg: linear-gradient(
+    145deg,
+    color-mix(in srgb, white 78%, var(--color-iris, #f2bf8c) 22%) 0%,
+    color-mix(in srgb, white 72%, var(--color-gold, #e4a667) 28%) 100%
+  );
+  --cozy-button-bg-hover: linear-gradient(
+    145deg,
+    color-mix(in srgb, white 74%, var(--color-iris, #f2bf8c) 26%) 0%,
+    color-mix(in srgb, white 68%, var(--color-gold, #e4a667) 32%) 100%
+  );
+}
+
 /* ---------------------------------------------------------------------------
    Body Styles
    --------------------------------------------------------------------------- */
 
 body {
-  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-body-ui, var(--font-body, "Inter", system-ui, -apple-system, "Segoe UI", sans-serif));
 }
 
 /* Prose (Content) Font */
@@ -144,6 +219,56 @@ body {
 /* Link Reset */
 a {
   color: inherit;
+}
+
+/* ---------------------------------------------------------------------------
+   Cozy Form Elements
+   --------------------------------------------------------------------------- */
+
+:where(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  select,
+  textarea
+) {
+  border-radius: var(--wc-radius-md);
+  border: 1px solid var(--cozy-input-border);
+  background: var(--cozy-input-bg);
+  padding: 0.65rem 0.9rem;
+  box-shadow: var(--cozy-input-shadow);
+  transition: border-color 180ms ease, background 200ms ease, box-shadow 200ms ease;
+}
+
+:where(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  select,
+  textarea
+):hover {
+  border-color: var(--cozy-input-border-focus);
+  background: var(--cozy-input-bg-hover);
+}
+
+:is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  select,
+  textarea
+):focus {
+  border-color: var(--cozy-input-border-focus);
+}
+
+:is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  select,
+  textarea
+):focus-visible {
+  box-shadow: var(--focus-ring-shadow), var(--cozy-input-shadow);
+}
+
+:where(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  select,
+  textarea
+)::placeholder {
+  color: color-mix(in srgb, var(--text-muted) 85%, white 15%);
 }
 
 /* ---------------------------------------------------------------------------
@@ -477,6 +602,18 @@ a {
 
   .shadow-2 {
     box-shadow: var(--elevation-tier-2);
+  }
+
+  .rounded-md {
+    border-radius: var(--wc-radius-sm);
+  }
+
+  .rounded-lg {
+    border-radius: var(--wc-radius-md);
+  }
+
+  .rounded-xl {
+    border-radius: var(--wc-radius-lg);
   }
 }
 

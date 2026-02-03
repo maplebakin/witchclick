@@ -15,6 +15,7 @@ const keyOk = ADMIN_KEY && url.searchParams.get('key') === ADMIN_KEY;
 const canUse = isDev || !!keyOk;
 
 const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || '';
 ---
 <Base
   title="WitchClick — Settings Dashboard"
@@ -31,7 +32,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
     <div class="space-y-6">
       <AdminNav currentPath="/admin/settings" />
 
-      <div class="mx-auto max-w-4xl space-y-6" data-settings-admin data-dev-api={DEV_API}>
+      <div class="mx-auto max-w-4xl space-y-6" data-settings-admin data-dev-api={DEV_API} data-dev-key={DEV_KEY}>
       <section class="rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm">
         <header class="mb-6">
           <h1 class="text-2xl font-semibold text-primary">Site Settings</h1>
@@ -276,7 +277,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             >
               Reset
             </button>
-            <p class="ml-auto text-sm" data-status></p>
+            <p class="ml-auto text-sm" data-status role="status" aria-live="polite" aria-atomic="true"></p>
           </div>
         </form>
       </section>
@@ -298,6 +299,12 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           if (!root) return;
 
           const devApi = root.getAttribute('data-dev-api') || 'http://localhost:8787';
+          const devKey = root.getAttribute('data-dev-key');
+          function apiFetch(path, options = {}) {
+            const headers = { ...(options.headers || {}) };
+            if (devKey) headers['X-WC-Dev-Key'] = devKey;
+            return fetch(devApi + path, { ...options, headers });
+          }
           const form = root.querySelector('#settingsForm');
           const statusEl = root.querySelector('[data-status]');
           const resetBtn = root.querySelector('#resetBtn');
@@ -396,7 +403,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           async function loadSettings() {
             try {
               setStatus('Loading settings…');
-              const res = await fetch(devApi + '/settings/get', {
+              const res = await apiFetch('/settings/get', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: '{}'
@@ -416,7 +423,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           async function saveSettings(data) {
             try {
               setStatus('Saving settings…');
-              const res = await fetch(devApi + '/settings/save', {
+              const res = await apiFetch('/settings/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)

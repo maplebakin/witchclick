@@ -6,7 +6,6 @@ import createDOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
 import { loadAllPosts, extractHeadingOutline } from '../src/utils/posts.js';
 import { autoLinkAffiliates } from '../tools/src/auto-affiliate.js';
-import { readSettings, getSiteOrigin, buildCanonicalUrl, toAbsoluteUrl } from '../src/utils/settings.js';
 import { getRelatedPosts } from '../src/utils/recommendations.js';
 
 const CWD = process.cwd();
@@ -35,7 +34,6 @@ class Slugger {
 }
 
 async function processPost(post) {
-  const settings = readSettings();
   const allProducts = fs.existsSync(PRODUCTS_FILE) ? JSON.parse(fs.readFileSync(PRODUCTS_FILE, 'utf8')).products || [] : [];
   
   // 1. Process Markdown and Sanitize HTML

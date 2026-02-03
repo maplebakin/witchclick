@@ -36,9 +36,22 @@ const currentShadowSoft = activeMidnight?.shadowSoft || activeDawn?.shadowSoft |
 
 const currentText = activeMidnight?.textBody || activeDawn?.textBody || defaultText;
 const currentTextMuted = activeMidnight?.textMuted || activeDawn?.textMuted || defaultMuted;
+
+const rootStyle = {
+  '--accent': accent,
+  '--text': currentText,
+  '--muted': currentTextMuted,
+  '--surface-plain': currentSurfacePlain,
+  '--surface-card': currentSurfaceCard,
+  '--surface-elevated': currentSurfaceElevated,
+  '--border-subtle': currentBorderSubtle,
+  '--shadow-soft': currentShadowSoft,
+  '--font-heading': `"${currentFontHeading}", serif`,
+  '--font-body': `"${currentFontBody}", serif`,
+};
 ---
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style={rootStyle}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -52,17 +65,7 @@ const currentTextMuted = activeMidnight?.textMuted || activeDawn?.textMuted || d
 
       :root {
         color-scheme: light;
-        font-family: "${currentFontHeading}", serif;
-        --accent: ${accent};
-        --text: ${currentText};
-        --muted: ${currentTextMuted};
-        --surface-plain: ${currentSurfacePlain};
-        --surface-card: ${currentSurfaceCard};
-        --surface-elevated: ${currentSurfaceElevated};
-        --border-subtle: ${currentBorderSubtle};
-        --shadow-soft: ${currentShadowSoft};
-        --font-heading: "${currentFontHeading}", serif;
-        --font-body: "${currentFontBody}", serif;
+        font-family: var(--font-heading);
       }
 
       * {

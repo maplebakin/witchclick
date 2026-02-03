@@ -453,14 +453,14 @@ blockquote {
   margin: var(--space-6) 0;
   padding: var(--space-4) var(--space-5);
   border-left: 3px solid var(--border-accent-strong);
-  background: rgba(14, 6, 26, 0.6);
-  border-radius: 0.75rem;
+  background: var(--cozy-surface-gradient, rgba(14, 6, 26, 0.6));
+  border-radius: var(--wc-radius-md, 0.75rem);
   color: var(--text-primary);
   font-style: italic;
 }
 
 :root[data-comfort-theme="dawn"] blockquote {
-  background: rgba(242, 236, 229, 0.7);
+  background: var(--cozy-surface-gradient, rgba(242, 236, 229, 0.7));
   color: var(--text-primary);
 }
 
@@ -567,7 +567,7 @@ main {
    --------------------------------------------------------------------------- */
 
 .glass-panel {
-  background: var(--glass-surface);
+  background: var(--cozy-surface-gradient, var(--glass-surface));
   border: 1px solid var(--glass-border);
   border-radius: var(--wc-radius-lg, 1rem);
   backdrop-filter: blur(var(--glass-blur, 16px));
@@ -575,7 +575,7 @@ main {
 }
 
 .glass-panel--strong {
-  background: var(--glass-surface-strong);
+  background: var(--cozy-surface-gradient, var(--glass-surface-strong));
   border-color: var(--glass-border-strong, var(--glass-border));
   box-shadow: var(--glass-shadow-strong, var(--shadow-3));
 }
@@ -1096,8 +1096,8 @@ main {
   padding-block: var(--header-link-padding-block);
   padding-inline: var(--header-link-padding-inline);
   border-radius: var(--header-link-radius);
-  border: 1px solid color-mix(in srgb, var(--header-border) 50%, transparent 50%);
-  background: color-mix(in srgb, var(--header-background) 55%, transparent 45%);
+  border: 1px solid color-mix(in srgb, var(--header-border) 45%, var(--cozy-border) 55%);
+  background: color-mix(in srgb, var(--header-background) 50%, var(--cozy-surface-soft) 50%);
   font-family: var(--font-body-ui);
   font-size: var(--header-link-font-size);
   font-weight: 500;
@@ -1106,11 +1106,13 @@ main {
   line-height: 1.2;
   color: var(--text-strong);
   text-decoration: none;
+  box-shadow: 0 12px 28px -24px color-mix(in srgb, var(--color-night) 60%, transparent 40%);
   transition:
     color 220ms ease,
     background-color 240ms ease,
     border-color 240ms ease,
-    transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    transform 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 240ms ease;
 }
 
 .site-nav__link::after,
@@ -1153,8 +1155,9 @@ main {
 .site-nav__button:hover,
 .site-nav__button:focus-visible {
   color: var(--comfort-chip-text-strong, var(--text-accent-strong));
-  border-color: color-mix(in srgb, var(--header-border) 35%, var(--color-iris) 65%);
-  background: color-mix(in srgb, var(--header-background) 45%, var(--color-iris) 55%);
+  border-color: color-mix(in srgb, var(--header-border) 30%, var(--cozy-border) 70%);
+  background: var(--cozy-surface-gradient);
+  box-shadow: var(--cozy-shadow);
   transform: translateY(-2px);
 }
 
@@ -1170,7 +1173,7 @@ main {
 .site-nav__button[aria-current="page"] {
   color: var(--comfort-chip-text-strong, var(--text-accent-strong));
   font-weight: 600;
-  background: color-mix(in srgb, var(--header-background) 40%, var(--color-iris) 60%);
+  background: var(--cozy-surface-gradient);
 }
 
 .site-nav__link[aria-current="page"]::after,
@@ -1186,21 +1189,24 @@ main {
   width: 2.75rem;
   height: 2.75rem;
   border-radius: var(--header-link-radius);
-  border: 1px solid color-mix(in srgb, var(--header-border) 50%, transparent 50%);
-  background: color-mix(in srgb, var(--header-background) 50%, transparent 50%);
+  border: 1px solid color-mix(in srgb, var(--header-border) 45%, var(--cozy-border) 55%);
+  background: color-mix(in srgb, var(--header-background) 50%, var(--cozy-surface-soft) 50%);
   color: var(--text-strong);
   cursor: pointer;
+  box-shadow: 0 12px 28px -24px color-mix(in srgb, var(--color-night) 60%, transparent 40%);
   transition:
     color 220ms ease,
     background-color 240ms ease,
     border-color 240ms ease,
-    transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    transform 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 240ms ease;
 }
 
 .site-nav__toggle:hover,
 .site-nav__toggle:focus-visible {
-  background: color-mix(in srgb, var(--header-background) 40%, var(--color-iris) 60%);
-  border-color: color-mix(in srgb, var(--header-border) 38%, var(--color-iris) 62%);
+  background: var(--cozy-surface-gradient);
+  border-color: color-mix(in srgb, var(--header-border) 30%, var(--cozy-border) 70%);
+  box-shadow: var(--cozy-shadow);
   color: var(--comfort-chip-text-strong, var(--text-accent-strong));
   transform: translateY(-2px);
 }
@@ -1215,9 +1221,9 @@ main {
   right: 0;
   margin-top: var(--space-2);
   padding: var(--space-4);
-  border-radius: 1rem;
-  border: 1px solid color-mix(in srgb, var(--header-border) 65%, transparent 35%);
-  background: color-mix(in srgb, var(--header-background) 92%, transparent 8%);
+  border-radius: var(--wc-radius-md, 1rem);
+  border: 1px solid color-mix(in srgb, var(--header-border) 55%, var(--cozy-border) 45%);
+  background: var(--cozy-surface-gradient);
   backdrop-filter: blur(16px);
   box-shadow: 0 24px 60px -32px color-mix(in srgb, var(--color-night) 65%, transparent 35%);
   min-width: 16rem;
@@ -1250,9 +1256,9 @@ main {
   display: grid;
   gap: var(--space-1);
   padding: var(--space-2) var(--space-3);
-  border-radius: 0.75rem;
+  border-radius: var(--wc-radius-sm, 0.75rem);
   border: 1px solid transparent;
-  background: color-mix(in srgb, var(--header-background) 65%, transparent 35%);
+  background: color-mix(in srgb, var(--header-background) 58%, var(--cozy-surface-soft) 42%);
   color: color-mix(in srgb, var(--layout-shell-ink) 85%, white 15%);
   font-family: var(--font-body);
   text-transform: none;
@@ -1267,8 +1273,8 @@ main {
 
 .site-nav__submenu-link:hover,
 .site-nav__submenu-link:focus-visible {
-  border-color: color-mix(in srgb, var(--header-border) 40%, var(--color-iris) 60%);
-  background: color-mix(in srgb, var(--header-background) 55%, var(--color-iris) 45%);
+  border-color: color-mix(in srgb, var(--header-border) 35%, var(--cozy-border) 65%);
+  background: var(--cozy-surface-gradient);
   color: var(--comfort-chip-text-strong, var(--text-accent-strong));
   transform: translateX(4px);
 }
@@ -1319,30 +1325,31 @@ main {
 .search-input {
   width: 100%;
   border-radius: 999px;
-  border: 1px solid var(--border-accent-subtle);
-  background: rgba(12, 5, 23, 0.65);
+  border: 1px solid var(--cozy-input-border);
+  background: var(--cozy-input-bg);
   backdrop-filter: blur(8px);
   padding: var(--space-2) var(--space-4);
   color: var(--text-secondary);
   font-size: 0.9rem;
   letter-spacing: 0.08em;
+  box-shadow: var(--cozy-input-shadow);
   transition: all 240ms ease;
 }
 
 .search-input:focus {
-  border-color: rgba(212, 175, 55, 0.4);
-  background: rgba(12, 5, 23, 0.8);
+  border-color: var(--cozy-input-border-focus);
+  background: var(--cozy-input-bg-hover);
 }
 
 :root[data-comfort-theme="dawn"] .search-input {
-  background: rgba(244, 239, 232, 0.9);
-  border-color: rgba(122, 94, 154, 0.28);
+  background: var(--cozy-input-bg);
+  border-color: var(--cozy-input-border);
   color: var(--text-secondary);
 }
 
 :root[data-comfort-theme="dawn"] .search-input:focus {
-  border-color: rgba(122, 94, 154, 0.45);
-  background: rgba(244, 239, 232, 0.98);
+  border-color: var(--cozy-input-border-focus);
+  background: var(--cozy-input-bg-hover);
 }
 
 .search-input::placeholder {
@@ -1359,17 +1366,17 @@ main {
   left: 0;
   right: 0;
   z-index: 50;
-  border-radius: 1rem;
-  border: 1px solid var(--border-accent-subtle);
-  background: rgba(7, 2, 15, 0.95);
+  border-radius: var(--wc-radius-md, 1rem);
+  border: 1px solid var(--cozy-input-border);
+  background: var(--cozy-surface-gradient);
   backdrop-filter: blur(16px);
   box-shadow: var(--shadow-soft);
   overflow: hidden;
 }
 
 :root[data-comfort-theme="dawn"] .search-results {
-  background: rgba(255, 252, 247, 0.98);
-  border-color: color-mix(in srgb, var(--color-gold) 28%, transparent 72%);
+  background: var(--cozy-surface-gradient);
+  border-color: var(--cozy-input-border);
 }
 
 .search-result {

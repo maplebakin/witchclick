@@ -16,6 +16,7 @@ const keyOk = ADMIN_KEY && url.searchParams.get("key") === ADMIN_KEY;
 const canUse = isDev || !!keyOk;
 
 const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
+const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || "";
 ---
 
 <Base
@@ -31,7 +32,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
 
   {
     canUse ? (
-      <div class="space-y-6" data-staging-root data-dev-api={DEV_API}>
+      <div class="space-y-6" data-staging-root data-dev-api={DEV_API} data-dev-key={DEV_KEY}>
         <AdminNav currentPath="/admin/staging" />
 
         <section class="rounded-2xl border border-line-subtle bg-surface-base p-6 shadow-sm">
@@ -126,14 +127,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
     canUse && (
       <script is:inline>
         (function () {
-          var root = document.querySelector("[data-staging-root]");
-          var DEV_API = root?.getAttribute("data-dev-api") || "http://localhost:8787";
           var $ = function (id) {
             return document.getElementById(id);
           };
 
           var drafts = [];
-          var selectedForCompare = [];
 
           function formatDate(isoString) {
             var date = new Date(isoString);
@@ -419,14 +417,13 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
             }
 
             // Load full content for comparison
-            var promises = topicDrafts.map(function (draft) {
-              return fetch("/api/staging/preview.json", {
+            var promises = topicDrafts.map(async function (draft) {
+              var res = await fetch("/api/staging/preview.json", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ slug: draft.slug }),
-              }).then(function (res) {
-                return res.json();
               });
+              return res.json();
             });
 
             try {

@@ -16,9 +16,6 @@ let saveThemeRecord: (payload: Record<string, unknown>) => Promise<AdminThemeRec
 let setActiveThemeRecord: (
   payload: Record<string, unknown>,
 ) => Promise<{ active: AdminThemeListing["active"]; theme: AdminThemeRecord }>;
-let _deleteThemeRecord: (
-  payload: Record<string, unknown>,
-) => Promise<{ slug: string; mode: AdminThemeRecord["mode"]; active: AdminThemeListing["active"] }>;
 
 async function prepareTempDir() {
   tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "wc-admin-theme-"));
@@ -50,7 +47,6 @@ describe("admin theme dashboard", () => {
       listThemes,
       saveThemeRecord,
       setActiveThemeRecord,
-      deleteThemeRecord: _deleteThemeRecord,
     } = await import("../dev-api.js"));
   });
 
@@ -250,7 +246,7 @@ describe("admin theme dashboard", () => {
       await remove({ slug: "cache-test" });
 
       const afterDelete = getActiveThemes();
-      expect(afterDelete.midnight.slug).toBe("legacy-midnight");
+      expect(afterDelete.midnight.slug).toBe("default-midnight");
 
       expect(resetSpy).toHaveBeenCalledTimes(4);
     } finally {

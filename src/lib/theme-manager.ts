@@ -871,6 +871,11 @@ export class ThemeManager {
 
     console.log('[generateTokensFromBase] Input colors:', { background, primary, accent });
 
+    // Ensure colors are defined before proceeding
+    if (!background || !primary || !accent) {
+      throw new Error('Missing required theme colors: background, primary, or accent');
+    }
+
     const isDark = this.isColorDark(background);
     console.log('[generateTokensFromBase] isDark:', isDark);
     const mixLight = '#ffffff';  // Always white to lighten colors

@@ -3,6 +3,14 @@ function initCursesGenerator() {
   if (!root) return;
 
   const DEV_API = root.getAttribute('data-dev-api') || 'http://localhost:8787';
+  const DEV_KEY = root.getAttribute('data-dev-key') || '';
+  const baseHeaders: Record<string, string> = DEV_KEY ? { 'X-WC-Dev-Key': DEV_KEY } : {};
+  const jsonHeaders = { 'Content-Type': 'application/json', ...baseHeaders };
+
+  function apiFetch(path: string, options: RequestInit = {}) {
+    const headers = { ...baseHeaders, ...(options.headers || {}) };
+    return fetch(`${DEV_API}${path}`, { ...options, headers });
+  }
   const $ = <T extends HTMLElement = HTMLElement>(selector: string) => root.querySelector<T>(selector);
 
   const typeSelect = $('[data-curse-type]') as HTMLSelectElement | null;
@@ -96,9 +104,9 @@ function initCursesGenerator() {
       if (altarItem) body.altarItem = altarItem;
       if (journalingFollowUp) body.journalingFollowUp = journalingFollowUp;
 
-      const res = await fetch(`${DEV_API}/curses/prompt`, {
+      const res = await apiFetch('/curses/prompt', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: jsonHeaders,
         body: JSON.stringify(body),
       });
       const data = await res.json();
@@ -116,9 +124,9 @@ function initCursesGenerator() {
       if (ingestSummary) ingestSummary.textContent = '';
       if (previewEl) previewEl.innerHTML = '';
       const spec = parseSpec();
-      const res = await fetch(`${DEV_API}/curses/ingest${options.ingest ? '' : '?dryRun=true'}`, {
+      const res = await apiFetch(`/curses/ingest${options.ingest ? '' : '?dryRun=true'}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: jsonHeaders,
         body: JSON.stringify({ spec, dryRun: !options.ingest }),
       });
       const data = await res.json();

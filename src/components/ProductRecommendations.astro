@@ -40,12 +40,40 @@ function buildHref(product: ProductInput): string {
   return base;
 }
 
-function resolveImage(product: ProductInput): string {
+function resolveImageSources(product: ProductInput) {
+  const placeholder = buildPlaceholderSvg(product?.name);
   if (typeof product?.image === "string" && product.image.trim().length > 0) {
-    return product.image;
+    return { src: product.image, fallback: placeholder, isPlaceholder: false };
   }
-  const placeholderLabel = encodeURIComponent(product?.name ?? "Affiliate pick");
-  return `https://placehold.co/600x400?text=${placeholderLabel}`;
+  return { src: placeholder, fallback: placeholder, isPlaceholder: true };
+}
+
+function buildPlaceholderSvg(label?: string): string {
+  const raw = typeof label === "string" && label.trim().length > 0 ? label.trim() : "Affiliate pick";
+  const safe = raw.length > 36 ? `${raw.slice(0, 33)}...` : raw;
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400" role="img" aria-label="${escapeSvgText(raw)}">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#2a1f2a" />
+          <stop offset="100%" stop-color="#3c2a1f" />
+        </linearGradient>
+      </defs>
+      <rect width="600" height="400" rx="28" fill="url(#bg)" />
+      <rect x="24" y="24" width="552" height="352" rx="22" fill="rgba(255,255,255,0.06)" />
+      <text x="50%" y="52%" text-anchor="middle" dominant-baseline="middle" font-family="Georgia, 'Times New Roman', serif" font-size="24" fill="rgba(244, 241, 255, 0.9)">
+        ${escapeSvgText(safe)}
+      </text>
+      <text x="50%" y="68%" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, sans-serif" font-size="12" letter-spacing="2" fill="rgba(244, 241, 255, 0.5)">
+        WITCHCLICK PICK
+      </text>
+    </svg>
+  `;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+function escapeSvgText(value: string): string {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 ---
 {display.length > 0 && (
@@ -58,7 +86,7 @@ function resolveImage(product: ProductInput): string {
       {display.map((product) => {
         const href = buildHref(product);
         const rel = product?.rel ?? "sponsored nofollow";
-        const image = resolveImage(product);
+        const imageSources = resolveImageSources(product);
         return (
           <li class="product-card">
             <a
@@ -68,7 +96,15 @@ function resolveImage(product: ProductInput): string {
               class="product-card-link"
               data-affiliate="true"
             >
-              <img src={image} alt={product?.name ?? "Affiliate product"} loading="lazy" class="product-card-image" />
+              <img
+                src={imageSources.src}
+                data-fallback={imageSources.fallback}
+                data-placeholder={imageSources.isPlaceholder ? "true" : "false"}
+                alt={product?.name ?? "Affiliate product"}
+                loading="lazy"
+                decoding="async"
+                class="product-card-image"
+              />
             </a>
             <div class="product-card-body">
               <h3 class="product-card-title">{product?.name ?? "Affiliate product"}</h3>
@@ -135,9 +171,11 @@ function resolveImage(product: ProductInput): string {
 
   .product-card-link {
     display: block;
-    border-radius: 0.75rem;
+    border-radius: var(--wc-radius-md, 0.9rem);
     overflow: hidden;
     border: 1px solid rgba(124, 58, 237, 0.25);
+    background:
+      linear-gradient(135deg, rgba(76, 29, 149, 0.25), rgba(164, 116, 73, 0.2));
     transition: border-color 0.2s ease, opacity 0.2s ease;
   }
 
@@ -151,6 +189,13 @@ function resolveImage(product: ProductInput): string {
     width: 100%;
     aspect-ratio: 4 / 3;
     object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .product-card-image.is-loaded,
+  .product-card-image.is-fallback {
+    opacity: 1;
   }
 
   .product-card-body {
@@ -200,3 +245,39 @@ function resolveImage(product: ProductInput): string {
     }
   }
 </style>
+
+<script>
+  function initProductRecsFallbacks() {
+    const images = document.querySelectorAll('.product-card-image[data-fallback]');
+    images.forEach((img) => {
+      if (!(img instanceof HTMLImageElement)) return;
+      const fallback = img.dataset.fallback;
+      const markLoaded = () => {
+        img.classList.add('is-loaded');
+      };
+
+      if (img.complete) {
+        markLoaded();
+      } else {
+        img.addEventListener('load', markLoaded, { once: true });
+      }
+
+      img.addEventListener(
+        'error',
+        () => {
+          if (fallback && img.src !== fallback) {
+            img.src = fallback;
+          }
+          img.classList.add('is-fallback');
+        },
+        { once: true },
+      );
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initProductRecsFallbacks, { once: true });
+  } else {
+    initProductRecsFallbacks();
+  }
+</script>

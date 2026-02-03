@@ -1,7 +1,6 @@
 --- 
 import RitualSampler from '../../components/RitualSampler.astro';
-import { CollectionEntry, getCollection } from 'astro:content';
-import { marked } from 'marked';
+import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
     // Utility to extract reflection prompts from markdown if not explicitly in data
@@ -12,11 +11,13 @@ export async function getStaticPaths() {
         let match;
 
         while ((match = reflectionHeadingPattern.exec(markdownContent)) !== null) {
-            const promptsBlock = match[2];
+            const promptsBlock = match[2] || '';
             const promptLinePattern = /^\s*[-*]\s*(.+)$/gim; // Matches bullet points
             let lineMatch;
             while ((lineMatch = promptLinePattern.exec(promptsBlock)) !== null) {
-                prompts.push(lineMatch[1].trim());
+                if (lineMatch[1]) {
+                    prompts.push(lineMatch[1].trim());
+                }
             }
         }
         return prompts;

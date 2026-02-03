@@ -6,10 +6,8 @@ import { marked } from 'marked';
 import createDOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
 import Base from "../../layouts/Base.astro";
-import AdSlot from "../../components/AdSlot.astro";
 import Disclosure from "../../components/Disclosure.astro";
 import DownloadCard from "../../components/DownloadCard.astro";
-import ProductRecommendations from "../../components/ProductRecommendations.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import PostRail from "../../components/PostRail.astro";
 import ReadingProgress from "../../components/ReadingProgress.astro";
@@ -164,10 +162,7 @@ const {
 } = post;
 
 const effectiveSlug = post.slug;
-const reflectionPrompts = Array.isArray(data.reflectionPrompts) ? data.reflectionPrompts : [];
-
 const settings = readSettings();
-const showEndAd = Boolean(settings.ads?.provider) && data.includeAds !== false;
 const siteOrigin = getSiteOrigin(settings);
 const title = data.title ?? "Untitled";
 const description = data.metaDescription ?? data.description ?? data.excerpt ?? '';

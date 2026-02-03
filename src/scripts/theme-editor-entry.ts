@@ -62,8 +62,6 @@ const LEGACY_FIELDS: Array<{ key: string; label: string; placeholder: string }> 
   { key: "textMuted", label: "Muted", placeholder: "var(--text-muted)" },
 ];
 
-const QUICK_EDIT_KEYS = new Set(["primary", "accent", "background", "textPrimary", "textHeading", "textMuted"]);
-
 const PAGE_LAYOUT_FIELDS: Array<{ key: string; label: string; placeholder: string }> = [
   { key: "background", label: "Page Background", placeholder: "var(--background)" },
   { key: "headerBackground", label: "Header Background", placeholder: "var(--header-background)" },
@@ -161,64 +159,6 @@ function createLegacyControl(field: { key: string; label: string; placeholder: s
       />
     </div>
   `;
-  return wrapper;
-}
-
-function applyGroupedValue(keys: string[], value: string) {
-  const events = ['input', 'change'];
-  keys.forEach((key) => {
-    const inputs = Array.from(
-      document.querySelectorAll<HTMLInputElement>(`[data-color-input="${key}"], [data-color-picker="${key}"]`)
-    );
-    inputs.forEach((el) => {
-      el.value = value;
-      events.forEach((evt) => el.dispatchEvent(new Event(evt, { bubbles: true })));
-    });
-  });
-}
-
-function createGroupControl(label: string, description: string, targetKeys: string[]): HTMLElement {
-  const wrapper = document.createElement("div");
-  wrapper.className = "space-y-2 rounded-lg border border-line-subtle bg-surface-base/70 p-3";
-  wrapper.innerHTML = `
-    <div class="flex items-center justify-between gap-2">
-      <div>
-        <p class="text-xs font-semibold uppercase tracking-wide text-body-muted">${label}</p>
-        <p class="text-[11px] text-body-muted">${description}</p>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="inline-block h-6 w-6 rounded border border-line-neutral shadow-inner" data-group-swatch></span>
-        <input
-          type="color"
-          class="h-9 w-12 cursor-pointer rounded border border-line-neutral"
-          aria-label="${label}"
-        />
-      </div>
-    </div>
-    <input
-      type="text"
-      placeholder="var(--primary)"
-      class="w-full rounded-lg border border-line-neutral px-3 py-2 font-mono text-xs"
-    />
-  `;
-
-  const colorPicker = wrapper.querySelector<HTMLInputElement>('input[type="color"]');
-  const textInput = wrapper.querySelector<HTMLInputElement>('input[type="text"]');
-  const swatch = wrapper.querySelector<HTMLElement>('[data-group-swatch]');
-  const syncAll = (value: string) => {
-    if (colorPicker && colorPicker.value !== value) colorPicker.value = value;
-    if (textInput && textInput.value !== value) textInput.value = value;
-    if (swatch) swatch.style.background = value;
-    applyGroupedValue(targetKeys, value);
-  };
-
-  colorPicker?.addEventListener("input", () => syncAll(colorPicker.value));
-  textInput?.addEventListener("blur", () => {
-    const value = textInput.value.trim();
-    if (!value) return;
-    syncAll(value);
-  });
-
   return wrapper;
 }
 
@@ -565,13 +505,16 @@ function buildPreviewSection(container: HTMLElement): void {
         <span class="text-[11px] uppercase tracking-wide text-body-muted">Fonts update in real time</span>
       </div>
       <div class="space-y-3">
-        ${ALL_FONT_VARIABLE_KEYS.map((key) => `
-          <div class="rounded-lg border border-line-subtle bg-surface-base/80 p-3 shadow-sm" data-preview-font-section="${key}">
-            <div class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">${toLabel(key)}</div>
-            <p class="mt-1 text-lg" data-preview-font="${key}">The quick brown fox dances softly.</p>
-            <code class="mt-1 block text-[10px] font-mono text-body-muted" data-preview-font-value="${key}">—</code>
+        ${ALL_FONT_VARIABLE_KEYS.map((key) => {
+          const keyStr = String(key);
+          return `
+          <div class="rounded-lg border border-line-subtle bg-surface-base/80 p-3 shadow-sm" data-preview-font-section="${keyStr}">
+            <div class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">${toLabel(keyStr)}</div>
+            <p class="mt-1 text-lg" data-preview-font="${keyStr}">The quick brown fox dances softly.</p>
+            <code class="mt-1 block text-[10px] font-mono text-body-muted" data-preview-font-value="${keyStr}">—</code>
           </div>
-        `).join("")}
+        `;
+        }).join("")}
       </div>
     </div>
     <div class="space-y-3 rounded-xl border border-line-subtle bg-surface-base/80 p-4">
@@ -580,13 +523,16 @@ function buildPreviewSection(container: HTMLElement): void {
         <span class="text-[11px] uppercase tracking-wide text-body-muted">Every editable color token</span>
       </div>
       <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-        ${ALL_COLOR_VARIABLE_KEYS.filter((key) => !NON_COLOR_SWATCH.has(key)).map((key) => `
-          <div class="space-y-2 rounded-xl border border-line-subtle bg-surface-base/90 p-3 shadow-sm" data-preview-swatch="${key}">
-            <div class="h-10 w-full rounded-lg border border-line-subtle" style="background: var(--preview-${key})"></div>
-            <div class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">${toLabel(key)}</div>
-            <code class="block text-[10px] font-mono text-body-muted" data-preview-swatch-value="${key}">—</code>
+        ${ALL_COLOR_VARIABLE_KEYS.filter((key) => !NON_COLOR_SWATCH.has(String(key))).map((key) => {
+          const keyStr = String(key);
+          return `
+          <div class="space-y-2 rounded-xl border border-line-subtle bg-surface-base/90 p-3 shadow-sm" data-preview-swatch="${keyStr}">
+            <div class="h-10 w-full rounded-lg border border-line-subtle" style="background: var(--preview-${keyStr})"></div>
+            <div class="text-[11px] font-semibold uppercase tracking-wide text-body-muted">${toLabel(keyStr)}</div>
+            <code class="block text-[10px] font-mono text-body-muted" data-preview-swatch-value="${keyStr}">—</code>
           </div>
-        `).join("")}
+        `;
+        }).join("")}
       </div>
     </div>
   `;

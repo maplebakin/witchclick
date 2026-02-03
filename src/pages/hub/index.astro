@@ -191,7 +191,45 @@ const breadcrumbs = [
           )}
         </div>
       ) : (
-        <p class="hub-index-season__placeholder">Our next seasonal arc is brewing—peek back soon for fresh rituals.</p>
+        <div class="hub-index-season__empty">
+          <p class="hub-index-season__placeholder">
+            Our next seasonal arc is brewing. We refresh the calendar in gentle cycles, so new anchor rituals typically land every 6–8 weeks.
+          </p>
+          <div class="hub-index-season__timeline">
+            <div class="hub-index-season__timeline-item">
+              <span class="hub-index-season__timeline-label">Release</span>
+              <span class="hub-index-season__timeline-window">Late winter</span>
+            </div>
+            <div class="hub-index-season__timeline-item">
+              <span class="hub-index-season__timeline-label">Focus</span>
+              <span class="hub-index-season__timeline-window">Early spring</span>
+            </div>
+            <div class="hub-index-season__timeline-item">
+              <span class="hub-index-season__timeline-label">Calm</span>
+              <span class="hub-index-season__timeline-window">High summer</span>
+            </div>
+          </div>
+          <div class="hub-index-season__actions">
+            <a class="hub-index-season__link" href="/hub/release">Explore Release</a>
+            <a class="hub-index-season__link" href="/hub/focus">Explore Focus</a>
+            <a class="hub-index-season__link" href="/hub/calm">Explore Calm</a>
+          </div>
+          <form class="hub-index-season__form" name="seasonal-updates" method="POST" data-netlify="true">
+            <input type="hidden" name="form-name" value="seasonal-updates" />
+            <label class="hub-index-season__label">
+              Get seasonal updates
+              <input
+                type="email"
+                name="email"
+                inputmode="email"
+                autocomplete="email"
+                placeholder="you@example.com"
+                class="hub-index-season__input"
+              />
+            </label>
+            <button type="submit" class="hub-index-season__button">Notify me</button>
+          </form>
+        </div>
       )}
     </div>
   </section>
@@ -370,6 +408,109 @@ const breadcrumbs = [
     margin: 0;
     font-size: 0.95rem;
     color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
+  }
+
+  .hub-index-season__empty {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .hub-index-season__timeline {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .hub-index-season__timeline-item {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--theme-color-amethyst) 30%, transparent 70%);
+    background: color-mix(in srgb, var(--theme-surface-panel) 92%, transparent 8%);
+    color: color-mix(in srgb, var(--ink-body, currentColor) 85%, white 15%);
+  }
+
+  .hub-index-season__timeline-label {
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+  }
+
+  .hub-index-season__timeline-window {
+    font-size: 0.85rem;
+    opacity: 0.8;
+  }
+
+  .hub-index-season__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .hub-index-season__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.55rem 1.2rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--theme-color-gold) 35%, transparent 65%);
+    background: color-mix(in srgb, var(--theme-surface-panel) 85%, transparent 15%);
+    color: var(--theme-text-strong);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .hub-index-season__link:hover,
+  .hub-index-season__link:focus-visible {
+    background: color-mix(in srgb, var(--theme-color-gold) 18%, transparent 82%);
+    color: var(--theme-text-strong);
+  }
+
+  .hub-index-season__form {
+    display: grid;
+    gap: 0.65rem;
+    max-width: 26rem;
+  }
+
+  .hub-index-season__label {
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
+  }
+
+  .hub-index-season__input {
+    width: 100%;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--theme-color-gold) 35%, transparent 65%);
+    background: var(--cozy-input-bg, rgba(255, 250, 245, 0.85));
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+    color: var(--theme-text-strong);
+  }
+
+  .hub-index-season__button {
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--theme-color-gold) 45%, transparent 55%);
+    background: var(--cozy-button-bg, color-mix(in srgb, var(--theme-color-gold) 75%, transparent 25%));
+    color: var(--theme-text-strong);
+    font-weight: 600;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  }
+
+  .hub-index-season__button:hover,
+  .hub-index-season__button:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: var(--elevation-tier-1);
   }
 
   @media (min-width: 768px) {

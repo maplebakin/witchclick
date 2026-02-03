@@ -15,6 +15,7 @@ const keyOk = ADMIN_KEY && url.searchParams.get('key') === ADMIN_KEY;
 const canUse = isDev || !!keyOk;
 
 const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || '';
 ---
 <Base
   title="WitchClick — Partners Dashboard"
@@ -31,7 +32,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
     <div class="space-y-6">
       <AdminNav currentPath="/admin/partners" />
 
-      <div class="mx-auto max-w-6xl space-y-6" data-partners-admin data-dev-api={DEV_API}>
+      <div class="mx-auto max-w-6xl space-y-6" data-partners-admin data-dev-api={DEV_API} data-dev-key={DEV_KEY}>
         <header>
           <h1 class="text-2xl font-semibold text-primary">Partners & Community</h1>
           <p class="mt-2 text-sm text-body-muted">
@@ -87,7 +88,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
             <button type="button" id="validateBtn" class="admin-btn-secondary px-5 py-2.5 text-sm font-medium">
               Check for issues
             </button>
-            <p class="ml-auto text-sm" data-status></p>
+            <p class="ml-auto text-sm" data-status role="status" aria-live="polite" aria-atomic="true"></p>
           </div>
         </section>
       </div>
@@ -105,6 +106,12 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         const root = document.querySelector('[data-partners-admin]');
         if (!root) return;
         const devApi = root.getAttribute('data-dev-api');
+        const devKey = root.getAttribute('data-dev-key');
+        function apiFetch(path, options = {}) {
+          const headers = { ...(options.headers || {}) };
+          if (devKey) headers['X-WC-Dev-Key'] = devKey;
+          return fetch(devApi + path, { ...options, headers });
+        }
         const sectionsList = root.querySelector('[data-sections-list]');
         const highlightsList = root.querySelector('[data-highlights-list]');
         const updatedAtEl = root.querySelector('[data-updated-at]');
@@ -879,7 +886,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         async function loadData() {
           try {
             setStatus('Loading…');
-            const res = await fetch(devApi + '/partners/get', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+            const res = await apiFetch('/partners/get', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
             const json = await res.json();
             if (!json || !json.ok) throw new Error((json && json.error) || 'Failed to load');
             const data = json.data || {};
@@ -904,7 +911,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           try {
             setStatus('Saving…');
             const payload = buildPayload();
-            const res = await fetch(devApi + '/partners/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const res = await apiFetch('/partners/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             const json = await res.json();
             if (!json || !json.ok) throw new Error((json && json.error) || 'Failed to save');
             const data = json.data || {};

@@ -1,4 +1,5 @@
 ---
+/* eslint-disable astro/no-unused-css-selector */
 import Base from "../../layouts/Base.astro";
 import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
@@ -14,6 +15,7 @@ const keyOk = ADMIN_KEY && url.searchParams.get("key") === ADMIN_KEY;
 const authorized = isDev || !!keyOk;
 
 const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
+const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || "";
 ---
 <Base
   title="WitchClick — Theme Admin"
@@ -266,6 +268,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
           <div
             id="themeEditorRoot"
             data-dev-api={DEV_API}
+            data-dev-key={DEV_KEY}
             data-theme-watch={import.meta.env.DEV ? "auto" : "manual"}
             class="mt-5 rounded-xl border border-dashed border-line-subtle bg-surface-base/70 p-5 text-center text-sm text-body-muted"
           >
@@ -370,6 +373,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
   )}
 
   <style>
+    /* eslint-disable astro/no-unused-css-selector */
     :global(html[data-theme-preview="active"]),
     :global(html[data-theme-preview="active"]) body {
       --surface-base: var(--preview-background, var(--theme-surface-base));
@@ -517,5 +521,6 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
     .token-swatch__value.is-duplicate {
       visibility: hidden;
     }
+    /* eslint-enable astro/no-unused-css-selector */
   </style>
 </Base>

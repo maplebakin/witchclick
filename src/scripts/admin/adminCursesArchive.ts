@@ -3,6 +3,14 @@ function initCursesArchive() {
   if (!root) return;
 
   const DEV_API = root.getAttribute('data-dev-api') || 'http://localhost:8787';
+  const DEV_KEY = root.getAttribute('data-dev-key') || '';
+  const baseHeaders: Record<string, string> = DEV_KEY ? { 'X-WC-Dev-Key': DEV_KEY } : {};
+  const jsonHeaders = { 'Content-Type': 'application/json', ...baseHeaders };
+
+  function apiFetch(path: string, options: RequestInit = {}) {
+    const headers = { ...baseHeaders, ...(options.headers || {}) };
+    return fetch(`${DEV_API}${path}`, { ...options, headers });
+  }
   const $ = <T extends HTMLElement = HTMLElement>(selector: string) => root.querySelector<T>(selector);
 
   const librarySelect = $('[data-curse-list]') as HTMLSelectElement | null;
@@ -92,7 +100,7 @@ function initCursesArchive() {
     try {
       if (refreshBtn) refreshBtn.disabled = true;
       setStatus(libraryStatus, 'Loading curses…');
-      const res = await fetch(`${DEV_API}/curses/list`, { method: 'POST' });
+      const res = await apiFetch('/curses/list', { method: 'POST' });
       const data = await res.json();
       if (!data?.ok) throw new Error(data?.error || 'Unable to load curses');
       curses = Array.isArray(data.items)
@@ -124,9 +132,9 @@ function initCursesArchive() {
     try {
       enableEditor(false);
       setStatus(editorStatus, 'Loading curse…');
-      const res = await fetch(`${DEV_API}/curses/load`, {
+      const res = await apiFetch('/curses/load', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: jsonHeaders,
         body: JSON.stringify({ slug }),
       });
       const data = await res.json();
@@ -148,9 +156,9 @@ function initCursesArchive() {
     try {
       isSaving = true;
       setStatus(editorStatus, 'Saving…');
-      const res = await fetch(`${DEV_API}/curses/save`, {
+      const res = await apiFetch('/curses/save', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: jsonHeaders,
         body: JSON.stringify({
           originalSlug: currentSlug,
           frontmatter: fmTextarea?.value || '',
@@ -178,9 +186,9 @@ function initCursesArchive() {
     if (!ok) return;
     try {
       setStatus(editorStatus, 'Deleting…');
-      const res = await fetch(`${DEV_API}/curses/delete`, {
+      const res = await apiFetch('/curses/delete', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: jsonHeaders,
         body: JSON.stringify({ slug: currentSlug }),
       });
       const data = await res.json();

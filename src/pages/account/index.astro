@@ -11,7 +11,7 @@ const ritualEntries = getEntitiesForType("ritual", ritualMeta).map((entry) => ({
   tags: Array.isArray(entry.tags) ? entry.tags.slice(0, 5) : [],
 }));
 
-const _progressStatuses = [
+const progressStatuses = [
   { id: "completed", label: "Completed today", hint: "Mark when you complete the ritual.", accent: "✨" },
   { id: "repeat-next-week", label: "Repeat next week", hint: "Schedule a gentle revisit.", accent: "🔁" },
   { id: "resting", label: "Resting / paused", hint: "Pause the ritual to make space for integration.", accent: "🌙" },
@@ -24,6 +24,11 @@ const shareGift = {
   description:
     "Unlock a printable sampler you can gift to a friend whenever you share a ritual invitation.",
 };
+
+const ritualEntriesJson = JSON.stringify(ritualEntries);
+const progressStatusesJson = JSON.stringify(progressStatuses);
+void ritualEntriesJson;
+void progressStatusesJson;
 ---
 <Base
   title="Member Ritual Shelf — WitchClick"
@@ -93,8 +98,35 @@ const shareGift = {
         Invite a friend into your practice circle. When you share an invitation, we unlock a printable planner you can gift
         them right away.
       </p>
-      <button type="button" class="account-share__button" data-share-button>Share a ritual invitation</button>
-      <p class="account-share__message" data-share-message></p>
+      <button
+        type="button"
+        class="account-share__button"
+        data-share-button
+        data-analytics="account_share_click"
+      >
+        Share a ritual invitation
+      </button>
+      <p class="account-share__message" data-share-message role="status" aria-live="polite" aria-atomic="true"></p>
+      <div class="account-share__fallback" data-share-fallback hidden>
+        <p class="account-share__fallback-title">Share another way</p>
+        <div class="account-share__fallback-actions">
+          <button
+            type="button"
+            class="account-share__fallback-button"
+            data-share-copy
+            data-analytics="account_share_copy"
+          >
+            Copy invite
+          </button>
+          <a class="account-share__fallback-link" data-share-email data-analytics="account_share_email">Send email</a>
+          <a class="account-share__fallback-link" data-share-twitter data-analytics="account_share_twitter" target="_blank" rel="noopener">
+            Share on X
+          </a>
+          <a class="account-share__fallback-link" data-share-facebook data-analytics="account_share_facebook" target="_blank" rel="noopener">
+            Share on Facebook
+          </a>
+        </div>
+      </div>
       <div class="account-share__count" data-share-count-wrapper hidden>
         You&apos;ve gifted this printable <strong data-share-count>0</strong> time(s).
       </div>
@@ -110,23 +142,17 @@ const shareGift = {
   </section>
 
   <script type="application/json" is:inline id="account-rituals">
-    {JSON.stringify(ritualEntries)}
+    {ritualEntriesJson}
   </script>
   <script type="application/json" is:inline id="account-statuses">
-    {JSON.stringify(progressStatuses)}
+    {progressStatusesJson}
   </script>
-  <script type="application/json" is:inline id="account-share-gift">
-    {JSON.stringify(shareGift)}
-  </script>
-
   <script type="module" is:inline>
     const ritualsSource = document.getElementById("account-rituals");
     const statusesSource = document.getElementById("account-statuses");
-    const giftSource = document.getElementById("account-share-gift");
 
     const rituals = ritualsSource ? JSON.parse(ritualsSource.textContent || "[]") : [];
     const statuses = statusesSource ? JSON.parse(statusesSource.textContent || "[]") : [];
-    const shareGift = giftSource ? JSON.parse(giftSource.textContent || "{}") : {};
 
     const ritualsMap = new Map(Array.isArray(rituals) ? rituals.map((ritual) => [ritual.slug, ritual]) : []);
     const statusMap = new Map(Array.isArray(statuses) ? statuses.map((status) => [status.id, status]) : []);
@@ -140,6 +166,11 @@ const shareGift = {
     const shareSection = document.querySelector("[data-share-section]");
     const shareButton = shareSection?.querySelector("[data-share-button]");
     const shareMessage = shareSection?.querySelector("[data-share-message]");
+    const shareFallback = shareSection?.querySelector("[data-share-fallback]");
+    const shareCopy = shareSection?.querySelector("[data-share-copy]");
+    const shareEmail = shareSection?.querySelector("[data-share-email]");
+    const shareTwitter = shareSection?.querySelector("[data-share-twitter]");
+    const shareFacebook = shareSection?.querySelector("[data-share-facebook]");
     const shareReward = shareSection?.querySelector("[data-share-reward]");
     const shareCountWrapper = shareSection?.querySelector("[data-share-count-wrapper]");
     const shareCount = shareSection?.querySelector("[data-share-count]");
@@ -413,6 +444,103 @@ const shareGift = {
       }
     }
 
+    function buildSharePayload() {
+      const savedSlugs = Object.keys(state.rituals || {});
+      const highlightSlug = savedSlugs[0];
+      const highlight = highlightSlug ? ritualsMap.get(highlightSlug) : null;
+      const shareTitle = highlight ? `${highlight.name} — WitchClick` : "WitchClick Ritual";
+      const shareUrl = highlight
+        ? `${window.location.origin}/entities/ritual/${highlight.slug}`
+        : `${window.location.origin}/entities/ritual/`;
+      const shareText = highlight
+        ? `Join me for the "${highlight.name}" ritual on WitchClick.`
+        : "Join me for a WitchClick ritual I adore.";
+      return { title: shareTitle, text: shareText, url: shareUrl };
+    }
+
+    function updateShareFallback(payload) {
+      if (shareEmail instanceof HTMLAnchorElement) {
+        const body = `${payload.text}\n${payload.url}`;
+        shareEmail.href = `mailto:?subject=${encodeURIComponent(payload.title)}&body=${encodeURIComponent(body)}`;
+      }
+      if (shareTwitter instanceof HTMLAnchorElement) {
+        const message = `${payload.text} ${payload.url}`;
+        shareTwitter.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`;
+      }
+      if (shareFacebook instanceof HTMLAnchorElement) {
+        shareFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(payload.url)}`;
+      }
+    }
+
+    function showShareFallback(payload, message) {
+      updateShareFallback(payload);
+      if (shareFallback instanceof HTMLElement) {
+        shareFallback.hidden = false;
+      }
+      if (shareMessage instanceof HTMLElement && message) {
+        shareMessage.textContent = message;
+      }
+    }
+
+    function hideShareFallback() {
+      if (shareFallback instanceof HTMLElement) {
+        shareFallback.hidden = true;
+      }
+    }
+
+    function trackShareEvent(name, detail) {
+      try {
+        const win = window;
+        const analytics = win.__WC_ANALYTICS__;
+        if (!analytics || !name) return;
+        const payload = detail && Object.keys(detail).length ? detail : undefined;
+        if (analytics.provider === "plausible" && typeof win.plausible === "function") {
+          win.plausible(name, payload ? { props: payload } : {});
+        } else if (analytics.provider === "fathom" && win.fathom?.trackEvent) {
+          win.fathom.trackEvent(name);
+        } else if (analytics.provider === "umami") {
+          const tracker = win.umami;
+          if (typeof tracker === "function") {
+            tracker(name, payload);
+          } else if (tracker?.trackEvent) {
+            tracker.trackEvent(name, payload);
+          }
+        } else if (analytics.provider === "simple-analytics" && typeof win.sa_event === "function") {
+          win.sa_event(name, payload || {});
+        }
+      } catch (error) {
+        console.warn("[share] analytics event failed", error);
+      }
+    }
+
+    async function copySharePayload(payload) {
+      const text = `${payload.text}\n${payload.url}`;
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+      const helper = document.createElement("textarea");
+      helper.value = text;
+      helper.setAttribute("readonly", "true");
+      helper.style.position = "absolute";
+      helper.style.left = "-9999px";
+      document.body.appendChild(helper);
+      helper.select();
+      const execCommand = /** @type {{ execCommand?: (commandId: string) => boolean }} */ (document).execCommand;
+      const success = execCommand ? execCommand("copy") : false;
+      document.body.removeChild(helper);
+      return success;
+    }
+
+    function handleShareSuccess(method, message) {
+      state.shareUnlocked = true;
+      state.shareCount = (state.shareCount || 0) + 1;
+      persistState();
+      renderShareSection(message || "Gift unlocked! Enjoy the printable with your friend.");
+      hideShareFallback();
+      trackShareEvent("account_share_success", { method });
+    }
+
     function addRitual(slug) {
       if (!slug || state.rituals[slug]) return;
       const data = ritualsMap.get(slug);
@@ -495,45 +623,81 @@ const shareGift = {
     });
 
     async function handleShareClick() {
-      if (!shareButton || !shareMessage) return;
-      const savedSlugs = Object.keys(state.rituals || {});
-      const highlightSlug = savedSlugs[0];
-      const highlight = highlightSlug ? ritualsMap.get(highlightSlug) : null;
-      const shareText = highlight
-        ? `Join me for the "${highlight.name}" ritual on WitchClick.`
-        : "Join me for a WitchClick ritual I adore.";
-      const shareUrl = `${window.location.origin}/entities/ritual/`;
-      let shared = false;
-      try {
-        if (navigator.share) {
-          await navigator.share({ title: "WitchClick Ritual", text: shareText, url: shareUrl });
-          shared = true;
-        } else if (navigator.clipboard && navigator.clipboard.writeText) {
-          await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
-          shareMessage.textContent = "Invite copied—send it to your friend!";
-          shared = true;
-        } else {
-          shareMessage.textContent = `${shareText} ${shareUrl}`;
-          shared = true;
-        }
-      } catch (error) {
-        if (error?.name === "AbortError") {
-          shareMessage.textContent = "Share canceled—try again when you&apos;re ready.";
-        } else {
-          shareMessage.textContent = "We couldn&apos;t complete that share. Try again soon.";
-        }
+      if (!(shareButton instanceof HTMLButtonElement)) return;
+      const payload = buildSharePayload();
+      updateShareFallback(payload);
+
+      if (!navigator.share) {
+        showShareFallback(payload, "Your browser doesn't support quick sharing yet. Try one of these options.");
+        trackShareEvent("account_share_fallback_shown", { reason: "unsupported" });
+        return;
       }
 
-      if (shared) {
-        state.shareUnlocked = true;
-        state.shareCount = (state.shareCount || 0) + 1;
-        persistState();
-        renderShareSection("Gift unlocked! Enjoy the printable with your friend.");
+      if (shareMessage instanceof HTMLElement) {
+        shareMessage.textContent = "Opening your share sheet...";
+      }
+
+      shareButton.disabled = true;
+      shareButton.setAttribute("aria-busy", "true");
+
+      try {
+        await navigator.share(payload);
+        handleShareSuccess("web-share");
+      } catch (error) {
+        if (error?.name === "AbortError") {
+          if (shareMessage instanceof HTMLElement) {
+            shareMessage.textContent = "Share canceled—try again when you're ready.";
+          }
+          trackShareEvent("account_share_cancel", { method: "web-share" });
+        } else {
+          showShareFallback(payload, "We couldn't open the share sheet. Try one of these options instead.");
+          trackShareEvent("account_share_error", { method: "web-share" });
+        }
+      } finally {
+        shareButton.disabled = false;
+        shareButton.removeAttribute("aria-busy");
       }
     }
 
     if (shareButton instanceof HTMLButtonElement) {
       shareButton.addEventListener("click", handleShareClick);
+    }
+
+    if (shareCopy instanceof HTMLButtonElement) {
+      shareCopy.addEventListener("click", async () => {
+        const payload = buildSharePayload();
+        updateShareFallback(payload);
+        try {
+          const copied = await copySharePayload(payload);
+          if (copied) {
+            handleShareSuccess("copy", "Invite copied! Your gift is ready below.");
+            return;
+          }
+          showShareFallback(payload, "We couldn't copy the invite. Try another option below.");
+        } catch (error) {
+          showShareFallback(payload, "We couldn't copy the invite. Try another option below.");
+        }
+      });
+    }
+
+    const fallbackMessage = "Thanks for sharing! Your gift is ready below.";
+
+    if (shareEmail instanceof HTMLAnchorElement) {
+      shareEmail.addEventListener("click", () => {
+        handleShareSuccess("email", fallbackMessage);
+      });
+    }
+
+    if (shareTwitter instanceof HTMLAnchorElement) {
+      shareTwitter.addEventListener("click", () => {
+        handleShareSuccess("twitter", fallbackMessage);
+      });
+    }
+
+    if (shareFacebook instanceof HTMLAnchorElement) {
+      shareFacebook.addEventListener("click", () => {
+        handleShareSuccess("facebook", fallbackMessage);
+      });
     }
 
     renderSaved();
@@ -905,6 +1069,60 @@ const shareGift = {
       min-height: 1.2rem;
     }
 
+    .account-share__fallback {
+      margin-top: 0.4rem;
+      padding: 0.85rem 1rem;
+      border-radius: 1.25rem;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      display: grid;
+      gap: 0.65rem;
+      box-shadow: 0 16px 24px -20px rgba(59, 130, 246, 0.4);
+    }
+
+    .account-share__fallback-title {
+      margin: 0;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: rgba(30, 64, 175, 0.7);
+    }
+
+    .account-share__fallback-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .account-share__fallback-button,
+    .account-share__fallback-link {
+      border-radius: 999px;
+      padding: 0.45rem 1.05rem;
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      background: linear-gradient(140deg, rgba(147, 197, 253, 0.25), rgba(226, 232, 240, 0.7));
+      color: rgba(30, 64, 175, 0.95);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .account-share__fallback-button:hover,
+    .account-share__fallback-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 20px -18px rgba(37, 99, 235, 0.5);
+    }
+
+    .account-share__fallback-button:focus-visible,
+    .account-share__fallback-link:focus-visible {
+      outline: 2px solid rgba(59, 130, 246, 0.45);
+      outline-offset: 2px;
+    }
+
     .account-share__reward {
       margin-top: 0.75rem;
       padding: 1rem 1.25rem;
@@ -928,6 +1146,11 @@ const shareGift = {
     }
 
     @media (max-width: 640px) {
+      .account-share__fallback-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
       .catalog-card__header {
         flex-direction: column;
         align-items: flex-start;

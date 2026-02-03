@@ -3,6 +3,14 @@ function initPostEditorDashboard() {
   if (!root) return;
 
   const DEV_API = root.getAttribute('data-dev-api') || 'http://localhost:8787';
+  const DEV_KEY = root.getAttribute('data-dev-key') || '';
+  const baseHeaders: Record<string, string> = DEV_KEY ? { 'X-WC-Dev-Key': DEV_KEY } : {};
+  const jsonHeaders = { 'Content-Type': 'application/json', ...baseHeaders };
+
+  function apiFetch(path: string, options: RequestInit = {}) {
+    const headers = { ...baseHeaders, ...(options.headers || {}) };
+    return fetch(`${DEV_API}${path}`, { ...options, headers });
+  }
   const listEl = root.querySelector<HTMLSelectElement>('[data-post-list]');
   const searchInput = root.querySelector<HTMLInputElement>('[data-search]');
   const refreshButton = root.querySelector<HTMLButtonElement>('[data-refresh]');
@@ -140,7 +148,7 @@ function initPostEditorDashboard() {
     try {
       if (refreshButton) refreshButton.disabled = true;
       setStatus('Loading posts…');
-      const res = await fetch(`${DEV_API}/posts/list`, { method: 'POST' });
+      const res = await apiFetch('/posts/list', { method: 'POST' });
       const data = await res.json();
       if (!data?.ok) {
         throw new Error(data?.error || 'Unable to load posts');
@@ -187,9 +195,9 @@ function initPostEditorDashboard() {
       isLoadingPost = true;
       enableEditor(false);
       setStatus('Loading post…');
-      const res = await fetch(`${DEV_API}/posts/load`, {
+      const res = await apiFetch('/posts/load', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: jsonHeaders,
         body: JSON.stringify({ slug }),
       });
       const data = await res.json();
@@ -218,9 +226,9 @@ function initPostEditorDashboard() {
       setStatus('Saving changes…');
       setWarnings();
       saveButton && (saveButton.disabled = true);
-      const res = await fetch(`${DEV_API}/posts/update`, {
+      const res = await apiFetch('/posts/update', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: jsonHeaders,
         body: JSON.stringify({
           originalSlug: currentSlug,
           frontmatter: frontmatterTextarea.value,
@@ -258,9 +266,9 @@ function initPostEditorDashboard() {
     if (!confirmed) return;
     try {
       setStatus('Deleting…');
-      const res = await fetch(`${DEV_API}/posts/delete`, {
+      const res = await apiFetch('/posts/delete', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: jsonHeaders,
         body: JSON.stringify({ slug: currentSlug }),
       });
       const data = await res.json();
