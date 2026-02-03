@@ -147,4 +147,4 @@ This working supports your journey, never overrides medical or mental health nee
 
 Tick as you go, or glance back—like a trail of breadcrumbs proving you listened.
 
-Further reading: [Letting Yourself Soften Into Interpretation of Colour](/post/soften-into-interpretation-of-colour), [Mirror of Consequence for the One Who Chose Harm, Today](/curses/mirror-of-consequence-for-the-one-who-chose-harm-today), [Severance Ritual: Cut the Cord with Clean Precision](/curses/severance-ritual-cut-cord-clean-precision). Evidence base: [Mindfulness overview (APA)](https://www.apa.org/topics/mindfulness).
+Further reading: [Letting Yourself Soften Into Interpretation of Colour](/post/soften-into-interpretation-of-colour), [Mirror Truth Spoke Unintended](/curses/mirror-truth-spoke-unintended), [Knife Rite: Clean Cord Cutting](/curses/knife-rite-clean-cord-cutting). Evidence base: [Mindfulness overview (APA)](https://www.apa.org/topics/mindfulness).

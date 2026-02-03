@@ -54,7 +54,7 @@ Use fire safely in a controlled container. If cutting feels triggering, you can 
 
 This piece is meant to be reused when nerves are loud and focus is thin. Revisit it after tense conversations or restless nights, and adjust steps to match your spoons.
 
-Keep exploring with [Mirror of Consequence for the One Who Chose Harm, Today](/curses/mirror-of-consequence-for-the-one-who-chose-harm-today), [When The Waiting Period Feels Like Heavy Stagnation](/post/when-the-waiting-period-feels-like-stagnation), [Energy Return Ritual: Restore Balance](/post/energy-return-ritual-restore-balance).
+Keep exploring with [Mirror Truth Spoke Unintended](/curses/mirror-truth-spoke-unintended), [When The Waiting Period Feels Like Heavy Stagnation](/post/when-the-waiting-period-feels-like-stagnation), [Energy Return Ritual: Restore Balance](/post/energy-return-ritual-restore-balance).
 
 For an evidence-based primer, see [Understanding personal boundaries](https://www.apa.org/topics/relationships/boundaries).
 

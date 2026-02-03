@@ -29,6 +29,7 @@ import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 import generatorPresets, { resolveGeneratorPresetKey } from './server/lib/generatorPresets.js';
 import generatorStyles from './server/lib/generatorStyles.js';
@@ -2033,9 +2034,11 @@ async function withRequestBoundary(req, res, handler) {
     await withRequestBoundary(req, res, async () => {
       parsedUrl = null;
     const startTime = Date.now();
-    res.on('finish', () => {
-      logRequest(req, res.statusCode, Date.now() - startTime);
-    });
+    if (typeof res.on === 'function') {
+      res.on('finish', () => {
+        logRequest(req, res.statusCode, Date.now() - startTime);
+      });
+    }
 
     const remote = req.socket?.remoteAddress || '';
     const route = req.url || '';
@@ -3054,7 +3057,17 @@ async function withRequestBoundary(req, res, handler) {
   });
 });
 
-if (process.env.VITEST !== 'true') {
+const isDirectExecution = (() => {
+  const entry = process.argv[1];
+  if (!entry) return false;
+  try {
+    return path.resolve(entry) === path.resolve(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+})();
+
+if (isDirectExecution && process.env.VITEST !== 'true') {
   server.listen(PORT, HOST, () => {
     console.log(`[dev-api] listening on http://${HOST}:${PORT}`);
   });

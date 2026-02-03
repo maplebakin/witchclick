@@ -6,7 +6,7 @@ metaTitle: "Refinding Yourself Under the Holiday Mask Ritual"
 metaDescription: "A gentle ritual for peeling away holiday performance layers and reconnecting with your quieter, truer self when the season asks you to be someone else."
 tags: ["ritual","shadow-work","self-compassion","holidays","authenticity","boundaries"]
 outline: ["Opening Reflection","Quick, Low-Energy Variant","Deep Variant","Reflection Prompt","Ritual Checklist","Conclusion"]
-wordCount: 1024
+wordCount: 1087
 readingMinutes: 5
 entities: []
 includeAds: false
@@ -103,4 +103,4 @@ The holiday mask doesn't make you a fraud—it makes you human. We all wear vers
 
 Return to this ritual whenever you notice yourself disappearing into the performance. It will meet you exactly where you are—exhausted, resentful, tender, or numb. The practice of [refinding yourself](/post/when-your-existence-feels-like-it-takes-up-too-much-space) isn't about dramatic transformation; it's about small moments of recognition, gentle acknowledgments that you're still there, still real, still worth listening to beneath all the holiday noise.
 
-You don't have to burn the masks entirely. Sometimes we need them to survive the season. But knowing they're masks, knowing you can take them off in private moments, knowing your real self is waiting patiently underneath—that's the magic. That's how you make it through December without losing yourself completely.
+You don't have to burn the masks entirely. Sometimes we need them to survive the season. But knowing they're masks, knowing you can take them off in private moments, knowing your real self is waiting patiently underneath—that's the magic. That's how you make it through December without losing yourself completely. If the season feels especially overwhelming, the [CDC coping-with-stress guidance](https://www.cdc.gov/mentalhealth/stress-coping/cope-with-stress/index.html) offers grounded, practical support you can pair with this ritual.

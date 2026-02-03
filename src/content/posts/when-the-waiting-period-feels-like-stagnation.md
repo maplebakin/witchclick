@@ -112,7 +112,7 @@ For now, that is enough. Not thrilling, not cinematic. Just enough, in a soft, e
 
 This piece is meant to be reused when nerves are loud and focus is thin. Revisit it after tense conversations or restless nights, and adjust steps to match your spoons.
 
-Keep exploring with [When the Will to Exist Quietly Slips Away](/post/when-motivation-to-exist-is-gone), [Mirror of Consequence for the One Who Chose Harm, Today](/curses/mirror-of-consequence-for-the-one-who-chose-harm-today), [Severance Ritual: Cut the Cord with Clean Precision](/curses/severance-ritual-cut-cord-clean-precision).
+Keep exploring with [When the Will to Exist Quietly Slips Away](/post/when-motivation-to-exist-is-gone), [Mirror Truth Spoke Unintended](/curses/mirror-truth-spoke-unintended), [Knife Rite: Clean Cord Cutting](/curses/knife-rite-clean-cord-cutting).
 
 For an evidence-based primer, see [Mindfulness overview (APA)](https://www.apa.org/topics/mindfulness).
 

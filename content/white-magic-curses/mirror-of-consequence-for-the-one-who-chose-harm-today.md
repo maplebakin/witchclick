@@ -51,7 +51,7 @@ Use a flameless candle if kids, pets, or tiredness are nearby.
 
 This piece is meant to be reused when nerves are loud and focus is thin. Revisit it after tense conversations or restless nights, and adjust steps to match your spoons.
 
-Keep exploring with [Severance Ritual: Cut the Cord with Clean Precision](/curses/severance-ritual-cut-cord-clean-precision), [When The Waiting Period Feels Like Heavy Stagnation](/post/when-the-waiting-period-feels-like-stagnation), [Energy Return Ritual: Restore Balance](/post/energy-return-ritual-restore-balance).
+Keep exploring with [Knife Rite: Clean Cord Cutting](/curses/knife-rite-clean-cord-cutting), [When The Waiting Period Feels Like Heavy Stagnation](/post/when-the-waiting-period-feels-like-stagnation), [Energy Return Ritual: Restore Balance](/post/energy-return-ritual-restore-balance).
 
 For an evidence-based primer, see [Understanding personal boundaries](https://www.apa.org/topics/relationships/boundaries).
 

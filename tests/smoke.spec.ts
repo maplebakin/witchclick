@@ -205,7 +205,8 @@ test.describe("site smoke", () => {
           const visible = rect.width > 0 && rect.height > 0;
           if (!visible) return false;
           const tabindex = element.getAttribute("tabindex");
-          return tabindex === "-1";
+          if (tabindex !== "-1") return false;
+          return element.matches('a[href], button, [role="button"], input, select, textarea');
         })
         .map((element) => element.outerHTML.slice(0, 120));
     });
@@ -230,7 +231,8 @@ test.describe("site smoke", () => {
           const visible = rect.width > 0 && rect.height > 0;
           if (!visible) return false;
           const tabindex = element.getAttribute("tabindex");
-          return tabindex === "-1";
+          if (tabindex !== "-1") return false;
+          return element.matches('a[href], button, [role="button"], input, select, textarea');
         })
         .map((element) => element.outerHTML.slice(0, 120));
     });

@@ -253,4 +253,4 @@ Treat](https://en.wikipedia.org/wiki/Jungian_archetypes
 
 Treat) any external writing as reference, not as commandment. Your own experience of the Azazel archetype and of clarity itself remains the primary text for this working.
 
-Further reading: [Azazel's Clarity Spellwork and Scrying Spread](/post/azazels-clarity-spellwork-and-spread), [Focus Tea Rituals for Gentle, Distracted Brains](/post/focus-tea-rituals-gentle-brains), [Mirror of Consequence for the One Who Chose Harm, Today](/curses/mirror-of-consequence-for-the-one-who-chose-harm-today).
+Further reading: [Azazel's Clarity Spellwork and Scrying Spread](/post/azazels-clarity-spellwork-and-spread), [Focus Tea Rituals for Gentle, Distracted Brains](/post/focus-tea-rituals-gentle-brains), [Mirror Truth Spoke Unintended](/curses/mirror-truth-spoke-unintended).

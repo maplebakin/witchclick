@@ -23,7 +23,7 @@
     "check:affiliates": "node ./scripts/check-affiliate-ids.mjs",
     "themes:lint": "node ./scripts/themes-lint.mjs",
     "test:e2e": "playwright test",
-    "linkcheck": "linkinator ./dist --recurse --skip \"^https?://\"",
+    "linkcheck": "node ./scripts/check-internal-links.mjs",
     "themes:build": "node ./scripts/generate-theme-css.mjs",
     "themes:watch": "node ./scripts/generate-theme-css.mjs --watch",
     "tools:export:install": "playwright install chromium"

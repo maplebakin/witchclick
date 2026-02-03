@@ -6,7 +6,7 @@ metaTitle: "New Year Without the 'New Me' Pressure: A Cozy Story"
 metaDescription: "A whimsical first-person story about greeting the new year without transformation pressure—just tea, pajamas, and permission to stay exactly yourself."
 tags: ["story","new-year","self-compassion","rest-and-survival","gentle-self-care","toxic-positivity"]
 outline: ["Opening Reflection","The Morning After Midnight","The Notebook That Stayed Blank","What the Tea Told Me","The Same Me, Still Here","Gentle Takeaway"]
-wordCount: 1267
+wordCount: 1349
 readingMinutes: 6
 entities: []
 includeAds: false
@@ -92,10 +92,10 @@ They smiled. Made their own tea. Sat down across from me in their own rumpled cl
 
 The calendar said January first. My body said 'still recovering from December.' My heart said 'you're allowed to just be.' And for once, I listened to the quietest voice instead of the loudest.
 
-## Gentle Takeaway
+## Conclusion
 
 This story isn't about rejecting all growth or change—sometimes we do want to shift things, and that's beautiful too. It's about releasing the pressure that transformation is mandatory every time we flip a calendar page. It's about recognizing that [staying exactly yourself](/post/when-your-existence-feels-like-it-takes-up-too-much-space) can be the most radical act in a culture that profits from your dissatisfaction.
 
-If you woke up this new year and felt that familiar weight of 'I should be different by now,' maybe this story offers you permission to set it down. You're allowed to greet the new year in your oldest pajamas. You're allowed to keep your same routines, your same body, your same beautifully imperfect life.
+If you woke up this new year and felt that familiar weight of 'I should be different by now,' maybe this story offers you permission to set it down. You're allowed to greet the new year in your oldest pajamas. You're allowed to keep your same routines, your same body, your same beautifully imperfect life. Research on [self-compassion and emotional resilience](https://self-compassion.org/the-research/) supports this softer approach: kindness tends to help people sustain change better than shame does.
 
 The new year doesn't need a new you. It just needs the you that's already here, however that looks today.
