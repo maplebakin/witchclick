@@ -1,9 +1,12 @@
 // src/pages/api/staging/list.json.ts
 // List all draft posts for staging management
 
-import fs from 'node:fs';
-import path from 'node:path';
-import matter from 'gray-matter';
+import {
+  getCanonicalPostDisplayPath,
+  readAllPostRecords,
+  resolveCanonicalPostsDirectory,
+} from '../../../utils/postFiles';
+import { json, jsonError, requireMutatingAccess } from '../_mutating';
 
 interface DraftPost {
   slug: string;
@@ -22,41 +25,29 @@ interface DraftPost {
   };
 }
 
-function json(obj: unknown, status = 200) {
-  return new Response(JSON.stringify(obj), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-  });
-}
+export async function GET({ request }: { request: Request }) {
+  const denied = requireMutatingAccess(request);
+  if (denied) return denied;
 
-export async function GET() {
   try {
-    const CWD = process.cwd();
-    const postsDir = path.join(CWD, 'content', 'posts');
-
-    if (!fs.existsSync(postsDir)) {
-      return json({ ok: true, drafts: [] });
-    }
-
-    const files = fs.readdirSync(postsDir).filter((f) => f.endsWith('.md'));
+    const postsDir = resolveCanonicalPostsDirectory();
     const drafts: DraftPost[] = [];
+    const records = readAllPostRecords(postsDir);
 
-    for (const file of files) {
-      const filePath = path.join(postsDir, file);
-      const content = fs.readFileSync(filePath, 'utf8');
-      const { data } = matter(content);
+    for (const record of records) {
+      const { data, slug, fileName } = record;
 
       // Only include drafts
       if (data.draft === true) {
         drafts.push({
-          slug: data.slug || file.replace(/\.md$/, ''),
+          slug,
           title: data.title || 'Untitled',
           excerpt: data.excerpt || '',
           tags: Array.isArray(data.tags) ? data.tags : [],
           wordCount: data.wordCount || 0,
           readingMinutes: data.readingMinutes || 1,
           publishedAt: data.publishedAt || new Date().toISOString(),
-          filePath: `src/content/posts/${file}`,
+          filePath: getCanonicalPostDisplayPath(fileName),
           promptMetadata: data.promptMetadata,
         });
       }
@@ -68,10 +59,10 @@ export async function GET() {
     return json({ ok: true, drafts });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    return json({ ok: false, error: message }, 500);
+    return jsonError(500, 'INTERNAL_ERROR', message);
   }
 }
 
-export async function POST() {
-  return GET();
+export async function POST({ request }: { request: Request }) {
+  return GET({ request });
 }

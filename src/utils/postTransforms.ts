@@ -4,6 +4,7 @@
 import type { LoadedPost } from './posts';
 import type { CardPost } from '@/types/post';
 import { firstParagraph, estimateReadingMinutes, extractHeroImage, getPostCategory } from './posts';
+import { canonicalizeTagSlug, normalizeTagLabel } from './tags';
 
 /**
  * Transform a LoadedPost into CardPost format for display in lists/grids
@@ -30,16 +31,19 @@ export function postToCardData(post: LoadedPost): CardPost {
       ? fm.tags.split(",")
       : [];
 
-  const tags = Array.from(
-    new Map(
-      tagsRaw
-        .map((tag) => (typeof tag === "string" ? tag.trim() : ""))
-        .filter(Boolean)
-        .map((tag) => [tag.toLowerCase(), tag])
-    ).values()
-  );
+  const tagMap = new Map<string, string>();
+  for (const rawTag of tagsRaw) {
+    const label = normalizeTagLabel(rawTag);
+    if (!label) continue;
+    const canonical = canonicalizeTagSlug(label);
+    if (!canonical) continue;
+    if (!tagMap.has(canonical)) {
+      tagMap.set(canonical, label);
+    }
+  }
+  const tags = Array.from(tagMap.values());
 
-  const normalizedTags = tags.map((tag) => tag.toLowerCase());
+  const normalizedTags = tags.map((tag) => canonicalizeTagSlug(tag)).filter(Boolean);
 
   // Published date with fallback chain
   const publishedAtCandidate =

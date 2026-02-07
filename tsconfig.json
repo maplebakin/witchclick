@@ -4,7 +4,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "../scripts/ingest.mjs": ["scripts/ingest.d.mts"]
+      "../scripts/ingest.mjs": ["scripts/ingest.d.mts"],
+      "../scripts/verify-no-draft-leaks.mjs": ["scripts/verify-no-draft-leaks.d.ts"]
     },
     "types": ["node", "astro/client", "@playwright/test", "vitest"],
     "module": "ES2022",

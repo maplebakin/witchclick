@@ -54,11 +54,11 @@ When you have thirty minutes and the emotional bandwidth to go deeper, this vers
 
 3. **Invite your quieter self forward.** Close your eyes or soften your gaze. Ask: *Who am I when no one is watching? What do I actually want right now?* Let answers arrive slowly, without forcing. They might be small—"I want silence" or "I want to be left alone" or "I want to stop smiling."
 
-4. **Offer yourself permission.** Say these words or write them down: *I give myself permission to be tired. To be less than delightful. To need space. To disappoint people. To protect my tender parts.* Add your own permissions as they arise. This is where [gentle self-care practices](/post/gentle-self-care-practices) become acts of reclamation.
+4. **Offer yourself permission.** Say these words or write them down: *I give myself permission to be tired. To be less than delightful. To need space. To disappoint people. To protect my tender parts.* Add your own permissions as they arise. This is where [gentle self-care practices](/post/when-to-let-yourself-rest) become acts of reclamation.
 
 5. **Create a small anchor object.** Choose something you can carry—a smooth stone, a piece of jewelry, a folded note. Charge it with your intention: *This reminds me who I am underneath the performance.* Touch it throughout the holiday season when you need to remember yourself.
 
-6. **Set one boundary for tomorrow.** Don't overwhelm yourself with ten new rules. Choose one small boundary you can hold: saying no to one invitation, leaving an event thirty minutes early, skipping one tradition that drains you. Practice [tender boundaries](/post/tender-boundaries) as a form of self-recognition.
+6. **Set one boundary for tomorrow.** Don't overwhelm yourself with ten new rules. Choose one small boundary you can hold: saying no to one invitation, leaving an event thirty minutes early, skipping one tradition that drains you. Practice [tender boundaries](/post/calming-strategies-when-partner-pisses-you-off) as a form of self-recognition.
 
 7. **Close with gratitude for showing up.** Thank yourself for taking this time. For being brave enough to look underneath. For trusting that the real you is worth finding. Blow out your candle or turn off your lamp, carrying that recognition with you.
 
@@ -68,7 +68,7 @@ When you have thirty minutes and the emotional bandwidth to go deeper, this vers
 
 After the ritual, journal on this question: *If I could tell my holiday-masked self one true thing about who I actually am right now, what would I say?*
 
-Let your answer be messy, contradictory, or incomplete. The point isn't to find a perfect answer but to practice speaking to yourself with honesty and [self-compassion](/post/self-compassion) instead of performance.
+Let your answer be messy, contradictory, or incomplete. The point isn't to find a perfect answer but to practice speaking to yourself with honesty and [self-compassion](/post/when-your-existence-feels-like-it-takes-up-too-much-space) instead of performance.
 
 ## Ritual Checklist
 

@@ -1,0 +1,63 @@
+---
+import Base from "../../layouts/Base.astro";
+import HeadSlot from "@/components/HeadSlot.astro";
+
+const title = "Witch's Study";
+const description =
+  "A ritual-first workspace for inscribing drafts, tending chambers, and sealing finished workings.";
+
+const chambers = [
+  {
+    slug: "herbary",
+    name: "Herbary",
+    summary: "Botanical correspondences, plant notes, and grounded ingredient lore.",
+  },
+  {
+    slug: "crystal-grotto",
+    name: "Crystal Grotto",
+    summary: "Stone profiles, textures, and practical reference pages.",
+  },
+  {
+    slug: "moon-chamber",
+    name: "Moon Chamber",
+    summary: "Phase-aware drafts, timing notes, and celestial planning.",
+  },
+  {
+    slug: "grimoire",
+    name: "Grimoire",
+    summary: "The central registry where pages are inscribed, revised, and sealed.",
+  },
+];
+---
+
+<Base title={title} description={description} canon="/study" wide={true} noindex={true}>
+  <HeadSlot slot="head">
+    <meta name="robots" content="noindex" />
+  </HeadSlot>
+
+  <section class="mx-auto max-w-5xl space-y-8 py-12">
+    <header class="space-y-3">
+      <p class="text-xs uppercase tracking-[0.22em] text-body-muted">WitchClick Study</p>
+      <h1 class="font-serif text-4xl text-heading">The Study is Open</h1>
+      <p class="max-w-3xl text-base text-body">
+        This is Phase 1 scaffolding. Travel between chambers to preview the ritual-shaped workspace before editor wiring begins.
+      </p>
+    </header>
+
+    <div class="grid gap-4 md:grid-cols-2">
+      {chambers.map((chamber) => (
+        <a
+          href={`/study/chambers/${chamber.slug}`}
+          class="rounded-2xl border border-line-neutral bg-surface-base p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-line-strong hover:shadow-md"
+        >
+          <h2 class="font-serif text-2xl text-heading">{chamber.name}</h2>
+          <p class="mt-2 text-sm text-body-muted">{chamber.summary}</p>
+        </a>
+      ))}
+    </div>
+
+    <p class="text-sm text-body-muted">
+      Placeholder status: chamber routes are scaffolded, ready for the Grimoire editor integration in Phase 2.
+    </p>
+  </section>
+</Base>

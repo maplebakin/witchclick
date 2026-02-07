@@ -35,8 +35,8 @@ internalLinkHints:
 internalLinks: []
 publishedAt: '2025-10-30T13:59:36.445Z'
 canonicalUrl: 'https://witchclick.space/post/sick-parent-sick-child-reflection'
-heroImage: /images/hero/sick-parent-sick-child-reflection/sick-with-kiddo-4.png
-heroImageSrc: /images/hero/sick-parent-sick-child-reflection/sick-with-kiddo-4.png
+heroImage: /images/hero/sick-parent-sick-child-reflection/sick-with-kiddo-4.webp
+heroImageSrc: /images/hero/sick-parent-sick-child-reflection/sick-with-kiddo-4.webp
 heroAlt: ''
 specVersion: 2
 promptMetadata:

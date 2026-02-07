@@ -37,7 +37,7 @@ Low spoons, big feelings, end of the year. This path lets you do a clean curse i
 2. On the paper, write a short sentence about the pattern that is hurting you: 'I keep carrying their guilt', 'I am blamed when they explode', or something similar. Avoid names or specifics.
 3. Hold the paper and say quietly: 'Let what is not mine return to where it belongs.' Breathe out over the words as if you are dusting them off.
 4. Tear the paper into pieces and drop them into the bowl. Picture the bowl as a temporary inbox for the universe, not a trash can.
-5. When you feel done, blow out the candle. Empty the bowl later into recycling or the bin. If you want a softer follow-up another night, you can lean on the [Cozy Cursing Ritual](/post/cozy-cursing-ritual) for extra comfort.
+5. When you feel done, blow out the candle. Empty the bowl later into recycling or the bin. If you want a softer follow-up another night, you can lean on the [Cozy Cursing Ritual](/post/cozy-cursing-ritual-release-anger-banishment) for extra comfort.
 
 ## Deep December Clean-Cursing Variant
 
@@ -82,6 +82,6 @@ If cards are part of your practice, you can also weave this work with the [Secul
 
 Clean curses are not about being better than the people who hurt you; they are about refusing to be their storage unit. Each time you name a pattern, let what is not yours return, and choose one small act of care afterward, you are teaching your nervous system that clarity and rest can sit side by side.
 
-You can return to this clean cursing ritual whenever December feels heavy or when an old story suddenly flares up in the middle of the year. On softer days, you might swap it out for [Gentle Rituals](/post/gentle-rituals) or pair it with [When Life Feels on Pause](/post/when-life-feels-on-pause) if your whole life feels stalled.
+You can return to this clean cursing ritual whenever December feels heavy or when an old story suddenly flares up in the middle of the year. On softer days, you might swap it out for [gentle focus rituals](/post/focus-tea-rituals-gentle-brains) or pair it with [When Life Feels on Pause](/post/when-life-feels-on-pause) if your whole life feels stalled.
 
 Wherever you are, let this be enough for tonight: one clear sentence, one slow breath, one small boundary forming in the quiet.

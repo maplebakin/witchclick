@@ -10,6 +10,7 @@ import { PostSpecV2Schema, type PostSpecV2 } from '../../lib/postSpecSchema';
 import type { EntityType } from '../../lib/postSpecSchema';
 import { validatePostSpec } from '../../lib/postSpecValidator';
 import { slugify } from '../../../shared/slugify.js';
+import { json, jsonError, requireMutatingAccess } from './_mutating';
 
 /* ---------- helpers ---------- */
 
@@ -295,6 +296,9 @@ function normalizeCta(cta:any): { type:'kofi'|'download'|'none'; id?:string }{
 /* ---------- handler ---------- */
 
 export async function POST({ request }: { request: Request }) {
+  const denied = requireMutatingAccess(request);
+  if (denied) return denied;
+
   try {
     let input: unknown = null;
 
@@ -319,7 +323,7 @@ export async function POST({ request }: { request: Request }) {
     }
 
     if (!input) {
-      return json({ ok:false, error:'No JSON body provided. Paste a PostSpec v2 object.' }, 400);
+      return jsonError(400, 'INVALID_JSON', 'No JSON body provided. Paste a PostSpec v2 object.');
     }
 
     // Check for dry run and draft modes
@@ -342,7 +346,7 @@ export async function POST({ request }: { request: Request }) {
       normalizationReport = report;
       normalizationWarnings = Array.isArray(warnings) ? [...warnings] : [];
     } catch (error: any) {
-      return json({ ok:false, error: error?.message || String(error) }, 400);
+      return jsonError(400, 'NORMALIZATION_ERROR', error?.message || String(error));
     }
 
     const parsed = PostSpecV2Schema.safeParse(normalizedSpec);
@@ -352,7 +356,16 @@ export async function POST({ request }: { request: Request }) {
         const path = (issue.path ?? []).join('.') || 'root';
         return `${path}: ${issue.message}`;
       });
-      return json({ ok:false, error: schemaErrors[0], errors: schemaErrors, warnings: normalizationWarnings, normalizations: normalizationReport }, 400);
+      return jsonError(
+        400,
+        'VALIDATION_ERROR',
+        schemaErrors[0] || 'PostSpec validation failed',
+        {
+          errors: schemaErrors,
+          warnings: normalizationWarnings,
+          normalizations: normalizationReport,
+        },
+      );
     }
 
     const spec = parsed.data;
@@ -363,7 +376,16 @@ export async function POST({ request }: { request: Request }) {
     });
     if (!enforcement.valid) {
       const warnings = [...new Set([...normalizationWarnings, ...enforcement.warnings])];
-      return json({ ok: false, error: enforcement.errors[0], errors: enforcement.errors, warnings, normalizations: normalizationReport }, 400);
+      return jsonError(
+        400,
+        'VALIDATION_ERROR',
+        enforcement.errors[0] || 'PostSpec validation failed',
+        {
+          errors: enforcement.errors,
+          warnings,
+          normalizations: normalizationReport,
+        },
+      );
     }
 
     const contentWords = enforcement.wordCount;
@@ -372,7 +394,16 @@ export async function POST({ request }: { request: Request }) {
     const structureResult = validateStructure(spec, contentWords);
     if (structureResult.errors.length) {
       const warnings = [...new Set([...normalizationWarnings, ...enforcement.warnings, ...structureResult.warnings])];
-      return json({ ok:false, error: structureResult.errors[0], errors: structureResult.errors, warnings, normalizations: normalizationReport }, 400);
+      return jsonError(
+        400,
+        'VALIDATION_ERROR',
+        structureResult.errors[0] || 'Post structure validation failed',
+        {
+          errors: structureResult.errors,
+          warnings,
+          normalizations: normalizationReport,
+        },
+      );
     }
 
     // Paths & settings
@@ -539,13 +570,6 @@ export async function POST({ request }: { request: Request }) {
       saved: true,
     });
   } catch (e: any) {
-    return json({ ok:false, error: e?.message || String(e) }, 500);
+    return jsonError(500, 'INTERNAL_ERROR', e?.message || String(e));
   }
-}
-
-function json(obj: any, status = 200) {
-  return new Response(JSON.stringify(obj), {
-    status,
-    headers: { 'Content-Type': 'application/json' }
-  });
 }

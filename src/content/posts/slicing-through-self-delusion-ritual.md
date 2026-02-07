@@ -38,7 +38,7 @@ On low-spoon days, use this as a five-minute pattern check instead of a full exc
 1. Sit or lie where your body can soften, even a little. Place one hand on your chest or belly and notice the story currently looping in your mind.
 2. Name the story in one simple line, out loud or in a whisper: 'The story is that...' and fill in the rest without editing.
 3. Ask yourself, 'What tiny slice of this feels fact, and what feels fear?' Circle or underline the single detail you know is definitely real.
-4. Gently say, 'For now, I choose to believe the part that is real and set down the rest.' If your self-talk turns punishing, pause and try the gentler boundary work of the [Clean Cursing Ritual](/post/clean-cursing-ritual) instead of forcing yourself to continue.
+4. Gently say, 'For now, I choose to believe the part that is real and set down the rest.' If your self-talk turns punishing, pause and try the gentler boundary work of the [Clean Cursing Ritual](/post/clean-cursing-return-energy-to-origin) instead of forcing yourself to continue.
 5. When the waiting period feels heavy after you name the truth, drink some water, notice three colours in the room, and let that be enough for today.
 
 ## Deep Clarifying Variant
@@ -50,12 +50,12 @@ This is the longer version for evenings when you have more spoons and want to si
 3. Draw a simple vertical line down the page, slicing the story in two. On the left, list the observable facts: what someone said, what you did, what time it was. On the right, list interpretations, fears, and predictions.
 4. Place your hand on the page and breathe slowly, imagining the line as a small sword of truth. Ask, 'What belongs on the fact side that I left out? What belongs on the fear side that I kept pretending was solid?'
 5. If you read tarot, you might pull one card across the line, such as the Moon, as a symbol of how confusion and intuition mix. Treat it as an archetype, not an omen, and notice what feelings it stirs rather than what future it predicts.
-6. When you feel a bit more honest about the split between fact and fear, choose one kind action that honours the facts. If you need help with this, you can borrow ideas from the [Clarity Rite](/post/clarity-rite) or the [Energy Return Ritual](/post/energy-return-ritual) to support you in taking a grounded next step.
+6. When you feel a bit more honest about the split between fact and fear, choose one kind action that honours the facts. If you need help with this, you can borrow ideas from the [Clarity Rite](/post/secular-tarot-spread-for-a-sign) or the [Energy Return Ritual](/post/energy-return-ritual-restore-balance) to support you in taking a grounded next step.
 7. Close by thanking yourself for staying with discomfort instead of abandoning your own side of the story.
 
 ## Reflection Prompt
 
-If you enjoy dedicated prompts, you might explore the fuller structure in [Reflection Journal](/post/reflection-journal), but for this ritual keep it very simple.
+If you enjoy dedicated prompts, you might explore the fuller structure in [Reflection Journal](/post/using-different-perspectives-a-gentle-practical-guide), but for this ritual keep it very simple.
 
 Jot a few lines on your reflection journal pages that answer this question:
 

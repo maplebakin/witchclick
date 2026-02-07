@@ -23,7 +23,7 @@ export async function getStaticPaths() {
         return prompts;
     }
 
-    const posts = await getCollection('posts');
+    const posts = await getCollection('posts', ({ data }) => data.draft !== true);
     return posts.map((post) => {
         // Prioritize explicit reflectionPrompts field
         let reflectionPrompts = post.data.reflectionPrompts || [];

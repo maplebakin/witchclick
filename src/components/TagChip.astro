@@ -1,14 +1,17 @@
 ---
+import { canonicalTagHref, normalizeTagLabel } from "@/utils/tags";
+
 interface Props { tag: string }
 const { tag } = Astro.props as Props;
-const slug = String(tag).toLowerCase();
+const label = normalizeTagLabel(tag).toLowerCase();
+const href = canonicalTagHref(tag);
 ---
 <a
-  href={`/tag/${slug}`}
+  href={href}
   class="tag-chip inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs text-primary-strong focus-ring"
 >
   <span>#</span>
-  <span>{slug}</span>
+  <span>{label}</span>
 </a>
 
 <style>

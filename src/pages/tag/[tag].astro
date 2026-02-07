@@ -6,34 +6,32 @@ import { postsToCardData } from "../../utils/postTransforms";
 import { readSettings } from "../../utils/settings";
 import { createCollectionPageSchema } from "../../utils/structuredData";
 import HeadSlot from "@/components/HeadSlot.astro";
+import { buildTagRouteEntries, canonicalTagHref, canonicalizeTagSlug, tagsFromFrontmatter } from "@/utils/tags";
 
 export const prerender = true;
 
 export function getStaticPaths() {
   const posts = loadAllPosts();
-  const tags = new Set<string>();
-  posts.forEach((post) => {
-    const fm = post.data ?? {};
-    const postTags = Array.isArray(fm.tags) ? fm.tags : [];
-    postTags.forEach((tag) => tags.add(String(tag).toLowerCase()));
-  });
-
-  return Array.from(tags).map((tag) => ({
-    params: { tag },
-    props: { tag },
+  return buildTagRouteEntries(posts).map((entry) => ({
+    params: { tag: entry.routeTag },
+    props: entry,
   }));
 }
 
-const { tag } = Astro.props as { tag: string };
-const normalizedTag = tag.toLowerCase();
+const { routeTag, canonicalTag, label, redirectTo } = Astro.props as {
+  routeTag: string;
+  canonicalTag: string;
+  label: string;
+  redirectTo: string | null;
+};
+const normalizedTag = canonicalizeTagSlug(canonicalTag || routeTag);
 const settings = readSettings();
 const allPosts = loadAllPosts();
 
 const taggedPosts = allPosts
   .filter((post) => {
-    const fm = post.data ?? {};
-    const postTags = Array.isArray(fm.tags) ? fm.tags.map((t: any) => String(t).toLowerCase()) : [];
-    return postTags.includes(normalizedTag);
+    const postTags = tagsFromFrontmatter(post.data ?? {});
+    return postTags.some((tagValue) => canonicalizeTagSlug(tagValue) === normalizedTag);
   })
   .sort((a, b) => {
     const dateA = new Date(a.data?.publishedAt ?? a.data?.pubDate ?? a.data?.date ?? 0).getTime();
@@ -47,9 +45,9 @@ const cards = postsToCardData(taggedPosts);
 const collectionSchema = createCollectionPageSchema(
   settings,
   {
-    name: `Tag: ${tag}`,
-    url: `/tag/${normalizedTag}`,
-    description: `Posts filed under the ${tag} tag`,
+    name: `Tag: ${label}`,
+    url: canonicalTagHref(normalizedTag),
+    description: `Posts filed under the ${label} tag`,
     itemType: "Article",
   },
   cards.map((card) => ({
@@ -59,39 +57,64 @@ const collectionSchema = createCollectionPageSchema(
   })),
 );
 ---
-<Base title={`Tag: ${tag} — WitchClick`}>
-  <HeadSlot slot="head">
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(collectionSchema)} />
-  </HeadSlot>
+{redirectTo ? (
+  <html lang="en">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Redirecting tag — WitchClick</title>
+      <meta name="robots" content="noindex,nofollow" />
+      <link rel="canonical" href={redirectTo} />
+      <meta http-equiv="refresh" content={`0;url=${redirectTo}`} />
+      <script
+        is:inline
+        set:html={`window.location.replace(${JSON.stringify(redirectTo)});`}
+      />
+    </head>
+    <body>
+      <p>
+        Redirecting to the canonical tag page:
+        {" "}
+        <a href={redirectTo}>{redirectTo}</a>
+      </p>
+    </body>
+  </html>
+) : (
+  <Base title={`Tag: ${label} — WitchClick`}>
+    <HeadSlot slot="head">
+      <link rel="canonical" href={canonicalTagHref(normalizedTag)} />
+      <script type="application/ld+json" is:inline set:html={JSON.stringify(collectionSchema)} />
+    </HeadSlot>
 
-  <h1 class="mb-6">Tag: {tag}</h1>
-  {cards.length === 0 ? (
-    <p class="text-cloud-muted">
-      No posts found for this tag yet. <a class="underline" href="/">Back to home</a>.
-    </p>
-  ) : (
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      {cards.map((card) => (
-        <PostCard
-          href={`/post/${card.slug}`}
-          post={{
-            slug: card.slug,
-            title: card.title,
-            excerpt: card.excerpt,
-            tldr: card.tldr,
-            tags: card.tags,
-            readingMinutes: card.readingMinutes,
-            publishedAt: card.publishedAt,
-            spoonLevel: card.spoonLevel,
-            spoons: card.spoons,
-            heroImage: card.heroImage,
-            heroImageSrc: card.heroImageSrc,
-            heroImageAlt: card.heroImageAlt,
-            heroAlt: card.heroAlt,
-            category: card.category,
-          }}
-        />
-      ))}
-    </div>
-  )}
-</Base>
+    <h1 class="mb-6">Tag: {label}</h1>
+    {cards.length === 0 ? (
+      <p class="text-cloud-muted">
+        No posts found for this tag yet. <a class="underline" href="/">Back to home</a>.
+      </p>
+    ) : (
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {cards.map((card) => (
+          <PostCard
+            href={`/post/${card.slug}`}
+            post={{
+              slug: card.slug,
+              title: card.title,
+              excerpt: card.excerpt,
+              tldr: card.tldr,
+              tags: card.tags,
+              readingMinutes: card.readingMinutes,
+              publishedAt: card.publishedAt,
+              spoonLevel: card.spoonLevel,
+              spoons: card.spoons,
+              heroImage: card.heroImage,
+              heroImageSrc: card.heroImageSrc,
+              heroImageAlt: card.heroImageAlt,
+              heroAlt: card.heroAlt,
+              category: card.category,
+            }}
+          />
+        ))}
+      </div>
+    )}
+  </Base>
+)}

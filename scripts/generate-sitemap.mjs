@@ -12,8 +12,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distDir = path.join(__dirname, '..', 'dist');
 const siteUrl = 'https://witchclick.space';
 
-const EXCLUDE_PREFIXES = ['/author', '/account', '/admin', '/api'];
+const EXCLUDE_PREFIXES = ['/author', '/account', '/admin', '/api', '/sampler'];
 const EXCLUDE_EXACT = new Set(['/author', '/account']);
+const NOINDEX_META_RE = /<meta\s+[^>]*name=["']robots["'][^>]*content=["'][^"']*noindex[^"']*["'][^>]*>/i;
 
 function shouldIncludePathname(pathname) {
   if (!pathname) return true;
@@ -46,50 +47,72 @@ function findHtmlFiles(dir, baseDir = dir) {
     } else if (file.endsWith('.html')) {
       // Get relative path from dist
       const relativePath = path.relative(baseDir, filePath);
-      results.push(relativePath);
+      results.push({
+        relativePath,
+        filePath,
+      });
     }
   }
 
   return results;
 }
 
-// Convert file path to URL
-function filePathToUrl(filePath, baseUrl) {
-  let url = filePath
+function normalizePathname(filePath) {
+  let pathname = filePath
     .replace(/\\/g, '/') // Windows paths
     .replace(/index\.html$/, '') // Remove index.html
     .replace(/\.html$/, ''); // Remove .html
 
-  // Ensure it starts with /
-  if (!url.startsWith('/')) {
-    url = '/' + url;
+  if (!pathname.startsWith('/')) {
+    pathname = '/' + pathname;
   }
 
-  // Remove trailing slash for consistency (except root)
-  if (url.length > 1 && url.endsWith('/')) {
-    url = url.slice(0, -1);
+  if (pathname.length > 1 && pathname.endsWith('/')) {
+    pathname = pathname.slice(0, -1);
   }
 
-  return baseUrl + url;
+  return pathname;
+}
+
+function encodePathSegment(segment) {
+  if (!segment) return segment;
+  try {
+    return encodeURIComponent(decodeURIComponent(segment));
+  } catch {
+    return encodeURIComponent(segment);
+  }
+}
+
+function encodePathname(pathname) {
+  if (!pathname || pathname === '/') return '/';
+  const segments = pathname.split('/').map(encodePathSegment);
+  return segments.join('/').replace(/\/+/g, '/');
+}
+
+function fileHasNoindex(filePath) {
+  try {
+    const html = fs.readFileSync(filePath, 'utf8');
+    return NOINDEX_META_RE.test(html);
+  } catch {
+    return false;
+  }
 }
 
 // Check if URL should be excluded
-function shouldExclude(url) {
+function shouldExcludePathname(pathname) {
   const excludePatterns = [
     /\/admin(\/|$)/,
-    /\/api\//,
+    /\/api(\/|$)/,
     /\/404$/,
     /\/500$/,
   ];
 
-  return excludePatterns.some(pattern => pattern.test(url));
+  return excludePatterns.some(pattern => pattern.test(pathname));
 }
 
 // Generate sitemap XML
-function generateSitemap(urls, siteUrl) {
-  const now = new Date().toISOString();
-
-  const urlEntries = urls.map(url => {
+function generateSitemap(entries, siteUrl) {
+  const urlEntries = entries.map(({ url, lastmod }) => {
     // Determine priority and changefreq based on URL
     let priority = '0.5';
     let changefreq = 'weekly';
@@ -110,7 +133,7 @@ function generateSitemap(urls, siteUrl) {
 
     return `  <url>
     <loc>${url}</loc>
-    <lastmod>${now}</lastmod>
+    <lastmod>${lastmod}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
   </url>`;
@@ -123,13 +146,11 @@ ${urlEntries}
 }
 
 // Generate sitemap index
-function generateSitemapIndex(sitemapUrls) {
-  const now = new Date().toISOString();
-
-  const sitemapEntries = sitemapUrls.map(url => {
+function generateSitemapIndex(sitemaps) {
+  const sitemapEntries = sitemaps.map(({ url, lastmod }) => {
     return `  <sitemap>
     <loc>${url}</loc>
-    <lastmod>${now}</lastmod>
+    <lastmod>${lastmod}</lastmod>
   </sitemap>`;
   }).join('\n');
 
@@ -153,22 +174,33 @@ function main() {
   const htmlFiles = findHtmlFiles(distDir);
   console.log(`📄 Found ${htmlFiles.length} HTML files`);
 
-  // Convert to URLs and filter
-  const urls = htmlFiles
-    .map(file => filePathToUrl(file, baseUrl))
-    .filter(url => !shouldExclude(url))
-    .map(url => ({ url, pathname: new URL(url).pathname }))
+  const entries = htmlFiles
+    .map(({ relativePath, filePath }) => {
+      const pathname = normalizePathname(relativePath);
+      const encodedPathname = encodePathname(pathname);
+      const url = new URL(encodedPathname, `${baseUrl}/`).toString();
+      const stat = fs.statSync(filePath);
+      const lastmod = stat.mtime.toISOString();
+      const noindex = fileHasNoindex(filePath);
+      return {
+        url,
+        pathname: encodedPathname,
+        lastmod,
+        noindex,
+      };
+    })
+    .filter(({ pathname }) => !shouldExcludePathname(pathname))
     .filter(({ pathname }) => shouldIncludePathname(pathname))
-    .map(({ url }) => url)
-    .sort();
+    .filter(({ noindex }) => !noindex)
+    .sort((a, b) => a.url.localeCompare(b.url));
 
-  console.log(`✅ Including ${urls.length} URLs in sitemap`);
+  console.log(`✅ Including ${entries.length} URLs in sitemap`);
 
   // Split into chunks of 50000 URLs (sitemap limit)
   const chunkSize = 50000;
   const chunks = [];
-  for (let i = 0; i < urls.length; i += chunkSize) {
-    chunks.push(urls.slice(i, i + chunkSize));
+  for (let i = 0; i < entries.length; i += chunkSize) {
+    chunks.push(entries.slice(i, i + chunkSize));
   }
 
   // Generate sitemaps
@@ -179,12 +211,22 @@ function main() {
     const filepath = path.join(distDir, filename);
 
     fs.writeFileSync(filepath, sitemap, 'utf8');
-    sitemapFiles.push(filename);
+    const chunkLastmod = chunk.reduce((latest, entry) => {
+      if (!latest) return entry.lastmod;
+      return new Date(entry.lastmod).getTime() > new Date(latest).getTime() ? entry.lastmod : latest;
+    }, '');
+    sitemapFiles.push({
+      filename,
+      lastmod: chunkLastmod || new Date().toISOString(),
+    });
     console.log(`✓ Generated ${filename} with ${chunk.length} URLs`);
   });
 
   // Generate sitemap index
-  const sitemapUrls = sitemapFiles.map(file => `${baseUrl}/${file}`);
+  const sitemapUrls = sitemapFiles.map(({ filename, lastmod }) => ({
+    url: new URL(`/${filename}`, `${baseUrl}/`).toString(),
+    lastmod,
+  }));
   const sitemapIndex = generateSitemapIndex(sitemapUrls);
   const indexPath = path.join(distDir, 'sitemap-index.xml');
 

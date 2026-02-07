@@ -40,8 +40,8 @@ internalLinkHints:
 internalLinks: []
 publishedAt: '2025-11-04T20:11:39.353Z'
 canonicalUrl: 'https://witchclick.space/post/when-motivation-to-exist-is-gone'
-heroImage: /images/hero/when-motivation-to-exist-is-gone/motivation-gone.png
-heroImageSrc: /images/hero/when-motivation-to-exist-is-gone/motivation-gone.png
+heroImage: /images/hero/when-motivation-to-exist-is-gone/motivation-gone.webp
+heroImageSrc: /images/hero/when-motivation-to-exist-is-gone/motivation-gone.webp
 heroAlt: ''
 specVersion: 2
 promptMetadata:

@@ -52,12 +52,12 @@ If you're standing in front of your own dusty project pile, here are a few low-p
 
 - Open one old file or notebook and spend five minutes with it. No editing, no fixing, just noticing.
 - Pick a tiny action that can be finished in one sitting: sharpen pencils, title a page, sort one folder.
-- Pair your return with comfort. Tea, a blanket, a familiar playlist, or one round of [gentle self-care practices](/post/gentle-self-care-practices) to help your nervous system settle first.
+- Pair your return with comfort. Tea, a blanket, a familiar playlist, or one round of [gentle self-care practices](/post/when-to-let-yourself-rest) to help your nervous system settle first.
 - If you're not ready to continue, create a kind bookmark for future-you: one sticky note that says where to restart.
 
 I keep reminding myself that [life-on-pause seasons](/post/when-life-feels-on-pause) are often interruptions, not verdicts. Creative work can wait through hard seasons, caregiving, burnout, and all the ordinary chaos of being human.
 
-When shame starts talking louder than curiosity, I pause and borrow tools from [rest and survival](/post/rest-and-survival): one breath, one hand on my chest, one sentence that sounds like mercy. The goal isn't to become a productivity legend. The goal is to rebuild trust with your own creative rhythm.
+When shame starts talking louder than curiosity, I pause and borrow tools from [rest and survival](/post/when-life-feels-on-pause): one breath, one hand on my chest, one sentence that sounds like mercy. The goal isn't to become a productivity legend. The goal is to rebuild trust with your own creative rhythm.
 
 ## Conclusion
 

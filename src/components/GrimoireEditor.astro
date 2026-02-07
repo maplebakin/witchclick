@@ -1,0 +1,106 @@
+---
+import Input from '@/components/ui/Input.astro';
+import Textarea from '@/components/ui/Textarea.astro';
+import Button from '@/components/ui/Button.astro';
+---
+
+<section class="grimoire-editor rounded-3xl border border-line-strong p-6 shadow-sm md:p-8">
+  <header class="space-y-2">
+    <p class="grimoire-editor__eyebrow text-xs uppercase tracking-[0.22em]">Grimoire Editor</p>
+    <h2 class="font-serif text-3xl text-heading">Inscribe a New Page</h2>
+    <p class="max-w-2xl text-sm text-body">
+      Start with a clear title, set the route slug, then draft the body of your working.
+    </p>
+  </header>
+
+  <form class="mt-6 space-y-5" aria-label="Grimoire editor">
+    <label class="block">
+      <span class="text-xs uppercase tracking-[0.18em] text-body-muted">Title</span>
+      <div class="grimoire-editor__field-shell mt-2">
+        <Input
+          id="grimoire-title"
+          name="title"
+          autocomplete="off"
+          placeholder="A gentle ritual for focused mornings"
+        />
+      </div>
+    </label>
+
+    <label class="block">
+      <span class="text-xs uppercase tracking-[0.18em] text-body-muted">Slug</span>
+      <div class="grimoire-editor__field-shell mt-2">
+        <Input
+          id="grimoire-slug"
+          name="slug"
+          autocomplete="off"
+          placeholder="gentle-ritual-for-focused-mornings"
+          class="font-mono text-xs"
+        />
+      </div>
+    </label>
+
+    <label class="block">
+      <span class="text-xs uppercase tracking-[0.18em] text-body-muted">Body</span>
+      <div class="grimoire-editor__field-shell mt-2">
+        <Textarea
+          id="grimoire-body"
+          name="body"
+          rows={16}
+          placeholder="Write the opening intention, practical steps, and your closing note..."
+        />
+      </div>
+    </label>
+
+    <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+      <p class="text-xs text-body-muted">Phase 2 scaffold: save and publish wiring arrives in the next phase.</p>
+      <Button type="button" variant="secondary">Seal Working (Soon)</Button>
+    </div>
+  </form>
+</section>
+
+<style is:inline>
+  .grimoire-editor {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(80% 70% at 8% 0%, color-mix(in srgb, var(--color-gold) 16%, transparent 84%) 0%, transparent 75%),
+      linear-gradient(
+        152deg,
+        color-mix(in srgb, var(--surface-plain, var(--color-rune)) 88%, var(--color-rune) 12%) 0%,
+        color-mix(in srgb, var(--surface-plain, var(--color-rune)) 95%, var(--color-rune) 5%) 100%
+      );
+  }
+
+  .grimoire-editor::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      -14deg,
+      color-mix(in srgb, var(--color-border) 8%, transparent 92%) 0 1px,
+      transparent 1px 5px
+    );
+    opacity: 0.35;
+  }
+
+  .grimoire-editor__eyebrow {
+    color: color-mix(in srgb, var(--ink-muted) 90%, var(--color-gold) 10%);
+    font-family: var(--font-accent);
+  }
+
+  .grimoire-editor__field-shell :global(input),
+  .grimoire-editor__field-shell :global(textarea) {
+    position: relative;
+    z-index: 1;
+    border-color: color-mix(in srgb, var(--color-border) 58%, transparent 42%);
+    background: color-mix(in srgb, var(--color-rune) 86%, transparent 14%);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, white 45%, transparent 55%);
+  }
+
+  .grimoire-editor__field-shell :global(textarea) {
+    min-height: 16rem;
+    font-family: var(--font-body);
+    line-height: 1.7;
+  }
+</style>

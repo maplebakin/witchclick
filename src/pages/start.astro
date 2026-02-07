@@ -3,11 +3,19 @@ import Base from "@/layouts/Base.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import HeadSlot from "@/components/HeadSlot.astro";
 import { readSettings } from "@/utils/settings";
+import { canonicalTagHref } from "@/utils/tags";
 
 const title = "Start Here — Your Guide to WitchClick";
 const description = "New to WitchClick? Start here. Discover secular rituals, ADHD-friendly practices, and cozy tools for everyday magic without dogma.";
 
 const settings = readSettings();
+const tagLinks = {
+  secularTarot: canonicalTagHref("secular tarot"),
+  ritual: canonicalTagHref("ritual"),
+  adhdFriendly: canonicalTagHref("adhd-friendly"),
+  gentleRituals: canonicalTagHref("gentle rituals"),
+  ethicalCursing: canonicalTagHref("cursing ritual"),
+};
 const breadcrumbs = [
   { label: "Home", href: "/" },
   { label: "Start Here" },
@@ -143,11 +151,11 @@ const jsonLd = {
       <section class="mb-12">
         <h2>Explore by Interest</h2>
         <ul>
-          <li><a href="/tag/secular-tarot">Secular Tarot</a> — Pattern-reading, spreads, and reflection prompts</li>
-          <li><a href="/tag/ritual">Rituals</a> — Grounding, releasing, focusing, and transitioning</li>
-          <li><a href="/tag/adhd-friendly">ADHD-Friendly</a> — Low-spoons options and neurodivergent support</li>
-          <li><a href="/tag/gentle-rituals">Gentle Rituals</a> — When you need softness, not intensity</li>
-          <li><a href="/tag/cursing%20ritual">Ethical Cursing</a> — Boundary work and energetic accountability</li>
+          <li><a href={tagLinks.secularTarot}>Secular Tarot</a> — Pattern-reading, spreads, and reflection prompts</li>
+          <li><a href={tagLinks.ritual}>Rituals</a> — Grounding, releasing, focusing, and transitioning</li>
+          <li><a href={tagLinks.adhdFriendly}>ADHD-Friendly</a> — Low-spoons options and neurodivergent support</li>
+          <li><a href={tagLinks.gentleRituals}>Gentle Rituals</a> — When you need softness, not intensity</li>
+          <li><a href={tagLinks.ethicalCursing}>Ethical Cursing</a> — Boundary work and energetic accountability</li>
           <li><a href="/entities/ritual">Ritual Library</a> — Browse all our structured practices</li>
           <li><a href="/entities/tarot">Tarot Card Reference</a> — Secular interpretations for every card</li>
         </ul>

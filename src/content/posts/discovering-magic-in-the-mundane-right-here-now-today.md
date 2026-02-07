@@ -45,7 +45,7 @@ If you like structure, you might anchor this noticing to tiny moments you alread
 - While brushing your teeth: where is my body holding tension, and what happens if I soften it by 5 percent?
 - As you open your laptop: what quiet feeling is riding along with me into this next task?
 
-Over time, this kind of attention builds its own trail of breadcrumbs. When you read back through your notes, you start to see patterns: the seasons of your mood, the textures of your days, the way certain rooms or times of day change how you feel. This is the heart of [everyday magic](/post/everyday-magic): the ordinary world revealing itself, simply because you chose to look.
+Over time, this kind of attention builds its own trail of breadcrumbs. When you read back through your notes, you start to see patterns: the seasons of your mood, the textures of your days, the way certain rooms or times of day change how you feel. This is the heart of [everyday magic](/post/turning-housework-into-everyday-spellcraft-ritual): the ordinary world revealing itself, simply because you chose to look.
 
 ## Attention as a soft lantern, not a spotlight
 
@@ -57,7 +57,7 @@ If you are curious about how attention shapes experience, you might enjoy readin
 
 You might experiment in your journal with tracing where your attention actually goes in a day. Not where you think it should go, but where it wanders. What catches your eye when you walk from your bed to the kitchen. What you scroll past quickly and what you linger on. How your body feels after ten minutes of **noticing small details** versus ten minutes of racing through tabs.
 
-If you like anchors, you can even create a tiny themed page for this, like a one-page spread on **present-moment journaling** or a list of [tiny gratitude rituals](/post/tiny-gratitude-rituals) that help you reset your focus when your mind is tired.
+If you like anchors, you can even create a tiny themed page for this, like a one-page spread on **present-moment journaling** or a list of [tiny gratitude rituals](/post/when-life-feels-on-pause) that help you reset your focus when your mind is tired.
 
 ## When the mundane feels dull or heavy
 
@@ -69,7 +69,7 @@ That could look like choosing very small, neutral details. The edge of a book. T
 
 You might also notice where the story in your mind is louder than the moment in front of you. Doing laundry can carry a heavy story about being behind, failing, never catching up. But if you zoom in on **noticing small details**, you may find that this particular shirt, this particular color, this particular movement is just one action, happening now.
 
-When the mundane feels heavy, it can be helpful to lower the bar of what counts as magic. Maybe today it is not a burst of joy. Maybe it is a single breath that feels slightly less tight. A pause where you expected yourself to push. A scribbled line in a notebook that says, 'I am here, even if I do not know what to do next.' These tiny marks of presence are their own kind of [present-moment journaling](/post/present-moment-journaling).
+When the mundane feels heavy, it can be helpful to lower the bar of what counts as magic. Maybe today it is not a burst of joy. Maybe it is a single breath that feels slightly less tight. A pause where you expected yourself to push. A scribbled line in a notebook that says, 'I am here, even if I do not know what to do next.' These tiny marks of presence are their own kind of [present-moment journaling](/post/using-different-perspectives-a-gentle-practical-guide).
 
 ## Journaling Prompts
 

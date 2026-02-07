@@ -1,0 +1,53 @@
+---
+import Base from "../../../layouts/Base.astro";
+import HeadSlot from "@/components/HeadSlot.astro";
+import GrimoireEditor from "@/components/GrimoireEditor.astro";
+import { CHAMBERS, type ChamberDefinition } from "@/data/studyChambers";
+
+export function getStaticPaths() {
+  return CHAMBERS.map((chamber) => ({
+    params: { chamber: chamber.slug },
+    props: { chamber },
+  }));
+}
+
+const chamber = Astro.props.chamber as ChamberDefinition;
+const pageTitle = `Study Chamber — ${chamber.title}`;
+const pageDescription = `${chamber.title} placeholder for the WitchClick study experience.`;
+---
+
+<Base
+  title={pageTitle}
+  description={pageDescription}
+  canon={`/study/chambers/${chamber.slug}`}
+  wide={true}
+  noindex={true}
+>
+  <HeadSlot slot="head">
+    <meta name="robots" content="noindex" />
+  </HeadSlot>
+
+  <section class="mx-auto max-w-4xl space-y-6 py-12">
+    <header class="space-y-2">
+      <p class="text-xs uppercase tracking-[0.22em] text-body-muted">Chamber</p>
+      <h1 class="font-serif text-4xl text-heading">{chamber.title}</h1>
+      <p class="text-base text-body">{chamber.subtitle}</p>
+    </header>
+
+    <div class="rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm">
+      <h2 class="font-serif text-2xl text-heading">Phase 1 Placeholder</h2>
+      <ul class="mt-4 space-y-3 text-sm text-body-muted">
+        {chamber.placeholder.map((line) => <li>{line}</li>)}
+      </ul>
+    </div>
+
+    {chamber.slug === "grimoire" && <GrimoireEditor />}
+
+    <a
+      href="/study"
+      class="inline-flex items-center rounded-full border border-line-strong px-4 py-2 text-sm font-semibold text-body transition hover:border-line-bold hover:bg-surface-neutral-soft"
+    >
+      Return to the Study
+    </a>
+  </section>
+</Base>

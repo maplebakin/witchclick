@@ -44,7 +44,7 @@ No one was watching me. No one was grading my morning routine. The new year didn
 
 ## The Notebook That Stayed Blank
 
-There's a journal on my bedside table that I bought in October. Beautiful thing—cream pages, a soft cover with gold foil stars. I'd imagined myself filling it with goals and gratitudes, tracking habits, manifesting abundance, all those things the [toxic positivity](/post/toxic-positivity) industrial complex tells you a journal is for.
+There's a journal on my bedside table that I bought in October. Beautiful thing—cream pages, a soft cover with gold foil stars. I'd imagined myself filling it with goals and gratitudes, tracking habits, manifesting abundance, all those things the [toxic positivity](/post/when-everything-feels-pointless) industrial complex tells you a journal is for.
 
 It's still blank. Seventy-three days blank.
 
@@ -70,7 +70,7 @@ The new year is just a moment humans invented to mark time, like drawing a line 
 
 I thought about all the Januarys I'd spent white-knuckling through ambitious goals, feeling like a failure by February. The gym memberships I'd bought and abandoned. The meal plans that lasted four days. The morning routines that worked for exactly one morning before my brain said 'absolutely not.'
 
-What if—and this felt radical, almost rebellious—what if I just stayed me? What if I kept making [gentle self-care practices](/post/gentle-self-care-practices) that actually fit my life instead of the life Instagram told me I should want? What if I honored my need for [rest and survival](/post/rest-and-survival) instead of productivity and optimization?
+What if—and this felt radical, almost rebellious—what if I just stayed me? What if I kept making [gentle self-care practices](/post/when-to-let-yourself-rest) that actually fit my life instead of the life Instagram told me I should want? What if I honored my need for [rest and survival](/post/when-life-feels-on-pause) instead of productivity and optimization?
 
 The tea didn't answer. It just sat there being warm and slightly spicy and completely non-judgmental about my three-day pajamas.
 

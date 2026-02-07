@@ -7,7 +7,8 @@ import matter from "gray-matter";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "..");
-const contentRoot = path.join(repoRoot, "content");
+const postsRoot = path.join(repoRoot, "src", "content", "posts");
+const entitiesRoot = path.join(repoRoot, "content", "entities");
 
 function canonicalPath(pathname: string): string {
   let value = pathname.trim();
@@ -64,7 +65,7 @@ function normalizeEntity(candidate: unknown): EntityRef | null {
 }
 
 function collectEntityReferences(): EntityWithPost[] {
-  const postsDir = path.join(contentRoot, "posts");
+  const postsDir = postsRoot;
   const references: EntityWithPost[] = [];
 
   try {
@@ -81,6 +82,10 @@ function collectEntityReferences(): EntityWithPost[] {
       const postTitle = typeof fm.data?.title === "string" && fm.data.title.trim()
         ? fm.data.title.trim()
         : postSlug;
+      if (fm.data?.draft === true || fm.data?.published === false) {
+        continue;
+      }
+
       const entities = Array.isArray(fm.data?.entities) ? fm.data.entities : [];
 
       for (const entity of entities) {
@@ -98,17 +103,17 @@ function collectEntityReferences(): EntityWithPost[] {
 }
 
 function collectAllEntities(): EntityRef[] {
-  const entitiesRoot = path.join(contentRoot, "entities");
+  const root = entitiesRoot;
   const results: EntityRef[] = [];
 
   try {
     const types = fs
-      .readdirSync(entitiesRoot, { withFileTypes: true })
+      .readdirSync(root, { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
       .map((entry) => entry.name);
 
     for (const type of types) {
-      const dir = path.join(entitiesRoot, type);
+      const dir = path.join(root, type);
       const files = fs
         .readdirSync(dir, { withFileTypes: true })
         .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".json"));
@@ -172,10 +177,10 @@ test.describe("site smoke", () => {
       networkFailures.push(`${request.method()} ${request.url()} :: ${errorText}`);
     });
 
-    const postSlug = firstSlugFrom(path.join(contentRoot, "posts"));
+    const postSlug = firstSlugFrom(postsRoot);
     const curseSlug =
       firstSlugFrom(path.join(repoRoot, "archive", "curses")) ||
-      firstSlugFrom(path.join(contentRoot, "white-magic-curses"));
+      firstSlugFrom(path.join(repoRoot, "content", "white-magic-curses"));
 
     const routes = ["/", "/entities/", "/curses/", "/hub/", "/tools/"].map(canonicalPath);
     if (postSlug) routes.push(canonicalPath(`/post/${postSlug}/`));
@@ -298,6 +303,6 @@ test.describe("site smoke", () => {
     const placeholder = page.locator(".entity-related-placeholder");
     await expect(placeholder).toBeVisible();
     await expect(placeholder).toContainText("Lore Hub");
-    await expect(placeholder.locator('a[href="/hub"]')).toBeVisible();
+    await expect(placeholder.locator('a[href^="/hub"]')).toBeVisible();
   });
 });

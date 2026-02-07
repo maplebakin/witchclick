@@ -90,9 +90,9 @@ async function processPost(post) {
 
 async function buildCache() {
   console.log("Starting post cache build...");
-  if (!fs.existsSync(CACHE_DIR)) {
-    fs.mkdirSync(CACHE_DIR, { recursive: true });
-  }
+  // Clear stale cache entries so removed/draft slugs cannot leak into static paths.
+  fs.rmSync(CACHE_DIR, { recursive: true, force: true });
+  fs.mkdirSync(CACHE_DIR, { recursive: true });
 
   const posts = loadAllPosts();
   let count = 0;

@@ -2,41 +2,34 @@
 // Delete a draft post
 
 import fs from 'node:fs';
-import path from 'node:path';
-import matter from 'gray-matter';
-
-function json(obj: unknown, status = 200) {
-  return new Response(JSON.stringify(obj), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-  });
-}
+import { findPostRecordBySlug, resolveCanonicalPostsDirectory } from '../../../utils/postFiles';
+import { json, jsonError, parseJsonBody, readValidatedSlug, requireMutatingAccess } from '../_mutating';
 
 export async function POST({ request }: { request: Request }) {
+  const denied = requireMutatingAccess(request);
+  if (denied) return denied;
+
   try {
-    const body = await request.json();
-    const slug = body.slug;
+    const parsed = await parseJsonBody(request);
+    if (!parsed.ok) return parsed.response;
+    const body = parsed.body as Record<string, unknown>;
 
-    if (!slug || typeof slug !== 'string') {
-      return json({ ok: false, error: 'Missing or invalid slug' }, 400);
+    const slugResult = readValidatedSlug(body);
+    if (!slugResult.ok) return slugResult.response;
+    const slug = slugResult.slug;
+
+    const postsDir = resolveCanonicalPostsDirectory();
+    const record = findPostRecordBySlug(slug, postsDir);
+    if (!record) {
+      return jsonError(404, 'NOT_FOUND', `Post not found: ${slug}`);
     }
-
-    const CWD = process.cwd();
-    const postsDir = path.join(CWD, 'content', 'posts');
-    const filePath = path.join(postsDir, `${slug}.md`);
-
-    if (!fs.existsSync(filePath)) {
-      return json({ ok: false, error: `Post not found: ${slug}` }, 404);
-    }
-
-    // Verify it's a draft before deleting
-    const content = fs.readFileSync(filePath, 'utf8');
-    const { data } = matter(content);
+    const { filePath, data } = record;
 
     if (data.draft !== true) {
-      return json(
-        { ok: false, error: 'Cannot delete published post. Only drafts can be deleted from staging.' },
-        400
+      return jsonError(
+        400,
+        'INVALID_STATE',
+        'Cannot delete published post. Only drafts can be deleted from staging.',
       );
     }
 
@@ -51,6 +44,6 @@ export async function POST({ request }: { request: Request }) {
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    return json({ ok: false, error: message }, 500);
+    return jsonError(500, 'INTERNAL_ERROR', message);
   }
 }

@@ -27,20 +27,8 @@ import { autoLinkAffiliates } from "../../../tools/src/auto-affiliate.js";
 export const prerender = true;
 
 export async function getStaticPaths() {
-  const CACHE_DIR = path.join(process.cwd(), '.cache/post-data');
-  const slugs = new Set<string>();
-  if (fs.existsSync(CACHE_DIR)) {
-    const files = fs.readdirSync(CACHE_DIR);
-    for (const file of files) {
-      if (file.endsWith('.json')) {
-        slugs.add(file.replace(/\.json$/, ''));
-      }
-    }
-  }
-  if (slugs.size === 0 || import.meta.env.DEV) {
-    loadAllPosts().forEach((post) => slugs.add(post.slug));
-  }
-  return Array.from(slugs).map((slug) => ({ params: { slug } }));
+  // Source static paths from canonical published content only.
+  return loadAllPosts().map((post) => ({ params: { slug: post.slug } }));
 }
 
 const PRODUCTS_FILE = path.join(process.cwd(), 'content', 'products.json');
