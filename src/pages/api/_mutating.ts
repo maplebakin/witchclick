@@ -46,6 +46,16 @@ export function jsonError(
   );
 }
 
+export function methodNotAllowed(allow: string) {
+  return jsonError(
+    405,
+    "METHOD_NOT_ALLOWED",
+    `Method not allowed. Use ${allow}.`,
+    undefined,
+    { Allow: allow },
+  );
+}
+
 export function ensureDevOnly(): Response | null {
   if (isDevelopmentSession()) return null;
   return jsonError(404, "NOT_FOUND", DEV_ONLY_MESSAGE);
@@ -126,4 +136,22 @@ export function requireMutatingAccess(request: Request): Response | null {
   const devOnly = ensureDevOnly();
   if (devOnly) return devOnly;
   return requireAdminAuth(request);
+}
+
+export type MutatingAccessPolicy = "mutating" | "dev-only" | "auth-only" | "public";
+
+export function enforceMutatingAccess(
+  request: Request,
+  policy: MutatingAccessPolicy = "mutating",
+): Response | null {
+  if (policy === "public") {
+    return null;
+  }
+  if (policy === "dev-only") {
+    return ensureDevOnly();
+  }
+  if (policy === "auth-only") {
+    return requireAdminAuth(request);
+  }
+  return requireMutatingAccess(request);
 }

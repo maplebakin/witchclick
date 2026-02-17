@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { readSettings, type AnalyticsSettings } from "@/utils/settings";
+import { enforceMutatingAccess, methodNotAllowed } from "./_mutating";
 
 const JSON_HEADERS = { "Content-Type": "application/json; charset=utf-8" } as const;
 const CORS_HEADERS = {
@@ -23,7 +24,14 @@ export const OPTIONS: APIRoute = async () =>
     },
   });
 
+export const GET: APIRoute = async () => methodNotAllowed("POST, OPTIONS");
+
 export const POST: APIRoute = async ({ request }) => {
+  const denied = enforceMutatingAccess(request, "public");
+  if (denied) {
+    return denied;
+  }
+
   const settings = readSettings();
   const analytics = settings.analytics;
 
