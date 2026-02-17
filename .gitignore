@@ -6,6 +6,11 @@ yarn.lock
 
 # Build artifacts
 dist/
+.astro/
+.cache/
+test-results/
+coverage/
+playwright-report/
 .tmp/
 .tmp-*
 tmp/
@@ -20,12 +25,3 @@ Thumbs.db
 # Env
 .env
 .env.*
-
-node_modules/
-dist/
-.cache/
-.astro/
-test-results/
-coverage/
-playwright-report/
-*.log
