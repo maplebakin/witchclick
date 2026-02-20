@@ -10,5 +10,10 @@ export default defineConfig({
   test: {
     exclude: [...configDefaults.exclude, "tests/smoke.spec.ts"],
     pool: "forks",
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html", "json-summary"],
+      reportsDirectory: "./coverage",
+    },
   },
 });
