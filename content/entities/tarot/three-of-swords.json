@@ -1,0 +1,17 @@
+{
+  "slug": "three-of-swords",
+  "type": "tarot",
+  "name": "Three of Swords",
+  "summary": "Three of Swords invites honest grief without pretending it is easy or quick. Magically, it reflects heart pain as a clearing process; practically, it can mean naming what hurt, reducing self-blame, and asking for support while you heal.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Swords",
+    "keywords": ["heartbreak", "truth", "release"],
+    "uprightKeywords": ["heartbreak", "sorrow", "emotional pain"],
+    "reversedKeywords": ["healing", "acceptance", "processing grief"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "rose-quartz" },
+    { "type": "herb", "slug": "chamomile" }
+  ]
+}

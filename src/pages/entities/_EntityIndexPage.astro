@@ -21,6 +21,7 @@ function formatTypeLabel(value: string): string {
 
 const typeLabel = formatTypeLabel(type);
 const lowerTypeLabel = typeLabel.toLowerCase();
+const pageLead = [metadata.subtitle, metadata.introText].filter((value) => typeof value === "string" && value.trim().length > 0).join(" ");
 const breadcrumbs = [
   { label: "Home", href: "/" },
   { label: "Entities", href: "/entities" },
@@ -30,19 +31,14 @@ const breadcrumbs = [
 <Base title={metadata.title} description={metadata.subtitle} bodyDataType={type}>
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <section class="max-w-screen-lg mx-auto py-8 md:py-12 px-4">
-    <header class="space-y-4">
-      <h1 class="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 font-serif text-4xl leading-tight text-neutral-800">
-        <span class="text-4xl text-neutral-400" aria-hidden="true">{metadata.icon}</span>
-        <span class="flex flex-col">
-          <span>{metadata.title}</span>
-          <span class="text-base font-normal text-neutral-500">{metadata.subtitle}</span>
-        </span>
-      </h1>
-      <p class="max-w-3xl text-base leading-relaxed text-neutral-600">{metadata.introText}</p>
+    <header class="page-header">
+      <p class="page-header__eyebrow"><span aria-hidden="true">{metadata.icon}</span> {typeLabel} index</p>
+      <h1 class="page-header__title">{metadata.title}</h1>
+      <p class="page-header__lead">{pageLead}</p>
     </header>
 
     {entities.length === 0 ? (
-      <div class="mt-10 rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 p-6 text-center text-sm text-neutral-600">
+      <div class="mt-10 rounded-2xl border border-dashed border-line-neutral-strong bg-surface-muted p-6 text-center text-sm text-body-muted">
         <p>
           No {lowerTypeLabel} entries are live yet. Share a note with the
           <a class="font-semibold text-brand-primary hover:underline" href="/about">WitchClick team</a>

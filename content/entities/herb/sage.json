@@ -1,0 +1,16 @@
+{
+  "slug": "sage",
+  "type": "herb",
+  "name": "Sage",
+  "summary": "Sage invites a reset when space or mindset feels heavy and cluttered. Magically it is used for cleansing and protection; practically you can use smoke cleansing or floor washes to mark the end of one stressful cycle and start another with clearer boundaries.",
+  "properties": {
+    "keywords": ["cleansing", "protection", "clarity"],
+    "element": "Air",
+    "planet": "Jupiter",
+    "uses": ["smoke cleansing", "floor washes", "incense", "cooking"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "black-tourmaline" },
+    { "type": "tarot", "slug": "temperance" }
+  ]
+}

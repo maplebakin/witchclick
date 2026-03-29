@@ -179,6 +179,31 @@
   /* Chips */
   --chip-background: color-mix(in hsl, hsl(var(--text-accent)) 18%, transparent);
   --chip-border: color-mix(in hsl, hsl(var(--text-accent)) 45%, transparent);
+
+  /* Hub + playlist semantic surfaces */
+  --surface-card-dark: color-mix(in srgb, var(--theme-surface-card, var(--surface-card)) 86%, var(--theme-color-night, var(--surface-base)) 14%);
+  --surface-seasonal: color-mix(in srgb, var(--theme-surface-base, var(--surface-base)) 90%, var(--theme-color-night, var(--surface-base)) 10%);
+  --surface-seasonal-panel: color-mix(in srgb, var(--theme-surface-panel, var(--surface-panel)) 84%, var(--theme-color-night, var(--surface-base)) 16%);
+  --surface-seasonal-panel-highlight: color-mix(in srgb, var(--surface-seasonal-panel) 84%, var(--theme-color-amethyst, var(--text-accent)) 16%);
+  --border-seasonal: color-mix(in srgb, var(--theme-border-strong, var(--border-strong)) 72%, transparent 28%);
+  --border-seasonal-soft: color-mix(in srgb, var(--theme-border-subtle, var(--border-subtle)) 70%, transparent 30%);
+  --shadow-seasonal: var(--theme-shadow-strong, var(--shadow-3));
+  --surface-chip-accent: color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 16%, transparent 84%);
+  --border-chip-accent: color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 38%, transparent 62%);
+
+  /* Entity hub card semantic aliases */
+  --entity-card-border: var(--theme-entity-card-border, color-mix(in srgb, var(--theme-border-subtle, var(--border-subtle)) 78%, transparent 22%));
+  --entity-card-glow: var(--theme-entity-card-glow, color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 20%, transparent 80%));
+  --entity-card-highlight: var(--theme-entity-card-highlight, color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 12%, transparent 88%));
+  --entity-card-surface-top: var(--theme-entity-card-surface-top, var(--theme-surface-card, var(--surface-card)));
+  --entity-card-surface-bottom: var(--theme-entity-card-surface-bottom, var(--theme-surface-panel, var(--surface-panel)));
+  --entity-card-heading: var(--theme-entity-card-heading, var(--theme-text-strong, var(--text-strong)));
+  --entity-card-text: var(--theme-entity-card-text, var(--theme-text-body, var(--text-body)));
+  --entity-card-label: var(--theme-entity-card-label, var(--theme-text-subtle, var(--text-muted)));
+  --entity-card-cta: var(--theme-entity-card-cta, var(--theme-text-accent, var(--text-accent)));
+  --entity-card-cta-hover: var(--theme-entity-card-cta-hover, var(--theme-text-accent-strong, var(--text-accent)));
+  --entity-card-icon: var(--theme-entity-card-icon, var(--theme-text-accent, var(--text-accent)));
+  --entity-card-icon-shadow: var(--theme-entity-card-icon-shadow, color-mix(in srgb, var(--entity-card-icon) 35%, transparent 65%));
 }
 
 /* Legacy dawn attribute support (old toggle still writes data-comfort-theme) */

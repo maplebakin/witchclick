@@ -3,5 +3,5 @@
 /admin/*    /404  404
 
 For GitHub Pages users:
-/go/<key> fallback pages are generated under src/pages/go/*.astro by node tools/wc.js go:build.
+/go/<key> fallback pages are built from src/pages/go/[key].astro.
 If your host ignores /_redirects, you can still link to /go/<key> which will meta-refresh to the final URL.

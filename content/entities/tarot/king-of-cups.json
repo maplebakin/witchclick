@@ -1,0 +1,17 @@
+{
+  "slug": "king-of-cups",
+  "type": "tarot",
+  "name": "King of Cups",
+  "summary": "King of Cups invites steady emotional leadership without shutting feelings down. Magically, he reflects mature command of the inner tides; practically, he points to regulating first, then responding with clarity, fairness, and compassion when situations are hard.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Cups",
+    "keywords": ["stability", "compassion", "leadership"],
+    "uprightKeywords": ["emotional maturity", "calm authority", "wise counsel"],
+    "reversedKeywords": ["emotional suppression", "control", "detachment"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "amethyst" },
+    { "type": "herb", "slug": "rosemary" }
+  ]
+}

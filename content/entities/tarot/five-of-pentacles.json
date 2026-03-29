@@ -1,0 +1,17 @@
+{
+  "slug": "five-of-pentacles",
+  "type": "tarot",
+  "name": "Five of Pentacles",
+  "summary": "Five of Pentacles invites honesty about strain, especially when things feel isolating or financially tight. Magically, it reflects a winter phase that asks for endurance; practically, it can mean asking for help early, using available resources, and reducing shame around hard seasons.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Pentacles",
+    "keywords": ["hardship", "support", "resilience"],
+    "uprightKeywords": ["financial stress", "insecurity", "feeling excluded"],
+    "reversedKeywords": ["recovery", "assistance", "rebuilding stability"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "black-tourmaline" },
+    { "type": "herb", "slug": "sage" }
+  ]
+}

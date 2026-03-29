@@ -1,12 +1,6 @@
-// shared/slugify.js
-function slugify(value) {
-  const base = typeof value === "string" ? value : String(value ?? "");
-  return base.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-}
-
-// src/scripts/adminEntities.ts
-var TYPES = ["crystal", "herb", "moonPhase", "tarot", "planetaryDay", "ritual"];
-var SUGGEST = {
+import { slugify } from "../../../shared/slugify.js";
+const TYPES = ["crystal", "herb", "moonPhase", "tarot", "planetaryDay", "ritual"];
+const SUGGEST = {
   crystal: [
     ["color", "green"],
     ["chakra", "heart,third-eye"],
@@ -46,7 +40,7 @@ function initEntitiesAdmin() {
   const baseHeaders = DEV_KEY ? { "X-WC-Dev-Key": DEV_KEY } : {};
   const jsonHeaders = { "Content-Type": "application/json", ...baseHeaders };
   function apiFetch(path, options = {}) {
-    const headers = { ...baseHeaders, ...(options.headers || {}) };
+    const headers = { ...baseHeaders, ...options.headers || {} };
     return fetch(`${DEV_API}${path}`, { ...options, headers });
   }
   const $ = (id) => document.getElementById(id);

@@ -1,0 +1,3254 @@
+[
+  {
+    "route": "/",
+    "viewport": "desktop",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "WitchClick — Cozy secular rituals for everyday magic",
+      "h1": "WitchClick",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "WitchClick",
+          "tag": "h1",
+          "transform": "none",
+          "className": "mb-2 font-serif text-3xl font-bold tracking-tight text-body-strong sm:text-4xl"
+        },
+        {
+          "text": "Returning to Quiet Projects with Gentle Hands",
+          "tag": "h2",
+          "transform": "none",
+          "className": "mb-3 font-serif text-2xl font-bold text-body-strong sm:text-3xl"
+        },
+        {
+          "text": "Recent Posts",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-2xl font-semibold text-body-strong sm:text-3xl"
+        },
+        {
+          "text": "New Year Without the 'New Me' Pressure: A Cozy Story",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "Refinding Yourself Under the Holiday Mask Ritual",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "Slicing Through Self-Delusion: A Gentle Clarity Ritual",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "December Clean Curses for Messy, Tender Human Hearts",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "When The Waiting Period Feels Like Heavy Stagnation",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "Cozy Gaming November Ritual Guide 2025",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Start Here Grimoire Hubs Tools More Toggle theme Search Contact Admin RSS WitchClick Gentle rituals, cozy tools, and reflections for when life feels loud. Small practices for shadow work, rest,"
+    },
+    "screenshot": ".audit/screens/desktop__home.png"
+  },
+  {
+    "route": "/hub",
+    "viewport": "desktop",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Hub Constellation — Release, Focus, Calm",
+      "h1": "Seasonal rooms for soft structure",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Seasonal rooms for soft structure",
+          "tag": "h1",
+          "transform": "none",
+          "className": "page-header__title"
+        },
+        {
+          "text": "Release",
+          "tag": "h2",
+          "transform": "none",
+          "className": "hub-featured__title"
+        },
+        {
+          "text": "Release",
+          "tag": "h2",
+          "transform": "none",
+          "className": "hub-card__title"
+        },
+        {
+          "text": "Cozy Cursing Ritual: Release Anger Through Banishment",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "Focus",
+          "tag": "h2",
+          "transform": "none",
+          "className": "hub-card__title"
+        },
+        {
+          "text": "Focus Tea Rituals for Gentle, Distracted Brains",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "Calm",
+          "tag": "h2",
+          "transform": "none",
+          "className": "hub-card__title"
+        },
+        {
+          "text": "Create a Calm Space During Political Unrest: A Gentle Guide",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "Fall: Boundaries in Bloom",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Start Here Grimoire Hubs Tools More Toggle theme Search Contact Admin RSS Home Hubs HUB CONSTELLATION Seasonal rooms for soft structure Choose the hub that fits the moment—Release for compostin"
+    },
+    "screenshot": ".audit/screens/desktop__hub.png"
+  },
+  {
+    "route": "/hub/release",
+    "viewport": "desktop",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Release rituals & composting practices — WitchClick",
+      "h1": "Release rituals & composting practices",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Release rituals & composting practices",
+          "tag": "h1",
+          "transform": "none",
+          "className": "hub-hero__title"
+        },
+        {
+          "text": "Start here",
+          "tag": "h2",
+          "transform": "none",
+          "className": "hub-playlist__title"
+        },
+        {
+          "text": "Quick rituals",
+          "tag": "h2",
+          "transform": "none",
+          "className": "hub-playlist__title"
+        },
+        {
+          "text": "Deep dives",
+          "tag": "h2",
+          "transform": "none",
+          "className": "hub-playlist__title"
+        },
+        {
+          "text": "Tools & printables",
+          "tag": "h2",
+          "transform": "none",
+          "className": "hub-playlist__title"
+        },
+        {
+          "text": "Partner spotlight",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Moonlit Bath Release Bundle",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "Fall: Boundaries in Bloom",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Anchor posts",
+          "tag": "h3",
+          "transform": "none",
+          "className": ""
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Start Here Grimoire Hubs Tools More Toggle theme Search Contact Admin RSS Home Hubs Release rituals & composting practices LETTING GO WITH SOFTNESS Release rituals & composting practices Compos"
+    },
+    "screenshot": ".audit/screens/desktop__hub__release.png"
+  },
+  {
+    "route": "/post/creativity-tarot-ritual",
+    "viewport": "desktop",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Tarot Ritual for When Creativity Feels Pointless",
+      "h1": "Tarot Ritual for When Creativity Feels Pointless",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Tarot Ritual for When Creativity Feels Pointless",
+          "tag": "h1",
+          "transform": "none",
+          "className": "font-serif text-3xl leading-tight sm:text-4xl lg:text-5xl text-body-strong"
+        },
+        {
+          "text": "Opening Reflection",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Quick Ritual: The Five-Minute Spark",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Deep Dive Ritual: Reclaiming the Ember",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Making It Your Own: Accessibility and Adaptation",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Safety and Gentle Ethics",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Reflection Prompt",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Checklist Summary",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Conclusion",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Start Here Grimoire Hubs Tools More Toggle theme Search Contact Admin RSS Home Archive Tarot Ritual for When Creativity Feels Pointless SEPTEMBER 15, 2025 • 3 MINUTE READ Tarot Ritual for When "
+    },
+    "screenshot": ".audit/screens/desktop__post__creativity-tarot-ritual.png"
+  },
+  {
+    "route": "/post/april-full-moon-libra-2026",
+    "viewport": "desktop",
+    "status": 404,
+    "navError": null,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "404: Not Found",
+      "h1": "404:  Not found",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "404:  Not found",
+          "tag": "h1",
+          "transform": "none",
+          "className": ""
+        }
+      ],
+      "bodyTextSnippet": "404: Not found Path: /post/april-full-moon-libra-2026"
+    },
+    "screenshot": ".audit/screens/desktop__post__april-full-moon-libra-2026.png"
+  },
+  {
+    "route": "/post/april-new-moon-aries-2026",
+    "viewport": "desktop",
+    "status": 404,
+    "navError": null,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "404: Not Found",
+      "h1": "404:  Not found",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "404:  Not found",
+          "tag": "h1",
+          "transform": "none",
+          "className": ""
+        }
+      ],
+      "bodyTextSnippet": "404: Not found Path: /post/april-new-moon-aries-2026"
+    },
+    "screenshot": ".audit/screens/desktop__post__april-new-moon-aries-2026.png"
+  },
+  {
+    "route": "/entities",
+    "viewport": "desktop",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "The Grimoire — WitchClick",
+      "h1": "The Grimoire",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "The Grimoire",
+          "tag": "h1",
+          "transform": "none",
+          "className": "page-header__title"
+        },
+        {
+          "text": "The Crystal Index",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-2xl font-bold tracking-wider text-[var(--entity-card-heading)] sm:text-3xl"
+        },
+        {
+          "text": "The Herbal Lexicon",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-2xl font-bold tracking-wider text-[var(--entity-card-heading)] sm:text-3xl"
+        },
+        {
+          "text": "Moonlit Phases",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-2xl font-bold tracking-wider text-[var(--entity-card-heading)] sm:text-3xl"
+        },
+        {
+          "text": "Planetary Day Almanac",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-2xl font-bold tracking-wider text-[var(--entity-card-heading)] sm:text-3xl"
+        },
+        {
+          "text": "The Ritual Archive",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-2xl font-bold tracking-wider text-[var(--entity-card-heading)] sm:text-3xl"
+        },
+        {
+          "text": "The Arcana Directory",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-2xl font-bold tracking-wider text-[var(--entity-card-heading)] sm:text-3xl"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Start Here Grimoire Hubs Tools More Toggle theme Search Contact Admin RSS Home Entities GRIMOIRE INDEX The Grimoire Choose your path through this digital grimoire — each chapter holds whispered"
+    },
+    "screenshot": ".audit/screens/desktop__entities.png"
+  },
+  {
+    "route": "/entities/tarot",
+    "viewport": "desktop",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "The Arcana Directory",
+      "h1": "The Arcana Directory",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "The Arcana Directory",
+          "tag": "h1",
+          "transform": "none",
+          "className": "page-header__title"
+        },
+        {
+          "text": "Ace Of Cups",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Ace Of Pentacles",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Ace Of Swords",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Ace Of Wands",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Clarity Check In Spread",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Death",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Eight Of Cups",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Eight Of Pentacles",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Start Here Grimoire Hubs Tools More Toggle theme Search Contact Admin RSS Home Entities Tarot 🃏 TAROT INDEX The Arcana Directory The cards and spreads that speak in signs. Read the weave of fa"
+    },
+    "screenshot": ".audit/screens/desktop__entities__tarot.png"
+  },
+  {
+    "route": "/entities/crystal",
+    "viewport": "desktop",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "The Crystal Index",
+      "h1": "The Crystal Index",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "The Crystal Index",
+          "tag": "h1",
+          "transform": "none",
+          "className": "page-header__title"
+        },
+        {
+          "text": "Amazonite",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Amethyst",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Black Tourmaline",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Blue Lace Agate",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Carnelian",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Celestite",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Chrysocolla",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Citrine",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Start Here Grimoire Hubs Tools More Toggle theme Search Contact Admin RSS Home Entities Crystal 🔮 CRYSTAL INDEX The Crystal Index Resonant stones and whispering gems. Trace the latticework of "
+    },
+    "screenshot": ".audit/screens/desktop__entities__crystal.png"
+  },
+  {
+    "route": "/entities/herb",
+    "viewport": "desktop",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "The Herbal Lexicon",
+      "h1": "The Herbal Lexicon",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "The Herbal Lexicon",
+          "tag": "h1",
+          "transform": "none",
+          "className": "page-header__title"
+        },
+        {
+          "text": "Basil",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Bay Laurel",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Calendula",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Cedar",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Chamomile",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Cinnamon",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Clove",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Elderflower",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Start Here Grimoire Hubs Tools More Toggle theme Search Contact Admin RSS Home Entities Herb 🌿 HERB INDEX The Herbal Lexicon Greens that heal, hush, and ignite. Gather verdant allies for teas,"
+    },
+    "screenshot": ".audit/screens/desktop__entities__herb.png"
+  },
+  {
+    "route": "/entities/planetaryDay",
+    "viewport": "desktop",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Planetary Day Almanac",
+      "h1": "Planetary Day Almanac",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Planetary Day Almanac",
+          "tag": "h1",
+          "transform": "none",
+          "className": "page-header__title"
+        },
+        {
+          "text": "Friday",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Friday Venus",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Monday",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Saturday",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Saturday Saturn",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Sunday",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Wednesday",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Start Here Grimoire Hubs Tools More Toggle theme Search Contact Admin RSS Home Entities Planetary Day 🪐 PLANETARY DAY INDEX Planetary Day Almanac Weekday rhythms for intention and timing. Foll"
+    },
+    "screenshot": ".audit/screens/desktop__entities__planetaryDay.png"
+  },
+  {
+    "route": "/entities/tarot/the-magician",
+    "viewport": "desktop",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "The Magician — Tarot — WitchClick",
+      "h1": "The Magician",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "The Magician",
+          "tag": "h1",
+          "transform": "none",
+          "className": "entity-hero-title"
+        },
+        {
+          "text": "Overview",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Properties",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Allies woven into this lore",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Rituals that call on this ally",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Connection Web",
+          "tag": "h2",
+          "transform": "uppercase",
+          "className": "entity-graph-title"
+        },
+        {
+          "text": "Related Posts",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Start Here Grimoire Hubs Tools More Toggle theme Search Contact Admin RSS Home Entities Tarot The Magician Back to All Tarots 🃏 TAROT The Magician The Magician invites you to notice what tools"
+    },
+    "screenshot": ".audit/screens/desktop__entities__tarot__the-magician.png"
+  },
+  {
+    "route": "/entities/crystal/obsidian",
+    "viewport": "desktop",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Obsidian — Crystal — WitchClick",
+      "h1": "Obsidian",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Obsidian",
+          "tag": "h1",
+          "transform": "none",
+          "className": "entity-hero-title"
+        },
+        {
+          "text": "Overview",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Properties",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Allies woven into this lore",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Rituals that call on this ally",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Connection Web",
+          "tag": "h2",
+          "transform": "uppercase",
+          "className": "entity-graph-title"
+        },
+        {
+          "text": "Related Posts",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Start Here Grimoire Hubs Tools More Toggle theme Search Contact Admin RSS Home Entities Crystal Obsidian Back to All Crystals 🔮 CRYSTAL Obsidian Obsidian is useful when you need strong boundar"
+    },
+    "screenshot": ".audit/screens/desktop__entities__crystal__obsidian.png"
+  },
+  {
+    "route": "/entities/herb/lavender",
+    "viewport": "desktop",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Lavender — Herb — WitchClick",
+      "h1": "Lavender",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Lavender",
+          "tag": "h1",
+          "transform": "none",
+          "className": "entity-hero-title"
+        },
+        {
+          "text": "Overview",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Properties",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Allies woven into this lore",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Rituals that call on this ally",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Connection Web",
+          "tag": "h2",
+          "transform": "uppercase",
+          "className": "entity-graph-title"
+        },
+        {
+          "text": "Related Posts",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Start Here Grimoire Hubs Tools More Toggle theme Search Contact Admin RSS Home Entities Herb Lavender Back to All Herbs 🌿 HERB Lavender Lavender invites calm when your nervous system is runnin"
+    },
+    "screenshot": ".audit/screens/desktop__entities__herb__lavender.png"
+  },
+  {
+    "route": "/tools",
+    "viewport": "desktop",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Prints & Tools",
+      "h1": "Prints & Tools",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Prints & Tools",
+          "tag": "h1",
+          "transform": "none",
+          "className": "page-header__title"
+        },
+        {
+          "text": "Free Prints & Downloads",
+          "tag": "h2",
+          "transform": "none",
+          "className": "tools-section__title"
+        },
+        {
+          "text": "Ready to use",
+          "tag": "h3",
+          "transform": "none",
+          "className": "tools-tier-title"
+        },
+        {
+          "text": "Tools You Can Purchase",
+          "tag": "h2",
+          "transform": "none",
+          "className": "tools-section__title"
+        },
+        {
+          "text": "Sustainable Incense Stick Set",
+          "tag": "h3",
+          "transform": "none",
+          "className": "tools-card__title"
+        },
+        {
+          "text": "Altar Kit (Cloth, Chalice & Ritual Candles)",
+          "tag": "h3",
+          "transform": "none",
+          "className": "tools-card__title"
+        },
+        {
+          "text": "Gemstone-Infused Aromatherapy Candle",
+          "tag": "h3",
+          "transform": "none",
+          "className": "tools-card__title"
+        },
+        {
+          "text": "Ceramic Essential Oil Diffuser",
+          "tag": "h3",
+          "transform": "none",
+          "className": "tools-card__title"
+        },
+        {
+          "text": "Tumbled Stone Crystal Set",
+          "tag": "h3",
+          "transform": "none",
+          "className": "tools-card__title"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Start Here Grimoire Hubs Tools More Toggle theme Search Contact Admin RSS Home Prints & Tools PRINTABLE LIBRARY Prints & Tools Free printables, ritual downloads, and curated tools for everyday "
+    },
+    "screenshot": ".audit/screens/desktop__tools.png"
+  },
+  {
+    "route": "/lab",
+    "viewport": "desktop",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [
+      "Expected property name or '}' in JSON at position 6 (line 2 column 6)"
+    ],
+    "diagnostics": {
+      "title": "Ritual Lab",
+      "h1": "Prototype Ritual Generator",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Prototype Ritual Generator",
+          "tag": "h1",
+          "transform": "none",
+          "className": "font-serif text-4xl"
+        },
+        {
+          "text": "Your Ritual Draft",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-2xl"
+        },
+        {
+          "text": "Quick Automation Seeds",
+          "tag": "h3",
+          "transform": "none",
+          "className": "font-serif text-xl"
+        },
+        {
+          "text": "Printables & Planner Exports",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-3xl"
+        },
+        {
+          "text": "Three-Day Ritual Sampler Planner",
+          "tag": "h3",
+          "transform": "none",
+          "className": "printable-preview__title"
+        },
+        {
+          "text": "Character Creation Spread",
+          "tag": "h3",
+          "transform": "none",
+          "className": "font-serif text-xl"
+        },
+        {
+          "text": "Three-Day Ritual Sampler Planner",
+          "tag": "h3",
+          "transform": "none",
+          "className": "font-serif text-xl"
+        },
+        {
+          "text": "Sign up for the WitchClick dispatch",
+          "tag": "h2",
+          "transform": "none",
+          "className": "cta-title font-serif"
+        },
+        {
+          "text": "Reminders",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-3xl"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Start Here Grimoire Hubs Tools More Toggle theme Search Contact Admin RSS PHASE 2 LAB Prototype Ritual Generator Pair your current intention with the tools you have on hand. The ritual lab sugg"
+    },
+    "screenshot": ".audit/screens/desktop__lab.png"
+  },
+  {
+    "route": "/start",
+    "viewport": "desktop",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Start Here — Your Guide to WitchClick",
+      "h1": "Start Here: Your Guide to WitchClick",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Start Here: Your Guide to WitchClick",
+          "tag": "h1",
+          "transform": "none",
+          "className": "start-page-title"
+        },
+        {
+          "text": "What is WitchClick?",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Three Ways to Begin",
+          "tag": "h2",
+          "transform": "none",
+          "className": "mt-0"
+        },
+        {
+          "text": "Calm",
+          "tag": "h3",
+          "transform": "none",
+          "className": "text-xl font-bold mb-2 text-accent dark:text-info-soft"
+        },
+        {
+          "text": "Focus",
+          "tag": "h3",
+          "transform": "none",
+          "className": "text-xl font-bold mb-2 text-info dark:text-info-soft"
+        },
+        {
+          "text": "Release",
+          "tag": "h3",
+          "transform": "none",
+          "className": "text-xl font-bold mb-2 text-warning"
+        },
+        {
+          "text": "Start with These Popular Posts",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Our Approach: What Makes WitchClick Different",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Secular & Science-Adjacent",
+          "tag": "h3",
+          "transform": "none",
+          "className": ""
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Start Here Grimoire Hubs Tools More Toggle theme Search Contact Admin RSS Home Start Here WELCOME Start Here: Your Guide to WitchClick Cozy, secular rituals and tools for everyday magic. No dog"
+    },
+    "screenshot": ".audit/screens/desktop__start.png"
+  },
+  {
+    "route": "/search",
+    "viewport": "desktop",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Search — WitchClick",
+      "h1": "Search",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Search",
+          "tag": "h1",
+          "transform": "none",
+          "className": "page-header__title"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Start Here Grimoire Hubs Tools More Toggle theme Search Contact Admin RSS Home Search Search Find rituals, guides, and meanderings by keyword or tag. Search query Type a keyword to start search"
+    },
+    "screenshot": ".audit/screens/desktop__search.png"
+  },
+  {
+    "route": "/",
+    "viewport": "mobile390",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "WitchClick — Cozy secular rituals for everyday magic",
+      "h1": "WitchClick",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "WitchClick",
+          "tag": "h1",
+          "transform": "none",
+          "className": "mb-2 font-serif text-3xl font-bold tracking-tight text-body-strong sm:text-4xl"
+        },
+        {
+          "text": "Returning to Quiet Projects with Gentle Hands",
+          "tag": "h2",
+          "transform": "none",
+          "className": "mb-3 font-serif text-2xl font-bold text-body-strong sm:text-3xl"
+        },
+        {
+          "text": "Recent Posts",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-2xl font-semibold text-body-strong sm:text-3xl"
+        },
+        {
+          "text": "New Year Without the 'New Me' Pressure: A Cozy Story",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "Refinding Yourself Under the Holiday Mask Ritual",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "Slicing Through Self-Delusion: A Gentle Clarity Ritual",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "December Clean Curses for Messy, Tender Human Hearts",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "When The Waiting Period Feels Like Heavy Stagnation",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "Cozy Gaming November Ritual Guide 2025",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Open menu WitchClick Gentle rituals, cozy tools, and reflections for when life feels loud. Small practices for shadow work, rest, and everyday magic—designed with neurodivergent brains in mind."
+    },
+    "screenshot": ".audit/screens/mobile390__home.png"
+  },
+  {
+    "route": "/hub",
+    "viewport": "mobile390",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Hub Constellation — Release, Focus, Calm",
+      "h1": "Seasonal rooms for soft structure",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Seasonal rooms for soft structure",
+          "tag": "h1",
+          "transform": "none",
+          "className": "page-header__title"
+        },
+        {
+          "text": "Release",
+          "tag": "h2",
+          "transform": "none",
+          "className": "hub-featured__title"
+        },
+        {
+          "text": "Release",
+          "tag": "h2",
+          "transform": "none",
+          "className": "hub-card__title"
+        },
+        {
+          "text": "Cozy Cursing Ritual: Release Anger Through Banishment",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "Focus",
+          "tag": "h2",
+          "transform": "none",
+          "className": "hub-card__title"
+        },
+        {
+          "text": "Focus Tea Rituals for Gentle, Distracted Brains",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "Calm",
+          "tag": "h2",
+          "transform": "none",
+          "className": "hub-card__title"
+        },
+        {
+          "text": "Create a Calm Space During Political Unrest: A Gentle Guide",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "Fall: Boundaries in Bloom",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Open menu Back to Home HUB CONSTELLATION Seasonal rooms for soft structure Choose the hub that fits the moment—Release for composting, Focus for momentum, Calm for collective soothing. Each lan"
+    },
+    "screenshot": ".audit/screens/mobile390__hub.png"
+  },
+  {
+    "route": "/hub/release",
+    "viewport": "mobile390",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Release rituals & composting practices — WitchClick",
+      "h1": "Release rituals & composting practices",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Release rituals & composting practices",
+          "tag": "h1",
+          "transform": "none",
+          "className": "hub-hero__title"
+        },
+        {
+          "text": "Start here",
+          "tag": "h2",
+          "transform": "none",
+          "className": "hub-playlist__title"
+        },
+        {
+          "text": "Quick rituals",
+          "tag": "h2",
+          "transform": "none",
+          "className": "hub-playlist__title"
+        },
+        {
+          "text": "Deep dives",
+          "tag": "h2",
+          "transform": "none",
+          "className": "hub-playlist__title"
+        },
+        {
+          "text": "Tools & printables",
+          "tag": "h2",
+          "transform": "none",
+          "className": "hub-playlist__title"
+        },
+        {
+          "text": "Partner spotlight",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Moonlit Bath Release Bundle",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        },
+        {
+          "text": "Fall: Boundaries in Bloom",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Anchor posts",
+          "tag": "h3",
+          "transform": "none",
+          "className": ""
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Open menu Back to Hubs LETTING GO WITH SOFTNESS Release rituals & composting practices Compost burnout, honour endings, and invite fresh energy with rituals that meet you where you are—whether "
+    },
+    "screenshot": ".audit/screens/mobile390__hub__release.png"
+  },
+  {
+    "route": "/post/creativity-tarot-ritual",
+    "viewport": "mobile390",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Tarot Ritual for When Creativity Feels Pointless",
+      "h1": "Tarot Ritual for When Creativity Feels Pointless",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Tarot Ritual for When Creativity Feels Pointless",
+          "tag": "h1",
+          "transform": "none",
+          "className": "font-serif text-3xl leading-tight sm:text-4xl lg:text-5xl text-body-strong"
+        },
+        {
+          "text": "Opening Reflection",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Quick Ritual: The Five-Minute Spark",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Deep Dive Ritual: Reclaiming the Ember",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Making It Your Own: Accessibility and Adaptation",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Safety and Gentle Ethics",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Reflection Prompt",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Checklist Summary",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Conclusion",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Open menu Back to Archive SEPTEMBER 15, 2025 • 3 MINUTE READ Tarot Ritual for When Creativity Feels Pointless #planning #creativity #tarot #ritual #self-care #burnout #reflection TL;DR MEDIUM S"
+    },
+    "screenshot": ".audit/screens/mobile390__post__creativity-tarot-ritual.png"
+  },
+  {
+    "route": "/post/april-full-moon-libra-2026",
+    "viewport": "mobile390",
+    "status": 404,
+    "navError": null,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "404: Not Found",
+      "h1": "404:  Not found",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "404:  Not found",
+          "tag": "h1",
+          "transform": "none",
+          "className": ""
+        }
+      ],
+      "bodyTextSnippet": "404: Not found Path: /post/april-full-moon-libra-2026"
+    },
+    "screenshot": ".audit/screens/mobile390__post__april-full-moon-libra-2026.png"
+  },
+  {
+    "route": "/post/april-new-moon-aries-2026",
+    "viewport": "mobile390",
+    "status": 404,
+    "navError": null,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "404: Not Found",
+      "h1": "404:  Not found",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "404:  Not found",
+          "tag": "h1",
+          "transform": "none",
+          "className": ""
+        }
+      ],
+      "bodyTextSnippet": "404: Not found Path: /post/april-new-moon-aries-2026"
+    },
+    "screenshot": ".audit/screens/mobile390__post__april-new-moon-aries-2026.png"
+  },
+  {
+    "route": "/entities",
+    "viewport": "mobile390",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "The Grimoire — WitchClick",
+      "h1": "The Grimoire",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "The Grimoire",
+          "tag": "h1",
+          "transform": "none",
+          "className": "page-header__title"
+        },
+        {
+          "text": "The Crystal Index",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-2xl font-bold tracking-wider text-[var(--entity-card-heading)] sm:text-3xl"
+        },
+        {
+          "text": "The Herbal Lexicon",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-2xl font-bold tracking-wider text-[var(--entity-card-heading)] sm:text-3xl"
+        },
+        {
+          "text": "Moonlit Phases",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-2xl font-bold tracking-wider text-[var(--entity-card-heading)] sm:text-3xl"
+        },
+        {
+          "text": "Planetary Day Almanac",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-2xl font-bold tracking-wider text-[var(--entity-card-heading)] sm:text-3xl"
+        },
+        {
+          "text": "The Ritual Archive",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-2xl font-bold tracking-wider text-[var(--entity-card-heading)] sm:text-3xl"
+        },
+        {
+          "text": "The Arcana Directory",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-2xl font-bold tracking-wider text-[var(--entity-card-heading)] sm:text-3xl"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Open menu Back to Home GRIMOIRE INDEX The Grimoire Choose your path through this digital grimoire — each chapter holds whispered wisdom waiting to unfold. 🔮 CRYSTAL The Crystal Index Resonant "
+    },
+    "screenshot": ".audit/screens/mobile390__entities.png"
+  },
+  {
+    "route": "/entities/tarot",
+    "viewport": "mobile390",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "The Arcana Directory",
+      "h1": "The Arcana Directory",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "The Arcana Directory",
+          "tag": "h1",
+          "transform": "none",
+          "className": "page-header__title"
+        },
+        {
+          "text": "Ace Of Cups",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Ace Of Pentacles",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Ace Of Swords",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Ace Of Wands",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Clarity Check In Spread",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Death",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Eight Of Cups",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Eight Of Pentacles",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Open menu Back to Entities 🃏 TAROT INDEX The Arcana Directory The cards and spreads that speak in signs. Read the weave of fate through major and minor secrets alike. Each arcana whispers coun"
+    },
+    "screenshot": ".audit/screens/mobile390__entities__tarot.png"
+  },
+  {
+    "route": "/entities/crystal",
+    "viewport": "mobile390",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "The Crystal Index",
+      "h1": "The Crystal Index",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "The Crystal Index",
+          "tag": "h1",
+          "transform": "none",
+          "className": "page-header__title"
+        },
+        {
+          "text": "Amazonite",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Amethyst",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Black Tourmaline",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Blue Lace Agate",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Carnelian",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Celestite",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Chrysocolla",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Citrine",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Open menu Back to Entities 🔮 CRYSTAL INDEX The Crystal Index Resonant stones and whispering gems. Trace the latticework of power coiled within each crystal. From protective wards to amplifying"
+    },
+    "screenshot": ".audit/screens/mobile390__entities__crystal.png"
+  },
+  {
+    "route": "/entities/herb",
+    "viewport": "mobile390",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "The Herbal Lexicon",
+      "h1": "The Herbal Lexicon",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "The Herbal Lexicon",
+          "tag": "h1",
+          "transform": "none",
+          "className": "page-header__title"
+        },
+        {
+          "text": "Basil",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Bay Laurel",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Calendula",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Cedar",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Chamomile",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Cinnamon",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Clove",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Elderflower",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Open menu Back to Entities 🌿 HERB INDEX The Herbal Lexicon Greens that heal, hush, and ignite. Gather verdant allies for teas, tinctures, and spellcraft. These herbs bend their fragrant will t"
+    },
+    "screenshot": ".audit/screens/mobile390__entities__herb.png"
+  },
+  {
+    "route": "/entities/planetaryDay",
+    "viewport": "mobile390",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Planetary Day Almanac",
+      "h1": "Planetary Day Almanac",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Planetary Day Almanac",
+          "tag": "h1",
+          "transform": "none",
+          "className": "page-header__title"
+        },
+        {
+          "text": "Friday",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Friday Venus",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Monday",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Saturday",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Saturday Saturn",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Sunday",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        },
+        {
+          "text": "Wednesday",
+          "tag": "h3",
+          "transform": "none",
+          "className": "entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Open menu Back to Entities 🪐 PLANETARY DAY INDEX Planetary Day Almanac Weekday rhythms for intention and timing. Follow the seven-day planetary cadence to pair rituals with the tone of each da"
+    },
+    "screenshot": ".audit/screens/mobile390__entities__planetaryDay.png"
+  },
+  {
+    "route": "/entities/tarot/the-magician",
+    "viewport": "mobile390",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "The Magician — Tarot — WitchClick",
+      "h1": "The Magician",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "The Magician",
+          "tag": "h1",
+          "transform": "none",
+          "className": "entity-hero-title"
+        },
+        {
+          "text": "Overview",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Properties",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Allies woven into this lore",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Rituals that call on this ally",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Connection Web",
+          "tag": "h2",
+          "transform": "uppercase",
+          "className": "entity-graph-title"
+        },
+        {
+          "text": "Related Posts",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore",
+          "tag": "h3",
+          "transform": "none",
+          "className": "card-heading"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Open menu Back to Tarot Back to All Tarots 🃏 TAROT The Magician The Magician invites you to notice what tools are already in reach and use them with intention. Magically, this card points to f"
+    },
+    "screenshot": ".audit/screens/mobile390__entities__tarot__the-magician.png"
+  },
+  {
+    "route": "/entities/crystal/obsidian",
+    "viewport": "mobile390",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Obsidian — Crystal — WitchClick",
+      "h1": "Obsidian",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Obsidian",
+          "tag": "h1",
+          "transform": "none",
+          "className": "entity-hero-title"
+        },
+        {
+          "text": "Overview",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Properties",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Allies woven into this lore",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Rituals that call on this ally",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Connection Web",
+          "tag": "h2",
+          "transform": "uppercase",
+          "className": "entity-graph-title"
+        },
+        {
+          "text": "Related Posts",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Open menu Back to Crystal Back to All Crystals 🔮 CRYSTAL Obsidian Obsidian is useful when you need strong boundaries and fewer emotional leaks. Magically it is used for protection and shadow w"
+    },
+    "screenshot": ".audit/screens/mobile390__entities__crystal__obsidian.png"
+  },
+  {
+    "route": "/entities/herb/lavender",
+    "viewport": "mobile390",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Lavender — Herb — WitchClick",
+      "h1": "Lavender",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Lavender",
+          "tag": "h1",
+          "transform": "none",
+          "className": "entity-hero-title"
+        },
+        {
+          "text": "Overview",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Properties",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Allies woven into this lore",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Rituals that call on this ally",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        },
+        {
+          "text": "Connection Web",
+          "tag": "h2",
+          "transform": "uppercase",
+          "className": "entity-graph-title"
+        },
+        {
+          "text": "Related Posts",
+          "tag": "h2",
+          "transform": "none",
+          "className": "entity-section-title"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Open menu Back to Herb Back to All Herbs 🌿 HERB Lavender Lavender invites calm when your nervous system is running hot and your thoughts will not settle. Magically it is used for peace and gen"
+    },
+    "screenshot": ".audit/screens/mobile390__entities__herb__lavender.png"
+  },
+  {
+    "route": "/tools",
+    "viewport": "mobile390",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Prints & Tools",
+      "h1": "Prints & Tools",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Prints & Tools",
+          "tag": "h1",
+          "transform": "none",
+          "className": "page-header__title"
+        },
+        {
+          "text": "Free Prints & Downloads",
+          "tag": "h2",
+          "transform": "none",
+          "className": "tools-section__title"
+        },
+        {
+          "text": "Ready to use",
+          "tag": "h3",
+          "transform": "none",
+          "className": "tools-tier-title"
+        },
+        {
+          "text": "Tools You Can Purchase",
+          "tag": "h2",
+          "transform": "none",
+          "className": "tools-section__title"
+        },
+        {
+          "text": "Sustainable Incense Stick Set",
+          "tag": "h3",
+          "transform": "none",
+          "className": "tools-card__title"
+        },
+        {
+          "text": "Altar Kit (Cloth, Chalice & Ritual Candles)",
+          "tag": "h3",
+          "transform": "none",
+          "className": "tools-card__title"
+        },
+        {
+          "text": "Gemstone-Infused Aromatherapy Candle",
+          "tag": "h3",
+          "transform": "none",
+          "className": "tools-card__title"
+        },
+        {
+          "text": "Ceramic Essential Oil Diffuser",
+          "tag": "h3",
+          "transform": "none",
+          "className": "tools-card__title"
+        },
+        {
+          "text": "Tumbled Stone Crystal Set",
+          "tag": "h3",
+          "transform": "none",
+          "className": "tools-card__title"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Open menu Back to Home PRINTABLE LIBRARY Prints & Tools Free printables, ritual downloads, and curated tools for everyday magic. Free Prints & Downloads Print-at-home planners, ritual guides, a"
+    },
+    "screenshot": ".audit/screens/mobile390__tools.png"
+  },
+  {
+    "route": "/lab",
+    "viewport": "mobile390",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [
+      "Expected property name or '}' in JSON at position 6 (line 2 column 6)"
+    ],
+    "diagnostics": {
+      "title": "Ritual Lab",
+      "h1": "Prototype Ritual Generator",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Prototype Ritual Generator",
+          "tag": "h1",
+          "transform": "none",
+          "className": "font-serif text-4xl"
+        },
+        {
+          "text": "Your Ritual Draft",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-2xl"
+        },
+        {
+          "text": "Quick Automation Seeds",
+          "tag": "h3",
+          "transform": "none",
+          "className": "font-serif text-xl"
+        },
+        {
+          "text": "Printables & Planner Exports",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-3xl"
+        },
+        {
+          "text": "Three-Day Ritual Sampler Planner",
+          "tag": "h3",
+          "transform": "none",
+          "className": "printable-preview__title"
+        },
+        {
+          "text": "Character Creation Spread",
+          "tag": "h3",
+          "transform": "none",
+          "className": "font-serif text-xl"
+        },
+        {
+          "text": "Three-Day Ritual Sampler Planner",
+          "tag": "h3",
+          "transform": "none",
+          "className": "font-serif text-xl"
+        },
+        {
+          "text": "Sign up for the WitchClick dispatch",
+          "tag": "h2",
+          "transform": "none",
+          "className": "cta-title font-serif"
+        },
+        {
+          "text": "Reminders",
+          "tag": "h2",
+          "transform": "none",
+          "className": "font-serif text-3xl"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Open menu PHASE 2 LAB Prototype Ritual Generator Pair your current intention with the tools you have on hand. The ritual lab suggests a sequence, offers alternates, and shares printable exports"
+    },
+    "screenshot": ".audit/screens/mobile390__lab.png"
+  },
+  {
+    "route": "/start",
+    "viewport": "mobile390",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Start Here — Your Guide to WitchClick",
+      "h1": "Start Here: Your Guide to WitchClick",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Start Here: Your Guide to WitchClick",
+          "tag": "h1",
+          "transform": "none",
+          "className": "start-page-title"
+        },
+        {
+          "text": "What is WitchClick?",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Three Ways to Begin",
+          "tag": "h2",
+          "transform": "none",
+          "className": "mt-0"
+        },
+        {
+          "text": "Calm",
+          "tag": "h3",
+          "transform": "none",
+          "className": "text-xl font-bold mb-2 text-accent dark:text-info-soft"
+        },
+        {
+          "text": "Focus",
+          "tag": "h3",
+          "transform": "none",
+          "className": "text-xl font-bold mb-2 text-info dark:text-info-soft"
+        },
+        {
+          "text": "Release",
+          "tag": "h3",
+          "transform": "none",
+          "className": "text-xl font-bold mb-2 text-warning"
+        },
+        {
+          "text": "Start with These Popular Posts",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Our Approach: What Makes WitchClick Different",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Secular & Science-Adjacent",
+          "tag": "h3",
+          "transform": "none",
+          "className": ""
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Open menu Back to Home WELCOME Start Here: Your Guide to WitchClick Cozy, secular rituals and tools for everyday magic. No dogma, no gatekeeping, just practical prompts that meet you where you "
+    },
+    "screenshot": ".audit/screens/mobile390__start.png"
+  },
+  {
+    "route": "/search",
+    "viewport": "mobile390",
+    "status": 200,
+    "navError": null,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "diagnostics": {
+      "title": "Search — WitchClick",
+      "h1": "Search",
+      "hasHorizontalOverflow": false,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "hiddenReveal": 0,
+      "headingSnapshots": [
+        {
+          "text": "Content",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Manage",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Design",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Settings",
+          "tag": "h3",
+          "transform": "none",
+          "className": "site-nav__admin-section-label"
+        },
+        {
+          "text": "Search WitchClick",
+          "tag": "h2",
+          "transform": "none",
+          "className": ""
+        },
+        {
+          "text": "Search",
+          "tag": "h1",
+          "transform": "none",
+          "className": "page-header__title"
+        }
+      ],
+      "bodyTextSnippet": "Skip to content WITCHCLICK Open menu Back to Home Search Find rituals, guides, and meanderings by keyword or tag. Search query Type a keyword to start searching. WITCHCLICK Cozy secular rituals, printable tools, and mind"
+    },
+    "screenshot": ".audit/screens/mobile390__search.png"
+  }
+]

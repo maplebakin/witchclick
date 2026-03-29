@@ -1,0 +1,16 @@
+{
+  "slug": "chrysocolla",
+  "type": "crystal",
+  "name": "Chrysocolla",
+  "summary": "Chrysocolla supports emotionally honest communication, especially when you are afraid of being misunderstood. Magically it is used for heart-throat harmony; practically it helps with journaling before hard talks so your message stays clear and kind.",
+  "properties": {
+    "keywords": ["emotional expression", "communication", "self-soothing"],
+    "chakra": "Throat",
+    "element": "Water",
+    "colors": ["blue", "green"]
+  },
+  "related": [
+    { "type": "herb", "slug": "chamomile" },
+    { "type": "tarot", "slug": "the-empress" }
+  ]
+}

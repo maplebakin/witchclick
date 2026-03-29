@@ -1,0 +1,16 @@
+{
+  "slug": "green-aventurine",
+  "type": "crystal",
+  "name": "Green Aventurine",
+  "summary": "Green Aventurine is helpful for steady optimism when taking practical risks. Magically it is linked with luck and growth; practically it can support applying for opportunities, trying a new habit, and recovering confidence after setbacks.",
+  "properties": {
+    "keywords": ["opportunity", "growth", "optimism"],
+    "chakra": "Heart",
+    "element": "Earth",
+    "colors": ["green"]
+  },
+  "related": [
+    { "type": "herb", "slug": "rosemary" },
+    { "type": "tarot", "slug": "wheel-of-fortune" }
+  ]
+}

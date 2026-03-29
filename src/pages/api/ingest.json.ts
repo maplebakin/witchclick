@@ -407,7 +407,7 @@ export async function POST({ request }: { request: Request }) {
     }
 
     // Paths & settings
-    const POSTS_DIR = path.join(CWD, 'content', 'posts');
+    const POSTS_DIR = path.join(CWD, 'src', 'content', 'posts');
     const SETTINGS_PATH = path.join(CWD, 'content', 'settings.json');
     ensureDirSync(POSTS_DIR);
 

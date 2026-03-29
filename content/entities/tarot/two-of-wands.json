@@ -1,0 +1,17 @@
+{
+  "slug": "two-of-wands",
+  "type": "tarot",
+  "name": "Two of Wands",
+  "summary": "Two of Wands invites planning with courage when your next move feels bigger than your comfort zone. Magically, it reflects personal power meeting possibility; practically, it can look like choosing one direction and mapping the first two tasks.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Wands",
+    "keywords": ["planning", "direction", "agency"],
+    "uprightKeywords": ["future planning", "bold choices", "expansion"],
+    "reversedKeywords": ["fear of change", "poor planning", "stalled vision"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "citrine" },
+    { "type": "herb", "slug": "rosemary" }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "slug": "the-high-priestess",
+  "type": "tarot",
+  "name": "The High Priestess",
+  "summary": "The High Priestess invites a quieter pace so subtle signals can come into focus. Magically, she represents intuition and mystery; practically, she can point to pausing before decisions, reviewing what you already know, and trusting both evidence and inner sense.",
+  "properties": {
+    "number": 2,
+    "arcana": "Major",
+    "keywords": ["intuition", "stillness", "discernment"],
+    "uprightKeywords": ["inner knowing", "patience", "insight"],
+    "reversedKeywords": ["disconnection", "overthinking", "withheld truth"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "moonstone" },
+    { "type": "herb", "slug": "mugwort" },
+    { "type": "tarot", "slug": "the-moon" }
+  ]
+}

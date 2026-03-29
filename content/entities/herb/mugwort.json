@@ -1,0 +1,16 @@
+{
+  "slug": "mugwort",
+  "type": "herb",
+  "name": "Mugwort",
+  "summary": "Mugwort invites deeper intuition and reflection, especially when you feel disconnected from your own signals. Magically it is associated with dreamwork and divination; practically you can use it in a dream sachet or tea journaling ritual before bed.",
+  "properties": {
+    "keywords": ["intuition", "dreamwork", "divination"],
+    "element": "Water",
+    "planet": "Moon",
+    "uses": ["sachets", "teas", "incense", "oils"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "moonstone" },
+    { "type": "tarot", "slug": "the-moon" }
+  ]
+}

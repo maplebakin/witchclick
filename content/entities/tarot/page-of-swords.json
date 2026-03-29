@@ -1,0 +1,17 @@
+{
+  "slug": "page-of-swords",
+  "type": "tarot",
+  "name": "Page of Swords",
+  "summary": "Page of Swords invites curious observation and better questions before fast conclusions. Magically, it channels fresh mental current and alert perception; practically, it can mean fact-checking, taking notes, and using beginner energy to learn quickly.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Swords",
+    "keywords": ["curiosity", "analysis", "alertness"],
+    "uprightKeywords": ["curiosity", "new ideas", "mental agility"],
+    "reversedKeywords": ["gossip", "defensiveness", "misinformation"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "clear-quartz" },
+    { "type": "herb", "slug": "rosemary" }
+  ]
+}

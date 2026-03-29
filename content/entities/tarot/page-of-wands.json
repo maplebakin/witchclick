@@ -1,0 +1,17 @@
+{
+  "slug": "page-of-wands",
+  "type": "tarot",
+  "name": "Page of Wands",
+  "summary": "Page of Wands invites curiosity and experimentation without demanding perfection. Magically, this card brings playful exploratory fire; practically, it can mean trying a rough draft, a short prototype, or a low-stakes test to see what energizes you.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Wands",
+    "keywords": ["curiosity", "exploration", "initiative"],
+    "uprightKeywords": ["enthusiasm", "new ideas", "adventure"],
+    "reversedKeywords": ["inconsistency", "self-doubt", "scattered starts"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "carnelian" },
+    { "type": "herb", "slug": "rosemary" }
+  ]
+}

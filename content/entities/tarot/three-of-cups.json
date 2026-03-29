@@ -1,0 +1,17 @@
+{
+  "slug": "three-of-cups",
+  "type": "tarot",
+  "name": "Three of Cups",
+  "summary": "Three of Cups invites shared joy, even in small doses when life feels heavy. Magically, it reflects uplifting group energy; practically, it can mean texting a trusted friend, celebrating a small win, or letting support be mutual instead of doing everything alone.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Cups",
+    "keywords": ["friendship", "celebration", "mutual support"],
+    "uprightKeywords": ["community", "celebration", "creative collaboration"],
+    "reversedKeywords": ["social overload", "gossip", "disconnection"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "rose-quartz" },
+    { "type": "herb", "slug": "chamomile" }
+  ]
+}

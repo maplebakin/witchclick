@@ -1,0 +1,17 @@
+{
+  "slug": "king-of-wands",
+  "type": "tarot",
+  "name": "King of Wands",
+  "summary": "King of Wands invites vision with accountability, especially when others rely on your direction. Magically, it reflects masterful fire and purpose; practically, it means setting a clear strategy, communicating priorities, and following through when things get complicated.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Wands",
+    "keywords": ["vision", "leadership", "execution"],
+    "uprightKeywords": ["entrepreneurial drive", "inspired leadership", "long-term vision"],
+    "reversedKeywords": ["domineering behavior", "impatience", "directionless ambition"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "sun" },
+    { "type": "herb", "slug": "cedar" }
+  ]
+}

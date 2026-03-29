@@ -1,0 +1,17 @@
+{
+  "slug": "seven-of-cups",
+  "type": "tarot",
+  "name": "Seven of Cups",
+  "summary": "Seven of Cups invites imagination, but also clear choices when options become overwhelming. Magically, it speaks to visionary potential; practically, it helps to shortlist one or two realistic next steps so possibility turns into progress.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Cups",
+    "keywords": ["options", "imagination", "discernment"],
+    "uprightKeywords": ["choices", "fantasy", "possibility"],
+    "reversedKeywords": ["clarity", "commitment", "focused action"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "labradorite" },
+    { "type": "herb", "slug": "mugwort" }
+  ]
+}

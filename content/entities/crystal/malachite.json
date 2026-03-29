@@ -1,0 +1,16 @@
+{
+  "slug": "malachite",
+  "type": "crystal",
+  "name": "Malachite",
+  "summary": "Malachite is useful during change when old patterns are uncomfortable to release. Magically it is considered a transformation stone; practically it can support boundary decisions, habit tracking, and choosing growth over familiar stress loops.",
+  "properties": {
+    "keywords": ["transformation", "boundaries", "heart healing"],
+    "chakra": "Heart",
+    "element": "Earth",
+    "colors": ["green"]
+  },
+  "related": [
+    { "type": "herb", "slug": "rosemary" },
+    { "type": "tarot", "slug": "death" }
+  ]
+}

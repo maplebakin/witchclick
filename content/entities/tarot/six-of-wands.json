@@ -1,0 +1,17 @@
+{
+  "slug": "six-of-wands",
+  "type": "tarot",
+  "name": "Six of Wands",
+  "summary": "Six of Wands invites you to let success be visible, especially if you usually downplay your effort. Magically, it carries victory and recognition; practically, it can mean documenting outcomes and sharing credit so progress is repeatable, not accidental.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Wands",
+    "keywords": ["recognition", "confidence", "earned progress"],
+    "uprightKeywords": ["success", "public recognition", "confidence"],
+    "reversedKeywords": ["self-doubt", "delayed recognition", "ego strain"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "citrine" },
+    { "type": "herb", "slug": "rosemary" }
+  ]
+}

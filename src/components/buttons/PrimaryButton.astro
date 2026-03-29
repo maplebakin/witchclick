@@ -3,6 +3,7 @@ interface Props {
   href?: string;
   target?: string;
   rel?: string;
+  dataAffiliate?: boolean;
   type?: "button" | "submit" | "reset";
   size?: "md" | "sm";
   iconAfter?: string;
@@ -13,6 +14,7 @@ const {
   href,
   target,
   rel,
+  dataAffiliate = false,
   type = "button",
   size = "md",
   iconAfter = "",
@@ -31,7 +33,13 @@ if (target === "_blank") {
 }
 ---
 {href ? (
-  <a class={classes} href={href} target={target} rel={computedRel}>
+  <a
+    class={classes}
+    href={href}
+    target={target}
+    rel={computedRel}
+    data-affiliate={dataAffiliate ? "true" : undefined}
+  >
     {iconBefore && <span aria-hidden="true" class="wc-button__icon">{iconBefore}</span>}
     <span class="wc-button__label">
       <slot />

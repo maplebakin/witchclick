@@ -1,0 +1,17 @@
+{
+  "slug": "six-of-swords",
+  "type": "tarot",
+  "name": "Six of Swords",
+  "summary": "Six of Swords invites a gradual move from chaos toward steadier ground. Magically, it symbolizes passage and mental clearing; practically, it can be simplifying your environment, reducing conflict exposure, and taking the next safe step forward.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Swords",
+    "keywords": ["transition", "relief", "forward movement"],
+    "uprightKeywords": ["transition", "recovery", "moving forward"],
+    "reversedKeywords": ["stagnation", "unfinished baggage", "resistance to change"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "labradorite" },
+    { "type": "herb", "slug": "rosemary" }
+  ]
+}

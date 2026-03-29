@@ -2752,18 +2752,21 @@ async function withRequestBoundary(req, res, handler) {
           kofiUsername: typeof body.kofiUsername === 'string' ? body.kofiUsername.trim() : currentSettings.kofiUsername || '',
           showAccountLink: body.showAccountLink === true || body.showAccountLink === 'true',
           analytics: {
+            ...(currentSettings.analytics || {}),
             enabled: body.analyticsEnabled === true || body.analyticsEnabled === 'true',
             provider: typeof body.analyticsProvider === 'string' ? body.analyticsProvider.trim() : (currentSettings.analytics?.provider || 'plausible'),
             domain: typeof body.analyticsDomain === 'string' ? body.analyticsDomain.trim() : (currentSettings.analytics?.domain || ''),
             apiHost: typeof body.analyticsApiHost === 'string' ? body.analyticsApiHost.trim() : (currentSettings.analytics?.apiHost || ''),
           },
           ads: {
+            ...(currentSettings.ads || {}),
             provider: typeof body.adsProvider === 'string' ? body.adsProvider.trim() : (currentSettings.ads?.provider || 'adsense'),
             adsenseClientId: typeof body.adsenseClientId === 'string' ? body.adsenseClientId.trim() : (currentSettings.ads?.adsenseClientId || ''),
             sidebarSlotId: typeof body.sidebarSlotId === 'string' ? body.sidebarSlotId.trim() : (currentSettings.ads?.sidebarSlotId || ''),
             endSlotId: typeof body.endSlotId === 'string' ? body.endSlotId.trim() : (currentSettings.ads?.endSlotId || ''),
           },
           observability: {
+            ...(currentSettings.observability || {}),
             enabled: body.observabilityEnabled === true || body.observabilityEnabled === 'true',
             dsn: body.observabilityDsn || currentSettings.observability?.dsn || null,
             environment: typeof body.observabilityEnvironment === 'string' ? body.observabilityEnvironment.trim() : (currentSettings.observability?.environment || 'production'),

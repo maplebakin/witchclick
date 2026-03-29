@@ -143,6 +143,37 @@ function toLabel(value: string): string {
     .join(" ");
 }
 
+function safeJsonStringify(value: unknown): string {
+  const seen = new WeakSet<object>();
+  return JSON.stringify(value, (_key, candidate) => {
+    if (typeof candidate === "function" || typeof candidate === "symbol") {
+      return undefined;
+    }
+    if (candidate && typeof candidate === "object") {
+      const objectCandidate = candidate as object;
+      if (seen.has(objectCandidate)) {
+        return null;
+      }
+      seen.add(objectCandidate);
+    }
+    return candidate;
+  });
+}
+
+const ritualLabPayloadJson = safeJsonStringify({
+  entries: entries.map((entry) => ({
+    slug: entry.slug,
+    title: entry.title,
+    summary: entry.summary,
+    intents: entry.intents,
+    tools: entry.tools,
+    tags: entry.tags,
+    durationMinutes: entry.durationMinutes,
+    materials: entry.materials,
+    steps: entry.steps,
+  })),
+});
+
 ---
 <Base {title} {description}>
   {downloadCollectionSchema && (
@@ -160,61 +191,68 @@ function toLabel(value: string): string {
     </header>
 
     <div class="grid gap-8 lg:grid-cols-[320px_1fr]">
-      <form id="lab-form" class="space-y-6 rounded-3xl border border-line-muted/60 bg-surface-base/80 p-6 shadow-lg backdrop-blur dark:border-line-accent-deep/40 dark:bg-surface-veil/70">
-        <div class="space-y-2">
-          <label for="intent" class="block text-sm font-semibold uppercase tracking-wide text-tertiary">
-            Intention
-          </label>
-          <select
-            id="intent"
-            name="intent"
-            class="w-full rounded-2xl border border-line-muted bg-surface-base px-4 py-3 text-sm font-medium text-primary shadow-sm focus:border-line-bold focus:outline-none focus:ring-2 focus:ring-focus/60 dark:border-line-accent dark:bg-surface-backdrop dark:text-accent-ghost"
-          >
-            {intents.map((intent) => (
-              <option value={intent} selected={intent === defaultIntent}>
-                {toLabel(intent)}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div class="space-y-2">
-          <span class="block text-sm font-semibold uppercase tracking-wide text-tertiary">Tools & Texture</span>
-          <p class="text-xs opacity-70">Pick what you have nearby—sound gear, journals, or group energy.</p>
-          <div class="mt-3 grid gap-2">
-            {toolOptions.map((tool) => (
-              <label class="flex items-center gap-3 rounded-2xl border border-line-muted/80 bg-surface-muted/80 px-3 py-2 text-sm font-medium text-primary transition hover:border-line-bolder dark:border-line-accent/60 dark:bg-surface-accent-midnight/30 dark:text-accent-ghost">
-                <input type="checkbox" name="tools" value={tool.value} class="h-4 w-4 rounded border-line-strong text-tertiary focus:ring-focus-strong" />
-                <span>{tool.label}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div class="space-y-2">
-          <label for="time" class="block text-sm font-semibold uppercase tracking-wide text-tertiary">
-            Available Time
-          </label>
-          <select
-            id="time"
-            name="time"
-            class="w-full rounded-2xl border border-line-muted bg-surface-base px-4 py-3 text-sm font-medium text-primary shadow-sm focus:border-line-bold focus:outline-none focus:ring-2 focus:ring-focus/60 dark:border-line-accent dark:bg-surface-backdrop dark:text-accent-ghost"
-          >
-            {timeOptions.map((option) => (
-              <option value={option.value} selected={option.value === defaultTime}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
+      <form id="lab-form" class="lab-form rounded-3xl border border-line-muted/60 bg-surface-base/80 p-6 shadow-lg backdrop-blur dark:border-line-accent-deep/40 dark:bg-surface-veil/70">
         <button
           type="button"
           id="generate-btn"
-          class="w-full rounded-2xl bg-surface-accent-strong px-4 py-3 text-sm font-semibold uppercase tracking-wide text-inverse shadow-md transition hover:bg-surface-accent focus:outline-none focus:ring-2 focus:ring-focus"
+          class="lab-form__generate w-full rounded-2xl bg-surface-accent-strong px-4 py-3 text-sm font-semibold uppercase tracking-wide text-inverse shadow-md transition hover:bg-surface-accent focus:outline-none focus:ring-2 focus:ring-focus"
         >
           Refresh Ritual
         </button>
+
+        <details id="lab-options-disclosure" class="lab-options-disclosure" data-mobile-disclosure data-desktop-min="1024">
+          <summary id="lab-options-summary" class="lab-options-disclosure__summary" aria-controls="lab-options-panel" aria-expanded="false">
+            Customize ritual <span aria-hidden>→</span>
+          </summary>
+          <div id="lab-options-panel" class="lab-options-disclosure__content">
+            <div class="space-y-2">
+              <label for="intent" class="block text-sm font-semibold uppercase tracking-wide text-tertiary">
+                Intention
+              </label>
+              <select
+                id="intent"
+                name="intent"
+                class="w-full rounded-2xl border border-line-muted bg-surface-base px-4 py-3 text-sm font-medium text-primary shadow-sm focus:border-line-bold focus:outline-none focus:ring-2 focus:ring-focus/60 dark:border-line-accent dark:bg-surface-backdrop dark:text-accent-ghost"
+              >
+                {intents.map((intent) => (
+                  <option value={intent} selected={intent === defaultIntent}>
+                    {toLabel(intent)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div class="space-y-2">
+              <span class="block text-sm font-semibold uppercase tracking-wide text-tertiary">Tools & Texture</span>
+              <p class="text-xs opacity-70">Pick what you have nearby—sound gear, journals, or group energy.</p>
+              <div class="mt-3 grid gap-2">
+                {toolOptions.map((tool) => (
+                  <label class="flex items-center gap-3 rounded-2xl border border-line-muted/80 bg-surface-muted/80 px-3 py-2 text-sm font-medium text-primary transition hover:border-line-bolder dark:border-line-accent/60 dark:bg-surface-accent-midnight/30 dark:text-accent-ghost">
+                    <input type="checkbox" name="tools" value={tool.value} class="h-4 w-4 rounded border-line-strong text-tertiary focus:ring-focus-strong" />
+                    <span>{tool.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label for="time" class="block text-sm font-semibold uppercase tracking-wide text-tertiary">
+                Available Time
+              </label>
+              <select
+                id="time"
+                name="time"
+                class="w-full rounded-2xl border border-line-muted bg-surface-base px-4 py-3 text-sm font-medium text-primary shadow-sm focus:border-line-bold focus:outline-none focus:ring-2 focus:ring-focus/60 dark:border-line-accent dark:bg-surface-backdrop dark:text-accent-ghost"
+              >
+                {timeOptions.map((option) => (
+                  <option value={option.value} selected={option.value === defaultTime}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </details>
       </form>
 
       <div class="space-y-6">
@@ -370,29 +408,45 @@ function toLabel(value: string): string {
     </a>
   </section>
 
-  <script type="application/json" is:inline id="ritual-lab-data">
-    {JSON.stringify({
-      entries: entries.map((entry) => ({
-        slug: entry.slug,
-        title: entry.title,
-        summary: entry.summary,
-        intents: entry.intents,
-        tools: entry.tools,
-        tags: entry.tags,
-        durationMinutes: entry.durationMinutes,
-        materials: entry.materials,
-        steps: entry.steps,
-      })),
-    })}
-  </script>
+  <script type="application/json" is:inline id="ritual-lab-data" set:html={ritualLabPayloadJson}></script>
   <script type="module" is:inline>
     const dataEl = document.getElementById("ritual-lab-data");
     const form = document.getElementById("lab-form");
     const output = document.getElementById("ritual-output");
     const generateBtn = document.getElementById("generate-btn");
+    const disclosureNodes = Array.from(document.querySelectorAll("[data-mobile-disclosure]"));
+
+    const setupResponsiveDisclosure = (node) => {
+      if (!(node instanceof HTMLDetailsElement)) return;
+      const summary = node.querySelector("summary");
+      const minWidth = Number(node.dataset.desktopMin || "1024");
+      const mediaQuery = window.matchMedia(`(min-width: ${minWidth}px)`);
+
+      const syncState = () => {
+        if (summary instanceof HTMLElement) {
+          summary.setAttribute("aria-expanded", node.open ? "true" : "false");
+        }
+      };
+
+      const applyViewportState = () => {
+        node.open = mediaQuery.matches;
+        syncState();
+      };
+
+      applyViewportState();
+      node.addEventListener("toggle", syncState);
+      mediaQuery.addEventListener("change", applyViewportState);
+    };
+
+    disclosureNodes.forEach(setupResponsiveDisclosure);
 
     if (dataEl && form && output && generateBtn) {
-      const payload = JSON.parse(dataEl.textContent || "{}");
+      let payload = { entries: [] };
+      try {
+        payload = JSON.parse(dataEl.textContent || "{}");
+      } catch (error) {
+        console.error("Unable to parse ritual lab data payload", error);
+      }
       const entries = Array.isArray(payload.entries) ? payload.entries : [];
 
       const renderEntry = (entry) => {
@@ -546,6 +600,70 @@ function toLabel(value: string): string {
 </script>
 
 <style>
+  .lab-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .lab-form__generate {
+    order: 1;
+  }
+
+  .lab-options-disclosure {
+    order: 2;
+    border: 1px solid color-mix(in srgb, var(--line-subtle) 72%, transparent 28%);
+    border-radius: var(--card-radius);
+    background: color-mix(in srgb, var(--surface-muted) 80%, transparent 20%);
+    padding: var(--space-3);
+  }
+
+  .lab-options-disclosure__summary {
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-accent);
+    list-style: none;
+  }
+
+  .lab-options-disclosure__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .lab-options-disclosure__content {
+    margin-top: var(--space-4);
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 1024px) {
+    .lab-form__generate {
+      order: 2;
+    }
+
+    .lab-options-disclosure {
+      order: 1;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      padding: 0;
+    }
+
+    .lab-options-disclosure__summary {
+      display: none;
+    }
+
+    .lab-options-disclosure:not([open]) > .lab-options-disclosure__content {
+      display: grid;
+    }
+
+    .lab-options-disclosure__content {
+      margin-top: 0;
+    }
+  }
+
   .lab-evergreen {
     margin: clamp(2.5rem, 6vw, 3.5rem) auto;
     max-width: min(48rem, 90vw);

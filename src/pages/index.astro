@@ -4,7 +4,7 @@ import PostCard from "@/components/PostCard.astro";
 import HeadSlot from "@/components/HeadSlot.astro";
 import Card from "@/components/ui/Card.astro";
 import Button from "@/components/ui/Button.astro";
-import { loadAllPosts, filterPostsByCategory, POST_CATEGORY_RITUAL } from "@/utils/posts";
+import { loadAllPosts, filterPostsByCategory, POST_CATEGORY_RITUAL, POST_CATEGORY_MEANDERING } from "@/utils/posts";
 import { postsToCardData } from "@/utils/postTransforms";
 import { readSettings } from "@/utils/settings";
 import { createCollectionPageSchema } from "@/utils/structuredData";
@@ -17,6 +17,7 @@ const settings = readSettings();
 
 // Filter for ritual posts only (default category for existing posts)
 const ritualPosts = filterPostsByCategory(allPosts, POST_CATEGORY_RITUAL);
+const hasPublishedMeanderings = filterPostsByCategory(allPosts, POST_CATEGORY_MEANDERING).length > 0;
 
 // Transform to card data
 const cardPosts: CardPost[] = postsToCardData(ritualPosts);
@@ -26,6 +27,9 @@ const featuredPost = cardPosts[0] ?? null;
 
 // Show recent posts (12 total, excluding the featured one)
 const recentPosts = cardPosts.slice(1, 13);
+const bentoFeaturedPost = recentPosts[0] ?? null;
+const bentoSidePosts = recentPosts.slice(1, 4);
+const remainingRecentPosts = recentPosts.slice(4);
 
 // Create schema for the post collection
 const collectionSchema = featuredPost ? createCollectionPageSchema(
@@ -52,26 +56,26 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
   )}
 
   <div class="mx-auto w-full max-w-6xl px-4">
-    <header class="pt-3 pb-6 text-center sm:pt-4 sm:pb-8">
-      <div class="mx-auto max-w-2xl">
-        <h1 class="mb-2 font-serif text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">WitchClick</h1>
+    <header data-reveal class="mb-[var(--page-header-gap)] pt-3 pb-6 text-center sm:pt-4 sm:pb-8">
+      <div class="mx-auto max-w-[var(--content-max-width)]">
+        <h1 class="mb-2 font-serif text-3xl font-bold tracking-tight text-body-strong sm:text-4xl">WitchClick</h1>
         <p class="mb-3 text-lg font-medium text-brand-accent sm:text-xl">
           Gentle rituals, cozy tools, and reflections for when life feels loud.
         </p>
-        <p class="text-sm text-neutral-700">
+        <p class="text-sm text-body">
           Small practices for shadow work, rest, and everyday magic—designed with neurodivergent brains in mind.
         </p>
       </div>
     </header>
 
     {featuredPost && (
-      <article class="mx-auto mt-5 mb-4 w-full max-w-4xl sm:mt-6 sm:mb-6">
+      <article data-reveal class="mx-auto mb-[var(--page-header-gap)] w-full max-w-4xl">
         <a
           href={`/post/${featuredPost.slug}`}
-          class="block overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5 lg:grid lg:grid-cols-2 lg:gap-0"
+          class="group block overflow-hidden rounded-2xl border border-line-neutral bg-surface-base shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5 lg:grid lg:grid-cols-2 lg:gap-0"
         >
           {(featuredPost.heroImage || featuredPost.heroImageSrc) && (
-            <div class="overflow-hidden bg-neutral-100 aspect-[3/2] lg:aspect-auto">
+            <div class="overflow-hidden bg-surface-soft aspect-[3/2] lg:aspect-auto">
               <img
                 src={featuredPost.heroImageSrc || featuredPost.heroImage}
                 alt={featuredPost.heroAlt || featuredPost.heroImageAlt || `Hero image for ${featuredPost.title}`}
@@ -85,13 +89,13 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
             <span class="mb-3 inline-block rounded-full bg-accent-soft/30 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-brand-accent">
               Latest
             </span>
-            <h2 class="mb-3 font-serif text-2xl font-bold text-neutral-800 sm:text-3xl">{featuredPost.title}</h2>
-            <p class="mb-5 text-base leading-relaxed text-neutral-700 opacity-95">{featuredPost.tldr || featuredPost.excerpt}</p>
+            <h2 class="mb-3 font-serif text-2xl font-bold text-body-strong sm:text-3xl">{featuredPost.title}</h2>
+            <p class="mb-5 text-base leading-relaxed text-body opacity-95">{featuredPost.tldr || featuredPost.excerpt}</p>
             <div class="flex flex-wrap items-center gap-3">
               {featuredPost.tags.slice(0, 3).map((tag) => (
-                <span class="rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-600">{tag}</span>
+                <span class="rounded-full bg-surface-soft px-3 py-1 text-xs text-body-muted">{tag}</span>
               ))}
-              <span class="text-xs text-neutral-500 opacity-70">{featuredPost.readingMinutes} min read</span>
+              <span class="text-xs text-body-subtle opacity-70">{featuredPost.readingMinutes} min read</span>
             </div>
           </div>
         </a>
@@ -99,48 +103,101 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
     )}
 
     {recentPosts.length > 0 && (
-      <section class="mt-4 mb-10 sm:mt-6 sm:mb-14" aria-labelledby="recent-posts-heading">
-        <div class="mx-auto w-full max-w-4xl border-t border-neutral-200/60 pt-5 sm:pt-6">
+      <section data-reveal class="mb-[var(--page-section-gap)]" aria-labelledby="recent-posts-heading">
+        <div class="mx-auto w-full max-w-4xl border-t border-line-neutral/60 pt-5 sm:pt-6">
           <div class="flex items-center justify-between mb-5 sm:mb-6">
-            <h2 id="recent-posts-heading" class="font-serif text-2xl font-semibold text-neutral-800 sm:text-3xl">Recent Posts</h2>
-            <a href="/page/1" class="text-sm font-medium text-brand-accent transition-colors hover:text-brand-primary hover:underline">View all →</a>
+            <h2 id="recent-posts-heading" class="font-serif text-2xl font-semibold text-body-strong sm:text-3xl">Recent Posts</h2>
+            <a href="/page/1" class="text-sm font-medium text-brand-accent transition-colors hover:text-brand-accent hover:underline">View all →</a>
           </div>
         </div>
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 sm:gap-8">
-          {recentPosts.map((post) => (
-            <PostCard
-              href={`/post/${post.slug}`}
-              post={{
-                slug: post.slug,
-                title: post.title,
-                excerpt: post.excerpt,
-                tldr: post.tldr,
-                tags: post.tags,
-                readingMinutes: post.readingMinutes,
-                publishedAt: post.publishedAt,
-                spoonLevel: post.spoonLevel,
-                spoons: post.spoons,
-                heroImage: post.heroImage,
-                heroImageSrc: post.heroImageSrc,
-                heroImageAlt: post.heroImageAlt,
-                heroAlt: post.heroAlt,
-                category: post.category,
-              }}
-            />
-          ))}
-        </div>
+        {bentoFeaturedPost && (
+          <div data-reveal class="home-bento">
+            <div class="home-bento__item home-bento__item--feature">
+              <PostCard
+                layout="bento-featured"
+                href={`/post/${bentoFeaturedPost.slug}`}
+                post={{
+                  slug: bentoFeaturedPost.slug,
+                  title: bentoFeaturedPost.title,
+                  excerpt: bentoFeaturedPost.excerpt,
+                  tldr: bentoFeaturedPost.tldr,
+                  tags: bentoFeaturedPost.tags,
+                  readingMinutes: bentoFeaturedPost.readingMinutes,
+                  publishedAt: bentoFeaturedPost.publishedAt,
+                  spoonLevel: bentoFeaturedPost.spoonLevel,
+                  spoons: bentoFeaturedPost.spoons,
+                  heroImage: bentoFeaturedPost.heroImage,
+                  heroImageSrc: bentoFeaturedPost.heroImageSrc,
+                  heroImageAlt: bentoFeaturedPost.heroImageAlt,
+                  heroAlt: bentoFeaturedPost.heroAlt,
+                  category: bentoFeaturedPost.category,
+                }}
+              />
+            </div>
+            {bentoSidePosts.map((post, index) => (
+              <div class:list={["home-bento__item", `home-bento__item--side-${index + 1}`]}>
+                <PostCard
+                  layout="bento-compact"
+                  href={`/post/${post.slug}`}
+                  post={{
+                    slug: post.slug,
+                    title: post.title,
+                    excerpt: post.excerpt,
+                    tldr: post.tldr,
+                    tags: post.tags,
+                    readingMinutes: post.readingMinutes,
+                    publishedAt: post.publishedAt,
+                    spoonLevel: post.spoonLevel,
+                    spoons: post.spoons,
+                    heroImage: post.heroImage,
+                    heroImageSrc: post.heroImageSrc,
+                    heroImageAlt: post.heroImageAlt,
+                    heroAlt: post.heroAlt,
+                    category: post.category,
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {remainingRecentPosts.length > 0 && (
+          <div data-reveal class="home-recent-grid">
+            {remainingRecentPosts.map((post) => (
+              <PostCard
+                href={`/post/${post.slug}`}
+                post={{
+                  slug: post.slug,
+                  title: post.title,
+                  excerpt: post.excerpt,
+                  tldr: post.tldr,
+                  tags: post.tags,
+                  readingMinutes: post.readingMinutes,
+                  publishedAt: post.publishedAt,
+                  spoonLevel: post.spoonLevel,
+                  spoons: post.spoons,
+                  heroImage: post.heroImage,
+                  heroImageSrc: post.heroImageSrc,
+                  heroImageAlt: post.heroImageAlt,
+                  heroAlt: post.heroAlt,
+                  category: post.category,
+                }}
+              />
+            ))}
+          </div>
+        )}
       </section>
     )}
   </div>
 
-  <aside class="my-12 sm:my-20">
+  <aside data-reveal class="my-[var(--page-section-gap)]">
     <Card class="max-w-lg mx-auto text-center" padding="lg">
-      <h3 class="mb-2 font-serif text-xl font-semibold text-neutral-800 sm:text-2xl">Looking for more?</h3>
-      <p class="mb-6 text-base text-neutral-600">
+      <h3 class="mb-2 font-serif text-xl font-semibold text-body-strong sm:text-2xl">Looking for more?</h3>
+      <p class="mb-6 text-base text-body-muted">
         Explore printable tools, browse by topic, check out non-magickal rambles, or reach out if you need something specific.
       </p>
       <div class="flex flex-wrap gap-3 justify-center">
-        <Button href="/meanderings" variant="secondary" size="sm">Meanderings</Button>
+        {hasPublishedMeanderings && <Button href="/meanderings" variant="secondary" size="sm">Meanderings</Button>}
         <Button href="/tools" variant="secondary" size="sm">Printable Tools</Button>
         <Button href="/entities" variant="secondary" size="sm">Browse Topics</Button>
         <Button href="/contact" variant="secondary" size="sm">Get in Touch</Button>
@@ -148,3 +205,52 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
     </Card>
   </aside>
 </Base>
+
+<style>
+  .home-bento {
+    display: grid;
+    gap: var(--grid-gap);
+    grid-template-areas:
+      "feature"
+      "side-1"
+      "side-2"
+      "side-3";
+  }
+
+  .home-bento__item--feature {
+    grid-area: feature;
+  }
+
+  .home-bento__item--side-1 {
+    grid-area: side-1;
+  }
+
+  .home-bento__item--side-2 {
+    grid-area: side-2;
+  }
+
+  .home-bento__item--side-3 {
+    grid-area: side-3;
+  }
+
+  .home-bento :global(.ritual-card) {
+    height: 100%;
+  }
+
+  .home-recent-grid {
+    display: grid;
+    gap: var(--grid-gap);
+    margin-top: var(--page-header-gap);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  }
+
+  @media (min-width: 960px) {
+    .home-bento {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-areas:
+        "feature feature side-1"
+        "feature feature side-2"
+        "feature feature side-3";
+    }
+  }
+</style>

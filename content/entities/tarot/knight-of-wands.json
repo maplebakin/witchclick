@@ -1,0 +1,17 @@
+{
+  "slug": "knight-of-wands",
+  "type": "tarot",
+  "name": "Knight of Wands",
+  "summary": "Knight of Wands invites bold movement when timing matters, with enough structure to avoid avoidable chaos. Magically, it carries intense forward fire; practically, it helps to channel urgency into one clear objective and a finish plan.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Wands",
+    "keywords": ["drive", "bold action", "focus under pressure"],
+    "uprightKeywords": ["passion", "momentum", "decisive pursuit"],
+    "reversedKeywords": ["impulsiveness", "recklessness", "unfinished efforts"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "carnelian" },
+    { "type": "herb", "slug": "cinnamon" }
+  ]
+}

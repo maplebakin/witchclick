@@ -1,0 +1,16 @@
+{
+  "slug": "frankincense",
+  "type": "herb",
+  "name": "Frankincense",
+  "summary": "Frankincense invites focused presence when your attention is scattered. Magically it is used for purification and spiritual centering; practically it can be burned as incense before meditation, journaling, or any task that needs a calm, clear head.",
+  "properties": {
+    "keywords": ["purification", "focus", "centering"],
+    "element": "Fire",
+    "planet": "Sun",
+    "uses": ["incense", "oils", "smoke cleansing", "sachets"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "selenite" },
+    { "type": "tarot", "slug": "the-hermit" }
+  ]
+}

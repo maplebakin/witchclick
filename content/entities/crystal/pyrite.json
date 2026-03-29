@@ -1,0 +1,16 @@
+{
+  "slug": "pyrite",
+  "type": "crystal",
+  "name": "Pyrite",
+  "summary": "Pyrite is great for work blocks where you need momentum and clear priorities. Magically it is tied to prosperity and protective drive; practically it can anchor a focused sprint where you define one outcome and finish it.",
+  "properties": {
+    "keywords": ["prosperity", "drive", "protection"],
+    "chakra": "Solar Plexus",
+    "element": "Earth",
+    "colors": ["gold"]
+  },
+  "related": [
+    { "type": "herb", "slug": "cinnamon" },
+    { "type": "tarot", "slug": "ace-of-pentacles" }
+  ]
+}

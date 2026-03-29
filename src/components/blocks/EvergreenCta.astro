@@ -181,8 +181,16 @@ const formId = `cta-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^
       flex-direction: column;
     }
 
-    .cta-submit {
+    .cta-form-fields input {
+      flex: 1 1 auto;
       width: 100%;
+    }
+
+    .cta-submit {
+      display: inline-flex;
+      align-items: center;
+      width: 100%;
+      align-self: stretch;
       justify-content: center;
     }
   }

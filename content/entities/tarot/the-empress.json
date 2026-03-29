@@ -1,0 +1,18 @@
+{
+  "slug": "the-empress",
+  "type": "tarot",
+  "name": "The Empress",
+  "summary": "The Empress invites you to create conditions where growth feels supported, not forced. Magically, she reflects fertile creative energy; practically, she often points to rest, nourishment, and tending the routines that help projects and relationships thrive.",
+  "properties": {
+    "number": 3,
+    "arcana": "Major",
+    "keywords": ["nurturing", "abundance", "creativity"],
+    "uprightKeywords": ["care", "growth", "embodiment"],
+    "reversedKeywords": ["depletion", "smothering", "creative block"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "rose-quartz" },
+    { "type": "herb", "slug": "chamomile" },
+    { "type": "tarot", "slug": "the-emperor" }
+  ]
+}

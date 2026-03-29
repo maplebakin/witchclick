@@ -1,4 +1,4 @@
-const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.js');
+const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.cjs');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {

@@ -1,0 +1,16 @@
+{
+  "slug": "thyme",
+  "type": "herb",
+  "name": "Thyme",
+  "summary": "Thyme invites steady courage when you need to follow through on something difficult. Magically it is used for purification and resilience; practically it works well in baths, teas, or cooking as a ritual cue to stay grounded and keep going.",
+  "properties": {
+    "keywords": ["courage", "resilience", "purification"],
+    "element": "Fire",
+    "planet": "Venus",
+    "uses": ["teas", "bath rituals", "cooking", "floor washes"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "red-jasper" },
+    { "type": "tarot", "slug": "strength" }
+  ]
+}

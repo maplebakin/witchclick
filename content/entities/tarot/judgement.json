@@ -1,0 +1,18 @@
+{
+  "slug": "judgement",
+  "type": "tarot",
+  "name": "Judgement",
+  "summary": "Judgement invites a compassionate reckoning with the past so you can move forward with clearer intent. Magically, it symbolizes awakening and renewal; practically, it often reflects reviewing lessons, making amends where possible, and choosing your next chapter on purpose.",
+  "properties": {
+    "number": 20,
+    "arcana": "Major",
+    "keywords": ["awakening", "reckoning", "renewal"],
+    "uprightKeywords": ["clarity", "forgiveness", "calling"],
+    "reversedKeywords": ["self-judgment", "avoidance", "stuckness"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "clear-quartz" },
+    { "type": "herb", "slug": "rosemary" },
+    { "type": "tarot", "slug": "the-sun" }
+  ]
+}

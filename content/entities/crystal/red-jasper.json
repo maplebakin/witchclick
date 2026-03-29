@@ -1,0 +1,16 @@
+{
+  "slug": "red-jasper",
+  "type": "crystal",
+  "name": "Red Jasper",
+  "summary": "Red Jasper supports endurance when life is demanding and motivation is uneven. Magically it is used for grounding and stamina; practically it can anchor body-based routines like hydration, walking, and finishing one essential task at a time.",
+  "properties": {
+    "keywords": ["stamina", "grounding", "stability"],
+    "chakra": "Root",
+    "element": "Earth",
+    "colors": ["red"]
+  },
+  "related": [
+    { "type": "herb", "slug": "cedar" },
+    { "type": "tarot", "slug": "strength" }
+  ]
+}

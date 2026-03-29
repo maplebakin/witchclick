@@ -1,0 +1,17 @@
+{
+  "slug": "four-of-pentacles",
+  "type": "tarot",
+  "name": "Four of Pentacles",
+  "summary": "Four of Pentacles invites healthy protection of your resources without letting fear run everything. Magically, it speaks to containment and boundaries; practically, it can mean saving intentionally while staying open to support, generosity, and needed change.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Pentacles",
+    "keywords": ["security", "control", "conservation"],
+    "uprightKeywords": ["stability", "resource protection", "financial caution"],
+    "reversedKeywords": ["scarcity mindset", "rigidity", "difficulty letting go"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "obsidian" },
+    { "type": "herb", "slug": "cedar" }
+  ]
+}

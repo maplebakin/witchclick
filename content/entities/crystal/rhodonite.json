@@ -1,0 +1,16 @@
+{
+  "slug": "rhodonite",
+  "type": "crystal",
+  "name": "Rhodonite",
+  "summary": "Rhodonite supports repair work after conflict, disappointment, or self-criticism. Magically it is used for compassion and emotional balance; practically it can anchor apology planning, boundary repair, and choosing accountability over avoidance.",
+  "properties": {
+    "keywords": ["compassion", "emotional repair", "forgiveness"],
+    "chakra": "Heart",
+    "element": "Earth",
+    "colors": ["pink", "black"]
+  },
+  "related": [
+    { "type": "herb", "slug": "chamomile" },
+    { "type": "tarot", "slug": "the-lovers" }
+  ]
+}

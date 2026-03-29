@@ -53,8 +53,8 @@ Editors can reference the following affiliate keys in post specs and frontmatter
 
 ## Builds & checks
 
-- `npm run build` now fails fast if legacy `npm_config_http_proxy` env vars are set so maintainers can clean them before Astro runs.
-- `npm run build:public` runs the normal build then prunes admin/api outputs from `dist/` for safer deploys.
+- `npm run build` now fails fast if legacy `npm_config_http_proxy` env vars are set so maintainers can clean them before Astro runs, then prunes admin/api outputs so the artifact is deploy-safe by default.
+- `npm run build:public` is an alias for the deploy-safe build.
 - `npm run check:prepub` runs type/lint, link check, and the public build in one go.
 - `npm run drafts:sync` copies Cauldron draft JSONs (`cauldron/src/data/drafts`) into `content/drafts/` for quick ingest or review.
 - `npm run themes:lint` validates theme JSON files for required fields and duplicate slug/mode pairs.

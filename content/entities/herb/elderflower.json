@@ -1,0 +1,16 @@
+{
+  "slug": "elderflower",
+  "type": "herb",
+  "name": "Elderflower",
+  "summary": "Elderflower invites gentle transition work when you are between phases and need steadiness. Magically it is associated with protection and threshold support; practically you can use it in teas or baths while naming what you are releasing and what you are building next.",
+  "properties": {
+    "keywords": ["transition", "protection", "soothing"],
+    "element": "Water",
+    "planet": "Venus",
+    "uses": ["teas", "bath rituals", "sachets", "oils"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "celestite" },
+    { "type": "tarot", "slug": "the-world" }
+  ]
+}

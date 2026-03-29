@@ -1,0 +1,17 @@
+{
+  "slug": "page-of-pentacles",
+  "type": "tarot",
+  "name": "Page of Pentacles",
+  "summary": "Page of Pentacles invites grounded curiosity about what you can build next. Magically, it carries beginner energy with practical promise; practically, it points to learning basics, testing one idea, and committing to small repeatable actions.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Pentacles",
+    "keywords": ["study", "opportunity", "commitment"],
+    "uprightKeywords": ["practical learning", "new opportunity", "steady progress"],
+    "reversedKeywords": ["procrastination", "poor follow-through", "unrealistic plans"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "clear-quartz" },
+    { "type": "herb", "slug": "thyme" }
+  ]
+}

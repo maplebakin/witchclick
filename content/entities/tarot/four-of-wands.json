@@ -1,0 +1,17 @@
+{
+  "slug": "four-of-wands",
+  "type": "tarot",
+  "name": "Four of Wands",
+  "summary": "Four of Wands invites you to mark progress, even if the milestone is small. Magically, it represents stable celebratory energy; practically, it can be creating rituals of rest and appreciation that make hard work feel sustainable.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Wands",
+    "keywords": ["stability", "celebration", "belonging"],
+    "uprightKeywords": ["joy", "homecoming", "milestone reached"],
+    "reversedKeywords": ["tension at home", "disconnection", "unsteady support"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "rose-quartz" },
+    { "type": "herb", "slug": "chamomile" }
+  ]
+}

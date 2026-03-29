@@ -1,0 +1,17 @@
+{
+  "slug": "five-of-cups",
+  "type": "tarot",
+  "name": "Five of Cups",
+  "summary": "Five of Cups invites honest grief without pretending everything is fine. Magically, it honors emotional release; practically, it can mean naming what was lost and also identifying one steady resource that is still available to you.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Cups",
+    "keywords": ["grief", "regret", "resilience"],
+    "uprightKeywords": ["loss", "grief", "disappointment"],
+    "reversedKeywords": ["acceptance", "healing", "perspective"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "black-tourmaline" },
+    { "type": "herb", "slug": "rosemary" }
+  ]
+}

@@ -33,12 +33,12 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
       <AdminNav currentPath="/admin/calendar" />
 
       <div class="mx-auto max-w-6xl space-y-6" data-calendar-admin data-dev-api={DEV_API} data-dev-key={DEV_KEY}>
-      <header>
-        <h1 class="text-2xl font-semibold text-primary">Editorial Calendar</h1>
-        <p class="mt-2 text-sm text-body-muted">
+      <section class="rounded-2xl border border-line-subtle bg-surface-base p-6 shadow-sm">
+        <h1 class="text-2xl font-semibold text-body-strong">Editorial Calendar</h1>
+        <p class="mt-1 text-sm text-body-muted">
           Manage seasonal content planning and anchor posts.
         </p>
-      </header>
+      </section>
 
       <section class="rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm">
         <div class="mb-4 flex items-center justify-between gap-4">

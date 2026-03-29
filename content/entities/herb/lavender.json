@@ -1,0 +1,16 @@
+{
+  "slug": "lavender",
+  "type": "herb",
+  "name": "Lavender",
+  "summary": "Lavender invites calm when your nervous system is running hot and your thoughts will not settle. Magically it is used for peace and gentle purification; practically you can add it to tea, bath rituals, or a bedside sachet to support sleep routines.",
+  "properties": {
+    "keywords": ["calm", "sleep", "purification"],
+    "element": "Air",
+    "planet": "Mercury",
+    "uses": ["teas", "sachets", "bath rituals", "oils"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "amethyst" },
+    { "type": "tarot", "slug": "the-star" }
+  ]
+}

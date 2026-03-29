@@ -1,0 +1,16 @@
+{
+  "slug": "lepidolite",
+  "type": "crystal",
+  "name": "Lepidolite",
+  "summary": "Lepidolite is a good support when anxiety is high and your nervous system needs gentler pacing. Magically it is used for soothing transitions; practically you can use it as a cue for slower breathing, shorter task lists, and earlier wind-down time.",
+  "properties": {
+    "keywords": ["soothing", "stress relief", "transition support"],
+    "chakra": "Third Eye",
+    "element": "Air",
+    "colors": ["purple", "pink"]
+  },
+  "related": [
+    { "type": "herb", "slug": "chamomile" },
+    { "type": "tarot", "slug": "temperance" }
+  ]
+}

@@ -45,15 +45,15 @@ const accentBorder = toRgba(accentHex, 0.28);
 const accentSurface = toRgba(accentHex, 0.1);
 const accentOverlay = toRgba(accentHex, 0.22);
 const accentLabel = toRgba(accentHex, 0.6);
-const accentHeading = mixColors(accentHex, "#111827", 0.45);
-const accentSummary = mixColors(accentHex, "#1f2937", 0.6);
+const accentHeading = "var(--theme-text-strong, var(--text-strong))";
+const accentSummary = "var(--theme-text-body, var(--text-body))";
 const accentKeywordBg = toRgba(accentHex, 0.16);
 const accentKeywordBorder = toRgba(accentHex, 0.35);
 const accentKeywordText = mixColors(accentHex, "#111827", 0.35);
 const accentBadgeBg = toRgba(accentHex, 0.2);
 const accentBadgeBorder = toRgba(accentHex, 0.38);
 const accentBadgeText = mixColors(accentHex, "#111827", 0.3);
-const accentPlaceholder = toRgba(accentHex, 0.5);
+const accentPlaceholder = "var(--theme-text-muted, var(--text-muted))";
 const accentStar = toRgba(accentHex, 0.35);
 
 const cardGradientClass = theme?.cardStyleClass ?? "from-gradient-default-start/20 to-gradient-default-end/40";
@@ -96,6 +96,7 @@ const typeLabel =
       "focus-ring",
       "entity-card relative block overflow-hidden rounded-3xl border bg-gradient-to-br via-surface-base/80 p-6 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.35)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_25px_60px_-30px_rgba(15,23,42,0.45)]",
       cardGradientClass,
+      showStubBadge && "opacity-60",
     ]}
     style={themeVarString ? `${themeVarString};` : undefined}
   >
@@ -112,7 +113,7 @@ const typeLabel =
   <span class="entity-card-label text-xs uppercase">{typeLabel}</span>
   {showStubBadge && (
     <span class="entity-card-badge rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wide shadow-sm">
-      Lore in progress
+      Stub — coming soon
     </span>
   )}
 </div>
@@ -194,11 +195,11 @@ const typeLabel =
   }
 
   .entity-card-title {
-    color: var(--entity-heading, #4c1d95);
+    color: var(--entity-heading, var(--theme-text-strong, var(--text-strong)));
   }
 
   .entity-card-summary {
-    color: var(--entity-summary, color-mix(in srgb, var(--theme-color-amethyst) 85%, transparent));
+    color: var(--entity-summary, var(--theme-text-body, var(--text-body)));
     line-height: 1.5;
     overflow: visible;
     text-overflow: clip;
@@ -208,7 +209,7 @@ const typeLabel =
   }
 
   .entity-card-placeholder {
-    color: var(--entity-placeholder, color-mix(in srgb, var(--theme-color-amethyst) 50%, transparent));
+    color: var(--entity-placeholder, var(--theme-text-muted, var(--text-muted)));
   }
 
   .entity-card-tag {
@@ -218,6 +219,6 @@ const typeLabel =
   }
 
   .entity-card-empty-keywords {
-    color: var(--entity-placeholder, color-mix(in srgb, var(--theme-color-amethyst) 45%, transparent));
+    color: var(--entity-placeholder, var(--theme-text-muted, var(--text-muted)));
   }
 </style>

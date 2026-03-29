@@ -1,0 +1,17 @@
+{
+  "slug": "eight-of-pentacles",
+  "type": "tarot",
+  "name": "Eight of Pentacles",
+  "summary": "Eight of Pentacles invites focused repetition that turns effort into real skill. Magically, it honors devotion through craft; practically, it can look like practice blocks, fewer distractions, and consistent systems that make improvement measurable.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Pentacles",
+    "keywords": ["diligence", "mastery", "routine"],
+    "uprightKeywords": ["apprenticeship", "skill building", "focused effort"],
+    "reversedKeywords": ["perfectionism", "stagnation", "lack of focus"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "clear-quartz" },
+    { "type": "herb", "slug": "rosemary" }
+  ]
+}

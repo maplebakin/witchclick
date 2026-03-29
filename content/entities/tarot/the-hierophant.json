@@ -1,0 +1,18 @@
+{
+  "slug": "the-hierophant",
+  "type": "tarot",
+  "name": "The Hierophant",
+  "summary": "The Hierophant invites you to learn from tradition while staying honest about what actually supports you. Magically, this card speaks to lineage and shared wisdom; practically, it can mean finding a reliable teacher, framework, or community standard to ground your next steps.",
+  "properties": {
+    "number": 5,
+    "arcana": "Major",
+    "keywords": ["tradition", "mentorship", "structure"],
+    "uprightKeywords": ["guidance", "ritual", "shared values"],
+    "reversedKeywords": ["rigidity", "rebellion", "empty rules"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "amethyst" },
+    { "type": "herb", "slug": "sage" },
+    { "type": "tarot", "slug": "the-high-priestess" }
+  ]
+}

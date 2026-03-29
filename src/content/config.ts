@@ -11,17 +11,24 @@ const posts = defineCollection({
   schema: z.object({
     // Core
     title: z.string(),
+    slug: z.string().optional(),
+    excerpt: z.string().optional(),
     description: z.string().max(200).optional(),
+    metaDescription: z.string().optional(),
     pubDate: z.coerce.date().optional(),       // prefer this
     publishedAt: z.coerce.date().optional(),   // accepted alias
     updatedAt: z.coerce.date().optional(),
     tags: z.array(z.string()).default([]),
+    outline: z.array(z.string()).optional(),
+    wordCount: z.number().int().nonnegative().optional(),
+    entities: z.array(z.object({ type: z.string(), slug: z.string() })).default([]),
     category: z.enum(["ritual", "meandering"]).default("ritual"),
     contentType: z.enum(["ritual", "guide", "spread", "reflection", "story", "tarotSpread", "spellwork", "crystals"]).optional(),
     draft: z.boolean().default(false),
 
     // SEO & social
     canonical: z.string().url().optional(),
+    canonicalUrl: z.string().url().optional(),
     ogImage: z.string().optional(),
     readingMinutes: z.number().int().positive().optional(),
     tldr: z
@@ -46,6 +53,53 @@ const posts = defineCollection({
         ])
       )
       .default([]),
+    internalLinkHints: z.array(z.string()).default([]),
+    specVersion: z.number().int().optional(),
+    promptMetadata: z
+      .object({
+        topic: z.string().optional(),
+        requestedWords: z.number().optional(),
+        deliveredWords: z.number().optional(),
+        toggles: z
+          .object({
+            ads: z.string().optional(),
+            kofi: z.string().optional(),
+            mode: z.string().optional(),
+            style: z.string().optional(),
+            strict: z.boolean().optional(),
+          })
+          .optional(),
+        generatedAt: z.string().optional(),
+        engagementFocus: z
+          .object({
+            tags: z
+              .array(
+                z.object({
+                  tag: z.string(),
+                  reason: z.string().optional(),
+                  score: z.number().optional(),
+                  recencyDays: z.number().optional(),
+                })
+              )
+              .optional(),
+            entities: z
+              .array(
+                z.object({
+                  slug: z.string(),
+                  type: z.string().optional(),
+                  name: z.string().optional(),
+                  reason: z.string().optional(),
+                  score: z.number().optional(),
+                  recencyDays: z.number().optional(),
+                })
+              )
+              .optional(),
+          })
+          .optional(),
+        source: z.string().optional(),
+        notes: z.string().optional(),
+      })
+      .optional(),
 
     // CTA toggles
     includeAds: z.boolean().default(false).optional(),

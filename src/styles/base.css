@@ -18,11 +18,11 @@
 
 :root {
   /* Typography */
-  --font-body-serif: "Lora", "Crimson Text", Georgia, serif;
+  --font-body-serif: "Lora", "Literata", "Crimson Text", Georgia, "Times New Roman", Times, serif;
   --font-body: var(--font-body-serif);
-  --font-heading: "Cinzel", "Cormorant Garamond", "Times New Roman", serif;
-  --font-accent: "Cormorant Garamond", "Cinzel", serif;
-  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-heading: "Cinzel", "Cormorant Garamond", "Literata", Georgia, "Times New Roman", Times, serif;
+  --font-accent: "Cormorant Garamond", "Great Vibes", "Parisienne", "Times New Roman", serif;
+  --font-sans: "Inter", "Segoe UI", "Helvetica Neue", Arial, system-ui, -apple-system, sans-serif;
   --font-body-ui: var(--font-body);
   --font-body-letter-spacing: normal;
 
@@ -37,6 +37,12 @@
   --space-7: 2.5rem;
   --space-8: 3rem;
   --space-9: 4rem;
+
+  /* Shared page spacing */
+  --page-section-gap: clamp(3rem, 6vw, 5rem);
+  --page-header-gap: clamp(2rem, 5vw, 3rem);
+  --grid-gap: clamp(1.5rem, 3vw, 2.25rem);
+  --content-max-width: 48rem;
 
   /* Core Brand Colors */
   --color-midnight: var(--theme-color-midnight, #070a05);
@@ -417,7 +423,6 @@ h6 {
   font-family: var(--font-heading);
   letter-spacing: 0.045em;
   color: var(--ink-strong, #1a102c);
-  text-transform: uppercase;
 }
 
 h1 {
@@ -554,6 +559,36 @@ main {
   .wc-container {
     --wc-container-max: 92rem;
   }
+}
+
+/* Reusable section/page header pattern */
+.page-header {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 48rem;
+}
+
+.page-header__eyebrow {
+  margin: 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-accent);
+}
+
+.page-header__title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.page-header__lead {
+  margin: 0;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  line-height: 1.6;
+  color: var(--text-muted);
 }
 
 /* Ensure transparent backgrounds for nested containers */

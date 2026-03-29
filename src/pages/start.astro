@@ -2,13 +2,21 @@
 import Base from "@/layouts/Base.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import HeadSlot from "@/components/HeadSlot.astro";
+import Button from "@/components/ui/Button.astro";
 import { readSettings } from "@/utils/settings";
 import { canonicalTagHref } from "@/utils/tags";
+import { loadAllPosts } from "@/utils/posts";
 
 const title = "Start Here — Your Guide to WitchClick";
 const description = "New to WitchClick? Start here. Discover secular rituals, ADHD-friendly practices, and cozy tools for everyday magic without dogma.";
 
 const settings = readSettings();
+const knownSlugs = new Set(loadAllPosts().map((post) => post.slug));
+
+function postHref(slug: string): string {
+  return knownSlugs.has(slug) ? `/post/${slug}` : "/page/1";
+}
+
 const tagLinks = {
   secularTarot: canonicalTagHref("secular tarot"),
   ritual: canonicalTagHref("ritual"),
@@ -52,8 +60,8 @@ const jsonLd = {
         </p>
       </header>
 
-      <div class="prose prose-lg dark:prose-invert max-w-none">
-      <section class="mb-12">
+      <div id="start-flow-content" class="prose prose-lg dark:prose-invert max-w-none">
+      <section id="start-what-is" class="start-flow-section mb-12" data-section-label="What is WitchClick?">
         <h2>What is WitchClick?</h2>
         <p>
           WitchClick is a collection of <strong>secular rituals, tarot spreads, and gentle practices</strong> designed for
@@ -66,7 +74,7 @@ const jsonLd = {
         </p>
       </section>
 
-      <section class="mb-12 bg-surface-soft dark:bg-surface-inverse-muted p-6 rounded-lg">
+      <section id="start-three-ways" class="start-flow-section mb-12 bg-surface-soft dark:bg-surface-inverse-muted p-6 rounded-lg" data-section-label="Three Ways to Begin">
         <h2 class="mt-0">Three Ways to Begin</h2>
         <p>We organize our content around three core needs:</p>
 
@@ -85,8 +93,8 @@ const jsonLd = {
             </p>
           </a>
 
-          <a href="/hub/release" class="block p-6 bg-surface-card dark:bg-surface-inverse-soft rounded-lg shadow-sm hover:shadow-md transition-shadow border-l-4 border-orange-500">
-            <h3 class="text-xl font-bold mb-2 text-orange-600 dark:text-orange-400">Release</h3>
+          <a href="/hub/release" class="block p-6 bg-surface-card dark:bg-surface-inverse-soft rounded-lg shadow-sm hover:shadow-md transition-shadow border-l-4 border-warning">
+            <h3 class="text-xl font-bold mb-2 text-warning">Release</h3>
             <p class="text-sm text-body dark:text-inverse-soft">
               Cord-cutting, boundary work, and ethical "cursing" rituals for letting go with softness.
             </p>
@@ -94,33 +102,33 @@ const jsonLd = {
         </div>
       </section>
 
-      <section class="mb-12">
+      <section id="start-popular-posts" class="start-flow-section mb-12" data-section-label="Popular Posts">
         <h2>Start with These Popular Posts</h2>
         <ul>
           <li>
-            <a href="/post/tarot-as-a-secular-tool">Tarot as a Secular Tool</a> — Pattern-reading for everyday
+            <a href={postHref("tarot-as-a-secular-tool")}>Tarot as a Secular Tool</a> — Pattern-reading for everyday
             decisions, no mysticism required
           </li>
           <li>
-            <a href="/post/when-everything-feels-pointless">When Everything Feels Pointless</a> — Gentle rituals to
+            <a href={postHref("when-everything-feels-pointless")}>When Everything Feels Pointless</a> — Gentle rituals to
             re-enter meaning when the fog rolls in
           </li>
           <li>
-            <a href="/post/calming-strategies-when-partner-pisses-you-off">When Your Partner Pisses You Off</a> —
+            <a href={postHref("calming-strategies-when-partner-pisses-you-off")}>When Your Partner Pisses You Off</a> —
             Calm-first strategies that keep love in the room
           </li>
           <li>
-            <a href="/post/secular-tarot-spread-for-a-sign">Secular Tarot Spread for Seeking a Sign</a> — Notice
+            <a href={postHref("secular-tarot-spread-for-a-sign")}>Secular Tarot Spread for Seeking a Sign</a> — Notice
             patterns, name options, choose a testable next step
           </li>
           <li>
-            <a href="/post/anxiety-from-avoiding-responsibilities-gentle-rituals">When Avoiding Makes You Anxious</a> —
+            <a href={postHref("anxiety-from-avoiding-responsibilities-gentle-rituals")}>When Avoiding Makes You Anxious</a> —
             Tiny, kind moves to re-enter your day without bullying yourself
           </li>
         </ul>
       </section>
 
-      <section class="mb-12">
+      <section id="start-approach" class="start-flow-section mb-12" data-section-label="Our Approach">
         <h2>Our Approach: What Makes WitchClick Different</h2>
 
         <h3>Secular & Science-Adjacent</h3>
@@ -148,7 +156,7 @@ const jsonLd = {
         </p>
       </section>
 
-      <section class="mb-12">
+      <section id="start-interests" class="start-flow-section mb-12" data-section-label="Explore by Interest">
         <h2>Explore by Interest</h2>
         <ul>
           <li><a href={tagLinks.secularTarot}>Secular Tarot</a> — Pattern-reading, spreads, and reflection prompts</li>
@@ -161,19 +169,19 @@ const jsonLd = {
         </ul>
       </section>
 
-      <section class="mb-12 bg-info-faint dark:bg-surface-inverse-muted p-6 rounded-lg">
+      <section id="start-specific-needs" class="start-flow-section mb-12 bg-info-faint dark:bg-surface-inverse-muted p-6 rounded-lg" data-section-label="Looking for Something Specific?">
         <h2 class="mt-0">Looking for Something Specific?</h2>
         <ul class="mb-4">
-          <li><strong>Job interview anxiety?</strong> Try the <a href="/post/pre-interview-grounding-ritual">Pre-Interview Grounding Ritual</a></li>
-          <li><strong>First day at new job?</strong> Check out <a href="/post/first-day-new-job-secular-tarot-spread-journal">First-Day Tarot Spread</a></li>
-          <li><strong>Relationship conflict?</strong> Start with <a href="/post/calming-strategies-when-partner-pisses-you-off">Calm-First Conflict Strategies</a></li>
-          <li><strong>Feeling burnt out?</strong> Read <a href="/post/when-to-let-yourself-rest">When to Let Yourself Rest</a></li>
-          <li><strong>Need to make a decision?</strong> Use <a href="/post/using-different-perspectives-a-gentle-practical-guide">Different Perspectives Guide</a></li>
-          <li><strong>Creative block?</strong> Try <a href="/post/creativity-tarot-ritual">Creativity Tarot Ritual</a></li>
+          <li><strong>Job interview anxiety?</strong> Try the <a href={postHref("pre-interview-grounding-ritual")}>Pre-Interview Grounding Ritual</a></li>
+          <li><strong>First day at new job?</strong> Check out <a href={postHref("first-day-new-job-secular-tarot-spread-journal")}>First-Day Tarot Spread</a></li>
+          <li><strong>Relationship conflict?</strong> Start with <a href={postHref("calming-strategies-when-partner-pisses-you-off")}>Calm-First Conflict Strategies</a></li>
+          <li><strong>Feeling burnt out?</strong> Read <a href={postHref("when-to-let-yourself-rest")}>When to Let Yourself Rest</a></li>
+          <li><strong>Need to make a decision?</strong> Use <a href={postHref("using-different-perspectives-a-gentle-practical-guide")}>Different Perspectives Guide</a></li>
+          <li><strong>Creative block?</strong> Try <a href={postHref("creativity-tarot-ritual")}>Creativity Tarot Ritual</a></li>
         </ul>
       </section>
 
-      <section class="mb-12">
+      <section id="start-tools" class="start-flow-section mb-12" data-section-label="Tools & Resources">
         <h2>Tools & Resources</h2>
         <ul>
           <li><a href="/lab">The Lab</a> — Experimental rituals and printable downloads</li>
@@ -183,20 +191,20 @@ const jsonLd = {
         </ul>
       </section>
 
-      <section class="mb-12">
+      <section id="start-connected" class="start-flow-section mb-12" data-section-label="Stay Connected">
         <h2>Stay Connected</h2>
         <p>
           Get gentle emails twice a month with new rituals, printable drops, and secular tarot spreads.
           No spam, just cozy prompts.
         </p>
         <p>
-          <a href="https://witchclick.substack.com/api/v1/free" class="inline-block px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg transition-colors">
+          <Button href="https://witchclick.substack.com/api/v1/free" variant="primary">
             Sign up for the WitchClick dispatch
-          </a>
+          </Button>
         </p>
       </section>
 
-      <section>
+      <section id="start-questions" class="start-flow-section" data-section-label="Questions">
         <h2>Questions?</h2>
         <p>
           Check out our <a href="/about">About page</a> to learn more about the humans behind WitchClick,
@@ -209,9 +217,87 @@ const jsonLd = {
         </p>
       </section>
       </div>
+
+      <nav id="start-mobile-guide" class="start-mobile-guide" aria-label="Start page section navigation" hidden>
+        <p id="start-mobile-guide-label" class="start-mobile-guide__label">Next section</p>
+        <button type="button" id="start-mobile-guide-btn" class="start-mobile-guide__button" aria-controls="start-flow-content">
+          Next →
+        </button>
+      </nav>
     </article>
   </div>
 </Base>
+
+<script type="module" is:inline>
+  const guide = document.getElementById("start-mobile-guide");
+  const guideLabel = document.getElementById("start-mobile-guide-label");
+  const guideButton = document.getElementById("start-mobile-guide-btn");
+  const sections = Array.from(document.querySelectorAll(".start-flow-section[id]"));
+
+  if (
+    guide instanceof HTMLElement &&
+    guideLabel instanceof HTMLElement &&
+    guideButton instanceof HTMLButtonElement &&
+    sections.length > 1
+  ) {
+    const mobileQuery = window.matchMedia("(max-width: 767px)");
+
+    const getCurrentIndex = () => {
+      let index = 0;
+      sections.forEach((section, candidate) => {
+        if (!(section instanceof HTMLElement)) return;
+        if (section.getBoundingClientRect().top <= window.innerHeight * 0.45) {
+          index = candidate;
+        }
+      });
+      return index;
+    };
+
+    const updateGuide = () => {
+      const isMobile = mobileQuery.matches;
+      guide.hidden = !isMobile;
+      if (!isMobile) return;
+
+      const currentIndex = getCurrentIndex();
+      const nextIndex = Math.min(currentIndex + 1, sections.length - 1);
+      const nextSection = sections[nextIndex];
+
+      if (!(nextSection instanceof HTMLElement)) return;
+
+      if (currentIndex >= sections.length - 1) {
+        guideLabel.textContent = "You've reached the final section";
+        guideButton.textContent = "Back to top";
+        guideButton.dataset.target = "#top";
+        return;
+      }
+
+      const sectionLabel =
+        nextSection.dataset.sectionLabel ||
+        nextSection.querySelector("h2")?.textContent?.trim() ||
+        "next section";
+
+      guideLabel.textContent = `Next: ${sectionLabel}`;
+      guideButton.textContent = `Jump to ${sectionLabel} →`;
+      guideButton.dataset.target = `#${nextSection.id}`;
+    };
+
+    guideButton.addEventListener("click", () => {
+      const target = guideButton.dataset.target || "";
+      if (target === "#top") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+      const section = document.querySelector(target);
+      if (section instanceof HTMLElement) {
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+
+    window.addEventListener("scroll", updateGuide, { passive: true });
+    mobileQuery.addEventListener("change", updateGuide);
+    updateGuide();
+  }
+</script>
 
 <style>
   .start-page-container {
@@ -229,7 +315,7 @@ const jsonLd = {
     font-size: 0.875rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--text-accent, #ea580c);
+    color: var(--text-accent);
     margin-bottom: 0.5rem;
   }
 
@@ -238,12 +324,69 @@ const jsonLd = {
     font-weight: 700;
     line-height: 1.2;
     margin-bottom: 1rem;
-    color: var(--text-strong, #111827);
+    color: var(--text-strong);
   }
 
   .start-page-intro {
     font-size: clamp(1.125rem, 2.5vw, 1.25rem);
     line-height: 1.6;
-    color: var(--text-body, #4b5563);
+    color: var(--text-body);
+  }
+
+  .start-flow-section {
+    scroll-margin-top: clamp(5rem, 12vw, 6.5rem);
+  }
+
+  .start-mobile-guide {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom));
+    border-top: 1px solid color-mix(in srgb, var(--line-subtle) 75%, transparent 25%);
+    background: color-mix(in srgb, var(--surface-base) 88%, transparent 12%);
+    backdrop-filter: blur(10px);
+  }
+
+  .start-mobile-guide__label {
+    margin: 0;
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .start-mobile-guide__button {
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--line-strong) 72%, transparent 28%);
+    background: color-mix(in srgb, var(--surface-muted) 86%, transparent 14%);
+    color: var(--text-strong);
+    padding: 0.7rem 1rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+    text-align: center;
+    transition: background-color 160ms ease, border-color 160ms ease;
+  }
+
+  .start-mobile-guide__button:hover,
+  .start-mobile-guide__button:focus-visible {
+    background: color-mix(in srgb, var(--surface-soft) 88%, transparent 12%);
+    border-color: color-mix(in srgb, var(--line-bolder) 78%, transparent 22%);
+  }
+
+  @media (max-width: 767px) {
+    .start-page-container {
+      padding-bottom: clamp(5.5rem, 18vw, 7rem);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .start-mobile-guide {
+      display: none !important;
+    }
   }
 </style>

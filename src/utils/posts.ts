@@ -79,6 +79,22 @@ function isDraft(data: Record<string, any> | null | undefined): boolean {
   return false;
 }
 
+function publishTimestamp(data: Record<string, any> | null | undefined): number | null {
+  if (!data) return null;
+  const candidates = [data.publishDate, data.publishedAt, data.pubDate, data.date];
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    const value = +new Date(candidate);
+    if (!Number.isNaN(value)) return value;
+  }
+  return null;
+}
+
+function isFutureDated(data: Record<string, any> | null | undefined): boolean {
+  const ts = publishTimestamp(data);
+  return ts !== null && ts > Date.now();
+}
+
 function deriveDate(
   filePath: string,
   data: Record<string, any>
@@ -138,7 +154,10 @@ export function loadAllPosts(): LoadedPost[] {
           spoons: spoons || undefined,
         } satisfies LoadedPost;
       })
-      .filter((post) => !isDraft(post.data));
+      .filter((post) => !isDraft(post.data))
+      // Exclude scheduled posts from public lists/routes until their publish date arrives.
+      // If preview mode is added later, gate a PREVIEW_MODE env var bypass here.
+      .filter((post) => !isFutureDated(post.data));
 
     posts.push(...dirPosts);
   }

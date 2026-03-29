@@ -1,6 +1,7 @@
 ---
 import SpoonsBadge from "./SpoonsBadge.astro";
 import { extractHeroImage } from "@/utils/posts";
+import { canonicalTagHref } from "@/utils/tags";
 
 export interface Props {
   // Either pass a whole post object (frontmatter-ish)...
@@ -49,6 +50,7 @@ export interface Props {
   imageAlt?: string
   cardImage?: unknown
   cardImageAlt?: string
+  layout?: 'default' | 'bento-featured' | 'bento-compact'
 }
 
 const {
@@ -73,6 +75,7 @@ const {
   imageAlt,
   cardImage,
   cardImageAlt,
+  layout = 'default',
 } = Astro.props as Props
 
 const link = href || (post?.slug ? `/post/${post.slug}` : '#')
@@ -92,7 +95,7 @@ const _summary = truncateSummary(_summarySource)
 
 const metadataItems = [
   _dateLabel,
-  typeof _mins === 'number' && Number.isFinite(_mins) ? `${_mins} min ritual` : undefined,
+  typeof _mins === 'number' && Number.isFinite(_mins) ? `${_mins} min read` : undefined,
 ].filter((value): value is string => Boolean(value))
 
 const heroContext = {
@@ -112,6 +115,10 @@ const heroImageData = extractHeroImage(heroContext)
 const _heroSrc = typeof heroImageData.src === 'string' ? heroImageData.src : ''
 const _heroAlt = typeof heroImageData.alt === 'string' && heroImageData.alt.trim() ? heroImageData.alt : _title
 const _hasHero = Boolean(_heroSrc)
+const _cardLabel = _title ? `Read ${_title}` : 'Read post'
+const _isCompact = layout === 'bento-compact'
+const _isFeatured = layout === 'bento-featured'
+const _visibleTags = _isCompact ? _tags.slice(0, 1) : _tags.slice(0, 6)
 
 function formatDate(value?: string){
   if (!value) return '';
@@ -137,38 +144,46 @@ function truncateSummary(value: string | undefined | null, max = 120): string {
   return /[.!?…]$/.test(safe) ? safe : `${safe}…`
 }
 ---
-<a
-  href={link}
+<article
   class:list={[
     "card-panel card-tier-1 card-panel-soft focus-visible:outline-none ritual-card",
     className,
     _spoon && `ritual-card--${_spoon}`,
+    _isFeatured && "ritual-card--bento-featured",
+    _isCompact && "ritual-card--bento-compact",
   ]}
   data-spoon-level={_spoon || undefined}
 >
+  <a href={link} class="ritual-card__overlay-link focus-ring" aria-label={_cardLabel}>
+    <span class="sr-only">{_cardLabel}</span>
+  </a>
   <span aria-hidden class="card-radial card-radial-top" />
   <span aria-hidden class="card-radial card-radial-bottom" />
-  <div class="card-figure" data-has-image={_hasHero ? 'true' : undefined}>
-    {_hasHero && (
-      <img
-        src={_heroSrc}
-        alt={_heroAlt}
-        loading="lazy"
-        decoding="async"
-        class="card-figure__media"
-      />
-    )}
-  </div>
-  <div class="card-body">
-    <div class="card-badges">
-      {_spoon && <SpoonsBadge level={_spoon} />}
-      {_showCategoryBadge && (
-        <span class="category-badge category-badge--meandering">
-          meandering
-        </span>
+  {!_isCompact && (
+    <div class="card-figure" data-has-image={_hasHero ? 'true' : undefined}>
+      {_hasHero && (
+        <img
+          src={_heroSrc}
+          alt={_heroAlt}
+          loading="lazy"
+          decoding="async"
+          class="card-figure__media"
+        />
       )}
     </div>
-    {metadataItems.length > 0 && (
+  )}
+  <div class="card-body">
+    {!_isCompact && (
+      <div class="card-badges">
+        {_spoon && <SpoonsBadge level={_spoon} />}
+        {_showCategoryBadge && (
+          <span class="category-badge category-badge--meandering">
+            meandering
+          </span>
+        )}
+      </div>
+    )}
+    {!_isCompact && metadataItems.length > 0 && (
       <ul class="card-metadata">
         {metadataItems.map((item) => (
           <li class="card-metadata__item">{item}</li>
@@ -177,14 +192,68 @@ function truncateSummary(value: string | undefined | null, max = 120): string {
     )}
     <div class="card-text">
       <h3 class="card-heading">{_title}</h3>
-      {_summary && <p class="card-subtle">{_summary}</p>}
+      {!_isCompact && _summary && <p class="card-subtle">{_summary}</p>}
     </div>
-    {_tags.length > 0 && (
-      <div class="card-tags">
-        {_tags.slice(0, 6).map((t) => (
-          <span class="card-pill card-tag">#{String(t).toLowerCase()}</span>
+    {_visibleTags.length > 0 && (
+      <div class="card-tags card-tags--linked">
+        {_visibleTags.map((t) => (
+          <a href={canonicalTagHref(String(t).toLowerCase())} class="card-pill card-tag" tabindex="-1">
+            #{String(t).toLowerCase()}
+          </a>
         ))}
       </div>
     )}
   </div>
-</a>
+</article>
+
+<style>
+  .ritual-card {
+    position: relative;
+  }
+
+  .ritual-card__overlay-link {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    border-radius: inherit;
+  }
+
+  .ritual-card > :not(.ritual-card__overlay-link) {
+    pointer-events: none;
+  }
+
+  .ritual-card .card-tags--linked,
+  .ritual-card .card-tags--linked * {
+    pointer-events: auto;
+  }
+
+  .ritual-card .card-tags--linked {
+    position: relative;
+    z-index: 20;
+  }
+
+  .ritual-card--bento-featured .card-figure {
+    aspect-ratio: 16 / 9;
+  }
+
+  .ritual-card--bento-featured .card-heading {
+    font-size: clamp(1.45rem, 3vw, 1.9rem);
+  }
+
+  .ritual-card--bento-compact {
+    grid-template-rows: 1fr;
+  }
+
+  .ritual-card--bento-compact .card-body {
+    gap: var(--space-3);
+    padding: var(--space-4);
+  }
+
+  .ritual-card--bento-compact .card-heading {
+    font-size: clamp(1rem, 2.1vw, 1.2rem);
+  }
+
+  .ritual-card--bento-compact .card-tags {
+    margin-top: 0;
+  }
+</style>

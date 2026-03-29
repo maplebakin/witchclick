@@ -1,0 +1,17 @@
+{
+  "slug": "queen-of-cups",
+  "type": "tarot",
+  "name": "Queen of Cups",
+  "summary": "Queen of Cups invites deep empathy with clear boundaries, especially if you are carrying a lot for others. Magically, she represents intuitive emotional wisdom; practically, she suggests checking body cues, naming limits, and offering care that does not erase your own needs.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Cups",
+    "keywords": ["empathy", "emotional intelligence", "boundaries"],
+    "uprightKeywords": ["compassion", "intuition", "emotional balance"],
+    "reversedKeywords": ["emotional burnout", "martyrdom", "boundary issues"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "moonstone" },
+    { "type": "herb", "slug": "mugwort" }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "slug": "celestite",
+  "type": "crystal",
+  "name": "Celestite",
+  "summary": "Celestite is useful for quieting mental static and creating a softer environment. Magically it is associated with peace and gentle insight; practically it can be part of a bedtime ritual where you lower stimulation and reset your breathing.",
+  "properties": {
+    "keywords": ["peace", "gentle insight", "rest"],
+    "chakra": "Throat",
+    "element": "Air",
+    "colors": ["blue", "white"]
+  },
+  "related": [
+    { "type": "herb", "slug": "lavender" },
+    { "type": "tarot", "slug": "the-star" }
+  ]
+}

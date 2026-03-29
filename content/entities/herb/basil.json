@@ -1,0 +1,16 @@
+{
+  "slug": "basil",
+  "type": "herb",
+  "name": "Basil",
+  "summary": "Basil invites practical prosperity work rooted in daily habits, not wishful thinking. Magically it is linked with luck, abundance, and home protection; practically you can cook with it intentionally or place a small sachet near your workspace while reviewing goals and budgets.",
+  "properties": {
+    "keywords": ["prosperity", "protection", "luck"],
+    "element": "Fire",
+    "planet": "Mars",
+    "uses": ["cooking", "sachets", "floor washes", "oils"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "citrine" },
+    { "type": "tarot", "slug": "ace-of-pentacles" }
+  ]
+}

@@ -1,5 +1,6 @@
 ---
 import CtaFooter from "./CtaFooter.astro";
+import ProductRecommendations from "./ProductRecommendations.astro";
 
 interface Recommendation {
   title: string;
@@ -21,12 +22,24 @@ interface TocItem {
   level: number;
 }
 
+interface ProductItem {
+  key?: string;
+  name?: string;
+  brand?: string;
+  url?: string;
+  utm?: string;
+  rel?: string;
+  tags?: string[];
+  image?: string;
+}
+
 interface Props {
   recommendations?: Recommendation[];
   entities?: EntityItem[];
   toc?: TocItem[];
   ctaType?: "kofi" | "download" | "none";
   ctaId?: string;
+  products?: ProductItem[];
 }
 
 const {
@@ -35,13 +48,15 @@ const {
   toc = [],
   ctaType = "none",
   ctaId,
+  products = [],
 } = Astro.props as Props;
 
 const hasRecommendations = recommendations.length > 0;
 const hasEntities = entities.length > 0;
 const hasCta = ctaType !== "none";
 const hasToc = toc.length > 0;
-const showRail = hasRecommendations || hasEntities || hasCta || hasToc;
+const hasProducts = products.length > 0;
+const showRail = hasRecommendations || hasEntities || hasCta || hasToc || hasProducts;
 
 // Calculate content counts for mobile trigger badge
 const contentCount = recommendations.length + entities.length + (hasToc ? 1 : 0);
@@ -109,6 +124,12 @@ const contentSummary = contentItems.join(' • ');
             </ul>
           )}
           {hasCta && <CtaFooter type={ctaType} id={ctaId} />}
+        </section>
+      )}
+
+      {hasProducts && (
+        <section class="post-rail__section" aria-label="Recommended products">
+          <ProductRecommendations products={products} title="Cozy picks" />
         </section>
       )}
 

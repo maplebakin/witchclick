@@ -1,0 +1,17 @@
+{
+  "slug": "seven-of-swords",
+  "type": "tarot",
+  "name": "Seven of Swords",
+  "summary": "Seven of Swords invites strategic thinking when direct approaches feel unsafe or ineffective. Magically, it reflects shadow intelligence and discretion; practically, it can mean protecting your plans, documenting facts, and acting with integrity even under pressure.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Swords",
+    "keywords": ["strategy", "discretion", "self-protection"],
+    "uprightKeywords": ["strategy", "secrecy", "independent action"],
+    "reversedKeywords": ["truth revealed", "self-honesty", "course correction"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "obsidian" },
+    { "type": "herb", "slug": "thyme" }
+  ]
+}

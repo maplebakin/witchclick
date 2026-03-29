@@ -1,0 +1,17 @@
+{
+  "slug": "six-of-pentacles",
+  "type": "tarot",
+  "name": "Six of Pentacles",
+  "summary": "Six of Pentacles invites a fair exchange where giving and receiving both stay respectful. Magically, it represents circulating abundance; practically, it can mean clarifying expectations, sharing resources transparently, and accepting help without self-judgment.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Pentacles",
+    "keywords": ["reciprocity", "generosity", "fairness"],
+    "uprightKeywords": ["balanced exchange", "generosity", "community support"],
+    "reversedKeywords": ["inequality", "strings attached", "debt pressure"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "citrine" },
+    { "type": "herb", "slug": "chamomile" }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "slug": "citrine",
+  "type": "crystal",
+  "name": "Citrine",
+  "summary": "Citrine helps when motivation is low and you need a practical confidence boost. Magically it is linked with abundance and optimism; practically you can pair it with a short money or task planning session and pick one concrete next step.",
+  "properties": {
+    "keywords": ["confidence", "abundance", "motivation"],
+    "chakra": "Solar Plexus",
+    "element": "Fire",
+    "colors": ["yellow", "gold"]
+  },
+  "related": [
+    { "type": "herb", "slug": "cinnamon" },
+    { "type": "tarot", "slug": "the-sun" }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "slug": "nettle",
+  "type": "herb",
+  "name": "Nettle",
+  "summary": "Nettle invites grounded strength when you are depleted but still need to function. Magically it is used for protection and stamina; practically it works in teas or baths as part of a recovery routine that supports energy and clearer boundaries.",
+  "properties": {
+    "keywords": ["stamina", "protection", "grounding"],
+    "element": "Fire",
+    "planet": "Mars",
+    "uses": ["teas", "bath rituals", "floor washes", "oils"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "red-jasper" },
+    { "type": "tarot", "slug": "strength" }
+  ]
+}

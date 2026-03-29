@@ -1,0 +1,17 @@
+{
+  "slug": "ten-of-pentacles",
+  "type": "tarot",
+  "name": "Ten of Pentacles",
+  "summary": "Ten of Pentacles invites long-view thinking about security, family, and shared resources. Magically, it symbolizes legacy and continuity; practically, it can mean estate planning, mutual support agreements, and building stability that outlives short-term stress.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Pentacles",
+    "keywords": ["legacy", "stability", "community"],
+    "uprightKeywords": ["lasting security", "shared wealth", "family support"],
+    "reversedKeywords": ["financial instability", "family tension", "shaky foundation"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "citrine" },
+    { "type": "herb", "slug": "cedar" }
+  ]
+}

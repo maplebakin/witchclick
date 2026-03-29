@@ -1,0 +1,17 @@
+{
+  "slug": "three-of-wands",
+  "type": "tarot",
+  "name": "Three of Wands",
+  "summary": "Three of Wands invites you to think beyond the first win and build for what comes next. Magically, it speaks to expansion and energetic reach; practically, it often means tracking what is working and preparing support for sustained growth.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Wands",
+    "keywords": ["expansion", "foresight", "momentum"],
+    "uprightKeywords": ["progress", "opportunity", "long-range vision"],
+    "reversedKeywords": ["delays", "limited outlook", "overextension"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "clear-quartz" },
+    { "type": "herb", "slug": "thyme" }
+  ]
+}

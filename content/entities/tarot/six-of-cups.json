@@ -1,0 +1,17 @@
+{
+  "slug": "six-of-cups",
+  "type": "tarot",
+  "name": "Six of Cups",
+  "summary": "Six of Cups invites comfort through memory, kindness, and familiar rituals. Magically, it reflects gentle heart-healing through the past; practically, it can be revisiting what used to help while staying grounded in what you need now.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Cups",
+    "keywords": ["memory", "comfort", "kindness"],
+    "uprightKeywords": ["nostalgia", "kindness", "simple joy"],
+    "reversedKeywords": ["stuck in past", "idealization", "growing up"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "clear-quartz" },
+    { "type": "herb", "slug": "thyme" }
+  ]
+}

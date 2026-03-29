@@ -1,0 +1,16 @@
+{
+  "slug": "lapis-lazuli",
+  "type": "crystal",
+  "name": "Lapis Lazuli",
+  "summary": "Lapis Lazuli is useful when you need honest communication and sharper thinking. Magically it is linked to insight and truth; practically it can support note-taking, scripting your points, and saying what you mean clearly.",
+  "properties": {
+    "keywords": ["truth", "insight", "communication"],
+    "chakra": "Third Eye",
+    "element": "Water",
+    "colors": ["blue", "gold"]
+  },
+  "related": [
+    { "type": "herb", "slug": "sage" },
+    { "type": "tarot", "slug": "the-high-priestess" }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "slug": "moonstone",
+  "type": "crystal",
+  "name": "Moonstone",
+  "summary": "Moonstone supports emotional processing when your mood shifts feel intense or hard to track. Magically it is associated with intuition and cycles; practically it pairs well with a daily check-in where you name your energy level and adjust plans accordingly.",
+  "properties": {
+    "keywords": ["intuition", "emotional balance", "cycles"],
+    "chakra": "Sacral",
+    "element": "Water",
+    "colors": ["white", "cream"]
+  },
+  "related": [
+    { "type": "herb", "slug": "mugwort" },
+    { "type": "tarot", "slug": "the-moon" }
+  ]
+}

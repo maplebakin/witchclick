@@ -5,7 +5,7 @@ import { enforceMutatingAccess, methodNotAllowed } from "./_mutating";
 const JSON_HEADERS = { "Content-Type": "application/json; charset=utf-8" } as const;
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Allow-Headers": "content-type",
 } as const;
 
@@ -24,9 +24,7 @@ export const OPTIONS: APIRoute = async () =>
     },
   });
 
-export const GET: APIRoute = async () => methodNotAllowed("POST, OPTIONS");
-
-export const POST: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request, url }) => {
   const denied = enforceMutatingAccess(request, "public");
   if (denied) {
     return denied;
@@ -35,26 +33,14 @@ export const POST: APIRoute = async ({ request }) => {
   const settings = readSettings();
   const analytics = settings.analytics;
 
-  const rawBody = await request.text();
-  if (!rawBody) {
-    return jsonResponse({ ok: false, error: "Body required" }, 400);
-  }
-
-  let payload: any;
-  try {
-    payload = JSON.parse(rawBody);
-  } catch {
-    return jsonResponse({ ok: false, error: "Invalid JSON body" }, 400);
-  }
-
-  const url = typeof payload?.url === "string" ? payload.url.trim() : "";
-  if (!url) {
+  const targetUrl = url.searchParams.get("url")?.trim() ?? "";
+  if (!targetUrl) {
     return jsonResponse({ ok: false, error: "url is required" }, 422);
   }
 
   let parsedUrl: URL;
   try {
-    parsedUrl = new URL(url);
+    parsedUrl = new URL(targetUrl);
   } catch {
     return jsonResponse({ ok: false, error: "url must be an absolute URL" }, 422);
   }
@@ -63,7 +49,7 @@ export const POST: APIRoute = async ({ request }) => {
     return jsonResponse({ ok: false, error: "Unsupported URL protocol" }, 422);
   }
 
-  const ts = normalizeTimestamp(payload?.ts);
+  const ts = normalizeTimestamp(url.searchParams.get("ts"));
   if (!ts) {
     return jsonResponse({ ok: false, error: "ts must be a valid ISO string or epoch milliseconds" }, 422);
   }
@@ -122,6 +108,8 @@ export const POST: APIRoute = async ({ request }) => {
     return jsonResponse({ ok: false, forwarded: false, error: "forward_error" }, 502);
   }
 };
+
+export const POST: APIRoute = async () => methodNotAllowed("GET, OPTIONS");
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {

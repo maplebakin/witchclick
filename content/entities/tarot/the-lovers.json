@@ -1,0 +1,18 @@
+{
+  "slug": "the-lovers",
+  "type": "tarot",
+  "name": "The Lovers",
+  "summary": "The Lovers invites choices that align with your values, whether in romance, friendship, or commitments to yourself. Magically, it reflects heart-centered connection; practically, it often points to clear communication, consent, and choosing what feels mutual and sustainable.",
+  "properties": {
+    "number": 6,
+    "arcana": "Major",
+    "keywords": ["choice", "connection", "alignment"],
+    "uprightKeywords": ["partnership", "honesty", "value alignment"],
+    "reversedKeywords": ["misalignment", "avoidance", "indecision"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "rose-quartz" },
+    { "type": "herb", "slug": "lavender" },
+    { "type": "tarot", "slug": "the-chariot" }
+  ]
+}

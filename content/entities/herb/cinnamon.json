@@ -1,0 +1,16 @@
+{
+  "slug": "cinnamon",
+  "type": "herb",
+  "name": "Cinnamon",
+  "summary": "Cinnamon invites momentum when you feel stuck at the starting line. Magically it is linked with prosperity, speed, and confidence; practically you can use it in teas, cooking, or a simple doorway sprinkle ritual paired with a clear next action.",
+  "properties": {
+    "keywords": ["momentum", "prosperity", "confidence"],
+    "element": "Fire",
+    "planet": "Sun",
+    "uses": ["teas", "cooking", "incense", "floor washes"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "citrine" },
+    { "type": "tarot", "slug": "ace-of-wands" }
+  ]
+}

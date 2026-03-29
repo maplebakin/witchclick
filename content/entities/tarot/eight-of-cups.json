@@ -1,0 +1,17 @@
+{
+  "slug": "eight-of-cups",
+  "type": "tarot",
+  "name": "Eight of Cups",
+  "summary": "Eight of Cups invites leaving what no longer fits, even when that choice is difficult. Magically, it marks a soulful turning point; practically, it can be setting one boundary or stepping away from a draining pattern to protect your energy.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Cups",
+    "keywords": ["departure", "self-respect", "search for meaning"],
+    "uprightKeywords": ["walking away", "self-honesty", "transition"],
+    "reversedKeywords": ["fear of change", "avoidance", "lingering"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "obsidian" },
+    { "type": "herb", "slug": "cedar" }
+  ]
+}

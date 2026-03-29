@@ -1,0 +1,16 @@
+{
+  "slug": "selenite",
+  "type": "crystal",
+  "name": "Selenite",
+  "summary": "Selenite is helpful for mental decluttering when your thoughts feel noisy. Magically it is used for cleansing and clarity; practically it works well as a reset cue before bed or before switching tasks.",
+  "properties": {
+    "keywords": ["clarity", "cleansing", "calm"],
+    "chakra": "Crown",
+    "element": "Air",
+    "colors": ["white"]
+  },
+  "related": [
+    { "type": "herb", "slug": "lavender" },
+    { "type": "tarot", "slug": "the-star" }
+  ]
+}

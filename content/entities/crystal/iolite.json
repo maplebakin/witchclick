@@ -1,0 +1,16 @@
+{
+  "slug": "iolite",
+  "type": "crystal",
+  "name": "Iolite",
+  "summary": "Iolite supports insight when you feel directionless or mentally scattered. Magically it is used for inner vision and navigation; practically it works well with reflection prompts that help you choose one priority and drop competing noise.",
+  "properties": {
+    "keywords": ["inner vision", "direction", "discernment"],
+    "chakra": "Third Eye",
+    "element": "Water",
+    "colors": ["indigo", "violet"]
+  },
+  "related": [
+    { "type": "herb", "slug": "mugwort" },
+    { "type": "tarot", "slug": "the-hermit" }
+  ]
+}

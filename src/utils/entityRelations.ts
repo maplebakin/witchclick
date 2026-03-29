@@ -44,12 +44,26 @@ function summarize(entity: { type: string; summary?: string }): string {
 }
 
 export function parseEntityRef(ref: unknown): EntityReference | null {
-  if (typeof ref !== "string") return null;
-  const value = ref.trim();
-  if (!value) return null;
-  const [type, slug] = value.split(":");
-  if (!type || !slug) return null;
-  return { type: type.trim(), slug: slug.trim() };
+  if (typeof ref === "string") {
+    const value = ref.trim();
+    if (!value) return null;
+    const [type, slug] = value.split(":");
+    if (!type || !slug) return null;
+    const normalizedType = type.trim();
+    const normalizedSlug = slug.trim();
+    if (!normalizedType || !normalizedSlug) return null;
+    return { type: normalizedType, slug: normalizedSlug };
+  }
+
+  if (ref && typeof ref === "object") {
+    const candidate = ref as { type?: unknown; slug?: unknown };
+    const normalizedType = typeof candidate.type === "string" ? candidate.type.trim() : "";
+    const normalizedSlug = typeof candidate.slug === "string" ? candidate.slug.trim() : "";
+    if (!normalizedType || !normalizedSlug) return null;
+    return { type: normalizedType, slug: normalizedSlug };
+  }
+
+  return null;
 }
 
 export function resolveEntityRefs(refs: unknown[]): EntityRelation[] {

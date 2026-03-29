@@ -1,24 +1,4 @@
-// shared/slugify.js
-var VALID_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-function slugify(value) {
-  const base = typeof value === "string" ? value : String(value ?? "");
-  return base.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-}
-function isValidSlug(value) {
-  if (typeof value !== "string") return false;
-  if (!value) return false;
-  return VALID_SLUG_PATTERN.test(value);
-}
-function analyzeSlug(value) {
-  const raw = typeof value === "string" ? value : String(value ?? "");
-  const trimmed = raw.trim();
-  const normalized = slugify(trimmed);
-  const valid = normalized ? isValidSlug(normalized) : false;
-  const changed = trimmed.length > 0 && normalized !== trimmed;
-  return { raw, trimmed, slug: normalized, valid, changed };
-}
-
-// src/scripts/adminWrite.ts
+import { analyzeSlug } from "../../../shared/slugify.js";
 function initWriteAdmin() {
   const root = document.querySelector("[data-dev-api]");
   const DEV_API = root?.getAttribute("data-dev-api") || "http://localhost:8787";
@@ -26,7 +6,7 @@ function initWriteAdmin() {
   const baseHeaders = DEV_KEY ? { "X-WC-Dev-Key": DEV_KEY } : {};
   const jsonHeaders = { "Content-Type": "application/json", ...baseHeaders };
   function apiFetch(path, options = {}) {
-    const headers = { ...baseHeaders, ...(options.headers || {}) };
+    const headers = { ...baseHeaders, ...options.headers || {} };
     return fetch(`${DEV_API}${path}`, { ...options, headers });
   }
   const $ = (id) => document.getElementById(id);
@@ -339,7 +319,6 @@ function initWriteAdmin() {
     const tldrValue = ($("tldr")?.value ?? "").trim();
     const spoonsValueRaw = ($("spoons")?.value ?? "").trim().toLowerCase();
     const spoonsValue = ["low", "medium", "high"].includes(spoonsValueRaw) ? spoonsValueRaw : "";
-    const categoryInput = document.querySelector('input[name="category"]:checked');
     const payload = {
       title: titleInput?.value ?? "",
       slug: state.manualProvided && state.slug ? state.slug : "",
@@ -347,7 +326,6 @@ function initWriteAdmin() {
       metaDescription: $("meta")?.value ?? "",
       tldr: tldrValue || void 0,
       tags: $("tags")?.value ?? "",
-      category: categoryInput?.value ?? "meandering",
       includeAds: Boolean($("ads")?.checked),
       includeKofi: Boolean($("kofi")?.checked),
       spoons: spoonsValue || void 0,

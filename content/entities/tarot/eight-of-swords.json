@@ -1,0 +1,17 @@
+{
+  "slug": "eight-of-swords",
+  "type": "tarot",
+  "name": "Eight of Swords",
+  "summary": "Eight of Swords invites you to question the story that says you have no options. Magically, it shows a binding spell of fear and thought loops; practically, it can mean identifying one constraint you can influence and taking one small freeing action.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Swords",
+    "keywords": ["restriction", "fear", "reframing"],
+    "uprightKeywords": ["feeling trapped", "self-limiting beliefs", "anxiety"],
+    "reversedKeywords": ["new perspective", "agency", "mental release"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "black-tourmaline" },
+    { "type": "herb", "slug": "sage" }
+  ]
+}

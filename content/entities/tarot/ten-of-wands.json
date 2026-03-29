@@ -1,0 +1,17 @@
+{
+  "slug": "ten-of-wands",
+  "type": "tarot",
+  "name": "Ten of Wands",
+  "summary": "Ten of Wands invites a realistic audit of what you are carrying. Magically, it shows fire overloaded by obligation; practically, it points to delegating, dropping nonessential tasks, and protecting your capacity before stress becomes collapse.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Wands",
+    "keywords": ["burden", "responsibility", "capacity"],
+    "uprightKeywords": ["overload", "duty", "strain"],
+    "reversedKeywords": ["release", "delegation", "recovery from overwhelm"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "obsidian" },
+    { "type": "herb", "slug": "sage" }
+  ]
+}

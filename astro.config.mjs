@@ -59,6 +59,12 @@ export default defineConfig({
   redirects: {
     "/rss": "/rss.xml",
     "/feed": "/rss.xml",
+    "/salon": "/hub",
+    "/study": "/",
+    "/study/herbary": "/entities/herb",
+    "/study/crystal-grotto": "/entities/crystal",
+    "/study/moon-chamber": "/entities/moonPhase",
+    "/study/grimoire": "/entities",
   },
 
   server: {

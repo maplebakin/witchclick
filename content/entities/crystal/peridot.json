@@ -1,0 +1,16 @@
+{
+  "slug": "peridot",
+  "type": "crystal",
+  "name": "Peridot",
+  "summary": "Peridot is useful when you want to release stuck resentment and make space for healthier habits. Magically it is associated with renewal and heart-led growth; practically it can support a reset plan where you declutter one area and recommit to one supportive routine.",
+  "properties": {
+    "keywords": ["renewal", "heart healing", "growth"],
+    "chakra": "Heart",
+    "element": "Earth",
+    "colors": ["green"]
+  },
+  "related": [
+    { "type": "herb", "slug": "thyme" },
+    { "type": "tarot", "slug": "ace-of-pentacles" }
+  ]
+}

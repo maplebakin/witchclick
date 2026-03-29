@@ -10,12 +10,18 @@ import path from "node:path";
 
 const REQUIRED_FIELDS = ["primary", "accent", "background", "fontSerif", "fontScript"];
 const THEMES_DIR = path.join(process.cwd(), "content", "themes");
+const IGNORED_FILES = new Set(["active.json"]);
 
 async function readThemeFiles() {
   try {
     const entries = await fs.readdir(THEMES_DIR, { withFileTypes: true });
     return entries
-      .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".json"))
+      .filter(
+        (entry) =>
+          entry.isFile() &&
+          entry.name.toLowerCase().endsWith(".json") &&
+          !IGNORED_FILES.has(entry.name.toLowerCase())
+      )
       .map((entry) => path.join(THEMES_DIR, entry.name));
   } catch (error) {
     console.error("No theme directory found at content/themes:", error?.message ?? error);

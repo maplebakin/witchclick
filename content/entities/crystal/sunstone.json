@@ -1,0 +1,16 @@
+{
+  "slug": "sunstone",
+  "type": "crystal",
+  "name": "Sunstone",
+  "summary": "Sunstone is useful when you want more energy and confidence without forcing positivity. Magically it is linked with joy and personal power; practically it can support activation routines like morning movement, light exposure, and one meaningful priority.",
+  "properties": {
+    "keywords": ["vitality", "confidence", "joy"],
+    "chakra": "Sacral",
+    "element": "Fire",
+    "colors": ["orange", "gold"]
+  },
+  "related": [
+    { "type": "herb", "slug": "cinnamon" },
+    { "type": "tarot", "slug": "the-sun" }
+  ]
+}

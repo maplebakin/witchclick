@@ -9,7 +9,8 @@
     "provider": "plausible",
     "domain": "witchclick.space",
     "scriptUrl": "https://plausible.witchclick.space/js/script.js",
-    "apiHost": "https://plausible.witchclick.space"
+    "apiHost": "https://plausible.witchclick.space",
+    "endpoint": "https://plausible.witchclick.space/api/event"
   },
   "ads": {
     "provider": "adsense",

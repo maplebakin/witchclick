@@ -1,0 +1,17 @@
+{
+  "slug": "king-of-swords",
+  "type": "tarot",
+  "name": "King of Swords",
+  "summary": "King of Swords invites principled leadership grounded in logic and fairness, not ego. Magically, it reflects mastery of the mind and ethical authority; practically, it can mean setting clear standards, documenting decisions, and staying objective in hard conversations.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Swords",
+    "keywords": ["integrity", "authority", "objectivity"],
+    "uprightKeywords": ["intellectual authority", "fair judgment", "strategic clarity"],
+    "reversedKeywords": ["rigidity", "detachment", "misuse of power"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "clear-quartz" },
+    { "type": "herb", "slug": "rosemary" }
+  ]
+}

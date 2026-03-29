@@ -344,18 +344,18 @@ for (const section of navSections) {
     padding: 0.625rem 0.875rem;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #7c3aed;
-    background: #ede9fe;
-    border: 1px solid #a78bfa;
+    color: var(--admin-accent-text);
+    background: var(--admin-accent-soft);
+    border: 1px solid var(--admin-accent-border);
     border-radius: 0.75rem;
     text-decoration: none;
     transition: all 0.15s ease;
   }
 
   .admin-nav-staging-link:hover {
-    background: #ddd6fe;
-    color: #6b21a8;
-    border-color: #8b5cf6;
+    background: var(--admin-accent-soft-hover);
+    color: color-mix(in srgb, var(--admin-accent) 90%, black 10%);
+    border-color: var(--admin-accent);
     box-shadow: 0 1px 3px 0 rgb(124 58 237 / 0.2);
   }
 
@@ -367,7 +367,7 @@ for (const section of navSections) {
     padding: 0.625rem 0.875rem;
     font-size: 0.875rem;
     font-weight: 500;
-    color: #374151;
+    color: var(--admin-text-body);
     background: var(--admin-surface-base);
     border: 1px solid var(--admin-border-neutral);
     border-radius: 0.75rem;
@@ -450,38 +450,37 @@ for (const section of navSections) {
   }
 
   .admin-nav-link:hover {
-    background: #f3f4f6;
-    border-color: #d1d5db;
+    background: var(--admin-hover-bg);
+    border-color: var(--admin-border-neutral);
   }
 
   .admin-nav-link--active {
-    background: #ede9fe;
-    border-color: #a78bfa;
+    background: var(--admin-accent-soft);
+    border-color: var(--admin-accent-border);
   }
 
   .admin-nav-link--active:hover {
-    background: #ddd6fe;
-    border-color: #8b5cf6;
+    background: var(--admin-accent-soft-hover);
   }
 
   .admin-nav-link-label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--admin-text-strong);
   }
 
   .admin-nav-link-description {
     font-size: 0.75rem;
-    color: #4b5563;
+    color: var(--admin-text-muted);
     line-height: 1.2;
   }
 
   .admin-nav-link--active .admin-nav-link-label {
-    color: #6b21a8;
+    color: var(--admin-accent-text);
   }
 
   .admin-nav-link--active .admin-nav-link-description {
-    color: #7c3aed;
+    color: var(--admin-accent);
   }
 
   /* Responsive: grid on larger screens */

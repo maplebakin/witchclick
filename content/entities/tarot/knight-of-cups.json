@@ -1,0 +1,17 @@
+{
+  "slug": "knight-of-cups",
+  "type": "tarot",
+  "name": "Knight of Cups",
+  "summary": "Knight of Cups invites heartfelt action, especially where you have been hesitating to express what matters. Magically, it carries romantic and creative momentum; practically, it can look like sending the message, making the ask, or sharing work before it feels perfect.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Cups",
+    "keywords": ["romance", "invitation", "follow-through"],
+    "uprightKeywords": ["romantic pursuit", "creative offer", "emotional bravery"],
+    "reversedKeywords": ["moodiness", "mixed signals", "escapism"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "carnelian" },
+    { "type": "herb", "slug": "lavender" }
+  ]
+}

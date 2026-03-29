@@ -1,0 +1,17 @@
+{
+  "slug": "queen-of-wands",
+  "type": "tarot",
+  "name": "Queen of Wands",
+  "summary": "Queen of Wands invites confident visibility rooted in self-trust, not performance. Magically, she represents radiant creative authority; practically, she suggests clear boundaries, steady routines, and leading with warmth while staying direct.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Wands",
+    "keywords": ["confidence", "charisma", "self-trust"],
+    "uprightKeywords": ["magnetism", "creative leadership", "courage"],
+    "reversedKeywords": ["insecurity", "jealousy", "overcompensation"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "citrine" },
+    { "type": "herb", "slug": "lavender" }
+  ]
+}

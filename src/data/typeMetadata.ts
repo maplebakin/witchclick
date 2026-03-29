@@ -50,6 +50,16 @@ export const typeMetadata = {
     stubLine: "This moon phase is still revealing its glow.",
     cardStyleClass: "from-gradient-moon-start/30 to-gradient-moon-end/40",
   },
+  planetaryDay: {
+    title: "Planetary Day Almanac",
+    subtitle: "Weekday rhythms for intention and timing.",
+    introText:
+      "Follow the seven-day planetary cadence to pair rituals with the tone of each day. Use these correspondences as gentle structure for planning, focus, and release.",
+    icon: "🪐",
+    themeColor: "indigo-500",
+    stubLine: "This planetary day is still aligning its correspondences.",
+    cardStyleClass: "from-gradient-default-start/20 to-gradient-default-end/40",
+  },
   ritual: {
     title: "The Ritual Archive",
     subtitle: "Practices for presence, power, and peace.",

@@ -151,6 +151,13 @@
    Card Animation States
    --------------------------------------------------------------------------- */
 
+/* Fail-open default: cards remain visible unless actively observed as pending. */
+.card-panel:not([data-animate]),
+.card-panel[data-animate="done"] {
+  opacity: 1;
+  transform: none;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .card-panel[data-animate="pending"] {
     opacity: 0;
@@ -173,7 +180,6 @@
   overflow: hidden;
   isolation: isolate;
   backdrop-filter: blur(var(--glass-blur, 16px));
-  transform: translateZ(0);
   box-shadow: var(--card-elevation-base, var(--card-panel-shadow, var(--wc-shadow-soft, var(--elevation-tier-1))));
   transition:
     transform var(--card-transition),

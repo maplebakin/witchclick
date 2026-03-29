@@ -1,8 +1,18 @@
 {
-  "type": "tarot",
-  "name": "the magician",
   "slug": "the-magician",
-  "summary": "the magician — stub entity",
-  "properties": {},
-  "related": []
+  "type": "tarot",
+  "name": "The Magician",
+  "summary": "The Magician invites you to notice what tools are already in reach and use them with intention. Magically, this card points to focused will and aligned action; practically, it often reflects building one concrete skill and following through consistently.",
+  "properties": {
+    "number": 1,
+    "arcana": "Major",
+    "keywords": ["focus", "initiative", "integration"],
+    "uprightKeywords": ["manifestation", "resourcefulness", "skill"],
+    "reversedKeywords": ["manipulation", "untapped potential", "trickery"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "citrine" },
+    { "type": "herb", "slug": "rosemary" },
+    { "type": "tarot", "slug": "the-fool" }
+  ]
 }

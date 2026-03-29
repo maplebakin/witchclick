@@ -35,7 +35,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
       <div class="mx-auto max-w-4xl space-y-6" data-settings-admin data-dev-api={DEV_API} data-dev-key={DEV_KEY}>
       <section class="rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm">
         <header class="mb-6">
-          <h1 class="text-2xl font-semibold text-primary">Site Settings</h1>
+          <h1 class="text-2xl font-semibold text-body-strong">Site Settings</h1>
           <p class="mt-2 text-sm text-body-muted">
             Configure your site's brand, analytics, advertisements, and observability.
           </p>
@@ -44,7 +44,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
         <form id="settingsForm" class="space-y-8">
           {/* Basic Settings */}
           <div class="space-y-4">
-            <h2 class="text-lg font-semibold text-primary border-b border-line-subtle pb-2">Basic Settings</h2>
+            <h2 class="text-lg font-semibold text-body-strong border-b border-line-subtle pb-2">Basic Settings</h2>
 
             <label class="block">
               <span class="text-sm font-medium text-body">Site URL</span>
@@ -107,7 +107,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
           {/* Analytics Settings */}
           <div class="space-y-4">
-            <h2 class="text-lg font-semibold text-primary border-b border-line-subtle pb-2">Analytics</h2>
+            <h2 class="text-lg font-semibold text-body-strong border-b border-line-subtle pb-2">Analytics</h2>
 
             <label class="flex items-center gap-2">
               <input
@@ -127,8 +127,9 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
                 class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               >
                 <option value="plausible">Plausible</option>
-                <option value="googleanalytics">Google Analytics</option>
-                <option value="matomo">Matomo</option>
+                <option value="fathom">Fathom</option>
+                <option value="umami">Umami</option>
+                <option value="simple-analytics">Simple Analytics</option>
               </select>
             </label>
 
@@ -159,7 +160,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
           {/* Ads Settings */}
           <div class="space-y-4">
-            <h2 class="text-lg font-semibold text-primary border-b border-line-subtle pb-2">Advertisements</h2>
+            <h2 class="text-lg font-semibold text-body-strong border-b border-line-subtle pb-2">Advertisements</h2>
 
             <label class="block">
               <span class="text-sm font-medium text-body">Provider</span>
@@ -212,7 +213,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
           {/* Observability Settings */}
           <div class="space-y-4">
-            <h2 class="text-lg font-semibold text-primary border-b border-line-subtle pb-2">Observability</h2>
+            <h2 class="text-lg font-semibold text-body-strong border-b border-line-subtle pb-2">Observability</h2>
 
             <label class="flex items-center gap-2">
               <input

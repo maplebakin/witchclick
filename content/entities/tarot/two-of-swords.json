@@ -1,0 +1,17 @@
+{
+  "slug": "two-of-swords",
+  "type": "tarot",
+  "name": "Two of Swords",
+  "summary": "Two of Swords invites a pause when every option feels loaded and your brain is stuck in loops. Magically, it marks a threshold of inner balance; practically, it often means gathering one missing fact and making a good-enough choice instead of waiting for perfect certainty.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Swords",
+    "keywords": ["indecision", "mental gridlock", "discernment"],
+    "uprightKeywords": ["indecision", "stalemate", "avoidance"],
+    "reversedKeywords": ["clarity", "facing truth", "difficult choice made"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "clear-quartz" },
+    { "type": "herb", "slug": "sage" }
+  ]
+}

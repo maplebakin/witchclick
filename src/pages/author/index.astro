@@ -12,6 +12,7 @@ const authorSummaries = authors.map((author) => {
     postCount: posts.length,
   };
 });
+const authorsWithPosts = authorSummaries.filter(({ postCount }) => postCount > 0);
 ---
 <Base
   title="WitchClick Contributors"
@@ -29,17 +30,19 @@ const authorSummaries = authors.map((author) => {
     </div>
   </section>
 
-  <section class="author-index-grid">
-    {authorSummaries.map(({ author, postCount }) => (
-      <AuthorSpotlight
-        author={author}
-        postCount={postCount}
-        compact={false}
-        linkToProfile={true}
-        class="author-index-card"
-      />
-    ))}
-  </section>
+  {authorsWithPosts.length > 0 && (
+    <section class="author-index-grid">
+      {authorsWithPosts.map(({ author, postCount }) => (
+        <AuthorSpotlight
+          author={author}
+          postCount={postCount}
+          compact={false}
+          linkToProfile={true}
+          class="author-index-card"
+        />
+      ))}
+    </section>
+  )}
 </Base>
 
 <style>

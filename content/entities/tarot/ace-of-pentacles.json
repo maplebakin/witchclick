@@ -1,0 +1,17 @@
+{
+  "slug": "ace-of-pentacles",
+  "type": "tarot",
+  "name": "Ace of Pentacles",
+  "summary": "Ace of Pentacles invites you to treat new opportunities as seeds that need steady care, not instant results. Magically, it points to grounded prosperity energy; practically, it can mean starting a realistic budget, routine, or project plan that your future self can maintain.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Pentacles",
+    "keywords": ["opportunity", "stability", "investment"],
+    "uprightKeywords": ["new opportunity", "material start", "grounded growth"],
+    "reversedKeywords": ["missed opportunity", "poor planning", "instability"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "citrine" },
+    { "type": "herb", "slug": "rosemary" }
+  ]
+}

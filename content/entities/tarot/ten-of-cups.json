@@ -1,0 +1,17 @@
+{
+  "slug": "ten-of-cups",
+  "type": "tarot",
+  "name": "Ten of Cups",
+  "summary": "Ten of Cups invites building emotional safety with the people you choose, not chasing a perfect picture. Magically, it symbolizes harmonious connection; practically, it points to everyday care, clear communication, and shared routines that make belonging real.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Cups",
+    "keywords": ["belonging", "emotional security", "shared joy"],
+    "uprightKeywords": ["emotional harmony", "family bonds", "shared fulfillment"],
+    "reversedKeywords": ["tension at home", "miscommunication", "fragile expectations"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "rose-quartz" },
+    { "type": "herb", "slug": "cinnamon" }
+  ]
+}

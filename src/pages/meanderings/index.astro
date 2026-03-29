@@ -1,6 +1,7 @@
 ---
 import Base from "@/layouts/Base.astro";
 import PostCard from "@/components/PostCard.astro";
+import PrimaryButton from "@/components/buttons/PrimaryButton.astro";
 import { loadAllPosts, filterPostsByCategory, POST_CATEGORY_MEANDERING } from "@/utils/posts";
 import { postsToCardData } from "@/utils/postTransforms";
 import type { CardPost } from "@/types/post";
@@ -18,16 +19,13 @@ const recentPosts = cardPosts.slice(1);
 ---
 
 <Base title="Non-Magickal Meanderings — WitchClick">
-  <header class="blog-header">
-    <div class="blog-header__content">
-      <h1 class="blog-header__title">Non-Magickal Meanderings</h1>
-      <p class="blog-header__tagline">
-        A soft landing for the parts of my brain that aren't strictly witchy.
-      </p>
-      <p class="blog-header__description">
-        Life updates, half-baked theories, and whatever I'm currently fixated on.
-      </p>
-    </div>
+  <header class="page-header">
+    <p class="page-header__eyebrow">Non-magickal corner</p>
+    <h1 class="page-header__title">Non-Magickal Meanderings</h1>
+    <p class="page-header__lead">
+      A soft landing for the parts of my brain that aren't strictly witchy. Life updates, half-baked theories, and whatever
+      I'm currently fixated on.
+    </p>
   </header>
 
   {featuredPost && (
@@ -105,7 +103,7 @@ const recentPosts = cardPosts.slice(1);
             placeholder="you@example.com"
             class="meanderings-signup__input"
           />
-          <button type="submit" class="meanderings-signup__button">Notify me</button>
+          <PrimaryButton type="submit">Notify me</PrimaryButton>
         </div>
       </form>
       <div class="meanderings-signup__links">
@@ -131,43 +129,15 @@ const recentPosts = cardPosts.slice(1);
 </Base>
 
 <style>
-  /* Blog Header */
-  .blog-header {
-    padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(2rem, 5vw, 3rem);
+  .page-header {
+    padding: clamp(2.5rem, 6vw, 4rem) 0 var(--page-header-gap);
     text-align: center;
-  }
-
-  .blog-header__content {
-    max-width: 42rem;
     margin: 0 auto;
-  }
-
-  .blog-header__title {
-    margin: 0 0 0.75rem;
-    font-family: var(--font-heading, var(--font-body));
-    font-size: clamp(2.5rem, 6vw, 3.5rem);
-    font-weight: 700;
-color: var(--theme-text-strong);
-  }
-
-  .blog-header__tagline {
-    margin: 0 0 1rem;
-    font-size: clamp(1.1rem, 2.5vw, 1.35rem);
-    line-height: 1.5;
-    color: var(--theme-text-accent);
-  }
-
-  .blog-header__description {
-    margin: 0;
-    font-size: 1rem;
-    line-height: 1.7;
-    color: var(--theme-text-body);
-    opacity: 0.9;
   }
 
   /* Featured Post */
   .featured-post {
-    margin: clamp(2rem, 5vw, 3rem) 0;
+    margin: var(--page-header-gap) 0;
   }
 
   .featured-post__link {
@@ -190,7 +160,7 @@ color: var(--theme-text-strong);
   }
 
   .featured-post__content {
-    max-width: 48rem;
+    max-width: var(--content-max-width);
   }
 
   .featured-post__label {
@@ -245,7 +215,7 @@ color: var(--theme-text-strong);
 
   /* No Posts */
   .no-posts {
-    margin: clamp(3rem, 6vw, 5rem) 0;
+    margin: var(--page-section-gap) 0;
     padding: clamp(2rem, 5vw, 3rem);
     text-align: center;
     border-radius: clamp(1.2rem, 3vw, 2rem);
@@ -262,14 +232,14 @@ color: var(--theme-text-strong);
 
   /* Posts Section */
   .posts-section {
-    margin: clamp(3rem, 6vw, 5rem) 0;
+    margin: var(--page-section-gap) 0;
   }
 
   .posts-section__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+    margin-bottom: var(--page-header-gap);
   }
 
   .posts-section__title {
@@ -282,13 +252,13 @@ color: var(--theme-text-strong);
 
   .posts-grid {
     display: grid;
-    gap: clamp(1.5rem, 3vw, 2.25rem);
+    gap: var(--grid-gap);
     grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
   }
 
   /* Meanderings Signup */
   .meanderings-signup {
-    margin: clamp(2.5rem, 5vw, 4rem) 0;
+    margin: var(--page-section-gap) 0;
   }
 
   .meanderings-signup__content {
@@ -333,23 +303,6 @@ color: var(--theme-text-strong);
     color: var(--theme-text-strong);
   }
 
-  .meanderings-signup__button {
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--theme-color-gold, #d4af37) 45%, transparent 55%);
-    background: var(--cozy-button-bg, color-mix(in srgb, var(--theme-color-gold, #d4af37) 75%, transparent 25%));
-    color: var(--theme-text-strong);
-    font-weight: 600;
-    padding: 0.7rem 1.1rem;
-    cursor: pointer;
-    transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
-  }
-
-  .meanderings-signup__button:hover,
-  .meanderings-signup__button:focus-visible {
-    transform: translateY(-1px);
-    box-shadow: var(--elevation-tier-1);
-  }
-
   .meanderings-signup__links {
     display: flex;
     flex-wrap: wrap;
@@ -389,7 +342,7 @@ color: var(--theme-text-strong);
 
   /* Sidebar CTA */
   .sidebar-cta {
-    margin: clamp(3rem, 6vw, 5rem) 0;
+    margin: var(--page-section-gap) 0;
     padding: clamp(2rem, 5vw, 2.5rem);
     border-radius: clamp(1.2rem, 3vw, 1.75rem);
     border: 1px solid color-mix(in srgb, var(--theme-border-accent-medium, rgba(212, 175, 55, 0.3)) 85%, transparent 15%);

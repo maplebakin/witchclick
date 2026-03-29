@@ -1,0 +1,17 @@
+{
+  "slug": "nine-of-swords",
+  "type": "tarot",
+  "name": "Nine of Swords",
+  "summary": "Nine of Swords invites compassion for the mind under strain, especially when nights feel heavier than days. Magically, it reflects psychic overwhelm and intrusive worry; practically, it can help to externalize fears, reduce stimulation, and reach out before spirals deepen.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Swords",
+    "keywords": ["anxiety", "rumination", "mental overload"],
+    "uprightKeywords": ["anxiety", "sleeplessness", "worry"],
+    "reversedKeywords": ["relief", "support seeking", "reduced rumination"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "amethyst" },
+    { "type": "herb", "slug": "lavender" }
+  ]
+}

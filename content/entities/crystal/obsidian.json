@@ -1,0 +1,16 @@
+{
+  "slug": "obsidian",
+  "type": "crystal",
+  "name": "Obsidian",
+  "summary": "Obsidian is useful when you need strong boundaries and fewer emotional leaks. Magically it is used for protection and shadow work; practically you can hold it during journaling, then write down one pattern you want to interrupt this week.",
+  "properties": {
+    "keywords": ["protection", "grounding", "shadow work"],
+    "chakra": "Root",
+    "element": "Earth",
+    "colors": ["black"]
+  },
+  "related": [
+    { "type": "herb", "slug": "mugwort" },
+    { "type": "tarot", "slug": "the-moon" }
+  ]
+}

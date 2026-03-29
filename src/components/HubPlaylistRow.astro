@@ -1,4 +1,8 @@
 ---
+import { loadAllPosts } from "@/utils/posts";
+import { postToCardData } from "@/utils/postTransforms";
+import { canonicalizeTagSlug } from "@/utils/tags";
+
 interface PlaylistPost {
   slug: string;
   title: string;
@@ -17,49 +21,77 @@ interface Props {
 
 const { title, description, groupChips, posts, maxChipsPerCard = 3 } = Astro.props as Props;
 const headingId = `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'playlist'}-heading`;
+const primaryChip = groupChips[0] ?? "";
+const primaryChipCanonical = canonicalizeTagSlug(primaryChip);
+
+const fallbackPosts: PlaylistPost[] =
+  posts.length === 0 && primaryChipCanonical
+    ? loadAllPosts()
+        .map((post) => postToCardData(post))
+        .filter((card) =>
+          card.tags.some((tag) => canonicalizeTagSlug(tag) === primaryChipCanonical),
+        )
+        .slice(0, 4)
+        .map((card) => ({
+          slug: card.slug,
+          title: card.title,
+          excerpt: card.tldr ?? card.excerpt ?? "",
+          href: `/post/${card.slug}`,
+          chips: card.tags,
+        }))
+    : [];
+
+const visiblePosts = posts.length > 0 ? posts : fallbackPosts;
 ---
-<section class="hub-playlist" aria-labelledby={headingId}>
-  <header class="hub-playlist__header">
-    <div>
-      <h2 id={headingId} class="hub-playlist__title">
-        {title}
-      </h2>
-      <p class="hub-playlist__description">{description}</p>
+{visiblePosts.length > 0 && (
+  <section class="hub-playlist" aria-labelledby={headingId}>
+    <header class="hub-playlist__header">
+      <div>
+        <h2 id={headingId} class="hub-playlist__title">
+          {title}
+        </h2>
+        <p class="hub-playlist__description">{description}</p>
+      </div>
+      {groupChips.length > 0 && (
+        <ul class="hub-playlist__chips">
+          {groupChips.map((chip) => (
+            <li>{chip}</li>
+          ))}
+        </ul>
+      )}
+    </header>
+    <div class="hub-playlist__grid">
+      {visiblePosts.map((post) => (
+        <a class="hub-playlist__card" href={post.href}>
+          <span class="hub-playlist__card-title">{post.title}</span>
+          {post.excerpt && <span class="hub-playlist__card-excerpt">{post.excerpt}</span>}
+          {post.chips.length > 0 && (
+            <ul class="hub-playlist__card-chips">
+              {post.chips.slice(0, maxChipsPerCard).map((chip) => (
+                <li>{chip}</li>
+              ))}
+              {post.chips.length > maxChipsPerCard && (
+                <li class="hub-playlist__chip-overflow">
+                  +{post.chips.length - maxChipsPerCard}
+                </li>
+              )}
+            </ul>
+          )}
+        </a>
+      ))}
     </div>
-    {groupChips.length > 0 && (
-      <ul class="hub-playlist__chips">
-        {groupChips.map((chip) => (
-          <li>{chip}</li>
-        ))}
-      </ul>
-    )}
-  </header>
-  <div class="hub-playlist__grid">
-    {posts.map((post) => (
-      <a class="hub-playlist__card" href={post.href}>
-        <span class="hub-playlist__card-title">{post.title}</span>
-        {post.excerpt && <span class="hub-playlist__card-excerpt">{post.excerpt}</span>}
-        {post.chips.length > 0 && (
-          <ul class="hub-playlist__card-chips">
-            {post.chips.slice(0, maxChipsPerCard).map((chip) => (
-              <li>{chip}</li>
-            ))}
-            {post.chips.length > maxChipsPerCard && (
-              <li class="hub-playlist__chip-overflow">
-                +{post.chips.length - maxChipsPerCard}
-              </li>
-            )}
-          </ul>
-        )}
-      </a>
-    ))}
-  </div>
-</section>
+  </section>
+)}
 
 <style is:inline>
   .hub-playlist {
     display: grid;
     gap: clamp(1.5rem, 3vw, 2.25rem);
+    --hub-playlist-card-surface: var(--surface-card-dark);
+    --hub-playlist-card-border: color-mix(in srgb, var(--theme-color-gold) 32%, var(--theme-color-iris) 24%);
+    --hub-playlist-card-border-hover: color-mix(in srgb, var(--theme-color-gold) 45%, transparent 55%);
+    --hub-playlist-card-shadow: var(--theme-shadow-soft);
+    --hub-playlist-card-shadow-hover: var(--theme-shadow-strong);
   }
 
   .hub-playlist__header {
@@ -72,13 +104,12 @@ const headingId = `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'playlis
     margin: 0;
     font-size: clamp(1.15rem, 2vw, 1.35rem);
     letter-spacing: 0.16em;
-    text-transform: uppercase;
   }
 
   .hub-playlist__description {
     margin: 0;
     max-width: 52ch;
-    color: rgba(249, 245, 255, 0.78);
+    color: var(--theme-text-body);
     font-size: 1rem;
     line-height: 1.6;
   }
@@ -95,7 +126,7 @@ const headingId = `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'playlis
   .hub-playlist__chips li {
     padding: 0.35rem 0.8rem;
     border-radius: 999px;
-    border: 1px solid rgba(212, 175, 55, 0.32);
+    border: 1px solid var(--border-chip-accent);
     font-size: 0.75rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -112,19 +143,19 @@ const headingId = `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'playlis
     gap: 0.55rem;
     padding: clamp(1rem, 2.5vw, 1.4rem);
     border-radius: 1.4rem;
-    border: 1px solid color-mix(in srgb, var(--theme-color-gold, #d4af37) 32%, var(--theme-color-iris, #4b2a63) 24%);
-    background: color-mix(in srgb, var(--theme-color-night, #120725) 88%, transparent 12%);
+    border: 1px solid var(--hub-playlist-card-border);
+    background: var(--hub-playlist-card-surface);
     text-decoration: none;
-    color: inherit;
-    box-shadow: 0 18px 48px -30px rgba(8, 5, 18, 0.65);
+    color: var(--theme-text-strong);
+    box-shadow: var(--hub-playlist-card-shadow);
     transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
   }
 
   .hub-playlist__card:hover,
   .hub-playlist__card:focus-visible {
     transform: translateY(-4px);
-    border-color: rgba(212, 175, 55, 0.45);
-    box-shadow: 0 22px 55px -28px rgba(12, 7, 26, 0.7);
+    border-color: var(--hub-playlist-card-border-hover);
+    box-shadow: var(--hub-playlist-card-shadow-hover);
   }
 
   .hub-playlist__card-title {
@@ -133,7 +164,7 @@ const headingId = `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'playlis
   }
 
   .hub-playlist__card-excerpt {
-    color: rgba(249, 245, 255, 0.72);
+    color: var(--theme-text-muted);
     font-size: 0.92rem;
     line-height: 1.55;
   }
@@ -150,48 +181,17 @@ const headingId = `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'playlis
   .hub-playlist__card-chips li {
     padding: 0.3rem 0.7rem;
     border-radius: 999px;
-    background: rgba(212, 175, 55, 0.15);
+    background: var(--surface-chip-accent);
+    color: var(--theme-text-body);
     font-size: 0.7rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
   .hub-playlist__chip-overflow {
-    background: color-mix(in srgb, var(--text-accent, var(--theme-color-gold)) 24%, transparent 76%) !important;
+    background: color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 24%, transparent 76%) !important;
+    color: var(--theme-text-strong);
     font-weight: 600;
-  }
-
-  :root[data-comfort-theme="dawn"] .hub-playlist__description {
-    color: rgba(87, 63, 115, 0.75);
-  }
-
-  :root[data-comfort-theme="dawn"] .hub-playlist__chips li {
-    border-color: rgba(155, 134, 200, 0.45);
-  }
-
-  :root[data-comfort-theme="dawn"] .hub-playlist__card {
-    background: rgba(255, 255, 255, 0.9);
-    border-color: rgba(180, 154, 217, 0.3);
-    box-shadow: 0 18px 42px -28px rgba(83, 63, 112, 0.35);
-    color: rgba(58, 40, 84, 0.9);
-  }
-
-  :root[data-comfort-theme="dawn"] .hub-playlist__card:hover,
-  :root[data-comfort-theme="dawn"] .hub-playlist__card:focus-visible {
-    border-color: rgba(212, 175, 55, 0.45);
-  }
-
-  :root[data-comfort-theme="dawn"] .hub-playlist__card-excerpt {
-    color: rgba(87, 63, 115, 0.65);
-  }
-
-  :root[data-comfort-theme="dawn"] .hub-playlist__card-chips li {
-    background: rgba(186, 166, 220, 0.25);
-    color: rgba(87, 63, 115, 0.75);
-  }
-
-  :root[data-comfort-theme="dawn"] .hub-playlist__chip-overflow {
-    background: color-mix(in srgb, var(--text-accent, var(--theme-color-gold)) 26%, transparent 74%) !important;
   }
 
   @media (max-width: 640px) {

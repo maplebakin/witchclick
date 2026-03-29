@@ -45,7 +45,6 @@ const jsonLd = createCollectionPageSchema(
 <Base
   title={`${author.name} — WitchClick`}
   description={author.bio ?? `${author.name}'s stories on WitchClick`}
-  ambientColor="#c084fc"
 >
   <HeadSlot slot="head">
     <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
@@ -63,12 +62,12 @@ const jsonLd = createCollectionPageSchema(
     <AuthorSpotlight author={author} linkToProfile={false} postCount={posts.length} />
   </section>
 
-  <section class="author-page-posts">
-    <header>
-      <h2>Recent stories</h2>
-      <p>{posts.length === 0 ? `${author.name} is preparing their first piece.` : `Browse ${posts.length} ${posts.length === 1 ? "story" : "stories"} from ${author.name}.`}</p>
-    </header>
-    {cards.length > 0 ? (
+  {cards.length > 0 && (
+    <section class="author-page-posts">
+      <header>
+        <h2>Recent stories</h2>
+        <p>{`Browse ${posts.length} ${posts.length === 1 ? "story" : "stories"} from ${author.name}.`}</p>
+      </header>
       <div class="author-page-posts__grid">
         {cards.map((card) => (
           <PostCard
@@ -92,32 +91,8 @@ const jsonLd = createCollectionPageSchema(
           />
         ))}
       </div>
-    ) : (
-      <div class="author-page-posts__empty">
-        <p>Circle back soon—new work is on the way. Until then, explore the latest rituals or drop a note for updates.</p>
-        <div class="author-page-posts__actions">
-          <a href="/post" class="author-page-posts__link">Browse latest posts</a>
-          <a href="/hub" class="author-page-posts__link">Explore hubs</a>
-        </div>
-        <form class="author-page-posts__form" name="author-updates" method="POST" data-netlify="true">
-          <input type="hidden" name="form-name" value="author-updates" />
-          <input type="hidden" name="author" value={author.slug} />
-          <label class="author-page-posts__label">
-            Get notified when {author.name} publishes
-            <input
-              type="email"
-              name="email"
-              inputmode="email"
-              autocomplete="email"
-              placeholder="you@example.com"
-              class="author-page-posts__input"
-            />
-          </label>
-          <button type="submit" class="author-page-posts__button">Notify me</button>
-        </form>
-      </div>
-    )}
-  </section>
+    </section>
+  )}
 </Base>
 
 <style>
@@ -141,7 +116,7 @@ const jsonLd = createCollectionPageSchema(
     text-transform: uppercase;
     letter-spacing: 0.22em;
     font-size: 0.8rem;
-    color: color-mix(in srgb, var(--ambient-color, #c084fc) 68%, var(--ink-strong, currentColor) 32%);
+    color: color-mix(in srgb, var(--ambient-color, var(--text-accent)) 68%, var(--ink-strong, currentColor) 32%);
   }
 
   .author-page-hero__title {

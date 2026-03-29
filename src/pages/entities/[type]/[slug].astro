@@ -180,7 +180,7 @@ function pretty(v: unknown) {
   }
 }
 ---
-<Base title={`${ent.name} — ${typeLabel} — WitchClick`} wide ambientColor={accentHex}>
+<Base title={`${ent.name} — ${typeLabel} — WitchClick`} wide ambientColor={accentHex} noindex={isStub}>
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <article class="entity-page" style={themeVarString ? `${themeVarString};` : undefined}>
     <a href={`/entities/${ent.type}`} class="entity-back-link">
@@ -189,6 +189,11 @@ function pretty(v: unknown) {
       </svg>
       Back to All {typeLabel}s
     </a>
+    {isStub && (
+      <div class="rounded-lg border border-dashed border-line-neutral bg-surface-soft px-4 py-3 text-sm text-body-muted mb-6">
+        This entry is a placeholder. Full lore is being inscribed - check back soon.
+      </div>
+    )}
     <header class="entity-hero">
       <div class="entity-hero-sheen" aria-hidden="true" />
       <div class="entity-hero-inner">
@@ -406,7 +411,7 @@ function pretty(v: unknown) {
     gap: 3rem;
     margin-top: 2rem;
     margin-bottom: 4rem;
-    color: var(--ink-body, #111827);
+    color: var(--theme-text-body, var(--text-body));
   }
 
   .entity-back-link {
@@ -501,13 +506,13 @@ function pretty(v: unknown) {
     font-size: clamp(2.5rem, 5vw, 3.5rem);
     line-height: 1.1;
     font-family: var(--font-serif, "Literata", serif);
-    color: var(--entity-accent-heading, #4c1d95);
+    color: var(--theme-text-strong, var(--text-strong));
   }
 
   .entity-hero-summary {
     max-width: 60ch;
     font-size: 1.1rem;
-    color: var(--entity-accent-summary, #4338ca);
+    color: var(--theme-text-body, var(--text-body));
   }
 
   .entity-detail {
@@ -522,7 +527,7 @@ function pretty(v: unknown) {
 
   .entity-detail-summary p {
     margin-top: 0.75rem;
-    color: var(--ink-body, #111827);
+    color: var(--theme-text-body, var(--text-body));
     line-height: 1.7;
   }
 
@@ -530,7 +535,7 @@ function pretty(v: unknown) {
     font-size: 1.35rem;
     font-weight: 600;
     font-family: var(--font-serif, "Literata", serif);
-    color: var(--entity-accent-heading, #4c1d95);
+    color: var(--theme-text-strong, var(--text-strong));
   }
 
   .entity-properties dl {
@@ -550,7 +555,7 @@ function pretty(v: unknown) {
   .entity-property dd {
     margin: 0;
     font-size: 1rem;
-    color: var(--ink-strong, #1f2937);
+    color: var(--theme-text-body, var(--text-body));
   }
 
   .entity-property pre {
@@ -581,12 +586,12 @@ function pretty(v: unknown) {
   .entity-stub-heading {
     font-size: 1.8rem;
     font-family: var(--font-serif, "Literata", serif);
-    color: var(--entity-accent-heading, #4c1d95);
+    color: var(--theme-text-strong, var(--text-strong));
   }
 
   .entity-stub-copy {
     font-size: 1rem;
-    color: var(--ink-body, #111827);
+    color: var(--theme-text-body, var(--text-body));
   }
 
   .entity-stub-subscribe {
@@ -602,7 +607,7 @@ function pretty(v: unknown) {
     margin: 0;
     font-size: 1rem;
     font-weight: 600;
-    color: var(--ink-strong, #1f2937);
+    color: var(--theme-text-strong, var(--text-strong));
   }
 
   .entity-stub-subscribe-form {
@@ -617,7 +622,7 @@ function pretty(v: unknown) {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: var(--ink-muted, #6b7280);
+    color: var(--theme-text-muted, var(--text-muted));
   }
 
   .entity-stub-subscribe-input {
@@ -627,7 +632,7 @@ function pretty(v: unknown) {
     background: var(--cozy-input-bg, #fffaf5);
     padding: 0.65rem 0.85rem;
     font-size: 0.95rem;
-    color: var(--ink-strong, #1f2937);
+    color: var(--theme-text-strong, var(--text-strong));
   }
 
   .entity-stub-subscribe-input:focus-visible {
@@ -643,13 +648,13 @@ function pretty(v: unknown) {
   .entity-stub-subscribe-help {
     margin: 0;
     font-size: 0.85rem;
-    color: var(--ink-muted, #6b7280);
+    color: var(--theme-text-muted, var(--text-muted));
   }
 
   .entity-stub-subscribe-status {
     margin: 0;
     font-size: 0.85rem;
-    color: var(--ink-muted, #6b7280);
+    color: var(--theme-text-muted, var(--text-muted));
   }
 
   .entity-stub-actions {
@@ -663,7 +668,7 @@ function pretty(v: unknown) {
   .entity-stub-note {
     margin: 0;
     font-size: 0.9rem;
-    color: var(--ink-muted, #4b5563);
+    color: var(--theme-text-muted, var(--text-muted));
   }
 
   .entity-related {
@@ -682,7 +687,7 @@ function pretty(v: unknown) {
   .entity-related-sub {
     margin-top: 0.25rem;
     font-size: 0.95rem;
-    color: var(--ink-muted, #4b5563);
+    color: var(--theme-text-body, var(--text-body));
   }
 
   .entity-related-list {
@@ -705,7 +710,7 @@ function pretty(v: unknown) {
       var(--card-panel-surface);
     border: 1px dashed color-mix(in srgb, var(--entity-accent-border, color-mix(in srgb, var(--theme-color-amethyst) 25%, transparent)) 85%, transparent 15%);
     text-align: center;
-    color: var(--ink-muted, #4b5563);
+    color: var(--theme-text-body, var(--text-body));
   }
 
   /* Entity Graph Section */
@@ -728,10 +733,9 @@ function pretty(v: unknown) {
   .entity-graph-title {
     margin: 0;
     font-size: clamp(1.5rem, 3vw, 1.875rem);
-    font-family: var(--font-heading);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--ink-strong, #1a102c);
+    font-family: var(--font-heading, var(--font-serif));
+    letter-spacing: 0.01em;
+    color: var(--theme-text-strong, var(--text-strong));
   }
 
   .entity-graph-description {
@@ -739,7 +743,7 @@ function pretty(v: unknown) {
     align-items: center;
     gap: 0.5rem;
     font-size: 0.95rem;
-    color: var(--ink-muted, #4b5563);
+    color: var(--theme-text-body, var(--text-body));
     margin: 0;
   }
 
@@ -787,7 +791,7 @@ function pretty(v: unknown) {
     margin: 0 0 0.75rem 0;
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--ink-strong, #1a102c);
+    color: var(--theme-text-strong, var(--text-strong));
   }
 
   .entity-graph-legend-list {

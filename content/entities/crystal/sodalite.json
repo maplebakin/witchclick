@@ -1,0 +1,16 @@
+{
+  "slug": "sodalite",
+  "type": "crystal",
+  "name": "Sodalite",
+  "summary": "Sodalite helps when you need calm logic without disconnecting from your feelings. Magically it is used for mental clarity and truth; practically it is great for study sessions, decision matrices, and reducing overthinking noise.",
+  "properties": {
+    "keywords": ["logic", "clarity", "communication"],
+    "chakra": "Throat",
+    "element": "Air",
+    "colors": ["blue", "white"]
+  },
+  "related": [
+    { "type": "herb", "slug": "thyme" },
+    { "type": "tarot", "slug": "justice" }
+  ]
+}

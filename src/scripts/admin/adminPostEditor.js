@@ -1,4 +1,3 @@
-// src/scripts/adminPostEditor.ts
 function initPostEditorDashboard() {
   const root = document.querySelector("[data-post-editor]");
   if (!root) return;
@@ -7,7 +6,7 @@ function initPostEditorDashboard() {
   const baseHeaders = DEV_KEY ? { "X-WC-Dev-Key": DEV_KEY } : {};
   const jsonHeaders = { "Content-Type": "application/json", ...baseHeaders };
   function apiFetch(path, options = {}) {
-    const headers = { ...baseHeaders, ...(options.headers || {}) };
+    const headers = { ...baseHeaders, ...options.headers || {} };
     return fetch(`${DEV_API}${path}`, { ...options, headers });
   }
   const listEl = root.querySelector("[data-post-list]");

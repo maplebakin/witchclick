@@ -1,0 +1,17 @@
+{
+  "slug": "nine-of-pentacles",
+  "type": "tarot",
+  "name": "Nine of Pentacles",
+  "summary": "Nine of Pentacles invites you to recognize what you have built through steady choices. Magically, it reflects self-sustaining abundance; practically, it can mean enjoying earned comfort, protecting your independence, and not minimizing your progress.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Pentacles",
+    "keywords": ["independence", "comfort", "self-worth"],
+    "uprightKeywords": ["self-sufficiency", "material ease", "earned confidence"],
+    "reversedKeywords": ["overwork", "isolation", "unstable comfort"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "rose-quartz" },
+    { "type": "herb", "slug": "lavender" }
+  ]
+}

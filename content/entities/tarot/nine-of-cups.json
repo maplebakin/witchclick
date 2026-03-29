@@ -1,0 +1,17 @@
+{
+  "slug": "nine-of-cups",
+  "type": "tarot",
+  "name": "Nine of Cups",
+  "summary": "Nine of Cups invites satisfaction that is felt in the body, not just imagined on a checklist. Magically, it reflects wish energy and emotional fulfillment; practically, it can mean defining what \"enough\" looks like and actually allowing yourself to enjoy it.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Cups",
+    "keywords": ["contentment", "pleasure", "gratitude"],
+    "uprightKeywords": ["satisfaction", "pleasure", "wish fulfilled"],
+    "reversedKeywords": ["hollow success", "overindulgence", "misaligned desires"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "citrine" },
+    { "type": "herb", "slug": "chamomile" }
+  ]
+}

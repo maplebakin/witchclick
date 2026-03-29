@@ -1,0 +1,17 @@
+{
+  "slug": "queen-of-swords",
+  "type": "tarot",
+  "name": "Queen of Swords",
+  "summary": "Queen of Swords invites clarity with compassion, especially when boundaries need to be explicit. Magically, she represents refined discernment and truthful speech; practically, she points to direct communication, evidence-based decisions, and saying no without apology.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Swords",
+    "keywords": ["discernment", "boundaries", "clarity"],
+    "uprightKeywords": ["clear judgment", "honesty", "strong boundaries"],
+    "reversedKeywords": ["coldness", "overcritical thinking", "rigid boundaries"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "selenite" },
+    { "type": "herb", "slug": "sage" }
+  ]
+}

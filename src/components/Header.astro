@@ -5,6 +5,7 @@ import ThemeToggle from "./ThemeToggle.astro";
 interface NavLink {
   href: string;
   label: string;
+  description?: string;
   rel?: string;
   variant?: 'pill' | 'default';
 }
@@ -46,6 +47,9 @@ const visibleUtility = utilityLinks.filter((link) => link && typeof link.href ==
 function isActive(href: string): boolean {
   if (!href) return false;
   const normalized = href.endsWith("/") ? href : `${href}/`;
+  if (normalized === "/" && normalizedPath.startsWith("/post/")) {
+    return true;
+  }
   if (normalized === "/") {
     return normalizedPath === normalized;
   }
@@ -115,7 +119,7 @@ function isActive(href: string): boolean {
                   <li>
                     <a class="site-nav__submenu-link" href={item.href} rel={item.rel}>
                       <span class="site-nav__submenu-label">{item.label}</span>
-                      <span class="site-nav__submenu-meta">Dive deeper into {item.label}</span>
+                      <span class="site-nav__submenu-meta">{item.description ?? item.label}</span>
                     </a>
                   </li>
                 ))}
@@ -129,15 +133,15 @@ function isActive(href: string): boolean {
         <ThemeToggle class="site-nav__theme" />
 
         {/* Search is a primary action, keep it near the front */}
-        <button
-          type="button"
+        <a
+          href="/search"
           class="site-nav__button focus-ring"
           data-search-toggle
           aria-expanded="false"
           aria-controls="site-search-panel"
         >
           Search
-        </button>
+        </a>
 
         {/* Utility links like Contact, etc. */}
         {visibleUtility.length > 0 && (
@@ -384,7 +388,8 @@ function isActive(href: string): boolean {
     setMenuOpen(next);
   });
 
-  searchToggle?.addEventListener('click', () => {
+  searchToggle?.addEventListener('click', (event) => {
+    event.preventDefault();
     const next = searchToggle.getAttribute('aria-expanded') !== 'true';
     setSearchOpen(next);
   });

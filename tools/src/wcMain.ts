@@ -3,6 +3,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { buildAffiliateRedirects } from './goBuild.js';
 
 type Flags = Record<string, string | boolean>;
 
@@ -38,20 +39,6 @@ function parseArgv(argv: string[]) {
 
 function ensureDir(p: string) {
   fs.mkdirSync(p, { recursive: true });
-}
-
-function readJSON<T>(p: string): T | null {
-  try {
-    return JSON.parse(fs.readFileSync(p, 'utf8')) as T;
-  } catch {
-    return null;
-  }
-}
-
-function withUtm(url: string, utm?: string) {
-  if (!url) return '/';
-  if (!utm) return url;
-  return url.includes('?') ? `${url}&${utm}` : `${url}?${utm}`;
 }
 
 // ---- Commands ----
@@ -252,37 +239,14 @@ async function cmdCursesExport(flags: Flags) {
 }
 
 async function cmdGoBuild() {
-  const CWD = process.cwd();
-  const products = readJSON<{ products: Array<{ key: string; url?: string; utm?: string }> }>(
-    path.join(CWD, 'content', 'products.json'),
-  );
-
-  if (!products || !Array.isArray(products.products)) {
-    console.error('[go:build] Invalid or missing content/products.json');
+  try {
+    const count = buildAffiliateRedirects(process.cwd());
+    console.log(`[go:build] wrote ${path.join('public', '_redirects')} with ${count} entries`);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(message);
     process.exitCode = 1;
-    return;
   }
-
-  const lines: string[] = [];
-  // Hide admin in prod (e.g., Netlify)
-  lines.push('/admin      /404  404');
-  lines.push('/admin/*    /404  404');
-
-  // Affiliate redirects
-  for (const p of products.products) {
-    const key = (p.key || '').trim();
-    if (!key) continue;
-    const target = withUtm(String(p.url || '').trim(), String(p.utm || '').trim());
-    lines.push(`/go/${key}    ${target || '/'}   302`);
-  }
-
-  const outDir = path.join(CWD, 'public');
-  ensureDir(outDir);
-  fs.writeFileSync(path.join(outDir, '_redirects'), lines.join('\n') + '\n', 'utf8');
-
-  console.log(
-    `[go:build] wrote ${path.join('public', '_redirects')} with ${products.products.length} entries`,
-  );
 }
 
 async function cmdHealth() {

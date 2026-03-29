@@ -1,0 +1,16 @@
+{
+  "slug": "yarrow",
+  "type": "herb",
+  "name": "Yarrow",
+  "summary": "Yarrow invites energetic boundaries when you feel too open to other people's stress. Magically it is used for protection and psychic shielding; practically you can add it to a bath or floor wash before demanding weeks to reinforce your own limits.",
+  "properties": {
+    "keywords": ["boundaries", "protection", "focus"],
+    "element": "Water",
+    "planet": "Venus",
+    "uses": ["bath rituals", "floor washes", "sachets", "teas"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "obsidian" },
+    { "type": "tarot", "slug": "the-chariot" }
+  ]
+}

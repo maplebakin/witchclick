@@ -1,0 +1,16 @@
+{
+  "slug": "tigers-eye",
+  "type": "crystal",
+  "name": "Tiger's Eye",
+  "summary": "Tiger's Eye supports steady confidence when you need courage without impulsiveness. Magically it is associated with protection and willpower; practically you can keep it nearby during difficult conversations to stay grounded and direct.",
+  "properties": {
+    "keywords": ["courage", "focus", "protection"],
+    "chakra": "Solar Plexus",
+    "element": "Fire",
+    "colors": ["gold", "brown"]
+  },
+  "related": [
+    { "type": "herb", "slug": "rosemary" },
+    { "type": "tarot", "slug": "the-chariot" }
+  ]
+}

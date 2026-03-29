@@ -1,0 +1,17 @@
+{
+  "slug": "five-of-swords",
+  "type": "tarot",
+  "name": "Five of Swords",
+  "summary": "Five of Swords invites you to check the cost of being right when tension is high. Magically, it reflects sharp, ungrounded mental force; practically, it can mean stepping back, repairing what is repairable, and choosing boundaries over escalation.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Swords",
+    "keywords": ["conflict", "ego", "consequences"],
+    "uprightKeywords": ["conflict", "hollow victory", "tension"],
+    "reversedKeywords": ["reconciliation", "accountability", "de-escalation"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "black-tourmaline" },
+    { "type": "herb", "slug": "sage" }
+  ]
+}

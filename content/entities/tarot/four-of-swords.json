@@ -1,0 +1,17 @@
+{
+  "slug": "four-of-swords",
+  "type": "tarot",
+  "name": "Four of Swords",
+  "summary": "Four of Swords invites deliberate rest before your system forces a shutdown. Magically, it represents protective stillness; practically, it often looks like sleep, fewer inputs, and short recovery blocks that help your focus return.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Swords",
+    "keywords": ["rest", "recovery", "integration"],
+    "uprightKeywords": ["rest", "recovery", "mental reset"],
+    "reversedKeywords": ["burnout", "restlessness", "delayed healing"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "amethyst" },
+    { "type": "herb", "slug": "lavender" }
+  ]
+}

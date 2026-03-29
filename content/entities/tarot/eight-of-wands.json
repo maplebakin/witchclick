@@ -1,0 +1,17 @@
+{
+  "slug": "eight-of-wands",
+  "type": "tarot",
+  "name": "Eight of Wands",
+  "summary": "Eight of Wands invites fast movement, but not panic. Magically, it signals aligned momentum and clear transmission; practically, it often means batching decisions, sending the email, and removing blockers while energy is available.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Wands",
+    "keywords": ["speed", "alignment", "communication"],
+    "uprightKeywords": ["rapid progress", "news", "decisive action"],
+    "reversedKeywords": ["delays", "misfires", "rushed mistakes"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "clear-quartz" },
+    { "type": "herb", "slug": "thyme" }
+  ]
+}

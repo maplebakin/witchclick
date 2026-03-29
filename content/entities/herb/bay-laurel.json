@@ -1,0 +1,16 @@
+{
+  "slug": "bay-laurel",
+  "type": "herb",
+  "name": "Bay Laurel",
+  "summary": "Bay Laurel invites clear intention and follow-through, especially for goals that need structure. Magically it is associated with success and protection; practically you can write one intention on a bay leaf, burn it safely, and pair that moment with a concrete action list.",
+  "properties": {
+    "keywords": ["success", "clarity", "protection"],
+    "element": "Fire",
+    "planet": "Sun",
+    "uses": ["incense", "cooking", "sachets", "floor washes"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "pyrite" },
+    { "type": "tarot", "slug": "the-magician" }
+  ]
+}

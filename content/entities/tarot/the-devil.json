@@ -1,0 +1,18 @@
+{
+  "slug": "the-devil",
+  "type": "tarot",
+  "name": "The Devil",
+  "summary": "The Devil invites an honest look at patterns that feel binding, especially where shame or urgency hides your options. Magically, it explores shadow and attachment; practically, it can signal naming a habit, reducing one trigger, and reclaiming small acts of agency.",
+  "properties": {
+    "number": 15,
+    "arcana": "Major",
+    "keywords": ["attachment", "shadow", "agency"],
+    "uprightKeywords": ["desire", "bondage", "material pull"],
+    "reversedKeywords": ["release", "recovery", "reclaiming power"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "obsidian" },
+    { "type": "herb", "slug": "nettle" },
+    { "type": "tarot", "slug": "the-temperance" }
+  ]
+}

@@ -34,20 +34,32 @@ const partnerHighlight = hub.partnerHighlight
 type HubPost = NonNullable<ReturnType<typeof getPostBySlug>>;
 
 const playlists = hub.playlists.map((playlist) => {
-  const items = playlist.posts
-    .map((postSlug) => getPostBySlug(postSlug))
-    .filter((post): post is HubPost => Boolean(post))
+  const resolvedPosts = playlist.posts.map((postSlug) => ({
+    postSlug,
+    post: getPostBySlug(postSlug),
+  }));
+
+  const items = resolvedPosts
+    .filter((entry): entry is { postSlug: string; post: HubPost } => Boolean(entry.post))
     .map((post) => {
-      const data = post.data ?? {};
+      const data = post.post.data ?? {};
 
       return {
-        slug: post.slug,
-        title: post.title,
-        href: `/post/${post.slug}`,
-        excerpt: data.excerpt ?? data.metaDescription ?? post.tldr ?? "",
+        slug: post.post.slug,
+        title: post.post.title,
+        href: `/post/${post.post.slug}`,
+        excerpt: data.excerpt ?? data.metaDescription ?? post.post.tldr ?? "",
         chips: extractTagChips(data, 3),
       };
     });
+
+  if (items.length < 2) {
+    const missingPostSlugs = resolvedPosts.filter((entry) => !entry.post).map((entry) => entry.postSlug);
+    console.warn(
+      `[hub] Low live-card count for hub "${hub.slug}" playlist "${playlist.key}": ` +
+      `${items.length}/${playlist.posts.length} live. Missing: ${missingPostSlugs.join(", ") || "none"}.`,
+    );
+  }
 
   return { ...playlist, posts: items };
 });
@@ -279,7 +291,7 @@ const breadcrumbs = [
     margin: clamp(2rem, 6vw, 4rem) auto;
     padding: clamp(2rem, 6vw, 3.5rem);
     border-radius: clamp(1.75rem, 4vw, 2.5rem);
-    background: #0a0615;
+    background: var(--surface-panel-primary);
     border: 1px solid var(--theme-border-subtle);
     box-shadow: var(--theme-shadow-strong);
   }
@@ -312,14 +324,14 @@ const breadcrumbs = [
 
   .hub-partner__cta a {
     font-weight: 600;
-    color: color-mix(in srgb, var(--ambient-color, #7c3aed) 70%, var(--ink-strong, currentColor) 30%);
+    color: color-mix(in srgb, var(--ambient-color, var(--text-accent)) 70%, var(--ink-strong, currentColor) 30%);
   }
 
   .hub-season {
     margin: clamp(2rem, 6vw, 4rem) auto;
     padding: clamp(2rem, 6vw, 3.5rem);
     border-radius: clamp(1.75rem, 4vw, 2.5rem);
-    background: #0a0615;
+    background: var(--surface-panel-primary);
     border: 1px solid var(--theme-border-subtle);
     box-shadow: var(--theme-shadow-strong);
   }
@@ -344,7 +356,7 @@ const breadcrumbs = [
   .hub-season__panel {
     padding: clamp(1.25rem, 3vw, 1.85rem);
     border-radius: 1.75rem;
-    background: #140d20;
+    background: var(--surface-card);
     border: 1px solid var(--theme-border-subtle);
     box-shadow: var(--theme-shadow-soft);
   }
@@ -361,7 +373,7 @@ const breadcrumbs = [
   }
 
   .hub-season__panel--notes {
-    background: #1a0f2e;
+    background: var(--surface-elevated);
     border-color: var(--theme-color-amethyst);
   }
 

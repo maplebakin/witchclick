@@ -156,6 +156,13 @@ function sanitizeIsoDate(value, fallback) {
   return attempt(value) || attempt(fallback) || new Date().toISOString();
 }
 
+function resolvePublishDate(rawSpec) {
+  if (!isPlainObject(rawSpec)) return new Date().toISOString();
+  // Accept PostSpec-provided publish date and aliases; default to now when absent/invalid.
+  const candidate = rawSpec.publishDate ?? rawSpec.publishedAt ?? rawSpec.pubDate ?? rawSpec.date ?? null;
+  return sanitizeIsoDate(candidate, null);
+}
+
 function extractPromptMetadataCandidate(raw) {
   if (!isPlainObject(raw)) return null;
   const directKeys = [
@@ -495,6 +502,7 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
     sourcePath: relativeSourcePath,
     engagementFocus: options.engagementSignals,
   });
+  const publishedAt = resolvePublishDate(rawSpec);
 
   const frontmatter = {
     title: spec.title,
@@ -515,7 +523,7 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
       ? spec.internalLinkHints.map((hint) => String(hint?.anchor || '').trim()).filter(Boolean)
       : []),
     internalLinks: [],
-    publishedAt: new Date().toISOString(),
+    publishedAt,
     canonicalUrl: `${siteUrl}/post/${spec.slug}`,
     specVersion: 2,
   };
@@ -533,6 +541,12 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
   }
   if (spec.contentType) {
     frontmatter.contentType = spec.contentType;
+  }
+  if (spec.cluster) {
+    frontmatter.cluster = spec.cluster;
+  }
+  if (spec.externalLink) {
+    frontmatter.externalLink = spec.externalLink;
   }
 
   if (promptMetadata) {

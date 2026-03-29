@@ -1,0 +1,17 @@
+{
+  "slug": "seven-of-pentacles",
+  "type": "tarot",
+  "name": "Seven of Pentacles",
+  "summary": "Seven of Pentacles invites patient evaluation when progress feels slow but meaningful. Magically, it reflects long-term cultivation; practically, it helps to review what is working, adjust strategy, and keep going with realistic expectations.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Pentacles",
+    "keywords": ["patience", "assessment", "long-term growth"],
+    "uprightKeywords": ["steady progress", "evaluation", "perseverance"],
+    "reversedKeywords": ["impatience", "poor return", "need to reassess"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "labradorite" },
+    { "type": "herb", "slug": "thyme" }
+  ]
+}

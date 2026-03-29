@@ -1,0 +1,17 @@
+{
+  "slug": "seven-of-wands",
+  "type": "tarot",
+  "name": "Seven of Wands",
+  "summary": "Seven of Wands invites you to hold your ground when pressure rises. Magically, it represents protective fire and resolve; practically, it can look like defending priorities, setting boundaries, and saying no before overwhelm takes over.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Wands",
+    "keywords": ["boundaries", "defense", "resolve"],
+    "uprightKeywords": ["perseverance", "boundary setting", "conviction"],
+    "reversedKeywords": ["fatigue", "giving up", "boundary collapse"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "obsidian" },
+    { "type": "herb", "slug": "cedar" }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "slug": "five-of-wands",
+  "type": "tarot",
+  "name": "Five of Wands",
+  "summary": "Five of Wands invites you to work with friction instead of pretending it is not there. Magically, it reflects clashing fire that can sharpen intent; practically, it often means clarifying roles, reducing noise, and picking battles that actually matter.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Wands",
+    "keywords": ["friction", "competition", "clarification"],
+    "uprightKeywords": ["conflict", "competition", "scattered energy"],
+    "reversedKeywords": ["de-escalation", "cooperation", "avoided conflict"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "black-tourmaline" },
+    { "type": "herb", "slug": "sage" }
+  ]
+}

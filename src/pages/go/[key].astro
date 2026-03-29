@@ -1,0 +1,56 @@
+---
+import { buildAffiliateTarget, readProductCatalog } from "@/utils/products";
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return readProductCatalog()
+    .map((product) => {
+      const key = typeof product.key === "string" ? product.key.trim() : "";
+      const target = buildAffiliateTarget(product);
+      if (!key || !target) return null;
+
+      return {
+        params: { key },
+        props: {
+          key,
+          name: typeof product.name === "string" && product.name.trim() ? product.name.trim() : key,
+          target,
+        },
+      };
+    })
+    .filter(Boolean);
+}
+
+const { key, name, target } = Astro.props as {
+  key: string;
+  name: string;
+  target: string;
+};
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Redirecting to {name}</title>
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="canonical" href={target} />
+    <meta http-equiv="refresh" content={`0;url=${target}`} />
+    <script is:inline define:vars={{ target }}>
+      window.location.replace(target);
+    </script>
+  </head>
+  <body>
+    <main>
+      <p>
+        Redirecting to
+        {" "}
+        <a href={target} rel="sponsored nofollow">{name}</a>
+        .
+      </p>
+      <p>If nothing happens, use the link above.</p>
+      <p><small>Affiliate key: {key}</small></p>
+    </main>
+  </body>
+</html>

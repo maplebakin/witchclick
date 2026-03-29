@@ -1,0 +1,17 @@
+{
+  "slug": "three-of-pentacles",
+  "type": "tarot",
+  "name": "Three of Pentacles",
+  "summary": "Three of Pentacles invites collaborative progress where each person brings a different strength. Magically, it represents co-creation in aligned effort; practically, it often means clear roles, useful feedback, and building quality one step at a time.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Pentacles",
+    "keywords": ["teamwork", "craft", "shared goals"],
+    "uprightKeywords": ["collaboration", "skill development", "quality work"],
+    "reversedKeywords": ["miscommunication", "poor teamwork", "lack of standards"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "citrine" },
+    { "type": "herb", "slug": "sage" }
+  ]
+}

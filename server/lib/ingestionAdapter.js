@@ -2,7 +2,7 @@
 // @ts-check
 
 import { slugify, slugifyId } from '../../scripts/lib/slug.js';
-import { CONTENT_TYPES, POST_CATEGORIES } from './postSpecSchema.js';
+import { CONTENT_TYPES, POST_CATEGORIES, TOPIC_CLUSTERS } from './postSpecSchema.js';
 
 /**
  * @typedef {import('./postSpecSchema.js').PostSpecV2} PostSpecV2
@@ -149,6 +149,27 @@ function normalizeCategoryValue(value) {
     }
   }
   return undefined;
+}
+
+function normalizeClusterValue(value) {
+  const trimmed = toTrimmedString(value);
+  if (!trimmed) return undefined;
+  const normalized = trimmed.toLowerCase();
+  for (const allowed of TOPIC_CLUSTERS) {
+    if (normalized === allowed.toLowerCase()) {
+      return allowed;
+    }
+  }
+  return undefined;
+}
+
+function sanitizeExternalLink(value) {
+  if (!isPlainObject(value)) return undefined;
+  const url = toTrimmedString(value.url);
+  const anchor = toTrimmedString(value.anchor);
+  const description = toTrimmedString(value.description);
+  if (!url || !anchor || !description) return undefined;
+  return { url, anchor, description };
 }
 
 function isOpeningHeading(value) {
@@ -306,6 +327,19 @@ export function normalizePostSpec(raw, options = {}) {
     report.push('normalized category');
   }
 
+  // cluster
+  const rawCluster = toTrimmedString(input.cluster);
+  const cluster = normalizeClusterValue(rawCluster);
+  if (cluster && rawCluster !== cluster) {
+    report.push('normalized cluster');
+  }
+  if (rawCluster && !cluster) {
+    const message = `cluster dropped during normalization: "${rawCluster}"`;
+    warnings.push(message);
+    report.push('cluster dropped (invalid)');
+    console.warn(`[ingest] ${message}`);
+  }
+
   // tags & aliases
   const tagsFromCanonical = sanitizeStringArray(input.tags);
   let tags = Array.isArray(tagsFromCanonical) ? tagsFromCanonical : [];
@@ -438,6 +472,15 @@ export function normalizePostSpec(raw, options = {}) {
   }
   if (ctaDefaulted) report.push('cta defaulted to none');
 
+  // externalLink
+  const externalLink = sanitizeExternalLink(input.externalLink);
+  if (input.externalLink !== undefined && externalLink === undefined) {
+    const message = 'externalLink dropped during normalization: requires url, anchor, and description.';
+    warnings.push(message);
+    report.push('externalLink dropped (invalid)');
+    console.warn(`[ingest] ${message}`);
+  }
+
   // Opening Reflection enforcement
   const ensured = ensureOpening(outline, sections, report);
 
@@ -473,6 +516,7 @@ export function normalizePostSpec(raw, options = {}) {
     slug,
     ...(category ? { category } : {}),
     ...(contentType ? { contentType } : {}),
+    ...(cluster ? { cluster } : {}),
     metaDescription,
     tags,
     excerpt,
@@ -483,6 +527,7 @@ export function normalizePostSpec(raw, options = {}) {
     altTexts,
     internalLinkHints,
     affiliateHints,
+    ...(externalLink ? { externalLink } : {}),
     cta,
     adPlacements,
   };

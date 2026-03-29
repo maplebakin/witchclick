@@ -21,6 +21,7 @@ import { getAuthorBySlug, normalizeAuthorSlug, type AuthorProfile } from "../../
 import { readEntity } from "../../utils/entities";
 import { loadAllPosts, extractHeadingOutline } from "../../utils/posts";
 import { getRelatedPosts } from "../../utils/recommendations";
+import { canonicalTagHref } from "@/utils/tags";
 import { autoLinkAffiliates } from "../../../tools/src/auto-affiliate.js";
 
 
@@ -28,6 +29,7 @@ export const prerender = true;
 
 export async function getStaticPaths() {
   // Source static paths from canonical published content only.
+  // loadAllPosts() already excludes drafts and future-dated scheduled posts.
   return loadAllPosts().map((post) => ({ params: { slug: post.slug } }));
 }
 
@@ -64,6 +66,64 @@ function loadProducts() {
   } catch {
     return [];
   }
+}
+
+function matchAffiliateProducts(
+  postTags: string[],
+  affiliateHintKeys: string[],
+  allProducts: ReturnType<typeof loadProducts>,
+) {
+  // Prefer explicit hints from frontmatter
+  if (affiliateHintKeys.length > 0) {
+    const hinted = affiliateHintKeys
+      .map((key) => allProducts.find((p: { key?: string }) => p.key === key))
+      .filter(Boolean);
+    if (hinted.length > 0) return hinted.slice(0, 3);
+  }
+  // Fall back to tag overlap scoring
+  const normalized = postTags.map((t) => t.toLowerCase());
+  const scored = allProducts
+    .map((p: { tags?: string[]; [k: string]: unknown }) => ({
+      product: p,
+      score: (p.tags ?? []).filter((t: string) => normalized.includes(t.toLowerCase())).length,
+    }))
+    .filter((x: { score: number }) => x.score > 0)
+    .sort((a: { score: number }, b: { score: number }) => b.score - a.score);
+  return scored.slice(0, 3).map((x: { product: unknown }) => x.product);
+}
+
+function extractAffiliateHintKeys(data: Record<string, unknown>): string[] {
+  const keys: string[] = [];
+  const pushKey = (candidate: unknown) => {
+    const key = String(candidate ?? '').trim();
+    if (!key || keys.includes(key)) return;
+    keys.push(key);
+  };
+
+  // Primary persisted shape from ingest: affiliateAnchors[{ key, text, insertedCount }]
+  if (Array.isArray((data as { affiliateAnchors?: unknown[] }).affiliateAnchors)) {
+    for (const entry of (data as { affiliateAnchors: unknown[] }).affiliateAnchors) {
+      if (entry && typeof entry === 'object' && 'key' in entry) {
+        pushKey((entry as { key?: unknown }).key);
+      } else if (typeof entry === 'string') {
+        // Legacy/manual fallback when anchors are stored as raw key strings
+        pushKey(entry);
+      }
+    }
+  }
+
+  // Backward compatibility for older frontmatter shape: affiliateHints[]
+  if (Array.isArray((data as { affiliateHints?: unknown[] }).affiliateHints)) {
+    for (const entry of (data as { affiliateHints: unknown[] }).affiliateHints) {
+      if (typeof entry === 'string') {
+        pushKey(entry);
+      } else if (entry && typeof entry === 'object' && 'key' in entry) {
+        pushKey((entry as { key?: unknown }).key);
+      }
+    }
+  }
+
+  return keys;
 }
 
 async function buildPostFromSource(slug: string) {
@@ -218,6 +278,11 @@ const jsonLdAuthor = jsonLdAuthors.length === 0 ? { "@type": "Organization", nam
 
 const ogImage = data.ogImage ? toAbsoluteUrl(data.ogImage, settings) : `${siteOrigin}/og/${effectiveSlug}.jpg`;
 
+const allProducts = loadProducts();
+const postTags = Array.isArray(data.tags) ? data.tags.map((t: unknown) => String(t)) : [];
+const affiliateHintKeys = extractAffiliateHintKeys(data as Record<string, unknown>);
+const railProducts = matchAffiliateProducts(postTags, affiliateHintKeys, allProducts);
+
 const entList = Array.isArray(data.entities) ? data.entities : [];
 const resolvedEntities = entList.map((e: { type?: string; slug?: string }) => readEntity(String(e.type || ""), String(e.slug || ""))).filter(Boolean);
 const railEntities = resolvedEntities.map((entity: any) => ({
@@ -261,12 +326,12 @@ const jsonLd = {
           <header class="card-panel card-tier-2 card-panel-strong card-panel-static overflow-hidden p-6 sm:p-8 lg:p-10">
             <div class:list={["flex flex-col gap-8 lg:gap-10", heroImage && "lg:flex-row lg:items-start"]}>
               {heroImage && (
-                <figure class="relative aspect-[4/3] overflow-hidden rounded-xl border border-neutral-300/60 bg-neutral-100 shadow-sm lg:w-[42%]">
+                <figure class="relative aspect-[4/3] overflow-hidden rounded-xl border border-line-neutral-strong/60 bg-surface-soft shadow-sm lg:w-[42%]">
                   <img class="h-full w-full object-cover" src={heroImage} alt={heroAlt} loading="eager" />
                 </figure>
               )}
               <div class="flex flex-1 flex-col gap-6">
-                <p class="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-widest text-neutral-500">
+                <p class="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-widest text-body-subtle">
                   {publishedAt && <time datetime={new Date(publishedAt).toISOString()}>{new Date(publishedAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}</time>}
                   {(publishedAt || readingMinutes) && <span aria-hidden="true">•</span>}
                   {readingMinutes && <span>{readingMinutes} minute read</span>}
@@ -277,13 +342,17 @@ const jsonLd = {
                 </h1>
 
                 {authorSegments.length > 0 && (
-                  <p class="flex flex-wrap items-center gap-y-2 text-sm text-neutral-600">
+                  <p class="flex flex-wrap items-center gap-y-2 text-sm text-body-muted">
                     By
                     {authorSegments.map((author) => (
                       <span class="inline-flex items-center">
                         {author.separator === 'comma' && <span class="px-1">,</span>}
                         {author.separator === 'ampersand' && <span class="px-1">&amp;</span>}
-                        <a class="font-semibold transition-colors hover:text-brand-primary" href={author.href}>{author.label}</a>
+                        {author.href ? (
+                          <a class="font-semibold transition-colors hover:text-brand-primary" href={author.href}>{author.label}</a>
+                        ) : (
+                          <span class="font-semibold text-body-strong">{author.label}</span>
+                        )}
                       </span>
                     ))}
                   </p>
@@ -292,7 +361,14 @@ const jsonLd = {
                 {Array.isArray(data.tags) && data.tags.length > 0 && (
                   <ul class="mt-6 flex flex-wrap gap-2">
                     {data.tags.map((tag: any) => (
-                      <li><span class="rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-600">#{String(tag).toLowerCase()}</span></li>
+                      <li>
+                        <a
+                          href={canonicalTagHref(String(tag).toLowerCase())}
+                          class="rounded-full bg-surface-soft px-3 py-1 text-xs text-body-muted transition-colors hover:text-brand-primary"
+                        >
+                          #{String(tag).toLowerCase()}
+                        </a>
+                      </li>
                     ))}
                   </ul>
                 )}
@@ -320,6 +396,7 @@ const jsonLd = {
         toc={headingOutline}
         ctaType={ctaType}
         ctaId={ctaId}
+        products={railProducts}
       />
     </div>
 

@@ -1,0 +1,64 @@
+---
+import Base from "@/layouts/Base.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import { loadAllPosts } from "@/utils/posts";
+import { canonicalTagHref, canonicalizeTagSlug, tagsFromFrontmatter } from "@/utils/tags";
+
+export const prerender = true;
+
+const title = "Browse by Tag";
+const description = "Every topic we've written about, in one place.";
+
+const posts = loadAllPosts();
+const tagMap = new Map<string, { label: string; count: number }>();
+
+for (const post of posts) {
+  for (const tag of tagsFromFrontmatter(post.data ?? {})) {
+    const canonical = canonicalizeTagSlug(tag);
+    if (!canonical) continue;
+
+    const existing = tagMap.get(canonical);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      tagMap.set(canonical, { label: tag, count: 1 });
+    }
+  }
+}
+
+const tags = Array.from(tagMap.entries())
+  .map(([canonical, data]) => ({
+    canonical,
+    label: data.label,
+    count: data.count,
+  }))
+  .sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" }));
+
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Browse by Tag" },
+];
+---
+
+<Base title={`${title} — WitchClick`} description={description}>
+  <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
+
+  <section class="wc-section-shell">
+    <header class="page-header">
+      <h1 class="page-header__title">{title}</h1>
+      <p class="page-header__lead">{description}</p>
+    </header>
+
+    {tags.length === 0 ? (
+      <p class="text-body-muted">No tags yet. Check back after the next post drop.</p>
+    ) : (
+      <div class="mt-8 flex flex-wrap gap-3">
+        {tags.map((tag) => (
+          <a href={canonicalTagHref(tag.canonical)} class="card-pill card-tag">
+            #{tag.label} ({tag.count})
+          </a>
+        ))}
+      </div>
+    )}
+  </section>
+</Base>

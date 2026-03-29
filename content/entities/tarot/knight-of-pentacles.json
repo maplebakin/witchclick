@@ -1,0 +1,17 @@
+{
+  "slug": "knight-of-pentacles",
+  "type": "tarot",
+  "name": "Knight of Pentacles",
+  "summary": "Knight of Pentacles invites steady execution when flashy shortcuts are tempting. Magically, it reflects disciplined earth energy; practically, it means consistent routines, realistic pacing, and finishing what you start even when motivation dips.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Pentacles",
+    "keywords": ["reliability", "discipline", "consistency"],
+    "uprightKeywords": ["responsibility", "methodical progress", "dependability"],
+    "reversedKeywords": ["stagnation", "stubbornness", "workaholic imbalance"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "obsidian" },
+    { "type": "herb", "slug": "rosemary" }
+  ]
+}

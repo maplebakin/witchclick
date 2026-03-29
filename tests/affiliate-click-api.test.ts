@@ -39,11 +39,14 @@ async function writeSettings(overrides: Record<string, any>) {
   await fs.writeFile(settingsPath, JSON.stringify(data), "utf8");
 }
 
-function makeRequest(body: unknown) {
-  return new Request("http://localhost/api/affiliate-click", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body ?? {}),
+function makeRequest(params: Record<string, unknown>) {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params ?? {})) {
+    if (value === undefined || value === null) continue;
+    search.set(key, String(value));
+  }
+  return new Request(`http://localhost/api/affiliate-click.json?${search.toString()}`, {
+    method: "GET",
   });
 }
 
@@ -110,9 +113,9 @@ describe("affiliate click API", () => {
       .spyOn(globalThis as any, "fetch")
       .mockResolvedValue(new Response("{}", { status: 200, headers: { "Content-Type": "application/json" } }));
 
-    const { POST } = await import("../src/pages/api/affiliate-click.json.ts");
+    const { GET } = await import("../src/pages/api/affiliate-click.json.ts");
 
-    const response = await POST(
+    const response = await GET(
       createContext(makeRequest({ url: "https://merchant.example/item", ts: "2024-01-01T00:00:00Z" })),
     );
 
@@ -137,8 +140,8 @@ describe("affiliate click API", () => {
       analytics: { enabled: true, endpoint: "https://example.test/collect", domain: "witch.click" },
     });
 
-    const { POST } = await import("../src/pages/api/affiliate-click.json.ts");
-    const response = await POST(
+    const { GET } = await import("../src/pages/api/affiliate-click.json.ts");
+    const response = await GET(
       createContext(makeRequest({ url: "https://merchant.example/item", ts: "not-a-date" })),
     );
 
@@ -151,8 +154,8 @@ describe("affiliate click API", () => {
   it("acknowledges events when analytics is disabled", async () => {
     await writeSettings({ analytics: { enabled: false } });
 
-    const { POST } = await import("../src/pages/api/affiliate-click.json.ts");
-    const response = await POST(
+    const { GET } = await import("../src/pages/api/affiliate-click.json.ts");
+    const response = await GET(
       createContext(makeRequest({ url: "https://merchant.example/item", ts: "2024-01-01T00:00:00Z" })),
     );
 

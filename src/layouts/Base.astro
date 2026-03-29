@@ -20,6 +20,7 @@ import { buildAnalyticsInjection } from "@/utils/analytics";
 import { getActiveThemes } from "@/utils/theme";
 import { mixColors } from "@/utils/color";
 import cardAnimationsModule from "@/scripts/card-animations.js?url";
+import revealAnimationsModule from "@/scripts/reveal-animations.js?url";
 
 interface LayoutProps {
   title?: string;
@@ -274,6 +275,14 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Webfont loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Great+Vibes&family=Inter:wght@400;500;600;700&family=Literata:opsz,wght@7..72,400;7..72,500;7..72,600;7..72,700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Parisienne&display=swap"
+    />
     
     <!-- Theme Preference Script (must run before body render) -->
     <script is:inline>
@@ -539,15 +548,16 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
       disclosure={disclosure}
     />
     
-    <!-- Analytics -->
-    {analytics?.runtime?.inline && (
-      <script is:inline set:html={analytics.runtime.inline}></script>
-    )}
-    
-    <!-- Observability -->
-    {observabilityConfig && (
-      <script type="module" is:inline define:vars={{ observabilityConfig }}>
-        import { initObservability } from "@/utils/observability";
+	    <!-- Analytics -->
+	    {analytics?.runtime?.inline && (
+	      <script is:inline set:html={analytics.runtime.inline}></script>
+	    )}
+	    <script is:inline src="/clickthrough.js"></script>
+	    
+	    <!-- Observability -->
+	    {observabilityConfig && (
+	      <script type="module" is:inline define:vars={{ observabilityConfig }}>
+	        import { initObservability } from "@/utils/observability";
         initObservability(observabilityConfig);
       </script>
     )}
@@ -555,15 +565,18 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
     <!-- Card Animations -->
     <script type="module" is:inline src={cardAnimationsModule}></script>
     
+    <!-- Section Reveal Animations -->
+    <script type="module" is:inline src={revealAnimationsModule}></script>
+    
     <div id="cookie-consent-banner" class="fixed bottom-0 left-0 right-0 z-50 p-4 hidden">
-      <div class="max-w-screen-md mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left p-4 sm:p-6 shadow-xl rounded-2xl border bg-white">
-        <p class="text-sm text-neutral-700">
+      <div class="max-w-screen-md mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left p-4 sm:p-6 shadow-xl rounded-2xl border bg-surface-base">
+        <p class="text-sm text-body">
           This site uses cookies to ensure you get the best experience. By clicking "Accept", you agree to our use of cookies. For more information, please see our
           <a href="/privacy" class="text-brand-primary hover:underline">Privacy Policy</a>.
         </p>
         <div class="flex flex-col sm:flex-row gap-3">
           <button id="accept-cookies" class="inline-flex items-center justify-center rounded-lg font-semibold text-center transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-60 bg-brand-primary text-white border border-brand-primary-strong hover:bg-brand-primary-strong shadow-sm hover:shadow-md px-4 py-2 text-sm">Accept</button>
-          <button id="decline-cookies" class="inline-flex items-center justify-center rounded-lg font-semibold text-center transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-60 bg-white text-neutral-800 border border-neutral-200 hover:bg-neutral-100 hover:border-neutral-300 shadow-sm hover:shadow-md px-4 py-2 text-sm">Decline</button>
+          <button id="decline-cookies" class="inline-flex items-center justify-center rounded-lg font-semibold text-center transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-60 bg-surface-base text-body-strong border border-line-neutral hover:bg-surface-soft hover:border-line-neutral-strong shadow-sm hover:shadow-md px-4 py-2 text-sm">Decline</button>
         </div>
       </div>
     </div>

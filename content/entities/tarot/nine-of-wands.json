@@ -1,0 +1,17 @@
+{
+  "slug": "nine-of-wands",
+  "type": "tarot",
+  "name": "Nine of Wands",
+  "summary": "Nine of Wands invites persistence while acknowledging you are tired. Magically, it reflects protective endurance; practically, it can mean finishing with safeguards in place, asking for help, and pacing yourself so resilience does not turn into depletion.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Wands",
+    "keywords": ["resilience", "protection", "fatigue awareness"],
+    "uprightKeywords": ["persistence", "caution", "last push"],
+    "reversedKeywords": ["exhaustion", "defensiveness", "burnout risk"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "black-tourmaline" },
+    { "type": "herb", "slug": "chamomile" }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "slug": "kyanite",
+  "type": "crystal",
+  "name": "Kyanite",
+  "summary": "Kyanite helps when communication is tense and you need precision without aggression. Magically it is used for energetic alignment; practically it can support clear agendas, concise wording, and direct requests that reduce confusion.",
+  "properties": {
+    "keywords": ["alignment", "clear speech", "focus"],
+    "chakra": "Throat",
+    "element": "Air",
+    "colors": ["blue"]
+  },
+  "related": [
+    { "type": "herb", "slug": "sage" },
+    { "type": "tarot", "slug": "ace-of-swords" }
+  ]
+}

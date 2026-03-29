@@ -1,0 +1,17 @@
+{
+  "slug": "four-of-cups",
+  "type": "tarot",
+  "name": "Four of Cups",
+  "summary": "Four of Cups invites a pause when motivation is low or everything feels flat. Magically, it points to quiet inner listening; practically, it can help to step back, reduce inputs, and check whether one overlooked option is actually workable.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Cups",
+    "keywords": ["apathy", "reevaluation", "emotional pause"],
+    "uprightKeywords": ["rest", "contemplation", "emotional check-in"],
+    "reversedKeywords": ["renewed interest", "re-engagement", "small momentum"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "amethyst" },
+    { "type": "herb", "slug": "sage" }
+  ]
+}

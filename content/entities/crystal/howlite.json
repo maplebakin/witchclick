@@ -1,0 +1,16 @@
+{
+  "slug": "howlite",
+  "type": "crystal",
+  "name": "Howlite",
+  "summary": "Howlite is helpful when your mind is overstimulated and patience is thin. Magically it is associated with calm and emotional regulation; practically it works as a pause cue before reacting, especially in tense messages or conversations.",
+  "properties": {
+    "keywords": ["calm", "patience", "emotional regulation"],
+    "chakra": "Crown",
+    "element": "Air",
+    "colors": ["white", "gray"]
+  },
+  "related": [
+    { "type": "herb", "slug": "lavender" },
+    { "type": "tarot", "slug": "the-hanged-man" }
+  ]
+}

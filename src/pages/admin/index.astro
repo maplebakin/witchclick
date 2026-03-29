@@ -67,15 +67,15 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
     <div class="space-y-6">
       <AdminNav currentPath="/admin" />
 
-      <section class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <section class="rounded-2xl border border-line-subtle bg-surface-base p-6 shadow-sm">
         <div class="space-y-3">
           <div>
-            <h1 class="text-2xl font-semibold text-neutral-900">Content Generator</h1>
-            <p class="text-sm text-neutral-600 mt-1">
+            <h1 class="text-2xl font-semibold text-body-strong">Generator</h1>
+            <p class="text-sm text-body-muted mt-1">
               AI-powered workflow for creating posts and curses. Generate prompts, validate JSON, preview content, and ingest to your site.
             </p>
           </div>
-          <div class="rounded-lg border border-dashed border-neutral-200 bg-neutral-50 p-4 text-xs text-neutral-600">
+          <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-4 text-xs text-body-muted">
             <div class="font-semibold mb-2">📝 How it works:</div>
             <ol class="space-y-2 ml-4 list-decimal">
               <li><strong>Choose content type:</strong> Select Posts for articles or Curses for printable rituals</li>
@@ -88,20 +88,20 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
         </div>
       </section>
 
-      <div class="rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm">
+      <div class="rounded-2xl border border-line-subtle bg-surface-base p-3 shadow-sm">
         <div class="flex items-center gap-3">
-          <span class="text-sm font-medium text-neutral-500">Content Type:</span>
+          <span class="text-sm font-medium text-body-muted">Content Type:</span>
           <button
             type="button"
             data-panel-toggle="posts"
-            class="rounded-lg px-4 py-2 text-sm font-semibold text-brand-primary hover:bg-neutral-100 transition"
+            class="rounded-lg px-4 py-2 text-sm font-semibold text-brand-primary hover:bg-surface-neutral-soft transition"
           >
             📄 Posts
           </button>
           <button
             type="button"
             data-panel-toggle="curses"
-            class="rounded-lg px-4 py-2 text-sm font-semibold text-brand-primary hover:bg-neutral-100 transition"
+            class="rounded-lg px-4 py-2 text-sm font-semibold text-brand-primary hover:bg-surface-neutral-soft transition"
           >
             ✨ Curses
           </button>
@@ -182,9 +182,9 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
         </div>
 
         <div id="cursesPanel" data-panel="curses" class="hidden">
-          <div class="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm space-y-3">
+          <div class="rounded-2xl border border-line-subtle bg-surface-base p-4 shadow-sm space-y-3">
             <h2 class="text-xl font-semibold">Curses Dashboard moved</h2>
-            <p class="text-sm text-neutral-600">
+            <p class="text-sm text-body-muted">
               The curses generator and archive live in a dedicated dashboard optimized for print/PDF workflows.
             </p>
             <a href="/admin/curses" class="inline-flex items-center gap-2 rounded-lg bg-brand-primary text-white px-4 py-2 text-sm font-semibold shadow-sm hover:bg-brand-primary-strong">
@@ -195,10 +195,10 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
       </div>
       </div>
     ) : (
-    <section class="mx-auto max-w-3xl rounded-2xl border border-neutral-200 bg-white p-6 text-center shadow-sm">
+    <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
       <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
-      <p class="text-neutral-600">These tools only run in <strong>development</strong> (or with a temporary key when hosted on a server adapter).</p>
-      <ol class="mx-auto mt-4 list-decimal space-y-2 text-left text-sm text-neutral-600">
+      <p class="text-body-muted">These tools only run in <strong>development</strong> (or with a temporary key when hosted on a server adapter).</p>
+      <ol class="mx-auto mt-4 list-decimal space-y-2 text-left text-sm text-body-muted">
         <li>Run <code>npm run dev</code> locally.</li>
         <li>Use the ingestion CLI: <code>npm run ingest ./path/to/post.json</code>.</li>
         <li>If you later switch to serverless, set <code>PUBLIC_ADMIN_KEY</code> and visit <code>/admin?key=…</code>.</li>
@@ -255,10 +255,10 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           panelButtons.forEach(function(button){
             var active = button.getAttribute('data-panel-toggle') === name;
             if (active) {
-              button.classList.add('bg-white', 'shadow-sm');
+              button.classList.add('bg-surface-base', 'shadow-sm');
               button.setAttribute('aria-pressed', 'true');
             } else {
-              button.classList.remove('bg-white', 'shadow-sm');
+              button.classList.remove('bg-surface-base', 'shadow-sm');
               button.setAttribute('aria-pressed', 'false');
             }
           });

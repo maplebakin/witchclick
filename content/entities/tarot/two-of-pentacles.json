@@ -1,0 +1,17 @@
+{
+  "slug": "two-of-pentacles",
+  "type": "tarot",
+  "name": "Two of Pentacles",
+  "summary": "Two of Pentacles invites flexible balance when responsibilities compete for the same time and energy. Magically, it reflects flow between changing demands; practically, it can help to simplify your list, set priorities, and drop nonessential tasks before overload hits.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Pentacles",
+    "keywords": ["balance", "adaptability", "priorities"],
+    "uprightKeywords": ["juggling demands", "flexibility", "time management"],
+    "reversedKeywords": ["overwhelm", "disorganization", "imbalance"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "clear-quartz" },
+    { "type": "herb", "slug": "thyme" }
+  ]
+}

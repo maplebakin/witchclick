@@ -28,6 +28,16 @@
   --admin-surface-muted: hsl(var(--card-panel-surface-strong, var(--surface-card, var(--surface-panel, 0 0% 96% / 1))));
   --admin-border-subtle: hsl(var(--card-panel-border, var(--border-subtle, 0 0% 86% / 1)));
   --admin-border-strong: hsl(var(--card-panel-border-strong, var(--border-strong, 0 0% 70% / 1)));
+  --admin-accent: var(--text-accent, #7c3aed);
+  --admin-accent-soft: color-mix(in srgb, var(--admin-accent) 14%, white 86%);
+  --admin-accent-soft-hover: color-mix(in srgb, var(--admin-accent) 22%, white 78%);
+  --admin-accent-border: color-mix(in srgb, var(--admin-accent) 42%, transparent 58%);
+  --admin-accent-text: color-mix(in srgb, var(--admin-accent) 85%, black 15%);
+  --admin-hover-bg: color-mix(in srgb, var(--admin-surface-muted, #f3f4f6) 92%, transparent 8%);
+  --admin-border-neutral: var(--admin-border-subtle);
+  --admin-surface-hover: var(--admin-hover-bg);
+  --admin-text-primary: var(--admin-text-strong);
+  --admin-icon-muted: var(--admin-text-muted);
   --admin-focus: var(--focus-ring-color, var(--focus-ring, #2563eb));
 }
 

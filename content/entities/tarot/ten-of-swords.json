@@ -1,0 +1,17 @@
+{
+  "slug": "ten-of-swords",
+  "type": "tarot",
+  "name": "Ten of Swords",
+  "summary": "Ten of Swords invites acceptance when something has clearly reached its endpoint. Magically, it marks a complete mental purge; practically, it can mean stopping what is no longer viable, tending the fallout, and rebuilding with clearer limits.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Swords",
+    "keywords": ["ending", "release", "reset"],
+    "uprightKeywords": ["painful ending", "collapse", "finality"],
+    "reversedKeywords": ["recovery", "survival", "gradual renewal"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "obsidian" },
+    { "type": "herb", "slug": "cedar" }
+  ]
+}

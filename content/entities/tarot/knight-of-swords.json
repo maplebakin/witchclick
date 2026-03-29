@@ -1,0 +1,17 @@
+{
+  "slug": "knight-of-swords",
+  "type": "tarot",
+  "name": "Knight of Swords",
+  "summary": "Knight of Swords invites decisive action when delay is the bigger risk, while respecting your actual capacity. Magically, it carries intense directed thought; practically, it helps to move fast with a checklist so urgency does not become avoidable mistakes.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Swords",
+    "keywords": ["decisiveness", "momentum", "precision"],
+    "uprightKeywords": ["swift action", "focus", "direct communication"],
+    "reversedKeywords": ["impulsiveness", "harshness", "burnout pace"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "citrine" },
+    { "type": "herb", "slug": "thyme" }
+  ]
+}

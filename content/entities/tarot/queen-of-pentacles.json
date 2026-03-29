@@ -1,0 +1,17 @@
+{
+  "slug": "queen-of-pentacles",
+  "type": "tarot",
+  "name": "Queen of Pentacles",
+  "summary": "Queen of Pentacles invites nurturing that is practical, not performative. Magically, she represents abundant grounded care; practically, she can mean tending your space, protecting your budget, and offering support without abandoning your own needs.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Pentacles",
+    "keywords": ["resourcefulness", "care", "grounded leadership"],
+    "uprightKeywords": ["practical support", "financial wisdom", "nurturing stability"],
+    "reversedKeywords": ["overgiving", "money stress", "boundary strain"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "rose-quartz" },
+    { "type": "herb", "slug": "chamomile" }
+  ]
+}

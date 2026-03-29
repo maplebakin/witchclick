@@ -1,0 +1,16 @@
+{
+  "slug": "clove",
+  "type": "herb",
+  "name": "Clove",
+  "summary": "Clove invites protective warmth when you need confidence and firmer edges. Magically it is used for banishing negativity and drawing prosperity; practically you can simmer it in a kitchen blend, use it in oils, or add it to sachets for focused intention work.",
+  "properties": {
+    "keywords": ["protection", "prosperity", "focus"],
+    "element": "Fire",
+    "planet": "Jupiter",
+    "uses": ["incense", "oils", "sachets", "cooking"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "tigers-eye" },
+    { "type": "tarot", "slug": "ace-of-wands" }
+  ]
+}

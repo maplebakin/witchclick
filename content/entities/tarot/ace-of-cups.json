@@ -1,0 +1,17 @@
+{
+  "slug": "ace-of-cups",
+  "type": "tarot",
+  "name": "Ace of Cups",
+  "summary": "Ace of Cups invites a gentle emotional reset, especially if you have been running on empty. Magically, it signals fresh heart energy and intuitive openness; practically, it can look like naming one feeling clearly and making room for one supportive habit this week.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Cups",
+    "keywords": ["emotional opening", "receptivity", "heart-led start"],
+    "uprightKeywords": ["new emotions", "intuition", "creativity"],
+    "reversedKeywords": ["blocked feelings", "emotional loss", "emptiness"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "moonstone" },
+    { "type": "herb", "slug": "lavender" }
+  ]
+}

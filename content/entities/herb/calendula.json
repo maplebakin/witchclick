@@ -1,0 +1,16 @@
+{
+  "slug": "calendula",
+  "type": "herb",
+  "name": "Calendula",
+  "summary": "Calendula invites warmth and repair when life feels abrasive or emotionally dry. Magically it is used for healing, joy, and protection; practically you can use calendula-infused oils, baths, or teas to create gentle care rituals you can actually maintain.",
+  "properties": {
+    "keywords": ["healing", "joy", "protection"],
+    "element": "Fire",
+    "planet": "Sun",
+    "uses": ["oils", "bath rituals", "teas", "incense"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "sunstone" },
+    { "type": "tarot", "slug": "the-sun" }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "slug": "juniper",
+  "type": "herb",
+  "name": "Juniper",
+  "summary": "Juniper invites strong clearing when you need to cut through stagnation and reset your direction. Magically it is used for purification and protection; practically it works in smoke cleansing, oils, or bath rituals when you are closing out a difficult phase.",
+  "properties": {
+    "keywords": ["clearing", "protection", "renewal"],
+    "element": "Fire",
+    "planet": "Sun",
+    "uses": ["smoke cleansing", "bath rituals", "oils", "incense"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "obsidian" },
+    { "type": "tarot", "slug": "death" }
+  ]
+}

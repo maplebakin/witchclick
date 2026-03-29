@@ -1,0 +1,17 @@
+{
+  "slug": "king-of-pentacles",
+  "type": "tarot",
+  "name": "King of Pentacles",
+  "summary": "King of Pentacles invites responsible stewardship of money, time, and influence. Magically, it reflects mature prosperity and grounded authority; practically, it can mean long-term planning, stable systems, and leadership that protects people as well as outcomes.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Pentacles",
+    "keywords": ["stewardship", "security", "leadership"],
+    "uprightKeywords": ["abundance", "reliability", "long-term strategy"],
+    "reversedKeywords": ["materialism", "control issues", "rigid priorities"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "citrine" },
+    { "type": "herb", "slug": "sage" }
+  ]
+}

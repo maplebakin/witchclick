@@ -1,6 +1,6 @@
 {
-  "generated": "2026-02-17T15:23:36.215Z",
-  "count": 12,
+  "generated": "2026-03-26T19:26:20.433Z",
+  "count": 14,
   "themes": [
     {
       "slug": "cozy-dawn",
@@ -31,6 +31,18 @@
       "label": "Monochromatic Light",
       "mode": "dawn",
       "category": "imported"
+    },
+    {
+      "slug": "test-light",
+      "label": "Test Light",
+      "mode": "dawn",
+      "category": "custom"
+    },
+    {
+      "slug": "test-light-generated",
+      "label": "Test Light Generated",
+      "mode": "dawn",
+      "category": "custom"
     },
     {
       "slug": "yule-dawn",

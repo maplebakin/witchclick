@@ -1,6 +1,6 @@
 ---
 // src/components/EntityHubCard.astro
-import { toRgba, mixColors, resolveTailwindColor } from "@/utils/color";
+import { resolveTailwindColor } from "@/utils/color";
 
 interface Section {
   type: string;
@@ -22,27 +22,16 @@ const labelFor = (type: string) =>
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (char) => char.toUpperCase());
 
-// All the color generation logic is now encapsulated within this component.
 const accent = resolveTailwindColor(section.themeColor);
 const styles = {
-  '--entity-card-border': toRgba(accent, 0.32),
-  '--entity-card-glow': toRgba(accent, 0.16),
-  '--entity-card-highlight': mixColors("#ffffff", accent, 0.12),
-  '--entity-card-surface-top': mixColors("#ffffff", accent, 0.08),
-  '--entity-card-surface-bottom': mixColors("#f3edff", accent, 0.22),
-  '--entity-card-heading': mixColors(accent, "#140b1e", 0.28),
-  '--entity-card-text': mixColors(accent, "#1a102b", 0.18),
-  '--entity-card-label': mixColors(accent, "#ffffff", 0.48),
-  '--entity-card-cta': mixColors(accent, "#201333", 0.32),
-  '--entity-card-cta-hover': mixColors(accent, "#120824", 0.18),
-  '--entity-card-icon': accent,
-  '--entity-card-icon-shadow': toRgba(accent, 0.35),
+  '--entity-card-accent': accent,
+  '--entity-card-icon': `color-mix(in srgb, var(--theme-entity-card-icon, var(--entity-card-icon)) 65%, ${accent} 35%)`,
   '--card-hover-translate': '-0.4rem',
 };
 ---
 <a
   href={section.href}
-  class="group grid min-h-full gap-6 rounded-2xl border bg-neutral-900 p-6 text-white shadow-lg transition-all duration-200 ease-in-out hover:border-[var(--entity-card-border)] hover:shadow-2xl hover:-translate-y-1 focus-visible:border-[var(--entity-card-border)] focus-visible:shadow-2xl focus-visible:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--entity-card-border)]"
+  class="entity-hub-card group grid min-h-full gap-6 rounded-2xl border p-6 transition-all duration-200 ease-in-out hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-2"
   style={Object.entries(styles).map(([key, value]) => `${key}: ${value}`).join(';')}
 >
   <div class="grid items-start gap-4 lg:grid-cols-[minmax(0,0.4fr)_minmax(0,1fr)] lg:gap-2">
@@ -55,7 +44,7 @@ const styles = {
       </span>
     </div>
     <div class="space-y-2">
-      <h2 class="font-serif text-2xl font-bold uppercase tracking-wider text-[var(--entity-card-heading)] sm:text-3xl">
+      <h2 class="font-serif text-2xl font-bold tracking-wider text-[var(--entity-card-heading)] sm:text-3xl">
         {section.title}
       </h2>
       <p class="text-base leading-relaxed text-[var(--entity-card-text)]">
@@ -67,3 +56,21 @@ const styles = {
     Explore <span aria-hidden="true">→</span>
   </span>
 </a>
+
+<style is:inline>
+  .entity-hub-card {
+    border-color: var(--entity-card-border);
+    background:
+      radial-gradient(130% 120% at 8% 10%, color-mix(in srgb, var(--entity-card-highlight) 46%, transparent 54%), transparent 68%),
+      linear-gradient(160deg, var(--entity-card-surface-top), var(--entity-card-surface-bottom));
+    color: var(--entity-card-text);
+    box-shadow: 0 18px 42px -26px var(--entity-card-glow);
+  }
+
+  .entity-hub-card:hover,
+  .entity-hub-card:focus-visible {
+    border-color: color-mix(in srgb, var(--entity-card-accent) 36%, var(--entity-card-border) 64%);
+    box-shadow: 0 26px 55px -28px color-mix(in srgb, var(--entity-card-accent) 28%, var(--entity-card-glow) 72%);
+    outline-color: color-mix(in srgb, var(--entity-card-accent) 42%, var(--entity-card-border) 58%);
+  }
+</style>

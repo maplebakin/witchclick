@@ -1,0 +1,16 @@
+{
+  "slug": "cedar",
+  "type": "herb",
+  "name": "Cedar",
+  "summary": "Cedar invites steady grounding when stress makes everything feel shaky. Magically it is used for protection and home blessing; practically you can use cedar in smoke cleansing or floor washes to mark your space as calm, safe, and intentional.",
+  "properties": {
+    "keywords": ["grounding", "protection", "home blessing"],
+    "element": "Earth",
+    "planet": "Jupiter",
+    "uses": ["smoke cleansing", "floor washes", "incense", "sachets"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "black-tourmaline" },
+    { "type": "tarot", "slug": "the-emperor" }
+  ]
+}

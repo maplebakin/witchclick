@@ -1,0 +1,167 @@
+{
+  "specVersion": 2,
+  "title": "Mabon: A Ritual for Balance, Boundaries, and Letting Go",
+  "slug": "mabon-ritual-balance-boundaries-letting-go",
+  "category": "ritual",
+  "contentType": "ritual",
+  "cluster": "rituals-practices",
+  "metaDescription": "This Mabon ritual supports balance, boundaries, and letting go with practical steps, crystal-herb pairings, and a reflection prompt you can act on this week.",
+  "tags": [
+    "mabon",
+    "autumn equinox",
+    "sabbat",
+    "balance",
+    "boundaries",
+    "ritual"
+  ],
+  "excerpt": "A practical Mabon ritual for balancing what you carry, what you share, and what you finally release.",
+  "entities": [
+    {
+      "type": "crystal",
+      "slug": "smoky-quartz"
+    },
+    {
+      "type": "herb",
+      "slug": "sage"
+    },
+    {
+      "type": "moonPhase",
+      "slug": "waning-moon"
+    }
+  ],
+  "heroImagePrompt": "1920x1280 cozy ritual still life for Mabon: A Ritual for Balance, Boundaries, and Letting Go, candlelight, journal, herbs and crystals, warm natural textures, inclusive and grounded mood",
+  "altTexts": [
+    "Cozy ritual setup for Mabon: A Ritual for Balance, Boundaries, and Letting Go with journal, herbs, and crystals on a candlelit table."
+  ],
+  "internalLinkHints": [
+    {
+      "anchor": "low-spoons ritual adaptations",
+      "rationale": "Links to accessibility-focused ritual guidance for neurodivergent readers."
+    },
+    {
+      "anchor": "how to build a simple altar",
+      "rationale": "Supports beginners who want a minimal setup before ritual practice."
+    },
+    {
+      "anchor": "shadow work for beginners",
+      "rationale": "Gives readers deeper reflection support after emotionally intense rituals."
+    }
+  ],
+  "affiliateHints": [
+    {
+      "key": "sustainable-incense",
+      "anchor": "autumn release incense",
+      "rationale": "Fits letting-go and seasonal transition rituals."
+    },
+    {
+      "key": "mindfulness-journal",
+      "anchor": "autumn boundary journal",
+      "rationale": "Supports integration and planning after ritual."
+    },
+    {
+      "key": "singing-bowl",
+      "anchor": "closing sound ritual",
+      "rationale": "Clear sensory marker for transition and closure."
+    }
+  ],
+  "cta": {
+    "type": "kofi"
+  },
+  "adPlacements": [
+    "lead",
+    "mid",
+    "end"
+  ],
+  "outline": [
+    {
+      "heading": "Opening Reflection",
+      "id": "opening-reflection"
+    },
+    {
+      "heading": "Seasonal Context and Intention",
+      "id": "seasonal-context-and-intention"
+    },
+    {
+      "heading": "Prep the Ritual Space",
+      "id": "prep-the-ritual-space"
+    },
+    {
+      "heading": "The Ritual (4 Steps)",
+      "id": "the-ritual-4-steps"
+    },
+    {
+      "heading": "Crystal and Herb Pairings",
+      "id": "crystal-and-herb-pairings"
+    },
+    {
+      "heading": "Solo, Group, and Low-Spoons Adaptations",
+      "id": "solo-group-and-low-spoons-adaptations"
+    },
+    {
+      "heading": "Reflection Prompt and Next Week Plan",
+      "id": "reflection-prompt-and-next-week-plan"
+    },
+    {
+      "heading": "Skeptical-Friendly Interpretation",
+      "id": "skeptical-friendly-interpretation"
+    },
+    {
+      "heading": "Quick / Low-Energy Variant",
+      "id": "quick-low-energy-variant"
+    },
+    {
+      "heading": "Deep Variant",
+      "id": "deep-variant"
+    },
+    {
+      "heading": "Checklist / Summary",
+      "id": "checklist-summary"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Opening Reflection",
+      "markdown": "This is a gentle starting point for Mabon: A Ritual for Balance, Boundaries, and Letting Go. You can treat this practice as spiritual, secular, or both. Begin where your energy is today, keep it simple, and focus on one actionable next step."
+    },
+    {
+      "heading": "Seasonal Context and Intention",
+      "markdown": "**Verified timing (New York):** September equinox on September 22, 2026 at 8:05 PM EDT.\n\nMabon marks equal light and dark, making it an ideal moment for balance work. This ritual is for rebalancing obligations, emotional labor, and energy output before deeper autumn demands begin.\n\nSabbats can be devotional observances, seasonal planning points, or both. This version is practical by design: short enough to complete, flexible enough for fluctuating health and focus, and specific enough to produce a real shift in the week ahead. If your capacity is low, run the condensed version in 10 minutes with one written intention and one concrete follow-through action.\n\nThe purpose is not to perform a perfect aesthetic ritual. The purpose is to mark a threshold with honesty and choose one behavior that matches the season you are entering. When repeated year after year, these small threshold practices become a stable scaffold for identity, boundaries, and care.\n\nIf you miss the exact date, use the nearest evening. Consistency matters more than perfect timing. Marking the cycle at all helps your brain file experience into a story of change, which is often what makes next steps feel possible instead of abstract."
+    },
+    {
+      "heading": "Prep the Ritual Space",
+      "markdown": "Gather only what helps you stay present:\n- A cloth, tray, or small cleared surface\n- One candle or soft lamp\n- One cup of water or tea\n- Journal or notes app\n- One crystal and one herb from the pairings below\n\nIf sensory input is high, reduce intensity instead of quitting entirely. Keep lighting warm and low, skip strong scents, and use shorter prompts. If movement helps regulation, stand, sway, or pace while speaking your intention. Set a 20-minute container so your nervous system knows there is an endpoint.\n\nWrite this anchor line: **\"At Mabon, I am choosing balanced release.\"** Keep it visible through the ritual. If thoughts spiral, return to this sentence and one slow exhale.\n\nKeep an exit plan visible: water nearby, a blanket or sweater, and a short grounding action for after the ritual. This lowers performance pressure and helps your body trust the process. When your system feels safer, focus usually improves without forcing it."
+    },
+    {
+      "heading": "The Ritual (4 Steps)",
+      "markdown": "1. **Open the threshold (3 minutes).** Say the date out loud. Name what season is ending in your life and what season you are entering emotionally.\n2. **Inventory honestly (5 minutes).** List three patterns, obligations, or loops that are draining you. Circle one that you can reduce this week.\n3. **Make one seasonal vow (5 minutes).** Write one commitment in behavior terms, not identity terms. Example: \"I will do a 10-minute evening reset before scrolling.\"\n4. **Seal with immediate action (5 to 8 minutes).** Do one practical task before you leave the ritual: set a reminder, send a boundary text, prep tomorrow's materials, or clear one physical surface.\n\nClose with: **\"Small steps count. I keep what is useful, and I release what is not.\"**\n\nIf the ritual feels heavy, shorten each step to one minute and keep the action step. The action step is the bridge from symbolism to lived change.\n\nWrite your chosen action on a sticky note and place it where you will see it within the next hour. Visibility is a practical spell in itself. If the action feels too big once you stand up, shrink it by half and complete the smaller version immediately."
+    },
+    {
+      "heading": "Crystal and Herb Pairings",
+      "markdown": "Choose one pairing only:\n\n- **Smoky Quartz + Sage:** Supports release, grounding, and environmental reset.\n- **Rhodonite + Yarrow:** Helps hold compassion with stronger relational boundaries.\n- **Howlite + Chamomile:** Good for calm decision-making and sleep-friendly integration.\n\nPlace the crystal where your eyes land naturally. Use the herb as tea, sachet, steam, or scent strip based on what your body tolerates. Spiritually, correspondences can deepen symbolic focus. Secularly, they improve recall and emotional state-shifting by linking intention to sensory signals.\n\nIf a pairing feels wrong for your body or mood, replace it without guilt. Ritual efficacy comes from repeatable regulation and honest attention, not rigid adherence to a fixed correspondence list. Your best pairing is the one that helps you finish the ritual calmly and complete your chosen follow-through step afterward.\n\nNo pairing is mandatory. If cost, access, or sensory tolerance is a barrier, substitute with what you already have at home. A familiar mug, a textured stone, or a calming tea can do the same regulatory work when used with clear intention and repetition."
+    },
+    {
+      "heading": "Solo, Group, and Low-Spoons Adaptations",
+      "markdown": "Adaptations keep this practice accessible:\n\n**Solo version:** speak each step out loud to reduce mental drift and make the process feel concrete.\n**Partner or friend version:** each person names one release and one commitment; then both set a 72-hour check-in.\n**Group version:** keep shares short and optional; prioritize consent and privacy.\n**Low-spoons version:** skip altar setup, hold one object, breathe for 90 seconds, write one line, choose one tiny action.\n\nIf chronic illness, pain, or burnout is high, reduce standing and sensory load. If trauma cues arise, orient to safety first: feet on floor, eyes on a stable object, longer exhales, and permission to stop. Ritual is support, not coercion. The point is to increase agency and steadiness, never to override your limits.\n\nIf you have capacity, note which part was hardest tonight. That pattern is valuable data for designing next month's version. Over time, your ritual can become more personal and less effortful because it is built around your actual nervous-system needs."
+    },
+    {
+      "heading": "Reflection Prompt and Next Week Plan",
+      "markdown": "Use this close to convert ritual energy into an actual weekly plan:\n\n> **Reflection prompt:** Where is my energy exchange out of balance, and what boundary would make this season more sustainable?\n\nThen write:\n- **What I am carrying forward:**\n- **What I am setting down:**\n- **My one concrete action for the next 72 hours:**\n- **How I will remind myself (time, place, cue):**\n\nBefore ending, schedule the action in your calendar. If possible, pair it with an existing routine or body-doubling check-in. If the action fails twice, make it smaller, not stricter. Sustainable ritual is iterative. You are building trust with yourself through repeatable completion, not through pressure.\n\nBefore closing your notebook, decide how you will know this ritual helped. Pick one observable signal such as \"I sent the message\" or \"I slept before midnight twice this week.\" Concrete signals reduce shame spirals and make progress easier to notice."
+    },
+    {
+      "heading": "Skeptical-Friendly Interpretation",
+      "markdown": "You do not need metaphysical certainty to benefit from sabbat practice. Seasonal thresholds are psychologically useful: they create narrative markers, invite review, and support intentional course correction.\n\nIf you are spiritually oriented, you can frame this as ritual partnership with cyclical time. If you are secular, frame it as periodic reflection with sensory regulation and behavior design. Both approaches can be ethical, grounded, and deeply meaningful.\n\nReturn to the same structure each sabbat and track small outcomes. Over time, those notes become a personal archive of what actually supports your energy, your relationships, and your decision-making. That archive is the real magic: care that becomes repeatable.\n\nIf you track outcomes for three cycles, you can evaluate this like any reflective practice: what improved, what stayed hard, and what needs modification. That experimental mindset is fully compatible with spiritual ritual and often makes the practice more honest and useful.\n\nSmall repeated practices build durable trust. Keep the ritual short, track one action, and revisit next cycle with curiosity instead of judgment."
+    },
+    {
+      "heading": "Quick / Low-Energy Variant",
+      "markdown": "If capacity is low, run a 3-minute version: one breath cycle, one sentence intention, and one tiny next action. Keep the practice alive without forcing intensity. Low-energy consistency is still valid progress."
+    },
+    {
+      "heading": "Deep Variant",
+      "markdown": "When you have more capacity, extend this practice to 20 to 30 minutes by adding longer journaling, pattern review, and one concrete follow-through plan for the next 72 hours. Keep structure clear so depth does not become overwhelm."
+    },
+    {
+      "heading": "Checklist / Summary",
+      "markdown": "Checklist: set intention, choose the smallest viable setup, complete one focused practice cycle, log one observation, and schedule one next action. Summary: keep what is useful, simplify what creates friction, and repeat with compassion."
+    }
+  ]
+}

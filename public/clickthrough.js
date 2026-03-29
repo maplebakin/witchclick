@@ -7,6 +7,7 @@
   const DATASET_FLAG = "affiliateBound";
   const MAX_ENTRIES = 100;
   const analyticsEnabled = Boolean(window.__WC_ANALYTICS__);
+  const ENDPOINT_PATH = "/api/affiliate-click.json";
 
   function readLog() {
     try {
@@ -35,27 +36,25 @@
     writeLog(entries);
   }
 
+  function buildClickUrl(payload) {
+    const params = new URLSearchParams();
+    if (payload?.url) {
+      params.set("url", String(payload.url));
+    }
+    if (payload?.ts) {
+      params.set("ts", String(payload.ts));
+    }
+    return `${ENDPOINT_PATH}?${params.toString()}`;
+  }
+
   function sendClickBeacon(payload) {
     if (!analyticsEnabled) return;
 
-    const body = JSON.stringify(payload);
-
-    if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
-      try {
-        const data = typeof Blob === "function" ? new Blob([body], { type: "application/json" }) : body;
-        if (navigator.sendBeacon("/api/affiliate-click", data)) {
-          return;
-        }
-      } catch (error) {
-        console.warn("Affiliate beacon sendBeacon failed", error);
-      }
-    }
+    const endpoint = buildClickUrl(payload);
 
     if (typeof fetch === "function") {
-      fetch("/api/affiliate-click", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body,
+      fetch(endpoint, {
+        method: "GET",
         keepalive: true,
       }).catch((error) => {
         console.warn("Affiliate beacon fetch failed", error);

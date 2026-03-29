@@ -1,0 +1,17 @@
+{
+  "slug": "ace-of-wands",
+  "type": "tarot",
+  "name": "Ace of Wands",
+  "summary": "Ace of Wands invites you to follow a fresh spark before overthinking talks you out of it. Magically, it marks ignition and creative fire; practically, it often means starting one small, visible step today so momentum has somewhere to land.",
+  "properties": {
+    "arcana": "Minor",
+    "suit": "Wands",
+    "keywords": ["initiation", "drive", "creative risk"],
+    "uprightKeywords": ["inspiration", "new energy", "creative spark"],
+    "reversedKeywords": ["blocked energy", "false starts", "burnout"]
+  },
+  "related": [
+    { "type": "crystal", "slug": "carnelian" },
+    { "type": "herb", "slug": "cinnamon" }
+  ]
+}
