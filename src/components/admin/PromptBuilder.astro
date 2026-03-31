@@ -40,41 +40,41 @@ const {
 <Card as="section" class="lg:col-span-5">
   <div class="mb-4 space-y-2">
     <h2 class="text-xl font-semibold">Step 1: Build Generator Prompt</h2>
-    <p class="text-xs text-body-muted">Configure your post preferences to generate an AI prompt</p>
+    <p class="text-[0.8rem] text-body-muted">Configure your post preferences to generate an AI prompt</p>
   </div>
   <div class="grid gap-4">
     <label class="block">
-      <span class="text-xs font-medium uppercase tracking-wide text-body-subtle">Topic</span>
+      <span class="text-[0.8rem] font-medium uppercase tracking-wide text-body-subtle">Topic</span>
       <Input id="topic" placeholder="tea ritual for focus" />
-      <p class="mt-1 text-[11px] text-body-faint">What should this post be about?</p>
+      <p class="mt-1 text-[0.8rem] text-body-faint">What should this post be about?</p>
     </label>
     <label class="block">
-      <span class="text-xs font-medium">Word count</span>
+      <span class="text-[0.8rem] font-medium">Word count</span>
       <Input id="words" type="number" placeholder="1000-1500 words (approx)" />
     </label>
     <label class="block">
-      <span class="text-xs font-medium">Template</span>
+      <span class="text-[0.8rem] font-medium">Template</span>
       <Select id="mode">
         <option value="" selected>The Grand Arcane Template</option>
         {presetOptions.map((option) => (
           <option value={option.key}>{option.label}</option>
         ))}
       </Select>
-      <p class="mt-1 text-[11px] text-body-subtle" id="modeHelp">{defaultModeDescription}</p>
+      <p class="mt-1 text-[0.8rem] text-body-subtle" id="modeHelp">{defaultModeDescription}</p>
     </label>
     <label class="block">
-      <span class="text-xs font-medium">Writing style</span>
+      <span class="text-[0.8rem] font-medium">Writing style</span>
       <Select id="style">
         {styleOptions.map((option) => (
           <option value={option.key}>{option.label}</option>
         ))}
       </Select>
-      <p id="styleHelp" class="mt-1 text-[11px] text-body-subtle">{defaultStyleDescription}</p>
+      <p id="styleHelp" class="mt-1 text-[0.8rem] text-body-subtle">{defaultStyleDescription}</p>
     </label>
     <label class="block">
-      <span class="text-xs font-medium">Reflection Prompts (one per line)</span>
+      <span class="text-[0.8rem] font-medium">Reflection Prompts (one per line)</span>
       <Textarea id="reflectionPrompts" placeholder="e.g., How does this ritual connect you to nature?" />
-      <p class="mt-1 text-[11px] text-body-faint">List specific prompts for personal reflection related to this post.</p>
+      <p class="mt-1 text-[0.8rem] text-body-faint">List specific prompts for personal reflection related to this post.</p>
     </label>
     <div class="flex gap-4 text-sm">
       <label class="inline-flex items-center gap-2">
@@ -90,8 +90,8 @@ const {
       <Button id="genPrompt" variant="secondary" size="sm">Generate Prompt</Button>
       <Button id="copyPrompt" variant="primary" size="sm">Copy</Button>
     </div>
-    <Textarea id="promptOut" class="font-mono text-xs h-64" placeholder="The AI's whispered guidance will manifest here…"></Textarea>
-    <p class="text-xs text-body-muted">Offer this parchment to your Oracle (LLM) → receive the structured spell → infuse it into the content cauldron on the right.</p>
+    <Textarea id="promptOut" class="font-mono text-[0.8rem] h-64" placeholder="The AI's whispered guidance will manifest here…"></Textarea>
+    <p class="text-[0.8rem] text-body-muted">Offer this parchment to your Oracle (LLM) → receive the structured spell → infuse it into the content cauldron on the right.</p>
   </div>
 </Card>
 

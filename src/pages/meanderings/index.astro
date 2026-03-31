@@ -92,7 +92,13 @@ const recentPosts = cardPosts.slice(1);
         If you want a gentle ping when a new non-magickal post goes live, leave your email below.
         You can also subscribe by RSS.
       </p>
-      <form class="meanderings-signup__form" name="meanderings-updates" method="POST" data-netlify="true">
+      <form
+        class="meanderings-signup__form"
+        name="meanderings-updates"
+        method="POST"
+        data-netlify="true"
+        data-form-success="Thanks. We will send a gentle ping when a new meandering drops."
+      >
         <input type="hidden" name="form-name" value="meanderings-updates" />
         <div class="meanderings-signup__fields">
           <input
@@ -105,6 +111,7 @@ const recentPosts = cardPosts.slice(1);
           />
           <PrimaryButton type="submit">Notify me</PrimaryButton>
         </div>
+        <p class="wc-form-status" data-form-status hidden aria-live="polite"></p>
       </form>
       <div class="meanderings-signup__links">
         <a href="/rss.xml">RSS feed</a>
@@ -167,7 +174,7 @@ const recentPosts = cardPosts.slice(1);
     display: inline-block;
     margin-bottom: 0.75rem;
     padding: 0.35rem 0.85rem;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;

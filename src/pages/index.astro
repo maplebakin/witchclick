@@ -2,6 +2,7 @@
 import Base from "@/layouts/Base.astro";
 import PostCard from "@/components/PostCard.astro";
 import HeadSlot from "@/components/HeadSlot.astro";
+import SpoonsBadge from "@/components/SpoonsBadge.astro";
 import Card from "@/components/ui/Card.astro";
 import Button from "@/components/ui/Button.astro";
 import { loadAllPosts, filterPostsByCategory, POST_CATEGORY_RITUAL, POST_CATEGORY_MEANDERING } from "@/utils/posts";
@@ -22,17 +23,14 @@ const hasPublishedMeanderings = filterPostsByCategory(allPosts, POST_CATEGORY_ME
 // Transform to card data
 const cardPosts: CardPost[] = postsToCardData(ritualPosts);
 
-// Show featured post at the top
-const featuredPost = cardPosts[0] ?? null;
-
-// Show recent posts (12 total, excluding the featured one)
-const recentPosts = cardPosts.slice(1, 13);
-const bentoFeaturedPost = recentPosts[0] ?? null;
-const bentoSidePosts = recentPosts.slice(1, 4);
-const remainingRecentPosts = recentPosts.slice(4);
+// Most recent post as section hero, then supporting grid posts
+const latestPost = cardPosts[0] ?? null;
+const latestPostHasImage = Boolean(latestPost && (latestPost.heroImageSrc || latestPost.heroImage));
+const gridPosts = cardPosts.slice(1, 7);
+const hasMorePosts = cardPosts.length > 7;
 
 // Create schema for the post collection
-const collectionSchema = featuredPost ? createCollectionPageSchema(
+const collectionSchema = latestPost ? createCollectionPageSchema(
   settings,
   {
     name: "Recent Rituals & Essays",
@@ -40,7 +38,7 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
     description: "Gentle rituals, cozy tools, and reflections for when life feels loud.",
     itemType: "Article",
   },
-  [featuredPost, ...recentPosts].map((post) => ({
+  [latestPost, ...gridPosts].map((post) => ({
     name: post.title,
     url: `/post/${post.slug}`,
     description: post.tldr ?? post.excerpt,
@@ -56,114 +54,60 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
   )}
 
   <div class="mx-auto w-full max-w-6xl px-4">
-    <header data-reveal class="mb-[var(--page-header-gap)] pt-3 pb-6 text-center sm:pt-4 sm:pb-8">
-      <div class="mx-auto max-w-[var(--content-max-width)]">
-        <h1 class="mb-2 font-serif text-3xl font-bold tracking-tight text-body-strong sm:text-4xl">WitchClick</h1>
-        <p class="mb-3 text-lg font-medium text-brand-accent sm:text-xl">
+    <header data-reveal class="home-masthead mb-0 text-center">
+      <div class="home-masthead__inner mx-auto max-w-[var(--content-max-width)]">
+        <h1 class="home-masthead__title">WitchClick</h1>
+        <p class="home-masthead__tagline">
           Gentle rituals, cozy tools, and reflections for when life feels loud.
         </p>
-        <p class="text-sm text-body">
+        <p class="home-masthead__subline">
           Small practices for shadow work, rest, and everyday magic—designed with neurodivergent brains in mind.
         </p>
+        <div class="home-masthead__sigil" aria-hidden="true"><span>✦</span></div>
       </div>
     </header>
 
-    {featuredPost && (
-      <article data-reveal class="mx-auto mb-[var(--page-header-gap)] w-full max-w-4xl">
-        <a
-          href={`/post/${featuredPost.slug}`}
-          class="group block overflow-hidden rounded-2xl border border-line-neutral bg-surface-base shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5 lg:grid lg:grid-cols-2 lg:gap-0"
-        >
-          {(featuredPost.heroImage || featuredPost.heroImageSrc) && (
-            <div class="overflow-hidden bg-surface-soft aspect-[3/2] lg:aspect-auto">
-              <img
-                src={featuredPost.heroImageSrc || featuredPost.heroImage}
-                alt={featuredPost.heroAlt || featuredPost.heroImageAlt || `Hero image for ${featuredPost.title}`}
-                class="h-full w-full object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
-                loading="eager"
-                decoding="async"
-              />
-            </div>
-          )}
-          <div class="p-6 sm:p-8 lg:p-10 lg:flex lg:flex-col lg:justify-center">
-            <span class="mb-3 inline-block rounded-full bg-accent-soft/30 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-brand-accent">
-              Latest
-            </span>
-            <h2 class="mb-3 font-serif text-2xl font-bold text-body-strong sm:text-3xl">{featuredPost.title}</h2>
-            <p class="mb-5 text-base leading-relaxed text-body opacity-95">{featuredPost.tldr || featuredPost.excerpt}</p>
-            <div class="flex flex-wrap items-center gap-3">
-              {featuredPost.tags.slice(0, 3).map((tag) => (
-                <span class="rounded-full bg-surface-soft px-3 py-1 text-xs text-body-muted">{tag}</span>
-              ))}
-              <span class="text-xs text-body-subtle opacity-70">{featuredPost.readingMinutes} min read</span>
-            </div>
-          </div>
-        </a>
-      </article>
-    )}
-
-    {recentPosts.length > 0 && (
-      <section data-reveal class="mb-[var(--page-section-gap)]" aria-labelledby="recent-posts-heading">
-        <div class="mx-auto w-full max-w-4xl border-t border-line-neutral/60 pt-5 sm:pt-6">
-          <div class="flex items-center justify-between mb-5 sm:mb-6">
-            <h2 id="recent-posts-heading" class="font-serif text-2xl font-semibold text-body-strong sm:text-3xl">Recent Posts</h2>
+    {latestPost && (
+      <section data-reveal class="home-posts mb-[var(--page-section-gap)]" aria-labelledby="home-posts-heading">
+        <div class="mx-auto w-full max-w-4xl">
+          <div class="home-posts__header">
+            <h2 id="home-posts-heading" class="font-serif text-2xl font-semibold text-body-strong sm:text-3xl">From the Grimoire</h2>
             <a href="/page/1" class="text-sm font-medium text-brand-accent transition-colors hover:text-brand-accent hover:underline">View all →</a>
           </div>
-        </div>
-        {bentoFeaturedPost && (
-          <div data-reveal class="home-bento">
-            <div class="home-bento__item home-bento__item--feature">
-              <PostCard
-                layout="bento-featured"
-                href={`/post/${bentoFeaturedPost.slug}`}
-                post={{
-                  slug: bentoFeaturedPost.slug,
-                  title: bentoFeaturedPost.title,
-                  excerpt: bentoFeaturedPost.excerpt,
-                  tldr: bentoFeaturedPost.tldr,
-                  tags: bentoFeaturedPost.tags,
-                  readingMinutes: bentoFeaturedPost.readingMinutes,
-                  publishedAt: bentoFeaturedPost.publishedAt,
-                  spoonLevel: bentoFeaturedPost.spoonLevel,
-                  spoons: bentoFeaturedPost.spoons,
-                  heroImage: bentoFeaturedPost.heroImage,
-                  heroImageSrc: bentoFeaturedPost.heroImageSrc,
-                  heroImageAlt: bentoFeaturedPost.heroImageAlt,
-                  heroAlt: bentoFeaturedPost.heroAlt,
-                  category: bentoFeaturedPost.category,
-                }}
-              />
-            </div>
-            {bentoSidePosts.map((post, index) => (
-              <div class:list={["home-bento__item", `home-bento__item--side-${index + 1}`]}>
-                <PostCard
-                  layout="bento-compact"
-                  href={`/post/${post.slug}`}
-                  post={{
-                    slug: post.slug,
-                    title: post.title,
-                    excerpt: post.excerpt,
-                    tldr: post.tldr,
-                    tags: post.tags,
-                    readingMinutes: post.readingMinutes,
-                    publishedAt: post.publishedAt,
-                    spoonLevel: post.spoonLevel,
-                    spoons: post.spoons,
-                    heroImage: post.heroImage,
-                    heroImageSrc: post.heroImageSrc,
-                    heroImageAlt: post.heroImageAlt,
-                    heroAlt: post.heroAlt,
-                    category: post.category,
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-        )}
 
-        {remainingRecentPosts.length > 0 && (
+          <article class="home-posts__hero">
+            <a href={`/post/${latestPost.slug}`} class="group block">
+              {latestPostHasImage && (
+                <img
+                  src={latestPost.heroImageSrc || latestPost.heroImage}
+                  alt={latestPost.heroAlt || latestPost.heroImageAlt || `Hero image for ${latestPost.title}`}
+                  class="home-posts__hero-image"
+                  loading="eager"
+                  decoding="async"
+                />
+              )}
+              <div class:list={["home-posts__hero-content", !latestPostHasImage && "home-posts__hero-content--text-only"]}>
+                <h3 class:list={["home-posts__hero-title", !latestPostHasImage && "home-posts__hero-title--text-only"]}>{latestPost.title}</h3>
+                <p class="home-posts__hero-description">{latestPost.tldr || latestPost.excerpt}</p>
+                <div class="home-posts__hero-tags">
+                  {latestPost.tags.slice(0, 3).map((tag) => (
+                    <span class="home-posts__tag">#{String(tag).toLowerCase()}</span>
+                  ))}
+                </div>
+                <div class="home-posts__hero-meta">
+                  <span class="home-posts__reading-time">{latestPost.readingMinutes} min read</span>
+                  <span class="home-posts__spoons">
+                    <SpoonsBadge level={latestPost.spoonLevel || latestPost.spoons} />
+                  </span>
+                </div>
+              </div>
+            </a>
+          </article>
+        </div>
+
+        {gridPosts.length > 0 && (
           <div data-reveal class="home-recent-grid">
-            {remainingRecentPosts.map((post) => (
+            {gridPosts.map((post) => (
               <PostCard
                 href={`/post/${post.slug}`}
                 post={{
@@ -184,6 +128,14 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
                 }}
               />
             ))}
+          </div>
+        )}
+
+        {hasMorePosts && (
+          <div class="home-posts__footer">
+            <a href="/page/1" class="text-sm text-body-muted transition-colors hover:text-brand-accent hover:underline">
+              View all posts →
+            </a>
           </div>
         )}
       </section>
@@ -207,50 +159,213 @@ const collectionSchema = featuredPost ? createCollectionPageSchema(
 </Base>
 
 <style>
-  .home-bento {
-    display: grid;
-    gap: var(--grid-gap);
-    grid-template-areas:
-      "feature"
-      "side-1"
-      "side-2"
-      "side-3";
+  .home-masthead {
+    position: relative;
+    padding-block: clamp(1.5rem, 4vw, 2rem) clamp(0.9rem, 2.5vw, 1.5rem);
   }
 
-  .home-bento__item--feature {
-    grid-area: feature;
+  .home-masthead__inner {
+    position: relative;
+    isolation: isolate;
   }
 
-  .home-bento__item--side-1 {
-    grid-area: side-1;
+  .home-masthead__inner::before {
+    content: "";
+    position: absolute;
+    inset: auto 50% -1.2rem;
+    width: min(38rem, 92%);
+    height: clamp(7rem, 22vw, 11rem);
+    transform: translateX(-50%);
+    border-radius: 999px;
+    pointer-events: none;
+    z-index: -1;
+    background: radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 14%, transparent 86%) 0%,
+      color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 7%, transparent 93%) 45%,
+      transparent 78%
+    );
   }
 
-  .home-bento__item--side-2 {
-    grid-area: side-2;
+  .home-masthead__title {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    font-weight: 700;
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+    color: var(--theme-text-strong, var(--text-strong));
   }
 
-  .home-bento__item--side-3 {
-    grid-area: side-3;
+  .home-masthead__tagline {
+    margin: 0.85rem auto 0;
+    max-width: 36ch;
+    font-size: clamp(1.2rem, 2.4vw, 1.45rem);
+    line-height: 1.42;
+    font-weight: 500;
+    color: var(--theme-text-muted, var(--text-muted));
   }
 
-  .home-bento :global(.ritual-card) {
-    height: 100%;
+  .home-masthead__subline {
+    margin: 1rem auto 0;
+    max-width: 58ch;
+    font-size: 1rem;
+    line-height: 1.65;
+    color: color-mix(in srgb, var(--theme-text-body, var(--text-body)) 90%, transparent 10%);
+  }
+
+  .home-masthead__sigil {
+    margin-top: 1.35rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    color: color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 78%, transparent 22%);
+    font-size: 0.95rem;
+  }
+
+  .home-masthead__sigil::before,
+  .home-masthead__sigil::after {
+    content: "";
+    width: clamp(4.25rem, 14vw, 6rem);
+    height: 1px;
+    background: color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 44%, transparent 56%);
+  }
+
+  .home-posts__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .home-posts__hero {
+    margin-top: 1.35rem;
+  }
+
+  .home-posts__hero > a {
+    display: block;
+  }
+
+  .home-posts__hero-image {
+    width: 100%;
+    height: clamp(11rem, 32vw, 17.5rem);
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 0.75rem 0.75rem 0 0;
+    background: color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 16%, transparent 84%);
+  }
+
+  .home-posts__hero-content {
+    padding: 1.25rem;
+    background: color-mix(in srgb, var(--theme-surface-panel, var(--surface-panel)) 5%, transparent 95%);
+    border-radius: 0 0 0.75rem 0.75rem;
+  }
+
+  .home-posts__hero-content--text-only {
+    padding-top: 2rem;
+  }
+
+  .home-posts__hero-title {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    line-height: 1.17;
+    font-weight: 700;
+    color: var(--theme-text-strong, var(--text-strong));
+    transition: color var(--dur-med, 200ms) var(--ease-out-curve, ease);
+  }
+
+  .home-posts__hero-title--text-only {
+    font-size: clamp(2rem, 5vw, 2.8rem);
+  }
+
+  .group:hover .home-posts__hero-title,
+  .group:focus-visible .home-posts__hero-title {
+    color: var(--theme-text-accent-strong, var(--text-accent));
+  }
+
+  .home-posts__hero-description {
+    margin: 0.85rem 0 0;
+    max-width: 70ch;
+    font-size: 1rem;
+    line-height: 1.62;
+    color: var(--theme-text-muted, var(--text-muted));
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .home-posts__hero-tags {
+    margin-top: 0.95rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+
+  .home-posts__tag {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 24%, transparent 76%);
+    background: color-mix(in srgb, var(--theme-surface-panel, var(--surface-panel)) 4%, transparent 96%);
+    padding: 0.2rem 0.65rem;
+    font-size: 0.8rem;
+    line-height: 1.2;
+    color: var(--theme-text-muted, var(--text-muted));
+  }
+
+  .home-posts__hero-meta {
+    margin-top: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    min-height: 1.4rem;
+  }
+
+  .home-posts__reading-time {
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--theme-text-muted, var(--text-muted)) 88%, transparent 12%);
+  }
+
+  .home-posts__spoons {
+    transform: scale(0.9);
+    transform-origin: left center;
+    color: color-mix(in srgb, var(--theme-text-muted, var(--text-muted)) 92%, transparent 8%);
+  }
+
+  .home-posts__footer {
+    margin-top: 1.35rem;
+    text-align: right;
   }
 
   .home-recent-grid {
     display: grid;
     gap: var(--grid-gap);
-    margin-top: var(--page-header-gap);
+    margin-top: 1.5rem;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
   }
 
-  @media (min-width: 960px) {
-    .home-bento {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      grid-template-areas:
-        "feature feature side-1"
-        "feature feature side-2"
-        "feature feature side-3";
+  @media (max-width: 719px) {
+    .home-masthead__tagline {
+      max-width: 26ch;
+    }
+
+    .home-posts__header {
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+
+    .home-posts__hero-content {
+      padding-inline: 0;
+      padding-bottom: 0;
+    }
+
+    .home-posts__hero-meta {
+      gap: 0.7rem;
     }
   }
 </style>

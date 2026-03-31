@@ -133,7 +133,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
             const deleteBtn = document.createElement('button');
             deleteBtn.type = 'button';
-            deleteBtn.className = 'text-xs text-danger hover:underline';
+            deleteBtn.className = 'text-[0.8rem] text-danger hover:underline';
             deleteBtn.textContent = 'Delete';
             deleteBtn.addEventListener('click', () => {
               products.splice(index, 1);
@@ -161,7 +161,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               label.className = 'block' + (field.fullWidth ? ' md:col-span-2' : '');
 
               const labelSpan = document.createElement('span');
-              labelSpan.className = 'text-xs font-medium text-body';
+              labelSpan.className = 'text-[0.8rem] font-medium text-body';
               labelSpan.textContent = field.label;
               if (field.required) {
                 const req = document.createElement('span');

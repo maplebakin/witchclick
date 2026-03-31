@@ -144,7 +144,13 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
       <p class="partners-request__copy">
         Know a small business, mutual aid project, or creator who aligns with WitchClick values? Share their details and we will review for a future constellation.
       </p>
-      <form class="partners-request__form" name="partner-requests" method="POST" data-netlify="true">
+      <form
+        class="partners-request__form"
+        name="partner-requests"
+        method="POST"
+        data-netlify="true"
+        data-form-success="Thanks for the recommendation. We will review this partner soon."
+      >
         <input type="hidden" name="form-name" value="partner-requests" />
         <label class="partners-request__label">
           Partner name
@@ -168,6 +174,7 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
           <input type="email" name="email" inputmode="email" autocomplete="email" placeholder="you@example.com" class="partners-request__input" />
         </label>
         <button type="submit" class="partners-request__button">Send suggestion</button>
+        <p class="wc-form-status" data-form-status hidden aria-live="polite"></p>
       </form>
     </div>
   </section>
@@ -232,7 +239,7 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
     border: 1px solid color-mix(in srgb, var(--theme-color-gold) 45%, transparent 55%);
     background: color-mix(in srgb, var(--theme-color-night) 70%, var(--theme-color-gold) 30%);
     color: var(--theme-color-ink);
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     letter-spacing: 0.16em;
   }
 
@@ -314,7 +321,7 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
     align-items: center;
     padding: 0.25rem 0.75rem;
     border-radius: 999px;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     background: color-mix(in srgb, var(--theme-color-iris) 10%, transparent);

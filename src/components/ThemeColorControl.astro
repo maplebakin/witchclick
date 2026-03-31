@@ -10,14 +10,14 @@ interface Props {
   description?: string;
 }
 
-const { label, variableKey, placeholder = "#000000", description } = Astro.props;
+const { label, variableKey, placeholder = "var(--text-strong)", description } = Astro.props;
 ---
 
 <label class="block text-sm">
-  <span class="text-xs font-medium uppercase tracking-wide text-body-muted flex items-center gap-2">
+  <span class="text-[0.8rem] font-medium uppercase tracking-wide text-body-muted flex items-center gap-2">
     {label}
     {description && (
-      <span class="text-[10px] normal-case font-normal opacity-75">({description})</span>
+      <span class="text-[0.8rem] normal-case font-normal opacity-75">({description})</span>
     )}
   </span>
   <div class="mt-1 flex items-center gap-2">

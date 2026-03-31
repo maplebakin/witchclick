@@ -61,6 +61,7 @@ export interface SiteSettings {
   ads?: AdsSettings;
   observability?: ObservabilitySettings;
   clientErrorEndpoint?: string | null;
+  formEndpoint?: string | null;
   autoSummaries?: boolean;
   autoSpoons?: boolean;
   activeThemes?: ActiveThemes;
@@ -75,6 +76,7 @@ const DEFAULT_SETTINGS: SiteSettings = {
   showAccountLink: false,
   observability: { enabled: false, dsn: null, environment: "production" },
   clientErrorEndpoint: null,
+  formEndpoint: null,
   autoSummaries: true,
   autoSpoons: true,
 };
@@ -111,6 +113,10 @@ function deepMergeSettings(base: SiteSettings, next: Partial<SiteSettings>): Sit
       next.clientErrorEndpoint === undefined
         ? base.clientErrorEndpoint ?? null
         : next.clientErrorEndpoint,
+    formEndpoint:
+      next.formEndpoint === undefined
+        ? base.formEndpoint ?? null
+        : next.formEndpoint,
   };
 }
 
@@ -231,6 +237,11 @@ export function toAbsoluteUrl(url: string, settings: SiteSettings = readSettings
   return ensureAbsoluteUrl(url, base);
 }
 
+export function getFormEndpoint(settings: SiteSettings = readSettings()): string | null {
+  const raw = typeof settings.formEndpoint === "string" ? settings.formEndpoint.trim() : "";
+  return raw ? raw : null;
+}
+
 function sanitizeSettings(input: unknown): Partial<SiteSettings> {
   if (!input || typeof input !== "object") {
     throw new Error("settings.json must contain an object");
@@ -319,6 +330,25 @@ function sanitizeSettings(input: unknown): Partial<SiteSettings> {
           errors.push("clientErrorEndpoint must be a rooted path or absolute URL");
         } else {
           out.clientErrorEndpoint = endpoint;
+        }
+      }
+    }
+  }
+
+  if ("formEndpoint" in data) {
+    const raw = data.formEndpoint;
+    if (raw === null) {
+      out.formEndpoint = null;
+    } else {
+      const endpoint = expectString(raw, "formEndpoint", errors, { allowEmpty: true });
+      if (endpoint !== undefined) {
+        const trimmed = endpoint.trim();
+        if (!trimmed) {
+          out.formEndpoint = null;
+        } else if (!isValidEndpoint(trimmed)) {
+          errors.push("formEndpoint must be a rooted path or absolute URL");
+        } else {
+          out.formEndpoint = trimmed;
         }
       }
     }

@@ -42,7 +42,7 @@ const site = Astro.url?.origin ?? "";
               Compose a post directly in markdown. Perfect for quick articles or when you prefer writing by hand over AI generation.
             </p>
           </div>
-          <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-4 text-xs text-body-muted">
+          <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-4 text-[0.8rem] text-body-muted">
             <div class="font-semibold mb-2">✍️ Writing tips:</div>
             <ul class="space-y-1.5 ml-4">
               <li><strong>Metadata:</strong> Fill in title, slug, excerpt, and tags for SEO</li>
@@ -66,40 +66,40 @@ const site = Astro.url?.origin ?? "";
 
         <div class="grid gap-3 md:grid-cols-2">
           <label class="block">
-            <span class="text-xs font-medium">Title</span>
+            <span class="text-[0.8rem] font-medium">Title</span>
             <input id="title" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="Tea Ritual for Focus" />
           </label>
           <label class="block">
-            <span class="text-xs font-medium">Slug (optional)</span>
+            <span class="text-[0.8rem] font-medium">Slug (optional)</span>
             <input id="slug" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="tea-ritual-for-focus" />
-            <p class="mt-1 text-[11px] text-body-subtle">Leave blank to auto-generate from the title.</p>
-            <p id="slugPreview" class="mt-1 text-[11px] font-mono text-body-faint"></p>
-            <p id="slugStatus" class="mt-1 text-[11px] text-body-subtle"></p>
+            <p class="mt-1 text-[0.8rem] text-body-subtle">Leave blank to auto-generate from the title.</p>
+            <p id="slugPreview" class="mt-1 text-[0.8rem] font-mono text-body-faint"></p>
+            <p id="slugStatus" class="mt-1 text-[0.8rem] text-body-subtle"></p>
           </label>
           <label class="block md:col-span-2">
-            <span class="text-xs font-medium">Excerpt</span>
+            <span class="text-[0.8rem] font-medium">Excerpt</span>
             <input id="excerpt" class="mt-1 w-full admin-btn-secondary px-3 py-2" />
-            <p id="excerptHint" class="mt-1 text-[11px] text-body-subtle">
+            <p id="excerptHint" class="mt-1 text-[0.8rem] text-body-subtle">
               Aim for around 220 characters so your intro stays readable in feeds. Leave blank to auto-generate from your
               Markdown.
             </p>
           </label>
           <label class="block md:col-span-2">
-            <span class="text-xs font-medium">TL;DR (optional)</span>
+            <span class="text-[0.8rem] font-medium">TL;DR (optional)</span>
             <textarea
               id="tldr"
               class="mt-1 w-full admin-btn-secondary px-3 py-2"
               rows="2"
               placeholder="One or two sentences that capture the core insight"
             ></textarea>
-            <p class="mt-1 text-[11px] text-body-subtle">
+            <p class="mt-1 text-[0.8rem] text-body-subtle">
               Keep it to 1–2 sentences. Leave blank to let the build pipeline summarize automatically.
             </p>
           </label>
           <label class="block md:col-span-2">
-            <span class="text-xs font-medium">Meta Description</span>
+            <span class="text-[0.8rem] font-medium">Meta Description</span>
             <input id="meta" class="mt-1 w-full admin-btn-secondary px-3 py-2" />
-            <p id="metaHint" class="mt-1 text-[11px] text-body-subtle">
+            <p id="metaHint" class="mt-1 text-[0.8rem] text-body-subtle">
               Aim for 120–160 characters. Keep it concise, actionable, and include your primary keywords. Leave blank for an
               auto-generated summary.
             </p>
@@ -107,22 +107,22 @@ const site = Astro.url?.origin ?? "";
               id="searchPreview"
               class="mt-3 rounded-lg border border-line-subtle bg-surface-sunken px-3 py-2 text-left text-sm shadow-inner"
             >
-              <p class="text-[10px] font-semibold uppercase tracking-wide text-body-faint">Search snippet preview</p>
+              <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-faint">Search snippet preview</p>
               <p id="searchPreviewTitle" class="mt-1 text-sm font-semibold text-surface-accent-deep">
                 Your post title will appear here
               </p>
-              <p id="searchPreviewUrl" class="text-[11px] text-body-muted">spacebarcollective.com/post/your-slug</p>
+              <p id="searchPreviewUrl" class="text-[0.8rem] text-body-muted">spacebarcollective.com/post/your-slug</p>
               <p id="searchPreviewDescription" class="mt-1 text-sm text-body-subtle">
                 Your meta description or excerpt will appear here so you can check the length.
               </p>
             </div>
           </label>
           <label class="block md:col-span-2">
-            <span class="text-xs font-medium">Tags (comma or newline separated, 4–7 ideal)</span>
+            <span class="text-[0.8rem] font-medium">Tags (comma or newline separated, 4–7 ideal)</span>
             <input id="tags" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="tea, ritual, focus, study" />
           </label>
           <fieldset class="block md:col-span-2">
-            <legend class="text-xs font-medium">Category</legend>
+            <legend class="text-[0.8rem] font-medium">Category</legend>
             <div class="mt-2 flex gap-4">
               <label class="inline-flex items-center gap-2 text-sm">
                 <input type="radio" id="categoryMeandering" name="category" value="meandering" checked />
@@ -135,14 +135,14 @@ const site = Astro.url?.origin ?? "";
             </div>
           </fieldset>
           <label class="block md:col-span-1">
-            <span class="text-xs font-medium">Spoons (optional)</span>
+            <span class="text-[0.8rem] font-medium">Spoons (optional)</span>
             <select id="spoons" class="mt-1 w-full admin-btn-secondary px-3 py-2">
               <option value="">Auto-detect from length</option>
               <option value="low">Low — quick read</option>
               <option value="medium">Medium — moderate focus</option>
               <option value="high">High — deep dive</option>
             </select>
-            <p class="mt-1 text-[11px] text-body-subtle">Override the automatic energy estimate if you already know the pace.</p>
+            <p class="mt-1 text-[0.8rem] text-body-subtle">Override the automatic energy estimate if you already know the pace.</p>
           </label>
         </div>
 
@@ -156,13 +156,13 @@ const site = Astro.url?.origin ?? "";
         </div>
 
         <label class="mt-4 block">
-          <span class="text-xs font-medium">Entities (optional, type:slug, comma-separated)</span>
+          <span class="text-[0.8rem] font-medium">Entities (optional, type:slug, comma-separated)</span>
           <input id="entities" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="herb:peppermint, crystal:fluorite" />
-          <p id="entityValidation" class="mt-2 text-xs"></p>
+          <p id="entityValidation" class="mt-2 text-[0.8rem]"></p>
         </label>
 
         <label class="mt-4 block">
-          <span class="text-xs font-medium">Markdown</span>
+          <span class="text-[0.8rem] font-medium">Markdown</span>
           <textarea id="markdown" class="mt-1 h-80 w-full admin-btn-secondary px-3 py-2 font-mono text-sm" placeholder="## Heading&#10;&#10;Your cozy content here..."></textarea>
         </label>
 

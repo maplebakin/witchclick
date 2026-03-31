@@ -63,14 +63,14 @@ const hasLinks = Array.isArray(author.links) && author.links.length > 0;
     --card-hover-translate: -0.2rem;
     --card-elevation-base: var(--elevation-tier-1);
     --card-elevation-hover: var(--elevation-tier-2);
-    border: 1px solid color-mix(in srgb, var(--ambient-color, #a855f7) 32%, var(--card-panel-border, currentColor) 68%);
+    border: 1px solid color-mix(in srgb, var(--ambient-color, hsl(var(--accent-2) / 1)) 32%, var(--card-panel-border, currentColor) 68%);
     background:
-      radial-gradient(circle at top left, color-mix(in srgb, var(--ambient-color, #a855f7) 18%, transparent 82%), transparent),
+      radial-gradient(circle at top left, color-mix(in srgb, var(--ambient-color, hsl(var(--accent-2) / 1)) 18%, transparent 82%), transparent),
       var(--card-panel-surface);
     padding: clamp(1.25rem, 3vw, 1.85rem);
     display: grid;
     gap: 0.75rem;
-    color: color-mix(in srgb, var(--ink-body, #1f1a2b) 92%, white 8%);
+    color: color-mix(in srgb, var(--ink-body, var(--text-body)) 92%, white 8%);
   }
 
   .author-spotlight--compact {
@@ -87,7 +87,7 @@ const hasLinks = Array.isArray(author.links) && author.links.length > 0;
     font-size: clamp(1.15rem, 2.6vw, 1.45rem);
     font-weight: 700;
     text-decoration: none;
-    color: color-mix(in srgb, var(--ink-strong, #0f172a) 85%, var(--ambient-color, #7c3aed) 15%);
+    color: color-mix(in srgb, var(--ink-strong, var(--text-strong)) 85%, var(--ambient-color, hsl(var(--accent-2) / 1)) 15%);
   }
 
   .author-spotlight__name:hover,
@@ -103,7 +103,7 @@ const hasLinks = Array.isArray(author.links) && author.links.length > 0;
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.18em;
-    color: color-mix(in srgb, var(--ink-muted, #475569) 78%, white 22%);
+    color: color-mix(in srgb, var(--ink-muted, var(--text-muted)) 78%, white 22%);
   }
 
   .author-spotlight__title,
@@ -111,7 +111,7 @@ const hasLinks = Array.isArray(author.links) && author.links.length > 0;
   .author-spotlight__count {
     margin: 0;
     font-size: 0.95rem;
-    color: color-mix(in srgb, var(--ink-muted, #475569) 82%, white 18%);
+    color: color-mix(in srgb, var(--ink-muted, var(--text-muted)) 82%, white 18%);
   }
 
   .author-spotlight__bio {
@@ -129,13 +129,13 @@ const hasLinks = Array.isArray(author.links) && author.links.length > 0;
   }
 
   .author-spotlight__specialties li {
-    background: color-mix(in srgb, var(--ambient-color, #7c3aed) 12%, white 88%);
+    background: color-mix(in srgb, var(--ambient-color, hsl(var(--accent-2) / 1)) 12%, white 88%);
     border-radius: 999px;
     padding: 0.25rem 0.9rem;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--ink-strong, #111827) 80%, white 20%);
+    color: color-mix(in srgb, var(--ink-strong, hsl(var(--neutral-8) / 1)) 80%, white 20%);
   }
 
   .author-spotlight__links {
@@ -152,13 +152,13 @@ const hasLinks = Array.isArray(author.links) && author.links.length > 0;
     align-items: center;
     gap: 0.3rem;
     font-weight: 600;
-    color: color-mix(in srgb, var(--ambient-color, #7c3aed) 70%, var(--ink-strong, #111827) 30%);
+    color: color-mix(in srgb, var(--ambient-color, hsl(var(--accent-2) / 1)) 70%, var(--ink-strong, hsl(var(--neutral-8) / 1)) 30%);
     text-decoration: none;
   }
 
   .author-spotlight__links a::after {
     content: "↗";
-    font-size: 0.75rem;
+    font-size: 0.8rem;
   }
 
   .author-spotlight__links a:hover,

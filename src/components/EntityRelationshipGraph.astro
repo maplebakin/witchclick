@@ -39,13 +39,13 @@ const links = neighbors.map((entity) => ({
 }));
 
 const palette: Record<string, string> = {
-  ritual: "#8b5cf6",
-  crystal: "#38bdf8",
-  herb: "#34d399",
-  moonPhase: "#facc15",
-  planetaryDay: "#fb7185",
-  tarot: "#f472b6",
-  default: "#c4b5fd",
+  ritual: "hsl(var(--accent-2) / 1)",
+  crystal: "hsl(var(--accent-1) / 1)",
+  herb: "hsl(var(--green-3) / 1)",
+  moonPhase: "var(--text-accent)",
+  planetaryDay: "hsl(var(--red-3) / 1)",
+  tarot: "hsl(var(--accent-2) / 1)",
+  default: "hsl(var(--accent-1) / 1)",
 };
 ---
 <section class="entity-graph" aria-label="Relationship graph">
@@ -91,7 +91,7 @@ const palette: Record<string, string> = {
 
     const link = canvas
       .append("g")
-      .attr("stroke", "#d1d5db")
+      .attr("stroke", "var(--border-subtle)")
       .attr("stroke-width", 1.2)
       .selectAll("line")
       .data(links)
@@ -113,10 +113,10 @@ const palette: Record<string, string> = {
       .attr("fill-opacity", (d) => (d.id === centerId ? 0.9 : 0.7))
       .attr("stroke", (d) =>
         d.direction === "inbound"
-          ? "#f59e0b"
+          ? "var(--text-accent)"
           : d.direction === "bidirectional"
-            ? "#8b5cf6"
-            : "#6366f1"
+            ? "hsl(var(--accent-2) / 1)"
+            : "hsl(var(--accent-3) / 1)"
       )
       .attr("stroke-width", (d) => (d.id === centerId ? 3 : 2))
       .attr("stroke-dasharray", (d) => (d.direction === "inbound" ? "4 2" : ""));
@@ -127,7 +127,7 @@ const palette: Record<string, string> = {
       .attr("text-anchor", "middle")
       .attr("font-size", (d) => (d.id === centerId ? "15px" : "12px"))
       .attr("dy", (d) => (d.id === centerId ? 5 : 4))
-      .attr("fill", "#111827")
+      .attr("fill", "hsl(var(--neutral-8) / 1)")
       .attr("pointer-events", "none");
 
     node.append("title").text((d) => `${d.label}\n${d.summary}`);

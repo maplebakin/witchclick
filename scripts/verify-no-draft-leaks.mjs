@@ -84,6 +84,59 @@ export function findLeakedDraftRoutes(distDir, draftSlugs) {
   return leaked;
 }
 
+const DATA_FILES_TO_SCAN = [
+  "search.json",
+  "feed.json",
+  path.join("feed", "ritual.json"),
+  path.join("feed", "meandering.json"),
+  "rss.xml",
+];
+
+function toDraftRouteCandidates(slug) {
+  return DRAFT_ROUTE_PREFIXES.map((prefix) => `${prefix}/${slug}`);
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function hasRouteCandidate(body, routeCandidate) {
+  const escapedRoute = escapeRegExp(routeCandidate);
+  const boundaryPattern = new RegExp(`${escapedRoute}(?=[/?#"'\\s<]|$)`);
+  return boundaryPattern.test(body);
+}
+
+export function findLeakedDraftDataFiles(distDir, draftSlugs) {
+  if (!fs.existsSync(distDir) || draftSlugs.length === 0) return [];
+
+  const leaks = [];
+  for (const relativeFile of DATA_FILES_TO_SCAN) {
+    const absoluteFile = path.join(distDir, relativeFile);
+    if (!fs.existsSync(absoluteFile)) continue;
+
+    let body = "";
+    try {
+      body = fs.readFileSync(absoluteFile, "utf8");
+    } catch {
+      continue;
+    }
+
+    for (const slug of draftSlugs) {
+      const routeCandidates = toDraftRouteCandidates(slug);
+      const hasLeak = routeCandidates.some((candidate) => hasRouteCandidate(body, candidate));
+      if (hasLeak) {
+        leaks.push({
+          slug,
+          file: relativeFile.replace(/\\/g, "/"),
+          routes: routeCandidates,
+        });
+      }
+    }
+  }
+
+  return leaks;
+}
+
 function collectSitemapFiles(distDir) {
   if (!fs.existsSync(distDir)) return [];
   return fs
@@ -134,14 +187,15 @@ export function verifyNoDraftLeaks({
 } = {}) {
   const draftSlugs = collectDraftPostSlugs(postsDir);
   if (draftSlugs.length === 0) {
-    return { ok: true, draftSlugs: [], routeLeaks: [], sitemapLeaks: [] };
+    return { ok: true, draftSlugs: [], routeLeaks: [], sitemapLeaks: [], dataLeaks: [] };
   }
 
   const routeLeaks = findLeakedDraftRoutes(distDir, draftSlugs);
   const sitemapLeaks = findLeakedDraftSitemapUrls(distDir, draftSlugs);
-  const ok = routeLeaks.length === 0 && sitemapLeaks.length === 0;
+  const dataLeaks = findLeakedDraftDataFiles(distDir, draftSlugs);
+  const ok = routeLeaks.length === 0 && sitemapLeaks.length === 0 && dataLeaks.length === 0;
 
-  return { ok, draftSlugs, routeLeaks, sitemapLeaks };
+  return { ok, draftSlugs, routeLeaks, sitemapLeaks, dataLeaks };
 }
 
 function logAndExit(result) {
@@ -164,6 +218,13 @@ function logAndExit(result) {
     console.error("\nLeaked sitemap URLs:");
     for (const leak of result.sitemapLeaks) {
       console.error(`- ${leak.pathname} via ${leak.sitemap} (draft slug: ${leak.slug})`);
+    }
+  }
+
+  if (result.dataLeaks.length > 0) {
+    console.error("\nLeaked feed/search data files:");
+    for (const leak of result.dataLeaks) {
+      console.error(`- ${leak.file} references draft slug: ${leak.slug}`);
     }
   }
 

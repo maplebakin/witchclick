@@ -76,7 +76,7 @@ export function resolveEntityRefs(refs: unknown[]): EntityRelation[] {
     if (!parsed) continue;
     const key = `${parsed.type}:${parsed.slug}`;
     if (seen.has(key)) continue;
-    const entity = readEntity(parsed.type, parsed.slug);
+    const entity = readEntity(parsed.type, parsed.slug, { includeUnpublished: false });
     if (!entity) continue;
     seen.add(key);
     results.push({
@@ -93,7 +93,7 @@ export function resolveEntityRefs(refs: unknown[]): EntityRelation[] {
 }
 
 export function findInboundRelations(targetType: string, targetSlug: string): EntityRelation[] {
-  const all = readAllEntities();
+  const all = readAllEntities({ includeUnpublished: false });
   const results: EntityRelation[] = [];
   const seen = new Set<string>();
   const needle = `${targetType}:${targetSlug}`;

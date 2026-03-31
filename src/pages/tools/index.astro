@@ -314,7 +314,13 @@ const breadcrumbs = [
         <p class="tools-request__copy">
           Looking for something specific? Share the ritual tool, planner, or resource you want and we will add it to the cozy backlog.
         </p>
-        <form class="tools-request__form" name="tools-request" method="POST" data-netlify="true">
+        <form
+          class="tools-request__form"
+          name="tools-request"
+          method="POST"
+          data-netlify="true"
+          data-form-success="Request received. Thanks for helping shape the printable queue."
+        >
           <input type="hidden" name="form-name" value="tools-request" />
           <label class="tools-request__label">
             What would help you right now?
@@ -337,6 +343,7 @@ const breadcrumbs = [
             />
           </label>
           <PrimaryButton type="submit">Send request</PrimaryButton>
+          <p class="wc-form-status" data-form-status hidden aria-live="polite"></p>
         </form>
       </div>
     </section>
@@ -517,7 +524,7 @@ const breadcrumbs = [
     justify-self: start;
     border-radius: 999px;
     padding: 0.25rem 0.65rem;
-    font-size: 0.72rem;
+    font-size: 0.8rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: color-mix(in srgb, var(--text-body) 78%, transparent 22%);
@@ -584,7 +591,7 @@ const breadcrumbs = [
     top: 1rem;
     right: 1rem;
     padding: 0.35rem 0.75rem;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 0.05em;
     text-transform: uppercase;
@@ -624,7 +631,7 @@ const breadcrumbs = [
 
   .print-card__tag {
     padding: 0.35rem 0.75rem;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 500;
     background: color-mix(in srgb, var(--surface-soft, #f3f4f6) 90%, transparent 10%);
     color: var(--text-body, #6b7280);
@@ -697,7 +704,7 @@ const breadcrumbs = [
 
   .tools-card__tag {
     padding: 0.35rem 0.75rem;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 500;
     background: color-mix(in srgb, var(--surface-soft, #f3f4f6) 90%, transparent 10%);
     color: var(--text-body, #6b7280);

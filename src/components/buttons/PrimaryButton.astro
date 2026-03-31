@@ -77,7 +77,7 @@ if (target === "_blank") {
     letter-spacing: 0.16em;
     text-transform: uppercase;
     line-height: 1.2;
-    box-shadow: var(--cozy-shadow, 0 16px 36px -28px color-mix(in srgb, var(--color-night, #261a0d) 60%, transparent 40%));
+    box-shadow: var(--cozy-shadow, 0 16px 36px -28px color-mix(in srgb, var(--color-night, var(--surface-panel)) 60%, transparent 40%));
     transition: background 160ms ease, transform 160ms ease, color 160ms ease, border-color 160ms ease, box-shadow 200ms ease;
     text-decoration: none;
   }
@@ -87,7 +87,7 @@ if (target === "_blank") {
     background: var(--btn-bg-hover);
     color: var(--btn-text);
     border-color: color-mix(in srgb, var(--border-accent-strong) 60%, transparent 40%);
-    box-shadow: var(--cozy-shadow-hover, 0 22px 46px -30px color-mix(in srgb, var(--color-night, #261a0d) 55%, transparent 45%));
+    box-shadow: var(--cozy-shadow-hover, 0 22px 46px -30px color-mix(in srgb, var(--color-night, var(--surface-panel)) 55%, transparent 45%));
   }
 
   .wc-button:active {

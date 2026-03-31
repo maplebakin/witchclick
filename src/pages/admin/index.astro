@@ -75,7 +75,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               AI-powered workflow for creating posts and curses. Generate prompts, validate JSON, preview content, and ingest to your site.
             </p>
           </div>
-          <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-4 text-xs text-body-muted">
+          <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-4 text-[0.8rem] text-body-muted">
             <div class="font-semibold mb-2">📝 How it works:</div>
             <ol class="space-y-2 ml-4 list-decimal">
               <li><strong>Choose content type:</strong> Select Posts for articles or Curses for printable rituals</li>
@@ -122,19 +122,19 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           <section class="lg:col-span-7 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
             <div class="mb-4 space-y-2">
               <h2 class="text-xl font-semibold">Step 2: Process JSON Content</h2>
-              <p class="text-xs text-body-muted">Paste PostSpec JSON from your AI, then validate, preview, and ingest</p>
+              <p class="text-[0.8rem] text-body-muted">Paste PostSpec JSON from your AI, then validate, preview, and ingest</p>
             </div>
 
-            <textarea id="spec" class="h-56 w-full admin-btn-secondary px-3 py-2 font-mono text-xs" placeholder="Infuse the Oracle's PostSpec v2 JSON here…"></textarea>
+            <textarea id="spec" class="h-56 w-full admin-btn-secondary px-3 py-2 font-mono text-[0.8rem]" placeholder="Infuse the Oracle's PostSpec v2 JSON here…"></textarea>
 
             <div class="mt-3 space-y-4 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] lg:gap-6">
               <div class="space-y-3">
                 <div class="flex flex-col gap-2">
-                  <div class="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wide text-body-muted">
+                  <div class="flex flex-wrap items-center gap-2 text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">
                     <span>Binding method</span>
                     <div class="inline-flex rounded-full border border-line-neutral bg-surface-neutral-soft p-1" data-save-mode>
-                      <button type="button" data-mode="publish" class="rounded-full px-3 py-1 text-[11px] font-semibold text-body bg-surface-base shadow-sm">Whisper to the world</button>
-                      <button type="button" data-mode="draft" class="rounded-full px-3 py-1 text-[11px] font-semibold text-body-muted">Secure in the grimoire</button>
+                      <button type="button" data-mode="publish" class="rounded-full px-3 py-1 text-[0.8rem] font-semibold text-body bg-surface-base shadow-sm">Whisper to the world</button>
+                      <button type="button" data-mode="draft" class="rounded-full px-3 py-1 text-[0.8rem] font-semibold text-body-muted">Secure in the grimoire</button>
                     </div>
                   </div>
                   <div class="flex flex-wrap gap-2">
@@ -144,7 +144,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
                     <button id="ingestPublishBtn" class="admin-btn-primary px-4 py-2 text-sm font-semibold">🚀 Unveil & Publish</button>
                     <button id="clearBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">Clear</button>
                   </div>
-                  <div class="text-xs text-body-muted rounded-lg border border-dashed border-line-subtle bg-surface-base/60 px-3 py-2">
+                  <div class="text-[0.8rem] text-body-muted rounded-lg border border-dashed border-line-subtle bg-surface-base/60 px-3 py-2">
                     <strong>💡 Tip:</strong> Validate first to check for errors, Preview to see the rendered flow. Use the save mode toggle to store drafts without publishing. <a href="/admin/staging" class="text-primary hover:underline">View staged drafts →</a>
                   </div>
                 </div>
@@ -155,7 +155,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
                   ></div>
                   <div
                     id="specSummary"
-                    class="rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[11px] text-body-muted"
+                    class="rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[0.8rem] text-body-muted"
                   ></div>
                 </div>
                 <div id="preview" class="prose prose-neutral mt-4 max-w-none border-t pt-4"></div>
@@ -164,18 +164,18 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
                 <div class="flex items-start justify-between gap-3">
                   <div>
                     <h3 class="text-sm font-semibold text-body-strong">Recent Posts</h3>
-                    <p class="text-xs text-body-muted">Quick links to the latest ingestions.</p>
+                    <p class="text-[0.8rem] text-body-muted">Quick links to the latest ingestions.</p>
                   </div>
-                  <button type="button" data-recent-refresh class="admin-btn-secondary px-3 py-1 text-xs font-semibold">↻ Refresh</button>
+                  <button type="button" data-recent-refresh class="admin-btn-secondary px-3 py-1 text-[0.8rem] font-semibold">↻ Refresh</button>
                 </div>
-                <label class="flex items-center gap-2 text-xs text-body-muted">
+                <label class="flex items-center gap-2 text-[0.8rem] text-body-muted">
                   <span class="sr-only">Filter recent posts</span>
                   <input type="search" data-recent-filter class="w-full admin-btn-secondary px-3 py-1.5 text-sm" placeholder="Filter posts…" />
                 </label>
                 <div class="space-y-2" data-recent-list>
-                  <div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-body-muted">Fetching recent posts…</div>
+                  <div class="rounded-lg border border-dashed border-line-subtle p-3 text-[0.8rem] text-body-muted">Fetching recent posts…</div>
                 </div>
-                <p class="text-[11px] text-body-muted">Select a post to insert a JSON stub or jump to the editor.</p>
+                <p class="text-[0.8rem] text-body-muted">Select a post to insert a JSON stub or jump to the editor.</p>
               </aside>
             </div>
           </section>
@@ -309,11 +309,11 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           function appendList(label, items, className){
             if (!Array.isArray(items) || !items.length) return;
             var heading=document.createElement('p');
-            heading.className='mt-2 text-[11px] font-semibold ' + className;
+            heading.className='mt-2 text-[0.8rem] font-semibold ' + className;
             heading.textContent=label + ':';
             el.appendChild(heading);
             var list=document.createElement('ul');
-            list.className='mt-1 list-disc pl-5 text-[11px] ' + className;
+            list.className='mt-1 list-disc pl-5 text-[0.8rem] ' + className;
             items.forEach(function(item){
               var li=document.createElement('li');
               li.textContent=String(item);
@@ -328,11 +328,11 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
           if (Array.isArray(postStubs) && postStubs.length) {
             var stubsHeading=document.createElement('p');
-            stubsHeading.className='mt-2 text-[11px] font-semibold text-info';
+            stubsHeading.className='mt-2 text-[0.8rem] font-semibold text-info';
             stubsHeading.textContent='Post stubs that will be created:';
             el.appendChild(stubsHeading);
             var stubsList=document.createElement('ul');
-            stubsList.className='mt-1 list-disc pl-5 text-[11px] text-info';
+            stubsList.className='mt-1 list-disc pl-5 text-[0.8rem] text-info';
             postStubs.forEach(function(stub){
               var li=document.createElement('li');
               li.textContent=(stub.title || stub.slug) + ' (' + (stub.path || stub.slug) + ')';
@@ -399,7 +399,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
           if (Array.isArray(errors) && errors.length) {
             var list=document.createElement('ul');
-            list.className='mt-2 list-disc pl-5 text-[11px] text-danger';
+            list.className='mt-2 list-disc pl-5 text-[0.8rem] text-danger';
             errors.forEach(function(item){
               var li=document.createElement('li');
               li.textContent=String(item);
@@ -437,7 +437,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           var panel = $('specSummary');
           if (!panel) return;
           panel.innerHTML='';
-          var baseClass='rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[11px]';
+          var baseClass='rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[0.8rem]';
           if (!spec) {
             panel.className = baseClass + ' text-body-subtle';
             var empty=document.createElement('p');
@@ -448,7 +448,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
           panel.className = baseClass + ' text-body-muted';
           var title=document.createElement('p');
-          title.className='text-xs font-semibold uppercase tracking-wide text-body-faint';
+          title.className='text-[0.8rem] font-semibold uppercase tracking-wide text-body-faint';
           title.textContent='Spec Summary';
           panel.appendChild(title);
 
@@ -470,10 +470,10 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             var row=document.createElement('div');
             row.className='grid grid-cols-[120px_1fr] gap-2';
             var dt=document.createElement('dt');
-            dt.className='text-[11px] font-medium text-body-faint';
+            dt.className='text-[0.8rem] font-medium text-body-faint';
             dt.textContent=label;
             var dd=document.createElement('dd');
-            dd.className='text-[11px] text-body';
+            dd.className='text-[0.8rem] text-body';
             dd.textContent=value;
             row.appendChild(dt);
             row.appendChild(dd);
@@ -503,7 +503,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           var panel = $('curseSummary');
           if (!panel) return;
           panel.innerHTML='';
-          var baseClass='rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[11px]';
+          var baseClass='rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[0.8rem]';
           if (!spec) {
             panel.className = baseClass + ' text-body-subtle';
             var empty=document.createElement('p');
@@ -514,7 +514,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
           panel.className = baseClass + ' text-body-muted';
           var title=document.createElement('p');
-          title.className='text-xs font-semibold uppercase tracking-wide text-body-faint';
+          title.className='text-[0.8rem] font-semibold uppercase tracking-wide text-body-faint';
           title.textContent='Curse Summary';
           panel.appendChild(title);
 
@@ -522,10 +522,10 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             var row=document.createElement('div');
             row.className='grid grid-cols-[120px_1fr] gap-2';
             var dt=document.createElement('dt');
-            dt.className='text-[11px] font-medium text-body-faint';
+            dt.className='text-[0.8rem] font-medium text-body-faint';
             dt.textContent=label;
             var dd=document.createElement('dd');
-            dd.className='text-[11px] text-body';
+            dd.className='text-[0.8rem] text-body';
             dd.textContent=value;
             row.appendChild(dt);
             row.appendChild(dd);
@@ -575,7 +575,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             totalWords += wordCount(sec.markdown||'');
           }
           var meta = document.createElement('p');
-          meta.className='mt-4 text-xs text-body-faint';
+          meta.className='mt-4 text-[0.8rem] text-body-faint';
           meta.textContent = '~' + totalWords + ' words • ~' + Math.max(1, Math.round(totalWords/200)) + ' min read';
           el.appendChild(meta);
         }
@@ -935,13 +935,13 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
         function renderRecentPosts(){
           if (!recentListEl) return;
           if (!recentPosts.length) {
-            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-body-muted">No scrolls in the archive yet.</div>';
+            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-[0.8rem] text-body-muted">No scrolls in the archive yet.</div>';
             return;
           }
           var term = recentFilterText.trim().toLowerCase();
           var filtered = recentPosts.filter(function(post){ return matchesRecentFilter(post, term); });
           if (!filtered.length) {
-            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-body-muted">No matching scrolls. Refine your scrying.</div>';
+            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-[0.8rem] text-body-muted">No matching scrolls. Refine your scrying.</div>';
             return;
           }
           recentListEl.innerHTML = '';
@@ -955,13 +955,13 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               <div class="flex items-start justify-between gap-3">
                 <div>
                   <p class="font-semibold text-body">${(post.title || '(untitled)').replace(/</g, '&lt;')}</p>
-                  <p class="text-[11px] text-body-muted">${post.slug || ''}</p>
+                  <p class="text-[0.8rem] text-body-muted">${post.slug || ''}</p>
                 </div>
-                <span class="text-[10px] font-semibold uppercase tracking-wide text-body-muted">${dateLabel}</span>
+                <span class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">${dateLabel}</span>
               </div>
               <div class="mt-2 flex flex-wrap gap-2">
-                <button type="button" class="rounded-lg border border-line-neutral px-2 py-1 text-[11px] font-semibold hover:bg-surface-base" data-recent-insert data-slug="${safeSlugAttr}">Infuse stub</button>
-                <a class="rounded-lg border border-line-neutral px-2 py-1 text-[11px] font-semibold text-primary hover:bg-surface-base" href="/admin/posts?slug=${encodeURIComponent(post.slug || '')}" target="_blank" rel="noopener">Edit</a>
+                <button type="button" class="rounded-lg border border-line-neutral px-2 py-1 text-[0.8rem] font-semibold hover:bg-surface-base" data-recent-insert data-slug="${safeSlugAttr}">Infuse stub</button>
+                <a class="rounded-lg border border-line-neutral px-2 py-1 text-[0.8rem] font-semibold text-primary hover:bg-surface-base" href="/admin/posts?slug=${encodeURIComponent(post.slug || '')}" target="_blank" rel="noopener">Edit</a>
               </div>
             `;
             recentListEl.appendChild(card);
@@ -970,7 +970,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
         async function loadRecentPosts(){
           if (!recentListEl) return;
-          recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-body-muted">Summoning recent scrolls…</div>';
+          recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-[0.8rem] text-body-muted">Summoning recent scrolls…</div>';
           try{
             var res = await apiFetch('/posts/list', { method: 'POST' });
             var data = await res.json();
@@ -980,7 +980,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             recentPosts = items.slice(0, 10);
             renderRecentPosts();
           }catch(error){
-            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-xs text-danger">The archive resisteth! Failed to load recent scrolls.</div>';
+            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-[0.8rem] text-danger">The archive resisteth! Failed to load recent scrolls.</div>';
           }
         }
 
@@ -1132,7 +1132,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             totalWords += wordCount(sec.markdown||'');
           }
           var meta = document.createElement('p');
-          meta.className='mt-4 text-xs text-body-faint';
+          meta.className='mt-4 text-[0.8rem] text-body-faint';
           meta.textContent = '~' + totalWords + ' words • ~' + Math.max(1, Math.round(totalWords/200)) + ' min read';
           el.appendChild(meta);
         }

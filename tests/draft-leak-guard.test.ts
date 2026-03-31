@@ -48,6 +48,7 @@ describe("draft leak guard", () => {
     expect(result.draftSlugs).toContain("draft-post");
     expect(result.routeLeaks).toEqual([]);
     expect(result.sitemapLeaks).toEqual([]);
+    expect(result.dataLeaks).toEqual([]);
   });
 
   it("fails when a draft slug appears in a generated route and sitemap URL", async () => {
@@ -82,5 +83,54 @@ describe("draft leak guard", () => {
         }),
       ]),
     );
+    expect(result.dataLeaks).toEqual([]);
+  });
+
+  it("fails when a draft slug appears in search/feed payloads", async () => {
+    await setupTempProject();
+
+    await writeFile(
+      "src/content/posts/hidden.md",
+      `---\ntitle: Hidden\nslug: hidden-from-public\ndraft: true\n---\nHidden`,
+    );
+    await writeFile("dist/feed.json", `{"items":[{"url":"https://witchclick.space/post/hidden-from-public"}]}`);
+
+    const modulePath = "../scripts/verify-no-draft-leaks.mjs";
+    const { verifyNoDraftLeaks } = await import(modulePath);
+    const result = verifyNoDraftLeaks({ projectRoot: tempDir });
+
+    expect(result.ok).toBe(false);
+    expect(result.routeLeaks).toEqual([]);
+    expect(result.sitemapLeaks).toEqual([]);
+    expect(result.dataLeaks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          slug: "hidden-from-public",
+          file: "feed.json",
+        }),
+      ]),
+    );
+  });
+
+  it("does not flag data leaks when draft slug is only a prefix of a published slug", async () => {
+    await setupTempProject();
+
+    await writeFile(
+      "src/content/posts/hidden.md",
+      `---\ntitle: Hidden\nslug: short-slug\ndraft: true\n---\nHidden`,
+    );
+    await writeFile(
+      "dist/feed.json",
+      `{"items":[{"url":"https://witchclick.space/post/short-slug-expanded"}]}`,
+    );
+
+    const modulePath = "../scripts/verify-no-draft-leaks.mjs";
+    const { verifyNoDraftLeaks } = await import(modulePath);
+    const result = verifyNoDraftLeaks({ projectRoot: tempDir });
+
+    expect(result.ok).toBe(true);
+    expect(result.routeLeaks).toEqual([]);
+    expect(result.sitemapLeaks).toEqual([]);
+    expect(result.dataLeaks).toEqual([]);
   });
 });

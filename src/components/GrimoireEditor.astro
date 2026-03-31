@@ -6,7 +6,7 @@ import Button from '@/components/ui/Button.astro';
 
 <section class="grimoire-editor rounded-3xl border border-line-strong p-6 shadow-sm md:p-8">
   <header class="space-y-2">
-    <p class="grimoire-editor__eyebrow text-xs uppercase tracking-[0.22em]">Grimoire Editor</p>
+    <p class="grimoire-editor__eyebrow text-[0.8rem] uppercase tracking-[0.22em]">Grimoire Editor</p>
     <h2 class="font-serif text-3xl text-heading">Inscribe a New Page</h2>
     <p class="max-w-2xl text-sm text-body">
       Start with a clear title, set the route slug, then draft the body of your working.
@@ -15,7 +15,7 @@ import Button from '@/components/ui/Button.astro';
 
   <form class="mt-6 space-y-5" aria-label="Grimoire editor">
     <label class="block">
-      <span class="text-xs uppercase tracking-[0.18em] text-body-muted">Title</span>
+      <span class="text-[0.8rem] uppercase tracking-[0.18em] text-body-muted">Title</span>
       <div class="grimoire-editor__field-shell mt-2">
         <Input
           id="grimoire-title"
@@ -27,20 +27,20 @@ import Button from '@/components/ui/Button.astro';
     </label>
 
     <label class="block">
-      <span class="text-xs uppercase tracking-[0.18em] text-body-muted">Slug</span>
+      <span class="text-[0.8rem] uppercase tracking-[0.18em] text-body-muted">Slug</span>
       <div class="grimoire-editor__field-shell mt-2">
         <Input
           id="grimoire-slug"
           name="slug"
           autocomplete="off"
           placeholder="gentle-ritual-for-focused-mornings"
-          class="font-mono text-xs"
+          class="font-mono text-[0.8rem]"
         />
       </div>
     </label>
 
     <label class="block">
-      <span class="text-xs uppercase tracking-[0.18em] text-body-muted">Body</span>
+      <span class="text-[0.8rem] uppercase tracking-[0.18em] text-body-muted">Body</span>
       <div class="grimoire-editor__field-shell mt-2">
         <Textarea
           id="grimoire-body"
@@ -52,7 +52,7 @@ import Button from '@/components/ui/Button.astro';
     </label>
 
     <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
-      <p class="text-xs text-body-muted">Phase 2 scaffold: save and publish wiring arrives in the next phase.</p>
+      <p class="text-[0.8rem] text-body-muted">Phase 2 scaffold: save and publish wiring arrives in the next phase.</p>
       <Button type="button" variant="secondary">Seal Working (Soon)</Button>
     </div>
   </form>

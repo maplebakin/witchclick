@@ -17,37 +17,37 @@ const { title, open = false } = Astro.props as Props;
   .wc-accordion {
     --accordion-border: color-mix(
       in srgb,
-      var(--ambient-color, hsl(270 55% 50%)) 45%,
+      var(--ambient-color, hsl(var(--accent-2) / 1)) 45%,
       transparent 55%
     );
     --accordion-border-active: color-mix(
       in srgb,
-      var(--ambient-color, hsl(270 55% 50%)) 58%,
+      var(--ambient-color, hsl(var(--accent-2) / 1)) 58%,
       transparent 42%
     );
     --accordion-surface: color-mix(
       in srgb,
-      var(--ambient-color, hsl(270 55% 50%)) 22%,
+      var(--ambient-color, hsl(var(--accent-2) / 1)) 22%,
       black 78%
     );
     --accordion-surface-active: color-mix(
       in srgb,
-      var(--ambient-color, hsl(270 55% 50%)) 28%,
+      var(--ambient-color, hsl(var(--accent-2) / 1)) 28%,
       black 72%
     );
     border-radius: 1rem;
     border: 1px solid var(--accordion-border);
     background: linear-gradient(160deg, var(--accordion-surface) 0%, color-mix(in srgb,
-            var(--ambient-color, hsl(270 55% 50%)) 16%, black 84%) 100%);
-    box-shadow: 0 20px 45px -28px color-mix(in srgb, var(--ambient-color, hsl(270 55% 50%)) 38%, black 62%);
-    color: var(--action-primary-text, #f6f2ff);
+            var(--ambient-color, hsl(var(--accent-2) / 1)) 16%, black 84%) 100%);
+    box-shadow: 0 20px 45px -28px color-mix(in srgb, var(--ambient-color, hsl(var(--accent-2) / 1)) 38%, black 62%);
+    color: var(--action-primary-text, var(--text-strong));
     overflow: hidden;
   }
 
   .wc-accordion[open] {
     border-color: var(--accordion-border-active);
     background: linear-gradient(160deg, var(--accordion-surface-active) 0%, color-mix(in srgb,
-            var(--ambient-color, hsl(270 55% 50%)) 20%, black 80%) 100%);
+            var(--ambient-color, hsl(var(--accent-2) / 1)) 20%, black 80%) 100%);
   }
 
   .wc-accordion__summary {
@@ -86,7 +86,7 @@ const { title, open = false } = Astro.props as Props;
   }
 
   .wc-accordion__summary:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--action-primary-text, #f6f2ff) 70%, white 30%);
+    outline: 2px solid color-mix(in srgb, var(--action-primary-text, var(--text-strong)) 70%, white 30%);
     outline-offset: 3px;
   }
 
@@ -96,7 +96,7 @@ const { title, open = false } = Astro.props as Props;
     gap: 0.75rem;
     font-family: var(--font-body-ui, var(--font-body));
     font-size: 0.95rem;
-    color: color-mix(in srgb, var(--action-primary-text, #f6f2ff) 94%, white 6%);
+    color: color-mix(in srgb, var(--action-primary-text, var(--text-strong)) 94%, white 6%);
   }
 
   :global(.wc-accordion__lead) {
@@ -111,40 +111,40 @@ const { title, open = false } = Astro.props as Props;
   }
 
   :global(.wc-accordion__list li::marker) {
-    color: color-mix(in srgb, var(--action-primary-text, #f6f2ff) 65%, white 35%);
+    color: color-mix(in srgb, var(--action-primary-text, var(--text-strong)) 65%, white 35%);
   }
 
   :root[data-comfort-theme="dawn"] .wc-accordion {
     --accordion-border: color-mix(
       in srgb,
-      var(--panel-border-soft, hsl(270 30% 82% / 0.3)) 65%,
+      var(--panel-border-soft, color-mix(in srgb, var(--border-subtle) 72%, transparent 28%)) 65%,
       transparent 35%
     );
     --accordion-border-active: color-mix(
       in srgb,
-      var(--panel-border-strong, hsl(270 30% 75% / 0.35)) 70%,
+      var(--panel-border-strong, color-mix(in srgb, var(--border-strong) 72%, transparent 28%)) 70%,
       transparent 30%
     );
-    background: linear-gradient(160deg, color-mix(in oklab, var(--panel-surface-soft, #f2ebff) 94%, white 6%) 0%,
-        color-mix(in oklab, var(--panel-surface-strong, #e2d5fa) 88%, white 12%) 100%);
-    box-shadow: 0 20px 45px -28px color-mix(in srgb, var(--surface-tint, hsl(270 55% 62%)) 26%, transparent 74%);
-    color: var(--ink-strong, #1a102c);
+    background: linear-gradient(160deg, color-mix(in oklab, var(--panel-surface-soft, var(--surface-card)) 94%, white 6%) 0%,
+        color-mix(in oklab, var(--panel-surface-strong, var(--surface-elevated)) 88%, white 12%) 100%);
+    box-shadow: 0 20px 45px -28px color-mix(in srgb, var(--surface-tint, hsl(var(--accent-1) / 1)) 26%, transparent 74%);
+    color: var(--ink-strong, var(--text-strong));
   }
 
   :root[data-comfort-theme="dawn"] .wc-accordion[open] {
-    background: linear-gradient(160deg, color-mix(in oklab, var(--panel-surface-strong, #e2d5fa) 92%, white 8%) 0%,
-        color-mix(in oklab, var(--panel-surface-strong, #e2d5fa) 82%, white 18%) 100%);
+    background: linear-gradient(160deg, color-mix(in oklab, var(--panel-surface-strong, var(--surface-elevated)) 92%, white 8%) 0%,
+        color-mix(in oklab, var(--panel-surface-strong, var(--surface-elevated)) 82%, white 18%) 100%);
   }
 
   :global(:root[data-comfort-theme="dawn"] .wc-accordion__summary) {
-    color: var(--ink-strong, #1a102c);
+    color: var(--ink-strong, var(--text-strong));
   }
 
   :root[data-comfort-theme="dawn"] .wc-accordion__panel {
-    color: var(--ink-body, #2c1b3d);
+    color: var(--ink-body, var(--text-body));
   }
 
   :global(:root[data-comfort-theme="dawn"] .wc-accordion__list li::marker) {
-    color: color-mix(in srgb, var(--action-primary, hsl(270 55% 50%)) 45%, transparent 55%);
+    color: color-mix(in srgb, var(--action-primary, hsl(var(--accent-2) / 1)) 45%, transparent 55%);
   }
 </style>

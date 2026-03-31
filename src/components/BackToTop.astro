@@ -27,13 +27,13 @@
     width: 3rem;
     height: 3rem;
     border-radius: 50%;
-    border: 2px solid color-mix(in srgb, var(--theme-color-gold, #d4af37) 45%, transparent 55%);
-    background: color-mix(in srgb, var(--theme-color-night, #120725) 90%, var(--theme-color-iris, #4b2a63) 10%);
-    color: var(--theme-color-gold, #d4af37);
+    border: 2px solid color-mix(in srgb, var(--theme-color-gold, var(--text-accent)) 45%, transparent 55%);
+    background: color-mix(in srgb, var(--theme-color-night, var(--surface-base)) 90%, var(--theme-color-iris, hsl(var(--accent-ink) / 1)) 10%);
+    color: var(--theme-color-gold, var(--text-accent));
     cursor: pointer;
     box-shadow:
-      0 4px 12px rgba(0, 0, 0, 0.4),
-      0 0 0 1px color-mix(in srgb, var(--theme-color-gold, #d4af37) 25%, transparent 75%);
+      0 4px 12px hsl(var(--neutral-9) / 0.4),
+      0 0 0 1px color-mix(in srgb, var(--theme-color-gold, var(--text-accent)) 25%, transparent 75%);
     opacity: 0;
     visibility: hidden;
     transform: translateY(1rem) scale(0.9);
@@ -47,14 +47,14 @@
   }
 
   .back-to-top:hover {
-    background: color-mix(in srgb, var(--theme-color-night, #120725) 82%, var(--theme-color-iris, #4b2a63) 18%);
-    border-color: color-mix(in srgb, var(--theme-color-gold, #d4af37) 55%, var(--theme-color-iris, #4b2a63) 45%);
-    color: var(--color-rune, #f8f3ff);
+    background: color-mix(in srgb, var(--theme-color-night, var(--surface-base)) 82%, var(--theme-color-iris, hsl(var(--accent-ink) / 1)) 18%);
+    border-color: color-mix(in srgb, var(--theme-color-gold, var(--text-accent)) 55%, var(--theme-color-iris, hsl(var(--accent-ink) / 1)) 45%);
+    color: var(--color-rune, var(--text-strong));
     transform: translateY(-3px) scale(1.05);
     box-shadow:
-      0 8px 16px rgba(0, 0, 0, 0.5),
-      0 0 0 1px color-mix(in srgb, var(--theme-color-gold, #d4af37) 35%, transparent 65%),
-      0 0 20px color-mix(in srgb, var(--theme-color-iris, #4b2a63) 30%, transparent 70%);
+      0 8px 16px hsl(var(--neutral-9) / 0.5),
+      0 0 0 1px color-mix(in srgb, var(--theme-color-gold, var(--text-accent)) 35%, transparent 65%),
+      0 0 20px color-mix(in srgb, var(--theme-color-iris, hsl(var(--accent-ink) / 1)) 30%, transparent 70%);
   }
 
   .back-to-top:active {
@@ -62,7 +62,7 @@
   }
 
   .back-to-top:focus-visible {
-    outline: 3px solid var(--theme-color-gold, #d4af37);
+    outline: 3px solid var(--theme-color-gold, var(--text-accent));
     outline-offset: 3px;
   }
 
@@ -72,22 +72,22 @@
 
   /* Dawn theme */
   :root[data-comfort-theme="dawn"] .back-to-top {
-    background: color-mix(in srgb, var(--color-night, #ede5dc) 98%, var(--theme-color-iris, #9b86c8) 2%);
-    border-color: color-mix(in srgb, var(--theme-color-iris, #9b86c8) 35%, transparent 65%);
-    color: var(--theme-color-iris, #9b86c8);
+    background: color-mix(in srgb, var(--color-night, var(--surface-base)) 98%, var(--theme-color-iris, hsl(var(--accent-2) / 1)) 2%);
+    border-color: color-mix(in srgb, var(--theme-color-iris, hsl(var(--accent-2) / 1)) 35%, transparent 65%);
+    color: var(--theme-color-iris, hsl(var(--accent-2) / 1));
     box-shadow:
-      0 4px 12px rgba(71, 54, 96, 0.2),
-      0 0 0 1px color-mix(in srgb, var(--theme-color-iris, #9b86c8) 20%, transparent 80%);
+      0 4px 12px hsl(var(--neutral-7) / 0.2),
+      0 0 0 1px color-mix(in srgb, var(--theme-color-iris, hsl(var(--accent-2) / 1)) 20%, transparent 80%);
   }
 
   :root[data-comfort-theme="dawn"] .back-to-top:hover {
-    background: color-mix(in srgb, var(--color-night, #ede5dc) 95%, var(--theme-color-iris, #9b86c8) 5%);
-    border-color: color-mix(in srgb, var(--theme-color-iris, #9b86c8) 50%, transparent 50%);
-    color: var(--theme-color-iris, #9b86c8);
+    background: color-mix(in srgb, var(--color-night, var(--surface-base)) 95%, var(--theme-color-iris, hsl(var(--accent-2) / 1)) 5%);
+    border-color: color-mix(in srgb, var(--theme-color-iris, hsl(var(--accent-2) / 1)) 50%, transparent 50%);
+    color: var(--theme-color-iris, hsl(var(--accent-2) / 1));
     box-shadow:
-      0 8px 16px rgba(71, 54, 96, 0.25),
-      0 0 0 1px color-mix(in srgb, var(--theme-color-iris, #9b86c8) 30%, transparent 70%),
-      0 0 20px rgba(155, 134, 200, 0.2);
+      0 8px 16px hsl(var(--neutral-7) / 0.25),
+      0 0 0 1px color-mix(in srgb, var(--theme-color-iris, hsl(var(--accent-2) / 1)) 30%, transparent 70%),
+      0 0 20px hsl(var(--accent-2) / 0.2);
   }
 
   /* Mobile positioning */

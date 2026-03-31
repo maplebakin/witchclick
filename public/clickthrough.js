@@ -7,7 +7,7 @@
   const DATASET_FLAG = "affiliateBound";
   const MAX_ENTRIES = 100;
   const analyticsEnabled = Boolean(window.__WC_ANALYTICS__);
-  const ENDPOINT_PATH = "/api/affiliate-click.json";
+  const AFFILIATE_EVENT_NAME = "affiliate_click";
 
   function readLog() {
     try {
@@ -36,29 +36,39 @@
     writeLog(entries);
   }
 
-  function buildClickUrl(payload) {
-    const params = new URLSearchParams();
-    if (payload?.url) {
-      params.set("url", String(payload.url));
-    }
-    if (payload?.ts) {
-      params.set("ts", String(payload.ts));
-    }
-    return `${ENDPOINT_PATH}?${params.toString()}`;
-  }
-
   function sendClickBeacon(payload) {
     if (!analyticsEnabled) return;
+    const cfg = window.__WC_ANALYTICS__ || null;
+    if (!cfg) return;
 
-    const endpoint = buildClickUrl(payload);
+    const details = {
+      href: payload?.url ? String(payload.url) : "",
+      ts: payload?.ts ? String(payload.ts) : new Date().toISOString(),
+    };
 
-    if (typeof fetch === "function") {
-      fetch(endpoint, {
-        method: "GET",
-        keepalive: true,
-      }).catch((error) => {
-        console.warn("Affiliate beacon fetch failed", error);
-      });
+    try {
+      if (cfg.provider === "plausible") {
+        if (typeof window.plausible === "function") {
+          window.plausible(AFFILIATE_EVENT_NAME, { props: details });
+        }
+      } else if (cfg.provider === "fathom") {
+        if (window.fathom && typeof window.fathom.trackEvent === "function") {
+          window.fathom.trackEvent(AFFILIATE_EVENT_NAME);
+        }
+      } else if (cfg.provider === "umami") {
+        var umami = window.umami;
+        if (typeof umami === "function") {
+          umami(AFFILIATE_EVENT_NAME, details);
+        } else if (umami && typeof umami.trackEvent === "function") {
+          umami.trackEvent(AFFILIATE_EVENT_NAME, details);
+        }
+      } else if (cfg.provider === "simple-analytics") {
+        if (typeof window.sa_event === "function") {
+          window.sa_event(AFFILIATE_EVENT_NAME, details);
+        }
+      }
+    } catch (error) {
+      console.warn("Affiliate analytics event failed", error);
     }
   }
 

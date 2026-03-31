@@ -15,7 +15,7 @@ import {
   footerUtilityLinks,
   adminNavSections,
 } from "@/data/navigation";
-import { readSettings, buildCanonicalUrl, toAbsoluteUrl } from "@/utils/settings";
+import { readSettings, buildCanonicalUrl, toAbsoluteUrl, getFormEndpoint } from "@/utils/settings";
 import { buildAnalyticsInjection } from "@/utils/analytics";
 import { getActiveThemes } from "@/utils/theme";
 import { mixColors } from "@/utils/color";
@@ -107,6 +107,7 @@ const normalizeAccountLink = (
 // Settings and Theme Configuration
 const settings = readSettings();
 const analytics = buildAnalyticsInjection(settings);
+const formEndpoint = getFormEndpoint(settings);
 const brandName = settings.brandName ?? "WitchClick";
 const disclosure = settings.disclosure ?? "";
 const showAccountLink = settings.showAccountLink ?? false;
@@ -401,6 +402,9 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
     </script>
 
     <slot name="head" />
+    {analytics?.head?.attributes && (
+      <script is:inline {...analytics.head.attributes}></script>
+    )}
   </head>
   
   <body
@@ -549,13 +553,159 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
     />
     
 	    <!-- Analytics -->
-	    {analytics?.runtime?.inline && (
-	      <script is:inline set:html={analytics.runtime.inline}></script>
+	    {analytics?.config?.inline && (
+	      <script is:inline set:html={analytics.config.inline}></script>
 	    )}
-	    <script is:inline src="/clickthrough.js"></script>
-	    
-	    <!-- Observability -->
-	    {observabilityConfig && (
+		    {analytics?.runtime?.inline && (
+		      <script is:inline set:html={analytics.runtime.inline}></script>
+		    )}
+		    <script is:inline src="/clickthrough.js"></script>
+		    <script is:inline define:vars={{ formEndpoint }}>
+		      (() => {
+		        const configuredEndpoint = typeof formEndpoint === "string" ? formEndpoint.trim() : "";
+		        const forms = Array.from(document.querySelectorAll('form[data-netlify="true"]'));
+		        if (!forms.length) return;
+
+		        const ensureStatusNode = (form) => {
+		          const existing = form.querySelector("[data-form-status]");
+		          if (existing instanceof HTMLElement) return existing;
+		          const node = document.createElement("p");
+		          node.className = "wc-form-status";
+		          node.dataset.formStatus = "";
+		          node.hidden = true;
+		          node.setAttribute("aria-live", "polite");
+		          form.appendChild(node);
+		          return node;
+		        };
+
+		        const setStatus = (node, state, message) => {
+		          node.hidden = false;
+		          node.className = "wc-form-status";
+		          node.dataset.state = state;
+		          if (state) node.classList.add(`wc-form-status--${state}`);
+		          node.textContent = message;
+		          node.setAttribute("role", state === "error" ? "alert" : "status");
+		          node.setAttribute("aria-live", state === "error" ? "assertive" : "polite");
+		        };
+
+		        const clearStatus = (node) => {
+		          node.hidden = true;
+		          node.className = "wc-form-status";
+		          node.dataset.state = "";
+		          node.textContent = "";
+		          node.removeAttribute("role");
+		          node.setAttribute("aria-live", "polite");
+		        };
+
+		        const resolveEndpoint = (form) => {
+		          const perForm = (form.getAttribute("data-form-endpoint") || "").trim();
+		          return perForm || configuredEndpoint;
+		        };
+
+		        const toggleSubmitting = (form, isSubmitting) => {
+		          form.setAttribute("aria-busy", isSubmitting ? "true" : "false");
+		          const submitControls = form.querySelectorAll('button[type="submit"], input[type="submit"]');
+		          submitControls.forEach((control) => {
+		            if (control instanceof HTMLButtonElement || control instanceof HTMLInputElement) {
+		              control.disabled = isSubmitting;
+		            }
+		          });
+		        };
+
+		        const toBodyString = (formData) => {
+		          const params = new URLSearchParams();
+		          for (const [key, value] of formData.entries()) {
+		            if (typeof value === "string") {
+		              params.append(key, value);
+		            }
+		          }
+		          return params.toString();
+		        };
+
+		        const parseErrorDetail = async (response) => {
+		          const contentType = response.headers.get("content-type") || "";
+		          if (contentType.includes("application/json")) {
+		            try {
+		              const payload = await response.json();
+		              if (payload && typeof payload === "object") {
+		                const message = payload.error || payload.message;
+		                if (typeof message === "string" && message.trim()) {
+		                  return message.trim();
+		                }
+		              }
+		            } catch (_error) {
+		              // Ignore parse issues and fall back to status text.
+		            }
+		          }
+		          const statusText = response.statusText ? ` ${response.statusText}` : "";
+		          return `HTTP ${response.status}${statusText}`.trim();
+		        };
+
+		        forms.forEach((node) => {
+		          if (!(node instanceof HTMLFormElement)) return;
+		          const form = node;
+		          const statusNode = ensureStatusNode(form);
+		          const successMessage =
+		            form.getAttribute("data-form-success") || "Thanks! Your message was sent.";
+		          const defaultErrorMessage =
+		            form.getAttribute("data-form-error") ||
+		            "We couldn't send that right now. Please try again in a moment.";
+
+		          form.addEventListener("submit", async (event) => {
+		            event.preventDefault();
+		            if (!form.reportValidity()) return;
+		            clearStatus(statusNode);
+
+		            const endpoint = resolveEndpoint(form);
+		            if (!endpoint) {
+		              setStatus(
+		                statusNode,
+		                "error",
+		                "Form delivery is not configured yet. Please set formEndpoint in content/settings.json.",
+		              );
+		              return;
+		            }
+
+		            const payload = new FormData(form);
+		            if (!payload.get("form-name")) {
+		              const formName = form.getAttribute("name");
+		              if (formName) payload.set("form-name", formName);
+		            }
+
+		            setStatus(statusNode, "pending", "Sending...");
+		            toggleSubmitting(form, true);
+
+		            try {
+		              const response = await fetch(endpoint, {
+		                method: "POST",
+		                headers: {
+		                  "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+		                  Accept: "application/json",
+		                },
+		                body: toBodyString(payload),
+		              });
+
+		              if (!response.ok) {
+		                const detail = await parseErrorDetail(response);
+		                throw new Error(detail);
+		              }
+
+		              form.reset();
+		              setStatus(statusNode, "success", successMessage);
+		            } catch (error) {
+		              const detail = error instanceof Error ? error.message : "";
+		              const suffix = detail ? ` (${detail})` : "";
+		              setStatus(statusNode, "error", `${defaultErrorMessage}${suffix}`);
+		            } finally {
+		              toggleSubmitting(form, false);
+		            }
+		          });
+		        });
+		      })();
+		    </script>
+		    
+		    <!-- Observability -->
+		    {observabilityConfig && (
 	      <script type="module" is:inline define:vars={{ observabilityConfig }}>
 	        import { initObservability } from "@/utils/observability";
         initObservability(observabilityConfig);

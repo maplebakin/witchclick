@@ -183,7 +183,7 @@ const ritualLabPayloadJson = safeJsonStringify({
   )}
   <section class="mx-auto max-w-6xl space-y-6 py-12">
     <header class="space-y-3 text-center">
-      <p class="text-sm uppercase tracking-widest text-accent">Phase 2 Lab</p>
+      <p class="text-sm uppercase tracking-wide text-accent">Phase 2 Lab</p>
       <h1 class="font-serif text-4xl">Prototype Ritual Generator</h1>
       <p class="mx-auto max-w-2xl text-base opacity-80">
         Pair your current intention with the tools you have on hand. The ritual lab suggests a sequence, offers alternates, and shares printable exports so you can carry the flow into your week.
@@ -224,7 +224,7 @@ const ritualLabPayloadJson = safeJsonStringify({
 
             <div class="space-y-2">
               <span class="block text-sm font-semibold uppercase tracking-wide text-tertiary">Tools & Texture</span>
-              <p class="text-xs opacity-70">Pick what you have nearby—sound gear, journals, or group energy.</p>
+              <p class="text-[0.8rem] opacity-70">Pick what you have nearby—sound gear, journals, or group energy.</p>
               <div class="mt-3 grid gap-2">
                 {toolOptions.map((tool) => (
                   <label class="flex items-center gap-3 rounded-2xl border border-line-muted/80 bg-surface-muted/80 px-3 py-2 text-sm font-medium text-primary transition hover:border-line-bolder dark:border-line-accent/60 dark:bg-surface-accent-midnight/30 dark:text-accent-ghost">
@@ -286,6 +286,7 @@ const ritualLabPayloadJson = safeJsonStringify({
       name="ritual-lab-downloads"
       method="POST"
       data-netlify="true"
+      data-form-success="Thanks. We logged your printable request and update preference."
     >
       <input type="hidden" name="form-name" value="ritual-lab-downloads" />
       <label class="block text-sm font-medium text-primary dark:text-accent-ghost">
@@ -307,7 +308,7 @@ const ritualLabPayloadJson = safeJsonStringify({
           class="mt-2 w-full rounded-2xl border border-line-muted bg-surface-base px-4 py-3 text-sm shadow-sm focus:border-line-bold focus:outline-none focus:ring-2 focus:ring-focus/60 dark:border-line-accent dark:bg-surface-backdrop dark:text-accent-ghost"
         />
       </label>
-      <div class="flex flex-wrap items-center gap-3 text-xs opacity-70">
+      <div class="flex flex-wrap items-center gap-3 text-[0.8rem] opacity-70">
         <button type="submit" class="rounded-full bg-surface-accent-strong px-4 py-2 text-inverse shadow hover:bg-surface-accent">
           Send me future printables
         </button>
@@ -316,6 +317,7 @@ const ritualLabPayloadJson = safeJsonStringify({
           Skip & browse downloads
         </a>
       </div>
+      <p class="wc-form-status" data-form-status hidden aria-live="polite"></p>
     </form>
 
     <PrintableSamplePreview
@@ -336,7 +338,7 @@ const ritualLabPayloadJson = safeJsonStringify({
               <h3 class="font-serif text-xl">{item.name}</h3>
               {item.summary && <p class="text-sm opacity-80">{item.summary}</p>}
               {item.features && item.features.length > 0 && (
-                <ul class="list-disc space-y-1 pl-5 text-xs opacity-70">
+                <ul class="list-disc space-y-1 pl-5 text-[0.8rem] opacity-70">
                   {item.features.map((feature) => (
                     <li>{feature}</li>
                   ))}
@@ -345,7 +347,7 @@ const ritualLabPayloadJson = safeJsonStringify({
               {item.tags && item.tags.length > 0 && (
                 <div class="flex flex-wrap gap-2">
                   {item.tags.map((tag) => (
-                    <span class="rounded-full bg-surface-soft px-3 py-1 text-xs font-medium text-primary-strong dark:bg-surface-accent-night/40 dark:text-accent-ghost">
+                    <span class="rounded-full bg-surface-soft px-3 py-1 text-[0.8rem] font-medium text-primary-strong dark:bg-surface-accent-night/40 dark:text-accent-ghost">
                       {toLabel(tag)}
                     </span>
                   ))}
@@ -361,7 +363,7 @@ const ritualLabPayloadJson = safeJsonStringify({
                 <span aria-hidden>↗</span>
               </a>
               <a
-                class="text-xs font-medium text-secondary underline hover:text-accent"
+                class="text-[0.8rem] font-medium text-secondary underline hover:text-accent"
                 href="/lab/three-day-sampler"
               >
                 View printable preview
@@ -460,7 +462,7 @@ const ritualLabPayloadJson = safeJsonStringify({
               <h3 class="font-serif text-xl">${entry.title}</h3>
               ${entry.summary ? `<p class="text-sm opacity-80">${entry.summary}</p>` : ""}
             </div>
-            ${entry.durationMinutes ? `<span class="rounded-full bg-surface-soft px-3 py-1 text-xs font-semibold text-primary-strong">${entry.durationMinutes} min</span>` : ""}
+            ${entry.durationMinutes ? `<span class="rounded-full bg-surface-soft px-3 py-1 text-[0.8rem] font-semibold text-primary-strong">${entry.durationMinutes} min</span>` : ""}
           </div>
         `;
         container.appendChild(heading);
@@ -468,8 +470,8 @@ const ritualLabPayloadJson = safeJsonStringify({
         if (entry.materials && entry.materials.length > 0) {
           const materials = document.createElement("div");
           materials.innerHTML = `
-            <p class="text-xs font-semibold uppercase tracking-wide text-tertiary">Materials</p>
-            <ul class="mt-1 flex flex-wrap gap-2 text-xs opacity-80">
+            <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-tertiary">Materials</p>
+            <ul class="mt-1 flex flex-wrap gap-2 text-[0.8rem] opacity-80">
               ${entry.materials
                 .map((item) => `<li class="rounded-full bg-surface-muted px-3 py-1 text-primary-strong">${toTitle(item)}</li>`)
                 .join("")}
@@ -489,7 +491,7 @@ const ritualLabPayloadJson = safeJsonStringify({
                   <span class="flex h-8 w-8 items-center justify-center rounded-full bg-surface-soft font-semibold text-primary-strong">${index + 1}</span>
                   <div>
                     <p class="font-semibold">${step.title || `Step ${index + 1}`}</p>
-                    ${step.duration ? `<p class="text-xs opacity-70">${step.duration}</p>` : ""}
+                    ${step.duration ? `<p class="text-[0.8rem] opacity-70">${step.duration}</p>` : ""}
                   </div>
                 </div>
                 <p class="pl-11 leading-relaxed opacity-90">${step.description}</p>
@@ -554,7 +556,7 @@ const ritualLabPayloadJson = safeJsonStringify({
 
         if (plan.primary) {
           const primaryHeader = document.createElement("p");
-          primaryHeader.className = "text-xs font-semibold uppercase tracking-wide text-tertiary";
+          primaryHeader.className = "text-[0.8rem] font-semibold uppercase tracking-wide text-tertiary";
           primaryHeader.textContent = "Primary match";
           output.appendChild(primaryHeader);
           output.appendChild(renderEntry(plan.primary));
@@ -567,7 +569,7 @@ const ritualLabPayloadJson = safeJsonStringify({
 
         if (plan.alternates && plan.alternates.length > 0) {
           const altHeading = document.createElement("p");
-          altHeading.className = "text-xs font-semibold uppercase tracking-wide text-tertiary";
+          altHeading.className = "text-[0.8rem] font-semibold uppercase tracking-wide text-tertiary";
           altHeading.textContent = "Other ideas";
           output.appendChild(altHeading);
           plan.alternates.forEach((entry) => {
@@ -684,7 +686,7 @@ const ritualLabPayloadJson = safeJsonStringify({
 
   .lab-testimonials__eyebrow {
     margin: 0;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     letter-spacing: 0.28em;
     text-transform: uppercase;
     color: var(--theme-text-accent);

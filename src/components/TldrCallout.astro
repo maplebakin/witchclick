@@ -46,35 +46,29 @@ const description = summary.trim();
     position: relative;
     display: grid;
     gap: 0.85rem;
-    padding: clamp(1.4rem, 3vw, 1.9rem);
-    border-radius: clamp(1.35rem, 3vw, 1.75rem);
-    border: 1px solid color-mix(in srgb, var(--theme-color-gold, #d4af37) 28%, transparent 72%);
-    background:
-      radial-gradient(80% 120% at 15% 10%, color-mix(in srgb, var(--theme-color-gold, #d4af37) 28%, transparent) 0%, transparent 70%),
-      radial-gradient(85% 120% at 85% 15%, color-mix(in srgb, var(--theme-color-iris, #4b2a63) 22%, transparent) 0%, transparent 68%),
-      color-mix(in srgb, var(--theme-color-night, #120725) 92%, transparent 8%);
-    box-shadow: 0 18px 48px -28px rgba(11, 6, 20, 0.65);
-    color: rgba(249, 245, 255, 0.95);
+    padding: 0.25rem 0 0.25rem 1.5rem;
+    border-inline-start: 3px solid var(--theme-text-accent, var(--text-accent));
+    background: color-mix(in srgb, var(--theme-surface-panel, var(--surface-panel)) 4%, transparent 96%);
+    color: var(--theme-text-body, var(--text-body));
     max-width: min(100%, 72ch);
   }
 
   .tldr-callout__header {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
     gap: 0.75rem;
   }
 
   .tldr-callout__chip {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.25rem 0.85rem;
-    border-radius: 999px;
-    background: rgba(12, 5, 23, 0.68);
-    border: 1px solid rgba(212, 175, 55, 0.42);
-    font-size: 0.7rem;
-    letter-spacing: 0.28em;
+    display: inline-block;
+    padding: 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
+    color: var(--theme-text-accent, var(--text-accent));
   }
 
   .tldr-callout__spoons {
@@ -86,7 +80,7 @@ const description = summary.trim();
     margin: 0;
     font-size: 1rem;
     line-height: 1.6;
-    color: rgba(249, 245, 255, 0.9);
+    color: var(--theme-text-body, var(--text-body));
   }
 
   .tldr-callout__list {
@@ -96,38 +90,17 @@ const description = summary.trim();
     gap: 0.4rem;
     font-size: 0.96rem;
     line-height: 1.55;
-    color: rgba(249, 245, 255, 0.88);
+    color: var(--theme-text-body, var(--text-body));
     list-style: disc;
   }
 
   .tldr-callout__list li::marker {
-    color: rgba(212, 175, 55, 0.75);
-  }
-
-  :root[data-comfort-theme="dawn"] .tldr-callout {
-    background:
-      radial-gradient(80% 120% at 15% 10%, rgba(212, 175, 55, 0.16), transparent 72%),
-      radial-gradient(85% 120% at 85% 15%, rgba(155, 134, 200, 0.18), transparent 70%),
-      rgba(252, 248, 242, 0.94);
-    border-color: rgba(155, 134, 200, 0.35);
-    box-shadow: 0 20px 55px -30px rgba(93, 76, 128, 0.32);
-    color: rgba(58, 40, 84, 0.95);
-  }
-
-  :root[data-comfort-theme="dawn"] .tldr-callout__chip {
-    background: rgba(255, 255, 255, 0.92);
-    border-color: rgba(155, 134, 200, 0.4);
-    color: rgba(85, 63, 115, 0.82);
-  }
-
-  :root[data-comfort-theme="dawn"] .tldr-callout__summary,
-  :root[data-comfort-theme="dawn"] .tldr-callout__list {
-    color: rgba(58, 40, 84, 0.9);
+    color: color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 72%, transparent 28%);
   }
 
   @media (max-width: 720px) {
     .tldr-callout {
-      padding: 1.2rem 1.35rem;
+      padding-left: 1.25rem;
     }
   }
 </style>

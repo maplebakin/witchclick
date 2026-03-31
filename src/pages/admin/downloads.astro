@@ -48,20 +48,20 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           <h2 class="text-lg font-semibold">Editor</h2>
           <span
             id="loadedIndicator"
-            class="rounded-full bg-surface-muted px-3 py-1 text-xs font-medium text-body"
+            class="rounded-full bg-surface-muted px-3 py-1 text-[0.8rem] font-medium text-body"
           >No download loaded</span>
         </div>
         <div class="grid gap-3 md:grid-cols-2">
-          <label class="block"><span class="text-xs font-medium">Name</span><input id="name" class="mt-1 w-full admin-btn-secondary px-3 py-2" /></label>
-          <label class="block"><span class="text-xs font-medium">Slug</span><input id="slug" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="tarot-study-planner" /></label>
-          <label class="block"><span class="text-xs font-medium">Price</span><input id="price" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="5.00" /></label>
-          <label class="block"><span class="text-xs font-medium">Currency</span><input id="currency" class="mt-1 w-full admin-btn-secondary px-3 py-2" value="USD" /></label>
-          <label class="block md:col-span-2"><span class="text-xs font-medium">Summary</span><input id="summary" class="mt-1 w-full admin-btn-secondary px-3 py-2" /></label>
-          <label class="block md:col-span-2"><span class="text-xs font-medium">Cover image URL (public)</span><input id="cover" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="/images/downloads/cover.jpg" /></label>
-          <label class="block md:col-span-2"><span class="text-xs font-medium">File URL (public PDF)</span><input id="file" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="/files/file.pdf" /></label>
-          <label class="block md:col-span-2"><span class="text-xs font-medium">External checkout URL (optional)</span><input id="url" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="https://ko-fi.com/s/..." /></label>
-          <label class="block md:col-span-2"><span class="text-xs font-medium">Features (one per line)</span><textarea id="features" class="mt-1 h-24 w-full admin-btn-secondary px-3 py-2"></textarea></label>
-          <label class="block md:col-span-2"><span class="text-xs font-medium">Tags (comma-separated)</span><input id="tags" class="mt-1 w-full admin-btn-secondary px-3 py-2" /></label>
+          <label class="block"><span class="text-[0.8rem] font-medium">Name</span><input id="name" class="mt-1 w-full admin-btn-secondary px-3 py-2" /></label>
+          <label class="block"><span class="text-[0.8rem] font-medium">Slug</span><input id="slug" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="tarot-study-planner" /></label>
+          <label class="block"><span class="text-[0.8rem] font-medium">Price</span><input id="price" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="5.00" /></label>
+          <label class="block"><span class="text-[0.8rem] font-medium">Currency</span><input id="currency" class="mt-1 w-full admin-btn-secondary px-3 py-2" value="USD" /></label>
+          <label class="block md:col-span-2"><span class="text-[0.8rem] font-medium">Summary</span><input id="summary" class="mt-1 w-full admin-btn-secondary px-3 py-2" /></label>
+          <label class="block md:col-span-2"><span class="text-[0.8rem] font-medium">Cover image URL (public)</span><input id="cover" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="/images/downloads/cover.jpg" /></label>
+          <label class="block md:col-span-2"><span class="text-[0.8rem] font-medium">File URL (public PDF)</span><input id="file" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="/files/file.pdf" /></label>
+          <label class="block md:col-span-2"><span class="text-[0.8rem] font-medium">External checkout URL (optional)</span><input id="url" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="https://ko-fi.com/s/..." /></label>
+          <label class="block md:col-span-2"><span class="text-[0.8rem] font-medium">Features (one per line)</span><textarea id="features" class="mt-1 h-24 w-full admin-btn-secondary px-3 py-2"></textarea></label>
+          <label class="block md:col-span-2"><span class="text-[0.8rem] font-medium">Tags (comma-separated)</span><input id="tags" class="mt-1 w-full admin-btn-secondary px-3 py-2" /></label>
         </div>
         <div class="mt-4 flex flex-wrap items-center gap-3">
           <button id="save" class="admin-btn-primary px-4 py-2 text-sm font-semibold">Save</button>

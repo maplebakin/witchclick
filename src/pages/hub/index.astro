@@ -249,7 +249,13 @@ const breadcrumbs = [
             <a class="hub-index-season__link" href="/hub/focus">Explore Focus</a>
             <a class="hub-index-season__link" href="/hub/calm">Explore Calm</a>
           </div>
-          <form class="hub-index-season__form" name="seasonal-updates" method="POST" data-netlify="true">
+          <form
+            class="hub-index-season__form"
+            name="seasonal-updates"
+            method="POST"
+            data-netlify="true"
+            data-form-success="You are on the list for seasonal updates."
+          >
             <input type="hidden" name="form-name" value="seasonal-updates" />
             <label class="hub-index-season__label">
               Get seasonal updates
@@ -263,6 +269,7 @@ const breadcrumbs = [
               />
             </label>
             <PrimaryButton type="submit">Notify me</PrimaryButton>
+            <p class="wc-form-status" data-form-status hidden aria-live="polite"></p>
           </form>
         </div>
       )}
@@ -297,7 +304,7 @@ const breadcrumbs = [
 
   .hub-featured__eyebrow {
     margin: 0 0 var(--space-2);
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.16em;
     color: color-mix(in srgb, var(--theme-text-accent, var(--theme-color-gold)) 82%, var(--theme-text-strong) 18%);

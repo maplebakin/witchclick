@@ -82,12 +82,12 @@ const breadcrumbs = [
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <article class="mx-auto max-w-3xl space-y-6 py-10">
     <header class="space-y-3 text-center">
-      <p class="text-xs uppercase tracking-[0.2em] text-accent">White Magic Curse</p>
+      <p class="text-[0.8rem] uppercase tracking-[0.2em] text-accent">White Magic Curse</p>
       <h1 class="text-3xl font-semibold text-primary">{title}</h1>
       {curse.invocation && (
         <p class="text-sm italic text-secondary">{curse.invocation}</p>
       )}
-      <div class="flex flex-wrap justify-center gap-2 text-[11px] uppercase tracking-wide text-tertiary">
+      <div class="flex flex-wrap justify-center gap-2 text-[0.8rem] uppercase tracking-wide text-tertiary">
         {curse.tags.map((tag) => (
           <span class="rounded-full border border-line-muted px-2 py-0.5">{tag}</span>
         ))}
@@ -103,7 +103,7 @@ const breadcrumbs = [
           )}
         </div>
       )}
-      <dl class="mx-auto grid max-w-xl grid-cols-1 gap-2 text-[11px] text-muted sm:grid-cols-2">
+      <dl class="mx-auto grid max-w-xl grid-cols-1 gap-2 text-[0.8rem] text-muted sm:grid-cols-2">
         <div>
           <dt class="font-semibold uppercase tracking-wide text-tertiary">Type</dt>
           <dd class="capitalize">{generator?.type ?? '—'}</dd>
@@ -191,7 +191,7 @@ const breadcrumbs = [
     align-items: center;
     gap: 0.35rem;
     margin-bottom: 0.35rem;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;

@@ -37,10 +37,10 @@ import Input from "@/components/ui/Input.astro";
             </div>
             <div class="space-y-2">
               <p class="text-sm font-medium text-neutral-700">Drag &amp; drop hero artwork, or click to browse</p>
-              <p class="text-xs text-neutral-500" data-drop-hint>
+              <p class="text-[0.8rem] text-neutral-500" data-drop-hint>
                 Once a post is selected, you can upload PNG, JPG, or WEBP files up to 5&nbsp;MB.
               </p>
-              <p class="text-xs text-neutral-500" data-file-info></p>
+              <p class="text-[0.8rem] text-neutral-500" data-file-info></p>
             </div>
           </div>
         </div>
@@ -58,13 +58,13 @@ import Input from "@/components/ui/Input.astro";
               class="hidden h-full w-full object-cover"
             />
           </div>
-          <figcaption class="text-xs text-neutral-500" data-existing-hero>
+          <figcaption class="text-[0.8rem] text-neutral-500" data-existing-hero>
             Select a post to review its current hero details.
           </figcaption>
         </figure>
       </div>
       <label class="block">
-        <span class="text-xs font-medium uppercase tracking-wide text-neutral-500">Alt text</span>
+        <span class="text-[0.8rem] font-medium uppercase tracking-wide text-neutral-500">Alt text</span>
         <Input
           type="text"
           placeholder="Cozy cauldron simmering beside tarot cards on a window seat"
@@ -72,7 +72,7 @@ import Input from "@/components/ui/Input.astro";
           data-alt-input
           disabled
         />
-        <p class="mt-1 text-xs text-neutral-400">
+        <p class="mt-1 text-[0.8rem] text-neutral-400">
           Alt text helps screen readers understand the imagery—tweak it after uploading if needed.
         </p>
       </label>

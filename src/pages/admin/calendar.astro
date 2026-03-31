@@ -42,15 +42,15 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
       <section class="rounded-2xl border border-line-neutral bg-surface-base p-6 shadow-sm">
         <div class="mb-4 flex items-center justify-between gap-4">
-          <p class="text-xs text-body-muted">Last updated: <span data-updated-at>—</span></p>
-          <button type="button" class="text-xs font-medium text-primary hover:underline" id="addSeasonBtn">
+          <p class="text-[0.8rem] text-body-muted">Last updated: <span data-updated-at>—</span></p>
+          <button type="button" class="text-[0.8rem] font-medium text-primary hover:underline" id="addSeasonBtn">
             + Add season
           </button>
         </div>
 
         <div class="space-y-3">
           <p class="text-sm font-medium text-body">Season planner</p>
-          <p class="text-xs text-body-muted">
+          <p class="text-[0.8rem] text-body-muted">
             Manage slug, season label, theme, focus, publishing window, anchor posts, rituals, and notes for each season.
           </p>
         </div>
@@ -170,17 +170,17 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
                 <div class="rounded-lg border border-line-subtle bg-surface-soft p-3" data-anchor-index="${anchorIndex}">
                   <div class="mb-2 flex items-center justify-between gap-2">
                     <h4 class="text-sm font-semibold text-primary">Anchor ${anchorIndex + 1}</h4>
-                    <button type="button" class="text-xs text-body-muted hover:text-danger" data-remove-anchor>Remove</button>
+                    <button type="button" class="text-[0.8rem] text-body-muted hover:text-danger" data-remove-anchor>Remove</button>
                   </div>
                   <label class="block">
-                    <span class="text-xs font-medium text-body">Title<span class="text-danger">*</span></span>
+                    <span class="text-[0.8rem] font-medium text-body">Title<span class="text-danger">*</span></span>
                     <input type="text" class="mt-1 w-full rounded-lg border border-line-neutral bg-surface-base px-3 py-2 text-sm" data-field="anchorPosts.title" data-anchor-index="${anchorIndex}" value="${escapeHtml(anchor.title)}" placeholder="Anchor title" />
-                    <p class="mt-1 text-xs text-danger hidden" data-anchor-error="title"></p>
+                    <p class="mt-1 text-[0.8rem] text-danger hidden" data-anchor-error="title"></p>
                   </label>
                   <label class="mt-3 block">
-                    <span class="text-xs font-medium text-body">Slug<span class="text-danger">*</span></span>
+                    <span class="text-[0.8rem] font-medium text-body">Slug<span class="text-danger">*</span></span>
                     <input type="text" class="mt-1 w-full rounded-lg border border-line-neutral bg-surface-base px-3 py-2 text-sm" data-field="anchorPosts.slug" data-anchor-index="${anchorIndex}" value="${escapeHtml(anchor.slug)}" placeholder="anchor-post-slug" />
-                    <p class="mt-1 text-xs text-danger hidden" data-anchor-error="slug"></p>
+                    <p class="mt-1 text-[0.8rem] text-danger hidden" data-anchor-error="slug"></p>
                   </label>
                 </div>
               `
@@ -193,12 +193,12 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
                 <div class="flex items-start gap-3" data-ritual-index="${ritualIndex}">
                   <div class="flex-1">
                     <label class="block">
-                      <span class="text-xs font-medium text-body">Ritual ${ritualIndex + 1}</span>
+                      <span class="text-[0.8rem] font-medium text-body">Ritual ${ritualIndex + 1}</span>
                       <input type="text" class="mt-1 w-full rounded-lg border border-line-neutral bg-surface-base px-3 py-2 text-sm" data-field="rituals" data-ritual-index="${ritualIndex}" value="${escapeHtml(ritual)}" placeholder="Example: Oct 3 — Moonlit boundary mapping" />
-                      <p class="mt-1 text-xs text-danger hidden" data-ritual-error></p>
+                      <p class="mt-1 text-[0.8rem] text-danger hidden" data-ritual-error></p>
                     </label>
                   </div>
-                  <button type="button" class="mt-5 text-xs text-body-muted hover:text-danger" data-remove-ritual>Remove</button>
+                  <button type="button" class="mt-5 text-[0.8rem] text-body-muted hover:text-danger" data-remove-ritual>Remove</button>
                 </div>
               `
             )
@@ -209,12 +209,12 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h3 class="text-lg font-semibold text-primary">Season ${index + 1}</h3>
-                  <p class="text-xs text-body-muted">Keep slugs unique and focused.</p>
+                  <p class="text-[0.8rem] text-body-muted">Keep slugs unique and focused.</p>
                 </div>
                 <div class="flex items-center gap-2">
-                  <button type="button" class="rounded-lg border border-line-neutral px-3 py-1.5 text-xs font-medium hover:bg-surface-base" data-move-up ${index === 0 ? 'disabled' : ''}>Move up</button>
-                  <button type="button" class="rounded-lg border border-line-neutral px-3 py-1.5 text-xs font-medium hover:bg-surface-base" data-move-down ${index === total - 1 ? 'disabled' : ''}>Move down</button>
-                  <button type="button" class="rounded-lg border border-line-neutral px-3 py-1.5 text-xs font-medium text-danger hover:bg-surface-base" data-remove-season>Remove</button>
+                  <button type="button" class="rounded-lg border border-line-neutral px-3 py-1.5 text-[0.8rem] font-medium hover:bg-surface-base" data-move-up ${index === 0 ? 'disabled' : ''}>Move up</button>
+                  <button type="button" class="rounded-lg border border-line-neutral px-3 py-1.5 text-[0.8rem] font-medium hover:bg-surface-base" data-move-down ${index === total - 1 ? 'disabled' : ''}>Move down</button>
+                  <button type="button" class="rounded-lg border border-line-neutral px-3 py-1.5 text-[0.8rem] font-medium text-danger hover:bg-surface-base" data-remove-season>Remove</button>
                 </div>
               </div>
 
@@ -222,47 +222,47 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
                 <label class="block">
                   <span class="text-sm font-medium text-body">Slug<span class="text-danger">*</span></span>
                   <input type="text" class="mt-1 w-full rounded-lg border border-line-neutral bg-surface-base px-3 py-2 text-sm" data-field="slug" value="${escapeHtml(season.slug)}" placeholder="fall-boundaries-in-bloom" />
-                  <p class="mt-1 text-xs text-danger hidden" data-error-field="slug"></p>
+                  <p class="mt-1 text-[0.8rem] text-danger hidden" data-error-field="slug"></p>
                 </label>
                 <label class="block">
                   <span class="text-sm font-medium text-body">Season name<span class="text-danger">*</span></span>
                   <input type="text" class="mt-1 w-full rounded-lg border border-line-neutral bg-surface-base px-3 py-2 text-sm" data-field="season" value="${escapeHtml(season.season)}" placeholder="Fall" />
-                  <p class="mt-1 text-xs text-danger hidden" data-error-field="season"></p>
+                  <p class="mt-1 text-[0.8rem] text-danger hidden" data-error-field="season"></p>
                 </label>
                 <label class="block">
                   <span class="text-sm font-medium text-body">Theme<span class="text-danger">*</span></span>
                   <input type="text" class="mt-1 w-full rounded-lg border border-line-neutral bg-surface-base px-3 py-2 text-sm" data-field="theme" value="${escapeHtml(season.theme)}" placeholder="Boundaries in Bloom" />
-                  <p class="mt-1 text-xs text-danger hidden" data-error-field="theme"></p>
+                  <p class="mt-1 text-[0.8rem] text-danger hidden" data-error-field="theme"></p>
                 </label>
                 <label class="block">
                   <span class="text-sm font-medium text-body">Focus<span class="text-danger">*</span></span>
                   <input type="text" class="mt-1 w-full rounded-lg border border-line-neutral bg-surface-base px-3 py-2 text-sm" data-field="focus" value="${escapeHtml(season.focus)}" placeholder="Tending tender boundaries…" />
-                  <p class="mt-1 text-xs text-danger hidden" data-error-field="focus"></p>
+                  <p class="mt-1 text-[0.8rem] text-danger hidden" data-error-field="focus"></p>
                 </label>
                 <label class="block md:col-span-2">
                   <span class="text-sm font-medium text-body">Window<span class="text-danger">*</span></span>
                   <input type="text" class="mt-1 w-full rounded-lg border border-line-neutral bg-surface-base px-3 py-2 text-sm" data-field="window" value="${escapeHtml(season.window)}" placeholder="September – November" />
-                  <p class="mt-1 text-xs text-danger hidden" data-error-field="window"></p>
+                  <p class="mt-1 text-[0.8rem] text-danger hidden" data-error-field="window"></p>
                 </label>
               </div>
 
               <div class="mt-6 space-y-3">
                 <div class="flex items-center justify-between">
                   <h4 class="text-sm font-semibold text-body">Anchor posts</h4>
-                  <button type="button" class="text-xs font-medium text-primary hover:underline" data-add-anchor>Add anchor</button>
+                  <button type="button" class="text-[0.8rem] font-medium text-primary hover:underline" data-add-anchor>Add anchor</button>
                 </div>
                 <div class="space-y-3" data-anchor-list>
-                  ${anchorPosts || '<p class="rounded-lg border border-dashed border-line-subtle bg-surface-base p-4 text-center text-xs text-body-muted">No anchor posts yet.</p>'}
+                  ${anchorPosts || '<p class="rounded-lg border border-dashed border-line-subtle bg-surface-base p-4 text-center text-[0.8rem] text-body-muted">No anchor posts yet.</p>'}
                 </div>
               </div>
 
               <div class="mt-6 space-y-3">
                 <div class="flex items-center justify-between">
                   <h4 class="text-sm font-semibold text-body">Rituals</h4>
-                  <button type="button" class="text-xs font-medium text-primary hover:underline" data-add-ritual>Add ritual</button>
+                  <button type="button" class="text-[0.8rem] font-medium text-primary hover:underline" data-add-ritual>Add ritual</button>
                 </div>
                 <div class="space-y-3" data-ritual-list>
-                  ${rituals || '<p class="rounded-lg border border-dashed border-line-subtle bg-surface-base p-4 text-center text-xs text-body-muted">No rituals yet.</p>'}
+                  ${rituals || '<p class="rounded-lg border border-dashed border-line-subtle bg-surface-base p-4 text-center text-[0.8rem] text-body-muted">No rituals yet.</p>'}
                 </div>
               </div>
 

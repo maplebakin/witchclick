@@ -14,18 +14,18 @@ const settings = readSettings();
 const activeMidnight = settings.activeThemes?.midnight;
 const activeDawn = settings.activeThemes?.dawn;
 
-const themeAccent = activeMidnight?.primary || activeDawn?.primary || '#B04F5C'; // Use Yule Cranberry Red as default fallback
+const themeAccent = activeMidnight?.primary || activeDawn?.primary || 'hsl(var(--red-3) / 1)'; // Use Yule Cranberry Red as default fallback
 const accent = themeAccent;
 
 const currentFontHeading = activeMidnight?.fontHeading || activeDawn?.fontHeading || 'Cinzel';
 const currentFontBody = activeMidnight?.fontSerif || activeDawn?.fontSerif || 'Cormorant Garamond';
 
-const defaultText = '#2C3E50'; // Dark Charcoal
-const defaultMuted = '#6A807E'; // Muted Green-Gray
-const defaultPlainSurface = '#F5F8F7'; // Pale Icy Blue/White
-const defaultCardSurface = '#E8ECEB'; // Slightly darker surface
-const defaultElevatedSurface = '#D9DFDE'; // More elevated surface
-const defaultBorder = '#CCD3D2'; // Pale Border
+const defaultText = 'var(--text-strong)'; // Dark Charcoal
+const defaultMuted = 'var(--text-muted)'; // Muted Green-Gray
+const defaultPlainSurface = 'var(--surface-base)'; // Pale Icy Blue/White
+const defaultCardSurface = 'var(--surface-card)'; // Slightly darker surface
+const defaultElevatedSurface = 'var(--surface-elevated)'; // More elevated surface
+const defaultBorder = 'var(--border-subtle)'; // Pale Border
 const defaultShadow = 'var(--theme-shadow-soft)'; // Subtle dark shadow
 
 const currentSurfacePlain = activeMidnight?.surfacePlain || activeDawn?.surfacePlain || defaultPlainSurface;

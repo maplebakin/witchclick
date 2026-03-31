@@ -60,7 +60,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             <label class="block">
               <span class="text-sm font-medium text-body">Slug</span>
               <input type="text" name="slug" class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm" placeholder="sol-rivera" />
-              <p class="mt-1 text-xs text-body-muted">Auto-generated from name if blank</p>
+              <p class="mt-1 text-[0.8rem] text-body-muted">Auto-generated from name if blank</p>
             </label>
 
             <label class="block">
@@ -92,7 +92,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           <div class="space-y-3">
             <div class="flex items-center justify-between">
               <span class="text-sm font-medium text-body">Links</span>
-              <button type="button" id="addLinkBtn" class="text-xs text-primary hover:underline">Add Link</button>
+              <button type="button" id="addLinkBtn" class="text-[0.8rem] text-primary hover:underline">Add Link</button>
             </div>
             <div id="linksContainer" class="space-y-2"></div>
           </div>
@@ -168,7 +168,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
             removeBtn.textContent = 'Remove';
-            removeBtn.className = 'text-xs text-danger hover:underline';
+            removeBtn.className = 'text-[0.8rem] text-danger hover:underline';
             removeBtn.addEventListener('click', () => { links.splice(i, 1); renderLinks(); });
             div.appendChild(titleInput);
             div.appendChild(urlInput);

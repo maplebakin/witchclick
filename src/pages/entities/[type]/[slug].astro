@@ -3,13 +3,12 @@
 import Base from "../../../layouts/Base.astro";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 import PostCard from "../../../components/PostCard.astro";
-import fs from "node:fs";
-import path from "node:path";
 import { getTypeMetadata } from "../../../data/typeMetadata";
 import { resolveTailwindColor, mixColors, toRgba } from "../../../utils/color";
 import { toCssVariables } from "../../../utils/style";
 import { getPostsForEntity } from "../../../utils/entityPosts";
 import EntityRelationshipGraph from "../../../components/EntityRelationshipGraph.astro";
+import { readAllEntities } from "../../../utils/entities";
 import {
   resolveEntityRefs,
   findInboundRelations,
@@ -20,33 +19,17 @@ export const prerender = true;
 
 /** Build-time loader: discover all entity JSON files and emit params+props */
 export async function getStaticPaths() {
-  const root = path.join(process.cwd(), 'content', 'entities');
   const paths = [] as Array<{ params: { type: string; slug: string }, props: any }>;
-  if (!fs.existsSync(root)) return [];
+  const entitiesByType = readAllEntities({ includeUnpublished: false });
 
-  const types = fs.readdirSync(root, { withFileTypes: true })
-    .filter(d => d.isDirectory())
-    .map(d => d.name);
-
-  for (const type of types) {
-    const dir = path.join(root, type);
-    const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
-    for (const f of files) {
-      const slug = f.replace(/\.json$/, '');
-      try {
-        const j = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
-        const ent = {
-          type: j.type || type,
-          slug: j.slug || slug,
-          name: j.name || slug,
-          summary: j.summary || '',
-          properties: j.properties || {},
-          related: Array.isArray(j.related) ? j.related : [],
-        };
-        paths.push({ params: { type, slug }, props: { ent } });
-      } catch {
-        // skip malformed file
-      }
+  for (const [type, entries] of Object.entries(entitiesByType)) {
+    if (!Array.isArray(entries)) continue;
+    for (const entry of entries) {
+      if (!entry?.slug) continue;
+      paths.push({
+        params: { type, slug: entry.slug },
+        props: { ent: entry },
+      });
     }
   }
   return paths;
@@ -60,6 +43,8 @@ const { ent } = Astro.props as {
     summary?: string;
     properties?: Record<string, unknown>;
     related?: string[];
+    isStub?: boolean;
+    published?: boolean;
   };
 };
 
@@ -85,7 +70,7 @@ const themeVarString = toCssVariables({
 });
 
 const summaryText = typeof ent.summary === "string" ? ent.summary.trim() : "";
-const isStub = summaryText ? /stub/i.test(summaryText) : false;
+const isStub = Boolean((ent as { isStub?: boolean }).isStub);
 
 const DEV_API = import.meta.env.PUBLIC_DEV_API || "";
 const isDev = import.meta.env.DEV;
@@ -496,7 +481,7 @@ function pretty(v: unknown) {
   }
 
   .entity-hero-type {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.35em;
     color: var(--entity-accent-label, color-mix(in srgb, var(--theme-color-amethyst) 60%, transparent));

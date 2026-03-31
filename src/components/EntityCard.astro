@@ -49,10 +49,10 @@ const accentHeading = "var(--theme-text-strong, var(--text-strong))";
 const accentSummary = "var(--theme-text-body, var(--text-body))";
 const accentKeywordBg = toRgba(accentHex, 0.16);
 const accentKeywordBorder = toRgba(accentHex, 0.35);
-const accentKeywordText = mixColors(accentHex, "#111827", 0.35);
+const accentKeywordText = mixColors(accentHex, "hsl(var(--neutral-8) / 1)", 0.35);
 const accentBadgeBg = toRgba(accentHex, 0.2);
 const accentBadgeBorder = toRgba(accentHex, 0.38);
-const accentBadgeText = mixColors(accentHex, "#111827", 0.3);
+const accentBadgeText = mixColors(accentHex, "hsl(var(--neutral-8) / 1)", 0.3);
 const accentPlaceholder = "var(--theme-text-muted, var(--text-muted))";
 const accentStar = toRgba(accentHex, 0.35);
 
@@ -94,7 +94,7 @@ const typeLabel =
     href={`/entities/${type}/${slug}`}
     class:list={[
       "focus-ring",
-      "entity-card relative block overflow-hidden rounded-3xl border bg-gradient-to-br via-surface-base/80 p-6 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.35)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_25px_60px_-30px_rgba(15,23,42,0.45)]",
+      "entity-card relative block overflow-hidden rounded-3xl border bg-gradient-to-br via-surface-base/80 p-6 shadow-[0_20px_45px_-25px_hsl(var(--neutral-8) / 0.35)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_25px_60px_-30px_hsl(var(--neutral-8) / 0.45)]",
       cardGradientClass,
       showStubBadge && "opacity-60",
     ]}
@@ -110,9 +110,9 @@ const typeLabel =
 
     <div class="relative z-10 flex flex-col gap-4">
       <div class="flex items-start justify-start gap-3 flex-wrap">
-  <span class="entity-card-label text-xs uppercase">{typeLabel}</span>
+  <span class="entity-card-label text-[0.8rem] uppercase">{typeLabel}</span>
   {showStubBadge && (
-    <span class="entity-card-badge rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wide shadow-sm">
+    <span class="entity-card-badge rounded-full border px-3 py-1 text-[0.8rem] font-semibold uppercase tracking-wide shadow-sm">
       Stub — coming soon
     </span>
   )}
@@ -120,7 +120,7 @@ const typeLabel =
 
 
       <div class="space-y-3">
-        <h3 class="entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]">
+        <h3 class="entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_hsl(var(--neutral-0) / 0.6)]">
           {name}
         </h3>
         {summaryContent && (
@@ -137,7 +137,7 @@ const typeLabel =
           ))}
         </div>
       ) : (
-        showStubBadge && <p class="entity-card-empty-keywords mt-auto text-xs uppercase tracking-[0.25em]">Keywords forthcoming</p>
+        showStubBadge && <p class="entity-card-empty-keywords mt-auto text-[0.8rem] uppercase tracking-[0.25em]">Keywords forthcoming</p>
       )}
     </div>
   </a>
@@ -165,8 +165,8 @@ const typeLabel =
   }
 
   .entity-card-orb {
-    border-color: var(--entity-border, rgba(124, 58, 237, 0.22));
-    background: radial-gradient(circle at top, var(--entity-overlay, rgba(124, 58, 237, 0.22)), transparent 70%);
+    border-color: var(--entity-border, hsl(var(--accent-2) / 0.22));
+    background: radial-gradient(circle at top, var(--entity-overlay, hsl(var(--accent-2) / 0.22)), transparent 70%);
     filter: blur(2px);
   }
 
@@ -181,7 +181,7 @@ const typeLabel =
     .entity-card-label {
     color: var(--entity-label, color-mix(in srgb, var(--theme-color-amethyst) 65%, transparent));
     letter-spacing: 0.18em;   /* gentle, still “label-y” but not absurd */
-    font-size: 0.7rem;        /* slightly small to keep it compact */
+    font-size: 0.8rem;        /* slightly small to keep it compact */
     overflow-wrap: anywhere;
     word-break: break-word;
     max-width: 100%;
@@ -213,7 +213,7 @@ const typeLabel =
   }
 
   .entity-card-tag {
-    --card-pill-text: var(--entity-keyword-text, rgba(88, 28, 135, 0.85));
+    --card-pill-text: var(--entity-keyword-text, hsl(var(--accent-ink) / 0.85));
     --card-pill-bg: var(--entity-keyword-bg, color-mix(in srgb, var(--theme-color-amethyst) 16%, transparent));
     --card-pill-border: var(--entity-keyword-border, color-mix(in srgb, var(--theme-color-amethyst) 35%, transparent));
   }

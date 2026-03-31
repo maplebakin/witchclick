@@ -1,7 +1,6 @@
 // tools/src/ingest.ts
 import fs from 'node:fs';
 import path from 'node:path';
-// @ts-expect-error: Runtime helper ships as JS only.
 import { executeIngest } from '../../server/lib/ingestExecutor.js';
 import { resolvePostsDirectories } from '../../scripts/lib/contentPaths.js';
 import type { PostSpecV2 } from './types';

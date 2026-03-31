@@ -7,9 +7,9 @@ type RawEntity = {
   name: string;
   summary: string;
   properties: Record<string, unknown>;
+  isStub?: boolean;
+  published?: boolean;
 };
-
-const STUB_PATTERN = /stub entity/i;
 
 function toTitleCase(value: string): string {
   return value
@@ -56,14 +56,14 @@ function extractKeywords(entity: RawEntity): string[] {
 }
 
 export function getEntitiesForType(type: string, metadata: TypeMetadataEntry) {
-  const all = readAllEntities();
+  const all = readAllEntities({ includeUnpublished: false });
   const entries = Array.isArray(all[type]) ? (all[type] as RawEntity[]) : [];
 
   return entries
     .map((entry) => {
       const rawSummary = typeof entry.summary === "string" ? entry.summary.trim() : "";
-      const isStub = !rawSummary || STUB_PATTERN.test(rawSummary);
-      const summary = isStub ? metadata.stubLine : rawSummary;
+      const isStub = Boolean(entry.isStub);
+      const summary = rawSummary || metadata.stubLine;
       const tags = extractKeywords(entry);
 
       const displayName = entry.name

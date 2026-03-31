@@ -66,7 +66,7 @@ const tags = sorted.map(([value, count]) => ({
 
   .search-tags__label {
     margin: 0;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     letter-spacing: 0.28em;
     text-transform: uppercase;
     color: color-mix(in srgb, var(--text-hint, var(--theme-text-hint)) 95%, transparent 5%);
@@ -82,7 +82,7 @@ const tags = sorted.map(([value, count]) => ({
     border: 1px solid color-mix(in srgb, var(--text-accent, var(--theme-color-gold)) 42%, transparent 58%);
     background: color-mix(in srgb, hsl(var(--surface-panel-primary)) 88%, transparent 12%);
     border-radius: 999px;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     padding: 0.4rem 0.85rem;
     color: color-mix(in srgb, var(--theme-text-secondary) 92%, transparent 8%);
     transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
@@ -105,6 +105,6 @@ const tags = sorted.map(([value, count]) => ({
   :root[data-comfort-theme="dawn"] .search-tags__chip:focus-visible {
     border-color: color-mix(in srgb, var(--text-accent, var(--theme-color-gold)) 40%, transparent 60%);
     background: color-mix(in srgb, hsl(var(--surface-panel-primary)) 98%, transparent 2%);
-    color: color-mix(in srgb, var(--theme-link-color, #caa043) 60%, var(--theme-text-body) 40%);
+    color: color-mix(in srgb, var(--theme-link-color, var(--text-accent)) 60%, var(--theme-text-body) 40%);
   }
 </style>

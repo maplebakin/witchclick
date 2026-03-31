@@ -212,19 +212,19 @@
     border-radius: 50%;
     background: linear-gradient(
       135deg,
-      color-mix(in srgb, var(--theme-color-gold, #d4af37) 82%, transparent 18%) 0%,
-      color-mix(in srgb, var(--theme-color-iris, #4b2a63) 82%, transparent 18%) 100%
+      color-mix(in srgb, var(--theme-color-gold, var(--text-accent)) 82%, transparent 18%) 0%,
+      color-mix(in srgb, var(--theme-color-iris, hsl(var(--accent-ink) / 1)) 82%, transparent 18%) 100%
     );
-    border: 1px solid color-mix(in srgb, var(--theme-color-gold, #d4af37) 25%, transparent 75%);
+    border: 1px solid color-mix(in srgb, var(--theme-color-gold, var(--text-accent)) 25%, transparent 75%);
     color: white;
     cursor: pointer;
-    box-shadow: 0 4px 12px color-mix(in srgb, var(--theme-color-iris, #4b2a63) 35%, transparent 65%);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--theme-color-iris, hsl(var(--accent-ink) / 1)) 35%, transparent 65%);
     transition: all 0.2s ease;
   }
 
   .quick-actions__trigger:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 20px color-mix(in srgb, var(--theme-color-gold, #d4af37) 30%, var(--theme-color-iris, #4b2a63) 70%);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--theme-color-gold, var(--text-accent)) 30%, var(--theme-color-iris, hsl(var(--accent-ink) / 1)) 70%);
   }
 
   .quick-actions__trigger:active {
@@ -232,15 +232,15 @@
   }
 
   .quick-actions__trigger:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--theme-color-gold, #d4af37) 45%, var(--theme-color-iris, #4b2a63) 55%);
+    outline: 2px solid color-mix(in srgb, var(--theme-color-gold, var(--text-accent)) 45%, var(--theme-color-iris, hsl(var(--accent-ink) / 1)) 55%);
     outline-offset: 2px;
   }
 
   :global(.quick-actions.is-open .quick-actions__trigger) {
     background: linear-gradient(
       135deg,
-      color-mix(in srgb, var(--theme-color-gold, #d4af37) 88%, transparent 12%) 0%,
-      color-mix(in srgb, var(--theme-color-iris, #4b2a63) 88%, transparent 12%) 100%
+      color-mix(in srgb, var(--theme-color-gold, var(--text-accent)) 88%, transparent 12%) 0%,
+      color-mix(in srgb, var(--theme-color-iris, hsl(var(--accent-ink) / 1)) 88%, transparent 12%) 100%
     );
   }
 
@@ -250,10 +250,10 @@
     bottom: 4.5rem;
     right: 0;
     width: 18rem;
-    background: var(--admin-surface-base, #ffffff);
-    border: 1px solid var(--admin-border-subtle, #e5e7eb);
+    background: var(--admin-surface-base, hsl(var(--neutral-0) / 1));
+    border: 1px solid var(--admin-border-subtle, var(--border-subtle));
     border-radius: 1rem;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 40px hsl(var(--neutral-9) / 0.1);
     opacity: 0;
     transform: translateY(8px);
     transition: opacity 0.2s ease, transform 0.2s ease;
@@ -269,14 +269,14 @@
     align-items: center;
     justify-content: space-between;
     padding: 1rem 1rem 0.75rem;
-    border-bottom: 1px solid var(--admin-border-subtle, #e5e7eb);
+    border-bottom: 1px solid var(--admin-border-subtle, var(--border-subtle));
   }
 
   .quick-actions__title {
     margin: 0;
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--admin-text-primary, #111827);
+    color: var(--admin-text-primary, hsl(var(--neutral-8) / 1));
   }
 
   .quick-actions__close {
@@ -286,15 +286,15 @@
     padding: 0.25rem;
     background: none;
     border: none;
-    color: var(--admin-text-muted, #6b7280);
+    color: var(--admin-text-muted, var(--text-muted));
     cursor: pointer;
     border-radius: var(--wc-radius-sm, 0.75rem);
     transition: all 0.15s ease;
   }
 
   .quick-actions__close:hover {
-    background: var(--admin-surface-soft, #f3f4f6);
-    color: var(--admin-text-primary, #111827);
+    background: var(--admin-surface-soft, var(--surface-panel));
+    color: var(--admin-text-primary, hsl(var(--neutral-8) / 1));
   }
 
   .quick-actions__nav {
@@ -308,7 +308,7 @@
   }
 
   .quick-actions__section:not(:last-child) {
-    border-bottom: 1px solid var(--admin-border-subtle, #e5e7eb);
+    border-bottom: 1px solid var(--admin-border-subtle, var(--border-subtle));
   }
 
   .quick-actions__section-title {
@@ -318,7 +318,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--admin-text-muted, #6b7280);
+    color: var(--admin-text-muted, var(--text-muted));
   }
 
   .quick-actions__link {
@@ -328,33 +328,33 @@
     padding: 0.5rem 0.75rem;
     border-radius: var(--wc-radius-sm, 0.75rem);
     text-decoration: none;
-    color: var(--admin-text-primary, #111827);
+    color: var(--admin-text-primary, hsl(var(--neutral-8) / 1));
     font-size: 0.875rem;
     transition: all 0.15s ease;
   }
 
   .quick-actions__link:hover {
-    background: var(--admin-surface-soft, #f3f4f6);
-    color: #6b21a8;
+    background: var(--admin-surface-soft, var(--surface-panel));
+    color: hsl(var(--accent-ink) / 1);
   }
 
   .quick-actions__link:focus-visible {
-    outline: 2px solid #a78bfa;
+    outline: 2px solid hsl(var(--accent-2) / 1);
     outline-offset: -2px;
   }
 
   .quick-actions__link svg {
     flex-shrink: 0;
-    color: var(--admin-icon-muted, #9ca3af);
+    color: var(--admin-icon-muted, var(--text-muted));
   }
 
   .quick-actions__link:hover svg {
-    color: #6b21a8;
+    color: hsl(var(--accent-ink) / 1);
   }
 
   .quick-actions__footer {
     padding: 0.75rem 1rem;
-    border-top: 1px solid var(--admin-border-subtle, #e5e7eb);
+    border-top: 1px solid var(--admin-border-subtle, var(--border-subtle));
   }
 
   .quick-actions__site-link {
@@ -364,15 +364,15 @@
     padding: 0.5rem 0.75rem;
     border-radius: var(--wc-radius-sm, 0.75rem);
     text-decoration: none;
-    color: var(--admin-text-muted, #6b7280);
+    color: var(--admin-text-muted, var(--text-muted));
     font-size: 0.8125rem;
     font-weight: 500;
     transition: all 0.15s ease;
   }
 
   .quick-actions__site-link:hover {
-    background: var(--admin-surface-soft, #f3f4f6);
-    color: var(--admin-text-primary, #111827);
+    background: var(--admin-surface-soft, var(--surface-panel));
+    color: var(--admin-text-primary, hsl(var(--neutral-8) / 1));
   }
 
   @media (max-width: 768px) {

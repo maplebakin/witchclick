@@ -193,8 +193,8 @@ const nextLabel = p < totalPages ? "Turn the page" : "Story complete";
     border: 1px solid color-mix(in srgb, var(--ambient-color, var(--text-accent, var(--theme-color-gold))) 32%, transparent 68%);
     background:
       radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--ambient-highlight, var(--text-accent, var(--theme-color-gold))) 28%, transparent 72%), transparent 68%),
-      linear-gradient(135deg, color-mix(in srgb, var(--ambient-color, var(--theme-color-gold, #d4af37)) 54%, rgba(8, 2, 16, 0.65) 46%) 0%, color-mix(in srgb, var(--ambient-color, var(--theme-color-iris, #4b2a63)) 42%, rgba(13, 5, 24, 0.92) 58%) 100%);
-    color: color-mix(in srgb, var(--ink-strong, #f4f1ff) 94%, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 6%);
+      linear-gradient(135deg, color-mix(in srgb, var(--ambient-color, var(--theme-color-gold, var(--text-accent))) 54%, hsl(var(--neutral-9) / 0.65) 46%) 0%, color-mix(in srgb, var(--ambient-color, var(--theme-color-iris, hsl(var(--accent-ink) / 1))) 42%, hsl(var(--neutral-9) / 0.92) 58%) 100%);
+    color: color-mix(in srgb, var(--ink-strong, var(--text-strong)) 94%, var(--ambient-highlight, hsl(var(--accent-1) / 0.6)) 6%);
     box-shadow: 0 18px 45px -26px color-mix(in srgb, var(--ambient-color, var(--text-accent, var(--theme-color-gold))) 38%, black 62%);
     text-decoration: none;
     transition:
@@ -210,7 +210,7 @@ const nextLabel = p < totalPages ? "Turn the page" : "Story complete";
     inset: 0;
     border-radius: inherit;
     pointer-events: none;
-    background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 18%, transparent 82%), transparent 70%);
+    background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--ambient-highlight, hsl(var(--accent-1) / 0.6)) 18%, transparent 82%), transparent 70%);
     opacity: 0;
     transition: opacity 200ms ease;
   }
@@ -240,9 +240,9 @@ const nextLabel = p < totalPages ? "Turn the page" : "Story complete";
 
   .pagination__link--disabled {
     pointer-events: none;
-    background: linear-gradient(135deg, color-mix(in srgb, var(--ambient-color, var(--theme-color-gold, #d4af37)) 22%, transparent 78%) 0%, color-mix(in srgb, var(--surface-panel-primary) 86%, transparent 14%) 100%);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--ambient-color, var(--theme-color-gold, var(--text-accent))) 22%, transparent 78%) 0%, color-mix(in srgb, var(--surface-panel-primary) 86%, transparent 14%) 100%);
     border-color: color-mix(in srgb, var(--ambient-color, var(--text-accent, var(--theme-color-gold))) 20%, transparent 80%);
-    color: color-mix(in srgb, var(--ink-muted, #d6cffa) 85%, white 15%);
+    color: color-mix(in srgb, var(--ink-muted, var(--text-muted)) 85%, white 15%);
     box-shadow: none;
     transform: none;
   }
@@ -255,10 +255,10 @@ const nextLabel = p < totalPages ? "Turn the page" : "Story complete";
   }
 
   .pagination__eyebrow {
-    font-size: 0.65rem;
+    font-size: 0.8rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 75%, var(--ink-body, #f4f1ff) 25%);
+    color: color-mix(in srgb, var(--ambient-highlight, hsl(var(--accent-1) / 0.6)) 75%, var(--ink-body, var(--text-strong)) 25%);
   }
 
   .pagination__label {
@@ -273,7 +273,7 @@ const nextLabel = p < totalPages ? "Turn the page" : "Story complete";
     justify-content: center;
     width: 2.2rem;
     height: 2.2rem;
-    color: color-mix(in srgb, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 68%, white 32%);
+    color: color-mix(in srgb, var(--ambient-highlight, hsl(var(--accent-1) / 0.6)) 68%, white 32%);
     filter: drop-shadow(0 8px 18px color-mix(in srgb, var(--ambient-color, var(--text-accent, var(--theme-color-gold))) 35%, transparent 65%));
   }
 
@@ -292,8 +292,8 @@ const nextLabel = p < totalPages ? "Turn the page" : "Story complete";
     border-radius: clamp(1.6rem, 4vw, 2.4rem);
     border: 1px solid color-mix(in srgb, var(--ambient-color, var(--text-accent, var(--theme-color-gold))) 26%, transparent 74%);
     background:
-      radial-gradient(circle at 20% 0%, color-mix(in srgb, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 18%, transparent 82%), transparent 70%),
-      linear-gradient(180deg, color-mix(in srgb, var(--ambient-color, var(--theme-color-iris, #4b2a63)) 24%, rgba(8, 2, 18, 0.78)) 0%, color-mix(in srgb, var(--ambient-color, var(--theme-color-iris, #4b2a63)) 18%, rgba(6, 1, 14, 0.92)) 100%);
+      radial-gradient(circle at 20% 0%, color-mix(in srgb, var(--ambient-highlight, hsl(var(--accent-1) / 0.6)) 18%, transparent 82%), transparent 70%),
+      linear-gradient(180deg, color-mix(in srgb, var(--ambient-color, var(--theme-color-iris, hsl(var(--accent-ink) / 1))) 24%, hsl(var(--neutral-9) / 0.78)) 0%, color-mix(in srgb, var(--ambient-color, var(--theme-color-iris, hsl(var(--accent-ink) / 1))) 18%, hsl(var(--neutral-9) / 0.92)) 100%);
     box-shadow: 0 20px 50px -26px color-mix(in srgb, var(--ambient-color, var(--text-accent, var(--theme-color-gold))) 40%, black 60%);
   }
 
@@ -303,7 +303,7 @@ const nextLabel = p < totalPages ? "Turn the page" : "Story complete";
     inset: 0;
     pointer-events: none;
     border-radius: inherit;
-    border: 1px solid color-mix(in srgb, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 28%, transparent 72%);
+    border: 1px solid color-mix(in srgb, var(--ambient-highlight, hsl(var(--accent-1) / 0.6)) 28%, transparent 72%);
     opacity: 0.5;
   }
 
@@ -311,7 +311,7 @@ const nextLabel = p < totalPages ? "Turn the page" : "Story complete";
     display: inline-flex;
     width: 2.6rem;
     height: 2.6rem;
-    color: color-mix(in srgb, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 78%, white 22%);
+    color: color-mix(in srgb, var(--ambient-highlight, hsl(var(--accent-1) / 0.6)) 78%, white 22%);
     filter: drop-shadow(0 10px 18px color-mix(in srgb, var(--ambient-color, var(--text-accent, var(--theme-color-gold))) 38%, transparent 62%));
   }
 
@@ -324,14 +324,14 @@ const nextLabel = p < totalPages ? "Turn the page" : "Story complete";
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
-    color: color-mix(in srgb, var(--ink-strong, #f4f1ff) 95%, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 5%);
+    color: color-mix(in srgb, var(--ink-strong, var(--text-strong)) 95%, var(--ambient-highlight, hsl(var(--accent-1) / 0.6)) 5%);
   }
 
   .pagination__status-eyebrow {
-    font-size: 0.68rem;
+    font-size: 0.8rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--ambient-highlight, rgba(233, 212, 255, 0.6)) 62%, var(--ink-body, #f4f1ff) 38%);
+    color: color-mix(in srgb, var(--ambient-highlight, hsl(var(--accent-1) / 0.6)) 62%, var(--ink-body, var(--text-strong)) 38%);
   }
 
   .pagination__status-label {

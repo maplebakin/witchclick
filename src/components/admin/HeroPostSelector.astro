@@ -24,8 +24,8 @@ import Button from "@/components/ui/Button.astro";
         <!-- Recently Added Posts Column -->
         <div class="space-y-2">
           <div class="flex items-center gap-2">
-            <span class="text-xs font-semibold uppercase tracking-wide text-neutral-800">Recently Added</span>
-            <span class="text-[10px] font-medium uppercase tracking-wide rounded-full bg-brand-accent/20 px-2 py-0.5 text-brand-primary" data-recent-count>0</span>
+            <span class="text-[0.8rem] font-semibold uppercase tracking-wide text-neutral-800">Recently Added</span>
+            <span class="text-[0.8rem] font-medium uppercase tracking-wide rounded-full bg-brand-accent/20 px-2 py-0.5 text-brand-primary" data-recent-count>0</span>
           </div>
           <Input
             type="search"
@@ -34,15 +34,15 @@ import Button from "@/components/ui/Button.astro";
             data-recent-filter
           />
           <div class="space-y-1 rounded-lg border border-neutral-200 bg-white p-2 max-h-64 overflow-y-auto" data-recent-posts>
-            <div class="flex items-center justify-center py-8 text-xs text-neutral-500">Loading posts…</div>
+            <div class="flex items-center justify-center py-8 text-[0.8rem] text-neutral-500">Loading posts…</div>
           </div>
         </div>
 
         <!-- Posts Without Hero Image Column -->
         <div class="space-y-2">
           <div class="flex items-center gap-2">
-            <span class="text-xs font-semibold uppercase tracking-wide text-neutral-800">Needs Hero Image</span>
-            <span class="text-[10px] font-medium uppercase tracking-wide rounded-full bg-status-success-soft px-2 py-0.5 text-status-success" data-missing-count>0</span>
+            <span class="text-[0.8rem] font-semibold uppercase tracking-wide text-neutral-800">Needs Hero Image</span>
+            <span class="text-[0.8rem] font-medium uppercase tracking-wide rounded-full bg-status-success-soft px-2 py-0.5 text-status-success" data-missing-count>0</span>
           </div>
           <Input
             type="search"
@@ -51,7 +51,7 @@ import Button from "@/components/ui/Button.astro";
             data-missing-filter
           />
           <div class="space-y-1 rounded-lg border border-neutral-200 bg-white p-2 max-h-64 overflow-y-auto" data-missing-hero-posts>
-            <div class="flex items-center justify-center py-8 text-xs text-neutral-500">Loading posts…</div>
+            <div class="flex items-center justify-center py-8 text-[0.8rem] text-neutral-500">Loading posts…</div>
           </div>
         </div>
       </div>
@@ -65,11 +65,11 @@ import Button from "@/components/ui/Button.astro";
       <div class="hidden rounded-lg border-2 border-brand-primary bg-brand-accent/10 px-4 py-3" data-selected-post-display>
         <div class="flex items-center justify-between gap-3">
           <div class="flex-1">
-            <div class="text-[10px] font-semibold uppercase tracking-wide text-neutral-500 mb-1">Selected Post</div>
+            <div class="text-[0.8rem] font-semibold uppercase tracking-wide text-neutral-500 mb-1">Selected Post</div>
             <div class="font-semibold text-neutral-800" data-selected-title></div>
-            <div class="text-xs text-neutral-500" data-selected-slug></div>
+            <div class="text-[0.8rem] text-neutral-500" data-selected-slug></div>
           </div>
-          <Button type="button" variant="danger" size="sm" class="!px-2 !py-1 text-xs hover:underline" data-clear-selection>Clear</Button>
+          <Button type="button" variant="danger" size="sm" class="!px-2 !py-1 text-[0.8rem] hover:underline" data-clear-selection>Clear</Button>
         </div>
       </div>
     </div>
@@ -131,7 +131,7 @@ import Button from "@/components/ui/Button.astro";
       title.textContent = post.title || post.slug;
 
       const slug = document.createElement('div');
-      slug.className = 'text-xs text-neutral-500 truncate mt-0.5';
+      slug.className = 'text-[0.8rem] text-neutral-500 truncate mt-0.5';
       slug.textContent = post.slug;
 
       card.appendChild(title);
@@ -139,7 +139,7 @@ import Button from "@/components/ui/Button.astro";
 
       if (post.heroImage) {
         const badge = document.createElement('div');
-        badge.className = 'text-[10px] font-medium text-status-success mt-1';
+        badge.className = 'text-[0.8rem] font-medium text-status-success mt-1';
         badge.textContent = '✓ Has hero image';
         card.appendChild(badge);
       }
@@ -167,7 +167,7 @@ import Button from "@/components/ui/Button.astro";
       recentPostsList.innerHTML = '';
       const filtered = recentCandidates.filter((post) => matchesFilterTerm(post, recentFilterText));
       if (!filtered.length) {
-        recentPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-xs text-neutral-500">No matches.</div>';
+        recentPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-[0.8rem] text-neutral-500">No matches.</div>';
       } else {
         filtered.forEach((post) => {
           recentPostsList.appendChild(createPostCard(post));
@@ -182,11 +182,11 @@ import Button from "@/components/ui/Button.astro";
       if (!missingHeroPostsList) return;
       missingHeroPostsList.innerHTML = '';
       if (!missingCandidates.length) {
-        missingHeroPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-xs text-status-success">All posts have hero images! 🎉</div>';
+        missingHeroPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-[0.8rem] text-status-success">All posts have hero images! 🎉</div>';
       } else {
         const filtered = missingCandidates.filter((post) => matchesFilterTerm(post, missingFilterText));
         if (!filtered.length) {
-          missingHeroPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-xs text-neutral-500">No matches.</div>';
+          missingHeroPostsList.innerHTML = '<div class="flex items-center justify-center py-8 text-[0.8rem] text-neutral-500">No matches.</div>';
         } else {
           filtered.forEach((post) => {
             missingHeroPostsList.appendChild(createPostCard(post));
@@ -267,8 +267,8 @@ import Button from "@/components/ui/Button.astro";
         }
 
       } catch (err) {
-        if(recentPostsList) recentPostsList.innerHTML = '<div class="text-danger text-xs">Could not load posts.</div>';
-        if(missingHeroPostsList) missingHeroPostsList.innerHTML = '<div class="text-danger text-xs">Could not load posts.</div>';
+        if(recentPostsList) recentPostsList.innerHTML = '<div class="text-danger text-[0.8rem]">Could not load posts.</div>';
+        if(missingHeroPostsList) missingHeroPostsList.innerHTML = '<div class="text-danger text-[0.8rem]">Could not load posts.</div>';
       }
     }
 

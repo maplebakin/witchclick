@@ -43,7 +43,7 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as 
               Create and edit entities like crystals, herbs, tarot cards, moon phases, and rituals. Entities power cross-references across your site.
             </p>
           </div>
-          <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-4 text-xs text-body-muted">
+          <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-4 text-[0.8rem] text-body-muted">
             <div class="font-semibold mb-2">🔮 Entity types:</div>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
               <div class="flex items-center gap-2 rounded-md bg-surface-soft px-3 py-1.5">
@@ -83,7 +83,7 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as 
             <h2 class="text-lg font-semibold">Entity Library</h2>
             <button id="newBtn" class="admin-btn-primary px-3 py-1.5 text-sm font-semibold">+ New</button>
           </div>
-          <p class="text-xs text-body-muted">Search and select to edit, or create new</p>
+          <p class="text-[0.8rem] text-body-muted">Search and select to edit, or create new</p>
         </div>
         <input id="search" placeholder="Search entities..." class="mb-3 w-full admin-btn-secondary px-3 py-2 text-sm" />
         <div id="list" class="max-h-[70vh] overflow-auto text-sm"></div>
@@ -93,27 +93,27 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as 
       <section class="lg:col-span-8 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
         <div class="mb-4 space-y-2">
           <h2 class="text-lg font-semibold">Entity Editor</h2>
-          <p class="text-xs text-body-muted">Create or edit entity details and properties</p>
+          <p class="text-[0.8rem] text-body-muted">Create or edit entity details and properties</p>
         </div>
 
         <div class="grid gap-3 md:grid-cols-2">
           <label class="block">
-            <span class="text-xs font-medium">Type</span>
+            <span class="text-[0.8rem] font-medium">Type</span>
             <select id="type" class="mt-1 w-full admin-btn-secondary px-3 py-2">
               {TYPES.map(t => <option value={t}>{t}</option>)}
             </select>
           </label>
           <label class="block">
-            <span class="text-xs font-medium">Slug</span>
+            <span class="text-[0.8rem] font-medium">Slug</span>
             <input id="slug" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="peppermint" />
-            <p class="mt-1 text-xs text-body-faint">Leave blank to auto-fill from Name.</p>
+            <p class="mt-1 text-[0.8rem] text-body-faint">Leave blank to auto-fill from Name.</p>
           </label>
           <label class="block md:col-span-2">
-            <span class="text-xs font-medium">Name</span>
+            <span class="text-[0.8rem] font-medium">Name</span>
             <input id="name" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="Peppermint" />
           </label>
           <label class="block md:col-span-2">
-            <span class="text-xs font-medium">Summary</span>
+            <span class="text-[0.8rem] font-medium">Summary</span>
             <textarea id="summary" class="mt-1 h-20 w-full admin-btn-secondary px-3 py-2"></textarea>
           </label>
         </div>
@@ -121,9 +121,9 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as 
         <div class="mt-4 space-y-3">
           <div class="flex items-center justify-between">
             <h3 class="text-sm font-semibold">Custom Properties</h3>
-            <span class="text-[10px] font-medium uppercase tracking-wide rounded-full bg-surface-accent-soft px-2 py-0.5 text-accent">Optional</span>
+            <span class="text-[0.8rem] font-medium uppercase tracking-wide rounded-full bg-surface-accent-soft px-2 py-0.5 text-accent">Optional</span>
           </div>
-          <p class="text-xs text-body-muted">Add key-value pairs for entity-specific metadata (e.g., "chakra: heart", "planet: Venus")</p>
+          <p class="text-[0.8rem] text-body-muted">Add key-value pairs for entity-specific metadata (e.g., "chakra: heart", "planet: Venus")</p>
           <div id="props" class="space-y-2"></div>
           <div class="flex gap-2">
             <button id="addProp" class="admin-btn-secondary px-3 py-1.5 text-sm font-medium">+ Add Property</button>
@@ -132,9 +132,9 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as 
         </div>
 
         <label class="mt-4 block">
-          <span class="text-xs font-medium uppercase tracking-wide text-body-subtle">Related Entities</span>
+          <span class="text-[0.8rem] font-medium uppercase tracking-wide text-body-subtle">Related Entities</span>
           <input id="related" class="mt-1 w-full admin-btn-secondary px-3 py-2" placeholder="fluorite,new-moon,clear-quartz" />
-          <p class="mt-1 text-xs text-body-muted">Comma-separated slugs of related entities for cross-linking</p>
+          <p class="mt-1 text-[0.8rem] text-body-muted">Comma-separated slugs of related entities for cross-linking</p>
         </label>
 
         <div class="mt-6 flex gap-3 border-t border-line-subtle pt-4">

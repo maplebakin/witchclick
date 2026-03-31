@@ -52,7 +52,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
                 Refresh
               </button>
             </div>
-            <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-4 text-xs text-body-muted">
+            <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-4 text-[0.8rem] text-body-muted">
               <div class="mb-2 font-semibold">How it works:</div>
               <ol class="ml-4 list-decimal space-y-1">
                 <li>
@@ -221,7 +221,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
                   ")</span></h3>";
                 if (topicDrafts.length > 1) {
                   html +=
-                    '<button class="compare-topic-btn rounded border border-line-neutral bg-surface-base px-2 py-1 text-xs hover:bg-surface-soft" data-topic="' +
+                    '<button class="compare-topic-btn rounded border border-line-neutral bg-surface-base px-2 py-1 text-[0.8rem] hover:bg-surface-soft" data-topic="' +
                     escapeHtml(topic) +
                     '">Compare All</button>';
                 }
@@ -259,7 +259,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               '<p class="mt-1 text-sm text-body-muted line-clamp-2">' +
               escapeHtml(draft.excerpt) +
               "</p>";
-            html += '<div class="mt-2 flex flex-wrap gap-2 text-xs text-body-faint">';
+            html += '<div class="mt-2 flex flex-wrap gap-2 text-[0.8rem] text-body-faint">';
             html += "<span>" + draft.wordCount + " words</span>";
             html += '<span class="text-line-subtle">•</span>';
             html += "<span>" + draft.readingMinutes + " min read</span>";
@@ -278,13 +278,13 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               html += '<div class="mt-2 flex flex-wrap gap-1">';
               for (var i = 0; i < Math.min(draft.tags.length, 5); i++) {
                 html +=
-                  '<span class="rounded-full bg-surface-neutral-soft px-2 py-0.5 text-xs text-body-muted">' +
+                  '<span class="rounded-full bg-surface-neutral-soft px-2 py-0.5 text-[0.8rem] text-body-muted">' +
                   escapeHtml(draft.tags[i]) +
                   "</span>";
               }
               if (draft.tags.length > 5) {
                 html +=
-                  '<span class="text-xs text-body-faint">+' +
+                  '<span class="text-[0.8rem] text-body-faint">+' +
                   (draft.tags.length - 5) +
                   " more</span>";
               }
@@ -295,15 +295,15 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
             html += '<div class="flex flex-shrink-0 flex-col gap-2">';
             html +=
-              '<button class="preview-btn admin-btn-secondary px-3 py-1.5 text-xs font-medium" data-slug="' +
+              '<button class="preview-btn admin-btn-secondary px-3 py-1.5 text-[0.8rem] font-medium" data-slug="' +
               escapeHtml(draft.slug) +
               '">Preview</button>';
             html +=
-              '<button class="publish-btn admin-btn-primary px-3 py-1.5 text-xs font-semibold" data-slug="' +
+              '<button class="publish-btn admin-btn-primary px-3 py-1.5 text-[0.8rem] font-semibold" data-slug="' +
               escapeHtml(draft.slug) +
               '">Publish</button>';
             html +=
-              '<button class="delete-btn admin-btn-secondary px-3 py-1.5 text-xs font-medium text-danger" data-slug="' +
+              '<button class="delete-btn admin-btn-secondary px-3 py-1.5 text-[0.8rem] font-medium text-danger" data-slug="' +
               escapeHtml(draft.slug) +
               '">Delete</button>';
             html += "</div>";
@@ -398,7 +398,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             }
 
             html +=
-              '<p class="mt-4 text-xs text-body-faint">~' +
+              '<p class="mt-4 text-[0.8rem] text-body-faint">~' +
               data.frontmatter.wordCount +
               " words • ~" +
               data.frontmatter.readingMinutes +
@@ -454,16 +454,16 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               html +=
                 '<div class="flex gap-2">';
               html +=
-                '<button class="publish-btn admin-btn-primary px-2.5 py-1 text-xs font-semibold" data-slug="' +
+                '<button class="publish-btn admin-btn-primary px-2.5 py-1 text-[0.8rem] font-semibold" data-slug="' +
                 escapeHtml(post.slug) +
                 '">Publish</button>';
               html +=
-                '<button class="delete-btn admin-btn-secondary px-2.5 py-1 text-xs font-medium text-danger" data-slug="' +
+                '<button class="delete-btn admin-btn-secondary px-2.5 py-1 text-[0.8rem] font-medium text-danger" data-slug="' +
                 escapeHtml(post.slug) +
                 '">Delete</button>';
               html += "</div></div>";
 
-              html += '<div class="mb-2 text-xs text-body-muted">';
+              html += '<div class="mb-2 text-[0.8rem] text-body-muted">';
               html += post.frontmatter.wordCount + " words • ";
               html += post.frontmatter.readingMinutes + " min read • ";
               html += formatDate(post.frontmatter.publishedAt);

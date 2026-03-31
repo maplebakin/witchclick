@@ -62,16 +62,16 @@ const formId = `cta-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^
     border-radius: clamp(1.5rem, 3vw, 1.9rem);
     /* Midnight theme: dark card with light text */
     background:
-      radial-gradient(85% 120% at 12% 8%, color-mix(in srgb, var(--theme-color-gold, #d4af37) 18%, transparent) 0%, transparent 68%),
-      radial-gradient(80% 100% at 88% 5%, color-mix(in srgb, var(--theme-color-iris, #4b2a63) 20%, transparent) 0%, transparent 70%),
-      color-mix(in srgb, var(--theme-color-night, #120725) 88%, transparent 12%);
-    border: 1px solid color-mix(in srgb, var(--theme-color-gold, #d4af37) 35%, var(--theme-color-iris, #4b2a63) 25%);
-    box-shadow: 0 22px 55px -32px rgba(11, 6, 20, 0.5);
+      radial-gradient(85% 120% at 12% 8%, color-mix(in srgb, var(--theme-color-gold, var(--text-accent)) 18%, transparent) 0%, transparent 68%),
+      radial-gradient(80% 100% at 88% 5%, color-mix(in srgb, var(--theme-color-iris, hsl(var(--accent-ink) / 1)) 20%, transparent) 0%, transparent 70%),
+      color-mix(in srgb, var(--theme-color-night, var(--surface-base)) 88%, transparent 12%);
+    border: 1px solid color-mix(in srgb, var(--theme-color-gold, var(--text-accent)) 35%, var(--theme-color-iris, hsl(var(--accent-ink) / 1)) 25%);
+    box-shadow: 0 22px 55px -32px hsl(var(--neutral-9) / 0.5);
   }
 
   .cta-eyebrow {
     margin: 0;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     letter-spacing: 0.32em;
     text-transform: uppercase;
     color: var(--theme-text-tertiary);
@@ -106,22 +106,22 @@ const formId = `cta-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^
     min-width: 0;
     padding: 0.75rem 1rem;
     border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--theme-color-gold, #d4af37) 25%, var(--theme-color-iris, #4b2a63) 25%);
-    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid color-mix(in srgb, var(--theme-color-gold, var(--text-accent)) 25%, var(--theme-color-iris, hsl(var(--accent-ink) / 1)) 25%);
+    background: hsl(var(--neutral-0) / 0.95);
     font-size: 0.95rem;
-    color: #1f2937;
+    color: var(--text-strong);
     transition: border-color 180ms ease, box-shadow 180ms ease;
   }
 
   .cta-form-fields input::placeholder {
-    color: #9ca3af;
+    color: var(--text-muted);
     opacity: 1;
   }
 
   .cta-form-fields input:focus-visible {
     outline: none;
-    border-color: rgba(124, 58, 237, 0.5);
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+    border-color: hsl(var(--accent-2) / 0.5);
+    box-shadow: 0 0 0 3px hsl(var(--accent-2) / 0.15);
   }
 
   .cta-submit {
@@ -159,21 +159,21 @@ const formId = `cta-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^
   /* Dawn theme overrides */
   :root[data-comfort-theme="dawn"] .evergreen-cta {
     background:
-      radial-gradient(85% 120% at 12% 8%, rgba(155, 134, 200, 0.15), transparent 68%),
-      radial-gradient(80% 100% at 88% 5%, rgba(180, 154, 217, 0.18), transparent 70%),
-      rgba(252, 248, 242, 0.95);
-    border-color: color-mix(in srgb, rgba(122, 94, 154, 0.35) 75%, transparent 25%);
-    box-shadow: 0 22px 55px -32px rgba(71, 54, 96, 0.32);
+      radial-gradient(85% 120% at 12% 8%, hsl(var(--accent-2) / 0.15), transparent 68%),
+      radial-gradient(80% 100% at 88% 5%, hsl(var(--accent-2) / 0.18), transparent 70%),
+      hsl(var(--neutral-0) / 0.95);
+    border-color: color-mix(in srgb, hsl(var(--accent-ink) / 0.35) 75%, transparent 25%);
+    box-shadow: 0 22px 55px -32px hsl(var(--neutral-7) / 0.32);
   }
 
   :root[data-comfort-theme="dawn"] .cta-form-fields input {
-    border-color: rgba(122, 94, 154, 0.35);
-    background: rgba(255, 255, 255, 0.98);
+    border-color: hsl(var(--accent-ink) / 0.35);
+    background: hsl(var(--neutral-0) / 0.98);
   }
 
   :root[data-comfort-theme="dawn"] .cta-form-fields input:focus-visible {
-    border-color: rgba(122, 94, 154, 0.55);
-    box-shadow: 0 0 0 3px rgba(122, 94, 154, 0.18);
+    border-color: hsl(var(--accent-ink) / 0.55);
+    box-shadow: 0 0 0 3px hsl(var(--accent-ink) / 0.18);
   }
 
   @media (max-width: 540px) {

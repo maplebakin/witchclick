@@ -191,30 +191,7 @@ body {
   font-family: var(--font-body-ui, var(--font-body, "Inter", system-ui, -apple-system, "Segoe UI", sans-serif));
 }
 
-/* Prose (Content) Font */
-.prose {
-  font-family: var(--font-serif, Literata, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif);
-  color: var(--ink-body, var(--text-body));
-}
-
-.prose :is(h1, h2, h3, h4, h5, h6) {
-  color: var(--ink-strong, var(--text-strong));
-  letter-spacing: 0.02em;
-  text-transform: none;
-}
-
-.prose a {
-  color: var(--link-color, var(--text-accent));
-}
-
-.prose strong {
-  color: var(--text-accent-strong, var(--ink-strong));
-}
-
-.prose blockquote {
-  border-left-color: var(--border-accent-strong, var(--border-strong));
-  color: color-mix(in srgb, var(--ink-body, var(--text-body)) 88%, transparent 12%);
-}
+/* Prose styles are canonical in src/styles/base.css (see the "Prose styling for blog content" section). */
 
 /* Link Reset */
 a {
