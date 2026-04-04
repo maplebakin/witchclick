@@ -6,7 +6,7 @@ import HeadSlot from "@/components/HeadSlot.astro";
 import EvergreenCta from "@/components/blocks/EvergreenCta.astro";
 import PrintableSamplePreview from "@/components/blocks/PrintableSamplePreview.astro";
 import Testimonials from "@/components/blocks/Testimonials.astro";
-import { readSettings } from "../../utils/settings";
+import { readSettings, getFormEndpoint } from "../../utils/settings";
 import { createCollectionPageSchema } from "../../utils/structuredData";
 import { readEvergreenBlocks } from "../../utils/blocks";
 import { collectUnique, loadRitualLabEntries } from "../../utils/ritualLab";
@@ -28,6 +28,7 @@ const defaultIntent = intents[0] ?? "reset";
 const defaultTime = timeOptions[0]?.value ?? 15;
 
 const settings = readSettings();
+const hasFormEndpoint = Boolean(getFormEndpoint(settings));
 const evergreenBlocks = readEvergreenBlocks();
 const evergreenCta = evergreenBlocks.cta ?? null;
 const testimonialSection = evergreenBlocks.testimonialSection ?? null;
@@ -176,11 +177,12 @@ const ritualLabPayloadJson = safeJsonStringify({
 
 ---
 <Base {title} {description}>
-  {downloadCollectionSchema && (
-    <HeadSlot slot="head">
+  <HeadSlot slot="head">
+    <meta name="robots" content="noindex, nofollow" />
+    {downloadCollectionSchema && (
       <script type="application/ld+json" is:inline set:html={JSON.stringify(downloadCollectionSchema)} />
-    </HeadSlot>
-  )}
+    )}
+  </HeadSlot>
   <section class="mx-auto max-w-6xl space-y-6 py-12">
     <header class="space-y-3 text-center">
       <p class="text-sm uppercase tracking-wide text-accent">Phase 2 Lab</p>
@@ -281,44 +283,50 @@ const ritualLabPayloadJson = safeJsonStringify({
       </p>
     </header>
 
-    <form
-      class="mx-auto max-w-2xl space-y-3 rounded-3xl border border-line-muted/70 bg-surface-muted/80 p-6 shadow-lg backdrop-blur dark:border-line-accent-strong/60 dark:bg-surface-accent-midnight/40"
-      name="ritual-lab-downloads"
-      method="POST"
-      data-netlify="true"
-      data-form-success="Thanks. We logged your printable request and update preference."
-    >
-      <input type="hidden" name="form-name" value="ritual-lab-downloads" />
-      <label class="block text-sm font-medium text-primary dark:text-accent-ghost">
-        What printable would help right now? (optional)
-        <textarea
-          name="request"
-          rows="3"
-          placeholder="Example: A ritual check-in page or a gentle habit tracker for low-spoons mornings."
-          class="mt-2 w-full rounded-2xl border border-line-muted bg-surface-base px-4 py-3 text-sm shadow-sm focus:border-line-bold focus:outline-none focus:ring-2 focus:ring-focus/60 dark:border-line-accent dark:bg-surface-backdrop dark:text-accent-ghost"
-        ></textarea>
-      </label>
-      <label class="block text-sm font-medium text-primary dark:text-accent-ghost">
-        Email (optional)
-        <input
-          type="email"
-          name="email"
-          inputmode="email"
-          placeholder="you@example.com"
-          class="mt-2 w-full rounded-2xl border border-line-muted bg-surface-base px-4 py-3 text-sm shadow-sm focus:border-line-bold focus:outline-none focus:ring-2 focus:ring-focus/60 dark:border-line-accent dark:bg-surface-backdrop dark:text-accent-ghost"
-        />
-      </label>
-      <div class="flex flex-wrap items-center gap-3 text-[0.8rem] opacity-70">
-        <button type="submit" class="rounded-full bg-surface-accent-strong px-4 py-2 text-inverse shadow hover:bg-surface-accent">
-          Send me future printables
-        </button>
-        <span>or</span>
-        <a class="rounded-full border border-line-strong px-4 py-2 font-medium text-secondary hover:border-line-bold" href="#downloads">
-          Skip & browse downloads
-        </a>
-      </div>
-      <p class="wc-form-status" data-form-status hidden aria-live="polite"></p>
-    </form>
+    {hasFormEndpoint ? (
+      <form
+        class="mx-auto max-w-2xl space-y-3 rounded-3xl border border-line-muted/70 bg-surface-muted/80 p-6 shadow-lg backdrop-blur dark:border-line-accent-strong/60 dark:bg-surface-accent-midnight/40"
+        name="ritual-lab-downloads"
+        method="POST"
+        data-netlify="true"
+        data-form-success="Thanks. We logged your printable request and update preference."
+      >
+        <input type="hidden" name="form-name" value="ritual-lab-downloads" />
+        <label class="block text-sm font-medium text-primary dark:text-accent-ghost">
+          What printable would help right now? (optional)
+          <textarea
+            name="request"
+            rows="3"
+            placeholder="Example: A ritual check-in page or a gentle habit tracker for low-spoons mornings."
+            class="mt-2 w-full rounded-2xl border border-line-muted bg-surface-base px-4 py-3 text-sm shadow-sm focus:border-line-bold focus:outline-none focus:ring-2 focus:ring-focus/60 dark:border-line-accent dark:bg-surface-backdrop dark:text-accent-ghost"
+          ></textarea>
+        </label>
+        <label class="block text-sm font-medium text-primary dark:text-accent-ghost">
+          Email (optional)
+          <input
+            type="email"
+            name="email"
+            inputmode="email"
+            placeholder="you@example.com"
+            class="mt-2 w-full rounded-2xl border border-line-muted bg-surface-base px-4 py-3 text-sm shadow-sm focus:border-line-bold focus:outline-none focus:ring-2 focus:ring-focus/60 dark:border-line-accent dark:bg-surface-backdrop dark:text-accent-ghost"
+          />
+        </label>
+        <div class="flex flex-wrap items-center gap-3 text-[0.8rem] opacity-70">
+          <button type="submit" class="rounded-full bg-surface-accent-strong px-4 py-2 text-inverse shadow hover:bg-surface-accent">
+            Send me future printables
+          </button>
+          <span>or</span>
+          <a class="rounded-full border border-line-strong px-4 py-2 font-medium text-secondary hover:border-line-bold" href="#downloads">
+            Skip & browse downloads
+          </a>
+        </div>
+        <p class="wc-form-status" data-form-status hidden aria-live="polite"></p>
+      </form>
+    ) : (
+      <p class="mx-auto max-w-2xl text-center text-sm opacity-75">
+        Printable requests and email updates are temporarily offline while form delivery is being configured. You can still browse the current downloads below.
+      </p>
+    )}
 
     <PrintableSamplePreview
       title={samplerPreview.title}

@@ -1,6 +1,11 @@
 export type TypeMetadataEntry = {
+  label?: string;
+  pluralLabel?: string;
+  emoji?: string;
+  slug?: string;
   title: string;
   subtitle: string;
+  description?: string;
   introText: string;
   icon: string;
   themeColor: string;
@@ -41,8 +46,13 @@ export const typeMetadata = {
     cardStyleClass: "from-gradient-herb-start/30 to-gradient-herb-end/40",
   },
   moonPhase: {
+    label: "Moon Phase",
+    pluralLabel: "Moon Phases",
+    emoji: "🌙",
+    slug: "moonPhase",
     title: "Moonlit Phases",
     subtitle: "The rhythm of the sky’s turning face.",
+    description: "The rhythm of the sky’s turning face.",
     introText:
       "Chart the waxing and waning tides of lunar magic. Each phase is a compass point guiding intention, release, and the secret grammar of the night.",
     icon: "🌙",
@@ -50,9 +60,31 @@ export const typeMetadata = {
     stubLine: "This moon phase is still revealing its glow.",
     cardStyleClass: "from-gradient-moon-start/30 to-gradient-moon-end/40",
   },
+  planet: {
+    label: "Planet",
+    pluralLabel: "Planets",
+    emoji: "🪐",
+    slug: "planet",
+    title: "The Celestial Bodies",
+    subtitle:
+      "The planets are not fortune tellers. They are mirrors — each one reflecting a different quality of attention back at you.",
+    description:
+      "The planets are not fortune tellers. They are mirrors — each one reflecting a different quality of attention back at you.",
+    introText:
+      "The planets are not fortune tellers. They are mirrors — each one reflecting a different quality of attention back at you.",
+    icon: "🪐",
+    themeColor: "indigo-500",
+    stubLine: "This celestial body is still revealing its lore.",
+    cardStyleClass: "from-gradient-default-start/20 to-gradient-default-end/40",
+  },
   planetaryDay: {
+    label: "Planetary Day",
+    pluralLabel: "Planetary Days",
+    emoji: "🪐",
+    slug: "planetaryDay",
     title: "Planetary Day Almanac",
     subtitle: "Weekday rhythms for intention and timing.",
+    description: "Weekday rhythms for intention and timing.",
     introText:
       "Follow the seven-day planetary cadence to pair rituals with the tone of each day. Use these correspondences as gentle structure for planning, focus, and release.",
     icon: "🪐",
@@ -71,14 +103,36 @@ export const typeMetadata = {
     cardStyleClass: "from-gradient-ritual-start/30 to-gradient-ritual-end/40",
   },
   tarot: {
+    label: "Tarot",
+    pluralLabel: "Tarot",
+    emoji: "🃏",
+    slug: "tarot",
     title: "The Arcana Directory",
-    subtitle: "The cards and spreads that speak in signs.",
+    subtitle:
+      "78 cards. Infinite mirrors. The tarot speaks in archetypes, seasons, and shadows.",
+    description:
+      "78 cards. Infinite mirrors. The tarot speaks in archetypes, seasons, and shadows.",
     introText:
       "Read the weave of fate through major and minor secrets alike. Each arcana whispers counsel, caution, and cosmic conversation for the seeker.",
     icon: "🃏",
     themeColor: "violet-600",
     stubLine: "This arcana awaits its card to be drawn.",
     cardStyleClass: "from-gradient-tarot-start/30 to-gradient-tarot-end/40",
+  },
+  spread: {
+    label: "Spread",
+    pluralLabel: "Spreads",
+    emoji: "🪄",
+    slug: "spread",
+    title: "The Spread Library",
+    subtitle: "Layouts for reflection, pattern reading, and play.",
+    description: "Layouts for reflection, pattern reading, and play.",
+    introText:
+      "Explore structured card layouts designed to surface patterns, questions, and next steps. These spreads hold space for reflection without pretending to predict your life.",
+    icon: "🪄",
+    themeColor: "amber-500",
+    stubLine: "This spread is still arranging its cards.",
+    cardStyleClass: "from-gradient-ritual-start/30 to-gradient-ritual-end/40",
   },
 } satisfies Record<string, TypeMetadataEntry>;
 

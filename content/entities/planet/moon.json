@@ -1,0 +1,12 @@
+{
+  "type": "planet",
+  "name": "The Moon",
+  "slug": "moon",
+  "summary": "This celestial body is still revealing its lore.",
+  "status": "stub",
+  "properties": {
+    "rulingSign": "Cancer",
+    "energy": "emotion, instinct, memory, comfort"
+  },
+  "related": []
+}

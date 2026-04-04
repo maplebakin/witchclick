@@ -64,7 +64,7 @@ const themeToggleId = `comfort-theme-${variant}`;
 
     const run = () => {
       const comfort = window.__wcComfort;
-      if (!comfort) return;
+      if (!comfort) return false;
 
       const fontToggles = Array.from(
         host.querySelectorAll<HTMLInputElement>('[data-comfort-font-toggle]')
@@ -103,12 +103,19 @@ const themeToggleId = `comfort-theme-${variant}`;
         },
         { once: true },
       );
+
+      return true;
+    };
+
+    const start = () => {
+      if (run()) return;
+      window.addEventListener('wc:comfort-ready', run, { once: true });
     };
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', run, { once: true });
+      document.addEventListener('DOMContentLoaded', start, { once: true });
     } else {
-      run();
+      start();
     }
   })();
 </script>

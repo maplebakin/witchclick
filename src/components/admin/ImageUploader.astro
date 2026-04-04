@@ -12,7 +12,7 @@ import Input from "@/components/ui/Input.astro";
       <div class="space-y-1">
         <h2 class="text-base font-semibold text-neutral-800">Step 3 — Upload hero artwork</h2>
         <p class="text-sm text-neutral-500">
-          With the prompt in hand, render a new hero image and import it from your device.
+          With the prompt in hand, render a new hero image, preview it locally, then upload it to the post's hero folder.
         </p>
       </div>
       <div class="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
@@ -38,7 +38,7 @@ import Input from "@/components/ui/Input.astro";
             <div class="space-y-2">
               <p class="text-sm font-medium text-neutral-700">Drag &amp; drop hero artwork, or click to browse</p>
               <p class="text-[0.8rem] text-neutral-500" data-drop-hint>
-                Once a post is selected, you can upload PNG, JPG, or WEBP files up to 5&nbsp;MB.
+                Once a post is selected, you can upload PNG, JPG, or WEBP files. Stay under 5&nbsp;MB, and expect files above 3.5&nbsp;MB to risk body-limit failures after base64 conversion.
               </p>
               <p class="text-[0.8rem] text-neutral-500" data-file-info></p>
             </div>
@@ -76,36 +76,330 @@ import Input from "@/components/ui/Input.astro";
           Alt text helps screen readers understand the imagery—tweak it after uploading if needed.
         </p>
       </label>
+      <div class="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          class="admin-btn-primary px-4 py-2 text-sm font-semibold"
+          data-upload-confirm
+          disabled
+        >
+          Upload artwork
+        </button>
+        <span class="text-sm text-neutral-500" data-upload-status></span>
+      </div>
+      <div
+        class="hidden rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800"
+        data-upload-warning
+      ></div>
+      <div
+        class="hidden rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700"
+        data-upload-error
+      ></div>
     </div>
   </div>
 </Card>
 
 <script>
-    // This script is intentionally left sparse.
-    // In the full refactor, the complex drag/drop, file reading, and preview logic
-    // from the original hero.astro's inline script would be moved here.
-    // It would also need to communicate with the other components, highlighting
-    // the need for a shared state solution.
-    document.addEventListener('DOMContentLoaded', () => {
-        const root = document.querySelector('[data-drop-zone]');
-        if (!root) return;
+  document.addEventListener('DOMContentLoaded', () => {
+    const card = document.querySelector('[data-drop-zone]')?.closest('li');
+    const dropZone = document.querySelector('[data-drop-zone]') as HTMLElement | null;
+    if (!card || !dropZone) return;
 
-        // Simplified event listeners to show the concept
-        root.addEventListener('dragenter', (event) => {
-            event.preventDefault();
-            // In a real implementation, we'd check if drops are enabled
-            root.classList.add('border-brand-primary', 'bg-neutral-100');
-        });
+    const heroUploaderRoot = card.closest('#heroUploader');
+    if (!heroUploaderRoot) return;
 
-        root.addEventListener('dragleave', (event) => {
-            event.preventDefault();
-            root.classList.remove('border-brand-primary', 'bg-neutral-100');
-        });
+    const DEV_API = heroUploaderRoot.getAttribute('data-dev-api') || 'http://localhost:8787';
+    const DEV_KEY = heroUploaderRoot.getAttribute('data-dev-key') || '';
+    const baseHeaders: Record<string, string> = DEV_KEY ? { 'X-WC-Dev-Key': DEV_KEY } : {};
+    const fileInput = card.querySelector('[data-file-input]') as HTMLInputElement | null;
+    const overlay = card.querySelector('[data-drop-overlay]') as HTMLElement | null;
+    const hint = card.querySelector('[data-drop-hint]') as HTMLElement | null;
+    const fileInfo = card.querySelector('[data-file-info]') as HTMLElement | null;
+    const preview = card.querySelector('[data-preview]') as HTMLImageElement | null;
+    const previewPlaceholder = card.querySelector('[data-preview-placeholder]') as HTMLElement | null;
+    const existingHero = card.querySelector('[data-existing-hero]') as HTMLElement | null;
+    const altInput = card.querySelector('[data-alt-input]') as HTMLInputElement | null;
+    const uploadButton = card.querySelector('[data-upload-confirm]') as HTMLButtonElement | null;
+    const uploadStatus = card.querySelector('[data-upload-status]') as HTMLElement | null;
+    const uploadWarning = card.querySelector('[data-upload-warning]') as HTMLElement | null;
+    const uploadError = card.querySelector('[data-upload-error]') as HTMLElement | null;
 
-        root.addEventListener('drop', (event) => {
-            event.preventDefault();
-            root.classList.remove('border-brand-primary', 'bg-neutral-100');
-            // Logic to handle file drop would go here
+    let selectedFile: File | null = null;
+    let previewUrl = '';
+
+    function apiFetch(path: string, options: RequestInit = {}) {
+      const headers = { ...baseHeaders, ...(options.headers || {}) };
+      return fetch(`${DEV_API}${path}`, { ...options, headers });
+    }
+
+    function setState(patch: Record<string, unknown>) {
+      const update = (window as any).setHeroUploaderState;
+      if (typeof update === 'function') update(patch);
+    }
+
+    function getState() {
+      return ((window as any).heroUploaderState || {}) as Record<string, any>;
+    }
+
+    function clearMessage(el: HTMLElement | null) {
+      if (!el) return;
+      el.textContent = '';
+      el.classList.add('hidden');
+    }
+
+    function showMessage(el: HTMLElement | null, message: string) {
+      if (!el) return;
+      if (!message) {
+        clearMessage(el);
+        return;
+      }
+      el.textContent = message;
+      el.classList.remove('hidden');
+    }
+
+    function resetPreview() {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        previewUrl = '';
+      }
+      if (preview) {
+        preview.src = '';
+        preview.classList.add('hidden');
+      }
+      if (previewPlaceholder) {
+        previewPlaceholder.classList.remove('hidden');
+      }
+    }
+
+    function setPreview(file: File) {
+      resetPreview();
+      previewUrl = URL.createObjectURL(file);
+      if (preview) {
+        preview.src = previewUrl;
+        preview.classList.remove('hidden');
+      }
+      if (previewPlaceholder) {
+        previewPlaceholder.classList.add('hidden');
+      }
+    }
+
+    function validateFile(file: File | null): string {
+      if (!file) return 'Choose an image before uploading.';
+      const allowed = new Set(['image/jpeg', 'image/png', 'image/webp']);
+      if (!allowed.has(file.type)) {
+        return 'Unsupported file type. Use JPG, PNG, or WEBP.';
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        return 'File is over 5 MB. Choose a smaller image before uploading.';
+      }
+      return '';
+    }
+
+    function updateFileState(file: File | null) {
+      selectedFile = file;
+      clearMessage(uploadError);
+      clearMessage(uploadWarning);
+      setState({
+        uploadedImagePath: '',
+        uploadStatus: 'idle',
+        attachStatus: 'idle',
+      });
+
+      const error = validateFile(file);
+      if (error) {
+        if (fileInfo) fileInfo.textContent = '';
+        resetPreview();
+        if (uploadButton) uploadButton.disabled = true;
+        showMessage(uploadError, error);
+        return;
+      }
+
+      if (!file) {
+        if (fileInfo) fileInfo.textContent = '';
+        resetPreview();
+        if (uploadButton) uploadButton.disabled = true;
+        return;
+      }
+
+      setPreview(file);
+      if (fileInfo) {
+        fileInfo.textContent = `${file.name} • ${(file.size / (1024 * 1024)).toFixed(2)} MB • ${file.type}`;
+      }
+      if (file.size > 3.5 * 1024 * 1024) {
+        showMessage(uploadWarning, 'This file is above 3.5 MB. Base64 conversion adds overhead, so the 5 MB request-body limit may reject it.');
+      }
+      if (uploadButton) uploadButton.disabled = false;
+    }
+
+    function syncForSelection() {
+      const state = getState();
+      const slug = typeof state.selectedSlug === 'string' ? state.selectedSlug : '';
+      const posts = ((window as any).heroUploaderPosts || []) as any[];
+      const post = posts.find((item) => item.slug === slug);
+      const unlocked = Boolean(slug);
+
+      if (fileInput) fileInput.disabled = !unlocked;
+      if (altInput) {
+        altInput.disabled = !unlocked;
+        altInput.value = unlocked ? (state.altText || '') : '';
+      }
+      if (overlay) {
+        overlay.style.display = unlocked ? 'none' : 'flex';
+      }
+      if (hint) {
+        hint.textContent = unlocked
+          ? 'Choose a JPG, PNG, or WEBP under 5 MB. Files above 3.5 MB may fail after base64 conversion.'
+          : 'Select a post above to unlock uploads.';
+      }
+      if (existingHero) {
+        if (!post) {
+          existingHero.textContent = 'Select a post to review its current hero details.';
+        } else if (post.heroImage) {
+          existingHero.textContent = `Current hero: ${post.heroImage}`;
+        } else {
+          existingHero.textContent = 'This post does not have a hero image yet.';
+        }
+      }
+      if (!unlocked) {
+        selectedFile = null;
+        if (fileInput) fileInput.value = '';
+        if (fileInfo) fileInfo.textContent = '';
+        clearMessage(uploadWarning);
+        clearMessage(uploadError);
+        if (uploadStatus) uploadStatus.textContent = '';
+        if (uploadButton) uploadButton.disabled = true;
+        resetPreview();
+      }
+    }
+
+    async function readFileAsDataUrl(file: File): Promise<string> {
+      return await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
+        reader.onerror = () => reject(new Error('Failed to read the selected file.'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function uploadSelectedFile() {
+      const state = getState();
+      const slug = typeof state.selectedSlug === 'string' ? state.selectedSlug : '';
+      const error = validateFile(selectedFile);
+      if (!slug) {
+        showMessage(uploadError, 'Select a post before uploading artwork.');
+        return;
+      }
+      if (error) {
+        showMessage(uploadError, error);
+        return;
+      }
+      if (!selectedFile) {
+        showMessage(uploadError, 'Choose an image before uploading.');
+        return;
+      }
+
+      try {
+        if (uploadButton) uploadButton.disabled = true;
+        if (uploadStatus) uploadStatus.textContent = 'Uploading artwork…';
+        clearMessage(uploadError);
+        const contentBase64 = await readFileAsDataUrl(selectedFile);
+        const response = await apiFetch('/upload/hero', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...baseHeaders,
+          },
+          body: JSON.stringify({
+            slug,
+            filename: selectedFile.name,
+            contentBase64,
+          }),
         });
+        const data = await response.json();
+        if (!response.ok || !data?.ok || !data?.path) {
+          throw new Error(data?.error || 'Upload failed.');
+        }
+        setState({
+          uploadedImagePath: data.path,
+          uploadStatus: 'success',
+          attachStatus: 'idle',
+          altText: altInput?.value.trim() || '',
+        });
+        if (uploadStatus) uploadStatus.textContent = `Uploaded to ${data.path}`;
+        const attachCard = document.querySelector('[data-submit]')?.closest('li');
+        if (attachCard instanceof HTMLElement) {
+          attachCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } catch (error: any) {
+        setState({
+          uploadedImagePath: '',
+          uploadStatus: 'error',
+        });
+        if (uploadStatus) uploadStatus.textContent = '';
+        showMessage(uploadError, error?.message || 'Upload failed.');
+      } finally {
+        if (uploadButton) {
+          uploadButton.disabled = Boolean(validateFile(selectedFile));
+        }
+      }
+    }
+
+    altInput?.addEventListener('input', () => {
+      setState({
+        altText: altInput.value.trim(),
+      });
     });
+
+    fileInput?.addEventListener('change', () => {
+      const file = fileInput.files?.[0] ?? null;
+      updateFileState(file);
+    });
+
+    uploadButton?.addEventListener('click', () => {
+      void uploadSelectedFile();
+    });
+
+    ['dragenter', 'dragover'].forEach((eventName) => {
+      dropZone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        if (fileInput?.disabled) return;
+        dropZone.classList.add('border-brand-primary', 'bg-neutral-100');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach((eventName) => {
+      dropZone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        dropZone.classList.remove('border-brand-primary', 'bg-neutral-100');
+      });
+    });
+
+    dropZone.addEventListener('drop', (event) => {
+      if (fileInput?.disabled) return;
+      const droppedFile = event.dataTransfer?.files?.[0] ?? null;
+      if (fileInput && event.dataTransfer?.files) {
+        fileInput.files = event.dataTransfer.files;
+      }
+      updateFileState(droppedFile);
+    });
+
+    document.addEventListener('post-selected', () => {
+      syncForSelection();
+    });
+
+    document.addEventListener('hero-state-changed', () => {
+      const state = getState();
+      if (altInput && document.activeElement !== altInput) {
+        altInput.value = state.altText || '';
+      }
+      if (state.uploadStatus === 'success' && state.uploadedImagePath && uploadStatus) {
+        uploadStatus.textContent = `Uploaded to ${state.uploadedImagePath}`;
+      }
+      if (state.uploadStatus === 'idle' && !state.uploadedImagePath && selectedFile == null && uploadStatus) {
+        uploadStatus.textContent = '';
+      }
+    });
+
+    syncForSelection();
+  });
 </script>

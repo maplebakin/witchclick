@@ -1,0 +1,12 @@
+{
+  "type": "planetaryDay",
+  "name": "Thursday",
+  "slug": "thursday",
+  "summary": "This planetary day is still revealing its lore.",
+  "status": "stub",
+  "properties": {
+    "planet": "Jupiter",
+    "energy": "expansion, abundance, wisdom"
+  },
+  "related": []
+}

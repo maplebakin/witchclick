@@ -12,8 +12,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distDir = path.join(__dirname, '..', 'dist');
 const siteUrl = 'https://witchclick.space';
 
-const EXCLUDE_PREFIXES = ['/author', '/account', '/admin', '/api', '/sampler'];
-const EXCLUDE_EXACT = new Set(['/author', '/account']);
+const EXCLUDE_PREFIXES = ['/author', '/account', '/admin', '/api', '/sampler', '/lab'];
+const EXCLUDE_EXACT = new Set(['/author', '/account', '/lab']);
 const NOINDEX_META_RE = /<meta\s+[^>]*name=["']robots["'][^>]*content=["'][^"']*noindex[^"']*["'][^>]*>/i;
 
 function shouldIncludePathname(pathname) {

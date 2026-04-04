@@ -1,0 +1,12 @@
+{
+  "type": "planet",
+  "name": "Uranus",
+  "slug": "uranus",
+  "summary": "This celestial body is still revealing its lore.",
+  "status": "stub",
+  "properties": {
+    "rulingSign": "Aquarius",
+    "energy": "rebellion, innovation, sudden change, freedom"
+  },
+  "related": []
+}

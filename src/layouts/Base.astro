@@ -5,6 +5,9 @@ import "@/styles/cards.css";
 import "@/styles/tailwind.css";
 import "@/styles/themes.generated.css";
 
+import { existsSync } from "node:fs";
+import path from "node:path";
+
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 
@@ -150,7 +153,28 @@ const fallbackOgImage = toAbsoluteUrl(
   "/images/hero/focus-hub-intro/tea-and-light-in-the-morning.webp",
   settings,
 );
-const resolvedOgImage = ogUrl || fallbackOgImage;
+
+const resolvePublicOgImage = (candidate: string): string => {
+  if (!candidate) return fallbackOgImage;
+
+  try {
+    const url = new URL(candidate);
+    const siteUrl = settings.siteUrl ? new URL(settings.siteUrl) : null;
+    const isSameOrigin = !siteUrl || url.origin === siteUrl.origin;
+
+    if (!isSameOrigin) return candidate;
+
+    const relativePath = decodeURIComponent(url.pathname).replace(/^\/+/, "");
+    if (!relativePath) return fallbackOgImage;
+
+    const publicPath = path.join(process.cwd(), "public", relativePath);
+    return existsSync(publicPath) ? candidate : fallbackOgImage;
+  } catch {
+    return fallbackOgImage;
+  }
+};
+
+const resolvedOgImage = resolvePublicOgImage(ogUrl);
 const canonicalUrl = buildCanonicalUrl(settings, { canonical: canon, astroUrl: Astro.url ?? null });
 
 // Navigation Configuration

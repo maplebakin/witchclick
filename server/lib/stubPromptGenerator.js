@@ -9,6 +9,7 @@ const TYPE_LABELS = {
   crystal: 'Crystal',
   herb: 'Herb',
   moonPhase: 'Moon Phase',
+  planet: 'Planet',
   ritual: 'Ritual',
   tarot: 'Tarot',
   planetaryDay: 'Planetary Day',
@@ -70,6 +71,18 @@ const TYPE_GUIDANCE = {
     ],
     related: 'Link to adjacent phases plus rituals or herbs that thrive during this phase.',
     extras: ['Note one boundary or pacing reminder for ADHD/ND brains.'],
+  },
+  planet: {
+    label: 'Planetary Mirror',
+    summary:
+      'Describe the planet or point as a symbolic mirror of attention, naming what it reflects in a secular astrology practice (45–70 words).',
+    properties: [
+      'Include `rulingSign` and `energy`.',
+      'Add 2–3 `focusThemes` or `keywords` that explain how it tends to show up.',
+      'Offer one `reflectionPrompt` or `everydayCue` for noticing this pattern gently.',
+    ],
+    related: 'Link to allied planetary days, moon phases, rituals, or tarot cards/spreads.',
+    extras: ['Keep the framing symbolic and practical, never predictive or fatalistic.'],
   },
   ritual: {
     label: 'Ritual Practice',
@@ -343,4 +356,3 @@ function toSlug(value) {
     .replace(/[^a-z0-9-]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }
-

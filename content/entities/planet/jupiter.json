@@ -1,0 +1,12 @@
+{
+  "type": "planet",
+  "name": "Jupiter",
+  "slug": "jupiter",
+  "summary": "This celestial body is still revealing its lore.",
+  "status": "stub",
+  "properties": {
+    "rulingSign": "Sagittarius",
+    "energy": "expansion, abundance, wisdom, luck"
+  },
+  "related": []
+}

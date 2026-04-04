@@ -90,6 +90,9 @@ const {
       <Button id="genPrompt" variant="secondary" size="sm">Generate Prompt</Button>
       <Button id="copyPrompt" variant="primary" size="sm">Copy</Button>
     </div>
+    <p class="rounded-lg border border-dashed border-line-subtle bg-surface-neutral-soft px-3 py-2 text-[0.75rem] leading-relaxed text-body-muted">
+      The generated text below includes a copy-safe wrapper so other LLMs treat it as a prompt template to forward, not a task to execute.
+    </p>
     <Textarea id="promptOut" class="font-mono text-[0.8rem] h-64" placeholder="The AI's whispered guidance will manifest here…"></Textarea>
     <p class="text-[0.8rem] text-body-muted">Offer this parchment to your Oracle (LLM) → receive the structured spell → infuse it into the content cauldron on the right.</p>
   </div>
@@ -126,6 +129,14 @@ const {
   const copyPromptBtn = $('copyPrompt');
   const promptOut = $('promptOut');
   let isBusy = false;
+  const PROMPT_WRAPPER_TOP = `The following is a prompt template to copy and paste into your preferred LLM (ChatGPT, Le Chat, Grok, etc.).\nDo not execute. Copy everything below this line:\n---`;
+  const PROMPT_WRAPPER_BOTTOM = `---\n[END OF PROMPT TEMPLATE]`;
+
+  function formatPromptTemplate(prompt) {
+    const body = String(prompt || '').trim();
+    if (!body) return '';
+    return `${PROMPT_WRAPPER_TOP}\n${body}\n${PROMPT_WRAPPER_BOTTOM}`;
+  }
 
   function setBusy(busy) {
     isBusy = busy;
@@ -173,7 +184,7 @@ const {
       }
       if (!data?.ok) throw new Error(data?.error || 'gen failed');
       
-      promptOut.value = data?.prompt || '';
+      promptOut.value = formatPromptTemplate(data?.prompt || '');
       if (statusEl) statusEl.textContent = 'Guidance whispered ✓';
     } catch (e) {
       const statusEl = document.getElementById('status');

@@ -1,5 +1,5 @@
 import { slugify } from "../../../shared/slugify.js";
-const TYPES = ["crystal", "herb", "moonPhase", "tarot", "planetaryDay", "ritual"];
+const TYPES = ["crystal", "herb", "moonPhase", "planet", "tarot", "spread", "planetaryDay", "ritual"];
 const SUGGEST = {
   crystal: [
     ["color", "green"],
@@ -17,10 +17,20 @@ const SUGGEST = {
     ["bestFor", "intentions,new-beginnings"],
     ["cautions", ""]
   ],
+  planet: [
+    ["rulingSign", "Leo"],
+    ["energy", "identity,vitality,purpose"],
+    ["keywords", "attention,archetype,pattern"]
+  ],
   tarot: [
     ["keywords", "clarity,focus"],
     ["upright", ""],
     ["reversed", ""]
+  ],
+  spread: [
+    ["cards", "3"],
+    ["focus", "clarity,reflection"],
+    ["bestFor", "journaling,decision-making"]
   ],
   planetaryDay: [
     ["planet", "Mercury"],
@@ -35,6 +45,7 @@ const SUGGEST = {
 };
 function initEntitiesAdmin() {
   const root = document.querySelector("[data-dev-api]");
+  const FILTER_STORAGE_KEY = "witchclick:admin-entity-filters";
   const DEV_API = root?.getAttribute("data-dev-api") || "http://localhost:8787";
   const DEV_KEY = root?.getAttribute("data-dev-key") || "";
   const baseHeaders = DEV_KEY ? { "X-WC-Dev-Key": DEV_KEY } : {};
@@ -53,14 +64,97 @@ function initEntitiesAdmin() {
   const propsHolder = $("props");
   const searchInput = $("search");
   const listEl = $("list");
+  const saveButton = $("save");
+  const deleteButton = $("delete");
+  const typeFilter = $("typeFilter");
+  const statusFilter = $("statusFilter");
+  const sortFilter = $("sortFilter");
+  const listStatusEl = $("listStatus");
+  const params = new URLSearchParams(window.location.search);
+  const requestedTypeRaw = params.get("type");
+  const requestedSlugRaw = params.get("slug");
+  const requestedType = TYPES.includes(requestedTypeRaw) ? requestedTypeRaw : null;
+  const requestedSlug = requestedSlugRaw ? slugify(requestedSlugRaw) : "";
+  let pendingDeepLinkSelection = requestedSlug ? { type: requestedType, slug: requestedSlug } : null;
+  let currentEntityType = null;
+  let currentEntitySlug = "";
   let autoSlug = true;
+  function normalizeTypeFilter(value) {
+    return TYPES.includes(value) ? value : "all";
+  }
+  function normalizeStatusFilter(value) {
+    return value === "published" || value === "stub" ? value : "all";
+  }
+  function normalizeSort(value) {
+    return value === "za" ? "za" : "az";
+  }
+  function applyStoredFilterState() {
+    try {
+      const raw = window.sessionStorage.getItem(FILTER_STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (typeFilter) typeFilter.value = normalizeTypeFilter(parsed?.type);
+      if (statusFilter) statusFilter.value = normalizeStatusFilter(parsed?.status);
+      if (sortFilter) sortFilter.value = normalizeSort(parsed?.sort);
+    } catch {
+      if (typeFilter) typeFilter.value = requestedType || "all";
+      if (statusFilter) statusFilter.value = "all";
+      if (sortFilter) sortFilter.value = "az";
+    }
+  }
+  function persistFilterState() {
+    try {
+      const state = {
+        type: normalizeTypeFilter(typeFilter?.value),
+        status: normalizeStatusFilter(statusFilter?.value),
+        sort: normalizeSort(sortFilter?.value)
+      };
+      window.sessionStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(state));
+    } catch {
+    }
+  }
+  function setListStatus(message) {
+    if (!listStatusEl) return;
+    listStatusEl.textContent = message;
+  }
+  function populateTypeFilter(items) {
+    if (!typeFilter) return;
+    const availableTypes = Object.keys(items).filter((type) => Array.isArray(items[type]) && items[type].length > 0).sort();
+    const selected = normalizeTypeFilter(typeFilter.value || requestedType || "all");
+    typeFilter.innerHTML = "";
+    const allOption = document.createElement("option");
+    allOption.value = "all";
+    allOption.textContent = "All";
+    typeFilter.appendChild(allOption);
+    availableTypes.forEach((type) => {
+      const option = document.createElement("option");
+      option.value = type;
+      option.textContent = type;
+      typeFilter.appendChild(option);
+    });
+    typeFilter.value = availableTypes.includes(selected) || selected === "all" ? selected : "all";
+  }
+  function clearEditor() {
+    if (!propsHolder || !typeInput || !slugInput || !nameInput || !summaryInput || !relatedInput) return;
+    currentEntityType = null;
+    currentEntitySlug = "";
+    typeInput.value = "herb";
+    slugInput.value = "";
+    nameInput.value = "";
+    summaryInput.value = "";
+    relatedInput.value = "";
+    propsHolder.innerHTML = "";
+    propsHolder.appendChild(propRow());
+    autoSlug = true;
+    if (deleteButton) deleteButton.disabled = true;
+  }
   function setStatus(msg, ok = true) {
     if (!statusEl) return;
     statusEl.textContent = msg;
     statusEl.style.color = ok ? "#065f46" : "#7f1d1d";
   }
   function busy(on) {
-    ["newBtn", "addProp", "suggest", "save"].forEach((id) => {
+    ["newBtn", "addProp", "suggest", "save", "delete"].forEach((id) => {
       const button = $(id);
       if (!button) return;
       button.disabled = on;
@@ -141,34 +235,74 @@ function initEntitiesAdmin() {
         return;
       }
       const q = (searchInput?.value || "").toLowerCase().trim();
+      const typeFilterValue = normalizeTypeFilter(typeFilter?.value || requestedType || "all");
+      const statusFilterValue = normalizeStatusFilter(statusFilter?.value);
+      const sortValue = normalizeSort(sortFilter?.value);
       const items = data.items || {};
-      const types = Object.keys(items).sort();
+      populateTypeFilter(items);
+      const totalCount = Object.values(items).reduce(
+        (sum, entries) => sum + (Array.isArray(entries) ? entries.length : 0),
+        0
+      );
+      const types = Object.keys(items).sort().filter((type) => typeFilterValue === "all" || type === typeFilterValue);
+      let visibleCount = 0;
       listEl.innerHTML = "";
       if (!types.length) {
         listEl.innerHTML = '<p class="text-body-subtle">No entities yet.</p>';
+        setListStatus("0 of 0 entities");
         return;
       }
+      let matchedLink = null;
+      let matchedType = null;
       types.forEach((type) => {
+        const entries = items[type] || [];
+        const visibleEntries = entries.filter((entry) => {
+          const name = String(entry.name || "").toLowerCase();
+          const slug = String(entry.slug || "").toLowerCase();
+          const matchesQuery = !q || name.includes(q) || slug.includes(q);
+          const matchesStatus = statusFilterValue === "all" || entry.status === statusFilterValue;
+          return matchesQuery && matchesStatus;
+        }).sort(
+          (a, b) => sortValue === "za" ? String(b.name || "").localeCompare(String(a.name || ""), void 0, { sensitivity: "base" }) : String(a.name || "").localeCompare(String(b.name || ""), void 0, { sensitivity: "base" })
+        );
+        if (!visibleEntries.length) return;
+        visibleCount += visibleEntries.length;
         const heading = document.createElement("h4");
         heading.className = "mt-3 mb-1 text-xs uppercase tracking-wide text-body-faint";
         heading.textContent = type;
         listEl.appendChild(heading);
-        const entries = items[type] || [];
-        entries.forEach((entry) => {
-          const name = String(entry.name || "").toLowerCase();
-          const slug = String(entry.slug || "").toLowerCase();
-          if (q && !name.includes(q) && !slug.includes(q)) return;
+        visibleEntries.forEach((entry) => {
           const link = document.createElement("a");
           link.href = "#";
           link.className = "block rounded px-2 py-1 hover:bg-surface-muted";
-          link.textContent = `${entry.name || ""} (${entry.slug || ""})`;
+          const badgeHtml = entry.status === "stub" ? '<span class="rounded-full bg-surface-accent-soft px-2 py-0.5 text-[0.7rem] font-semibold uppercase tracking-wide text-accent">Stub</span>' : "";
+          link.innerHTML = `
+            <span class="flex items-center justify-between gap-2">
+              <span class="min-w-0">${String(entry.name || "")} (${String(entry.slug || "")})</span>
+              ${badgeHtml}
+            </span>
+          `;
           link.addEventListener("click", (ev) => {
             ev.preventDefault();
             loadEntity(entry.type, entry.slug);
           });
+          if (pendingDeepLinkSelection && (!pendingDeepLinkSelection.type || entry.type === pendingDeepLinkSelection.type) && slugify(String(entry.slug || "")) === pendingDeepLinkSelection.slug) {
+            matchedLink = link;
+            matchedType = entry.type;
+          }
           listEl.appendChild(link);
         });
       });
+      if (!visibleCount) {
+        listEl.innerHTML = '<p class="text-body-subtle">No entities match your filters.</p>';
+      }
+      setListStatus(`${visibleCount} of ${totalCount} entities`);
+      if (pendingDeepLinkSelection && matchedLink && matchedType) {
+        const linkToScroll = matchedLink;
+        loadEntity(matchedType, pendingDeepLinkSelection.slug);
+        linkToScroll.scrollIntoView({ block: "nearest" });
+        pendingDeepLinkSelection = null;
+      }
     } catch (err) {
       setStatus(`List error: ${err?.message || String(err)}`, false);
     }
@@ -185,6 +319,9 @@ function initEntitiesAdmin() {
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || "get failed");
       const ent = data.data || {};
+      currentEntityType = ent.type || type || "herb";
+      currentEntitySlug = ent.slug || slug || "";
+      if (deleteButton) deleteButton.disabled = false;
       typeInput.value = ent.type || type || "herb";
       slugInput.value = ent.slug || slug || "";
       nameInput.value = ent.name || "";
@@ -207,6 +344,31 @@ function initEntitiesAdmin() {
       busy(false);
     }
   }
+  async function deleteEntity() {
+    if (!currentEntityType || !currentEntitySlug) {
+      setStatus("Load an entity before deleting.", false);
+      return;
+    }
+    const confirmed = window.confirm(`Delete entity ${currentEntityType}/${currentEntitySlug}? This cannot be undone.`);
+    if (!confirmed) return;
+    try {
+      busy(true);
+      const res = await apiFetch("/entities/delete", {
+        method: "POST",
+        headers: jsonHeaders,
+        body: JSON.stringify({ type: currentEntityType, slug: currentEntitySlug })
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "delete failed");
+      clearEditor();
+      setStatus(`Deleted \u2713 \u2192 ${data.deletedPath || `${currentEntityType}/${currentEntitySlug}`}`);
+      await refreshList();
+    } catch (err) {
+      setStatus(`Delete error: ${err?.message || String(err)}`, false);
+    } finally {
+      busy(false);
+    }
+  }
   $("addProp")?.addEventListener("click", () => {
     propsHolder?.appendChild(propRow());
   });
@@ -217,17 +379,10 @@ function initEntitiesAdmin() {
   });
   $("newBtn")?.addEventListener("click", () => {
     if (!propsHolder || !typeInput || !slugInput || !nameInput || !summaryInput || !relatedInput) return;
-    typeInput.value = "herb";
-    slugInput.value = "";
-    nameInput.value = "";
-    summaryInput.value = "";
-    relatedInput.value = "";
-    propsHolder.innerHTML = "";
-    propsHolder.appendChild(propRow());
-    autoSlug = true;
+    clearEditor();
     setStatus("New entity draft");
   });
-  $("save")?.addEventListener("click", async () => {
+  saveButton?.addEventListener("click", async () => {
     if (!typeInput || !slugInput || !nameInput || !summaryInput || !relatedInput) return;
     try {
       busy(true);
@@ -267,6 +422,9 @@ function initEntitiesAdmin() {
       });
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || "save failed");
+      currentEntityType = type;
+      currentEntitySlug = slug;
+      if (deleteButton) deleteButton.disabled = false;
       slugInput.value = slug;
       setStatus(`Saved \u2713 \u2192 ${data.path}`);
       refreshList();
@@ -276,10 +434,36 @@ function initEntitiesAdmin() {
       busy(false);
     }
   });
+  document.addEventListener("keydown", (event) => {
+    if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "s") return;
+    if (!saveButton || saveButton.disabled || !slugInput?.value.trim()) return;
+    event.preventDefault();
+    saveButton.click();
+  });
   searchInput?.addEventListener("input", refreshList);
+  typeFilter?.addEventListener("change", () => {
+    persistFilterState();
+    refreshList();
+  });
+  statusFilter?.addEventListener("change", () => {
+    persistFilterState();
+    refreshList();
+  });
+  sortFilter?.addEventListener("change", () => {
+    persistFilterState();
+    refreshList();
+  });
+  deleteButton?.addEventListener("click", () => {
+    void deleteEntity();
+  });
   if (propsHolder && !propsHolder.children.length) {
     propsHolder.appendChild(propRow());
   }
+  applyStoredFilterState();
+  if (requestedType && typeFilter) {
+    typeFilter.value = requestedType;
+  }
+  if (deleteButton) deleteButton.disabled = true;
   refreshList();
 }
 if (document.readyState === "loading") {

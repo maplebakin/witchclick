@@ -8,7 +8,7 @@ tags: ["ritual","shadow work","self-awareness","clarity","self-compassion"]
 outline: ["Opening Reflection","Quick, Low-Energy Variant","Deep Clarifying Variant","Reflection Prompt","Checklist / Summary","Gentle Safety Note","Further Reading","Closing Reflection"]
 wordCount: 1072
 readingMinutes: 5
-entities: [{"type":"crystal","slug":"clear-quartz"},{"type":"moonPhase","slug":"waxing-moon"},{"type":"tarot","slug":"the-moon"},{"type":"ritual","slug":"slicing-through-self-delusion-ritual"}]
+entities: [{"type":"crystal","slug":"clear-quartz"},{"type":"moonPhase","slug":"waxing-gibbous"},{"type":"tarot","slug":"the-moon"},{"type":"ritual","slug":"slicing-through-self-delusion-ritual"}]
 includeAds: true
 includeKofi: false
 affiliateAnchors: [{"key":"mindfulness-journal","text":"soft-cover mindfulness journal","insertedCount":0}]

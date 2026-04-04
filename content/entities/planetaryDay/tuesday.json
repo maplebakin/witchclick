@@ -1,0 +1,12 @@
+{
+  "type": "planetaryDay",
+  "name": "Tuesday",
+  "slug": "tuesday",
+  "summary": "This planetary day is still revealing its lore.",
+  "status": "stub",
+  "properties": {
+    "planet": "Mars",
+    "energy": "action, courage, conflict"
+  },
+  "related": []
+}

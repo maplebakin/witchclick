@@ -1,0 +1,12 @@
+{
+  "type": "planet",
+  "name": "Chiron",
+  "slug": "chiron",
+  "summary": "This celestial body is still revealing its lore.",
+  "status": "stub",
+  "properties": {
+    "rulingSign": "none",
+    "energy": "wounds, healing, the bridge between pain and wisdom"
+  },
+  "related": []
+}

@@ -78,6 +78,23 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             </div>
           </div>
 
+          <div class="mb-4 flex items-center gap-3">
+            <input
+              id="draftSearch"
+              type="search"
+              placeholder="Search drafts by title or slug..."
+              class="admin-btn-secondary w-full px-3 py-2"
+            />
+            <button
+              id="clearDraftSearch"
+              type="button"
+              class="admin-btn-secondary hidden px-3 py-2 text-sm"
+              aria-label="Clear draft search"
+            >
+              ×
+            </button>
+          </div>
+
           <div id="draftsList" class="space-y-4">
             <div class="py-8 text-center text-body-muted">Loading drafts...</div>
           </div>
@@ -124,14 +141,51 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
   }
 
   {
-    canUse && (
-      <script is:inline>
-        (function () {
-          var $ = function (id) {
-            return document.getElementById(id);
-          };
+	    canUse && (
+	      <script is:inline>
+	        (function () {
+	          var root = document.querySelector("[data-staging-root]");
+	          var DEV_API = root?.getAttribute("data-dev-api") || "http://localhost:8787";
+	          var DEV_KEY = root?.getAttribute("data-dev-key") || "";
+	          var requestedSlug = new URLSearchParams(window.location.search).get("slug") || "";
+	          var filteredDrafts = [];
+	          var $ = function (id) {
+	            return document.getElementById(id);
+	          };
 
-          var drafts = [];
+	          function withDevKey(options) {
+	            var headers = options && options.headers ? Object.assign({}, options.headers) : {};
+	            if (DEV_KEY) headers["X-WC-Dev-Key"] = DEV_KEY;
+	            return Object.assign({}, options || {}, { headers: headers });
+	          }
+
+	          function apiFetch(path, options) {
+	            return fetch(DEV_API + path, withDevKey(options));
+	          }
+
+	          var drafts = [];
+
+          function getSearchQuery() {
+            return (($("draftSearch") && $("draftSearch").value) || "").trim().toLowerCase();
+          }
+
+          function updateSearchUi() {
+            var clearBtn = $("clearDraftSearch");
+            var hasQuery = !!getSearchQuery();
+            if (clearBtn) {
+              clearBtn.classList.toggle("hidden", !hasQuery);
+            }
+          }
+
+          function getVisibleDrafts() {
+            var query = getSearchQuery();
+            if (!query) return drafts.slice();
+            return drafts.filter(function (draft) {
+              var title = String(draft.title || "").toLowerCase();
+              var slug = String(draft.slug || "").toLowerCase();
+              return title.includes(query) || slug.includes(query);
+            });
+          }
 
           function formatDate(isoString) {
             var date = new Date(isoString);
@@ -170,16 +224,17 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           }
 
           async function loadDrafts() {
-            try {
-              $("draftsList").innerHTML =
-                '<div class="py-8 text-center text-body-muted">Loading drafts...</div>';
+	            try {
+	              $("draftsList").innerHTML =
+	                '<div class="py-8 text-center text-body-muted">Loading drafts...</div>';
 
-              var res = await fetch("/api/staging/list.json", { method: "POST" });
-              var data = await res.json();
+	              var res = await apiFetch("/staging/list", { method: "POST" });
+	              var data = await res.json();
 
               if (!data.ok) throw new Error(data.error || "Failed to load drafts");
 
               drafts = data.drafts || [];
+              updateSearchUi();
               renderDrafts();
             } catch (e) {
               $("draftsList").innerHTML =
@@ -193,8 +248,10 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             var list = $("draftsList");
             var count = $("draftCount");
             var grouped = $("groupByTopic").checked;
+            filteredDrafts = getVisibleDrafts();
 
-            count.textContent = drafts.length + " draft" + (drafts.length === 1 ? "" : "s");
+            count.textContent =
+              filteredDrafts.length + " of " + drafts.length + " draft" + (drafts.length === 1 ? "" : "s");
 
             if (!drafts.length) {
               list.innerHTML =
@@ -202,8 +259,14 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               return;
             }
 
+            if (!filteredDrafts.length) {
+              list.innerHTML =
+                '<div class="py-8 text-center text-body-muted">No drafts match.</div>';
+              return;
+            }
+
             if (grouped) {
-              var groups = groupDraftsByTopic(drafts);
+              var groups = groupDraftsByTopic(filteredDrafts);
               var html = "";
               var topics = Object.keys(groups).sort();
 
@@ -235,14 +298,20 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               list.innerHTML = html;
             } else {
               var html = "";
-              for (var i = 0; i < drafts.length; i++) {
-                html += renderDraftCard(drafts[i], false);
+              for (var i = 0; i < filteredDrafts.length; i++) {
+                html += renderDraftCard(filteredDrafts[i], false);
               }
               list.innerHTML = html;
             }
 
-            attachCardListeners();
-          }
+	            attachCardListeners();
+	            if (requestedSlug) {
+	              var match = list.querySelector('[data-slug="' + requestedSlug.replace(/"/g, '&quot;') + '"]');
+	              if (match && typeof match.scrollIntoView === "function") {
+	                match.scrollIntoView({ block: "nearest" });
+	              }
+	            }
+	          }
 
           function renderDraftCard(draft, compact) {
             var cardClass = compact
@@ -408,7 +477,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           }
 
           async function compareByTopic(topic) {
-            var groups = groupDraftsByTopic(drafts);
+            var groups = groupDraftsByTopic(filteredDrafts);
             var topicDrafts = groups[topic] || [];
 
             if (topicDrafts.length < 2) {
@@ -539,6 +608,18 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           // Event listeners
           $("refreshBtn").addEventListener("click", loadDrafts);
           $("groupByTopic").addEventListener("change", renderDrafts);
+          $("draftSearch").addEventListener("input", function () {
+            updateSearchUi();
+            renderDrafts();
+          });
+          $("clearDraftSearch").addEventListener("click", function () {
+            if ($("draftSearch")) {
+              $("draftSearch").value = "";
+              $("draftSearch").focus();
+            }
+            updateSearchUi();
+            renderDrafts();
+          });
           $("closePreview").addEventListener("click", function () {
             $("previewSection").classList.add("hidden");
           });

@@ -47,6 +47,14 @@ function initWriteAdmin() {
 
   let slugTouched = false;
   let entityValidationTimeout: ReturnType<typeof setTimeout> | null = null;
+  let isSavingDraft = false;
+
+  function setSavingState(on: boolean) {
+    const saveButton = $<HTMLButtonElement>('save');
+    const savePublishButton = $<HTMLButtonElement>('savePublish');
+    if (saveButton) saveButton.disabled = on;
+    if (savePublishButton) savePublishButton.disabled = on;
+  }
 
   function setStatus(msg: string, ok = true, warnings?: string[], actions?: { slug: string; path: string }) {
     if (!statusEl) return;
@@ -410,7 +418,10 @@ function initWriteAdmin() {
   const savePublishButton = $<HTMLButtonElement>('savePublish');
 
   saveButton?.addEventListener('click', async () => {
+    if (isSavingDraft) return;
     try {
+      isSavingDraft = true;
+      setSavingState(true);
       setStatus('Saving...');
       const data = await savePost();
       const summary = summarizeEntities(data.entities);
@@ -418,11 +429,17 @@ function initWriteAdmin() {
       setStatus(message, true, data.warnings, { slug: data.slug, path: data.path });
     } catch (e: any) {
       setStatus(`Save error: ${e?.message || String(e)}`, false);
+    } finally {
+      isSavingDraft = false;
+      setSavingState(false);
     }
   });
 
   savePublishButton?.addEventListener('click', async () => {
+    if (isSavingDraft) return;
     try {
+      isSavingDraft = true;
+      setSavingState(true);
       setStatus('Saving...');
       const data = await savePost();
       const summary = summarizeEntities(data.entities);
@@ -439,7 +456,17 @@ function initWriteAdmin() {
       setStatus(publishMsg, true, data.warnings, { slug: data.slug, path: data.path });
     } catch (e: any) {
       setStatus(`Publish error: ${e?.message || String(e)}`, false);
+    } finally {
+      isSavingDraft = false;
+      setSavingState(false);
     }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 's') return;
+    if (!saveButton || saveButton.disabled || isSavingDraft) return;
+    event.preventDefault();
+    saveButton.click();
   });
 }
 

@@ -22,7 +22,7 @@ import Button from "@/components/ui/Button.astro";
             data-submit
             disabled
           >
-            Upload &amp; Attach
+            Attach to post
           </Button>
           <span class="text-sm text-neutral-500" data-status></span>
         </div>
@@ -30,37 +30,129 @@ import Button from "@/components/ui/Button.astro";
           class="hidden rounded-lg border border-status-success-soft bg-status-success-soft px-4 py-3 text-sm text-status-success-strong"
           data-success
         ></div>
+        <div
+          class="hidden rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700"
+          data-error
+        ></div>
       </div>
     </div>
 </Card>
 
 <script>
-    // This script is intentionally sparse.
-    // The real implementation would move the submit logic from hero.astro here.
-    // It would depend on state from the other components (which post is selected,
-    // which file is staged for upload), further proving the need for state management.
-    document.addEventListener('DOMContentLoaded', () => {
-        const submitBtn = document.querySelector('[data-submit]');
-        if (!submitBtn) return;
+  document.addEventListener('DOMContentLoaded', () => {
+    const submitBtn = document.querySelector('[data-submit]') as HTMLButtonElement | null;
+    if (!submitBtn) return;
+    const submitButton = submitBtn;
 
-        submitBtn.addEventListener('click', async (event) => {
-            event.preventDefault();
-            const statusEl = document.querySelector('[data-status]');
-            if (submitBtn.hasAttribute('disabled')) {
-                if (statusEl) statusEl.textContent = 'Please complete all previous steps.';
-                return;
-            }
+    const card = submitButton.closest('li');
+    const heroUploaderRoot = card?.closest('#heroUploader');
+    if (!card || !heroUploaderRoot) return;
 
-            // Simplified logic. The real version would get the selected post slug,
-            // the file data, and the alt text from the other components' state.
-            if (statusEl) statusEl.textContent = 'Uploading and attaching...';
-            
-            // Fake delay to simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
+    const DEV_API = heroUploaderRoot.getAttribute('data-dev-api') || 'http://localhost:8787';
+    const DEV_KEY = heroUploaderRoot.getAttribute('data-dev-key') || '';
+    const baseHeaders: Record<string, string> = DEV_KEY ? { 'X-WC-Dev-Key': DEV_KEY } : {};
+    const statusEl = card.querySelector('[data-status]') as HTMLElement | null;
+    const successEl = card.querySelector('[data-success]') as HTMLElement | null;
+    const errorEl = card.querySelector('[data-error]') as HTMLElement | null;
 
-            if (statusEl) statusEl.textContent = 'Successfully attached hero image!';
-            const successEl = document.querySelector('[data-success]');
-            if(successEl) successEl.classList.remove('hidden');
+    function apiFetch(path: string, options: RequestInit = {}) {
+      const headers = { ...baseHeaders, ...(options.headers || {}) };
+      return fetch(`${DEV_API}${path}`, { ...options, headers });
+    }
+
+    function getState() {
+      return ((window as any).heroUploaderState || {}) as Record<string, any>;
+    }
+
+    function setState(patch: Record<string, unknown>) {
+      const update = (window as any).setHeroUploaderState;
+      if (typeof update === 'function') update(patch);
+    }
+
+    function clearMessages() {
+      if (successEl) {
+        successEl.textContent = '';
+        successEl.classList.add('hidden');
+      }
+      if (errorEl) {
+        errorEl.textContent = '';
+        errorEl.classList.add('hidden');
+      }
+    }
+
+    function syncButtonState() {
+      const state = getState();
+      const ready = Boolean(state.selectedSlug && state.uploadedImagePath);
+      submitButton.disabled = !ready;
+      if (!ready && statusEl && state.attachStatus !== 'success') {
+        statusEl.textContent = state.selectedSlug
+          ? 'Upload artwork in Step 3 before attaching it to the post.'
+          : 'Select a post and upload artwork before attaching.';
+      }
+      if (ready && statusEl && state.attachStatus !== 'success') {
+        statusEl.textContent = `Ready to attach ${state.uploadedImagePath}`;
+      }
+    }
+
+    submitButton.addEventListener('click', async (event) => {
+      event.preventDefault();
+      const state = getState();
+      if (!state.selectedSlug || !state.uploadedImagePath) {
+        syncButtonState();
+        return;
+      }
+
+      try {
+        clearMessages();
+        submitButton.disabled = true;
+        if (statusEl) statusEl.textContent = 'Attaching hero image to the post…';
+        const response = await apiFetch('/posts/attach-hero', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...baseHeaders,
+          },
+          body: JSON.stringify({
+            slug: state.selectedSlug,
+            heroImage: state.uploadedImagePath,
+            heroAlt: state.altText || '',
+          }),
         });
+        const data = await response.json();
+        if (!response.ok || !data?.ok) {
+          throw new Error(data?.error || 'Attach failed.');
+        }
+        setState({ attachStatus: 'success' });
+        if (statusEl) statusEl.textContent = 'Hero image attached successfully.';
+        if (successEl) {
+          successEl.innerHTML = `Attached <code>${state.uploadedImagePath}</code> to <code>/post/${state.selectedSlug}</code>. <a href="/post/${state.selectedSlug}" class="underline" target="_blank" rel="noopener">View post</a>`;
+          successEl.classList.remove('hidden');
+        }
+      } catch (error: any) {
+        setState({ attachStatus: 'error' });
+        if (statusEl) statusEl.textContent = '';
+        if (errorEl) {
+          errorEl.textContent = error?.message || 'Attach failed.';
+          errorEl.classList.remove('hidden');
+        }
+      } finally {
+        syncButtonState();
+      }
     });
+
+    document.addEventListener('post-selected', () => {
+      clearMessages();
+      syncButtonState();
+    });
+
+    document.addEventListener('hero-state-changed', () => {
+      const state = getState();
+      if (state.attachStatus !== 'success' && successEl) {
+        successEl.classList.add('hidden');
+      }
+      syncButtonState();
+    });
+
+    syncButtonState();
+  });
 </script>

@@ -1,5 +1,6 @@
 ---
 import SearchBox from "./SearchBox.astro";
+import ComfortSettings from "./ComfortSettings.astro";
 import ThemeToggle from "./ThemeToggle.astro";
 
 interface NavLink {
@@ -43,6 +44,8 @@ const visibleAdminSections = adminSections.filter((section) =>
 const hasAdminLinks = visibleAdminSections.length > 0;
 const visibleSecondary = secondaryLinks.filter((link) => link && typeof link.href === "string");
 const visibleUtility = utilityLinks.filter((link) => link && typeof link.href === "string");
+const showComfortControls = !normalizedPath.startsWith("/admin/");
+const enableScrollReveal = !normalizedPath.startsWith("/admin/");
 
 function isActive(href: string): boolean {
   if (!href) return false;
@@ -56,7 +59,14 @@ function isActive(href: string): boolean {
   return normalizedPath.startsWith(normalized);
 }
 ---
-<header class="site-header" data-site-header>
+<header
+  class:list={[
+    "site-header",
+    enableScrollReveal ? "site-header--visible" : undefined,
+  ]}
+  data-site-header
+  data-scroll-reveal={enableScrollReveal ? "true" : "false"}
+>
   <div class="wc-container site-header__inner">
     <a class="site-logo" href="/">{brandName}</a>
     <nav class="site-nav" aria-label="Primary navigation">
@@ -128,9 +138,13 @@ function isActive(href: string): boolean {
           </li>
         )}
       </ul>
-            <div class="site-nav__actions">
-        {/* Theme is a visual/global toggle, goes first */}
-        <ThemeToggle class="site-nav__theme" />
+      <div class="site-nav__actions">
+        {showComfortControls && (
+          <div class="site-nav__comfort-group">
+            <ThemeToggle class="site-nav__theme" />
+            <ComfortSettings />
+          </div>
+        )}
 
         {/* Search is a primary action, keep it near the front */}
         <a
@@ -203,7 +217,6 @@ function isActive(href: string): boolean {
           RSS
         </a>
       </div>
-
     </nav>
   </div>
   <div
@@ -217,12 +230,6 @@ function isActive(href: string): boolean {
       <button type="button" class="site-nav__toggle focus-ring" data-mobile-close aria-label="Close menu">
         ✕
       </button>
-    </div>
-    <div class="site-nav__mobile-theme">
-      <ThemeToggle />
-    </div>
-    <div class="site-nav__mobile-search">
-      <SearchBox />
     </div>
     <ul class="site-nav__mobile-list">
       {navLinks.map((item) => (
@@ -258,6 +265,19 @@ function isActive(href: string): boolean {
         </ul>
       </div>
     )}
+    {showComfortControls && (
+      <div class="site-nav__mobile-theme">
+        <ThemeToggle />
+      </div>
+    )}
+    {showComfortControls && (
+      <div class="site-nav__mobile-comfort">
+        <ComfortSettings variant="stacked" />
+      </div>
+    )}
+    <div class="site-nav__mobile-search">
+      <SearchBox />
+    </div>
     {hasAdminLinks && (
       <div class="site-nav__mobile-admin">
         <p class="site-footer__title">Admin Panel</p>
@@ -319,6 +339,7 @@ function isActive(href: string): boolean {
 
 <script is:inline>
   const body = document.body;
+  const siteHeader = document.querySelector('[data-site-header]');
   const menuToggle = document.querySelector('[data-menu-toggle]');
   const mobileDrawer = document.querySelector('[data-mobile-drawer]');
   const searchToggle = document.querySelector('[data-search-toggle]');
@@ -330,6 +351,18 @@ function isActive(href: string): boolean {
   const submenuToggle = document.querySelector('[data-submenu-toggle]');
   const submenuPanel = document.querySelector('[data-submenu]');
   const submenuLinks = submenuPanel ? Array.from(submenuPanel.querySelectorAll('a')) : [];
+  const scrollRevealEnabled = siteHeader?.getAttribute('data-scroll-reveal') === 'true';
+  const SCROLL_TOP_THRESHOLD = 10;
+  const SCROLL_DIRECTION_THRESHOLD = 8;
+  let lastScrollY = window.scrollY;
+  let scrollAccumulator = 0;
+  let lastDirection = 0;
+
+  function setHeaderVisibility(visible) {
+    if (!siteHeader || !scrollRevealEnabled) return;
+    siteHeader.classList.toggle('site-header--hidden', !visible);
+    siteHeader.classList.toggle('site-header--visible', visible);
+  }
 
   function setMenuOpen(open) {
     if (mobileDrawer) {
@@ -346,6 +379,7 @@ function isActive(href: string): boolean {
       setSearchOpen(false);
       setSubmenuOpen(false);
     }
+    setHeaderVisibility(true);
   }
 
   function setSearchOpen(open) {
@@ -367,6 +401,7 @@ function isActive(href: string): boolean {
       }
       setSubmenuOpen(false);
     }
+    setHeaderVisibility(true);
   }
 
   function setSubmenuOpen(open) {
@@ -381,6 +416,49 @@ function isActive(href: string): boolean {
       setMenuOpen(false);
       setSearchOpen(false);
     }
+    setHeaderVisibility(true);
+  }
+
+  function handleHeaderScroll() {
+    if (!scrollRevealEnabled || !siteHeader) return;
+    if (body?.getAttribute('data-menu-open') === 'true' || body?.getAttribute('data-search-open') === 'true') {
+      setHeaderVisibility(true);
+      lastScrollY = window.scrollY;
+      scrollAccumulator = 0;
+      lastDirection = 0;
+      return;
+    }
+
+    const currentScrollY = window.scrollY;
+
+    if (currentScrollY < SCROLL_TOP_THRESHOLD) {
+      setHeaderVisibility(true);
+      lastScrollY = currentScrollY;
+      scrollAccumulator = 0;
+      lastDirection = 0;
+      return;
+    }
+
+    const delta = currentScrollY - lastScrollY;
+    if (Math.abs(delta) < 1) return;
+
+    const direction = delta > 0 ? 1 : -1;
+    if (direction !== lastDirection) {
+      scrollAccumulator = 0;
+      lastDirection = direction;
+    }
+
+    scrollAccumulator += delta;
+
+    if (direction > 0 && scrollAccumulator >= SCROLL_DIRECTION_THRESHOLD) {
+      setHeaderVisibility(false);
+      scrollAccumulator = 0;
+    } else if (direction < 0 && Math.abs(scrollAccumulator) >= SCROLL_DIRECTION_THRESHOLD) {
+      setHeaderVisibility(true);
+      scrollAccumulator = 0;
+    }
+
+    lastScrollY = currentScrollY;
   }
 
   menuToggle?.addEventListener('click', () => {
@@ -453,6 +531,11 @@ function isActive(href: string): boolean {
       setSubmenuOpen(false);
     }
   });
+
+  if (scrollRevealEnabled) {
+    setHeaderVisibility(true);
+    window.addEventListener('scroll', handleHeaderScroll, { passive: true });
+  }
 </script>
 
 <style is:global>
@@ -465,10 +548,20 @@ function isActive(href: string): boolean {
     display: inline-flex;
   }
 
+  .site-nav__comfort-group {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
   .site-nav__utility {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
+  }
+
+  .site-nav__mobile-comfort {
+    padding: 0 var(--space-4);
   }
 
   .site-nav__button--utility {
@@ -751,6 +844,22 @@ function isActive(href: string): boolean {
   /* Overall strip thickness */
   .site-header {
     padding-block: 0.4rem; /* smaller = thinner bar, bigger = taller bar */
+    transform: translateY(0);
+    transition:
+      transform 0.25s ease,
+      background-color 280ms ease,
+      border-color 280ms ease,
+      box-shadow 280ms ease,
+      backdrop-filter 280ms ease;
+    will-change: transform;
+  }
+
+  .site-header--visible {
+    transform: translateY(0);
+  }
+
+  .site-header--hidden {
+    transform: translateY(-100%);
   }
 
   /* Inner layout min height */

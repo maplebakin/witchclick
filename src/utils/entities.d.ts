@@ -1,5 +1,15 @@
+export type EntityType =
+  | "crystal"
+  | "herb"
+  | "moonPhase"
+  | "planet"
+  | "tarot"
+  | "spread"
+  | "planetaryDay"
+  | "ritual";
+
 export interface EntityRecord {
-  type: string;
+  type: EntityType | string;
   slug: string;
   name: string;
   summary: string;
@@ -17,4 +27,4 @@ export declare function isEntityStub(record: unknown): boolean;
 export declare function isEntityPublished(record: unknown): boolean;
 
 export declare function readAllEntities(options?: EntityReadOptions): Record<string, EntityRecord[]>;
-export declare function readEntity(type: string, slug: string, options?: EntityReadOptions): EntityRecord | null;
+export declare function readEntity(type: EntityType | string, slug: string, options?: EntityReadOptions): EntityRecord | null;

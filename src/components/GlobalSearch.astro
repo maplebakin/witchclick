@@ -1,10 +1,11 @@
 ---
 /**
  * GlobalSearch - Cmd+K global search modal for admin
- * Searches across posts, entities, authors, downloads
+ * Searches across posts and entities
  */
 
 const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || '';
 ---
 
 <div class="global-search-overlay" data-global-search-overlay>
@@ -18,7 +19,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
         type="text"
         class="global-search-input"
         data-global-search-input
-        placeholder="Search posts, entities, authors..."
+        placeholder="Search posts and entities..."
         autocomplete="off"
         spellcheck="false"
         aria-controls="global-search-results"
@@ -61,7 +62,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
   </div>
 </div>
 
-<script is:inline define:vars={{ DEV_API }}>
+<script is:inline define:vars={{ DEV_API, DEV_KEY }}>
   function initGlobalSearch() {
     const overlay = document.querySelector('[data-global-search-overlay]');
     const modal = document.querySelector('[data-global-search-modal]');
@@ -82,6 +83,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
     let searchTimeout = null;
     let selectedIndex = -1;
     let results = [];
+    const devHeaders = DEV_KEY ? { 'X-WC-Dev-Key': DEV_KEY } : {};
 
     function open() {
       if (isOpen) return;
@@ -146,6 +148,11 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
       resultsContainer.style.display = 'block';
     }
 
+    function apiFetch(path, options = {}) {
+      const headers = { ...devHeaders, ...(options.headers || {}) };
+      return fetch(`${DEV_API}${path}`, { ...options, headers });
+    }
+
     async function search(query) {
       if (!query || query.length < 2) {
         showEmpty();
@@ -158,14 +165,15 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 
       try {
         const [postsRes, entitiesRes] = await Promise.all([
-          fetch(`${DEV_API}/posts/list`, { method: 'POST' }).catch(() => null),
-          fetch(`${DEV_API}/entities/list`, { method: 'POST' }).catch(() => null),
+          apiFetch('/posts/list', { method: 'POST' }).catch(() => null),
+          apiFetch('/entities/list', { method: 'POST' }).catch(() => null),
         ]);
 
         const postsData = postsRes ? await postsRes.json() : { items: [] };
-        const entitiesData = entitiesRes ? await entitiesRes.json() : { entities: [] };
+        const entitiesData = entitiesRes ? await entitiesRes.json() : { items: {} };
 
         const lowerQuery = query.toLowerCase();
+        const entityItems = Object.values(entitiesData.items || {}).flat();
 
         // Search posts
         const posts = (postsData.items || [])
@@ -186,7 +194,7 @@ const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
           }));
 
         // Search entities
-        const entities = (entitiesData.entities || [])
+        const entities = entityItems
           .filter((item) => {
             const name = (item.name || '').toLowerCase();
             const slug = (item.slug || '').toLowerCase();

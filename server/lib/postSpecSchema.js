@@ -3,7 +3,7 @@
 
 import { z } from 'zod';
 
-export const ENTITY_TYPES = ['crystal', 'herb', 'moonPhase', 'tarot', 'planetaryDay', 'ritual'];
+export const ENTITY_TYPES = ['crystal', 'herb', 'moonPhase', 'planet', 'tarot', 'spread', 'planetaryDay', 'ritual'];
 export const CONTENT_TYPES = ['ritual', 'guide', 'spread', 'reflection', 'story', 'tarotSpread', 'spellwork', 'crystals'];
 export const POST_CATEGORIES = ['ritual', 'meandering'];
 export const TOPIC_CLUSTERS = [
@@ -97,12 +97,24 @@ const DOC_LINES = [
   '  "excerpt": string (1-2 sentences),',
   '  "outline": { "heading": string, "id": string }[],',
   '  "sections": { "heading": string, "markdown": string }[],',
-  '  "entities": { "type": "crystal"|"herb"|"moonPhase"|"tarot"|"planetaryDay"|"ritual", "slug": string }[],',
+  '  "entities": { "type": "crystal"|"herb"|"moonPhase"|"planet"|"tarot"|"spread"|"planetaryDay"|"ritual", "slug": string }[],',
   '  "heroImagePrompt": string | null,',
   '  "altTexts": string[],',
   '  "internalLinkHints": { "anchor": string, "rationale": string }[],',
   '  "affiliateHints": { "key": string, "anchor": string, "rationale": string }[],',
   '  "externalLink": { "url": string, "anchor": string, "description": string } (optional, one authoritative external reference),',
+  '  CRITICAL - externalLink format rules:',
+  '  - "url" must be a plain URL string ONLY,',
+  '  - Never combine url and anchor into one string,',
+  '  - Never use markdown link syntax in the url field,',
+  '  - Never wrap the url in brackets or parentheses,',
+  '  - "anchor" and "url" are always separate fields,',
+  '  - Valid:   {"url": "https://example.com", "anchor": "text here", "description": "..."},',
+  '  - Invalid: {"url": "[text here](https://example.com)", ...},',
+  '  - Invalid: {"url": "https://example.com%22,%22anchor%22:%22text", ...},',
+  '  - If you cannot produce a clean url string, omit externalLink entirely rather than malforming it,',
+  '  Never include a "sourceNote" field in the output,',
+  '  sourceNote is an internal LLM artifact and must not appear in the JSON,',
   '  "cta": { "type": "kofi"|"download"|"none", "id"?: string },',
   '  "adPlacements": ("lead"|"mid"|"end")[]',
   '}',

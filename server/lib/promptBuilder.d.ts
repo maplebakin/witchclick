@@ -1,6 +1,8 @@
 export interface MasterPromptOptions {
   topic: string;
   words: number;
+  contentType?: string;
+  styleDirective?: string;
   ads: 'on' | 'off';
   kofi: 'on' | 'off';
   brandName: string;

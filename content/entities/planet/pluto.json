@@ -1,0 +1,12 @@
+{
+  "type": "planet",
+  "name": "Pluto",
+  "slug": "pluto",
+  "summary": "This celestial body is still revealing its lore.",
+  "status": "stub",
+  "properties": {
+    "rulingSign": "Scorpio",
+    "energy": "transformation, power, death, rebirth"
+  },
+  "related": []
+}

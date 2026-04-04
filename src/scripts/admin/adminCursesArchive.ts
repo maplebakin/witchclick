@@ -214,6 +214,12 @@ function initCursesArchive() {
   saveBtn?.addEventListener('click', saveCurse);
   deleteBtn?.addEventListener('click', deleteCurse);
   mdTextarea?.addEventListener('input', () => renderPreview(mdTextarea.value));
+  document.addEventListener('keydown', (event) => {
+    if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 's') return;
+    if (!currentSlug || isSaving || !saveBtn || saveBtn.disabled) return;
+    event.preventDefault();
+    saveBtn.click();
+  });
 
   // Initial load
   loadLibrary().catch(() => setStatus(libraryStatus, 'Failed to load curses', 'error'));

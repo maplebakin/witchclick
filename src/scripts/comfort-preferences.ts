@@ -180,6 +180,7 @@ if (typeof window !== 'undefined') {
     subscribe,
     apply: applyToDom,
   };
+  window.dispatchEvent(new Event('wc:comfort-ready'));
 }
 
 export {};

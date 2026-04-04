@@ -1,0 +1,12 @@
+{
+  "type": "planet",
+  "name": "The Sun",
+  "slug": "sun",
+  "summary": "This celestial body is still revealing its lore.",
+  "status": "stub",
+  "properties": {
+    "rulingSign": "Leo",
+    "energy": "identity, vitality, ego, purpose"
+  },
+  "related": []
+}

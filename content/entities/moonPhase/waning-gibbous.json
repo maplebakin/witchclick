@@ -1,0 +1,23 @@
+{
+  "type": "moonPhase",
+  "name": "Waning Gibbous",
+  "slug": "waning-gibbous",
+  "summary": "Time for clearing, release, and tidying energetic boundaries as the light recedes.",
+  "status": "published",
+  "properties": {
+    "energy": "release",
+    "direction": "inward",
+    "keywords": [
+      "release",
+      "simplify",
+      "closure"
+    ],
+    "ritualIdeas": [
+      "desk altar reset",
+      "gentle banishing smoke"
+    ]
+  },
+  "related": [
+    "ritual:desk-altar"
+  ]
+}

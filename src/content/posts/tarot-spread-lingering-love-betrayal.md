@@ -26,7 +26,7 @@ readingMinutes: 2
 entities:
   - type: crystal
     slug: rose-quartz
-  - type: tarot
+  - type: spread
     slug: lingering-love-spread
 includeAds: false
 includeKofi: true

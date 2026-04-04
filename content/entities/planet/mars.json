@@ -1,0 +1,12 @@
+{
+  "type": "planet",
+  "name": "Mars",
+  "slug": "mars",
+  "summary": "This celestial body is still revealing its lore.",
+  "status": "stub",
+  "properties": {
+    "rulingSign": "Aries",
+    "energy": "action, desire, courage, conflict"
+  },
+  "related": []
+}

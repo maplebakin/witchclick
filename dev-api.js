@@ -8,6 +8,8 @@
 //   POST /entities/list
 //   POST /entities/get {type, slug}
 //   POST /entities/save {type, slug, name, summary, properties, related[]}
+//   POST /entities/delete {type, slug}
+//   POST /staging/list
 //   POST /posts/save   {title, slug?, excerpt, metaDescription, tags, includeAds, includeKofi, entities, markdown}
 //   POST /settings/get
 //   POST /settings/save {siteUrl, brandName, disclosure, kofiUsername, showAccountLink, analytics*, ads*, observability*, clientErrorEndpoint}
@@ -31,9 +33,8 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-import generatorPresets, { resolveGeneratorPresetKey } from './server/lib/generatorPresets.js';
+import { resolveGeneratorPresetKey } from './server/lib/generatorPresets.js';
 import generatorStyles from './server/lib/generatorStyles.js';
-import { STRICT_JSON_RULES } from './server/lib/strictJsonRules.js';
 import { buildMasterPrompt } from './server/lib/promptBuilder.js';
 import { buildCursePrompt } from './server/lib/cursePromptBuilder.js';
 import { CURSE_TARGETS, CURSE_TONES, CURSE_TYPES } from './server/lib/curseSpecSchema.js';
@@ -689,6 +690,7 @@ async function listPostsForHero() {
         const fmPublishedAt = frontmatterString(parsed.data, 'publishedAt');
         const fmPubDate = frontmatterString(parsed.data, 'pubDate');
         const fmTags = toStringArray(parsed.data?.tags);
+        const fmDraft = parsed.data?.draft === true;
 
         if (!isValidSlug(slug)) continue;
         if (itemsBySlug.has(slug)) continue;
@@ -703,6 +705,7 @@ async function listPostsForHero() {
           excerpt: fmExcerpt || fmMetaDescription || '',
           metaDescription: fmMetaDescription || '',
           mood: fmMood || '',
+          draft: fmDraft,
           publishedAt: fmPublishedAt || fmPubDate || null,
           pubDate: fmPubDate || fmPublishedAt || null,
           createdAt,
@@ -717,6 +720,66 @@ async function listPostsForHero() {
   const items = Array.from(itemsBySlug.values());
   items.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }));
   return items;
+}
+
+async function listDraftPosts() {
+  const directories = resolvePostsDirectories({ root: CWD });
+  const draftsBySlug = new Map();
+
+  for (const postsDir of directories) {
+    let entries = [];
+    try {
+      entries = await fsp.readdir(postsDir, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+
+    for (const entry of entries) {
+      if (!entry.isFile()) continue;
+      if (!entry.name.toLowerCase().endsWith('.md')) continue;
+
+      const file = path.join(postsDir, entry.name);
+      const fileSlug = path.basename(entry.name, path.extname(entry.name));
+
+      try {
+        const raw = await fsp.readFile(file, 'utf8');
+        const parsed = parseFrontmatter(raw);
+        if (parsed?.data?.draft !== true) continue;
+
+        const fmSlug = frontmatterString(parsed.data, 'slug');
+        const slug = fmSlug && isValidSlug(fmSlug) ? fmSlug : fileSlug;
+        if (!isValidSlug(slug) || draftsBySlug.has(slug)) continue;
+
+        const excerpt = frontmatterString(parsed.data, 'excerpt');
+        const publishedAt =
+          frontmatterString(parsed.data, 'publishedAt') ||
+          frontmatterString(parsed.data, 'pubDate') ||
+          new Date().toISOString();
+        const promptMetadata =
+          parsed.data && typeof parsed.data.promptMetadata === 'object' && parsed.data.promptMetadata !== null
+            ? parsed.data.promptMetadata
+            : undefined;
+
+        draftsBySlug.set(slug, {
+          slug,
+          title: frontmatterString(parsed.data, 'title') || 'Untitled',
+          excerpt: excerpt || '',
+          tags: toStringArray(parsed.data?.tags),
+          wordCount: Number(parsed.data?.wordCount || 0),
+          readingMinutes: Number(parsed.data?.readingMinutes || 1),
+          publishedAt,
+          filePath: path.relative(CWD, file).replace(/\\/g, '/'),
+          promptMetadata,
+        });
+      } catch {
+        // Skip unreadable draft files
+      }
+    }
+  }
+
+  const drafts = Array.from(draftsBySlug.values());
+  drafts.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+  return drafts;
 }
 
 async function attachHeroToPost({ slug, heroImage, heroAlt }) {
@@ -1210,7 +1273,7 @@ function assertMaxLen(label, value, max) {
 }
 
 // ---------- GENPROMPT (shared with CLI) ----------
-function buildGenprompt({ topic, words, ads, kofi }) {
+function buildGenprompt({ topic, words, ads, kofi, contentType, styleDirective }) {
   const context = loadPromptContext({ cwd: CWD });
   const allowed = Array.isArray(context.allowedAffiliateKeys)
     ? context.allowedAffiliateKeys
@@ -1225,6 +1288,8 @@ function buildGenprompt({ topic, words, ads, kofi }) {
   return buildMasterPrompt({
     topic,
     words,
+    contentType,
+    styleDirective,
     ads,
     kofi,
     brandName: context.brandName ?? 'WitchClick',
@@ -1234,34 +1299,6 @@ function buildGenprompt({ topic, words, ads, kofi }) {
     allowedAffiliateKeys: allowed,
     engagementSignals: context.engagementSignals,
   });
-}
-
-function buildPresetPrompt({ preset, topic, strict, styleDirective, contentType }) {
-  const lines = [`SYSTEM ROLE: ${preset.system}`];
-
-  if (styleDirective) {
-    lines.push(`STYLE DIRECTIVE: ${styleDirective}`);
-  }
-
-  lines.push(`Goal: ${preset.goal}`, '', `Topic: ${topic}`, '');
-
-  if (contentType) {
-    lines.push(`IMPORTANT: Set "contentType" field to "${contentType}" in your JSON output.`, '');
-  }
-
-  const contractLines = strict
-    ? preset.strictOutputContract
-    : preset.looseOutputContract;
-
-  lines.push(strict ? 'STRICT JSON CONTRACT:' : 'LOOSE JSON CONTRACT:');
-  lines.push(contractLines.join('\n'));
-
-  if (!contractLines.includes('STRICT JSON OUTPUT RULES (do all of these):')) {
-    lines.push('');
-    lines.push(...STRICT_JSON_RULES);
-  }
-
-  return lines.join('\n');
 }
 
 // ---------- POSTS ----------
@@ -1795,7 +1832,8 @@ async function listEntities() {
           type: j.type || type,
           slug: j.slug || f.replace(/\.json$/, ''),
           name: j.name || '',
-          summary: j.summary || ''
+          summary: j.summary || '',
+          status: isStubSummary(j.summary) ? 'stub' : 'published'
         });
       } catch { /* ignore broken file */ }
     }
@@ -1855,6 +1893,17 @@ async function saveEntity({ type, slug, name, summary, properties, related }) {
     notified = result.notified;
   }
   return { path: `content/entities/${type}/${s}.json`, slug: s, type, notified };
+}
+
+async function deleteEntity({ type, slug }) {
+  if (!type || !slug) throw new Error('type and slug are required');
+  const normalizedType = String(type);
+  const normalizedSlug = slugify(slug);
+  if (!normalizedSlug) throw new Error('invalid slug');
+  const file = path.join(CWD, 'content', 'entities', normalizedType, `${normalizedSlug}.json`);
+  if (!fs.existsSync(file)) throw new Error('not found');
+  await fsp.unlink(file);
+  return { type: normalizedType, slug: normalizedSlug, deletedPath: `content/entities/${normalizedType}/${normalizedSlug}.json` };
 }
 
 function isStubSummary(value) {
@@ -2087,14 +2136,16 @@ async function withRequestBoundary(req, res, handler) {
       const styleDirective = generatorStyles[styleKey] || generatorStyles.cozy;
       const resolvedStyleKey = generatorStyles[styleKey] ? styleKey : 'cozy';
       const strict = body.strict === true || body.strict === 'true';
-      const preset = resolvedModeKey ? generatorPresets[resolvedModeKey] : undefined;
-      const prompt = preset
-        ? buildPresetPrompt({ preset, topic, strict, styleDirective, contentType: resolvedModeKey })
-        : buildGenprompt({ topic, words, ads, kofi });
+      const prompt = buildGenprompt({
+        topic,
+        words,
+        ads,
+        kofi,
+        contentType: resolvedModeKey || undefined,
+        styleDirective,
+      });
 
-      const hasPreset = Boolean(resolvedModeKey);
-      // loud guard so stale prompts never slip through (master prompt only)
-      if (!hasPreset && (!prompt.includes('opening-reflection') || !prompt.includes('REQUIRED: The first outline item'))) {
+      if (!prompt.includes('opening-reflection') || !prompt.includes('INPUTS')) {
         return send(res, 500, { ok: false, error: 'Stale prompt detected (missing Opening Reflection guards). Check dev-api.js.' });
       }
       return send(res, 200, {
@@ -2307,6 +2358,15 @@ async function withRequestBoundary(req, res, handler) {
       try {
         const items = await listPostsForHero();
         return send(res, 200, { ok: true, items });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && (req.url === '/staging/list' || pathname === '/staging/list')) {
+      try {
+        const drafts = await listDraftPosts();
+        return send(res, 200, { ok: true, drafts });
       } catch (e) {
         return send(res, 500, { ok: false, error: e?.message || String(e) });
       }
@@ -2840,6 +2900,16 @@ async function withRequestBoundary(req, res, handler) {
       }
     }
 
+    if (req.method === 'POST' && req.url === '/entities/delete') {
+      try {
+        const body = await parseBody(req);
+        const data = await deleteEntity(body || {});
+        return send(res, 200, { ok: true, ...data });
+      } catch (e) {
+        return send(res, 400, { ok: false, error: e.message || String(e) });
+      }
+    }
+
     // ---- Products
     if (req.method === 'POST' && req.url === '/products/list') {
       try {
@@ -3085,7 +3155,6 @@ const adminPipelineHelpers = {
   generateMetaDescription,
   normalizeTags,
   buildGenprompt,
-  buildPresetPrompt,
   prepareSpecForPersistence,
   persistPreparedSpec,
 };
@@ -3098,7 +3167,6 @@ export {
   generateMetaDescription,
   normalizeTags,
   buildGenprompt,
-  buildPresetPrompt,
   prepareSpecForPersistence,
   persistPreparedSpec,
   adminPipelineHelpers,
