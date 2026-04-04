@@ -16,6 +16,9 @@ internalLinkHints: ["gentle self-care practices","tender boundaries","self-compa
 internalLinks: []
 publishedAt: "2025-12-31T17:14:18.438Z"
 canonicalUrl: "https://witchclick.space/post/refinding-yourself-holiday-mask-ritual"
+heroImage: "/images/hero/refinding-yourself-holiday-mask-ritual/chatgpt-image-apr-4-2026-11_01_52-am.png"
+heroImageSrc: "/images/hero/refinding-yourself-holiday-mask-ritual/chatgpt-image-apr-4-2026-11_01_52-am.png"
+heroAlt: ""
 specVersion: 2
 category: "ritual"
 contentType: "ritual"

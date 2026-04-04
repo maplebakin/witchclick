@@ -36,6 +36,9 @@ internalLinkHints:
 internalLinks: []
 publishedAt: '2025-11-28T13:20:51.471Z'
 canonicalUrl: 'https://witchclick.space/post/when-the-waiting-period-feels-like-stagnation'
+heroImage: "/images/hero/when-the-waiting-period-feels-like-stagnation/chatgpt-image-apr-4-2026-11_03_17-am.png"
+heroImageSrc: "/images/hero/when-the-waiting-period-feels-like-stagnation/chatgpt-image-apr-4-2026-11_03_17-am.png"
+heroAlt: ""
 specVersion: 2
 category: ritual
 contentType: story

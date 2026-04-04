@@ -16,6 +16,9 @@ internalLinkHints: ["toxic positivity","gentle self-care practices","rest and su
 internalLinks: []
 publishedAt: "2026-01-01T16:27:14.097Z"
 canonicalUrl: "https://witchclick.space/post/new-year-without-new-me-pressure"
+heroImage: "/images/hero/new-year-without-new-me-pressure/chatgpt-image-apr-4-2026-10_55_01-am.png"
+heroImageSrc: "/images/hero/new-year-without-new-me-pressure/chatgpt-image-apr-4-2026-10_55_01-am.png"
+heroAlt: ""
 specVersion: 2
 category: "ritual"
 contentType: "story"
