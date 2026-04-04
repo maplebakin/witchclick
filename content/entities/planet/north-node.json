@@ -1,0 +1,12 @@
+{
+  "type": "planet",
+  "name": "North Node",
+  "slug": "north-node",
+  "summary": "This celestial body is still revealing its lore.",
+  "status": "stub",
+  "properties": {
+    "rulingSign": "none",
+    "energy": "destiny, growth direction, soul purpose"
+  },
+  "related": []
+}

@@ -89,7 +89,20 @@ function auditPost(filePath) {
   const { data, content: markdown } = grayMatter(content);
 
   const slug = data.slug || path.basename(filePath, '.md');
-  const isDraft = data.draft === true;
+  const relativePath = path.relative(rootDir, filePath).replace(/\\/g, '/');
+  const isDraft = data.draft === true || data.published === false;
+  const publishCandidates = [data.publishDate, data.publishedAt, data.pubDate, data.date];
+  const publishTimestamp = publishCandidates.reduce((found, candidate) => {
+    if (found !== null || !candidate) return found;
+    const value = +new Date(candidate);
+    return Number.isNaN(value) ? null : value;
+  }, null);
+  const isFutureDated = publishTimestamp !== null && publishTimestamp > Date.now();
+  const contentType = relativePath.startsWith('content/white-magic-curses/')
+    ? 'curses_archive'
+    : relativePath.startsWith('src/content/posts/') || relativePath.startsWith('content/posts/')
+      ? 'post'
+      : 'unknown';
 
   // Count links in frontmatter
   const frontmatterInternalLinks = Array.isArray(data.internalLinks) ? data.internalLinks.length : 0;
@@ -109,7 +122,10 @@ function auditPost(filePath) {
 
   return {
     slug,
+    relativePath,
+    contentType,
     isDraft,
+    isFutureDated,
     hasIntro,
     hasConclusion,
     internalLinks: totalInternalLinks,
@@ -148,10 +164,16 @@ function main() {
 
   const results = files.map(auditPost);
 
-  // Filter out drafts and placeholders
-  const publishedResults = results.filter(r => !r.isDraft && r.wordCount >= 50);
+  const publishedResults = results.filter(r => !r.isDraft && !r.isFutureDated && r.wordCount >= 50);
+  const publishedPosts = publishedResults.filter(r => r.contentType === 'post');
+  const publishedArchiveEntries = publishedResults.filter(r => r.contentType === 'curses_archive');
 
-  console.log(`\n📊 Summary (${publishedResults.length} published posts):\n`);
+  console.log(`\n📊 Summary (${publishedPosts.length} published posts`);
+  if (publishedArchiveEntries.length > 0) {
+    console.log(`             + ${publishedArchiveEntries.length} public curses archive entries):\n`);
+  } else {
+    console.log(`):\n`);
+  }
 
   const missingIntro = publishedResults.filter(r => !r.hasIntro).length;
   const missingConclusion = publishedResults.filter(r => !r.hasConclusion).length;
@@ -184,8 +206,8 @@ function main() {
 
   console.log('\n' + '='.repeat(80));
   const compliantCount = publishedResults.filter(r => r.issues.length === 0).length;
-  console.log(`\n✅ ${compliantCount} posts are fully compliant`);
-  console.log(`⚠️  ${postsWithIssues.length} posts need updates\n`);
+  console.log(`\n✅ ${compliantCount} content files are fully compliant`);
+  console.log(`⚠️  ${postsWithIssues.length} content files need updates\n`);
 
   if (publishedResults.length === 0) {
     console.log('ℹ️  No published posts found to audit (drafts or low-wordcount posts are ignored).');

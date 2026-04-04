@@ -1,0 +1,12 @@
+{
+  "type": "planet",
+  "name": "Neptune",
+  "slug": "neptune",
+  "summary": "This celestial body is still revealing its lore.",
+  "status": "stub",
+  "properties": {
+    "rulingSign": "Pisces",
+    "energy": "dreams, illusion, spirituality, dissolution"
+  },
+  "related": []
+}

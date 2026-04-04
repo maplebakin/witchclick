@@ -120,6 +120,26 @@ import Button from "@/components/ui/Button.astro";
     let recentCandidates: any[] = [];
     let missingCandidates: any[] = [];
 
+    function syncHiddenSelectOptions() {
+      if (!select) return;
+      const currentValue = select.value;
+      select.innerHTML = '';
+      const blank = document.createElement('option');
+      blank.value = '';
+      blank.textContent = 'Select a post…';
+      select.appendChild(blank);
+      posts.forEach((post) => {
+        const option = document.createElement('option');
+        option.value = post.slug;
+        option.textContent = post.title || post.slug;
+        select.appendChild(option);
+      });
+      select.disabled = false;
+      if (currentValue && posts.find((post) => post.slug === currentValue)) {
+        select.value = currentValue;
+      }
+    }
+
     function createPostCard(post: any) {
       const card = document.createElement('button');
       card.type = 'button';
@@ -137,12 +157,12 @@ import Button from "@/components/ui/Button.astro";
       card.appendChild(title);
       card.appendChild(slug);
 
-      if (post.heroImage) {
-        const badge = document.createElement('div');
-        badge.className = 'text-[0.8rem] font-medium text-status-success mt-1';
-        badge.textContent = '✓ Has hero image';
-        card.appendChild(badge);
-      }
+      const badge = document.createElement('div');
+      badge.className = post.heroImage
+        ? 'text-[0.8rem] font-medium text-status-success mt-1'
+        : 'text-[0.8rem] font-medium text-amber-700 mt-1';
+      badge.textContent = post.heroImage ? '✓ Hero image set' : '⚠ Missing hero image';
+      card.appendChild(badge);
 
       card.addEventListener('click', () => {
         selectPost(post.slug);
@@ -209,12 +229,28 @@ import Button from "@/components/ui/Button.astro";
         selectedPostDisplay.classList.remove('hidden');
       }
 
+      const resolvedAlt = typeof post?.heroAlt === 'string' && post.heroAlt.trim()
+        ? post.heroAlt.trim()
+        : typeof post?.heroImageAlt === 'string' && post.heroImageAlt.trim()
+          ? post.heroImageAlt.trim()
+          : '';
+      const setState = (window as any).setHeroUploaderState;
+      if (typeof setState === 'function') {
+        setState({
+          selectedSlug: slug,
+          altText: resolvedAlt,
+          uploadedImagePath: '',
+          uploadStatus: 'idle',
+          attachStatus: 'idle',
+        });
+      }
+
       const changeEvent = new Event('change', { bubbles: true });
       select.dispatchEvent(changeEvent);
 
-      const uploadCard = heroUploaderRoot?.querySelector('[data-upload-card]');
-      if (uploadCard) {
-        uploadCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const promptCard = document.querySelector('[data-hero-prompt-card]');
+      if (promptCard instanceof HTMLElement) {
+        promptCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
 
@@ -224,6 +260,17 @@ import Button from "@/components/ui/Button.astro";
 
       if (selectedPostDisplay) {
         selectedPostDisplay.classList.add('hidden');
+      }
+
+      const setState = (window as any).setHeroUploaderState;
+      if (typeof setState === 'function') {
+        setState({
+          selectedSlug: '',
+          altText: '',
+          uploadedImagePath: '',
+          uploadStatus: 'idle',
+          attachStatus: 'idle',
+        });
       }
       
       const changeEvent = new Event('change', { bubbles: true });
@@ -235,6 +282,7 @@ import Button from "@/components/ui/Button.astro";
         const response = await apiFetch('/posts/list', { method: 'POST' });
         const data = await response.json();
         posts = Array.isArray(data.items) ? data.items : [];
+        syncHiddenSelectOptions();
         const win = window as typeof window & { heroUploaderPosts?: any[] };
         win.heroUploaderPosts = posts;
         document.dispatchEvent(new CustomEvent('hero-posts-loaded', { detail: { posts } }));
@@ -260,8 +308,10 @@ import Button from "@/components/ui/Button.astro";
         renderMissingList();
 
         // Pre-select post if in URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const preselect = urlParams.get('post');
+        const state = (window as any).heroUploaderState || {};
+        const preselect = typeof state.preselectedSlug === 'string' && state.preselectedSlug.trim()
+          ? state.preselectedSlug.trim()
+          : new URLSearchParams(window.location.search).get('post');
         if (preselect && posts.find(p => p.slug === preselect)) {
             selectPost(preselect);
         }

@@ -1,0 +1,12 @@
+{
+  "type": "planet",
+  "name": "Mercury",
+  "slug": "mercury",
+  "summary": "This celestial body is still revealing its lore.",
+  "status": "stub",
+  "properties": {
+    "rulingSign": "Gemini/Virgo",
+    "energy": "communication, thought, travel, adaptability"
+  },
+  "related": []
+}

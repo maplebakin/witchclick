@@ -17,6 +17,8 @@
    --------------------------------------------------------------------------- */
 
 :root {
+  font-size: 15px;
+
   /* Typography */
   --font-body-serif: "Lora", "Literata", "Crimson Text", Georgia, "Times New Roman", Times, serif;
   --font-body: var(--font-body-serif);
@@ -39,9 +41,9 @@
   --space-9: 4rem;
 
   /* Shared page spacing */
-  --page-section-gap: clamp(3rem, 6vw, 5rem);
-  --page-header-gap: clamp(2rem, 5vw, 3rem);
-  --grid-gap: clamp(1.5rem, 3vw, 2.25rem);
+  --page-section-gap: clamp(3rem, 6vw, 4.5rem);
+  --page-header-gap: clamp(2rem, 5vw, 2.7rem);
+  --grid-gap: clamp(1.5rem, 3vw, 2rem);
   --content-max-width: 48rem;
 
   /* Core Brand Colors */
@@ -91,14 +93,14 @@
   --layout-shell-background-plain: color-mix(in srgb, var(--page-bg-color) 82%, black 18%);
   --layout-shell-ink: color-mix(in srgb, var(--ink-strong) 95%, var(--page-bg-color) 5%);
   --layout-shell-ink-plain: color-mix(in srgb, var(--ink-strong) 90%, var(--page-bg-color) 10%);
-  --layout-shell-gap: clamp(2.25rem, 6vw, 3.75rem);
-  --layout-main-padding-block: clamp(3.75rem, 9vw, 5.75rem);
-  --layout-main-padding-block-end: clamp(4.5rem, 10vw, 7rem);
-  --layout-main-padding-block-plain: clamp(3rem, 7vw, 5rem);
-  --layout-main-gap: clamp(3rem, 8vw, 5rem);
-  --layout-main-plain-gap: clamp(2.5rem, 7vw, 4.5rem);
-  --layout-main-container-gap: clamp(2.25rem, 6vw, 3.5rem);
-  --layout-content-gap: clamp(2.75rem, 7vw, 4.75rem);
+  --layout-shell-gap: clamp(2.25rem, 6vw, 3.375rem);
+  --layout-main-padding-block: clamp(3.75rem, 9vw, 5.175rem);
+  --layout-main-padding-block-end: clamp(4.5rem, 10vw, 6.3rem);
+  --layout-main-padding-block-plain: clamp(3rem, 7vw, 4.5rem);
+  --layout-main-gap: clamp(3rem, 8vw, 4.5rem);
+  --layout-main-plain-gap: clamp(2.5rem, 7vw, 4rem);
+  --layout-main-container-gap: clamp(2.25rem, 6vw, 3.125rem);
+  --layout-content-gap: clamp(2.75rem, 7vw, 4.25rem);
   --layout-main-plain-radius: clamp(2rem, 5vw, 3.25rem);
   --layout-main-plain-border-color: color-mix(in srgb, var(--color-border) 78%, transparent 22%);
   --layout-main-plain-overlay:
@@ -112,28 +114,28 @@
   --header-border: color-mix(in srgb, var(--header-border-color) 42%, transparent 58%);
   --header-divider: color-mix(in srgb, var(--header-border) 65%, transparent 35%);
   --header-shadow: 0 18px 42px -28px color-mix(in srgb, var(--page-bg-color) 60%, transparent 40%);
-  --header-padding-block: clamp(0.7rem, 2vw, 1rem);
+  --header-padding-block: clamp(0.7rem, 2vw, 0.9rem);
 
   /* Footer tokens */
   --footer-background: var(--footer-bg-base, var(--neutral-9) / 0.85);
   --footer-border: var(--footer-border-base, var(--neutral-4) / 0.3);
-  --header-link-padding-block: clamp(0.4rem, 1.4vw, 0.65rem);
-  --header-link-padding-inline: clamp(.085rem, 2vw, 1.2rem);
+  --header-link-padding-block: clamp(0.4rem, 1.4vw, 0.6rem);
+  --header-link-padding-inline: clamp(.085rem, 2vw, 1.1rem);
   --header-link-letter-spacing: 0.05em;
-  --header-link-font-size: clamp(0.85rem, 1.6vw, .95rem);
+  --header-link-font-size: clamp(0.85rem, 1.6vw, 0.9rem);
   --header-link-radius: 999px;
   --header-link-gap: var(--space-2);
   --header-underline-color: color-mix(in srgb, var(--color-gold) 52%, var(--ink-body) 48%);
   --header-underline-offset: clamp(0.2rem, 1vw, 0.35rem);
-  --header-nav-gap: clamp(.09rem, 2.8vw, 1.6rem);
+  --header-nav-gap: clamp(.09rem, 2.8vw, 1.4rem);
   --header-mobile-background: color-mix(in srgb, var(--header-bg-color) 78%, transparent 22%);
   --header-mobile-link-font-size: clamp(1.05rem, 4vw, 1.25rem);
   --header-mobile-link-padding-block: clamp(0.85rem, 2.8vw, 1.15rem);
 
   /* Hero Tokens */
-  --hero-padding-block: clamp(5rem, 12vw, 8rem);
-  --hero-padding-inline: clamp(1.75rem, 8vw, 4.5rem);
-  --hero-radius: clamp(2.25rem, 6vw, 3.5rem);
+  --hero-padding-block: clamp(5rem, 12vw, 7.2rem);
+  --hero-padding-inline: clamp(1.75rem, 8vw, 4.05rem);
+  --hero-radius: clamp(2.25rem, 6vw, 3.15rem);
   --hero-background:
     linear-gradient(140deg,
       color-mix(in srgb, var(--ambient-depth, var(--color-night)) 62%, transparent 38%),
@@ -144,8 +146,8 @@
   --hero-backdrop:
     radial-gradient(82% 88% at 14% 18%, color-mix(in srgb, var(--color-gold) 26%, transparent 74%), transparent 68%),
     radial-gradient(88% 84% at 86% 14%, color-mix(in srgb, var(--color-amethyst) 24%, transparent 76%), transparent 70%);
-  --hero-inner-gap: clamp(1.75rem, 5vw, 3rem);
-  --hero-copy-gap: clamp(1.5rem, 4vw, 2.75rem);
+  --hero-inner-gap: clamp(1.75rem, 5vw, 2.7rem);
+  --hero-copy-gap: clamp(1.5rem, 4vw, 2.475rem);
   --hero-eyebrow-color: color-mix(in srgb, var(--ink-muted) 85%, white 15%);
   --hero-blurb-color: color-mix(in srgb, var(--ink-body) 92%, white 8%);
   --hero-note-color: color-mix(in srgb, var(--ink-muted) 75%, white 25%);
@@ -155,7 +157,7 @@
 
   /* Comfort Tokens */
   --comfort-tray-width: min(22rem, 100%);
-  --comfort-tray-sticky-offset: clamp(2rem, 5vw, 3.5rem);
+  --comfort-tray-sticky-offset: clamp(2rem, 5vw, 3.15rem);
   --comfort-chip-bg: color-mix(in srgb, var(--color-overlay) 45%, transparent 55%);
   --comfort-chip-bg-hover: color-mix(in srgb, var(--comfort-chip-bg) 80%, var(--color-amethyst) 20%);
   --comfort-chip-border: color-mix(in srgb, var(--color-border) 72%, transparent 28%);
@@ -672,6 +674,12 @@ main {
   padding-inline: clamp(1.25rem, 6vw, 2.75rem);
 }
 
+@media (min-width: 769px) {
+  .site-shell__content {
+    padding-top: 1.5rem;
+  }
+}
+
 .site-main {
   width: 100%;
   --site-main-content-gap: var(--layout-content-gap);
@@ -742,8 +750,17 @@ main {
 
 @media (max-width: 640px) {
   .site-main__container--plain {
-    padding: clamp(1.5rem, 7vw, 2rem);
-    border-radius: clamp(1.5rem, 7vw, 2.25rem);
+    padding: clamp(1.5rem, 7vw, 2rem) 0;
+    border-radius: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    overflow: visible;
+  }
+
+  .site-main__container--plain::before {
+    display: none;
   }
 }
 
@@ -1514,14 +1531,19 @@ main {
 
 .site-nav__mobile {
   position: fixed;
-  inset: 0;
-  z-index: 50;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  min-height: 100dvh;
+  height: 100dvh;
+  z-index: 200;
+  isolation: isolate;
   padding: clamp(var(--space-4), 3vh, var(--space-6)) clamp(var(--space-4), 5vw, var(--space-6));
-  background: var(--header-mobile-background, color-mix(in srgb, var(--glass-surface-strong, var(--surface-panel)) 94%, transparent 6%));
-  backdrop-filter: blur(var(--glass-blur, 18px));
+  background: #111a17;
   color: var(--layout-shell-ink, var(--text-strong));
   transform: translateY(-100%);
-  opacity: 0;
   visibility: hidden;
   transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1), opacity 280ms ease, visibility 0s 280ms;
   overflow-y: auto;
@@ -1529,8 +1551,16 @@ main {
 }
 
 :root[data-comfort-theme="dawn"] .site-nav__mobile {
-  background: color-mix(in srgb, var(--header-background) 94%, white 6%);
+  background: #111a17;
   color: color-mix(in srgb, var(--layout-shell-ink) 75%, black 25%);
+}
+
+.site-nav__mobile[aria-hidden="true"] {
+  opacity: 0;
+}
+
+.site-nav__mobile[aria-hidden="false"] {
+  opacity: 1;
 }
 
 .site-nav__mobile.is-open {
@@ -1569,7 +1599,7 @@ main {
   padding: 0;
   margin: 0;
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-2);
 }
 
 .site-nav__mobile-comfort {
@@ -1582,7 +1612,7 @@ main {
   letter-spacing: 0.04em;
   text-transform: none;
   color: var(--layout-shell-ink, var(--text-strong));
-  padding-block: var(--header-mobile-link-padding-block, 0.85rem);
+  padding-block: 0.6rem;
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;

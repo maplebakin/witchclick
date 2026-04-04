@@ -1,7 +1,7 @@
 // server/lib/promptFragments.js
 // Shared prompt fragments for buildMasterPrompt.
 
-import { BASE_FIELDS, STRUCTURE_REQUIREMENTS, generatorPresetOptions } from './generatorPresets.js';
+import { buildBaseFields, STRUCTURE_REQUIREMENTS, generatorPresetOptions } from './generatorPresets.js';
 
 function formatScore(score) {
   if (typeof score !== 'number' || Number.isNaN(score)) return null;
@@ -150,12 +150,16 @@ export const SEO_REQUIREMENTS_FRAGMENT = [
   '',
 ];
 
-export const BASE_VALIDATION_FRAGMENT = [
-  'BASE VALIDATION (applies to every PostSpec):',
-  ...BASE_FIELDS,
-  '- heroImagePrompt may be null; altTexts only required when images appear in markdown.',
-  '',
-];
+export function buildBaseValidationFragment(words) {
+  return [
+    'BASE VALIDATION (applies to every PostSpec):',
+    ...buildBaseFields(words),
+    '- heroImagePrompt may be null; altTexts only required when images appear in markdown.',
+    '',
+  ];
+}
+
+export const BASE_VALIDATION_FRAGMENT = buildBaseValidationFragment();
 
 function buildTypeStructureFragment() {
   const sections = [];
@@ -198,19 +202,27 @@ export function buildInputsFragment({
   siteUrl,
   topic,
   words,
+  contentType,
+  styleDirective,
   ads,
   kofi,
   existingPostTitles,
   existingPostSlugs,
   allowedAffiliateKeys,
 }) {
+  const resolvedContentType =
+    typeof contentType === 'string' && contentType.trim()
+      ? contentType.trim()
+      : 'ritual';
+
   return [
     'INPUTS',
     `brandName: "${brandName}"`,
     `siteUrl: "${siteUrl}"`,
     `topic: "${topic}"`,
     `wordCount: ${words}`,
-    'contentType: "ritual" (use "ritual" for standard ritual guides; if generating a different content type like "reflection", "story", "tarotSpread", "spellwork", or "crystals", update accordingly)',
+    `contentType: "${resolvedContentType}" (match the selected template/content type unless you intentionally need a different structure)`,
+    styleDirective ? `styleDirective: "${styleDirective}"` : 'styleDirective: ""',
     `includeAds: "${ads}"`,
     `includeKofi: "${kofi}"`,
     `existingPostTitles: ${JSON.stringify(existingPostTitles)}`,
@@ -256,6 +268,7 @@ export function buildProcessFragment(words) {
     '5) Sections',
     `   • Write ~${words} words total (±5%).`,
     '   • Keep paragraphs short, enforce numbered steps or narrative flow as required by the type-specific contract (e.g., numbered Quick/Deep steps for rituals, journaling prompts for reflections).',
+    '   • Treat INPUTS.wordCount as the single source of truth for total length; ignore any generic example ranges elsewhere in the prompt.',
     '   • Include a gentle safety note whenever the TYPE-SPECIFIC contract or safety triggers apply.',
     '   • The FIRST section object must have "heading":"Opening Reflection" and match the outline entry exactly.',
     '5b) Entities extraction',

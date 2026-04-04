@@ -5,12 +5,13 @@ import PrimaryButton from "@/components/buttons/PrimaryButton.astro";
 import PartnerProductCard from "@/components/PartnerProductCard.astro";
 import { readPartnerBlocks, type PartnerRecord } from "@/utils/partners";
 import { createItemListSchema } from "@/utils/structuredData";
-import { readSettings } from "@/utils/settings";
+import { readSettings, getFormEndpoint } from "@/utils/settings";
 import HeadSlot from "@/components/HeadSlot.astro";
 import { getLastUpdatedMeta } from "@/utils/lastUpdated";
 
 const partnerBlocks = readPartnerBlocks();
 const settings = readSettings();
+const hasFormEndpoint = Boolean(getFormEndpoint(settings));
 
 type PartnerWithExtras = PartnerRecord & { image?: string };
 
@@ -144,38 +145,44 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
       <p class="partners-request__copy">
         Know a small business, mutual aid project, or creator who aligns with WitchClick values? Share their details and we will review for a future constellation.
       </p>
-      <form
-        class="partners-request__form"
-        name="partner-requests"
-        method="POST"
-        data-netlify="true"
-        data-form-success="Thanks for the recommendation. We will review this partner soon."
-      >
-        <input type="hidden" name="form-name" value="partner-requests" />
-        <label class="partners-request__label">
-          Partner name
-          <input type="text" name="partner" placeholder="Example: Warmth Studio" class="partners-request__input" />
-        </label>
-        <label class="partners-request__label">
-          Website or social link
-          <input type="url" name="link" placeholder="https://..." class="partners-request__input" />
-        </label>
-        <label class="partners-request__label">
-          Why they fit
-          <textarea
-            name="reason"
-            rows="3"
-            placeholder="Short note on their vibe, values, or offerings."
-            class="partners-request__input"
-          ></textarea>
-        </label>
-        <label class="partners-request__label">
-          Your email (optional)
-          <input type="email" name="email" inputmode="email" autocomplete="email" placeholder="you@example.com" class="partners-request__input" />
-        </label>
-        <button type="submit" class="partners-request__button">Send suggestion</button>
-        <p class="wc-form-status" data-form-status hidden aria-live="polite"></p>
-      </form>
+      {hasFormEndpoint ? (
+        <form
+          class="partners-request__form"
+          name="partner-requests"
+          method="POST"
+          data-netlify="true"
+          data-form-success="Thanks for the recommendation. We will review this partner soon."
+        >
+          <input type="hidden" name="form-name" value="partner-requests" />
+          <label class="partners-request__label">
+            Partner name
+            <input type="text" name="partner" placeholder="Example: Warmth Studio" class="partners-request__input" />
+          </label>
+          <label class="partners-request__label">
+            Website or social link
+            <input type="url" name="link" placeholder="https://..." class="partners-request__input" />
+          </label>
+          <label class="partners-request__label">
+            Why they fit
+            <textarea
+              name="reason"
+              rows="3"
+              placeholder="Short note on their vibe, values, or offerings."
+              class="partners-request__input"
+            ></textarea>
+          </label>
+          <label class="partners-request__label">
+            Your email (optional)
+            <input type="email" name="email" inputmode="email" autocomplete="email" placeholder="you@example.com" class="partners-request__input" />
+          </label>
+          <button type="submit" class="partners-request__button">Send suggestion</button>
+          <p class="wc-form-status" data-form-status hidden aria-live="polite"></p>
+        </form>
+      ) : (
+        <p class="partners-request__copy">
+          Partner suggestions are temporarily offline while form delivery is being configured. You can still browse the current directory and affiliate highlights.
+        </p>
+      )}
     </div>
   </section>
 </Base>

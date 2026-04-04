@@ -1,6 +1,5 @@
 ---
 import type { TypeMetadataEntry } from "../data/typeMetadata";
-import { resolveTailwindColor, mixColors, toRgba } from "../utils/color";
 import { toCssVariables } from "../utils/style";
 
 export interface Props {
@@ -25,7 +24,15 @@ const {
   theme = undefined,
 } = Astro.props as Props;
 
-const summaryText = typeof summary === "string" ? summary.trim() : "";
+function stripInlineMarkdown(value: string): string {
+  return value
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/[`*_~]+/g, "")
+    .trim();
+}
+
+const summaryText = typeof summary === "string" ? stripInlineMarkdown(summary) : "";
 const stubFromSummary = summaryText ? /stub entity/i.test(summaryText) : false;
 const showStubBadge = variant === "grimoire" && (isStub || stubFromSummary);
 
@@ -40,21 +47,21 @@ const keywords = Array.isArray(tags)
     )
   : [];
 
-const accentHex = resolveTailwindColor(theme?.themeColor ?? "violet-500");
-const accentBorder = toRgba(accentHex, 0.28);
-const accentSurface = toRgba(accentHex, 0.1);
-const accentOverlay = toRgba(accentHex, 0.22);
-const accentLabel = toRgba(accentHex, 0.6);
+const accentTone = "var(--theme-color-gold, var(--theme-text-accent, var(--text-accent)))";
+const accentBorder = `color-mix(in srgb, ${accentTone} 24%, transparent)`;
+const accentSurface = "var(--theme-surface-panel, var(--surface-panel))";
+const accentOverlay = `color-mix(in srgb, ${accentTone} 16%, transparent)`;
+const accentLabel = "var(--theme-text-subtle, var(--text-muted))";
 const accentHeading = "var(--theme-text-strong, var(--text-strong))";
 const accentSummary = "var(--theme-text-body, var(--text-body))";
-const accentKeywordBg = toRgba(accentHex, 0.16);
-const accentKeywordBorder = toRgba(accentHex, 0.35);
-const accentKeywordText = mixColors(accentHex, "hsl(var(--neutral-8) / 1)", 0.35);
-const accentBadgeBg = toRgba(accentHex, 0.2);
-const accentBadgeBorder = toRgba(accentHex, 0.38);
-const accentBadgeText = mixColors(accentHex, "hsl(var(--neutral-8) / 1)", 0.3);
+const accentKeywordBg = `color-mix(in srgb, ${accentTone} 12%, transparent)`;
+const accentKeywordBorder = `color-mix(in srgb, ${accentTone} 24%, transparent)`;
+const accentKeywordText = "var(--theme-text-accent, var(--text-accent))";
+const accentBadgeBg = `color-mix(in srgb, ${accentTone} 14%, transparent)`;
+const accentBadgeBorder = `color-mix(in srgb, ${accentTone} 26%, transparent)`;
+const accentBadgeText = "var(--theme-text-accent, var(--text-accent))";
 const accentPlaceholder = "var(--theme-text-muted, var(--text-muted))";
-const accentStar = toRgba(accentHex, 0.35);
+const accentStar = accentTone;
 
 const cardGradientClass = theme?.cardStyleClass ?? "from-gradient-default-start/20 to-gradient-default-end/40";
 const stubLine = theme?.stubLine ?? "Lore pending — the scribes are still etching this entry.";
@@ -94,7 +101,7 @@ const typeLabel =
     href={`/entities/${type}/${slug}`}
     class:list={[
       "focus-ring",
-      "entity-card relative block overflow-hidden rounded-3xl border bg-gradient-to-br via-surface-base/80 p-6 shadow-[0_20px_45px_-25px_hsl(var(--neutral-8) / 0.35)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_25px_60px_-30px_hsl(var(--neutral-8) / 0.45)]",
+      "entity-card relative block h-full overflow-hidden rounded-3xl border bg-gradient-to-br via-surface-base/80 p-6 shadow-[0_20px_45px_-25px_hsl(var(--neutral-8) / 0.35)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_25px_60px_-30px_hsl(var(--neutral-8) / 0.45)]",
       cardGradientClass,
       showStubBadge && "opacity-60",
     ]}
@@ -108,7 +115,7 @@ const typeLabel =
     />
     <span aria-hidden class="entity-card-star pointer-events-none absolute top-5 right-6 text-4xl">✶</span>
 
-    <div class="relative z-10 flex flex-col gap-4">
+    <div class="entity-card-inner relative z-10 flex h-full flex-col gap-4">
       <div class="flex items-start justify-start gap-3 flex-wrap">
   <span class="entity-card-label text-[0.8rem] uppercase">{typeLabel}</span>
   {showStubBadge && (
@@ -118,20 +125,19 @@ const typeLabel =
   )}
 </div>
 
-
-      <div class="space-y-3">
+      <div class="entity-card-copy flex flex-1 flex-col space-y-3">
         <h3 class="entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_hsl(var(--neutral-0) / 0.6)]">
           {name}
         </h3>
         {summaryContent && (
-          <p class:list={["entity-card-summary text-sm italic", showStubBadge && !displaySummary ? "entity-card-placeholder" : ""]}>
+          <p class:list={["entity-card-summary text-sm", showStubBadge && !displaySummary ? "entity-card-placeholder" : ""]}>
             {summaryContent}
           </p>
         )}
       </div>
 
       {keywords.length > 0 ? (
-        <div class="mt-auto flex flex-wrap gap-2">
+        <div class="entity-card-keywords mt-auto flex flex-wrap gap-2">
           {keywords.map((tag) => (
             <span class="card-pill card-tag entity-card-tag">{tag}</span>
           ))}
@@ -154,32 +160,32 @@ const typeLabel =
 
 <style>
   .entity-card {
-    background-color: var(--entity-surface, var(--theme-surface-base));
-    border-color: var(--entity-border, color-mix(in srgb, var(--theme-color-amethyst) 28%, transparent));
-    overflow: hidden; /* <-- stop clipping */
-    height: auto; /* <-- let content determine height */
+    background-color: var(--entity-surface, var(--theme-surface-panel, var(--surface-panel)));
+    border-color: var(--entity-border, color-mix(in srgb, var(--theme-color-gold) 24%, transparent));
+    overflow: hidden;
+    height: 100%;
   }
 
   .entity-card-overlay {
-    background: radial-gradient(circle at top, var(--entity-overlay, color-mix(in srgb, var(--theme-color-amethyst) 22%, transparent)), transparent 65%);
+    background: radial-gradient(circle at top, var(--entity-overlay, color-mix(in srgb, var(--theme-color-gold) 16%, transparent)), transparent 65%);
   }
 
   .entity-card-orb {
-    border-color: var(--entity-border, hsl(var(--accent-2) / 0.22));
-    background: radial-gradient(circle at top, var(--entity-overlay, hsl(var(--accent-2) / 0.22)), transparent 70%);
+    border-color: var(--entity-border, color-mix(in srgb, var(--theme-color-gold) 24%, transparent));
+    background: radial-gradient(circle at top, var(--entity-overlay, color-mix(in srgb, var(--theme-color-gold) 16%, transparent)), transparent 70%);
     filter: blur(2px);
   }
 
   .entity-card-glow {
-    background: linear-gradient(135deg, var(--entity-overlay, color-mix(in srgb, var(--theme-color-amethyst) 18%, transparent)) 0%, transparent 80%);
+    background: linear-gradient(135deg, var(--entity-overlay, color-mix(in srgb, var(--theme-color-gold) 14%, transparent)) 0%, transparent 80%);
   }
 
   .entity-card-star {
-    color: var(--entity-star, color-mix(in srgb, var(--theme-color-amethyst) 40%, transparent));
+    color: var(--entity-star, var(--theme-color-gold, var(--theme-text-accent, var(--text-accent))));
   }
 
     .entity-card-label {
-    color: var(--entity-label, color-mix(in srgb, var(--theme-color-amethyst) 65%, transparent));
+    color: var(--entity-label, var(--theme-text-subtle, var(--text-muted)));
     letter-spacing: 0.18em;   /* gentle, still “label-y” but not absurd */
     font-size: 0.8rem;        /* slightly small to keep it compact */
     overflow-wrap: anywhere;
@@ -189,18 +195,24 @@ const typeLabel =
   }
 
   .entity-card-badge {
-    background: var(--entity-badge-bg, color-mix(in srgb, var(--theme-color-amethyst) 18%, transparent));
-    border-color: var(--entity-badge-border, color-mix(in srgb, var(--theme-color-amethyst) 35%, transparent));
-    color: var(--entity-badge-text, color-mix(in srgb, var(--theme-color-amethyst) 85%, transparent));
+    background: var(--entity-badge-bg, color-mix(in srgb, var(--theme-color-gold) 14%, transparent));
+    border-color: var(--entity-badge-border, color-mix(in srgb, var(--theme-color-gold) 26%, transparent));
+    color: var(--entity-badge-text, var(--theme-text-accent, var(--text-accent)));
   }
 
   .entity-card-title {
     color: var(--entity-heading, var(--theme-text-strong, var(--text-strong)));
   }
 
+  .entity-card-copy {
+    min-height: 0;
+  }
+
   .entity-card-summary {
     color: var(--entity-summary, var(--theme-text-body, var(--text-body)));
     line-height: 1.5;
+    font-style: normal;
+    flex: 1 1 auto;
     overflow: visible;
     text-overflow: clip;
     display: block;
@@ -214,8 +226,8 @@ const typeLabel =
 
   .entity-card-tag {
     --card-pill-text: var(--entity-keyword-text, hsl(var(--accent-ink) / 0.85));
-    --card-pill-bg: var(--entity-keyword-bg, color-mix(in srgb, var(--theme-color-amethyst) 16%, transparent));
-    --card-pill-border: var(--entity-keyword-border, color-mix(in srgb, var(--theme-color-amethyst) 35%, transparent));
+    --card-pill-bg: var(--entity-keyword-bg, color-mix(in srgb, var(--theme-color-gold) 12%, transparent));
+    --card-pill-border: var(--entity-keyword-border, color-mix(in srgb, var(--theme-color-gold) 24%, transparent));
   }
 
   .entity-card-empty-keywords {

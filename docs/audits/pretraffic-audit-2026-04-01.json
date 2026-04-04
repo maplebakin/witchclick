@@ -1,0 +1,219 @@
+{
+  "generatedAt": "2026-04-03T14:28:36.546Z",
+  "auditDate": "2026-04-01",
+  "commands": [
+    {
+      "command": "npm install",
+      "exitCode": 0,
+      "logPath": "/tmp/pretraffic-logs/01-npm-install.log"
+    },
+    {
+      "command": "npm run check",
+      "exitCode": 0,
+      "logPath": "/tmp/pretraffic-logs/02-npm-run-check.log"
+    },
+    {
+      "command": "npm run test",
+      "exitCode": 0,
+      "logPath": "/tmp/pretraffic-logs/03-npm-run-test.log"
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "logPath": "/tmp/pretraffic-logs/04-npm-run-build.log"
+    },
+    {
+      "command": "npm run linkcheck",
+      "exitCode": 0,
+      "logPath": "/tmp/pretraffic-logs/05-npm-run-linkcheck.log"
+    },
+    {
+      "command": "npm run audit:seo",
+      "exitCode": 0,
+      "logPath": "/tmp/pretraffic-logs/06-npm-run-audit-seo.log"
+    },
+    {
+      "command": "npm run check:affiliates",
+      "exitCode": 0,
+      "logPath": "/tmp/pretraffic-logs/07-npm-run-check-affiliates.log"
+    }
+  ],
+  "content": {
+    "totalPostFiles": 158,
+    "publishedPosts": 53,
+    "draftPosts": 105,
+    "publishedPostsWithPlaceholderSignals": {
+      "totalUniquePosts": 0,
+      "excerptContainsPlaceholderPost": 0,
+      "tagsIncludePlaceholderOrStub": 0,
+      "bodyContainsContentComingSoon": 0,
+      "bodyContainsAutomaticallyCreatedAsStub": 0,
+      "outlineExactlyPlaceholder": 0,
+      "slugs": []
+    },
+    "publishedPostsMissingHeroImage": 20,
+    "publishedPostsMissingMetaDescriptionDescriptionAndExcerpt": 0,
+    "publishedPostsUnder300Words": 0,
+    "publishedPostsUnder300WordDetails": []
+  },
+  "entities": {
+    "totalEntityFiles": 181,
+    "stubEntitiesByType": {
+      "crystal": 7,
+      "herb": 2,
+      "moonPhase": 7,
+      "planetaryDay": 6,
+      "ritual": 24,
+      "tarot": 27
+    },
+    "publishedEntitiesByType": {
+      "crystal": 24,
+      "herb": 18,
+      "moonPhase": 2,
+      "planetaryDay": 1,
+      "ritual": 3,
+      "tarot": 60
+    }
+  },
+  "routes": {
+    "totalRouteFilesEmittedInDist": 628,
+    "totalHtmlFilesInDist": 617,
+    "sitemapUrlsEmitted": 474,
+    "publicRoutesContainingPlaceholderPhrases": [
+      {
+        "route": "/meanderings/",
+        "file": "dist/meanderings/index.html",
+        "phrases": [
+          "check back soon"
+        ]
+      }
+    ]
+  },
+  "affiliates": {
+    "productKeys": [
+      {
+        "key": "altar-kit",
+        "targetUrl": "https://www.amazon.com/s?k=altar+tools+chalice+altar+cloth+ritual+candles&tag=witchclickspa-20",
+        "urlType": "generic_search_url"
+      },
+      {
+        "key": "aroma-diffuser",
+        "targetUrl": "https://www.amazon.com/s?k=ceramic+essential+oil+diffuser&tag=witchclickspa-20",
+        "urlType": "generic_search_url"
+      },
+      {
+        "key": "chakra-bracelet",
+        "targetUrl": "https://www.amazon.com/s?k=chakra+bracelet+mala&tag=witchclickspa-20",
+        "urlType": "generic_search_url"
+      },
+      {
+        "key": "crystal-bible",
+        "targetUrl": "https://bookshop.org/a/witchclick/search?keywords=the+crystal+bible+judy+hall",
+        "urlType": "generic_search_url"
+      },
+      {
+        "key": "gemstone-candle",
+        "targetUrl": "https://www.amazon.com/s?k=gemstone+infused+candle&tag=witchclickspa-20",
+        "urlType": "generic_search_url"
+      },
+      {
+        "key": "himalayan-salt-lamp",
+        "targetUrl": "https://www.amazon.com/s?k=himalayan+salt+lamp&tag=witchclickspa-20",
+        "urlType": "generic_search_url"
+      },
+      {
+        "key": "mindfulness-journal",
+        "targetUrl": "https://www.amazon.com/s?k=guided+mindfulness+journal&tag=witchclickspa-20",
+        "urlType": "generic_search_url"
+      },
+      {
+        "key": "moonology",
+        "targetUrl": "https://bookshop.org/a/witchclick/search?keywords=moonology+yasmin+boland",
+        "urlType": "generic_search_url"
+      },
+      {
+        "key": "singing-bowl",
+        "targetUrl": "https://www.amazon.com/s?k=singing+bowl+set&tag=witchclickspa-20",
+        "urlType": "generic_search_url"
+      },
+      {
+        "key": "smudge-kit",
+        "targetUrl": "https://www.amazon.com/s?k=white+sage+palo+santo+kit&tag=witchclickspa-20",
+        "urlType": "generic_search_url"
+      },
+      {
+        "key": "sustainable-incense",
+        "targetUrl": "https://www.amazon.com/s?k=sustainable+incense+sticks&tag=witchclickspa-20",
+        "urlType": "generic_search_url"
+      },
+      {
+        "key": "tumbled-stones",
+        "targetUrl": "https://www.amazon.com/s?k=tumbled+stones+set&tag=witchclickspa-20",
+        "urlType": "generic_search_url"
+      }
+    ],
+    "redirects": [
+      {
+        "from": "/go/sustainable-incense",
+        "to": "https://www.amazon.com/s?k=sustainable+incense+sticks&tag=witchclickspa-20&utm_source=witchclick&utm_medium=affiliate&utm_campaign=sustainable_incense",
+        "status": "302"
+      },
+      {
+        "from": "/go/altar-kit",
+        "to": "https://www.amazon.com/s?k=altar+tools+chalice+altar+cloth+ritual+candles&tag=witchclickspa-20&utm_source=witchclick&utm_medium=affiliate&utm_campaign=altar_kit",
+        "status": "302"
+      },
+      {
+        "from": "/go/gemstone-candle",
+        "to": "https://www.amazon.com/s?k=gemstone+infused+candle&tag=witchclickspa-20&utm_source=witchclick&utm_medium=affiliate&utm_campaign=gemstone_candle",
+        "status": "302"
+      },
+      {
+        "from": "/go/aroma-diffuser",
+        "to": "https://www.amazon.com/s?k=ceramic+essential+oil+diffuser&tag=witchclickspa-20&utm_source=witchclick&utm_medium=affiliate&utm_campaign=aroma_diffuser",
+        "status": "302"
+      },
+      {
+        "from": "/go/tumbled-stones",
+        "to": "https://www.amazon.com/s?k=tumbled+stones+set&tag=witchclickspa-20&utm_source=witchclick&utm_medium=affiliate&utm_campaign=tumbled_stones",
+        "status": "302"
+      },
+      {
+        "from": "/go/himalayan-salt-lamp",
+        "to": "https://www.amazon.com/s?k=himalayan+salt+lamp&tag=witchclickspa-20&utm_source=witchclick&utm_medium=affiliate&utm_campaign=himalayan_salt_lamp",
+        "status": "302"
+      },
+      {
+        "from": "/go/singing-bowl",
+        "to": "https://www.amazon.com/s?k=singing+bowl+set&tag=witchclickspa-20&utm_source=witchclick&utm_medium=affiliate&utm_campaign=singing_bowl",
+        "status": "302"
+      },
+      {
+        "from": "/go/mindfulness-journal",
+        "to": "https://www.amazon.com/s?k=guided+mindfulness+journal&tag=witchclickspa-20&utm_source=witchclick&utm_medium=affiliate&utm_campaign=mindfulness_journal",
+        "status": "302"
+      },
+      {
+        "from": "/go/chakra-bracelet",
+        "to": "https://www.amazon.com/s?k=chakra+bracelet+mala&tag=witchclickspa-20&utm_source=witchclick&utm_medium=affiliate&utm_campaign=chakra_bracelet",
+        "status": "302"
+      },
+      {
+        "from": "/go/smudge-kit",
+        "to": "https://www.amazon.com/s?k=white+sage+palo+santo+kit&tag=witchclickspa-20&utm_source=witchclick&utm_medium=affiliate&utm_campaign=smudge_kit",
+        "status": "302"
+      },
+      {
+        "from": "/go/crystal-bible",
+        "to": "https://bookshop.org/a/witchclick/search?keywords=the+crystal+bible+judy+hall&utm_source=witchclick&utm_medium=affiliate&utm_campaign=crystal_bible",
+        "status": "302"
+      },
+      {
+        "from": "/go/moonology",
+        "to": "https://bookshop.org/a/witchclick/search?keywords=moonology+yasmin+boland&utm_source=witchclick&utm_medium=affiliate&utm_campaign=moonology",
+        "status": "302"
+      }
+    ]
+  },
+  "brokenLinks": []
+}

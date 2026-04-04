@@ -22,10 +22,21 @@ const breadcrumbs = [
       </p>
     </header>
 
-    <div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 sm:gap-8">
+    <div class="entity-grid mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 sm:gap-8">
       {sections.map((section) => (
         <EntityHubCard section={section} />
       ))}
     </div>
   </section>
 </Base>
+
+<style>
+  @media (min-width: 1024px) {
+    .entity-grid > *:last-child:nth-child(3n - 2) {
+      grid-column: 1 / -1;
+      max-width: 600px;
+      width: 100%;
+      justify-self: center;
+    }
+  }
+</style>

@@ -8,7 +8,7 @@ import path from 'node:path';
 import { ensureUniqueSlug, slugify } from '../../scripts/lib/slug.js';
 import { readSlugHistory, writeSlugHistory } from '../../scripts/lib/slugHistory.js';
 import { normalizePostSpec } from './ingestionAdapter.js';
-import { PostSpecV2Schema } from './postSpecSchema.js';
+import { ENTITY_TYPES, PostSpecV2Schema } from './postSpecSchema.js';
 import { validatePostSpec } from './postSpecValidator.js';
 import { validateStructure } from './structureValidation.js';
 
@@ -107,6 +107,100 @@ function dedupe(items) {
 
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function cloneStructured(value) {
+  if (value === undefined) return undefined;
+  if (typeof structuredClone === 'function') {
+    return structuredClone(value);
+  }
+  return JSON.parse(JSON.stringify(value));
+}
+
+function recordSanitization(warnings, message) {
+  warnings.push(message);
+  console.warn(`[specPreparation] ${message}`);
+}
+
+function salvageExternalUrl(value) {
+  const raw = toTrimmedString(value);
+  if (!raw) return null;
+
+  const markdownMatch = raw.match(/\[[^\]]*\]\((https?:\/\/[^)\s]+)\)/i);
+  if (markdownMatch?.[1]) {
+    return markdownMatch[1];
+  }
+
+  const candidates = [raw];
+  try {
+    const decoded = decodeURIComponent(raw);
+    if (decoded && decoded !== raw) candidates.push(decoded);
+  } catch {
+    // Keep the raw candidate when decoding fails.
+  }
+
+  for (const candidate of candidates) {
+    const urlMatch = candidate.match(/\bhttps?:\/\/[^\s"'`)\]}]+/i);
+    if (!urlMatch?.[0]) continue;
+    const extracted = urlMatch[0];
+    try {
+      return new URL(extracted).toString();
+    } catch {
+      // Continue trying other candidates.
+    }
+  }
+
+  try {
+    return new URL(raw).toString();
+  } catch {
+    return null;
+  }
+}
+
+function sanitizeRawSpec(rawSpec) {
+  const warnings = [];
+  if (!isPlainObject(rawSpec)) {
+    return { spec: rawSpec, warnings };
+  }
+
+  const sanitized = cloneStructured(rawSpec);
+
+  if (!isPlainObject(sanitized)) {
+    return { spec: rawSpec, warnings };
+  }
+
+  if ('sourceNote' in sanitized) {
+    delete sanitized.sourceNote;
+    recordSanitization(warnings, 'Sanitized sourceNote field from raw spec.');
+  }
+
+  if (isPlainObject(sanitized.externalLink)) {
+    const salvagedUrl = salvageExternalUrl(sanitized.externalLink.url);
+    if (salvagedUrl) {
+      if (sanitized.externalLink.url !== salvagedUrl) {
+        sanitized.externalLink.url = salvagedUrl;
+        recordSanitization(warnings, 'Sanitized externalLink.url to a clean URL string.');
+      }
+    } else {
+      delete sanitized.externalLink;
+      recordSanitization(warnings, 'Removed unsalvageable externalLink field from raw spec.');
+    }
+  }
+
+  if (Array.isArray(sanitized.entities)) {
+    const allowedTypes = new Set(ENTITY_TYPES);
+    const originalCount = sanitized.entities.length;
+    sanitized.entities = sanitized.entities.filter((entity) => {
+      const type = toTrimmedString(entity?.type);
+      return type && allowedTypes.has(type);
+    });
+    const removedCount = originalCount - sanitized.entities.length;
+    if (removedCount > 0) {
+      recordSanitization(warnings, `Removed ${removedCount} entity record(s) with invalid type from raw spec.`);
+    }
+  }
+
+  return { spec: sanitized, warnings };
 }
 
 function toTrimmedString(value) {
@@ -434,11 +528,16 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
     ? options.allowedAffiliateKeys
     : listAllowedAffiliateKeys(cwd);
 
-  const { spec: normalizedSpec, report, warnings: normalizationWarnings } = normalizePostSpec(rawSpec, {
+  const { spec: sanitizedRawSpec, warnings: sanitizationWarnings } = sanitizeRawSpec(rawSpec);
+
+  const { spec: normalizedSpec, report, warnings: normalizationWarnings } = normalizePostSpec(sanitizedRawSpec, {
     allowedAffiliateKeys,
   });
   const normalizationReport = Array.isArray(report) ? [...report] : [];
-  const normalizationWarningsList = Array.isArray(normalizationWarnings) ? [...normalizationWarnings] : [];
+  const normalizationWarningsList = dedupe([
+    ...sanitizationWarnings,
+    ...(Array.isArray(normalizationWarnings) ? normalizationWarnings : []),
+  ]);
 
   const parsed = PostSpecV2Schema.safeParse(normalizedSpec);
   if (!parsed.success) {
@@ -495,14 +594,14 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
   const settings = readJSON(settingsPath) || { siteUrl: 'https://example.com', brandName: 'WitchClick' };
   const siteUrl = String(settings.siteUrl || 'https://example.com').replace(/\/$/, '');
 
-  const promptMetadata = buildPromptMetadata(rawSpec, spec, {
+  const promptMetadata = buildPromptMetadata(sanitizedRawSpec, spec, {
     targetWordCount,
     wordCount: enforcement.wordCount,
     generatedAt: generationTimestamp,
     sourcePath: relativeSourcePath,
     engagementFocus: options.engagementSignals,
   });
-  const publishedAt = resolvePublishDate(rawSpec);
+  const publishedAt = resolvePublishDate(sanitizedRawSpec);
 
   const frontmatter = {
     title: spec.title,

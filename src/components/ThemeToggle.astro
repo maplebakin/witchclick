@@ -11,6 +11,7 @@ const { class: className = "" } = Astro.props as Props;
   type="button"
   class:list={["theme-toggle focus-ring", className].filter(Boolean)}
   data-theme-toggle
+  data-theme="midnight"
   aria-pressed="false"
 >
   <span class="sr-only">Toggle theme</span>
@@ -45,7 +46,7 @@ const { class: className = "" } = Astro.props as Props;
 
     const run = () => {
       const comfort = window.__wcComfort;
-      if (!comfort) return;
+      if (!comfort) return false;
 
       const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -72,12 +73,19 @@ const { class: className = "" } = Astro.props as Props;
         },
         { once: true },
       );
+
+      return true;
+    };
+
+    const start = () => {
+      if (run()) return;
+      window.addEventListener('wc:comfort-ready', run, { once: true });
     };
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', run, { once: true });
+      document.addEventListener('DOMContentLoaded', start, { once: true });
     } else {
-      run();
+      start();
     }
   })();
 </script>
@@ -92,8 +100,8 @@ const { class: className = "" } = Astro.props as Props;
     width: var(--toggle-size);
     height: var(--toggle-size);
     border-radius: 999px;
-    border: 1px solid var(--accent);
-    background: var(--primary);
+    border: 1px solid var(--theme-color-gold, var(--text-accent, currentColor));
+    background: var(--theme-surface-panel, var(--surface-panel, var(--header-background, transparent)));
     color: var(--theme-text-strong);
     transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
   }
@@ -112,6 +120,11 @@ const { class: className = "" } = Astro.props as Props;
     transition: opacity 200ms ease, transform 200ms ease;
   }
 
+  .theme-toggle__icon--moon {
+    opacity: 1;
+    transform: scale(1);
+  }
+
   .theme-toggle__icon svg {
     display: block;
     width: 100%;
@@ -125,9 +138,9 @@ const { class: className = "" } = Astro.props as Props;
   }
 
   :global(.theme-toggle[data-theme='dawn']) {
-    background: var(--primary);
+    background: var(--theme-surface-panel, var(--surface-panel, var(--header-background, transparent)));
     color: var(--theme-text-body);
-    border-color: var(--accent);
+    border-color: var(--theme-color-gold, var(--text-accent, currentColor));
   }
 
   @media (prefers-reduced-motion: reduce) {

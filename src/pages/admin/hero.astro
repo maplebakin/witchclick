@@ -20,6 +20,7 @@ const canUse = isDev || !!keyOk;
 const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
 const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || "";
 const site = Astro.url?.origin ?? "";
+const preselectedPost = url.searchParams.get("post") ?? "";
 ---
 <Base
   title="WitchClick — Hero Image Uploader"
@@ -42,13 +43,17 @@ const site = Astro.url?.origin ?? "";
         data-dev-api={DEV_API}
         data-dev-key={DEV_KEY}
         data-site-origin={site}
+        data-preselected-post={preselectedPost}
       >
         <header class="space-y-2 rounded-2xl border border-line-subtle bg-surface-base p-6 shadow-sm">
           <h1 class="text-2xl font-semibold text-body-strong">Hero Image Uploader</h1>
           <p class="text-sm text-body-muted">
-            Choose a post, drop in artwork (PNG, JPG, or WEBP up to 5&nbsp;MB), add alt text, and the uploader will
+            Choose a post, drop in artwork (PNG, JPG, or WEBP), add alt text, and the uploader will
             store the file under <code class="rounded bg-neutral-100 px-1 py-0.5 text-[0.8rem] font-mono">/public/images/hero/&lt;slug&gt;</code>
             before wiring the frontmatter.
+          </p>
+          <p class="text-[0.8rem] text-body-muted">
+            Keep source files under about 3.5&nbsp;MB when possible. The dev API accepts a 5&nbsp;MB JSON body, and base64 upload overhead means larger files may fail before reaching the server.
           </p>
         </header>
 
@@ -74,24 +79,42 @@ const site = Astro.url?.origin ?? "";
 
   {canUse && (
     <script is:inline>
-      // This is a temporary, global-scope "glue" script to allow the components to communicate.
-      // It's an anti-pattern, but a necessary evil for an incremental refactor without
-      // adding a proper state management library.
-      
-      // The individual components will listen for events on this global object or read from it.
       window.heroUploaderPosts = [];
-      
-      const heroUploaderRoot = document.getElementById('heroUploader');
-      const postSelect = heroUploaderRoot.querySelector('[data-post-select]');
 
-      // When the post is selected in HeroPostSelector, it fires a 'change' event on the hidden select.
-      // Other components can listen to this to update their state.
-      postSelect.addEventListener('change', (e) => {
-        const newSlug = e.target.value;
-        // Dispatch a custom event that other components can listen to.
-        const event = new CustomEvent('post-selected', { detail: { slug: newSlug } });
-        document.dispatchEvent(event);
-      });
+      const heroUploaderRoot = document.getElementById('heroUploader');
+      const preselectedSlug = heroUploaderRoot?.getAttribute('data-preselected-post') || '';
+
+      window.heroUploaderState = {
+        preselectedSlug,
+        selectedSlug: '',
+        altText: '',
+        uploadedImagePath: '',
+        uploadStatus: 'idle',
+        attachStatus: 'idle',
+      };
+
+      window.setHeroUploaderState = function setHeroUploaderState(patch) {
+        window.heroUploaderState = Object.assign({}, window.heroUploaderState || {}, patch || {});
+        document.dispatchEvent(
+          new CustomEvent('hero-state-changed', {
+            detail: { state: window.heroUploaderState }
+          })
+        );
+      };
+
+      const postSelect = heroUploaderRoot?.querySelector('[data-post-select]');
+      if (postSelect) {
+        postSelect.addEventListener('change', (e) => {
+          const newSlug = e.target.value;
+          window.setHeroUploaderState({
+            selectedSlug: newSlug || '',
+            uploadedImagePath: '',
+            uploadStatus: 'idle',
+            attachStatus: 'idle',
+          });
+          document.dispatchEvent(new CustomEvent('post-selected', { detail: { slug: newSlug } }));
+        });
+      }
     </script>
   )}
 </Base>

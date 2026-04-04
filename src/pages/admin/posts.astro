@@ -1,7 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import { readSettings, buildCanonicalUrl } from "../../utils/settings";
-import adminPostEditorScript from "../../scripts/admin/adminPostEditor.js?url";
+import adminPostEditorScript from "../../scripts/admin/adminPostEditor.ts?url";
 import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
 
@@ -77,6 +77,42 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             data-search
             class="w-full rounded-lg border border-line-subtle px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
+          <div class="grid gap-3 md:grid-cols-3">
+            <label class="block">
+              <span class="text-[0.8rem] font-medium">Status</span>
+              <select
+                data-status-filter
+                class="mt-1 w-full admin-btn-secondary px-3 py-2 text-sm"
+              >
+                <option value="all">All</option>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
+              </select>
+            </label>
+            <label class="block">
+              <span class="text-[0.8rem] font-medium">Hero</span>
+              <select
+                data-hero-filter
+                class="mt-1 w-full admin-btn-secondary px-3 py-2 text-sm"
+              >
+                <option value="all">All</option>
+                <option value="missing">Missing Hero</option>
+                <option value="has">Has Hero</option>
+              </select>
+            </label>
+            <label class="block">
+              <span class="text-[0.8rem] font-medium">Sort</span>
+              <select
+                data-sort
+                class="mt-1 w-full admin-btn-secondary px-3 py-2 text-sm"
+              >
+                <option value="az">A→Z</option>
+                <option value="za">Z→A</option>
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+              </select>
+            </label>
+          </div>
           <div class="space-y-2">
             <p data-list-status class="text-[0.8rem] font-medium text-body-muted flex items-center gap-2">
               <span class="inline-block h-2 w-2 rounded-full bg-info animate-pulse"></span>

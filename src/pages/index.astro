@@ -164,6 +164,12 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
     padding-block: clamp(1.5rem, 4vw, 2rem) clamp(0.9rem, 2.5vw, 1.5rem);
   }
 
+  @media (min-width: 769px) {
+    .home-masthead {
+      padding-top: 0;
+    }
+  }
+
   .home-masthead__inner {
     position: relative;
     isolation: isolate;
@@ -264,6 +270,8 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
 
   .home-posts__hero-content--text-only {
     padding-top: 2rem;
+    background: transparent;
+    border-radius: 0;
   }
 
   .home-posts__hero-title {

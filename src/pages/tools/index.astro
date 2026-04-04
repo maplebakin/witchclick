@@ -4,7 +4,7 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import PrimaryButton from "../../components/buttons/PrimaryButton.astro";
 import fs from "node:fs";
 import HeadSlot from "@/components/HeadSlot.astro";
-import { readSettings } from "../../utils/settings";
+import { readSettings, getFormEndpoint } from "../../utils/settings";
 import { createItemListSchema } from "../../utils/structuredData";
 import { buildAffiliateTarget, readProductCatalog } from "@/utils/products";
 
@@ -77,6 +77,7 @@ const comingSoonDownloads = normalizedDownloads.filter((item) => {
 
 // Load affiliate products
 const settings = readSettings();
+const hasFormEndpoint = Boolean(getFormEndpoint(settings));
 
 interface ProductEntry {
   key?: string;
@@ -187,7 +188,7 @@ const breadcrumbs = [
       {readyDownloads.length === 0 && comingSoonDownloads.length === 0 ? (
         <div class="tools-empty">
           <p>
-            New printables are brewing. Check out the <a href="/lab">Ritual Lab</a> for interactive ritual generators, or visit the <a href="/curses">White Magic Curses</a> collection for printable boundary-setting cards.
+            New printables are brewing. Visit the <a href="/curses">White Magic Curses</a> collection for printable boundary-setting cards, or explore the tools below for what is currently live.
             If you have a wish list, drop a request in the <a href="#tools-request">printable request form</a> below.
           </p>
         </div>
@@ -220,7 +221,7 @@ const breadcrumbs = [
                       <PrimaryButton href={item.target} iconAfter="↓">
                         Download
                       </PrimaryButton>
-                      <a href="/lab/three-day-sampler" class="print-card__preview-link">
+                      <a href="/tools" class="print-card__preview-link">
                         View preview →
                       </a>
                     </div>
@@ -256,8 +257,8 @@ const breadcrumbs = [
 
       <div class="tools-cta">
         <p class="tools-cta__text">Want more printables and ritual planners?</p>
-        <PrimaryButton href="/lab" iconAfter="→">
-          Visit the Ritual Lab
+        <PrimaryButton href="/tools" iconAfter="→">
+          Explore Live Tools
         </PrimaryButton>
       </div>
     </section>
@@ -314,37 +315,43 @@ const breadcrumbs = [
         <p class="tools-request__copy">
           Looking for something specific? Share the ritual tool, planner, or resource you want and we will add it to the cozy backlog.
         </p>
-        <form
-          class="tools-request__form"
-          name="tools-request"
-          method="POST"
-          data-netlify="true"
-          data-form-success="Request received. Thanks for helping shape the printable queue."
-        >
-          <input type="hidden" name="form-name" value="tools-request" />
-          <label class="tools-request__label">
-            What would help you right now?
-            <textarea
-              name="request"
-              rows="3"
-              placeholder="Example: A one-page morning ritual tracker or a low-spoons cleaning reset checklist."
-              class="tools-request__input"
-            ></textarea>
-          </label>
-          <label class="tools-request__label">
-            Email (optional)
-            <input
-              type="email"
-              name="email"
-              inputmode="email"
-              autocomplete="email"
-              placeholder="you@example.com"
-              class="tools-request__input"
-            />
-          </label>
-          <PrimaryButton type="submit">Send request</PrimaryButton>
-          <p class="wc-form-status" data-form-status hidden aria-live="polite"></p>
-        </form>
+        {hasFormEndpoint ? (
+          <form
+            class="tools-request__form"
+            name="tools-request"
+            method="POST"
+            data-netlify="true"
+            data-form-success="Request received. Thanks for helping shape the printable queue."
+          >
+            <input type="hidden" name="form-name" value="tools-request" />
+            <label class="tools-request__label">
+              What would help you right now?
+              <textarea
+                name="request"
+                rows="3"
+                placeholder="Example: A one-page morning ritual tracker or a low-spoons cleaning reset checklist."
+                class="tools-request__input"
+              ></textarea>
+            </label>
+            <label class="tools-request__label">
+              Email (optional)
+              <input
+                type="email"
+                name="email"
+                inputmode="email"
+                autocomplete="email"
+                placeholder="you@example.com"
+                class="tools-request__input"
+              />
+            </label>
+            <PrimaryButton type="submit">Send request</PrimaryButton>
+            <p class="wc-form-status" data-form-status hidden aria-live="polite"></p>
+          </form>
+        ) : (
+          <p class="tools-request__copy">
+            Request intake is temporarily offline while form delivery is being configured. For now, browse the lab and current downloads instead of submitting here.
+          </p>
+        )}
       </div>
     </section>
   </div>

@@ -3,7 +3,8 @@ import Base from "@/layouts/Base.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import PrimaryButton from "@/components/buttons/PrimaryButton.astro";
 import PostCard from "@/components/PostCard.astro";
-import { readEditorialCalendar } from "@/utils/editorialCalendar";
+import fs from "node:fs";
+import path from "node:path";
 import { createCollectionPageSchema } from "@/utils/structuredData";
 import { readSettings } from "@/utils/settings";
 import { getPostBySlug, extractHeroImage, getPostCategory } from "@/utils/posts";
@@ -17,6 +18,7 @@ const HUBS = [
     description: "Let go without self-punishment. Rituals, prompts, and partner offerings that help you compost what is complete.",
     introSlug: "cozy-cursing-ritual-release-anger-banishment",
     accent: "var(--theme-warning, var(--theme-color-gold))",
+    moods: ["angry", "overwhelmed", "stuck"],
   },
   {
     slug: "focus",
@@ -24,6 +26,7 @@ const HUBS = [
     description: "Somatic resets, micro-accountability, and cozy planning spreads for attention that feels kind.",
     introSlug: "focus-tea-rituals-gentle-brains",
     accent: "var(--theme-info, var(--theme-color-iris))",
+    moods: ["scattered", "distracted", "restless"],
   },
   {
     slug: "calm",
@@ -31,16 +34,29 @@ const HUBS = [
     description: "Collective soothing practices, repair scripts, and mutual-aid highlights for staying resourced together.",
     introSlug: "calm-space-during-political-unrest-2",
     accent: "var(--theme-success, var(--theme-color-amethyst))",
+    moods: ["anxious", "overstimulated", "raw"],
   },
 ] as const;
 
 type HubConfig = (typeof HUBS)[number];
 
+const publicDir = path.join(process.cwd(), "public");
+
+function resolveHubImage(source: string | undefined): string | undefined {
+  if (!source) return undefined;
+  const trimmed = source.trim();
+  if (!trimmed) return undefined;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (!trimmed.startsWith("/")) return trimmed;
+  const publicPath = path.join(publicDir, trimmed.replace(/^\/+/, ""));
+  return fs.existsSync(publicPath) ? trimmed : undefined;
+}
+
 function resolveIntro(hub: HubConfig) {
   const post = getPostBySlug(hub.introSlug);
   if (!post) return null;
   const hero = extractHeroImage(post.data ?? {});
-  const heroSrc = typeof hero.src === "string" && hero.src.trim() ? hero.src.trim() : undefined;
+  const heroSrc = resolveHubImage(typeof hero.src === "string" && hero.src.trim() ? hero.src.trim() : undefined);
   const heroAlt = typeof hero.alt === "string" && hero.alt.trim() ? hero.alt.trim() : undefined;
   return {
     slug: post.slug,
@@ -89,9 +105,6 @@ const hubCards = HUBS.map((hub) => ({
 
 const featuredHub = [...hubCards].sort((a, b) => b.livePostCount - a.livePostCount)[0] ?? null;
 
-const calendar = readEditorialCalendar();
-const currentSeason = calendar.seasons[0] ?? null;
-
 const settings = readSettings();
 const collectionItems = hubCards.map((hub) => ({
   name: `${hub.title} Hub`,
@@ -117,7 +130,7 @@ const breadcrumbs = [
 
 <Base
   title="Hub Constellation — Release, Focus, Calm"
-  description="Navigate WitchClick's hubs: Release, Focus, and Calm. Explore curated rituals, seasonal stories, and collaborative offerings."
+  description="Pick how you're feeling right now and enter through Release, Focus, or Calm. Each WitchClick hub is tuned to a mood, not a topic."
   ambientColor="var(--theme-color-amethyst)"
 >
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
@@ -127,21 +140,21 @@ const breadcrumbs = [
 
   <header data-reveal class="page-header">
     <p class="page-header__eyebrow">Hub constellation</p>
-    <h1 class="page-header__title">Seasonal rooms for soft structure</h1>
+    <h1 class="page-header__title">How are you feeling right now?</h1>
     <p class="page-header__lead">
-      Choose the hub that fits the moment—Release for composting, Focus for momentum, Calm for collective soothing. Each
-      landing page gathers rituals, essays, and partner offerings you can return to anytime.
+      Each room is tuned to a different emotional frequency. Pick the mood that fits today and step into rituals, essays,
+      and gentle tools gathered around that feeling rather than a topic.
     </p>
   </header>
 
   {featuredHub && (
     <section data-reveal class="hub-featured" aria-labelledby="featured-hub-title">
       <p class="hub-featured__eyebrow">Featured hub</p>
-      <div class="hub-featured__content">
-        <div class="hub-featured__copy">
-          <h2 id="featured-hub-title" class="hub-featured__title">{featuredHub.title}</h2>
-          <p class="hub-featured__lead">{featuredHub.description}</p>
-          <p class="hub-featured__meta">{featuredHub.livePostCount} live rituals available</p>
+        <div class="hub-featured__content">
+          <div class="hub-featured__copy">
+            <h2 id="featured-hub-title" class="hub-featured__title">{featuredHub.title}</h2>
+            <p class="hub-featured__lead">{featuredHub.description}</p>
+            <p class="hub-featured__meta">{featuredHub.livePostCount} live rituals available</p>
         </div>
         <PrimaryButton href={`/hub/${featuredHub.slug}`} iconAfter="↗">
           Explore {featuredHub.title}
@@ -157,6 +170,11 @@ const breadcrumbs = [
           <div class="hub-card__header">
             <p class="hub-card__eyebrow">{hub.title} hub</p>
             <h2 class="hub-card__title">{hub.title}</h2>
+            <div class="hub-card__moods" aria-label={`${hub.title} mood cues`}>
+              {hub.moods.map((mood) => (
+                <span class="card-pill hub-card__mood">{mood}</span>
+              ))}
+            </div>
             <p class="hub-card__description">{hub.description}</p>
           </div>
           <div class="hub-card__actions">
@@ -190,91 +208,6 @@ const breadcrumbs = [
     </div>
   </section>
 
-  <section data-reveal class="hub-index-season">
-    <div class="hub-index-season__inner">
-      <header>
-        <p class="hub-index-season__eyebrow">Seasonal editorial arc</p>
-        <h2>{currentSeason ? `${currentSeason.season}: ${currentSeason.theme}` : "Seasonal calendar"}</h2>
-        {currentSeason?.focus && <p class="hub-index-season__lead">{currentSeason.focus}</p>}
-      </header>
-
-      {currentSeason ? (
-        <div class="hub-index-season__grid">
-          <div class="hub-index-season__panel">
-            <h3>Anchor stories</h3>
-            <ul>
-              {currentSeason.anchorPosts.map((anchor) => (
-                <li>
-                  <a href={`/post/${anchor.slug}`}>{anchor.title}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div class="hub-index-season__panel">
-            <h3>Ritual calendar</h3>
-            <ul>
-              {currentSeason.rituals.map((ritual) => (
-                <li>{ritual}</li>
-              ))}
-            </ul>
-          </div>
-          {currentSeason.notes && (
-            <div class="hub-index-season__panel hub-index-season__panel--highlight">
-              <h3>Partner spotlight</h3>
-              <p>{currentSeason.notes}</p>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div class="hub-index-season__empty">
-          <p class="hub-index-season__placeholder">
-            Our next seasonal arc is brewing. We refresh the calendar in gentle cycles, so new anchor rituals typically land every 6–8 weeks.
-          </p>
-          <div class="hub-index-season__timeline">
-            <div class="hub-index-season__timeline-item">
-              <span class="hub-index-season__timeline-label">Release</span>
-              <span class="hub-index-season__timeline-window">Late winter</span>
-            </div>
-            <div class="hub-index-season__timeline-item">
-              <span class="hub-index-season__timeline-label">Focus</span>
-              <span class="hub-index-season__timeline-window">Early spring</span>
-            </div>
-            <div class="hub-index-season__timeline-item">
-              <span class="hub-index-season__timeline-label">Calm</span>
-              <span class="hub-index-season__timeline-window">High summer</span>
-            </div>
-          </div>
-          <div class="hub-index-season__actions">
-            <a class="hub-index-season__link" href="/hub/release">Explore Release</a>
-            <a class="hub-index-season__link" href="/hub/focus">Explore Focus</a>
-            <a class="hub-index-season__link" href="/hub/calm">Explore Calm</a>
-          </div>
-          <form
-            class="hub-index-season__form"
-            name="seasonal-updates"
-            method="POST"
-            data-netlify="true"
-            data-form-success="You are on the list for seasonal updates."
-          >
-            <input type="hidden" name="form-name" value="seasonal-updates" />
-            <label class="hub-index-season__label">
-              Get seasonal updates
-              <input
-                type="email"
-                name="email"
-                inputmode="email"
-                autocomplete="email"
-                placeholder="you@example.com"
-                class="hub-index-season__input"
-              />
-            </label>
-            <PrimaryButton type="submit">Notify me</PrimaryButton>
-            <p class="wc-form-status" data-form-status hidden aria-live="polite"></p>
-          </form>
-        </div>
-      )}
-    </div>
-  </section>
 </Base>
 
 <style>
@@ -293,6 +226,7 @@ const breadcrumbs = [
     padding: var(--page-header-gap);
     border-radius: var(--card-radius);
     border: 1px solid color-mix(in srgb, var(--theme-border-strong) 65%, transparent 35%);
+    border-left: 3px solid var(--theme-color-gold);
     background:
       linear-gradient(
         130deg,
@@ -312,13 +246,13 @@ const breadcrumbs = [
 
   .hub-featured__content {
     display: grid;
-    gap: var(--page-header-gap);
+    gap: clamp(1rem, 3vw, 1.5rem);
     align-items: end;
   }
 
   .hub-featured__copy {
     display: grid;
-    gap: var(--space-3);
+    gap: 0.5rem;
   }
 
   .hub-featured__title {
@@ -336,9 +270,10 @@ const breadcrumbs = [
 
   .hub-featured__meta {
     margin: 0;
-    font-size: 0.92rem;
-    color: color-mix(in srgb, var(--theme-text-body) 80%, transparent 20%);
-    letter-spacing: 0.04em;
+    font-size: 1rem;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--theme-color-gold) 72%, var(--theme-text-strong) 28%);
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
@@ -369,6 +304,21 @@ const breadcrumbs = [
   .hub-card__header {
     display: grid;
     gap: 0.5rem;
+  }
+
+  .hub-card__moods {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin: 0.1rem 0 0.15rem;
+  }
+
+  .hub-card__mood {
+    border-color: color-mix(in srgb, var(--hub-accent, var(--theme-color-gold)) 20%, var(--theme-border-subtle) 80%);
+    background: color-mix(in srgb, var(--theme-surface-panel) 88%, transparent 12%);
+    color: color-mix(in srgb, var(--theme-text-body) 92%, transparent 8%);
+    text-transform: none;
+    letter-spacing: 0.01em;
   }
 
   .hub-card__eyebrow {
@@ -408,159 +358,6 @@ const breadcrumbs = [
     display: block;
   }
 
-  .hub-index-season {
-    margin: var(--page-section-gap) auto;
-    padding: clamp(2rem, 6vw, 3.5rem);
-    border-radius: clamp(1.75rem, 4vw, 2.5rem);
-    background: var(--surface-seasonal);
-    border: 1px solid var(--border-seasonal);
-    box-shadow: var(--shadow-seasonal);
-  }
-
-  .hub-index-season__inner {
-    display: grid;
-    gap: var(--grid-gap);
-  }
-
-  .hub-index-season__eyebrow {
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 0.22em;
-    font-size: 0.8rem;
-    color: color-mix(in srgb, var(--theme-info, var(--theme-text-accent)) 65%, var(--theme-ink-strong, currentColor) 35%);
-  }
-
-  .hub-index-season__lead {
-    margin: 0;
-    font-size: 1.05rem;
-    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
-    max-width: var(--content-max-width);
-  }
-
-  .hub-index-season__grid {
-    display: grid;
-    gap: var(--grid-gap);
-  }
-
-  .hub-index-season__panel {
-    padding: clamp(1.35rem, 3.5vw, 2rem);
-    border-radius: 1.85rem;
-    background: var(--surface-seasonal-panel);
-    border: 1px solid var(--border-seasonal-soft);
-    box-shadow: var(--theme-shadow-soft);
-  }
-
-  .hub-index-season__panel h3 {
-    margin-top: 0;
-    margin-bottom: 0.75rem;
-    font-size: 1.1rem;
-  }
-
-  .hub-index-season__panel ul {
-    margin: 0;
-    padding-left: 1.1rem;
-    display: grid;
-    gap: 0.45rem;
-    color: color-mix(in srgb, var(--ink-body, currentColor) 85%, white 15%);
-  }
-
-  .hub-index-season__panel--highlight {
-    background: var(--surface-seasonal-panel-highlight);
-    border-color: var(--border-seasonal);
-  }
-
-  .hub-index-season__placeholder {
-    margin: 0;
-    font-size: 0.95rem;
-    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
-  }
-
-  .hub-index-season__empty {
-    display: grid;
-    gap: 1.25rem;
-  }
-
-  .hub-index-season__timeline {
-    display: grid;
-    gap: 0.75rem;
-  }
-
-  .hub-index-season__timeline-item {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--theme-color-amethyst) 30%, transparent 70%);
-    background: color-mix(in srgb, var(--theme-surface-panel) 92%, transparent 8%);
-    color: color-mix(in srgb, var(--ink-body, currentColor) 85%, white 15%);
-  }
-
-  .hub-index-season__timeline-label {
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-  }
-
-  .hub-index-season__timeline-window {
-    font-size: 0.85rem;
-    opacity: 0.8;
-  }
-
-  .hub-index-season__actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-
-  .hub-index-season__link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.55rem 1.2rem;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--theme-color-gold) 35%, transparent 65%);
-    background: color-mix(in srgb, var(--theme-surface-panel) 85%, transparent 15%);
-    color: var(--theme-text-strong);
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 600;
-  }
-
-  .hub-index-season__link:hover,
-  .hub-index-season__link:focus-visible {
-    background: color-mix(in srgb, var(--theme-color-gold) 18%, transparent 82%);
-    color: var(--theme-text-strong);
-  }
-
-  .hub-index-season__form {
-    display: grid;
-    gap: 0.65rem;
-    max-width: 26rem;
-  }
-
-  .hub-index-season__label {
-    display: grid;
-    gap: 0.35rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: color-mix(in srgb, var(--ink-muted, currentColor) 78%, white 22%);
-  }
-
-  .hub-index-season__input {
-    width: 100%;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--theme-color-gold) 35%, transparent 65%);
-    background: var(--cozy-input-bg, color-mix(in srgb, var(--theme-surface-panel) 88%, transparent 12%));
-    padding: 0.65rem 1rem;
-    font-size: 0.9rem;
-    color: var(--theme-text-strong);
-  }
-
   @media (min-width: 768px) {
     .hub-featured__content {
       grid-template-columns: minmax(0, 1fr) auto;
@@ -568,10 +365,6 @@ const breadcrumbs = [
 
     .hub-index-grid__inner {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .hub-index-season__grid {
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     }
   }
 

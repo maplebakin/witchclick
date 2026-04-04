@@ -1,6 +1,6 @@
 import type { z } from 'zod';
 
-export const ENTITY_TYPES: ['crystal', 'herb', 'moonPhase', 'tarot', 'planetaryDay', 'ritual'];
+export const ENTITY_TYPES: ['crystal', 'herb', 'moonPhase', 'planet', 'tarot', 'spread', 'planetaryDay', 'ritual'];
 export const CONTENT_TYPES: ['ritual', 'guide', 'spread'];
 export const EntityTypeSchema: z.ZodEnum<typeof ENTITY_TYPES>;
 export const PostContentTypeSchema: z.ZodEnum<typeof CONTENT_TYPES>;
@@ -14,7 +14,7 @@ export const PostSpecV2Schema: z.ZodObject<{
   excerpt: z.ZodString;
   outline: z.ZodArray<z.ZodObject<{ heading: z.ZodString; id: z.ZodString; }, "strip", z.ZodTypeAny, { heading: string; id: string; }, { heading: string; id: string; }>>;
   sections: z.ZodArray<z.ZodObject<{ heading: z.ZodString; markdown: z.ZodString; }, "strip", z.ZodTypeAny, { heading: string; markdown: string; }, { heading: string; markdown: string; }>>;
-  entities: z.ZodArray<z.ZodObject<{ type: z.ZodEnum<typeof ENTITY_TYPES>; slug: z.ZodString; }, "strip", z.ZodTypeAny, { type: "crystal" | "herb" | "moonPhase" | "tarot" | "planetaryDay" | "ritual"; slug: string; }, { type: "crystal" | "herb" | "moonPhase" | "tarot" | "planetaryDay" | "ritual"; slug: string; }>>;
+  entities: z.ZodArray<z.ZodObject<{ type: z.ZodEnum<typeof ENTITY_TYPES>; slug: z.ZodString; }, "strip", z.ZodTypeAny, { type: "crystal" | "herb" | "moonPhase" | "planet" | "tarot" | "spread" | "planetaryDay" | "ritual"; slug: string; }, { type: "crystal" | "herb" | "moonPhase" | "planet" | "tarot" | "spread" | "planetaryDay" | "ritual"; slug: string; }>>;
   heroImagePrompt: z.ZodNullable<z.ZodString>;
   altTexts: z.ZodArray<z.ZodString>;
   internalLinkHints: z.ZodArray<z.ZodObject<{ anchor: z.ZodString; rationale: z.ZodString; }, "strip", z.ZodTypeAny, { anchor: string; rationale: string; }, { anchor: string; rationale: string; }>>;

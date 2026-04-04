@@ -1,0 +1,12 @@
+{
+  "type": "planet",
+  "name": "Venus",
+  "slug": "venus",
+  "summary": "This celestial body is still revealing its lore.",
+  "status": "stub",
+  "properties": {
+    "rulingSign": "Taurus/Libra",
+    "energy": "love, beauty, pleasure, values"
+  },
+  "related": []
+}

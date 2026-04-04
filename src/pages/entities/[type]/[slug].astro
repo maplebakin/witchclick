@@ -117,8 +117,72 @@ const inboundHeading = ent.type === "ritual"
   ? "Companion rituals & lore"
   : "Rituals that call on this ally";
 
+type PropertyDisplay =
+  | { kind: "text"; text: string }
+  | { kind: "chips"; items: string[] }
+  | { kind: "group"; entries: Array<{ label: string; value: PropertyDisplay }> };
+
+function toDisplayText(value: unknown): string {
+  if (typeof value === "string") return value.trim();
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  return "";
+}
+
+function collectChipItems(value: unknown): string[] {
+  const items: string[] = [];
+
+  const visit = (input: unknown) => {
+    const text = toDisplayText(input);
+    if (text) {
+      items.push(text);
+      return;
+    }
+
+    if (Array.isArray(input)) {
+      input.forEach(visit);
+      return;
+    }
+
+    if (input && typeof input === "object") {
+      Object.values(input as Record<string, unknown>).forEach(visit);
+    }
+  };
+
+  visit(value);
+
+  return Array.from(new Map(items.map((item) => [item.toLowerCase(), item])).values());
+}
+
+function normalizePropertyValue(value: unknown): PropertyDisplay | null {
+  const text = toDisplayText(value);
+  if (text) return { kind: "text", text };
+
+  if (Array.isArray(value)) {
+    const items = collectChipItems(value);
+    return items.length > 0 ? { kind: "chips", items } : null;
+  }
+
+  if (value && typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>)
+      .map(([label, nestedValue]) => {
+        const normalized = normalizePropertyValue(nestedValue);
+        return normalized ? { label: startCase(label), value: normalized } : null;
+      })
+      .filter((entry): entry is { label: string; value: PropertyDisplay } => Boolean(entry));
+
+    return entries.length > 0 ? { kind: "group", entries } : null;
+  }
+
+  return null;
+}
+
 const propertyEntries = ent.properties && typeof ent.properties === "object"
   ? Object.entries(ent.properties)
+      .map(([key, value]) => {
+        const display = normalizePropertyValue(value);
+        return display ? { key, label: startCase(key), value: display } : null;
+      })
+      .filter((entry): entry is { key: string; label: string; value: PropertyDisplay } => Boolean(entry))
   : [];
 
 const outboundRelations = resolveEntityRefs(ent.related ?? []);
@@ -137,8 +201,6 @@ const centerNode = {
   name: entityDisplayName,
   summary: summaryText || metadata.stubLine,
 };
-const hasRelations = outboundRelations.length > 0 || inboundRelations.length > 0;
-
 let relatedPosts: Array<{
   title: string;
   href: string;
@@ -156,16 +218,25 @@ try {
 } catch {
   relatedPosts = [];
 }
+relatedPosts = Array.from(new Map(relatedPosts.map((post) => [post.slug, post])).values());
 
-function pretty(v: unknown) {
-  try {
-    return JSON.stringify(v, null, 2);
-  } catch {
-    return String(v);
-  }
-}
+const relatedPostSlugSet = new Set(relatedPosts.map((post) => post.slug));
+const outboundDisplayRelations = outboundRelations.filter(
+  (relation) => !(relation.type === "ritual" && relatedPostSlugSet.has(relation.slug))
+);
+const inboundDisplayRelations = inboundRelations.filter(
+  (relation) => !(relation.type === "ritual" && relatedPostSlugSet.has(relation.slug))
+);
+const showInboundRelationSection = ent.type === "ritual"
+  ? inboundDisplayRelations.length > 0
+  : inboundDisplayRelations.length > 0 && relatedPosts.length === 0;
+const hasDisplayRelations = outboundDisplayRelations.length > 0 || showInboundRelationSection;
+const relatedPostsHeading = ent.type === "ritual" ? "Related Posts" : inboundHeading;
+const relatedPostsSubheading = ent.type === "ritual"
+  ? "Guides and essays already tied to this ritual."
+  : "Rituals and guides that already reference this ally.";
 ---
-<Base title={`${ent.name} — ${typeLabel} — WitchClick`} wide ambientColor={accentHex} noindex={isStub}>
+<Base title={`${ent.name} — ${typeLabel} — WitchClick`} wide ambientColor={accentHex} noindex={isStub} containerClass="entity-page-shell">
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <article class="entity-page" style={themeVarString ? `${themeVarString};` : undefined}>
     <a href={`/entities/${ent.type}`} class="entity-back-link">
@@ -239,33 +310,80 @@ function pretty(v: unknown) {
     ) : (
       <section class="entity-detail">
         {summaryText && (
-          <div class="entity-detail-summary">
+          <section class="entity-detail-summary entity-detail-section">
             <h2 class="entity-section-title">Overview</h2>
             <p>{summaryText}</p>
-          </div>
+          </section>
         )}
 
         {propertyEntries.length > 0 && (
-          <div class="entity-properties">
+          <section class="entity-properties entity-detail-section">
             <h2 class="entity-section-title">Properties</h2>
             <dl>
-              {propertyEntries.map(([key, value]) => (
+              {propertyEntries.map((entry) => (
                 <div class="entity-property">
-                  <dt>{key}</dt>
-                  <dd>{typeof value === "string" || typeof value === "number" ? String(value) : <pre><code>{pretty(value)}</code></pre>}</dd>
+                  <dt>{entry.label}</dt>
+                  <dd>
+                    {entry.value.kind === "text" && <p class="entity-property-text">{entry.value.text}</p>}
+                    {entry.value.kind === "chips" && (
+                      <ul class="entity-property-chips" aria-label={`${entry.label} values`}>
+                        {entry.value.items.map((item) => (
+                          <li><span class="entity-property-chip">{item}</span></li>
+                        ))}
+                      </ul>
+                    )}
+                    {entry.value.kind === "group" && (
+                      <dl class="entity-property-group">
+                        {entry.value.entries.map((subEntry) => (
+                          <div class="entity-property-group-item">
+                            <dt>{subEntry.label}</dt>
+                            <dd>
+                              {subEntry.value.kind === "text" && <p class="entity-property-text">{subEntry.value.text}</p>}
+                              {subEntry.value.kind === "chips" && (
+                                <ul class="entity-property-chips" aria-label={`${subEntry.label} values`}>
+                                  {subEntry.value.items.map((item) => (
+                                    <li><span class="entity-property-chip">{item}</span></li>
+                                  ))}
+                                </ul>
+                              )}
+                              {subEntry.value.kind === "group" && (
+                                <dl class="entity-property-group entity-property-group--nested">
+                                  {subEntry.value.entries.map((nestedEntry) => (
+                                    <div class="entity-property-group-item">
+                                      <dt>{nestedEntry.label}</dt>
+                                      <dd>
+                                        {nestedEntry.value.kind === "text" && <p class="entity-property-text">{nestedEntry.value.text}</p>}
+                                        {nestedEntry.value.kind === "chips" && (
+                                          <ul class="entity-property-chips" aria-label={`${nestedEntry.label} values`}>
+                                            {nestedEntry.value.items.map((item) => (
+                                              <li><span class="entity-property-chip">{item}</span></li>
+                                            ))}
+                                          </ul>
+                                        )}
+                                      </dd>
+                                    </div>
+                                  ))}
+                                </dl>
+                              )}
+                            </dd>
+                          </div>
+                        ))}
+                      </dl>
+                    )}
+                  </dd>
                 </div>
               ))}
             </dl>
-          </div>
+          </section>
         )}
 
-        {hasRelations && (
-          <div class="entity-relations">
-            {outboundRelations.length > 0 && (
-              <section class="entity-relations-section">
+        {hasDisplayRelations && (
+          <div class="entity-relations entity-detail-section">
+            {outboundDisplayRelations.length > 0 && (
+              <section class="entity-relations-section entity-detail-subsection">
                 <h2 class="entity-section-title">{outboundHeading}</h2>
                 <ul class="entity-relations-list">
-                  {outboundRelations.map((relation) => (
+                  {outboundDisplayRelations.map((relation) => (
                     <li>
                       <a
                         class="entity-relations-link"
@@ -283,11 +401,11 @@ function pretty(v: unknown) {
               </section>
             )}
 
-            {inboundRelations.length > 0 && (
-              <section class="entity-relations-section">
-                <h2 class="entity-section-title">{inboundHeading}</h2>
+            {showInboundRelationSection && (
+              <section class="entity-relations-section entity-detail-subsection">
+                <h2 class="entity-section-title">{ent.type === "ritual" ? inboundHeading : "Related Lore"}</h2>
                 <ul class="entity-relations-list">
-                  {inboundRelations.map((relation) => (
+                  {inboundDisplayRelations.map((relation) => (
                     <li>
                       <a
                         class="entity-relations-link inbound"
@@ -352,10 +470,10 @@ function pretty(v: unknown) {
       </section>
     )}
 
-    <section class="card-panel card-tier-1 card-panel-soft entity-related">
+    <section class="entity-related entity-detail-section">
       <div class="entity-related-header">
-        <h2 class="entity-section-title">Related Posts</h2>
-        <p class="entity-related-sub">Rituals and guides that already reference this ally.</p>
+        <h2 class="entity-section-title">{relatedPostsHeading}</h2>
+        <p class="entity-related-sub">{relatedPostsSubheading}</p>
       </div>
       {relatedPosts.length > 0 ? (
         <ul class="entity-related-list">
@@ -397,6 +515,20 @@ function pretty(v: unknown) {
     margin-top: 2rem;
     margin-bottom: 4rem;
     color: var(--theme-text-body, var(--text-body));
+  }
+
+  :global(.entity-page-shell.site-main__container--plain) {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    overflow: visible;
+  }
+
+  :global(.entity-page-shell.site-main__container--plain::before) {
+    display: none;
   }
 
   .entity-back-link {
@@ -503,11 +635,16 @@ function pretty(v: unknown) {
   .entity-detail {
     display: grid;
     gap: 2.5rem;
-    padding: clamp(2rem, 5vw, 3rem);
-    border-radius: 1.75rem;
-    border: 1px solid var(--entity-accent-border, color-mix(in srgb, var(--theme-color-amethyst) 25%, transparent));
-    background: linear-gradient(180deg, var(--theme-surface-base), var(--theme-surface-panel));
-    box-shadow: 0 18px 45px -28px var(--entity-accent-shadow, color-mix(in srgb, var(--theme-color-amethyst) 18%, transparent));
+  }
+
+  .entity-detail-section {
+    padding-top: 1.75rem;
+    border-top: 1px solid color-mix(in srgb, var(--entity-accent-border, color-mix(in srgb, var(--theme-color-amethyst) 24%, transparent)) 55%, transparent 45%);
+  }
+
+  .entity-detail-section:first-child {
+    padding-top: 0;
+    border-top: 0;
   }
 
   .entity-detail-summary p {
@@ -529,6 +666,15 @@ function pretty(v: unknown) {
     gap: 1.5rem;
   }
 
+  .entity-property {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem 1.15rem;
+    border-radius: 1rem;
+    border: 1px solid color-mix(in srgb, var(--entity-accent-border, color-mix(in srgb, var(--theme-color-amethyst) 24%, transparent)) 60%, transparent 40%);
+    background: color-mix(in srgb, var(--theme-surface-panel, var(--surface-panel)) 72%, transparent 28%);
+  }
+
   .entity-property dt {
     font-size: 0.85rem;
     text-transform: uppercase;
@@ -543,14 +689,73 @@ function pretty(v: unknown) {
     color: var(--theme-text-body, var(--text-body));
   }
 
-  .entity-property pre {
+  .entity-property-text {
     margin: 0;
-    padding: 1rem;
-    background: color-mix(in srgb, var(--theme-color-night) 85%, transparent);
-    color: color-mix(in srgb, var(--theme-text-primary) 95%, transparent);
-    border-radius: 1rem;
-    overflow-x: auto;
-    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .entity-property-chips {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0;
+    margin: 0;
+  }
+
+  .entity-property-chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--entity-accent-border, color-mix(in srgb, var(--theme-color-amethyst) 26%, transparent)) 70%, transparent 30%);
+    background: color-mix(in srgb, var(--theme-surface-base, var(--surface-base)) 78%, transparent 22%);
+    color: var(--theme-text-body, var(--text-body));
+    padding: 0.28rem 0.7rem;
+    font-size: 0.8rem;
+    line-height: 1.2;
+  }
+
+  .entity-property-group,
+  .entity-property-group--nested {
+    display: grid;
+    gap: 0.9rem;
+    margin: 0;
+  }
+
+  .entity-property-group {
+    margin-top: 0.25rem;
+  }
+
+  .entity-property-group-item {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .entity-property-group-item > dt {
+    margin: 0;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--theme-text-muted, var(--text-muted));
+  }
+
+  .entity-property-group-item > dd {
+    margin: 0;
+  }
+
+  .entity-property-group--nested {
+    padding-left: 0.9rem;
+    border-left: 1px solid color-mix(in srgb, var(--entity-accent-border, color-mix(in srgb, var(--theme-color-amethyst) 22%, transparent)) 55%, transparent 45%);
+  }
+
+  .entity-relations {
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  .entity-detail-subsection + .entity-detail-subsection {
+    padding-top: 1.5rem;
+    border-top: 1px solid color-mix(in srgb, var(--entity-accent-border, color-mix(in srgb, var(--theme-color-amethyst) 20%, transparent)) 45%, transparent 55%);
   }
 
   .entity-stub-card {
@@ -657,16 +862,8 @@ function pretty(v: unknown) {
   }
 
   .entity-related {
-    --card-hover-translate: 0;
-    --card-elevation-base: var(--elevation-tier-1);
-    --card-elevation-hover: var(--elevation-tier-1);
     display: grid;
     gap: 1.5rem;
-    padding: clamp(2rem, 5vw, 3rem);
-    border: 1px solid color-mix(in srgb, var(--entity-accent-border, color-mix(in srgb, var(--theme-color-amethyst) 22%, transparent)) 45%, transparent 55%);
-    background:
-      radial-gradient(circle at top left, color-mix(in srgb, var(--entity-accent-highlight, color-mix(in srgb, var(--theme-color-amethyst) 18%, transparent)) 55%, transparent) 0%, transparent 70%),
-      linear-gradient(160deg, var(--theme-surface-base) 95%, var(--entity-accent-surface, color-mix(in srgb, var(--theme-color-amethyst) 8%, transparent)));
   }
 
   .entity-related-sub {
@@ -824,7 +1021,6 @@ function pretty(v: unknown) {
     }
 
     .entity-hero,
-    .entity-detail,
     .entity-stub-card,
     .entity-related {
       border-radius: 1.5rem;
@@ -834,10 +1030,13 @@ function pretty(v: unknown) {
       font-size: clamp(2.25rem, 8vw, 3rem);
     }
 
-    .entity-detail,
     .entity-stub-card,
     .entity-related {
       padding: clamp(1.5rem, 6vw, 2.5rem);
+    }
+
+    .entity-detail-section {
+      padding-top: 1.5rem;
     }
 
     .entity-graph-description {

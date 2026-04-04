@@ -1,34 +1,45 @@
 import { STRICT_JSON_RULES } from './strictJsonRules.js';
 
+function formatSectionsRequirement(wordCount) {
+  if (Number.isFinite(wordCount) && Number(wordCount) > 0) {
+    return `- sections (body, content) — array of { heading, markdown|content } totaling approximately ${Number(wordCount)} words. First section heading must be "Opening Reflection".`;
+  }
+  return '- sections (body, content) — array of { heading, markdown|content } totaling approximately the INPUTS.wordCount target. First section heading must be "Opening Reflection".';
+}
+
 // Base contract fields that all presets share
-export const BASE_FIELDS = [
-  'Return a single JSON object that can be normalized into PostSpec v2 using relaxed keys and aliases.',
-  '',
-  'Required fields (aliases allowed):',
-  '- title (name, headline) — 50–60 characters with the primary keyword.',
-  '- slug (permalink, urlSlug) — kebab-case, ≤70 characters, no spaces.',
-  '- contentType — one of: "ritual", "guide", "spread", "reflection", "story", "tarotSpread", "spellwork", "crystals". MUST match the preset mode you are using.',
-  '- metaDescription (meta, description, seoDescription) — 150–160 characters; cozy and non-clickbait.',
-  '- tags (keywords, labels) — array of 4–7 short strings.',
-  '- excerpt — 35–55 words across 1–2 sentences.',
-  '- outline — array of { heading, id }. First item MUST be { "heading": "Opening Reflection", "id": "opening-reflection" }.',
-  '- sections (body, content) — array of { heading, markdown|content } totaling ~800–1,100 words. First section heading must be "Opening Reflection".',
-  '- internalLinkHints (internalLinks, linkHints) — array of 5–8 { anchor, rationale }; anchors must appear verbatim in sections.',
-  '- affiliateHints — array (≤1 per ~250 words) of { key, anchor, rationale }; [] allowed.',
-  '- cta — object { type: "kofi"|"download"|"none", id? }.',
-  '- adPlacements — array containing zero or more of "lead", "mid", "end" (or []).',
-  '',
-  'Optional but recommended fields:',
-  '- specVersion — number 2.',
-  '- heroImagePrompt — descriptive string or null.',
-  '- altTexts — array of strings matching any described images; [] if none.',
-  '- entities — array of { type, slug } if referenced.',
-  '',
-  'Strict JSON output rules:',
-  '- JSON only. No markdown fences or commentary outside the object.',
-  '- Use double-quoted keys/strings with straight quotes and valid JSON syntax.',
-  '- Follow the STRICT_JSON_RULES checklist; relaxed keys will be normalized by the server.'
-];
+export function buildBaseFields(wordCount) {
+  return [
+    'Return a single JSON object that can be normalized into PostSpec v2 using relaxed keys and aliases.',
+    '',
+    'Required fields (aliases allowed):',
+    '- title (name, headline) — 50–60 characters with the primary keyword.',
+    '- slug (permalink, urlSlug) — kebab-case, ≤70 characters, no spaces.',
+    '- contentType — one of: "ritual", "guide", "spread", "reflection", "story", "tarotSpread", "spellwork", "crystals". MUST match the preset mode you are using.',
+    '- metaDescription (meta, description, seoDescription) — 150–160 characters; cozy and non-clickbait.',
+    '- tags (keywords, labels) — array of 4–7 short strings.',
+    '- excerpt — 35–55 words across 1–2 sentences.',
+    '- outline — array of { heading, id }. First item MUST be { "heading": "Opening Reflection", "id": "opening-reflection" }.',
+    formatSectionsRequirement(wordCount),
+    '- internalLinkHints (internalLinks, linkHints) — array of 5–8 { anchor, rationale }; anchors must appear verbatim in sections.',
+    '- affiliateHints — array (≤1 per ~250 words) of { key, anchor, rationale }; [] allowed.',
+    '- cta — object { type: "kofi"|"download"|"none", id? }.',
+    '- adPlacements — array containing zero or more of "lead", "mid", "end" (or []).',
+    '',
+    'Optional but recommended fields:',
+    '- specVersion — number 2.',
+    '- heroImagePrompt — descriptive string or null.',
+    '- altTexts — array of strings matching any described images; [] if none.',
+    '- entities — array of { type, slug } if referenced.',
+    '',
+    'Strict JSON output rules:',
+    '- JSON only. No markdown fences or commentary outside the object.',
+    '- Use double-quoted keys/strings with straight quotes and valid JSON syntax.',
+    '- Follow the STRICT_JSON_RULES checklist; relaxed keys will be normalized by the server.'
+  ];
+}
+
+export const BASE_FIELDS = buildBaseFields();
 
 // Preset-specific structure requirements
 export const STRUCTURE_REQUIREMENTS = {
@@ -108,7 +119,7 @@ export const STRUCTURE_REQUIREMENTS = {
 };
 
 const makeLooseContract = (structureKey) => [
-  ...BASE_FIELDS,
+  ...buildBaseFields(),
   ...(STRUCTURE_REQUIREMENTS[structureKey] || STRUCTURE_REQUIREMENTS.reflection),
   '',
   '- heroImagePrompt may be null; altTexts only required when images appear in markdown.'

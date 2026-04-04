@@ -1,11 +1,28 @@
 function initPostEditorDashboard() {
   const root = document.querySelector('[data-post-editor]');
   if (!root) return;
+  const FILTER_STORAGE_KEY = 'witchclick:admin-post-editor-filters';
 
   const DEV_API = root.getAttribute('data-dev-api') || 'http://localhost:8787';
   const DEV_KEY = root.getAttribute('data-dev-key') || '';
   const baseHeaders: Record<string, string> = DEV_KEY ? { 'X-WC-Dev-Key': DEV_KEY } : {};
   const jsonHeaders = { 'Content-Type': 'application/json', ...baseHeaders };
+  type StatusFilterValue = 'all' | 'published' | 'draft';
+  type HeroFilterValue = 'all' | 'missing' | 'has';
+  type SortValue = 'az' | 'za' | 'newest' | 'oldest';
+  type PostListItem = {
+    slug: string;
+    title: string;
+    draft: boolean;
+    heroImage: string;
+    publishedAt: string;
+    createdAt: string;
+  };
+  type FilterState = {
+    status: StatusFilterValue;
+    hero: HeroFilterValue;
+    sort: SortValue;
+  };
 
   function apiFetch(path: string, options: RequestInit = {}) {
     const headers = { ...baseHeaders, ...(options.headers || {}) };
@@ -13,6 +30,9 @@ function initPostEditorDashboard() {
   }
   const listEl = root.querySelector<HTMLSelectElement>('[data-post-list]');
   const searchInput = root.querySelector<HTMLInputElement>('[data-search]');
+  const statusFilter = root.querySelector<HTMLSelectElement>('[data-status-filter]');
+  const heroFilter = root.querySelector<HTMLSelectElement>('[data-hero-filter]');
+  const sortSelect = root.querySelector<HTMLSelectElement>('[data-sort]');
   const refreshButton = root.querySelector<HTMLButtonElement>('[data-refresh]');
   const frontmatterTextarea = root.querySelector<HTMLTextAreaElement>('[data-frontmatter]');
   const markdownTextarea = root.querySelector<HTMLTextAreaElement>('[data-markdown]');
@@ -23,13 +43,63 @@ function initPostEditorDashboard() {
   const metaEl = root.querySelector<HTMLParagraphElement>('[data-meta]');
   const listStatusEl = root.querySelector<HTMLParagraphElement>('[data-list-status]');
 
-  let posts: { slug: string; title: string }[] = [];
-  let filteredPosts: { slug: string; title: string }[] = [];
+  let posts: PostListItem[] = [];
+  let filteredPosts: PostListItem[] = [];
   let currentSlug = '';
   let isLoadingPost = false;
+  let isSavingPost = false;
   let hasUnsavedChanges = false;
 
   const statusBase = statusEl?.className ?? '';
+
+  function normalizeStatusFilter(value: string | null | undefined): StatusFilterValue {
+    return value === 'published' || value === 'draft' ? value : 'all';
+  }
+
+  function normalizeHeroFilter(value: string | null | undefined): HeroFilterValue {
+    return value === 'missing' || value === 'has' ? value : 'all';
+  }
+
+  function normalizeSort(value: string | null | undefined): SortValue {
+    return value === 'za' || value === 'newest' || value === 'oldest' ? value : 'az';
+  }
+
+  function getFilterState(): FilterState {
+    return {
+      status: normalizeStatusFilter(statusFilter?.value),
+      hero: normalizeHeroFilter(heroFilter?.value),
+      sort: normalizeSort(sortSelect?.value),
+    };
+  }
+
+  function applyStoredFilterState() {
+    try {
+      const raw = window.sessionStorage.getItem(FILTER_STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as Partial<FilterState> | null;
+      if (statusFilter) statusFilter.value = normalizeStatusFilter(parsed?.status);
+      if (heroFilter) heroFilter.value = normalizeHeroFilter(parsed?.hero);
+      if (sortSelect) sortSelect.value = normalizeSort(parsed?.sort);
+    } catch {
+      if (statusFilter) statusFilter.value = 'all';
+      if (heroFilter) heroFilter.value = 'all';
+      if (sortSelect) sortSelect.value = 'az';
+    }
+  }
+
+  function persistFilterState() {
+    try {
+      window.sessionStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(getFilterState()));
+    } catch {
+      // Ignore storage failures
+    }
+  }
+
+  function getTimestamp(value: string): number {
+    if (!value) return 0;
+    const parsed = new Date(value).getTime();
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
 
   function setStatus(message: string, tone: 'info' | 'success' | 'error' = 'info', actions?: { slug: string }) {
     if (!statusEl) return;
@@ -101,10 +171,31 @@ function initPostEditorDashboard() {
   function renderList(options: { preserveSelection?: boolean } = {}) {
     if (!listEl) return;
     const query = (searchInput?.value || '').trim().toLowerCase();
-    filteredPosts = posts.filter((item) => {
-      if (!query) return true;
-      return item.title.toLowerCase().includes(query) || item.slug.includes(query);
-    });
+    const filters = getFilterState();
+    filteredPosts = posts
+      .filter((item) => {
+        const matchesQuery = !query || item.title.toLowerCase().includes(query) || item.slug.includes(query);
+        const matchesStatus =
+          filters.status === 'all' ||
+          (filters.status === 'draft' ? item.draft : !item.draft);
+        const hasHero = !!item.heroImage;
+        const matchesHero =
+          filters.hero === 'all' ||
+          (filters.hero === 'missing' ? !hasHero : hasHero);
+        return matchesQuery && matchesStatus && matchesHero;
+      })
+      .sort((a, b) => {
+        if (filters.sort === 'za') {
+          return b.title.localeCompare(a.title, undefined, { sensitivity: 'base' });
+        }
+        if (filters.sort === 'newest') {
+          return getTimestamp(b.publishedAt || b.createdAt) - getTimestamp(a.publishedAt || a.createdAt);
+        }
+        if (filters.sort === 'oldest') {
+          return getTimestamp(a.publishedAt || a.createdAt) - getTimestamp(b.publishedAt || b.createdAt);
+        }
+        return a.title.localeCompare(b.title, undefined, { sensitivity: 'base' });
+      });
 
     listEl.innerHTML = '';
     for (const item of filteredPosts) {
@@ -117,7 +208,7 @@ function initPostEditorDashboard() {
       listEl.appendChild(option);
     }
 
-    const totalText = `${filteredPosts.length} of ${posts.length} posts shown`;
+    const totalText = `${filteredPosts.length} of ${posts.length} posts`;
     if (listStatusEl) listStatusEl.textContent = totalText;
 
     if (!options.preserveSelection && listEl.options.length > 0) {
@@ -157,9 +248,12 @@ function initPostEditorDashboard() {
         ? data.items.map((item: any) => ({
             slug: String(item?.slug || ''),
             title: String(item?.title || String(item?.slug || 'Untitled post')),
+            draft: item?.draft === true,
+            heroImage: String(item?.heroImage || ''),
+            publishedAt: String(item?.publishedAt || item?.pubDate || ''),
+            createdAt: String(item?.createdAt || ''),
           }))
         : [];
-      posts.sort((a, b) => a.title.localeCompare(b.title));
       renderList({ preserveSelection: !!currentSlug });
 
       // Check for ?slug=post-slug URL parameter and pre-select
@@ -221,8 +315,9 @@ function initPostEditorDashboard() {
   }
 
   async function saveChanges() {
-    if (!frontmatterTextarea || !markdownTextarea || !currentSlug) return;
+    if (!frontmatterTextarea || !markdownTextarea || !currentSlug || isSavingPost) return;
     try {
+      isSavingPost = true;
       setStatus('Saving changes…');
       setWarnings();
       saveButton && (saveButton.disabled = true);
@@ -249,14 +344,22 @@ function initPostEditorDashboard() {
       if (existing) {
         existing.title = String(data.title || existing.title || data.slug);
       } else {
-        posts.push({ slug: data.slug, title: String(data.title || data.slug) });
+        posts.push({
+          slug: data.slug,
+          title: String(data.title || data.slug),
+          draft: false,
+          heroImage: '',
+          publishedAt: '',
+          createdAt: '',
+        });
       }
       posts = posts.filter((item) => !!item.slug);
-      posts.sort((a, b) => a.title.localeCompare(b.title));
       renderList({ preserveSelection: true });
     } catch (error: any) {
       setStatus(error?.message || 'Failed to save', 'error');
       if (saveButton) saveButton.disabled = false;
+    } finally {
+      isSavingPost = false;
     }
   }
 
@@ -301,6 +404,21 @@ function initPostEditorDashboard() {
     renderList({ preserveSelection: true });
   });
 
+  statusFilter?.addEventListener('change', () => {
+    persistFilterState();
+    renderList({ preserveSelection: true });
+  });
+
+  heroFilter?.addEventListener('change', () => {
+    persistFilterState();
+    renderList({ preserveSelection: true });
+  });
+
+  sortSelect?.addEventListener('change', () => {
+    persistFilterState();
+    renderList({ preserveSelection: true });
+  });
+
   listEl?.addEventListener('change', (event) => {
     const select = event.currentTarget as HTMLSelectElement | null;
     const nextSlug = select?.value || '';
@@ -312,6 +430,13 @@ function initPostEditorDashboard() {
     void saveChanges();
   });
 
+  document.addEventListener('keydown', (event) => {
+    if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 's') return;
+    if (!currentSlug || isLoadingPost || isSavingPost || !saveButton || saveButton.disabled) return;
+    event.preventDefault();
+    saveButton.click();
+  });
+
   deleteButton?.addEventListener('click', (event) => {
     event.preventDefault();
     void deletePost();
@@ -320,6 +445,7 @@ function initPostEditorDashboard() {
   frontmatterTextarea?.addEventListener('input', handleInputChange);
   markdownTextarea?.addEventListener('input', handleInputChange);
 
+  applyStoredFilterState();
   enableEditor(false);
   void fetchList();
 }

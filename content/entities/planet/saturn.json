@@ -1,0 +1,12 @@
+{
+  "type": "planet",
+  "name": "Saturn",
+  "slug": "saturn",
+  "summary": "This celestial body is still revealing its lore.",
+  "status": "stub",
+  "properties": {
+    "rulingSign": "Capricorn",
+    "energy": "structure, discipline, karma, time"
+  },
+  "related": []
+}

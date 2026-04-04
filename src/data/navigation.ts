@@ -33,7 +33,6 @@ export const primaryNavLinks: NavLink[] = [
 ];
 
 export const secondaryNavLinks: NavLink[] = [
-  { href: "/lab", label: "Ritual Lab", description: "Interactive ritual generator and printable downloads" },
   { href: "/curses", label: "White Magic Curses", description: "Ethical boundary-setting rituals" },
   { href: "/page/1", label: "Archive", description: "Browse every post in one place" },
   { href: "/tags", label: "Tags", description: "Browse all topics by tag" },
@@ -59,7 +58,8 @@ export const adminNavSections: AdminNavSection[] = [
   {
     label: "Content",
     items: [
-      { href: "/admin", label: "Generator" },
+      { href: "/admin", label: "Dashboard" },
+      { href: "/admin/generator", label: "Generator" },
       { href: "/admin/staging", label: "Staging" },
       { href: "/admin/write", label: "Write" },
       { href: "/admin/posts", label: "Posts" },

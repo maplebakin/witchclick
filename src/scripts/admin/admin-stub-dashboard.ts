@@ -149,6 +149,12 @@ class StubDashboard {
     this.validateBtn?.addEventListener('click', () => this.handleValidate());
     this.saveBtn?.addEventListener('click', () => this.handleSave());
     this.refreshBtn?.addEventListener('click', () => this.fetchStubs());
+    document.addEventListener('keydown', (event) => {
+      if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 's') return;
+      if (!this.selectedKey || !this.saveBtn || this.saveBtn.disabled) return;
+      event.preventDefault();
+      this.saveBtn.click();
+    });
   }
 
   private renderList() {

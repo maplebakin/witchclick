@@ -42,6 +42,13 @@ function initWriteAdmin() {
   }
   let slugTouched = false;
   let entityValidationTimeout = null;
+  let isSavingDraft = false;
+  function setSavingState(on) {
+    const saveButton2 = $("save");
+    const savePublishButton2 = $("savePublish");
+    if (saveButton2) saveButton2.disabled = on;
+    if (savePublishButton2) savePublishButton2.disabled = on;
+  }
   function setStatus(msg, ok = true, warnings, actions) {
     if (!statusEl) return;
     statusEl.innerHTML = "";
@@ -344,7 +351,10 @@ function initWriteAdmin() {
   const saveButton = $("save");
   const savePublishButton = $("savePublish");
   saveButton?.addEventListener("click", async () => {
+    if (isSavingDraft) return;
     try {
+      isSavingDraft = true;
+      setSavingState(true);
       setStatus("Saving...");
       const data = await savePost();
       const summary = summarizeEntities(data.entities);
@@ -352,10 +362,16 @@ function initWriteAdmin() {
       setStatus(message, true, data.warnings, { slug: data.slug, path: data.path });
     } catch (e) {
       setStatus(`Save error: ${e?.message || String(e)}`, false);
+    } finally {
+      isSavingDraft = false;
+      setSavingState(false);
     }
   });
   savePublishButton?.addEventListener("click", async () => {
+    if (isSavingDraft) return;
     try {
+      isSavingDraft = true;
+      setSavingState(true);
       setStatus("Saving...");
       const data = await savePost();
       const summary = summarizeEntities(data.entities);
@@ -370,7 +386,16 @@ function initWriteAdmin() {
       setStatus(publishMsg, true, data.warnings, { slug: data.slug, path: data.path });
     } catch (e) {
       setStatus(`Publish error: ${e?.message || String(e)}`, false);
+    } finally {
+      isSavingDraft = false;
+      setSavingState(false);
     }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "s") return;
+    if (!saveButton || saveButton.disabled || isSavingDraft) return;
+    event.preventDefault();
+    saveButton.click();
   });
 }
 if (typeof document !== "undefined") {

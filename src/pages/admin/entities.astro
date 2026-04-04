@@ -2,7 +2,7 @@
 /* Admin: Entities CRUD */
 import Base from "../../layouts/Base.astro";
 import { readSettings, buildCanonicalUrl } from "../../utils/settings";
-import adminEntitiesScript from "../../scripts/admin/adminEntities.js?url";
+import adminEntitiesScript from "../../scripts/admin/adminEntities.ts?url";
 import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
 
@@ -18,7 +18,7 @@ const canUse = isDev || !!keyOk;
 
 const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
 const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || '';
-const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as const;
+const TYPES = ['crystal','herb','moonPhase','planet','tarot','spread','planetaryDay','ritual'] as const;
 ---
 <Base
   title="WitchClick — Entities Admin"
@@ -40,7 +40,7 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as 
           <div>
             <h1 class="text-2xl font-semibold text-body-strong">Entity Manager</h1>
             <p class="text-sm text-body-muted mt-1">
-              Create and edit entities like crystals, herbs, tarot cards, moon phases, and rituals. Entities power cross-references across your site.
+              Create and edit entities like crystals, herbs, moon phases, planets, tarot cards, spreads, planetary days, and rituals. Entities power cross-references across your site.
             </p>
           </div>
           <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-4 text-[0.8rem] text-body-muted">
@@ -59,8 +59,16 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as 
                 <span class="font-medium">Moon Phases</span>
               </div>
               <div class="flex items-center gap-2 rounded-md bg-surface-soft px-3 py-1.5">
+                <span class="text-base">🪐</span>
+                <span class="font-medium">Planets</span>
+              </div>
+              <div class="flex items-center gap-2 rounded-md bg-surface-soft px-3 py-1.5">
                 <span class="text-base">🎴</span>
                 <span class="font-medium">Tarot</span>
+              </div>
+              <div class="flex items-center gap-2 rounded-md bg-surface-soft px-3 py-1.5">
+                <span class="text-base">🪄</span>
+                <span class="font-medium">Spreads</span>
               </div>
               <div class="flex items-center gap-2 rounded-md bg-surface-soft px-3 py-1.5">
                 <span class="text-base">🪐</span>
@@ -86,6 +94,30 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as 
           <p class="text-[0.8rem] text-body-muted">Search and select to edit, or create new</p>
         </div>
         <input id="search" placeholder="Search entities..." class="mb-3 w-full admin-btn-secondary px-3 py-2 text-sm" />
+        <div class="mb-3 grid gap-3 md:grid-cols-3">
+          <label class="block">
+            <span class="text-[0.8rem] font-medium">Type</span>
+            <select id="typeFilter" class="mt-1 w-full admin-btn-secondary px-3 py-2 text-sm">
+              <option value="all">All</option>
+            </select>
+          </label>
+          <label class="block">
+            <span class="text-[0.8rem] font-medium">Status</span>
+            <select id="statusFilter" class="mt-1 w-full admin-btn-secondary px-3 py-2 text-sm">
+              <option value="all">All</option>
+              <option value="published">Published</option>
+              <option value="stub">Stub</option>
+            </select>
+          </label>
+          <label class="block">
+            <span class="text-[0.8rem] font-medium">Sort</span>
+            <select id="sortFilter" class="mt-1 w-full admin-btn-secondary px-3 py-2 text-sm">
+              <option value="az">A→Z</option>
+              <option value="za">Z→A</option>
+            </select>
+          </label>
+        </div>
+        <p id="listStatus" class="mb-3 text-[0.8rem] font-medium text-body-muted">Loading entities…</p>
         <div id="list" class="max-h-[70vh] overflow-auto text-sm"></div>
       </section>
 
@@ -139,6 +171,7 @@ const TYPES = ['crystal','herb','moonPhase','tarot','planetaryDay','ritual'] as 
 
         <div class="mt-6 flex gap-3 border-t border-line-subtle pt-4">
           <button id="save" class="admin-btn-primary px-6 py-2.5 text-sm font-semibold">💾 Save Entity</button>
+          <button id="delete" class="admin-btn-secondary px-6 py-2.5 text-sm font-semibold text-danger">Delete entity</button>
           <span id="status" class="self-center text-sm text-body-muted"></span>
         </div>
       </section>

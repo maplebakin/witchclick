@@ -1,0 +1,12 @@
+{
+  "type": "planet",
+  "name": "South Node",
+  "slug": "south-node",
+  "summary": "This celestial body is still revealing its lore.",
+  "status": "stub",
+  "properties": {
+    "rulingSign": "none",
+    "energy": "past patterns, comfort zone, karmic release"
+  },
+  "related": []
+}

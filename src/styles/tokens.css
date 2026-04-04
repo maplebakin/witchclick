@@ -76,15 +76,15 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   /* Modular scale (minor third) */
-  --fs-0: 0.875rem;  /* small */
+  --fs-0: 0.85rem;   /* small */
   --fs-1: 1rem;      /* body */
-  --fs-2: 1.125rem;  /* body+ */
-  --fs-3: 1.25rem;   /* h6 */
-  --fs-4: 1.563rem;  /* h5 */
-  --fs-5: 1.953rem;  /* h4 */
-  --fs-6: 2.441rem;  /* h3 */
-  --fs-7: 3.052rem;  /* h2 */
-  --fs-8: 3.815rem;  /* h1 */
+  --fs-2: 1.05rem;   /* body+ */
+  --fs-3: 1.15rem;   /* h6 */
+  --fs-4: 1.4rem;    /* h5 */
+  --fs-5: 1.75rem;   /* h4 */
+  --fs-6: 2.2rem;    /* h3 */
+  --fs-7: 2.75rem;   /* h2 */
+  --fs-8: 3.45rem;   /* h1 */
 
   --lh-tight: 1.2;
   --lh-body: 1.55;

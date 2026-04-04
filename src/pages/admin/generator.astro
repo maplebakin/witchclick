@@ -1,0 +1,1404 @@
+--- 
+/* Admin: Prompt → JSON → Preview → Ingest */
+import Base from "../../layouts/Base.astro";
+import { readSettings, buildCanonicalUrl } from "../../utils/settings";
+import generatorStyles from "../../../server/lib/generatorStyles.js";
+import { generatorPresetOptions } from "../../../server/lib/generatorPresets.js";
+import normalizeDraftSpecScript from "../../scripts/normalizeDraftSpec.js?url";
+import HeadSlot from "@/components/HeadSlot.astro";
+import AdminNav from "@/components/AdminNav.astro";
+import PromptBuilder from "@/components/admin/PromptBuilder.astro";
+
+
+const settings = readSettings();
+const canonical = buildCanonicalUrl(settings, { path: "/admin/generator" });
+
+const toLabel = (key: string) =>
+  key
+    .replace(/([A-Z])/g, " $1")
+    .replace(/[-_]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+
+const presetOptions = generatorPresetOptions;
+
+const styleOptions = Object.entries(generatorStyles)
+  .map(([key, description]) => ({
+    key,
+    label: key === "cozy" ? "Cozy (default)" : toLabel(key),
+    description,
+  }))
+  .sort((a, b) => {
+    if (a.key === "cozy") return -1;
+    if (b.key === "cozy") return 1;
+    return a.label.localeCompare(b.label);
+  });
+
+const defaultModeDescription =
+  "Use the master prompt for the full ritual + reflection flow, or choose a template for a specialty outline.";
+const defaultStyleDescription =
+  styleOptions.find((option) => option.key === "cozy")?.description ??
+  "Write like a gentle, imperfect friend: warm, soft, everyday metaphors.";
+
+// Gate: dev OR query ?key=PUBLIC_ADMIN_KEY (useful if you later switch to a server adapter)
+const isDev = import.meta.env.DEV;
+const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
+const url = new URL(Astro.request.url);
+const keyOk = ADMIN_KEY && url.searchParams.get('key') === ADMIN_KEY;
+const canUse = isDev || !!keyOk;
+
+// Dev API base (falls back to localhost if not set)
+const DEV_API = import.meta.env.PUBLIC_DEV_API || 'http://localhost:8787';
+const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || '';
+---
+<Base
+  title="WitchClick — Admin Generator"
+  description="Generate prompts, validate JSON, preview content, and ingest posts."
+  canon={canonical}
+  wide={true}
+  noindex={true}
+>
+  <HeadSlot slot="head">
+    <meta name="robots" content="noindex" />
+  </HeadSlot>
+
+  {canUse ? (
+    <div class="space-y-6">
+      <AdminNav currentPath="/admin/generator" />
+
+      <section class="rounded-2xl border border-line-subtle bg-surface-base p-6 shadow-sm">
+        <div class="space-y-3">
+          <div>
+            <h1 class="text-2xl font-semibold text-body-strong">Generator</h1>
+            <p class="text-sm text-body-muted mt-1">
+              AI-powered workflow for creating posts and curses. Generate prompts, validate JSON, preview content, and ingest to your site.
+            </p>
+          </div>
+          <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-4 text-[0.8rem] text-body-muted">
+            <div class="font-semibold mb-2">📝 How it works:</div>
+            <ol class="space-y-2 ml-4 list-decimal">
+              <li><strong>Choose content type:</strong> Select Posts for articles or Curses for printable rituals</li>
+              <li><strong>Generate prompt:</strong> Fill in topic and preferences, get an AI-ready prompt</li>
+              <li><strong>Get JSON from AI:</strong> Paste prompt into your LLM (Claude, GPT, etc.), receive structured JSON</li>
+              <li><strong>Validate & Preview:</strong> Check the JSON structure and preview how it'll look</li>
+              <li><strong>Ingest:</strong> Save to your content directory as markdown files</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <div class="rounded-2xl border border-line-subtle bg-surface-base p-3 shadow-sm">
+        <div class="flex items-center gap-3">
+          <span class="text-sm font-medium text-body-muted">Content Type:</span>
+          <button
+            type="button"
+            data-panel-toggle="posts"
+            class="rounded-lg px-4 py-2 text-sm font-semibold text-brand-primary hover:bg-surface-neutral-soft transition"
+          >
+            📄 Posts
+          </button>
+          <button
+            type="button"
+            data-panel-toggle="curses"
+            class="rounded-lg px-4 py-2 text-sm font-semibold text-brand-primary hover:bg-surface-neutral-soft transition"
+          >
+            ✨ Curses
+          </button>
+        </div>
+      </div>
+
+      <div data-panel-root data-dev-api={DEV_API} data-dev-key={DEV_KEY}>
+        <div id="postsPanel" data-panel="posts" class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <PromptBuilder
+            presetOptions={presetOptions}
+            styleOptions={styleOptions}
+            defaultModeDescription={defaultModeDescription}
+            defaultStyleDescription={defaultStyleDescription}
+            devApi={DEV_API}
+            devKey={DEV_KEY}
+          />
+
+          <section class="lg:col-span-7 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
+            <div class="mb-4 space-y-2">
+              <h2 class="text-xl font-semibold">Step 2: Process JSON Content</h2>
+              <p class="text-[0.8rem] text-body-muted">Paste PostSpec JSON from your AI, then validate, preview, and ingest</p>
+            </div>
+
+            <textarea id="spec" class="h-56 w-full admin-btn-secondary px-3 py-2 font-mono text-[0.8rem]" placeholder="Infuse the Oracle's PostSpec v2 JSON here…"></textarea>
+
+            <div class="mt-3 space-y-4 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] lg:gap-6">
+              <div class="space-y-3">
+                <div class="flex flex-col gap-2">
+                  <div class="flex flex-wrap items-center gap-2 text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">
+                    <span>Binding method</span>
+                    <div class="inline-flex rounded-full border border-line-neutral bg-surface-neutral-soft p-1" data-save-mode>
+                      <button type="button" data-mode="publish" class="rounded-full px-3 py-1 text-[0.8rem] font-semibold text-body bg-surface-base shadow-sm">Whisper to the world</button>
+                      <button type="button" data-mode="draft" class="rounded-full px-3 py-1 text-[0.8rem] font-semibold text-body-muted">Secure in the grimoire</button>
+                    </div>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <button id="validateBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">✓ Verify Runes</button>
+                    <button id="previewBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">👁 Gaze into the Orb</button>
+                    <button id="ingestBtn" class="admin-btn-primary px-4 py-2 text-sm font-semibold">💾 Bind Draft</button>
+                    <button id="ingestPublishBtn" class="admin-btn-primary px-4 py-2 text-sm font-semibold">🚀 Unveil & Publish</button>
+                    <button id="clearBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">Clear</button>
+                  </div>
+                  <div class="text-[0.8rem] text-body-muted rounded-lg border border-dashed border-line-subtle bg-surface-base/60 px-3 py-2">
+                    <strong>💡 Tip:</strong> Validate first to check for errors, Preview to see the rendered flow. Use the save mode toggle to store drafts without publishing. <a href="/admin/staging" class="text-primary hover:underline">View staged drafts →</a>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-3">
+                  <div
+                    id="status"
+                    class="rounded-lg border border-line-slate bg-surface-cool-soft px-3 py-2 text-sm text-muted-strong"
+                  ></div>
+                  <div
+                    id="specSummary"
+                    class="rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[0.8rem] text-body-muted"
+                  ></div>
+                </div>
+                <div id="preview" class="prose prose-neutral mt-4 max-w-none border-t pt-4"></div>
+              </div>
+              <aside class="mt-6 space-y-3 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm lg:mt-0" data-recent-panel>
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 class="text-sm font-semibold text-body-strong">Recent Posts</h3>
+                    <p class="text-[0.8rem] text-body-muted">Quick links to the latest ingestions.</p>
+                  </div>
+                  <button type="button" data-recent-refresh class="admin-btn-secondary px-3 py-1 text-[0.8rem] font-semibold">↻ Refresh</button>
+                </div>
+                <label class="flex items-center gap-2 text-[0.8rem] text-body-muted">
+                  <span class="sr-only">Filter recent posts</span>
+                  <input type="search" data-recent-filter class="w-full admin-btn-secondary px-3 py-1.5 text-sm" placeholder="Filter posts…" />
+                </label>
+                <div class="space-y-2" data-recent-list>
+                  <div class="rounded-lg border border-dashed border-line-subtle p-3 text-[0.8rem] text-body-muted">Fetching recent posts…</div>
+                </div>
+                <p class="text-[0.8rem] text-body-muted">Select a post to insert a JSON stub or jump to the editor.</p>
+              </aside>
+            </div>
+          </section>
+        </div>
+
+        <div id="cursesPanel" data-panel="curses" class="hidden">
+          <div class="rounded-2xl border border-line-subtle bg-surface-base p-4 shadow-sm space-y-3">
+            <h2 class="text-xl font-semibold">Curses Dashboard moved</h2>
+            <p class="text-sm text-body-muted">
+              The curses generator and archive live in a dedicated dashboard optimized for print/PDF workflows.
+            </p>
+            <a href="/admin/curses" class="inline-flex items-center gap-2 rounded-lg bg-brand-primary text-white px-4 py-2 text-sm font-semibold shadow-sm hover:bg-brand-primary-strong">
+              Open Curses Dashboard →
+            </a>
+          </div>
+        </div>
+      </div>
+      </div>
+    ) : (
+    <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
+      <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
+      <p class="text-body-muted">These tools only run in <strong>development</strong> (or with a temporary key when hosted on a server adapter).</p>
+      <ol class="mx-auto mt-4 list-decimal space-y-2 text-left text-sm text-body-muted">
+        <li>Run <code>npm run dev</code> locally.</li>
+        <li>Use the ingestion CLI: <code>npm run ingest ./path/to/post.json</code>.</li>
+        <li>If you later switch to serverless, set <code>PUBLIC_ADMIN_KEY</code> and visit <code>/admin/generator?key=…</code>.</li>
+      </ol>
+    </section>
+  )}
+
+  {canUse && (
+    <>
+      <script type="module" is:inline src={normalizeDraftSpecScript}></script>
+      <script is:inline>
+      (function(){
+        var root = document.querySelector('[data-panel-root]');
+        var DEV_API = root?.getAttribute('data-dev-api') || 'http://localhost:8787';
+        var DEV_KEY = root?.getAttribute('data-dev-key') || '';
+        function withDevKey(options){
+          var headers = options && options.headers ? Object.assign({}, options.headers) : {};
+          if (DEV_KEY) headers['X-WC-Dev-Key'] = DEV_KEY;
+          return Object.assign({}, options || {}, { headers: headers });
+        }
+        function apiFetch(path, options){
+          return fetch(DEV_API + path, withDevKey(options));
+        }
+        var $ = function(id){ return document.getElementById(id); };
+        var rawCurseTypes = root?.getAttribute('data-curse-types') || '[]';
+        var rawCurseTargets = root?.getAttribute('data-curse-targets') || '[]';
+        var rawCurseTones = root?.getAttribute('data-curse-tones') || '[]';
+        var saveModeContainer = root?.querySelector('[data-save-mode]');
+        var currentSaveMode = 'publish';
+        var recentPanel = root?.querySelector('[data-recent-panel]');
+        var recentListEl = root?.querySelector('[data-recent-list]');
+        var recentRefreshBtn = root?.querySelector('[data-recent-refresh]');
+        var recentFilterInput = root?.querySelector('[data-recent-filter]');
+        var recentPosts = [];
+        var recentFilterText = '';
+        var CURSE_TYPES = [];
+        var CURSE_TARGETS = [];
+        var CURSE_TONES = [];
+        try { CURSE_TYPES = JSON.parse(rawCurseTypes); } catch {}
+        try { CURSE_TARGETS = JSON.parse(rawCurseTargets); } catch {}
+        try { CURSE_TONES = JSON.parse(rawCurseTones); } catch {}
+
+        var panelButtons = Array.from(document.querySelectorAll('[data-panel-toggle]'));
+        var panels = Array.from(document.querySelectorAll('[data-panel]'));
+
+        function showPanel(name){
+          panels.forEach(function(panel){
+            if (panel.getAttribute('data-panel') === name) {
+              panel.classList.remove('hidden');
+            } else {
+              panel.classList.add('hidden');
+            }
+          });
+          panelButtons.forEach(function(button){
+            var active = button.getAttribute('data-panel-toggle') === name;
+            if (active) {
+              button.classList.add('bg-surface-base', 'shadow-sm');
+              button.setAttribute('aria-pressed', 'true');
+            } else {
+              button.classList.remove('bg-surface-base', 'shadow-sm');
+              button.setAttribute('aria-pressed', 'false');
+            }
+          });
+        }
+
+        panelButtons.forEach(function(button){
+          button.addEventListener('click', function(){
+            var target = button.getAttribute('data-panel-toggle') || 'posts';
+            showPanel(target);
+          });
+        });
+
+        showPanel('posts');
+        if (saveModeContainer) {
+          saveModeContainer.addEventListener('click', function(event){
+            var target = event.target.closest('[data-mode]');
+            if (!target) return;
+            var mode = target.getAttribute('data-mode') || 'publish';
+            setSaveMode(mode);
+          });
+          setSaveMode(currentSaveMode);
+        }
+        function setStatus(msg, ok, warnings, notes, errors, postStubs, slug){
+          var el=$('status');
+          if (!el) return;
+          var base='admin-btn-secondary px-3 py-2 text-sm';
+          if (ok === false) {
+            el.className = base + ' border-danger bg-danger-soft text-danger';
+          } else if (ok === true) {
+            el.className = base + ' border-success bg-success-soft text-success';
+          } else {
+            el.className = base + ' border-line-neutral bg-surface-neutral-soft text-body-muted';
+          }
+          el.innerHTML='';
+
+          if (msg) {
+            var p=document.createElement('p');
+            p.className='font-medium';
+            // Support HTML in message (for links)
+            if (msg.indexOf('<a ') !== -1) {
+              p.innerHTML=msg;
+            } else {
+              p.textContent=msg;
+            }
+            el.appendChild(p);
+          }
+
+          function appendList(label, items, className){
+            if (!Array.isArray(items) || !items.length) return;
+            var heading=document.createElement('p');
+            heading.className='mt-2 text-[0.8rem] font-semibold ' + className;
+            heading.textContent=label + ':';
+            el.appendChild(heading);
+            var list=document.createElement('ul');
+            list.className='mt-1 list-disc pl-5 text-[0.8rem] ' + className;
+            items.forEach(function(item){
+              var li=document.createElement('li');
+              li.textContent=String(item);
+              list.appendChild(li);
+            });
+            el.appendChild(list);
+          }
+
+          appendList('Errors', errors, 'text-danger');
+          appendList('Warnings', warnings, 'text-warning');
+          appendList('Notes', notes, 'text-muted');
+
+          if (Array.isArray(postStubs) && postStubs.length) {
+            var stubsHeading=document.createElement('p');
+            stubsHeading.className='mt-2 text-[0.8rem] font-semibold text-info';
+            stubsHeading.textContent='Post stubs that will be created:';
+            el.appendChild(stubsHeading);
+            var stubsList=document.createElement('ul');
+            stubsList.className='mt-1 list-disc pl-5 text-[0.8rem] text-info';
+            postStubs.forEach(function(stub){
+              var li=document.createElement('li');
+              li.textContent=(stub.title || stub.slug) + ' (' + (stub.path || stub.slug) + ')';
+              stubsList.appendChild(li);
+            });
+            el.appendChild(stubsList);
+          }
+
+          // Add action buttons after successful ingest
+          if (ok === true && slug) {
+            var actionsDiv = document.createElement('div');
+            actionsDiv.className = 'mt-3 flex flex-wrap gap-2';
+
+            // View Post button
+            var viewBtn = document.createElement('a');
+            viewBtn.href = '/post/' + encodeURIComponent(slug);
+            viewBtn.target = '_blank';
+            viewBtn.rel = 'noopener';
+            viewBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-base px-3 py-1.5 text-sm font-medium text-accent hover:bg-surface-accent-soft';
+            viewBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>View Post';
+
+            // Upload Hero button
+            var heroBtn = document.createElement('a');
+            heroBtn.href = '/admin/hero?post=' + encodeURIComponent(slug);
+            heroBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-base px-3 py-1.5 text-sm font-medium text-accent hover:bg-surface-accent-soft';
+            heroBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>Upload Hero Image';
+
+            // Edit Post button
+            var editBtn = document.createElement('a');
+            editBtn.href = '/admin/posts?slug=' + encodeURIComponent(slug);
+            editBtn.className = 'inline-flex items-center gap-1.5 rounded-lg border border-line-neutral bg-surface-base px-3 py-1.5 text-sm font-medium text-accent hover:bg-surface-accent-soft';
+            editBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>Edit Post';
+
+            actionsDiv.appendChild(viewBtn);
+            actionsDiv.appendChild(heroBtn);
+            actionsDiv.appendChild(editBtn);
+            el.appendChild(actionsDiv);
+          }
+
+          if (!msg && !(Array.isArray(warnings) && warnings.length) && !(Array.isArray(notes) && notes.length)) {
+            el.textContent='Ready for PostSpec JSON.';
+          }
+        }
+
+        function setCurseStatus(msg, ok, errors){
+          var el = $('curseStatus');
+          if (!el) return;
+          var base='admin-btn-secondary px-3 py-2 text-sm';
+          if (ok === false) {
+            el.className = base + ' border-danger bg-danger-soft text-danger';
+          } else if (ok === true) {
+            el.className = base + ' border-success bg-success-soft text-success';
+          } else {
+            el.className = base + ' border-line-neutral bg-surface-neutral-soft text-body-muted';
+          }
+          el.innerHTML='';
+
+          if (msg) {
+            var p=document.createElement('p');
+            p.className='font-medium';
+            p.textContent=msg;
+            el.appendChild(p);
+          }
+
+          if (Array.isArray(errors) && errors.length) {
+            var list=document.createElement('ul');
+            list.className='mt-2 list-disc pl-5 text-[0.8rem] text-danger';
+            errors.forEach(function(item){
+              var li=document.createElement('li');
+              li.textContent=String(item);
+              list.appendChild(li);
+            });
+            el.appendChild(list);
+          }
+
+          if (!msg && !(Array.isArray(errors) && errors.length)) {
+            el.textContent='Ready for CurseSpec JSON.';
+          }
+        }
+        function busy(on){
+          ['genPrompt','validateBtn','previewBtn','ingestBtn','ingestPublishBtn','copyPrompt']
+            .forEach(function(id){ var b=$(id); if(b){ b.disabled=!!on; b.style.opacity = on ? .6 : 1; }});
+        }
+
+        function curseBusy(on){
+          ['curseGenPrompt','curseValidateBtn','curseIngestBtn','curseCopyPrompt']
+            .forEach(function(id){ var b=$(id); if(b){ b.disabled=!!on; b.style.opacity = on ? .6 : 1; }});
+        }
+
+        function summarizeEntities(list){
+          if (!Array.isArray(list) || !list.length) return 'None';
+          var sample = list.map(function(item){
+            var type = item && item.type ? item.type : '?';
+            var slug = item && item.slug ? item.slug : '?';
+            return type + ':' + slug;
+          });
+          return sample.join(', ');
+        }
+
+
+        function renderSpecSummary(spec){
+          var panel = $('specSummary');
+          if (!panel) return;
+          panel.innerHTML='';
+          var baseClass='rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[0.8rem]';
+          if (!spec) {
+            panel.className = baseClass + ' text-body-subtle';
+            var empty=document.createElement('p');
+            empty.textContent='No PostSpec manifested yet. Infuse the Cauldron with JSON to inspect its form.';
+            panel.appendChild(empty);
+            return;
+          }
+
+          panel.className = baseClass + ' text-body-muted';
+          var title=document.createElement('p');
+          title.className='text-[0.8rem] font-semibold uppercase tracking-wide text-body-faint';
+          title.textContent='Spec Summary';
+          panel.appendChild(title);
+
+          var tags=Array.isArray(spec.tags) ? spec.tags : [];
+          var sections=Array.isArray(spec.sections) ? spec.sections : [];
+          var outline=Array.isArray(spec.outline) ? spec.outline : [];
+          var entities=Array.isArray(spec.entities) ? spec.entities : [];
+          var internal=Array.isArray(spec.internalLinkHints) ? spec.internalLinkHints : [];
+          var affiliates=Array.isArray(spec.affiliateHints) ? spec.affiliateHints : [];
+          var altTexts=Array.isArray(spec.altTexts) ? spec.altTexts : [];
+          var totalWords=sections.reduce(function(sum, section){ return sum + wordCount(section && section.markdown || ''); }, 0);
+          var reading=Math.max(1, Math.round(totalWords / 200));
+          var ctaType=spec.cta && spec.cta.type ? spec.cta.type : 'none';
+          var ctaDetail = ctaType === 'download'
+            ? (spec.cta && spec.cta.id ? 'download (' + spec.cta.id + ')' : 'download (missing id)')
+            : ctaType;
+
+          function addRow(label, value){
+            var row=document.createElement('div');
+            row.className='grid grid-cols-[120px_1fr] gap-2';
+            var dt=document.createElement('dt');
+            dt.className='text-[0.8rem] font-medium text-body-faint';
+            dt.textContent=label;
+            var dd=document.createElement('dd');
+            dd.className='text-[0.8rem] text-body';
+            dd.textContent=value;
+            row.appendChild(dt);
+            row.appendChild(dd);
+            body.appendChild(row);
+          }
+
+          var body=document.createElement('dl');
+          body.className='mt-2 space-y-1';
+
+          addRow('Title', spec.title || '(missing)');
+          addRow('Slug', spec.slug || '(missing)');
+          addRow('Tags', (tags.length ? tags.length + ' — ' + tags.join(', ') : 'None'));
+          addRow('Sections', sections.length ? sections.length + ' sections' : 'None');
+          addRow('Outline', outline.length ? outline.length + ' items' : 'None');
+          addRow('Word count', totalWords + ' (~' + reading + ' min read)');
+          addRow('Hero prompt', spec.heroImagePrompt ? 'Provided' : 'None');
+          addRow('Alt texts', altTexts.length ? altTexts.length + ' provided' : 'None');
+          addRow('Entities', entities.length ? entities.length + ' — ' + summarizeEntities(entities) : 'None');
+          addRow('Internal links', internal.length ? internal.length + ' hints' : 'None');
+          addRow('Affiliate hints', affiliates.length ? affiliates.length + ' entries' : 'None');
+          addRow('CTA', ctaDetail);
+
+          panel.appendChild(body);
+        }
+
+        function renderCurseSummary(spec){
+          var panel = $('curseSummary');
+          if (!panel) return;
+          panel.innerHTML='';
+          var baseClass='rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[0.8rem]';
+          if (!spec) {
+            panel.className = baseClass + ' text-body-subtle';
+            var empty=document.createElement('p');
+            empty.textContent='No CurseSpec parsed yet. Paste JSON to inspect the structure.';
+            panel.appendChild(empty);
+            return;
+          }
+
+          panel.className = baseClass + ' text-body-muted';
+          var title=document.createElement('p');
+          title.className='text-[0.8rem] font-semibold uppercase tracking-wide text-body-faint';
+          title.textContent='Curse Summary';
+          panel.appendChild(title);
+
+          function addRow(label, value){
+            var row=document.createElement('div');
+            row.className='grid grid-cols-[120px_1fr] gap-2';
+            var dt=document.createElement('dt');
+            dt.className='text-[0.8rem] font-medium text-body-faint';
+            dt.textContent=label;
+            var dd=document.createElement('dd');
+            dd.className='text-[0.8rem] text-body';
+            dd.textContent=value;
+            row.appendChild(dt);
+            row.appendChild(dd);
+            body.appendChild(row);
+          }
+
+          var body=document.createElement('dl');
+          body.className='mt-2 space-y-1';
+          var generator = spec.generator || {};
+
+          addRow('Title', spec.title || '(missing)');
+          addRow('Slug', spec.slug || '(missing)');
+          addRow('Invocation', spec.invocation || '(missing)');
+          addRow('Type / Target', (generator.type || '?') + ' → ' + (generator.target || '?'));
+          addRow('Tone', generator.tone || '(unspecified)');
+          if (generator.topic) addRow('Topic', generator.topic);
+          if (generator.sigilName) addRow('Sigil', generator.sigilName);
+          if (generator.altarItem) addRow('Altar item', generator.altarItem);
+          if (generator.journalingFollowUp) addRow('Journal', generator.journalingFollowUp);
+          addRow('Tags', Array.isArray(spec.tags) && spec.tags.length ? spec.tags.join(', ') : '(none)');
+          if (spec.safetyNotes) addRow('Safety', spec.safetyNotes);
+
+          panel.appendChild(body);
+        }
+
+        function wordCount(md){
+          var text = String(md||'')
+            .replace(/```[\s\S]*?```/g,' ')
+            .replace(/`[^`]*`/g,' ')
+            .replace(/<[^>]+>/g,' ')
+            .replace(/[\*_#>~\-]+/g,' ');
+          var m = text.match(/\b[\p{L}\p{N}’']+\b/gu);
+          return m ? m.length : 0;
+        }
+        function renderPreview(spec){
+          var el = $('preview'); el.innerHTML = '';
+          var h1 = document.createElement('h1'); h1.textContent = spec.title || '(Un-named Incantation)'; el.appendChild(h1);
+          if (Array.isArray(spec.tags)){ var p = document.createElement('p'); p.className='text-sm text-inverse-subtle'; p.textContent='Tags: ' + spec.tags.join(', '); el.appendChild(p); }
+          var totalWords = 0;
+          for (var i=0;i<(spec.sections||[]).length;i++){
+            var sec = spec.sections[i];
+            var h2 = document.createElement('h2'); h2.textContent = sec.heading || 'Section'; el.appendChild(h2);
+            var div = document.createElement('div');
+            var safe = String(sec.markdown||'').trim().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+            div.innerHTML = safe;
+            el.appendChild(div);
+            totalWords += wordCount(sec.markdown||'');
+          }
+          var meta = document.createElement('p');
+          meta.className='mt-4 text-[0.8rem] text-body-faint';
+          meta.textContent = '~' + totalWords + ' words • ~' + Math.max(1, Math.round(totalWords/200)) + ' min read';
+          el.appendChild(meta);
+        }
+
+        function renderCursePreview(spec){
+          var el = $('cursePreview');
+          if (!el) return;
+          el.innerHTML='';
+          if (!spec) return;
+
+          var h1=document.createElement('h1');
+          h1.textContent = spec.title || '(untitled curse)';
+          el.appendChild(h1);
+
+          var tags = Array.isArray(spec.tags) ? spec.tags : [];
+          if (tags.length) {
+            var tagLine=document.createElement('p');
+            tagLine.className='text-sm text-body-subtle';
+            tagLine.textContent='Tags: ' + tags.join(', ');
+            el.appendChild(tagLine);
+          }
+
+          function appendSection(label, value){
+            var heading=document.createElement('h2');
+            heading.textContent=label;
+            el.appendChild(heading);
+            var div=document.createElement('div');
+            var safe=String(value || '').trim().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+            div.innerHTML = safe;
+            el.appendChild(div);
+          }
+
+          appendSection('Opening Reflection', spec.openingReflection || '');
+          appendSection('Invocation', spec.invocation || '');
+          appendSection('Method', spec.method || '');
+          appendSection('Closure & Aftercare', spec.closure || '');
+          if (spec.safetyNotes) appendSection('Safety Notes', spec.safetyNotes);
+        }
+
+        $('genPrompt').addEventListener('click', async function(){
+          try{
+            busy(true); setStatus('Whispering guidance...', null);
+            var body = {
+              topic: $('topic').value || 'tea ritual for focus',
+              words: Number($('words').value || 1200),
+              ads: $('ads').checked ? 'on' : 'off',
+              kofi: $('kofi').checked ? 'on' : 'off',
+              reflectionPrompts: $('reflectionPrompts').value.split('\n').map(s => s.trim()).filter(Boolean)
+            };
+            var mode = $('mode').value;
+            if (mode) body.mode = mode;
+            var style = $('style').value || 'cozy';
+            body.style = style;
+            var res = await apiFetch('/genprompt', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+            var data = null;
+            try { data = await res.json(); } catch { data = null; }
+            if(!res.ok) throw new Error((data && data.error) || ('gen failed ('+res.status+')'));
+            if (!data || !data.ok) throw new Error((data && data.error) || 'gen failed');
+            $('promptOut').value = (data && data.prompt) || '';
+            setStatus('Guidance whispered ✓', true);
+          }catch(e){ setStatus('Prompt error: ' + (e.message||String(e)), false); }
+          finally{ busy(false); }
+        });
+
+        $('copyPrompt').addEventListener('click', async function(){
+          var field = $('promptOut');
+          try{
+            await navigator.clipboard.writeText(field?.value || '');
+            setStatus('Copied spell ✓', true);
+          }
+          catch {
+            if (field) {
+              field.focus();
+              field.select();
+            }
+            setStatus('Press ⌘/Ctrl+C to copy the verse', null);
+          }
+        });
+
+        // --- JSON paste sanitizer helpers ---
+        function deBackslashOutsideStrings(s){
+          var out='', inStr=false, esc=false;
+          for (var i=0;i<s.length;i++){
+            var ch=s[i];
+            if (inStr){
+              out+=ch;
+              if (esc){ esc=false; }
+              else if (ch==='\\'){ esc=true; }
+              else if (ch==='"'){ inStr=false; }
+            } else {
+              if (ch === '"'){ inStr=true; out+=ch; }
+              else if (ch === '\\'){ // Check for literal backslash
+                var next=s[i+1];
+                // Only keep backslash if it's not escaping a JSON structural character
+                        if (['[', ']', '{', '}'].includes(next)){ continue; }              } else { out+=ch; }
+            }
+          }
+          return out;
+        }
+
+        function stripCodeFences(s){
+          return s
+            .replace(/^\s*```(?:json)?\s*/i, '')
+            .replace(/\s*```\s*$/, '');
+        }
+
+        function normalizeQuotes(s){
+          return s
+            .replace(/[“”]/g, '"')
+            .replace(/[‘’]/g, "'");
+        }
+
+        function stripInvisible(s){ // Removes BOM, ZWSP, etc.
+          return s.replace(/[\uFEFF\u200B-\u200F\u202A-\u202E\u00A0\r]/g, '');
+        }
+
+        function normalizeSpec(spec){
+          if (!spec || typeof spec !== 'object') return spec;
+
+          try {
+            var shared = window.WitchClick && window.WitchClick.normalizeDraftSpec;
+            if (typeof shared === 'function') {
+              var result = shared(spec);
+              if (result && typeof result === 'object' && result.spec && typeof result.spec === 'object') {
+                if (Array.isArray(result.warnings) && result.warnings.length) {
+                  console.info('Normalize warnings:', result.warnings);
+                }
+                return result.spec;
+              }
+            }
+          } catch (err) {
+            console.warn('Shared normalizer failed; falling back to legacy normalization.', err);
+          }
+
+          if (typeof spec.specVersion === 'string') {
+            var parsedVersion = Number(spec.specVersion);
+            if (!Number.isNaN(parsedVersion)) spec.specVersion = parsedVersion;
+          }
+
+          if (typeof spec.title === 'string') spec.title = spec.title.trim();
+          if (typeof spec.slug === 'string') spec.slug = spec.slug.trim();
+          if (typeof spec.metaDescription === 'string') spec.metaDescription = spec.metaDescription.trim();
+          if (typeof spec.excerpt === 'string') spec.excerpt = spec.excerpt.trim();
+
+          if (!Array.isArray(spec.tags)) {
+            if (typeof spec.tags === 'string') {
+              spec.tags = spec.tags.split(/[\n,]/).map(function(tag){ return tag.trim(); }).filter(Boolean);
+            } else {
+              spec.tags = [];
+            }
+          } else {
+            spec.tags = spec.tags.map(function(tag){ return String(tag || '').trim(); }).filter(Boolean);
+          }
+          var seenTags = new Set();
+          spec.tags = spec.tags.filter(function(tag){
+            var lower = tag.toLowerCase();
+            if (seenTags.has(lower)) return false;
+            seenTags.add(lower);
+            return true;
+          });
+
+          if (!Array.isArray(spec.sections)) {
+            spec.sections = [];
+          } else {
+            spec.sections = spec.sections.map(function(section){
+              var heading = section && typeof section.heading === 'string'
+                ? section.heading
+                : (section && typeof section.title === 'string' ? section.title : '');
+              var markdown = section && typeof section.markdown === 'string'
+                ? section.markdown
+                : (section && typeof section.content === 'string' ? section.content : '');
+              var cleaned = {
+                heading: heading.trim(),
+                markdown: String(markdown || '').trim(),
+              };
+              if (section && typeof section === 'object') {
+                for (var key in section) {
+                  if (key === 'heading' || key === 'markdown') continue;
+                  cleaned[key] = section[key];
+                }
+              }
+              return cleaned;
+            });
+          }
+
+          if (!Array.isArray(spec.internalLinkHints)) spec.internalLinkHints = [];
+          if (!Array.isArray(spec.affiliateHints)) spec.affiliateHints = [];
+          if (spec.heroImagePrompt === false) spec.heroImagePrompt = null;
+          if (spec.heroImagePrompt != null && typeof spec.heroImagePrompt !== 'string') {
+            spec.heroImagePrompt = String(spec.heroImagePrompt);
+          }
+
+          return spec;
+        }
+
+        function normalizeCurseSpec(spec){
+          if (!spec || typeof spec !== 'object') return spec;
+          if (typeof spec.specVersion === 'string') {
+            var parsedVersion = Number(spec.specVersion);
+            if (!Number.isNaN(parsedVersion)) spec.specVersion = parsedVersion;
+          }
+          ['title','slug','openingReflection','invocation','method','closure','safetyNotes'].forEach(function(key){
+            if (typeof spec[key] === 'string') spec[key] = spec[key].trim();
+          });
+          if (!Array.isArray(spec.tags)) {
+            if (typeof spec.tags === 'string') {
+              spec.tags = spec.tags.split(/[\n,]/).map(function(tag){ return tag.trim(); }).filter(Boolean);
+            } else {
+              spec.tags = [];
+            }
+          } else {
+            spec.tags = spec.tags.map(function(tag){ return String(tag || '').trim(); }).filter(Boolean);
+          }
+          var seen = new Set();
+          spec.tags = spec.tags.filter(function(tag){
+            var lower = tag.toLowerCase();
+            if (seen.has(lower)) return false;
+            seen.add(lower);
+            return true;
+          });
+          if (!spec.generator || typeof spec.generator !== 'object') {
+            spec.generator = {};
+          } else {
+            ['type','target','tone','topic','sigilName','altarItem','journalingFollowUp'].forEach(function(key){
+              if (typeof spec.generator[key] === 'string') {
+                spec.generator[key] = spec.generator[key].trim();
+              }
+            });
+          }
+          return spec;
+        }
+
+        function parseSpec(){
+          var field = $('spec');
+          if (!field) throw new Error('No textarea found.');
+          var raw = field.value;
+          if (!raw.trim()) throw new Error('No JSON provided. The Cauldron is empty.');
+
+          var base = stripInvisible(normalizeQuotes(stripCodeFences(raw)));
+          var attempts = [base];
+          var cleanedBackslashes = deBackslashOutsideStrings(base);
+          if (cleanedBackslashes !== base) attempts.push(cleanedBackslashes);
+
+          function tryParse(value){
+            try { return JSON.parse(value); } catch(_e) {
+              try { var maybe = JSON.parse(value); if (typeof maybe === 'string') { return JSON.parse(maybe); } } catch(_err){}
+            }
+            return null;
+          }
+
+          var parsed = null;
+          for (var i=0;i<attempts.length && !parsed;i++){
+            parsed = tryParse(attempts[i]);
+          }
+
+          if (!parsed) {
+            throw new Error('Invalid JSON — cleansed of superficial corruption, but the core structure remains blighted. Consult the Elder Scrolls (validate with jq) for truth.');
+          }
+
+          return normalizeSpec(parsed);
+        }
+
+        function parseCurseSpec(){
+          var field = $('curseSpec');
+          if (!field) throw new Error('No textarea found.');
+          var raw = document.getElementById('spec').value; // NOTE: This should likely be $('curseSpec').value
+          if (!raw.trim()) throw new Error('No JSON provided. The Cauldron is empty.');
+
+          var base = stripInvisible(normalizeQuotes(stripCodeFences(raw)));
+          var attempts = [base];
+          var cleanedBackslashes = deBackslashOutsideStrings(base);
+          if (cleanedBackslashes !== base) attempts.push(cleanedBackslashes);
+
+          var parsed = null;
+          for (var i=0;i<attempts.length && !parsed;i++){
+            try { parsed = JSON.parse(attempts[i]); } catch (_err) { parsed = null; }
+          }
+
+          if (!parsed) {
+            throw new Error('Invalid JSON — cleaned for fences/quotes, but structure still fails.');
+          }
+
+          return normalizeCurseSpec(parsed);
+        }
+
+
+        function normalizeResponseSpec(spec, fallback){
+          if (spec && typeof spec === 'object') return spec;
+          return fallback;
+        }
+
+        function extractArray(value){
+          return Array.isArray(value) ? value : [];
+        }
+
+        function updateSaveModeUI(){
+          if (!saveModeContainer) return;
+          var buttons = saveModeContainer.querySelectorAll('[data-mode]');
+          buttons.forEach(function(button){
+            var mode = button.getAttribute('data-mode') === 'draft' ? 'draft' : 'publish';
+            var active = mode === currentSaveMode;
+            button.classList.toggle('bg-surface-base', active);
+            button.classList.toggle('text-body', active);
+            button.classList.toggle('text-body-muted', !active);
+            button.classList.toggle('shadow-sm', active);
+          });
+        }
+
+        function setSaveMode(mode){
+          currentSaveMode = mode === 'draft' ? 'draft' : 'publish';
+          updateSaveModeUI();
+        }
+
+        function parseDateValue(value){
+          if (typeof value !== 'string' || !value.trim()) return null;
+          var parsed = Date.parse(value);
+          return Number.isFinite(parsed) ? parsed : null;
+        }
+
+        function matchesRecentFilter(post, term){
+          if (!term) return true;
+          var search = term.toLowerCase();
+          var candidates = [ post.title, post.slug, Array.isArray(post.tags) ? post.tags.join(' ') : '', post.metaDescription, post.excerpt ].filter(Boolean);
+          return candidates.some(function(value){ return typeof value === 'string' && value.toLowerCase().includes(search); });
+        }
+
+        function insertStubForPost(post){
+          var editor = $('spec');
+          if (!editor) return;
+          var stub = {
+            specVersion: 2,
+            title: post?.title || '',
+            slug: post?.slug || '',
+            excerpt: post?.excerpt || '',
+            metaDescription: post?.metaDescription || post?.excerpt || '',
+            tags: Array.isArray(post?.tags) ? post.tags : [],
+            includeAds: false,
+            includeKofi: true,
+            outline: [],
+            sections: [
+              { heading: 'Introduction', markdown: '' },
+              { heading: 'Practice', markdown: '' },
+              { heading: 'Reflection', markdown: '' }
+            ],
+            entities: [],
+            internalLinkHints: [],
+            affiliateHints: [],
+            reflectionPrompts: Array.isArray(post?.reflectionPrompts) ? post.reflectionPrompts : [],
+            heroImagePrompt: post?.heroImagePrompt || ''
+          };
+          editor.value = JSON.stringify(stub, null, 2);
+          editor.focus();
+          editor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          setStatus('Inserted JSON stub for “' + (post?.title || post?.slug || 'post') + '”. Fill in the outline and sections before validating.', null);
+        }
+
+        function renderRecentPosts(){
+          if (!recentListEl) return;
+          if (!recentPosts.length) {
+            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-[0.8rem] text-body-muted">No scrolls in the archive yet.</div>';
+            return;
+          }
+          var term = recentFilterText.trim().toLowerCase();
+          var filtered = recentPosts.filter(function(post){ return matchesRecentFilter(post, term); });
+          if (!filtered.length) {
+            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-[0.8rem] text-body-muted">No matching scrolls. Refine your scrying.</div>';
+            return;
+          }
+          recentListEl.innerHTML = '';
+          filtered.forEach(function(post){
+            var displayDate = post?.publishedAt || post?.createdAt || '';
+            var dateLabel = displayDate ? new Date(displayDate).toLocaleDateString() : '—';
+            var safeSlugAttr = (post?.slug || '').replace(/"/g, '&quot;');
+            var card = document.createElement('div');
+            card.className = 'rounded-xl border border-line-neutral bg-surface-neutral-soft p-3 text-sm';
+            card.innerHTML = `
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="font-semibold text-body">${(post.title || '(untitled)').replace(/</g, '&lt;')}</p>
+                  <p class="text-[0.8rem] text-body-muted">${post.slug || ''}</p>
+                </div>
+                <span class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">${dateLabel}</span>
+              </div>
+              <div class="mt-2 flex flex-wrap gap-2">
+                <button type="button" class="rounded-lg border border-line-neutral px-2 py-1 text-[0.8rem] font-semibold hover:bg-surface-base" data-recent-insert data-slug="${safeSlugAttr}">Infuse stub</button>
+                <a class="rounded-lg border border-line-neutral px-2 py-1 text-[0.8rem] font-semibold text-primary hover:bg-surface-base" href="/admin/posts?slug=${encodeURIComponent(post.slug || '')}" target="_blank" rel="noopener">Edit</a>
+              </div>
+            `;
+            recentListEl.appendChild(card);
+          });
+        }
+
+        async function loadRecentPosts(){
+          if (!recentListEl) return;
+          recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-[0.8rem] text-body-muted">Summoning recent scrolls…</div>';
+          try{
+            var res = await apiFetch('/posts/list', { method: 'POST' });
+            var data = await res.json();
+            if (!data?.ok) throw new Error(data?.error || 'Unable to load posts');
+            var items = Array.isArray(data.items) ? data.items : [];
+            items.sort(function(a, b){ var dateA = parseDateValue(a?.createdAt) || parseDateValue(a?.publishedAt) || 0; var dateB = parseDateValue(b?.createdAt) || parseDateValue(b?.publishedAt) || 0; return dateB - dateA; });
+            recentPosts = items.slice(0, 10);
+            renderRecentPosts();
+          }catch(error){
+            recentListEl.innerHTML = '<div class="rounded-lg border border-dashed border-line-subtle p-3 text-[0.8rem] text-danger">The archive resisteth! Failed to load recent scrolls.</div>';
+          }
+        }
+
+        function buildError(message, type, info){
+          var err = new Error(message);
+          err.type = type;
+          if (info && typeof info === 'object') {
+            Object.keys(info).forEach(function(key){ err[key] = info[key]; });
+          }
+          return err;
+        }
+
+        async function postSpec(spec, options){
+          var dryRun = options && options.dryRun ? 'true' : 'false';
+          var params = [];
+          if (dryRun === 'true') params.push('dryRun=true');
+          if (spec && spec._draft === true) params.push('draft=true');
+          // Use dev-api.js endpoint - Astro static mode can't handle POST bodies
+          var url = DEV_API + '/ingest' + (params.length ? '?' + params.join('&') : '');
+          var res;
+          try {
+            res = await fetch(url, withDevKey({ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(spec) }));
+          } catch (networkError) {
+            throw buildError('Network error contacting ingest endpoint: ' + (networkError && networkError.message ? networkError.message : 'unknown network error'), 'network', { original: networkError });
+          }
+
+          var text;
+          try { text = await res.text(); } catch (readError) { text = ''; }
+
+          var data = {};
+          if (text) {
+            try { data = JSON.parse(text); } catch { data = { raw: text }; }
+          }
+
+          if (!res.ok) {
+            throw buildError(
+              'Server error (' + res.status + '): ' + (data && data.error ? data.error : res.statusText || 'Unknown error'),
+              'http',
+              { status: res.status, data: data }
+            );
+          }
+
+          return data;
+        }
+
+        async function postCurse(spec, options){
+          var dryRun = options && options.dryRun ? 'true' : 'false';
+          var url = DEV_API + '/curses/ingest' + (dryRun === 'true' ? '?dryRun=true' : '');
+          var res;
+          try {
+            res = await fetch(url, withDevKey({ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ spec, dryRun }) }));
+          } catch (networkError) {
+            throw buildError('Network error contacting curse ingest endpoint: ' + (networkError && networkError.message ? networkError.message : 'unknown network error'), 'network', { original: networkError });
+          }
+
+          var data;
+          try { data = await res.json(); } catch (parseError) {
+            throw buildError('Curse ingest returned non-JSON response.', 'http', { status: res.status, original: parseError });
+          }
+
+          if (!res.ok || data.ok === false) {
+            throw buildError(
+              data && data.error ? data.error : 'Curse ingest error (' + res.status + ')',
+              'http',
+              { status: res.status, data: data }
+            );
+          }
+
+          return data;
+        }
+
+        function handleSpecError(err){
+          if (err && err.data && err.data.spec) {
+            renderSpecSummary(err.data.spec);
+          }
+          var warnings = err && err.data ? extractArray(err.data.warnings) : [];
+          var notes = err && err.data ? extractArray(err.data.normalizationReport) : [];
+          var errors = err && err.data ? extractArray(err.data.errors) : [];
+          var postStubs = err && err.data ? extractArray(err.data.postStubs) : [];
+          if (err && err.type === 'network') {
+            setStatus(err.message, false, warnings, notes, errors, postStubs);
+            return;
+          }
+          if (err && err.type === 'http') {
+            setStatus(err.message, false, warnings, notes, errors, postStubs);
+            return;
+          }
+          setStatus((err && err.message) || 'Unexpected error', false, warnings, notes, errors, postStubs);
+        }
+
+        function handleCurseError(err){
+          if (err && err.data && err.data.spec) {
+            renderCurseSummary(err.data.spec);
+            renderCursePreview(err.data.spec);
+          }
+          var errors = err && err.data ? extractArray(err.data.errors) : [];
+          if (err && err.type === 'network') {
+            setCurseStatus(err.message, false, errors);
+            return;
+          }
+          if (err && err.type === 'http') {
+            setCurseStatus(err.message, false, errors);
+            return;
+          }
+          setCurseStatus((err && err.message) || 'Unexpected error', false, errors);
+        }
+
+        $('validateBtn').addEventListener('click', async function(){
+          try{
+            busy(true); setStatus('Verifying runes…', null);
+            var spec = parseSpec();
+            var data = await postSpec(spec, { dryRun: true });
+            var finalSpec = normalizeResponseSpec(data.spec, spec);
+            renderSpecSummary(finalSpec);
+            var warnings = extractArray(data.warnings);
+            var notes = extractArray(data.normalizationReport);
+            var errors = extractArray(data.errors);
+            var postStubs = extractArray(data.postStubs);
+            if (data.ok === false) {
+              setStatus(data.error || 'Validation errors found.', false, warnings, notes, errors, postStubs);
+              return;
+            }
+            setStatus('Valid ✓', true, warnings, notes, errors, postStubs);
+          }catch(e){ handleSpecError(e); }
+          finally{ busy(false); }
+        });
+
+        function wordCount(md){
+          var text = String(md||'')
+            .replace(/```[\s\S]*?```/g,' ')
+            .replace(/`[^`]*`/g,' ')
+            .replace(/<[^>]+>/g,' ')
+            .replace(/[\*_#>~\-]+/g,' ');
+          var m = text.match(/\b[\p{L}\p{N}’']+\b/gu);
+          return m ? m.length : 0;
+        }
+        function renderPreview(spec){
+          var el = $('preview'); el.innerHTML = '';
+          var h1 = document.createElement('h1'); h1.textContent = spec.title || '(Un-named Incantation)'; el.appendChild(h1);
+          if (Array.isArray(spec.tags)){ var p = document.createElement('p'); p.className='text-sm text-inverse-subtle'; p.textContent='Tags: ' + spec.tags.join(', '); el.appendChild(p); }
+          var totalWords = 0;
+          for (var i=0;i<(spec.sections||[]).length;i++){
+            var sec = spec.sections[i];
+            var h2 = document.createElement('h2'); h2.textContent = sec.heading || 'Section'; el.appendChild(h2);
+            var div = document.createElement('div');
+            var safe = String(sec.markdown||'').trim().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+            div.innerHTML = safe;
+            el.appendChild(div);
+            totalWords += wordCount(sec.markdown||'');
+          }
+          var meta = document.createElement('p');
+          meta.className='mt-4 text-[0.8rem] text-body-faint';
+          meta.textContent = '~' + totalWords + ' words • ~' + Math.max(1, Math.round(totalWords/200)) + ' min read';
+          el.appendChild(meta);
+        }
+
+        function renderCursePreview(spec){
+          var el = $('cursePreview');
+          if (!el) return;
+          el.innerHTML='';
+          if (!spec) return;
+
+          var h1=document.createElement('h1');
+          h1.textContent = spec.title || '(untitled curse)';
+          el.appendChild(h1);
+
+          var tags = Array.isArray(spec.tags) ? spec.tags : [];
+          if (tags.length) {
+            var tagLine=document.createElement('p');
+            tagLine.className='text-sm text-body-subtle';
+            tagLine.textContent='Tags: ' + tags.join(', ');
+            el.appendChild(tagLine);
+          }
+
+          function appendSection(label, value){
+            var heading=document.createElement('h2');
+            heading.textContent=label;
+            el.appendChild(heading);
+            var div=document.createElement('div');
+            var safe=String(value || '').trim().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+            div.innerHTML = safe;
+            el.appendChild(div);
+          }
+
+          appendSection('Opening Reflection', spec.openingReflection || '');
+          appendSection('Invocation', spec.invocation || '');
+          appendSection('Method', spec.method || '');
+          appendSection('Closure & Aftercare', spec.closure || '');
+          if (spec.safetyNotes) appendSection('Safety Notes', spec.safetyNotes);
+        }
+
+        $('previewBtn').addEventListener('click', async function(){
+          try{
+            busy(true); setStatus('Validating for preview…', null);
+            var spec = parseSpec();
+            var data = await postSpec(spec, { dryRun: true });
+            var finalSpec = normalizeResponseSpec(data.spec, spec);
+            renderSpecSummary(finalSpec);
+            var warnings = extractArray(data.warnings);
+            var notes = extractArray(data.normalizationReport);
+            var errors = extractArray(data.errors);
+            var postStubs = extractArray(data.postStubs);
+            if (data.ok === false) {
+              setStatus(data.error || 'Validation errors found.', false, warnings, notes, errors, postStubs);
+              return;
+            }
+            renderPreview(finalSpec);
+            setStatus('Preview ✓', true, warnings, notes, errors, postStubs);
+          }catch(e){ handleSpecError(e); }
+          finally{ busy(false); }
+        });
+
+        $('ingestBtn').addEventListener('click', async function(){
+          try{
+            busy(true); setStatus('Verifying runes…', null);
+            var spec = parseSpec();
+            var dryRun = await postSpec(spec, { dryRun: true });
+            var finalSpec = normalizeResponseSpec(dryRun.spec, spec);
+            var isDraftMode = currentSaveMode === 'draft';
+            finalSpec._draft = isDraftMode;
+            renderSpecSummary(finalSpec);
+            var warnings = extractArray(dryRun.warnings);
+            var notes = extractArray(dryRun.normalizationReport);
+            var errors = extractArray(dryRun.errors);
+            var postStubs = extractArray(dryRun.postStubs);
+            if (dryRun.ok === false) {
+              setStatus(dryRun.error || 'Validation errors found.', false, warnings, notes, errors, postStubs);
+              return;
+            }
+            setStatus(finalSpec._draft ? 'Validation passed. Securing draft in grimoire…' : 'Validation passed. Infusing into the archive…', null, warnings, notes, errors, postStubs);
+            var data = await postSpec(finalSpec, { dryRun: false });
+            if (data.ok === false) {
+              setStatus(data.error || 'Ingest failed.', false, extractArray(data.warnings), extractArray(data.normalizationReport), extractArray(data.errors), extractArray(data.postStubs));
+              return;
+            }
+            var ingestWarnings = extractArray(data.warnings);
+            var ingestNotes = extractArray(data.normalizationReport);
+            var mergedWarnings = ingestWarnings.length ? ingestWarnings : warnings;
+            var mergedNotes = ingestNotes.length ? ingestNotes : notes;
+            var createdPosts = extractArray(data.createdPosts);
+            var location = data.path || ('src/content/posts/' + (data.slug || finalSpec.slug || 'post') + '.md');
+            var slug = data.slug || (finalSpec && finalSpec.slug) || '';
+            var msg;
+            if (data.saved === false) {
+              msg = finalSpec._draft ? 'Draft verified (dry run) → ' + location : 'Infused (dry run) → ' + location;
+            } else {
+              msg = (finalSpec._draft ? 'Draft secured ✓' : 'Infused ✓') + ' → ' + location;
+            }
+            if (createdPosts.length) {
+              msg += ' • Created ' + createdPosts.length + ' stub post' + (createdPosts.length === 1 ? '' : 's');
+            }
+            if (finalSpec._draft) {
+              msg += ' • <a href="/admin/staging" class="underline">View staging →</a>';
+            }
+            setStatus(msg, true, mergedWarnings, mergedNotes, extractArray(data.errors), createdPosts.map(function(p){ return {path: p}; }), slug);
+          }catch(e){ handleSpecError(e); }
+          finally{ busy(false); }
+        });
+
+        $('ingestPublishBtn').addEventListener('click', async function(){
+          try{
+            setSaveMode('publish');
+            busy(true); setStatus('Verifying runes…', null);
+            var spec = parseSpec();
+            var dryRun = await postSpec(spec, { dryRun: true });
+            var finalSpec = normalizeResponseSpec(dryRun.spec, spec);
+            finalSpec._draft = false;
+            renderSpecSummary(finalSpec);
+            var warnings = extractArray(dryRun.warnings);
+            var notes = extractArray(dryRun.normalizationReport);
+            var errors = extractArray(dryRun.errors);
+            var postStubs = extractArray(dryRun.postStubs);
+            if (dryRun.ok === false) {
+              setStatus(dryRun.error || 'Validation errors found.', false, warnings, notes, errors, postStubs);
+              return;
+            }
+            setStatus('Validation passed. Infusing into the archive…', null, warnings, notes, errors, postStubs);
+            var data = await postSpec(finalSpec, { dryRun: false });
+            if (data.ok === false) {
+              setStatus(data.error || 'Ingest failed.', false, extractArray(data.warnings), extractArray(data.normalizationReport), extractArray(data.errors), extractArray(data.postStubs));
+              return;
+            }
+            var ingestWarnings = extractArray(data.warnings);
+            var ingestNotes = extractArray(data.normalizationReport);
+            var createdPosts = extractArray(data.createdPosts);
+            var slug = data.slug || (finalSpec && finalSpec.slug) || '';
+            setStatus('Ingested. Publishing…', true, ingestWarnings.length ? ingestWarnings : warnings, ingestNotes.length ? ingestNotes : notes, extractArray(data.errors), createdPosts.map(function(p){ return {path: p}; }));
+            var r = await apiFetch('/bundle', { method:'POST' });
+            var b = await r.json();
+            if (!b.ok) throw new Error((b.steps && b.steps.map(function(s){return s.err;}).filter(Boolean).join('\n')) || b.error || 'bundle failed');
+            var slug = data.slug || (finalSpec && finalSpec.slug) || '';
+            var publishMsg = 'Unveiled ✓';
+            if (createdPosts.length) {
+              publishMsg += ' • Created ' + createdPosts.length + ' stub post' + (createdPosts.length === 1 ? '' : 's');
+            }
+            setStatus(publishMsg, true, ingestWarnings.length ? ingestWarnings : warnings, ingestNotes.length ? ingestNotes : notes, extractArray(data.errors), createdPosts.map(function(p){ return {path: p}; }), slug);
+          }catch(e){ handleSpecError(e); }
+          finally{ busy(false); }
+        });
+
+        $('clearBtn').addEventListener('click', function(){
+          $('spec').value=''; $('preview').innerHTML=''; renderSpecSummary(null); setStatus('Cleared. Ready for new JSON.', null);
+        });
+
+        if (recentRefreshBtn) {
+          recentRefreshBtn.addEventListener('click', function(){
+            loadRecentPosts();
+          });
+        }
+        if (recentFilterInput) {
+          recentFilterInput.addEventListener('input', function(event){
+            recentFilterText = event.currentTarget.value || '';
+            renderRecentPosts();
+          });
+        }
+        if (recentPanel) {
+          recentPanel.addEventListener('click', function(event){
+            var insertBtn = event.target.closest('[data-recent-insert]');
+            if (insertBtn) {
+              event.preventDefault();
+              var slug = insertBtn.getAttribute('data-slug') || '';
+              var post = recentPosts.find(function(item){ return item.slug === slug; });
+              if (post) {
+                insertStubForPost(post);
+              }
+            }
+          });
+        }
+
+        if (recentListEl) {
+          loadRecentPosts();
+        }
+
+        var curseTypeEl = $('curseType');
+        if (curseTypeEl) {
+          $('curseGenPrompt').addEventListener('click', async function(){
+            try {
+              curseBusy(true); setCurseStatus('Generating prompt...', null);
+              var type = ($('curseType')?.value || CURSE_TYPES[0] || 'mirror');
+              var target = ($('curseTarget')?.value || CURSE_TARGETS[0] || 'person');
+              var tone = ($('curseTone')?.value || CURSE_TONES[0] || 'poetic');
+              var topic = ($('curseTopic')?.value || '').trim();
+              var sigil = ($('curseSigil')?.value || '').trim();
+              var altar = ($('curseAltar')?.value || '').trim();
+              var journal = ($('curseJournal')?.value || '').trim();
+              var body = { type, target, tone };
+              if (topic) body.topic = topic;
+              if (sigil) body.sigilName = sigil;
+              if (altar) body.altarItem = altar;
+              if (journal) body.journalingFollowUp = journal;
+              var res = await apiFetch('/curses/prompt', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+              if (!res.ok) throw new Error('Prompt request failed ('+res.status+')');
+              var data = await res.json();
+              if (!data.ok) throw new Error(data.error || 'Prompt request failed');
+              $('cursePromptOut').value = data.prompt || '';
+              setCurseStatus('Prompt ready ✓', true);
+            } catch (e) { setCurseStatus('Prompt error: ' + (e && e.message ? e.message : String(e)), false); } 
+            finally { curseBusy(false); }
+          });
+
+          $('curseCopyPrompt').addEventListener('click', async function(){
+            var field = $('cursePromptOut');
+            try {
+              await navigator.clipboard.writeText(field?.value || '');
+              setCurseStatus('Copied ✓', true);
+            } catch {
+              if (field) {
+                field.focus();
+                field.select();
+              }
+              setCurseStatus('Press ⌘/Ctrl+C to copy', null);
+            }
+          });
+
+          $('curseValidateBtn').addEventListener('click', async function(){
+            try {
+              curseBusy(true); setCurseStatus('Validating…', null);
+              var spec = parseCurseSpec();
+              var data = await postCurse(spec, { dryRun: true });
+              var finalSpec = data && data.spec ? normalizeCurseSpec(data.spec) : spec;
+              renderCurseSummary(finalSpec);
+              renderCursePreview(finalSpec);
+              setCurseStatus('Valid ✓', true, extractArray(data.errors));
+            } catch (e) { handleCurseError(e); }
+            finally { curseBusy(false); }
+          });
+
+          $('curseIngestBtn').addEventListener('click', async function(){
+            try {
+              curseBusy(true); setCurseStatus('Validating…', null);
+              var spec = parseCurseSpec();
+              var dryRun = await postCurse(spec, { dryRun: true });
+              var finalSpec = dryRun && dryRun.spec ? normalizeCurseSpec(dryRun.spec) : spec;
+              renderCurseSummary(finalSpec);
+              renderCursePreview(finalSpec);
+              var dryErrors = extractArray(dryRun.errors);
+              if (dryRun.ok === false) {
+                setCurseStatus(dryRun.error || 'Validation errors found.', false, dryErrors);
+                return;
+              }
+              setCurseStatus('Validation passed. Ingesting…', null, dryErrors);
+              var data = await postCurse(finalSpec, { dryRun: false });
+              var path = data.path || ('archive/curses/' + (data.slug || finalSpec.slug || 'curse') + '.md');
+              var message = (data.saved === false ? 'Saved (dry run only).' : 'Ingested ✓') + ' → ' + path;
+              setCurseStatus(message, true, extractArray(data.errors));
+            } catch (e) { handleCurseError(e); }
+            finally { curseBusy(false); }
+          });
+
+          $('curseClearBtn').addEventListener('click', function(){
+            $('curseSpec').value='';
+            $('cursePreview').innerHTML='';
+            renderCurseSummary(null);
+            setCurseStatus('Cleared. Ready for new JSON.', null);
+          });
+        }
+      })();
+      </script>
+    </>
+  )}
+</Base>

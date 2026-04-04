@@ -22,15 +22,35 @@ import Textarea from "@/components/ui/Textarea.astro";
       >
         <div class="flex flex-wrap items-center justify-between gap-2">
           <span class="font-semibold text-neutral-800">✨ Hero Prompt Helper</span>
-          <Button
-            variant="primary"
-            size="sm"
-            class="!px-3 !py-1.5 !text-[0.8rem]"
-            data-copy-prompt
-            disabled
-          >
-            📋 Copy Prompt
-          </Button>
+          <div class="flex flex-wrap items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              class="!px-3 !py-1.5 !text-[0.8rem]"
+              data-regenerate-prompt
+              disabled
+            >
+              Regenerate
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              class="!px-3 !py-1.5 !text-[0.8rem]"
+              data-save-prompt
+              disabled
+            >
+              Save to post
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              class="!px-3 !py-1.5 !text-[0.8rem]"
+              data-copy-prompt
+              disabled
+            >
+              📋 Copy Prompt
+            </Button>
+          </div>
         </div>
         <div class="mt-3 flex items-start gap-2">
           <div class="flex-shrink-0 rounded-full bg-brand-accent/20 px-2 py-0.5 text-[0.8rem] font-bold text-brand-primary">
@@ -44,9 +64,9 @@ import Textarea from "@/components/ui/Textarea.astro";
           class="mt-3 flex flex-wrap items-center gap-2 text-[0.8rem] text-neutral-500"
           data-hero-theme
         ></div>
+        <p class="mt-2 hidden text-[0.8rem] text-neutral-500" data-hero-prompt-meta></p>
         <Textarea
-          class="mt-3 hidden h-32 w-full resize-y font-mono text-sm"
-          readonly
+          class="mt-3 hidden h-40 w-full resize-y font-mono text-sm"
           data-hero-prompt
           placeholder="Prompt will appear here..."
         ></Textarea>
@@ -69,9 +89,16 @@ import Textarea from "@/components/ui/Textarea.astro";
     const promptField = root.querySelector('[data-hero-prompt]') as HTMLTextAreaElement;
     const promptHint = root.querySelector('[data-hero-prompt-hint]');
     const copyPromptButton = root.querySelector('[data-copy-prompt]');
+    const regenerateButton = root.querySelector('[data-regenerate-prompt]');
+    const savePromptButton = root.querySelector('[data-save-prompt]');
+    const promptMeta = root.querySelector('[data-hero-prompt-meta]');
     const themeSummary = root.querySelector('[data-hero-theme]');
     const defaultHint = promptHint?.textContent?.trim() || 'Select a post to load its hero prompt.';
-    
+    const SETTING = 'soft natural window light, early morning or late afternoon';
+    const STYLE = 'cozy witchy aesthetic, muted earthy tones, film grain, editorial still life photography, no text or lettering';
+    let isSavingPrompt = false;
+    let regenerateCount = 0;
+
     // This component needs to listen to changes on the post selector,
     // which is outside its own scope. This is an anti-pattern, but necessary
     // for this incremental refactor. A full solution would use a shared state manager.
@@ -112,6 +139,95 @@ import Textarea from "@/components/ui/Textarea.astro";
         });
     }
 
+    promptField?.addEventListener('input', () => {
+      updateActionButtons();
+    });
+
+    regenerateButton?.addEventListener('click', () => {
+      const posts = (window as any).heroUploaderPosts || [];
+      const activeSlug = (((window as any).heroUploaderState || {}).selectedSlug || select?.value || '').trim();
+      if (!activeSlug) return;
+      const current = posts.find((post: any) => post.slug === activeSlug);
+      if (!current || !promptField) return;
+      regenerateCount += 1;
+      promptField.value = buildGeneratedPrompt(current, regenerateCount);
+      promptField.classList.remove('hidden');
+      if (promptMeta) {
+        promptMeta.textContent = 'Generated from the post title and tags. Edit freely before saving.';
+        promptMeta.classList.remove('hidden');
+      }
+      if (promptHint) {
+        promptHint.textContent = `Generated a fallback hero prompt for “${current?.title || current?.slug || 'post'}”.`;
+      }
+      updateThemeSummary(current);
+      updateActionButtons();
+    });
+
+    savePromptButton?.addEventListener('click', async () => {
+      const heroUploaderRoot = root.closest('#heroUploader') as HTMLElement | null;
+      const activeSlug = (((window as any).heroUploaderState || {}).selectedSlug || select?.value || '').trim();
+      const devApi = heroUploaderRoot?.getAttribute('data-dev-api') || 'http://localhost:8787';
+      const devKey = heroUploaderRoot?.getAttribute('data-dev-key') || '';
+      if (!activeSlug || !promptField?.value.trim() || isSavingPrompt) return;
+      const baseHeaders: Record<string, string> = devKey ? { 'X-WC-Dev-Key': devKey } : {};
+      const jsonHeaders: Record<string, string> = { 'Content-Type': 'application/json', ...baseHeaders };
+
+      function apiFetch(path: string, options: RequestInit = {}) {
+        const headers: Record<string, string> = { ...baseHeaders, ...(options.headers as Record<string, string> || {}) };
+        return fetch(`${devApi}${path}`, { ...options, headers });
+      }
+
+      try {
+        isSavingPrompt = true;
+        updateActionButtons();
+        if (promptHint) {
+          promptHint.textContent = 'Saving hero prompt to the post…';
+        }
+        const loadRes = await apiFetch('/posts/load', {
+          method: 'POST',
+          headers: jsonHeaders,
+          body: JSON.stringify({ slug: activeSlug }),
+        });
+        const loadData = await loadRes.json();
+        if (!loadData?.ok) {
+          throw new Error(loadData?.error || 'Unable to load post frontmatter');
+        }
+        const updatedFrontmatter = upsertHeroPrompt(loadData.frontmatter || '', promptField.value.trim());
+        const saveRes = await apiFetch('/posts/update', {
+          method: 'POST',
+          headers: jsonHeaders,
+          body: JSON.stringify({
+            originalSlug: activeSlug,
+            frontmatter: updatedFrontmatter,
+            markdown: loadData.markdown || '',
+          }),
+        });
+        const saveData = await saveRes.json();
+        if (!saveData?.ok) {
+          throw new Error(saveData?.error || 'Unable to save hero prompt');
+        }
+        const posts = (window as any).heroUploaderPosts || [];
+        const current = posts.find((post: any) => post.slug === activeSlug);
+        if (current) {
+          current.heroImagePrompt = promptField.value.trim();
+        }
+        if (promptMeta) {
+          promptMeta.textContent = 'Saved to post frontmatter.';
+          promptMeta.classList.remove('hidden');
+        }
+        if (promptHint) {
+          promptHint.textContent = `Saved hero prompt for “${saveData?.title || activeSlug}”.`;
+        }
+      } catch (error: any) {
+        if (promptHint) {
+          promptHint.textContent = error?.message || 'Could not save hero prompt.';
+        }
+      } finally {
+        isSavingPrompt = false;
+        updateActionButtons();
+      }
+    });
+
     function resolvePrompt(post: any) {
         const candidates = [
             { value: post?.heroImagePrompt, source: 'hero prompt' },
@@ -124,6 +240,89 @@ import Textarea from "@/components/ui/Textarea.astro";
             }
         }
         return { prompt: '', source: '' };
+    }
+
+    function updateActionButtons() {
+      const hasPrompt = !!promptField?.value.trim();
+      const activeSlug = (((window as any).heroUploaderState || {}).selectedSlug || select?.value || '').trim();
+      if (copyPromptButton) {
+        if (hasPrompt) copyPromptButton.removeAttribute('disabled');
+        else copyPromptButton.setAttribute('disabled', 'true');
+      }
+      if (regenerateButton) {
+        if (activeSlug) regenerateButton.removeAttribute('disabled');
+        else regenerateButton.setAttribute('disabled', 'true');
+      }
+      if (savePromptButton) {
+        if (activeSlug && hasPrompt && !isSavingPrompt) savePromptButton.removeAttribute('disabled');
+        else savePromptButton.setAttribute('disabled', 'true');
+      }
+    }
+
+    function capitalize(text: string) {
+      if (!text) return text;
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+
+    function deriveMood(tags: string[]) {
+      const normalized = tags.map((tag) => String(tag || '').toLowerCase().trim());
+      const groups = [
+        { keywords: ['ritual', 'ceremony'], mood: 'ceremonial and intentional' },
+        { keywords: ['cozy', 'comfort'], mood: 'warm and intimate' },
+        { keywords: ['shadow work', 'grief', 'loss'], mood: 'melancholic and contemplative' },
+        { keywords: ['tarot', 'divination'], mood: 'mystical and symbolic' },
+        { keywords: ['healing', 'self-care'], mood: 'gentle and restorative' },
+        { keywords: ['nature', 'seasons'], mood: 'organic and earthbound' },
+      ];
+      const match = groups.find((group) =>
+        group.keywords.some((keyword) => normalized.some((tag) => tag.includes(keyword)))
+      );
+      return match?.mood || 'atmospheric and quietly magical';
+    }
+
+    function deriveSubjectOptions(title: string) {
+      const normalizedTitle = String(title || '').toLowerCase();
+      const subjectMap = [
+        { keywords: ['candle', 'candles'], subject: 'a candlelit altar' },
+        { keywords: ['journal', 'journaling', 'writing'], subject: 'an open journal with a pen' },
+        { keywords: ['tea', 'mug', 'cup'], subject: 'a ceramic mug beside loose herbs' },
+        { keywords: ['hands', 'hand'], subject: 'a pair of hands arranging ritual tools' },
+        { keywords: ['window'], subject: 'a window altar with gauzy curtains' },
+        { keywords: ['forest', 'path', 'woods'], subject: 'a quiet forest path' },
+        { keywords: ['altar'], subject: 'a softly lit altar space' },
+        { keywords: ['moon'], subject: 'moonlit ritual tools on a wooden table' },
+        { keywords: ['tarot', 'card', 'cards'], subject: 'a tarot spread with a single focal card' },
+        { keywords: ['bath', 'soak'], subject: 'a herbal bath ritual scene' },
+        { keywords: ['grief', 'loss'], subject: 'a candle beside keepsakes and dried flowers' },
+        { keywords: ['season', 'autumn', 'winter', 'spring', 'summer'], subject: 'seasonal objects gathered on a rustic surface' },
+      ];
+      const matches = subjectMap
+        .filter((entry) => entry.keywords.some((keyword) => normalizedTitle.includes(keyword)))
+        .map((entry) => entry.subject);
+      const uniqueMatches = Array.from(new Set(matches));
+      return uniqueMatches.length ? uniqueMatches : ['a softly lit altar space'];
+    }
+
+    function buildGeneratedPrompt(post: any, variation = 0) {
+      const tags = Array.isArray(post?.tags) ? post.tags : [];
+      const mood = deriveMood(tags);
+      const subjectOptions = deriveSubjectOptions(post?.title || '');
+      const subject = subjectOptions[variation % subjectOptions.length] || 'a softly lit altar space';
+      return `${capitalize(mood)} atmosphere. ${capitalize(subject)} photographed with ${SETTING}. ${capitalize(STYLE)}.`;
+    }
+
+    function upsertHeroPrompt(frontmatter: string, prompt: string) {
+      const normalized = String(frontmatter || '').replace(/\r\n?/g, '\n').trimEnd();
+      const lines = normalized ? normalized.split('\n') : [];
+      const serializedPrompt = JSON.stringify(prompt);
+      const nextLine = `heroImagePrompt: ${serializedPrompt}`;
+      const index = lines.findIndex((line) => line.trim().startsWith('heroImagePrompt:'));
+      if (index >= 0) {
+        lines[index] = nextLine;
+      } else {
+        lines.push(nextLine);
+      }
+      return lines.join('\n');
     }
 
     function updateThemeSummary(post: any) {
@@ -150,13 +349,18 @@ import Textarea from "@/components/ui/Textarea.astro";
         }
         const activeSlug = typeof forcedSlug === 'string' && forcedSlug.trim()
             ? forcedSlug.trim()
-            : (select?.value || '');
+            : (((window as any).heroUploaderState || {}).selectedSlug || select?.value || '');
         if (!posts.length) {
             promptField.value = '';
             promptField.classList.add('hidden');
             if(copyPromptButton) copyPromptButton.setAttribute('disabled', 'true');
             if (promptHint) promptHint.textContent = defaultHint;
+            if (promptMeta) {
+                promptMeta.textContent = '';
+                promptMeta.classList.add('hidden');
+            }
             updateThemeSummary(null);
+            updateActionButtons();
             return;
         }
         if (!activeSlug) {
@@ -164,32 +368,48 @@ import Textarea from "@/components/ui/Textarea.astro";
             promptField.classList.add('hidden');
             if(copyPromptButton) copyPromptButton.setAttribute('disabled', 'true');
             if (promptHint) promptHint.textContent = defaultHint;
+            if (promptMeta) {
+                promptMeta.textContent = '';
+                promptMeta.classList.add('hidden');
+            }
             updateThemeSummary(null);
+            updateActionButtons();
             return;
         }
         const current = posts.find((post) => post.slug === activeSlug);
         const resolved = resolvePrompt(current);
         const promptText = resolved.prompt;
+        const hasSavedPrompt = resolved.source === 'hero prompt';
+        regenerateCount = 0;
         
         if (promptText) {
             promptField.value = promptText;
             promptField.classList.remove('hidden');
-            if(copyPromptButton) copyPromptButton.removeAttribute('disabled');
             if (promptHint) {
                 promptHint.textContent = resolved.source
                     ? `Loaded ${resolved.source} for “${current?.title || current?.slug || 'post'}”.`
                     : `Loaded prompt for “${current?.title || current?.slug || 'post'}”.`;
             }
+            if (promptMeta) {
+                promptMeta.textContent = hasSavedPrompt
+                    ? 'Saved prompt loaded. Regenerate if you want a fresh template from the post data.'
+                    : 'Fallback text loaded. Regenerate to build a fuller hero image prompt from the post title and tags.';
+                promptMeta.classList.remove('hidden');
+            }
             updateThemeSummary(current);
         } else {
-            promptField.value = '';
-            promptField.classList.add('hidden');
-            if(copyPromptButton) copyPromptButton.setAttribute('disabled', 'true');
+            promptField.value = buildGeneratedPrompt(current, regenerateCount);
+            promptField.classList.remove('hidden');
             if (promptHint) {
-                promptHint.textContent = `No hero prompt or alt text saved for “${current?.title || current?.slug || 'post'}”.`;
+                promptHint.textContent = `Generated a fallback hero prompt for “${current?.title || current?.slug || 'post'}”.`;
+            }
+            if (promptMeta) {
+                promptMeta.textContent = 'Generated from the post title and tags. Edit freely before saving.';
+                promptMeta.classList.remove('hidden');
             }
             updateThemeSummary(current);
         }
+        updateActionButtons();
     }
 
     updateHeroPromptUI((window as any).heroUploaderPosts || []);
