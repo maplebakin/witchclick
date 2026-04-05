@@ -609,6 +609,7 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
     excerpt: spec.excerpt,
     metaTitle: spec.title,
     metaDescription: spec.metaDescription,
+    heroImagePrompt: spec.heroImagePrompt ?? undefined,
     tags: spec.tags,
     outline: spec.outline.map((item) => item.heading),
     wordCount: enforcement.wordCount,

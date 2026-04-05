@@ -16,6 +16,9 @@ internalLinkHints: ["unfinished projects","quiet magic","pauses"]
 internalLinks: []
 publishedAt: "2026-01-28T15:33:54.945Z"
 canonicalUrl: "https://witchclick.space/post/returning-to-quiet-projects-with-gentle-hands"
+heroImage: "/images/hero/returning-to-quiet-projects-with-gentle-hands/chatgpt-image-apr-4-2026-10_56_40-am.png"
+heroImageSrc: "/images/hero/returning-to-quiet-projects-with-gentle-hands/chatgpt-image-apr-4-2026-10_56_40-am.png"
+heroAlt: ""
 specVersion: 2
 category: "ritual"
 contentType: "story"

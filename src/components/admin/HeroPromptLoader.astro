@@ -76,6 +76,8 @@ import Textarea from "@/components/ui/Textarea.astro";
 </Card>
 
 <script>
+  import { buildFallbackHeroPrompt } from '@/utils/heroPrompt';
+
   // This logic is still complex, but now it is scoped to this component.
   document.addEventListener('DOMContentLoaded', () => {
     const root = document.querySelector('[data-hero-prompt-card]');
@@ -94,8 +96,6 @@ import Textarea from "@/components/ui/Textarea.astro";
     const promptMeta = root.querySelector('[data-hero-prompt-meta]');
     const themeSummary = root.querySelector('[data-hero-theme]');
     const defaultHint = promptHint?.textContent?.trim() || 'Select a post to load its hero prompt.';
-    const SETTING = 'soft natural window light, early morning or late afternoon';
-    const STYLE = 'cozy witchy aesthetic, muted earthy tones, film grain, editorial still life photography, no text or lettering';
     let isSavingPrompt = false;
     let regenerateCount = 0;
 
@@ -150,7 +150,7 @@ import Textarea from "@/components/ui/Textarea.astro";
       const current = posts.find((post: any) => post.slug === activeSlug);
       if (!current || !promptField) return;
       regenerateCount += 1;
-      promptField.value = buildGeneratedPrompt(current, regenerateCount);
+      promptField.value = buildFallbackHeroPrompt(current, regenerateCount);
       promptField.classList.remove('hidden');
       if (promptMeta) {
         promptMeta.textContent = 'Generated from the post title and tags. Edit freely before saving.';
@@ -259,58 +259,6 @@ import Textarea from "@/components/ui/Textarea.astro";
       }
     }
 
-    function capitalize(text: string) {
-      if (!text) return text;
-      return text.charAt(0).toUpperCase() + text.slice(1);
-    }
-
-    function deriveMood(tags: string[]) {
-      const normalized = tags.map((tag) => String(tag || '').toLowerCase().trim());
-      const groups = [
-        { keywords: ['ritual', 'ceremony'], mood: 'ceremonial and intentional' },
-        { keywords: ['cozy', 'comfort'], mood: 'warm and intimate' },
-        { keywords: ['shadow work', 'grief', 'loss'], mood: 'melancholic and contemplative' },
-        { keywords: ['tarot', 'divination'], mood: 'mystical and symbolic' },
-        { keywords: ['healing', 'self-care'], mood: 'gentle and restorative' },
-        { keywords: ['nature', 'seasons'], mood: 'organic and earthbound' },
-      ];
-      const match = groups.find((group) =>
-        group.keywords.some((keyword) => normalized.some((tag) => tag.includes(keyword)))
-      );
-      return match?.mood || 'atmospheric and quietly magical';
-    }
-
-    function deriveSubjectOptions(title: string) {
-      const normalizedTitle = String(title || '').toLowerCase();
-      const subjectMap = [
-        { keywords: ['candle', 'candles'], subject: 'a candlelit altar' },
-        { keywords: ['journal', 'journaling', 'writing'], subject: 'an open journal with a pen' },
-        { keywords: ['tea', 'mug', 'cup'], subject: 'a ceramic mug beside loose herbs' },
-        { keywords: ['hands', 'hand'], subject: 'a pair of hands arranging ritual tools' },
-        { keywords: ['window'], subject: 'a window altar with gauzy curtains' },
-        { keywords: ['forest', 'path', 'woods'], subject: 'a quiet forest path' },
-        { keywords: ['altar'], subject: 'a softly lit altar space' },
-        { keywords: ['moon'], subject: 'moonlit ritual tools on a wooden table' },
-        { keywords: ['tarot', 'card', 'cards'], subject: 'a tarot spread with a single focal card' },
-        { keywords: ['bath', 'soak'], subject: 'a herbal bath ritual scene' },
-        { keywords: ['grief', 'loss'], subject: 'a candle beside keepsakes and dried flowers' },
-        { keywords: ['season', 'autumn', 'winter', 'spring', 'summer'], subject: 'seasonal objects gathered on a rustic surface' },
-      ];
-      const matches = subjectMap
-        .filter((entry) => entry.keywords.some((keyword) => normalizedTitle.includes(keyword)))
-        .map((entry) => entry.subject);
-      const uniqueMatches = Array.from(new Set(matches));
-      return uniqueMatches.length ? uniqueMatches : ['a softly lit altar space'];
-    }
-
-    function buildGeneratedPrompt(post: any, variation = 0) {
-      const tags = Array.isArray(post?.tags) ? post.tags : [];
-      const mood = deriveMood(tags);
-      const subjectOptions = deriveSubjectOptions(post?.title || '');
-      const subject = subjectOptions[variation % subjectOptions.length] || 'a softly lit altar space';
-      return `${capitalize(mood)} atmosphere. ${capitalize(subject)} photographed with ${SETTING}. ${capitalize(STYLE)}.`;
-    }
-
     function upsertHeroPrompt(frontmatter: string, prompt: string) {
       const normalized = String(frontmatter || '').replace(/\r\n?/g, '\n').trimEnd();
       const lines = normalized ? normalized.split('\n') : [];
@@ -398,7 +346,7 @@ import Textarea from "@/components/ui/Textarea.astro";
             }
             updateThemeSummary(current);
         } else {
-            promptField.value = buildGeneratedPrompt(current, regenerateCount);
+            promptField.value = buildFallbackHeroPrompt(current, regenerateCount);
             promptField.classList.remove('hidden');
             if (promptHint) {
                 promptHint.textContent = `Generated a fallback hero prompt for “${current?.title || current?.slug || 'post'}”.`;

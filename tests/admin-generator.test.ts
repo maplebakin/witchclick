@@ -133,6 +133,7 @@ describe("admin post generator pipeline", () => {
     expect(prepared.post.contents).toContain('title: "Cozy Focus Tea"');
     expect(prepared.post.contents).toContain('slug: "cozy-focus-tea-2"');
     expect(prepared.post.contents).toContain('metaDescription: "Quick focus tea summary."');
+    expect(prepared.post.contents).toContain('heroImagePrompt: "A cozy desk with tea."');
     expect(prepared.post.contents).toContain("includeAds: true");
     expect(prepared.post.contents).toContain("includeKofi: true");
     expect(prepared.post.contents).toContain('outline: ["Opening Reflection","Quick Ritual","Deep Dive","Ritual Checklist","Reflection Prompt"]');
@@ -141,6 +142,7 @@ describe("admin post generator pipeline", () => {
 
     const saved = await fs.readFile(path.join(postsDir, "cozy-focus-tea-2.md"), "utf8");
     expect(saved).toBe(prepared.post.contents);
+    expect(saved).toContain('heroImagePrompt: "A cozy desk with tea."');
 
     const herbStub = await fs.readFile(
       path.join(tempDir, "content", "entities", "herb", "peppermint.json"),

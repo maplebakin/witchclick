@@ -40,6 +40,9 @@ internalLinkHints:
 internalLinks: []
 publishedAt: '2025-10-02T02:59:44.100Z'
 canonicalUrl: 'https://witchclick.space/post/cozy-games-october-2025-2'
+heroImage: "/images/hero/cozy-games-october-2025-2/chatgpt-image-apr-4-2026-10_52_46-am.png"
+heroImageSrc: "/images/hero/cozy-games-october-2025-2/chatgpt-image-apr-4-2026-10_52_46-am.png"
+heroAlt: ""
 specVersion: 2
 spoonLevel: low
 cluster: cozy-witchcraft

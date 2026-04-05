@@ -16,6 +16,9 @@ internalLinkHints: []
 internalLinks: []
 publishedAt: "2026-04-04T14:25:47.767Z"
 canonicalUrl: "https://witchclick.space/post/astrology-as-neurodivergent-social-pattern-mapper"
+heroImage: "/images/hero/astrology-as-neurodivergent-social-pattern-mapper/chatgpt-image-apr-4-2026-10_50_23-am.png"
+heroImageSrc: "/images/hero/astrology-as-neurodivergent-social-pattern-mapper/chatgpt-image-apr-4-2026-10_50_23-am.png"
+heroAlt: ""
 specVersion: 2
 draft: true
 ---

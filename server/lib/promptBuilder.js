@@ -27,6 +27,9 @@ const DEFAULT_STRICT_RULES = [
   '• Inside markdown strings, avoid unescaped double quotes; prefer single quotes or escape like \\".',
   '• Do not escape brackets/braces unless inside strings: never emit \\[ or \\{ in the top-level structure.',
   '• No trailing commas. No comments. No undefined. Use [] for empty arrays and "" for empty strings. heroImagePrompt may be null.',
+  '• Title must be 47–63 characters.',
+  '• Meta description must be 150–160 characters.',
+  '• The first outline item and first section must be "Opening Reflection" with id "opening-reflection".',
   '• CRITICAL - externalLink format rules: "url" must be a plain URL string ONLY.',
   '• Never combine url and anchor into one string, never use markdown link syntax in the url field, and never wrap the url in brackets or parentheses.',
   '• "anchor" and "url" are always separate fields.',
@@ -34,8 +37,7 @@ const DEFAULT_STRICT_RULES = [
   '• Invalid: {"url": "[text here](https://example.com)", ...}',
   '• Invalid: {"url": "https://example.com%22,%22anchor%22:%22text", ...}',
   '• If you cannot produce a clean url string, omit externalLink entirely rather than malforming it.',
-  '• Never include a "sourceNote" field in the output.',
-  '• sourceNote is an internal LLM artifact and must not appear in the JSON.',
+  '• Never include a "sourceNote" field; it is an internal LLM artifact.',
   '• Start your response with "{" and end with "}".',
   '• Self-check before sending: imagine running JSON.parse on your answer. If it would fail, correct and re-emit the entire object.',
 ];
@@ -73,7 +75,7 @@ export function buildMasterPrompt(options = {}) {
     // 2) CONTENT RULES
     ...NON_NEGOTIABLES_FRAGMENT,
     ...SEO_REQUIREMENTS_FRAGMENT,
-    ...buildBaseValidationFragment(words),
+    ...buildBaseValidationFragment(),
     ...TYPE_STRUCTURE_FRAGMENT,
     ...buildInputsFragment({
       brandName,
@@ -89,16 +91,13 @@ export function buildMasterPrompt(options = {}) {
       allowedAffiliateKeys: sanitizeArray(allowedAffiliateKeys),
     }),
     ...buildEngagementFragment(engagementSignals || {}),
-    ...buildProcessFragment(words),
-    'Never reuse, paraphrase, or reformat any text the user provides. Generate original content for every field.',
+    ...buildProcessFragment(),
+    'Generate original content for all body sections. You may and should use the provided topic, post titles, and slugs naturally in context.',
 
     // 3) LENGTH WINDOWS
-    'COUNT WORDS AND CHARACTERS LITERALLY — NO ESTIMATES.',
-    'If any field violates its length rules, the entire output is invalid. Regenerate internally until every field meets its exact window before returning JSON.',
-    'Title must be between 50 and 60 characters, inclusive. Count characters exactly.',
-    'Generate the title only after all other fields are written, then adjust its length last to ensure 50–60 characters.',
-    'OpeningReflection must be 75–100 words. If you generate more or fewer words, shrink or expand the reflection while maintaining tone.',
-    'Use the same literal word-count accuracy for every word-bounded field.',
+    'TARGET WORD COUNT: Write sections totaling INPUTS.wordCount words (±10%). This is the single source of truth for length. Prioritize content quality if exact count cannot be achieved.',
+    'Generate title and meta description after drafting the body, then refine them to fit their required character windows.',
+    'Opening Reflection should stay concise, usually 1–2 short paragraphs.',
 
     // 4) STRICT JSON CONTRACT
     ...RETURN_FORMAT_FRAGMENT,

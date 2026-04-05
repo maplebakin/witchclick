@@ -6,7 +6,7 @@ export interface GeneratorPreset {
   strictOutputContract: string[];
 }
 
-export declare function buildBaseFields(wordCount?: number): string[];
+export declare function buildBaseFields(): string[];
 export declare const BASE_FIELDS: string[];
 export declare const STRUCTURE_REQUIREMENTS: Record<string, string[]>;
 
