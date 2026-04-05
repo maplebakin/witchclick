@@ -49,7 +49,7 @@ export function buildHeaderFragment({ brandName }) {
   const safeBrand = brandName || 'WitchClick';
   return [
     'WITCHCLICK PASSIVE-INCOME POST GENERATOR — MASTER PROMPT',
-    '(Role, rules, inputs, and exact JSON contract. Paste this whole thing into a fresh chat, then edit the INPUTS block.)',
+    '(Role, rules, inputs, and JSON contract. Paste this whole thing into a fresh chat, then edit the INPUTS block.)',
     '',
     `—you are my Head of Content Ops, SEO, and Affiliate Strategy for a metaphysical blog called "${safeBrand}". Your job is to produce a single, production-ready article spec that maximizes search intent coverage, internal linking potential, and affiliate conversion while staying gentle, ethical, and cozy.`,
     '',
@@ -88,10 +88,12 @@ export const SECULAR_TAROT_FRAGMENT = [
 export const NON_NEGOTIABLES_FRAGMENT = [
   'NON-NEGOTIABLES',
   '• Markdown-only (no raw HTML).',
+  '• All section content must be markdown strings inside the JSON object — not a separate markdown document.',
   '• Accessibility-first: short paragraphs, scannable lists; include a checklist box.',
   '• Avoid medical/health claims; add a gentle safety note if content could be misconstrued as medical/therapeutic or if fire/sharp objects are involved.',
+  '• Faith transition and deconstruction topics: Write with extra care. Acknowledge that leaving or questioning a religious tradition can be emotionally complex. Never mock or minimize the original tradition. Center the reader\'s autonomy and pace. Avoid triumphalist "I escaped religion" framing; prefer curious, tender, non-prescriptive language.',
   '• Use inclusive language; no gendered assumptions; no gatekeeping.',
-  '• REQUIRED: The first outline item AND the first section MUST be **Opening Reflection** with id **opening-reflection** (1–2 short paragraphs).',
+  '• Keep outline and section ordering aligned so each heading maps cleanly.',
   '',
 ];
 
@@ -106,8 +108,8 @@ export const SEO_REQUIREMENTS_FRAGMENT = [
   '   • Maintain your poetic, symbolic, conversational voice—no stiff SEO-speak.',
   '   • Example: "This spread explores the symbolic threshold where human intuition and machine insight meet, offering a reflective way to map your own creative emergence."',
   '',
-  '2. INTERNAL LINKS (3-5 required):',
-  '   • Naturally embed 3-5 internal links within body paragraphs.',
+  '2. INTERNAL LINKS (5-8 required):',
+  '   • Naturally embed 5-8 internal links within body paragraphs.',
   '   • Link to: category pillar pages, related spreads/rituals, concept explainers, tarot primers, shadow work pages, clean cursing posts, or cluster hubs.',
   '   • Use the provided existingPostTitles and existingPostSlugs to create contextual links.',
   '   • Format: [anchor text](/post/slug-name)',
@@ -116,8 +118,10 @@ export const SEO_REQUIREMENTS_FRAGMENT = [
   '   • Include ONE authoritative external reference.',
   '   • Examples: Wikipedia article on relevant archetype, trusted article about tarot symbolism, source on psychology/mythology, narrative identity research.',
   '   • Signals expertise, research, and authority.',
-  '   • Add in a "Further Reading" section before the conclusion.',
-  '   • Format: [anchor text](https://example.com)',
+  '   • Include the external link in TWO places:',
+  '     1. Embedded naturally in the markdown body or in a dedicated Further Reading section.',
+  '     2. Also in the top-level externalLink JSON field with url, anchor, and description.',
+  '   • Markdown format: [anchor text](https://example.com)',
   '',
   '4. TOPIC CLUSTER:',
   '   • Choose the most appropriate cluster from: tarot-spreads, rituals-practices, clean-cursing, ai-narrative-magic, shadow-work, cozy-witchcraft, motherquest, spellcraft-theory, magical-productivity.',
@@ -138,8 +142,7 @@ export const SEO_REQUIREMENTS_FRAGMENT = [
   '   • Ensure all required meta is present: publishedAt, readingMinutes, author, tags (3-5).',
   '   • These appear on-page and are trust signals for Google.',
   '',
-  '7. WORD COUNT:',
-  '   • Target 700-1200 words minimum for core content.',
+  '7. CONTENT DEPTH:',
   '   • Deeply reflective language, layered metaphor, real substance.',
   '   • Google rewards longform witchcraft content.',
   '',
@@ -150,10 +153,10 @@ export const SEO_REQUIREMENTS_FRAGMENT = [
   '',
 ];
 
-export function buildBaseValidationFragment(words) {
+export function buildBaseValidationFragment() {
   return [
     'BASE VALIDATION (applies to every PostSpec):',
-    ...buildBaseFields(words),
+    ...buildBaseFields(),
     '- heroImagePrompt may be null; altTexts only required when images appear in markdown.',
     '',
   ];
@@ -189,7 +192,7 @@ export const TYPE_STRUCTURE_FRAGMENT = buildTypeStructureFragment();
 export const RETURN_FORMAT_FRAGMENT = [
   'RETURN FORMAT',
   '• Return JSON ONLY. No backticks, no commentary. Valid JSON, double-quoted keys/strings.',
-  '• Must match PostSpec v2 exactly.',
+  '• Return a JSON object that can be normalized into PostSpec v2. Common field aliases are accepted. The server handles normalization.',
   '',
 ];
 
@@ -249,57 +252,57 @@ export function buildEngagementFragment(signals = {}) {
   return lines;
 }
 
-export function buildProcessFragment(words) {
+export function buildProcessFragment() {
   return [
     'PROCESS & CONSTRAINTS (follow step-by-step)',
     '1) Search intent & slug',
     '   • Infer primary intent + 2 secondary intents from the topic.',
     '   • Draft a slug in kebab-case reflecting the primary intent; avoid collisions with existingPostTitles and existingPostSlugs.',
     '2) Title, contentType & meta',
-    '   • Title 50–60 chars with primary keyword.',
-    '   • Set contentType to match the content structure you will generate. Choose from ritual, guide, reflection, story, tarotSpread, spellwork, or crystals.',
+    '   • Title 47–63 chars with primary keyword.',
+    '   • Set contentType to match the content structure you will generate. Choose from ritual, reflection, story, tarotSpread, spellwork, or crystals.',
     '   • Meta 150–160 chars; cozy, non-clickbait.',
     '3) Tags & excerpt',
     '   • 4–7 tags. Excerpt 1–2 sentences that entice the click without hype.',
     '4) Outline',
-    '   • The FIRST outline item must be exactly {"heading":"Opening Reflection","id":"opening-reflection"}.',
+    '   • The FIRST outline item must be {"heading":"Opening Reflection","id":"opening-reflection"}, and the FIRST section must use "heading":"Opening Reflection".',
     '   • Outline headings must match section headings character-for-character.',
     '   • After the Opening Reflection, follow the TYPE-SPECIFIC STRUCTURE CONTRACT for your chosen contentType (see above).',
     '5) Sections',
-    `   • Write ~${words} words total (±5%).`,
     '   • Keep paragraphs short, enforce numbered steps or narrative flow as required by the type-specific contract (e.g., numbered Quick/Deep steps for rituals, journaling prompts for reflections).',
-    '   • Treat INPUTS.wordCount as the single source of truth for total length; ignore any generic example ranges elsewhere in the prompt.',
     '   • Include a gentle safety note whenever the TYPE-SPECIFIC contract or safety triggers apply.',
-    '   • The FIRST section object must have "heading":"Opening Reflection" and match the outline entry exactly.',
     '5b) Entities extraction',
     '   • Identify crystals, herbs, tarot cards, moon phases, planetary days, and rituals named in the markdown; add them once with correct type/slug.',
     '6) Alt texts & optional image',
     '   • If images are referenced in markdown, provide equal-or-greater altTexts; else []. Set heroImagePrompt to a descriptive scene OR null.',
     '7) Internal links (hints)',
-    '   • Provide 5–8 internalLinkHints whose anchors are 2–6 words that appear verbatim in the sections. Each rationale explains where/why to link.',
+    '   • Provide 5–8 internalLinkHints objects as {"anchor","slug","rationale"}.',
+    '   • Anchors are 2–6 words and must appear verbatim in the sections; slug must match one value from existingPostSlugs exactly.',
+    '   • If no matching existingPostSlugs value exists, omit the hint rather than inventing a slug.',
     '8) Affiliate strategy (hints only; do not insert links)',
-    '   • ≤ 1 recommendation per ~250 words. Zero is acceptable. Do not invent or paraphrase keys. Requires: "key" ∈ allowedAffiliateKeys verbatim (case-sensitive match), else omit the hint. If no relevant keys, set affiliateHints: []. Note: Common synonyms (notebooks→micro-notebook, journal→ritual-journal, crystals→grounding-stone) are auto-normalized, but prefer exact keys when available.',
+    '   • ≤ 1 recommendation per ~250 words. Zero is acceptable. Do not invent or paraphrase keys. Requires: "key" ∈ allowedAffiliateKeys verbatim (case-sensitive match), else omit the hint. If no relevant keys, set affiliateHints: [].',
     '9) CTA & ads',
     '   • CTA: If includeKofi="on" return {"type":"kofi"}; if a download is relevant, include id and {"type":"download"}; otherwise {"type":"none"}. Never supply an id for kofi/none.',
     '   • Ads: If includeAds="off", return []. If "on", choose placements based on wordCount buckets — <900 words: ["mid"], 900–1399: ["lead","mid"], ≥1400: ["lead","mid","end"].',
     '10) Quality gate',
-    '   • Verify: title 50–60 chars; meta 150–160 chars; tags count 4–7; total wordcount within ±5%; per-section word allocation hits the ±2% tolerance targets; each section heading matches outline exactly; mandatory headings present (Opening Reflection, Quick/Low-Energy, Deep, Reflection Prompt, Checklist/Summary, Safety Note when triggered).',
-    '   • Ensure 5–8 internal link anchors (2–6 words) and ≤1 affiliate anchor per ~250 words; anchors must appear verbatim in markdown; altTexts count matches referenced images; heroImagePrompt null unless clearly described.',
-    '   • Confirm entities extracted once each with correct type/slug; CTA/ad rules satisfied based on include toggles and wordCount buckets; no raw HTML; tone matches voice examples.',
+    '   • Verify: tags count 4–7; each section heading matches outline exactly; mandatory headings present (Quick/Low-Energy, Deep, Reflection Prompt, Checklist/Summary, Safety Note when triggered).',
+    '   • Ensure 5–8 internalLinkHints objects with anchor+slug+rationale; each slug comes from existingPostSlugs exactly and each anchor appears verbatim in markdown.',
+    '   • Confirm the external link appears in BOTH places: markdown body/Further Reading and top-level externalLink { url, anchor, description }.',
+    '   • Confirm entities extracted once each with correct type/slug; ≤1 affiliate anchor per ~250 words; CTA/ad rules satisfied based on include toggles and wordCount buckets; altTexts count matches referenced images; heroImagePrompt null unless clearly described; no raw HTML; tone matches voice examples.',
     '',
   ];
 }
 
 export const RETURN_INSTRUCTIONS_FRAGMENT = [
   'RETURN INSTRUCTIONS',
-  '• Return a single, valid JSON object matching PostSpec v2 exactly, with all fields populated per the schema.',
-  '• Do not include any explanations, headings, or code fences—JSON only.',
+  '• Return a single valid JSON object that can be normalized into PostSpec v2.',
+  '• Fill fields coherently and keep structure internally consistent.',
   '',
 ];
 
 export const GOLDEN_JSON_FRAGMENT = [
   'GOLDEN JSON EXAMPLE (minimally valid shape — copy the structure, not the content):',
-  '{"specVersion":2,"title":"Cozy Moon Bath Journal","slug":"cozy-moon-bath-journal","contentType":"ritual","metaDescription":"Soak, journal, and reset with a moonlit bath ritual that adapts to your spoons.","tags":["ritual","self-care","moon","journaling"],"excerpt":"Create a gentle moon bath ritual with low-energy and deep-dive paths.","outline":[{"heading":"Opening Reflection","id":"opening-reflection"},{"heading":"Quick Moon Bath Variant","id":"quick-moon-bath-variant"},{"heading":"Deep Moon Bath Variant","id":"deep-moon-bath-variant"},{"heading":"Reflection Prompt","id":"reflection-prompt"},{"heading":"Moon Bath Checklist","id":"moon-bath-checklist"},{"heading":"Gentle Safety Note","id":"gentle-safety-note"}],"sections":[{"heading":"Opening Reflection","markdown":"Two short paragraphs..."},{"heading":"Quick Moon Bath Variant","markdown":"1. Step one..."},{"heading":"Deep Moon Bath Variant","markdown":"1. Step one..."},{"heading":"Reflection Prompt","markdown":"### Reflection Prompt\nWhat surprised you..."},{"heading":"Moon Bath Checklist","markdown":"- Item one"},{"heading":"Gentle Safety Note","markdown":"Keep water warm, not hot..."}],"entities":[{"type":"crystal","slug":"rose-quartz"}],"heroImagePrompt":null,"altTexts":[],"internalLinkHints":[{"anchor":"moon phase tracking","rationale":"Link to moon journal guide."}],"affiliateHints":[{"key":"bath-salts","anchor":"magnesium bath soak","rationale":"Soft upsell for restorative salts."}],"cta":{"type":"kofi"},"adPlacements":["lead","mid"]}',
+  '{"specVersion":2,"title":"Cozy Moon Bath Journal","slug":"cozy-moon-bath-journal","contentType":"ritual","cluster":"rituals-practices","metaDescription":"Soak, journal, and reset with a moonlit bath ritual that adapts to your spoons.","tags":["ritual","self-care","moon","journaling"],"excerpt":"Create a gentle moon bath ritual with low-energy and deep-dive paths.","outline":[{"heading":"Opening Reflection","id":"opening-reflection"},{"heading":"Quick Moon Bath Variant","id":"quick-moon-bath-variant"},{"heading":"Deep Moon Bath Variant","id":"deep-moon-bath-variant"},{"heading":"Reflection Prompt","id":"reflection-prompt"},{"heading":"Moon Bath Checklist","id":"moon-bath-checklist"},{"heading":"Gentle Safety Note","id":"gentle-safety-note"}],"sections":[{"heading":"Opening Reflection","markdown":"Two short paragraphs..."},{"heading":"Quick Moon Bath Variant","markdown":"1. Step one..."},{"heading":"Deep Moon Bath Variant","markdown":"1. Step one..."},{"heading":"Reflection Prompt","markdown":"### Reflection Prompt\nWhat surprised you..."},{"heading":"Moon Bath Checklist","markdown":"- Item one"},{"heading":"Gentle Safety Note","markdown":"Keep water warm, not hot..."}],"entities":[{"type":"crystal","slug":"rose-quartz"}],"heroImagePrompt":null,"altTexts":[],"internalLinkHints":[{"anchor":"journaling practice","slug":"journaling","rationale":"Link to the journaling post for deeper reflection support."}],"externalLink":{"url":"https://en.wikipedia.org/wiki/Moon","anchor":"moon phase reference","description":"Background context for lunar cycles."},"affiliateHints":[{"key":"mindfulness-journal","anchor":"reflection journal","rationale":"Natural fit for journaling content — a quality journal for tracking insights."}],"cta":{"type":"kofi"},"adPlacements":["lead","mid"]}',
 ];
 
 export default {
