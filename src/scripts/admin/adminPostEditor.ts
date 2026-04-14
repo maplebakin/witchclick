@@ -15,6 +15,8 @@ function initPostEditorDashboard() {
     title: string;
     draft: boolean;
     heroImage: string;
+    excerpt: string;
+    tags: string[];
     publishedAt: string;
     createdAt: string;
   };
@@ -38,7 +40,9 @@ function initPostEditorDashboard() {
   const markdownTextarea = root.querySelector<HTMLTextAreaElement>('[data-markdown]');
   const saveButton = root.querySelector<HTMLButtonElement>('[data-save]');
   const deleteButton = root.querySelector<HTMLButtonElement>('[data-delete]');
+  const tumblrButton = root.querySelector<HTMLButtonElement>('[data-tumblr-push]');
   const statusEl = root.querySelector<HTMLDivElement>('[data-status]');
+  const tumblrStatusEl = root.querySelector<HTMLDivElement>('[data-tumblr-status]');
   const warningsList = root.querySelector<HTMLUListElement>('[data-warnings]');
   const metaEl = root.querySelector<HTMLParagraphElement>('[data-meta]');
   const listStatusEl = root.querySelector<HTMLParagraphElement>('[data-list-status]');
@@ -48,9 +52,11 @@ function initPostEditorDashboard() {
   let currentSlug = '';
   let isLoadingPost = false;
   let isSavingPost = false;
+  let isTumblrPushing = false;
   let hasUnsavedChanges = false;
 
   const statusBase = statusEl?.className ?? '';
+  const tumblrStatusBase = tumblrStatusEl?.className ?? '';
 
   function normalizeStatusFilter(value: string | null | undefined): StatusFilterValue {
     return value === 'published' || value === 'draft' ? value : 'all';
@@ -140,6 +146,33 @@ function initPostEditorDashboard() {
     }
   }
 
+  function setTumblrStatus(message: string, tone: 'info' | 'success' | 'error' = 'info', postUrl = '') {
+    if (!tumblrStatusEl) return;
+    tumblrStatusEl.innerHTML = '';
+    let toneClass = '';
+    if (tone === 'error') toneClass = 'text-warning';
+    else if (tone === 'success') toneClass = 'text-surface-success';
+    else toneClass = 'text-body-muted';
+    tumblrStatusEl.className = [tumblrStatusBase || 'text-sm text-body-muted', toneClass].filter(Boolean).join(' ');
+    if (!message) return;
+
+    const textNode = document.createElement('span');
+    textNode.textContent = message;
+    tumblrStatusEl.appendChild(textNode);
+
+    if (tone === 'success' && postUrl) {
+      const spacer = document.createTextNode(' ');
+      const link = document.createElement('a');
+      link.href = postUrl;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.className = 'font-semibold text-primary hover:underline';
+      link.textContent = 'View on Tumblr';
+      tumblrStatusEl.appendChild(spacer);
+      tumblrStatusEl.appendChild(link);
+    }
+  }
+
   function setWarnings(warnings?: string[]) {
     if (!warningsList) return;
     warningsList.innerHTML = '';
@@ -156,10 +189,13 @@ function initPostEditorDashboard() {
   }
 
   function enableEditor(enabled: boolean) {
-    const elements = [frontmatterTextarea, markdownTextarea, saveButton, deleteButton];
+    const elements = [frontmatterTextarea, markdownTextarea, saveButton, deleteButton, tumblrButton];
     for (const el of elements) {
       if (!el) continue;
       el.disabled = !enabled;
+    }
+    if (tumblrButton && isTumblrPushing) {
+      tumblrButton.disabled = true;
     }
     if (!enabled) {
       if (frontmatterTextarea) frontmatterTextarea.value = '';
@@ -250,6 +286,8 @@ function initPostEditorDashboard() {
             title: String(item?.title || String(item?.slug || 'Untitled post')),
             draft: item?.draft === true,
             heroImage: String(item?.heroImage || ''),
+            excerpt: String(item?.excerpt || item?.metaDescription || ''),
+            tags: Array.isArray(item?.tags) ? item.tags.map((tag: unknown) => String(tag || '').trim()).filter(Boolean) : [],
             publishedAt: String(item?.publishedAt || item?.pubDate || ''),
             createdAt: String(item?.createdAt || ''),
           }))
@@ -304,8 +342,10 @@ function initPostEditorDashboard() {
       if (markdownTextarea) markdownTextarea.value = data.markdown || '';
       enableEditor(true);
       if (saveButton) saveButton.disabled = true;
+      if (tumblrButton) tumblrButton.disabled = false;
       updateMeta({ path: data.path, updatedAt: data.updatedAt });
       setWarnings();
+      setTumblrStatus('');
       setStatus(`Loaded “${data.title || data.slug}”.`, 'success');
     } catch (error: any) {
       setStatus(error?.message || 'Failed to load post', 'error');
@@ -349,6 +389,8 @@ function initPostEditorDashboard() {
           title: String(data.title || data.slug),
           draft: false,
           heroImage: '',
+          excerpt: '',
+          tags: [],
           publishedAt: '',
           createdAt: '',
         });
@@ -383,10 +425,141 @@ function initPostEditorDashboard() {
       currentSlug = '';
       hasUnsavedChanges = false;
       enableEditor(false);
+      setTumblrStatus('');
       setWarnings();
       renderList();
     } catch (error: any) {
       setStatus(error?.message || 'Failed to delete', 'error');
+    }
+  }
+
+  function parseYamlScalarValue(raw: string): string {
+    const value = String(raw || '').trim();
+    if (!value) return '';
+    const singleQuoted = value.startsWith("'") && value.endsWith("'");
+    const doubleQuoted = value.startsWith('"') && value.endsWith('"');
+    if (singleQuoted || doubleQuoted) {
+      return value.slice(1, -1).trim();
+    }
+    return value;
+  }
+
+  function parseFrontmatterScalar(frontmatter: string, key: string): string {
+    const pattern = new RegExp(`^${key}:\\s*(.+)$`, 'im');
+    const match = frontmatter.match(pattern);
+    if (!match?.[1]) return '';
+    return parseYamlScalarValue(match[1]);
+  }
+
+  function parseInlineTagList(value: string): string[] {
+    const inner = value.trim().replace(/^\[/, '').replace(/\]$/, '');
+    if (!inner) return [];
+    return inner
+      .split(',')
+      .map((tag) => parseYamlScalarValue(tag))
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+  }
+
+  function parseFrontmatterTags(frontmatter: string): string[] {
+    const lines = frontmatter.split(/\r?\n/);
+    const tags: string[] = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i] ?? '';
+      const match = line.match(/^tags:\s*(.*)$/i);
+      if (!match) continue;
+
+      const rest = String(match[1] || '').trim();
+      if (rest.startsWith('[')) {
+        return parseInlineTagList(rest);
+      }
+
+      let cursor = i + 1;
+      while (cursor < lines.length) {
+        const next = lines[cursor] ?? '';
+        if (/^\s*-\s+/.test(next)) {
+          const item = next.replace(/^\s*-\s+/, '');
+          const parsed = parseYamlScalarValue(item).trim();
+          if (parsed) tags.push(parsed);
+          cursor += 1;
+          continue;
+        }
+        if (/^\s*$/.test(next)) {
+          cursor += 1;
+          continue;
+        }
+        break;
+      }
+      return tags;
+    }
+
+    return tags;
+  }
+
+  function getCurrentPostListItem(): PostListItem | null {
+    if (!currentSlug) return null;
+    return posts.find((item) => item.slug === currentSlug) || null;
+  }
+
+  function buildTumblrPayload() {
+    if (!currentSlug) {
+      throw new Error('Select a post before pushing to Tumblr.');
+    }
+    const frontmatter = frontmatterTextarea?.value || '';
+    const fallback = getCurrentPostListItem();
+
+    const slug = parseFrontmatterScalar(frontmatter, 'slug') || currentSlug;
+    const title = parseFrontmatterScalar(frontmatter, 'title') || fallback?.title || slug;
+    const excerpt =
+      parseFrontmatterScalar(frontmatter, 'excerpt') ||
+      parseFrontmatterScalar(frontmatter, 'metaDescription') ||
+      fallback?.excerpt ||
+      '';
+    const heroImage =
+      parseFrontmatterScalar(frontmatter, 'heroImage') ||
+      parseFrontmatterScalar(frontmatter, 'heroImageSrc') ||
+      fallback?.heroImage ||
+      '';
+    const tags = parseFrontmatterTags(frontmatter);
+    const resolvedTags = tags.length ? tags : (fallback?.tags || []);
+    const url = `https://witchclick.space/posts/${encodeURIComponent(slug)}`;
+
+    if (!heroImage) {
+      throw new Error('This post is missing a heroImage path.');
+    }
+
+    return { slug, title, excerpt, url, heroImage, tags: resolvedTags };
+  }
+
+  async function pushCurrentPostToTumblr() {
+    if (!tumblrButton || isTumblrPushing) return;
+    const defaultLabel = 'Push to Tumblr';
+
+    try {
+      isTumblrPushing = true;
+      tumblrButton.disabled = true;
+      tumblrButton.textContent = 'Pushing…';
+      setTumblrStatus('Pushing post to Tumblr…', 'info');
+
+      const payload = buildTumblrPayload();
+      const res = await apiFetch('/tumblr-push', {
+        method: 'POST',
+        headers: jsonHeaders,
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || 'Tumblr push failed.');
+      }
+
+      setTumblrStatus('Pushed successfully.', 'success', String(data.postUrl || ''));
+    } catch (error: any) {
+      setTumblrStatus(error?.message || 'Tumblr push failed.', 'error');
+    } finally {
+      isTumblrPushing = false;
+      tumblrButton.disabled = !currentSlug;
+      tumblrButton.textContent = defaultLabel;
     }
   }
 
@@ -440,6 +613,11 @@ function initPostEditorDashboard() {
   deleteButton?.addEventListener('click', (event) => {
     event.preventDefault();
     void deletePost();
+  });
+
+  tumblrButton?.addEventListener('click', (event) => {
+    event.preventDefault();
+    void pushCurrentPostToTumblr();
   });
 
   frontmatterTextarea?.addEventListener('input', handleInputChange);

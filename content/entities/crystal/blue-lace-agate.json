@@ -1,8 +1,27 @@
 {
   "type": "crystal",
-  "name": "Blue Lace Agate",
   "slug": "blue-lace-agate",
-  "summary": "",
-  "properties": {},
-  "related": []
+  "name": "Blue Lace Agate",
+  "summary": "Blue Lace Agate has a soft, cooling feel that suits noisy days, tense conversations, and creative work that asks for steadier breath. It is often used as a desk or carry stone for easing mental static, supporting gentle communication, and helping overstimulated or low-energy practitioners settle without needing a big ritual.",
+  "properties": {
+    "keywords": [
+      "soothe",
+      "unclench",
+      "soften"
+    ],
+    "chakra": "throat",
+    "bodyArea": "throat, jaw, shoulders",
+    "nervousSystemSupport": "Often chosen as a calming tactile anchor during overstimulation, mental fatigue, or after too much screen time.",
+    "element": "Water",
+    "planet": "Mercury",
+    "care": "Wipe gently with a soft cloth and recharge by resting it overnight on a windowsill or beside a glass of water rather than in harsh sun.",
+    "placement": "Place near a keyboard, microphone, or bedside journal; it tends to fit well on desks and around electronics as a quiet visual cue to slow down and speak more gently.",
+    "carryIdeas": "Keep it in a pocket, hoodie pouch, or palm during calls, writing sessions, or transitions.",
+    "lowSpoonsUse": "Hold for a few breaths before answering messages or starting a task."
+  },
+  "related": [
+    "herb:chamomile",
+    "ritual:gentle-heart-check-in",
+    "moonPhase:waxing-moon"
+  ]
 }

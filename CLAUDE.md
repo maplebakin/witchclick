@@ -1,23 +1,24 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Authoritative reference: `LLM_PROJECT_BRIEFING.md` (use it first when details conflict).
 
 ## Project Overview
 
 WitchClick is a production-focused, static site platform for cozy metaphysical content. It uses an AI-driven workflow: Prompt → JSON → CLI ingest → static site. The platform is SEO-forward with internal linking and affiliate routing, built entirely as a zero-server static site.
 
 **Tech Stack:**
-- **Framework:** Astro 4.x (static site generation)
+- **Framework:** Astro 5.x (static site generation)
 - **Styling:** Tailwind CSS
 - **TypeScript:** Strict mode with `noUncheckedIndexedAccess`
 - **Testing:** Vitest (unit), Playwright (e2e)
-- **Package Manager:** pnpm (with workspace support)
+- **Package Manager:** npm
 
 ## Development Commands
 
 ### Core Development
 ```bash
-npm run dev              # Start Astro dev server (output: server in dev, static in build)
+npm run dev              # Start Astro dev server
 npm run build            # Production build (runs prebuild checks + build-clean script)
 npm run preview          # Preview production build
 npm run check            # Run Astro check, TypeScript, and ESLint
@@ -117,8 +118,7 @@ Helper: `scripts/lib/contentPaths.js` → `resolvePostsDirectories()`
 
 - **UI:** `/admin` routes serve interactive admin panels
 - **API:** `dev-api.js` provides local endpoints for prompt generation, ingestion, entity management
-- **Dev Mode:** Astro runs with `output: 'server'` in dev to enable POST endpoints
-- **Production:** Astro builds as `output: 'static'` (no server required)
+- **Output Mode:** Astro builds as `output: 'static'`; local/admin mutations are handled by `dev-api.js`
 
 **Admin Features:**
 - Generate prompts for AI content creation (`/admin`, `/api/genprompt`)
@@ -232,7 +232,7 @@ See `AGENTS.md` for full collaboration guidelines (includes branching, PR format
 ## Environment Notes
 
 - **Node Version:** Managed via `.nvmrc`
-- **Package Manager:** pnpm (workspace config in `pnpm-workspace.yaml`)
+- **Package Manager:** npm
 - **Linting:** ESLint with TypeScript and Astro plugins
 - **Sentry:** Client-side error tracking configured (`@sentry/browser`)
 
@@ -247,7 +247,7 @@ See `AGENTS.md` for full collaboration guidelines (includes branching, PR format
 
 ## Astro-Specific Notes
 
-- **Output Mode:** Hybrid (server in dev, static in build) controlled in `astro.config.mjs`
+- **Output Mode:** Static (`output: "static"`) controlled in `astro.config.mjs`
 - **Markdown:** GFM enabled, smartypants on, syntax highlighting off
 - **Redirects:** Configured in astro.config (e.g., `/rss` → `/rss.xml`)
 - **Sitemap:** Auto-generated, excludes /admin and /api routes

@@ -1,110 +1,253 @@
-# Color Tokens — WitchClick
+# Color Tokens — WitchClick (Canonical)
 
-Last updated: current repository state (fallbacks in `src/styles/tokens.css` and generated defaults).
+Last updated: April 12, 2026
 
-This file snapshots every color-related CSS custom property we ship today. Values below are the shipped fallbacks; the runtime theme loader and admin editor can override them at runtime.
+This is the canonical token reference merged from the prior `COLOR-TOKENS.md` and `VISUAL-TOKENS.md`.  
+Runtime theme data can override many values; treat these as baseline definitions and implementation guidance.
 
-## Sources
-- `src/styles/tokens.css` — semantic tokens and dawn overrides (runtime-friendly).
-- `src/styles/color-tokens.generated.css` — generated text palette fallbacks.
-- `src/styles/base.css` — legacy brand palette still referenced by layout tokens.
+## Table of Contents
+- [1. Sources and Precedence](#1-sources-and-precedence)
+- [2. Theme Model](#2-theme-model)
+- [3. Color Foundations](#3-color-foundations)
+- [4. Semantic Color Tokens](#4-semantic-color-tokens)
+- [5. Dawn Overrides](#5-dawn-overrides)
+- [6. Generated Text Palette](#6-generated-text-palette)
+- [7. Legacy Brand Palette](#7-legacy-brand-palette)
+- [8. Non-Color Visual Tokens](#8-non-color-visual-tokens)
+- [9. Component Usage References](#9-component-usage-references)
+- [10. Usage and Migration Guidelines](#10-usage-and-migration-guidelines)
+- [11. Maintenance Checklist](#11-maintenance-checklist)
 
-## Foundation (tokens.css)
+## 1. Sources and Precedence
 
-### Hue and Neutral Ladder
+Primary files:
+- `src/styles/tokens.css` — semantic surface/border/text/accent tokens and dawn overrides.
+- `src/styles/color-tokens.generated.css` — generated fallback text palette.
+- `src/styles/base.css` — legacy brand palette, spacing, typography, focus ring extensions, layout tokens.
+- `src/styles/cards.css` — card-level usage.
+- `src/styles/admin.css` — admin-specific token usage.
+
+Precedence:
+1. Runtime theme loader/admin theme editor
+2. `tokens.css` semantic tokens
+3. `color-tokens.generated.css`
+4. `base.css` legacy fallbacks
+
+## 2. Theme Model
+
+Core comfort themes:
+- Midnight (default)
+- Dawn (light)
+
+Theme switching uses root attributes:
+- `data-comfort-theme="dawn"` for light theme
+- default/no attribute for midnight
+
+Token override pattern:
+```css
+:root { --token-name: <midnight>; }
+:root[data-comfort-theme="dawn"] { --token-name: <dawn>; }
+```
+
+Additional seasonal presets exist under `content/themes/` and can be applied by runtime/theme admin flows.
+
+## 3. Color Foundations
+
+Hue and neutral ladder (`tokens.css`):
 - `--hc: 270`
-- `--neutral-0: 0 0% 100%`
-- `--neutral-1: 260 20% 96%`
-- `--neutral-2: 260 16% 88%`
-- `--neutral-3: 260 10% 72%`
-- `--neutral-4: 260 8% 55%`
-- `--neutral-5: 260 10% 38%`
-- `--neutral-6: 260 12% 28%`
-- `--neutral-7: 260 18% 18%`
-- `--neutral-8: 260 22% 12%`
-- `--neutral-9: 260 26% 8%`
+- `--neutral-0` through `--neutral-9`
 
-### Accent Ladder and Status Hues
-- `--accent-1: 270 60% 78%`
-- `--accent-2: 280 55% 68%`
-- `--accent-3: 260 65% 58%`
-- `--accent-ink: 250 60% 40%`
-- `--green-3: 150 50% 45%`
-- `--amber-3: 38 90% 50%`
-- `--red-3: 352 78% 56%`
+Accent and status ladder:
+- `--accent-1`, `--accent-2`, `--accent-3`, `--accent-ink`
+- `--green-3`, `--amber-3`, `--red-3`
 
-## Semantic Fallbacks (Midnight Theme)
-These are the default values before any runtime theme override.
+Shared recurring color families:
+- Gold accent (`#d4af37`) family
+- Iris/amethyst purple family (`#4b2a63`, `#7c4eb0`)
+- Rune/ink light text family (`#f8f3ff`, `#f4f1ff`, `#f9f5ff`)
 
-### Surfaces
+## 4. Semantic Color Tokens
+
+### 4.1 Surfaces
+
+Midnight fallbacks:
 - `--surface-base: hsl(260 26% 8% / 1)`
 - `--surface-panel: hsl(260 22% 12% / 0.92)`
 - `--surface-card: hsl(260 22% 12% / 0.84)`
 - `--surface-elevated: hsl(260 18% 18% / 0.9)`
 - `--surface-hover: hsl(260 18% 18% / 0.78)`
 
-### Glass Surfaces and Overlays
-- `--glass-surface: color-mix(in hsl, hsl(var(--surface-card)) 88%, transparent 12%)`
-- `--glass-surface-strong: color-mix(in hsl, hsl(var(--surface-panel)) 92%, transparent 8%)`
-- `--glass-card: color-mix(in hsl, hsl(var(--surface-panel)) 86%, transparent 14%)`
-- `--glass-hover: color-mix(in hsl, hsl(var(--surface-hover)) 82%, transparent 18%)`
-- `--glass-border: color-mix(in hsl, hsl(var(--border-subtle)) 65%, transparent 35%)`
-- `--glass-border-strong: color-mix(in hsl, hsl(var(--border-strong)) 72%, transparent 28%)`
-- `--glass-highlight: color-mix(in hsl, hsl(var(--text-accent)) 28%, transparent 72%)`
-- `--glass-glow: color-mix(in hsl, hsl(var(--text-accent)) 18%, transparent 82%)`
-- `--glass-shadow-soft: 0 22px 55px -32px hsl(260 26% 8% / 0.65)`
-- `--glass-shadow-strong: 0 32px 85px -36px hsl(260 26% 8% / 0.78)`
-- `--glass-blur: 16px`
-- `--glass-noise-opacity: 0.08`
+Related compatibility surface aliases are maintained in `tokens.css` for legacy selectors.
 
-### Borders and Text
-- `--border-subtle: hsl(260 12% 28% / 0.42)`
-- `--border-strong: hsl(260 8% 55% / 0.6)`
-- `--text-strong: hsl(0 0% 100% / 0.98)`
-- `--text-body: hsl(260 20% 96% / 0.9)`
-- `--text-muted: hsl(260 16% 88% / 0.75)`
-- `--text-accent: hsl(270 60% 78% / 1)`
+### 4.2 Glass and Overlay Surface Tokens
 
-### Admin Palette
-- `--admin-surface-base: hsl(0 0% 100% / 1)`
-- `--admin-accent: hsl(260 65% 58% / 1)`
+- `--glass-surface`, `--glass-surface-strong`
+- `--glass-card`, `--glass-hover`
+- `--glass-border`, `--glass-border-strong`
+- `--glass-highlight`, `--glass-glow`
+- `--glass-shadow-soft`, `--glass-shadow-strong`
+- `--glass-blur`, `--glass-noise-opacity`
 
-## Back-Compat Shim (tokens.css)
-Aliases that map legacy names to the semantic tokens above:
-- Surfaces: `--surface-panel-primary`, `--surface-panel-secondary`, `--surface-card-hover`, `--surface-muted`.
-- Borders: `--border-accent-subtle`, `--border-accent-medium`, `--border-accent-strong`, `--border-accent-hover`, `--border-purple-subtle`, `--border-purple-medium`.
-- Text: `--text-subtle`, `--text-accent-strong`.
-- Accent legacy: `--accent-purple-strong`, `--accent-purple-soft`.
-- Overlays and focus: `--overlay-panel`, `--overlay-panel-strong`, `--focus-ring`, `--shadow-card`, `--shadow-card-hover`.
-- Chips: `--chip-background`, `--chip-border`.
+### 4.3 Borders
 
-## Dawn (Light) Overrides (tokens.css)
-Active when `data-comfort-theme="dawn"` is present:
+Semantic border tokens:
+- `--border-subtle`
+- `--border-strong`
+
+Legacy accent border families still mapped:
+- `--border-accent-subtle`, `--border-accent-medium`, `--border-accent-strong`, `--border-accent-hover`
+- `--border-purple-subtle`, `--border-purple-medium`
+
+### 4.4 Text
+
+Semantic text tokens:
+- `--text-strong`
+- `--text-body`
+- `--text-muted`
+- `--text-subtle`
+- `--text-accent`
+- `--text-accent-strong`
+
+WCAG-oriented text levels (from generated/base layers):
+- `--text-primary`
+- `--text-secondary`
+- `--text-tertiary`
+- `--text-hint`
+- `--text-disabled`
+
+### 4.5 Accent and Utility Tokens
+
+- `--link-color`
+- `--focus-ring`
+- `--chip-background`, `--chip-border`
+- `--gradient-purple-radial`, `--gradient-gold-radial`
+
+### 4.6 Admin Tokens
+
+- `--admin-surface-base`
+- `--admin-accent`
+
+## 5. Dawn Overrides
+
+Dawn rebalances:
+- Surface stack toward lighter neutrals (`--surface-*` values become high-lightness variants)
+- Border tokens become more opaque/light-compatible
+- Text tokens shift from rune-white to dark violet/ink values
+- Glass mixes rebalance toward white
+- Accent/link/code block styling softens while preserving contrast
+
+Representative dawn values:
 - `--surface-base: hsl(260 40% 98% / 1)`
-- `--surface-panel: hsl(260 40% 98% / 1)`
 - `--surface-card: hsl(260 45% 97% / 1)`
-- `--surface-elevated: hsl(260 35% 96% / 1)`
-- `--surface-hover: hsl(260 22% 92% / 1)`
-- Glass modifiers in dawn: surface/hover mixes are rebalanced toward white.
-- Text: `--text-strong: hsl(260 30% 18% / 1)`, `--text-body: hsl(260 28% 24% / 0.92)`, `--text-muted: hsl(260 20% 36% / 0.75)`.
-- Borders: `--border-subtle: hsl(260 16% 88% / 1)`, `--border-strong: hsl(260 10% 72% / 1)`.
-- Accent softeners: links and code blocks use `hsl(270 60% 45% / 1)` and `hsl(270 55% 42% / 1)`; prose backgrounds use `hsl(260 25% 92% / 1)` and `hsl(260 25% 94% / 1)`.
+- `--text-strong: hsl(260 30% 18% / 1)`
+- `--text-body: hsl(260 28% 24% / 0.92)`
+- `--border-subtle: hsl(260 16% 88% / 1)`
 
-## Generated Text Palette (color-tokens.generated.css)
-Fallbacks that get rewritten by the admin theme editor:
+## 6. Generated Text Palette
 
-- Midnight: `--text-primary: rgba(244,241,255,0.96)`, `--text-secondary: rgba(244,241,255,0.85)`, `--text-tertiary: rgba(244,241,255,0.75)`, `--text-hint: rgba(244,241,255,0.65)`, `--text-disabled: rgba(244,241,255,0.45)`, `--text-strong: rgba(249,245,255,0.95)`, `--text-body: rgba(249,245,255,0.82)`, `--text-muted: rgba(249,245,255,0.72)`, `--text-subtle: rgba(249,245,255,0.7)`, `--text-accent: rgba(212,175,55,0.7)`, `--text-accent-strong: rgba(212,175,55,0.92)`, `--link-color: #e0c07d`.
+`src/styles/color-tokens.generated.css` ships fallback text values per theme.
 
-- Dawn: `--text-primary: rgba(44,27,61,1)`, `--text-secondary: rgba(44,27,61,0.9)`, `--text-tertiary: rgba(44,27,61,0.75)`, `--text-hint: rgba(44,27,61,0.6)`, `--text-disabled: rgba(44,27,61,0.4)`, `--text-strong: rgba(58,40,84,0.95)`, `--text-body: rgba(87,63,115,0.82)`, `--text-muted: rgba(87,63,115,0.7)`, `--text-subtle: rgba(87,63,115,0.65)`, `--text-accent: rgba(155,134,200,0.7)`, `--text-accent-strong: rgba(87,63,115,0.9)`, `--link-color: #caa043`.
+Midnight examples:
+- `--text-primary: rgba(244,241,255,0.96)`
+- `--text-secondary: rgba(244,241,255,0.85)`
+- `--text-tertiary: rgba(244,241,255,0.75)`
+- `--text-disabled: rgba(244,241,255,0.45)`
 
-## Legacy Brand Palette (base.css)
-Still loaded for layout tokens and gradients.
+Dawn examples:
+- `--text-primary: rgba(44,27,61,1)`
+- `--text-secondary: rgba(44,27,61,0.9)`
+- `--text-tertiary: rgba(44,27,61,0.75)`
+- `--text-disabled: rgba(44,27,61,0.4)`
 
-- Midnight defaults: `--color-midnight: #070a05`, `--color-night: #261a0d`, `--color-iris: #f2bf8c`, `--color-amethyst: #d18c47`, `--color-dusk: #22170b`, `--color-gold: #e4a667`, `--color-rune: #f8f2ed`, `--color-fog: #cc9966`, `--color-ink: #ebd9c7`, `--color-muted: rgba(235,217,199,0.72)`, `--color-border: #452e17`, `--color-border-strong: rgba(228,166,103,0.7)`, `--color-overlay: #22170b`, `--color-overlay-strong: #261a0d`.
+## 7. Legacy Brand Palette
 
-- Dawn variants: `--color-midnight: #f6f0e8`, `--color-night: #ede5dc`, `--color-iris: #9b86c8`, `--color-amethyst: #b49ad9`, `--color-dusk: #f2ecfa`, `--color-gold: #caa043`, `--color-rune: #fffdf6`, `--color-fog: #e5daf5`, `--color-ink: #2c1b3d`, `--color-muted: rgba(43,28,65,0.88)`, `--color-border: rgba(122,94,154,0.35)`, `--color-border-strong: rgba(122,94,154,0.55)`, `--color-overlay: rgba(242,236,229,0.48)`, `--color-overlay-strong: rgba(242,236,229,0.6)`.
+Legacy palette remains in `base.css` and is still referenced by some selectors/gradients.
 
-## Notes for Implementers
-- Runtime themes overwrite these values on page load; treat the numbers here as build-time safety nets.
-- Prefer semantic tokens (`--surface-*`, `--text-*`, `--border-*`) over direct hue primitives so themes stay consistent.
-- Back-compat aliases exist to keep legacy selectors working; new work should use the semantic names above.
+Midnight family includes:
+- `--color-midnight`, `--color-night`, `--color-iris`, `--color-amethyst`, `--color-dusk`
+- `--color-gold`, `--color-rune`, `--color-fog`, `--color-ink`
+- `--color-muted`, `--color-border`, `--color-border-strong`
+- `--color-overlay`, `--color-overlay-strong`
+
+Dawn family mirrors these token names with light-theme values.
+
+Semantic helper mixes in `base.css`:
+- `--ink-body`, `--ink-strong`, `--ink-muted`, `--link-color`
+
+## 8. Non-Color Visual Tokens
+
+These came from the prior visual token reference and remain relevant.
+
+### 8.1 Typography
+
+- `--font-body-serif`
+- `--font-body`
+- `--font-heading`
+- `--font-accent`
+- `--font-sans`
+- `--font-body-ui`
+- `--font-body-letter-spacing`
+
+Comfort font toggle:
+- `data-comfort-font="sans"` switches UI/body usage toward sans and adjusts tracking.
+
+### 8.2 Spacing
+
+Spacing scale (`base.css`):
+- `--space-0` through `--space-9` (4px-step based rhythm)
+
+### 8.3 Shadows and Focus Extensions
+
+- `--shadow-soft`, `--shadow-strong`
+- `--shadow-card`, `--shadow-card-hover`
+- Extended focus tokens: `--focus-ring-color`, `--focus-ring-offset`, `--focus-ring-base-shadow`, `--focus-ring-shadow`
+
+### 8.4 Layout Container Tokens
+
+- `--wc-container-max`
+- `--wc-container-padding`
+
+Responsive max-width adjustments are defined in `base.css` media queries.
+
+## 9. Component Usage References
+
+Representative component usage locations:
+- `src/components/PostRail.astro` (surface/border/shadow application)
+- `src/components/HubPlaylistRow.astro` (chip/tag tokens)
+- `src/components/ReadingProgress.astro` (progress + accent usage)
+- Admin pages/components under `src/pages/admin/*` (admin tokens)
+
+## 10. Usage and Migration Guidelines
+
+Preferred token hierarchy for new work:
+1. Semantic tokens in `tokens.css` (`--surface-*`, `--text-*`, `--border-*`)
+2. Generated text tokens for contrast ladder (`--text-primary` etc.)
+3. Legacy `--color-*` only when no semantic equivalent exists
+
+Do:
+- Use semantic tokens instead of hardcoded rgba/hex.
+- Test both midnight and dawn.
+- Preserve accessible focus styles.
+- Keep contrast at WCAG-compliant levels for body text.
+
+Do not:
+- Introduce hardcoded colors where tokens already exist.
+- Add undocumented token names.
+- Break legacy alias mappings without coordinated migration.
+
+## 11. Maintenance Checklist
+
+When introducing/updating tokens:
+1. Add or update token definitions in `tokens.css` or `base.css`.
+2. Add dawn variants where appropriate.
+3. Verify runtime/theme-editor behavior still hydrates correctly.
+4. Validate usage in representative components (post cards, hubs, admin panels).
+5. Update this document if token families or naming conventions change.
+
+---
+
+Related docs:
+- `LLM_PROJECT_BRIEFING.md`
+- `AGENTS.md`
+- `CLAUDE.md`
+- `README.md`

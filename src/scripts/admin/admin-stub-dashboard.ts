@@ -12,6 +12,9 @@ type StubEntry = {
   prompt: string;
   filePath: string;
   references: StubReference[];
+  stubRationale?: string;
+  stubParentSlug?: string;
+  stubParentTitle?: string;
 };
 
 type SavePayload = {
@@ -29,10 +32,15 @@ class StubDashboard {
   private devKey: string;
   private baseHeaders: Record<string, string>;
   private jsonHeaders: Record<string, string>;
+  private mode: 'entity' | 'post' = 'entity';
+  private entityStubs: StubEntry[] = [];
+  private entityFiltered: StubEntry[] = [];
+  private postStubs: StubEntry[] = [];
+  private postFiltered: StubEntry[] = [];
   private stubs: StubEntry[] = [];
   private filtered: StubEntry[] = [];
   private selectedKey: string | null = null;
-  private validatedEntity: SavePayload | null = null;
+  private validatedPayload: SavePayload | Record<string, unknown> | null = null;
 
   private listEl: HTMLElement | null = null;
   private searchInput: HTMLInputElement | null = null;
@@ -41,9 +49,16 @@ class StubDashboard {
   private referenceBadgeEl: HTMLElement | null = null;
   private promptTextArea: HTMLTextAreaElement | null = null;
   private copyPromptBtn: HTMLButtonElement | null = null;
-  private jsonInput: HTMLTextAreaElement | null = null;
-  private validateBtn: HTMLButtonElement | null = null;
-  private saveBtn: HTMLButtonElement | null = null;
+  private entityJsonInput: HTMLTextAreaElement | null = null;
+  private postJsonInput: HTMLTextAreaElement | null = null;
+  private entityValidateBtn: HTMLButtonElement | null = null;
+  private postValidateBtn: HTMLButtonElement | null = null;
+  private entitySaveBtn: HTMLButtonElement | null = null;
+  private postSaveBtn: HTMLButtonElement | null = null;
+  private modeEntityBtn: HTMLButtonElement | null = null;
+  private modePostBtn: HTMLButtonElement | null = null;
+  private stepEntityPanel: HTMLElement | null = null;
+  private stepPostPanel: HTMLElement | null = null;
   private statusEl: HTMLElement | null = null;
   private refreshBtn: HTMLButtonElement | null = null;
   private detailPanel: HTMLElement | null = null;
@@ -51,6 +66,9 @@ class StubDashboard {
   private selectedNameEl: HTMLElement | null = null;
   private selectedTypeEl: HTMLElement | null = null;
   private filePathEl: HTMLElement | null = null;
+  private previewHeading1El: HTMLElement | null = null;
+  private previewHeading2El: HTMLElement | null = null;
+  private previewHeading3El: HTMLElement | null = null;
   private previewSummaryEl: HTMLElement | null = null;
   private previewPropsEl: HTMLElement | null = null;
   private previewRelatedEl: HTMLElement | null = null;
@@ -64,6 +82,7 @@ class StubDashboard {
     this.bootstrapData();
     this.cacheElements();
     this.attachEvents();
+    this.setMode('entity');
     this.renderList();
     this.updateCounts();
     this.fetchStubs(false);
@@ -76,10 +95,10 @@ class StubDashboard {
 
   private bootstrapData() {
     try {
-      const raw = this.root.getAttribute('data-stubs') || '[]';
-      const parsed = JSON.parse(raw);
-      const entries = Array.isArray(parsed) ? parsed : [];
-      this.stubs = entries.map((item) => ({
+      const rawEntities = this.root.getAttribute('data-stubs') || '[]';
+      const parsedEntities = JSON.parse(rawEntities);
+      const entityEntries = Array.isArray(parsedEntities) ? parsedEntities : [];
+      this.entityStubs = entityEntries.map((item) => ({
         key: `${item.type}:${item.slug}`,
         type: item.type,
         slug: item.slug,
@@ -87,9 +106,36 @@ class StubDashboard {
         prompt: item.prompt || '',
         filePath: item.filePath || '',
         references: Array.isArray(item.references) ? item.references : [],
+        stubRationale: '',
+        stubParentSlug: '',
+        stubParentTitle: '',
       }));
-      this.filtered = [...this.stubs];
+
+      const rawPosts = this.root.getAttribute('data-post-stubs') || '[]';
+      const parsedPosts = JSON.parse(rawPosts);
+      const postEntries = Array.isArray(parsedPosts) ? parsedPosts : [];
+      this.postStubs = postEntries.map((item) => ({
+        key: `post:${item.slug}`,
+        type: 'post',
+        slug: item.slug,
+        name: item.name || item.slug,
+        prompt: item.prompt || '',
+        filePath: item.filePath || '',
+        references: Array.isArray(item.references) ? item.references : [],
+        stubRationale: item.stubRationale || '',
+        stubParentSlug: item.stubParentSlug || '',
+        stubParentTitle: item.stubParentTitle || '',
+      }));
+
+      this.entityFiltered = [...this.entityStubs];
+      this.postFiltered = [...this.postStubs];
+      this.stubs = [...this.entityStubs];
+      this.filtered = [...this.entityFiltered];
     } catch {
+      this.entityStubs = [];
+      this.entityFiltered = [];
+      this.postStubs = [];
+      this.postFiltered = [];
       this.stubs = [];
       this.filtered = [];
     }
@@ -103,9 +149,16 @@ class StubDashboard {
     this.referenceBadgeEl = this.root.querySelector('[data-reference-count]');
     this.promptTextArea = this.root.querySelector('[data-prompt-text]');
     this.copyPromptBtn = this.root.querySelector<HTMLButtonElement>('[data-copy-prompt]');
-    this.jsonInput = this.root.querySelector<HTMLTextAreaElement>('[data-json-input]');
-    this.validateBtn = this.root.querySelector<HTMLButtonElement>('[data-validate]');
-    this.saveBtn = this.root.querySelector<HTMLButtonElement>('[data-save]');
+    this.entityJsonInput = this.root.querySelector<HTMLTextAreaElement>('[data-json-input-entity]');
+    this.postJsonInput = this.root.querySelector<HTMLTextAreaElement>('[data-json-input-post]');
+    this.entityValidateBtn = this.root.querySelector<HTMLButtonElement>('[data-validate-entity]');
+    this.postValidateBtn = this.root.querySelector<HTMLButtonElement>('[data-validate-post]');
+    this.entitySaveBtn = this.root.querySelector<HTMLButtonElement>('[data-save-entity]');
+    this.postSaveBtn = this.root.querySelector<HTMLButtonElement>('[data-save-post]');
+    this.modeEntityBtn = this.root.querySelector<HTMLButtonElement>('[data-mode-entity]');
+    this.modePostBtn = this.root.querySelector<HTMLButtonElement>('[data-mode-post]');
+    this.stepEntityPanel = this.root.querySelector('[data-step2-entity]');
+    this.stepPostPanel = this.root.querySelector('[data-step2-post]');
     this.statusEl = this.root.querySelector('[data-status]');
     this.refreshBtn = this.root.querySelector<HTMLButtonElement>('[data-refresh]');
     this.detailPanel = this.root.querySelector('[data-detail-panel]');
@@ -113,6 +166,9 @@ class StubDashboard {
     this.selectedNameEl = this.root.querySelector('[data-selected-name]');
     this.selectedTypeEl = this.root.querySelector('[data-selected-type]');
     this.filePathEl = this.root.querySelector('[data-file-path]');
+    this.previewHeading1El = this.root.querySelector('[data-preview-heading-1]');
+    this.previewHeading2El = this.root.querySelector('[data-preview-heading-2]');
+    this.previewHeading3El = this.root.querySelector('[data-preview-heading-3]');
     this.previewSummaryEl = this.root.querySelector('[data-preview-summary]');
     this.previewPropsEl = this.root.querySelector('[data-preview-props]');
     this.previewRelatedEl = this.root.querySelector('[data-preview-related]');
@@ -130,38 +186,112 @@ class StubDashboard {
     });
 
     this.searchInput?.addEventListener('input', () => {
-      const term = this.searchInput?.value?.trim().toLowerCase() || '';
-      if (!term) {
-        this.filtered = [...this.stubs];
-      } else {
-        this.filtered = this.stubs.filter((entry) => {
-          return (
-            entry.name.toLowerCase().includes(term) ||
-            entry.slug.toLowerCase().includes(term) ||
-            entry.type.toLowerCase().includes(term)
-          );
-        });
-      }
-      this.renderList();
+      this.applySearchFilter();
     });
 
     this.copyPromptBtn?.addEventListener('click', () => this.copyPrompt());
-    this.validateBtn?.addEventListener('click', () => this.handleValidate());
-    this.saveBtn?.addEventListener('click', () => this.handleSave());
+    this.entityValidateBtn?.addEventListener('click', () => this.handleValidate());
+    this.postValidateBtn?.addEventListener('click', () => this.handleValidate());
+    this.entitySaveBtn?.addEventListener('click', () => this.handleSave());
+    this.postSaveBtn?.addEventListener('click', () => this.handleSave());
+    this.modeEntityBtn?.addEventListener('click', () => this.setMode('entity'));
+    this.modePostBtn?.addEventListener('click', () => this.setMode('post'));
     this.refreshBtn?.addEventListener('click', () => this.fetchStubs());
     document.addEventListener('keydown', (event) => {
       if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 's') return;
-      if (!this.selectedKey || !this.saveBtn || this.saveBtn.disabled) return;
+      const activeSaveBtn = this.mode === 'post' ? this.postSaveBtn : this.entitySaveBtn;
+      if (!this.selectedKey || !activeSaveBtn || activeSaveBtn.disabled) return;
       event.preventDefault();
-      this.saveBtn.click();
+      activeSaveBtn.click();
     });
+  }
+
+  private setMode(mode: 'entity' | 'post') {
+    this.mode = mode;
+    if (this.mode === 'entity') {
+      this.stubs = [...this.entityStubs];
+      this.filtered = [...this.entityFiltered];
+    } else {
+      this.stubs = [...this.postStubs];
+      this.filtered = [...this.postFiltered];
+    }
+
+    this.selectedKey = null;
+    this.validatedPayload = null;
+    if (this.entityJsonInput) this.entityJsonInput.value = '';
+    if (this.postJsonInput) this.postJsonInput.value = '';
+    if (this.previewSummaryEl) this.previewSummaryEl.textContent = 'Waiting for validation…';
+    if (this.previewPropsEl) this.previewPropsEl.textContent = '—';
+    if (this.previewRelatedEl) this.previewRelatedEl.textContent = '—';
+    this.detailPanel?.classList.add('hidden');
+    this.emptyState?.classList.remove('hidden');
+
+    this.applySearchFilter();
+    this.updateModeUI();
+    this.renderList();
+    this.updateCounts();
+    this.setStatus('');
+  }
+
+  private updateModeUI() {
+    const entityActive = this.mode === 'entity';
+    if (this.modeEntityBtn) {
+      this.modeEntityBtn.classList.toggle('bg-surface-base', entityActive);
+      this.modeEntityBtn.classList.toggle('shadow-sm', entityActive);
+      this.modeEntityBtn.classList.toggle('text-body', entityActive);
+      this.modeEntityBtn.classList.toggle('text-body-muted', !entityActive);
+      this.modeEntityBtn.setAttribute('aria-pressed', entityActive ? 'true' : 'false');
+    }
+    if (this.modePostBtn) {
+      this.modePostBtn.classList.toggle('bg-surface-base', !entityActive);
+      this.modePostBtn.classList.toggle('shadow-sm', !entityActive);
+      this.modePostBtn.classList.toggle('text-body', !entityActive);
+      this.modePostBtn.classList.toggle('text-body-muted', entityActive);
+      this.modePostBtn.setAttribute('aria-pressed', !entityActive ? 'true' : 'false');
+    }
+    if (this.stepEntityPanel) this.stepEntityPanel.classList.toggle('hidden', !entityActive);
+    if (this.stepPostPanel) this.stepPostPanel.classList.toggle('hidden', entityActive);
+
+    if (this.previewHeading1El) {
+      this.previewHeading1El.textContent = entityActive ? 'Summary Preview' : 'Title';
+    }
+    if (this.previewHeading2El) {
+      this.previewHeading2El.textContent = entityActive ? 'Properties' : 'Content Type';
+    }
+    if (this.previewHeading3El) {
+      this.previewHeading3El.textContent = entityActive ? 'Related Entities' : 'Word Count';
+    }
+  }
+
+  private applySearchFilter() {
+    const term = this.searchInput?.value?.trim().toLowerCase() || '';
+    const source = this.stubs;
+    if (!term) {
+      this.filtered = [...source];
+    } else {
+      this.filtered = source.filter((entry) => {
+        return (
+          entry.name.toLowerCase().includes(term) ||
+          entry.slug.toLowerCase().includes(term) ||
+          entry.type.toLowerCase().includes(term)
+        );
+      });
+    }
+    if (this.mode === 'entity') {
+      this.entityFiltered = [...this.filtered];
+    } else {
+      this.postFiltered = [...this.filtered];
+    }
+    this.renderList();
   }
 
   private renderList() {
     if (!this.listEl) return;
     if (!this.filtered.length) {
       this.listEl.innerHTML =
-        '<p class="text-sm text-body-muted px-2 py-3">No stub entities match your search.</p>';
+        this.mode === 'entity'
+          ? '<p class="text-sm text-body-muted px-2 py-3">No stub entities match your search.</p>'
+          : '<p class="text-sm text-body-muted px-2 py-3">No stub posts match your search.</p>';
       return;
     }
 
@@ -195,15 +325,16 @@ class StubDashboard {
 
   private updateCounts() {
     if (this.countEl) {
-      this.countEl.textContent = String(this.stubs.length);
+      this.countEl.textContent = String(this.mode === 'entity' ? this.entityStubs.length : this.postStubs.length);
     }
   }
 
   private selectStub(key: string) {
     const entry = this.stubs.find((stub) => stub.key === key);
     this.selectedKey = entry ? entry.key : null;
-    this.validatedEntity = null;
-    this.jsonInput && (this.jsonInput.value = '');
+    this.validatedPayload = null;
+    this.entityJsonInput && (this.entityJsonInput.value = '');
+    this.postJsonInput && (this.postJsonInput.value = '');
     this.previewSummaryEl && (this.previewSummaryEl.textContent = 'Waiting for validation…');
     this.previewPropsEl && (this.previewPropsEl.textContent = '—');
     this.previewRelatedEl && (this.previewRelatedEl.textContent = '—');
@@ -236,7 +367,9 @@ class StubDashboard {
     if (!this.referenceListEl) return;
     if (!references.length) {
       this.referenceListEl.innerHTML =
-        '<p class="text-xs text-body-muted">No posts reference this entity yet.</p>';
+        this.mode === 'entity'
+          ? '<p class="text-xs text-body-muted">No posts reference this entity yet.</p>'
+          : '<p class="text-xs text-body-muted">No reference posts recorded for this stub yet.</p>';
       return;
     }
     const list = document.createElement('ul');
@@ -258,7 +391,7 @@ class StubDashboard {
     if (!this.promptTextArea) return;
     const value = this.promptTextArea.value;
     if (!value) {
-      this.setStatus('No prompt available for this entity yet.', 'error');
+      this.setStatus('No prompt available for this stub yet.', 'error');
       return;
     }
 
@@ -289,16 +422,22 @@ class StubDashboard {
     }
     const parsed = this.parseJsonInput();
     if (!parsed) return;
-    this.validatedEntity = parsed;
+    this.validatedPayload = parsed;
     this.updatePreview(parsed);
-    this.setStatus('JSON looks good—ready to save.', 'success');
+    this.setStatus(this.mode === 'entity' ? 'JSON looks good—ready to save.' : 'PostSpec JSON looks good—ready to ingest.', 'success');
   }
 
-  private parseJsonInput(): SavePayload | null {
-    if (!this.jsonInput) return null;
-    const raw = this.jsonInput.value.trim();
+  private parseJsonInput(): SavePayload | Record<string, unknown> | null {
+    const input = this.mode === 'entity' ? this.entityJsonInput : this.postJsonInput;
+    if (!input) return null;
+    const raw = input.value.trim();
     if (!raw) {
-      this.setStatus('Paste the completed entity JSON first.', 'error');
+      this.setStatus(
+        this.mode === 'entity'
+          ? 'Paste the completed entity JSON first.'
+          : 'Paste the PostSpec JSON first.',
+        'error',
+      );
       return null;
     }
     let parsed: any;
@@ -309,8 +448,19 @@ class StubDashboard {
       return null;
     }
     if (!parsed || typeof parsed !== 'object') {
-      this.setStatus('Entity must be a JSON object.', 'error');
+      this.setStatus(this.mode === 'entity' ? 'Entity must be a JSON object.' : 'PostSpec must be a JSON object.', 'error');
       return null;
+    }
+
+    if (this.mode === 'post') {
+      const specVersion = Number(parsed.specVersion);
+      const title = typeof parsed.title === 'string' ? parsed.title.trim() : '';
+      const slug = typeof parsed.slug === 'string' ? parsed.slug.trim() : '';
+      if (specVersion !== 2 || !title || !slug) {
+        this.setStatus('PostSpec must include specVersion: 2, title, and slug.', 'error');
+        return null;
+      }
+      return parsed;
     }
 
     const entry = this.stubs.find((stub) => stub.key === this.selectedKey);
@@ -342,19 +492,39 @@ class StubDashboard {
     return { type, slug, name, summary, properties, related };
   }
 
-  private updatePreview(entity: SavePayload) {
-    if (this.previewSummaryEl) {
-      this.previewSummaryEl.textContent = entity.summary || '—';
+  private updatePreview(payload: SavePayload | Record<string, unknown>) {
+    if (this.mode === 'post') {
+      const post = payload as Record<string, unknown>;
+      if (this.previewSummaryEl) {
+        this.previewSummaryEl.textContent =
+          typeof post.title === 'string' && post.title.trim() ? post.title.trim() : '—';
+      }
+      if (this.previewPropsEl) {
+        this.previewPropsEl.textContent =
+          typeof post.contentType === 'string' && post.contentType.trim()
+            ? post.contentType.trim()
+            : '(not set)';
+      }
+      if (this.previewRelatedEl) {
+        const wordCount = post.wordCount;
+        this.previewRelatedEl.textContent =
+          typeof wordCount === 'number' || (typeof wordCount === 'string' && wordCount.trim())
+            ? String(wordCount)
+            : '(not set)';
+      }
+      return;
     }
+
+    const entity = payload as SavePayload;
+    if (this.previewSummaryEl) this.previewSummaryEl.textContent = entity.summary || '—';
     if (this.previewPropsEl) {
       const propCount = Object.keys(entity.properties || {}).length;
       this.previewPropsEl.textContent = `${propCount} field${propCount === 1 ? '' : 's'}`;
     }
     if (this.previewRelatedEl) {
-      this.previewRelatedEl.textContent =
-        entity.related && entity.related.length
-          ? entity.related.join(', ')
-          : 'No related entities provided';
+      this.previewRelatedEl.textContent = entity.related && entity.related.length
+        ? entity.related.join(', ')
+        : 'No related entities provided';
     }
   }
 
@@ -363,42 +533,75 @@ class StubDashboard {
       this.setStatus('Select a stub before saving.', 'error');
       return;
     }
-    const entity = this.validatedEntity || this.parseJsonInput();
-    if (!entity) return;
+    const payload = this.validatedPayload || this.parseJsonInput();
+    if (!payload) return;
 
-    if (this.saveBtn) this.saveBtn.disabled = true;
-    this.setStatus('Saving entity…', 'info');
+    const activeSaveBtn = this.mode === 'entity' ? this.entitySaveBtn : this.postSaveBtn;
+    if (activeSaveBtn) activeSaveBtn.disabled = true;
 
     try {
-      const response = await this.apiFetch('/entities/save', {
-        method: 'POST',
-        headers: this.jsonHeaders,
-        body: JSON.stringify(entity),
-      });
-      const data = await response.json();
-      if (!response.ok || data?.ok === false) {
-        throw new Error(data?.error || 'Failed to save entity');
+      if (this.mode === 'entity') {
+        const entity = payload as SavePayload;
+        this.setStatus('Saving entity…', 'info');
+        const response = await this.apiFetch('/entities/save', {
+          method: 'POST',
+          headers: this.jsonHeaders,
+          body: JSON.stringify(entity),
+        });
+        const data = await response.json();
+        if (!response.ok || data?.ok === false) {
+          throw new Error(data?.error || 'Failed to save entity');
+        }
+        this.setStatus('Entity saved. Refreshing stubs…', 'success');
+        this.removeStub(entity.type, entity.slug);
+        this.fetchStubs(false);
+      } else {
+        this.setStatus('Ingesting post…', 'info');
+        const raw = this.postJsonInput?.value?.trim() || JSON.stringify(payload);
+        const response = await this.apiFetch('/ingest', {
+          method: 'POST',
+          headers: this.jsonHeaders,
+          body: raw,
+        });
+        const data = await response.json();
+        if (!response.ok || data?.ok === false) {
+          throw new Error(data?.error || 'Failed to ingest post');
+        }
+        const slug = typeof (payload as any).slug === 'string' ? (payload as any).slug.trim() : '';
+        this.setStatus('Post ingested.', 'success');
+        if (slug) this.removeStub('post', slug);
       }
-      this.setStatus('Entity saved. Refreshing stubs…', 'success');
-      this.removeStub(entity.type, entity.slug);
-      this.fetchStubs(false);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to save entity';
+      const message = error instanceof Error
+        ? error.message
+        : this.mode === 'entity'
+          ? 'Failed to save entity'
+          : 'Failed to ingest post';
       this.setStatus(message, 'error');
     } finally {
-      if (this.saveBtn) this.saveBtn.disabled = false;
+      if (activeSaveBtn) activeSaveBtn.disabled = false;
     }
   }
 
   private removeStub(type: string, slug: string) {
     const key = `${type}:${slug}`;
-    this.stubs = this.stubs.filter((entry) => entry.key !== key);
-    this.filtered = this.filtered.filter((entry) => entry.key !== key);
+    if (this.mode === 'entity') {
+      this.entityStubs = this.entityStubs.filter((entry) => entry.key !== key);
+      this.entityFiltered = this.entityFiltered.filter((entry) => entry.key !== key);
+      this.stubs = [...this.entityStubs];
+      this.filtered = [...this.entityFiltered];
+    } else {
+      this.postStubs = this.postStubs.filter((entry) => entry.key !== key);
+      this.postFiltered = this.postFiltered.filter((entry) => entry.key !== key);
+      this.stubs = [...this.postStubs];
+      this.filtered = [...this.postFiltered];
+    }
     if (this.selectedKey === key) {
       this.selectedKey = null;
       this.detailPanel?.classList.add('hidden');
       this.emptyState?.classList.remove('hidden');
     }
+    this.applySearchFilter();
     this.renderList();
     this.updateCounts();
   }
@@ -409,7 +612,9 @@ class StubDashboard {
       this.setStatus('Refreshing stub list…', 'info');
     }
     try {
-      const response = await this.apiFetch('/entities/stubs', {
+      const endpoint = this.mode === 'entity' ? '/entities/stubs' : '/posts/stubs';
+      // TODO: wire /posts/stubs in dev-api.js
+      const response = await this.apiFetch(endpoint, {
         method: 'POST',
         headers: this.jsonHeaders,
       });
@@ -418,16 +623,30 @@ class StubDashboard {
         throw new Error(data?.error || 'Failed to load stub prompts');
       }
       const entries = Array.isArray(data.stubs) ? data.stubs : [];
-      this.stubs = entries.map((item: any) => ({
+      const mapped = entries.map((item: any) => ({
         key: `${item.type}:${item.slug}`,
         type: item.type,
         slug: item.slug,
         name: item.name || item.slug,
         prompt: item.prompt || '',
-        filePath: item.filePath || '',
+        filePath: item.filePath || item.relativePath || '',
         references: Array.isArray(item.references) ? item.references : [],
+        stubRationale: item.stubRationale || '',
+        stubParentSlug: item.stubParentSlug || '',
+        stubParentTitle: item.stubParentTitle || '',
       }));
-      this.filtered = [...this.stubs];
+      if (this.mode === 'entity') {
+        this.entityStubs = mapped;
+        this.entityFiltered = [...this.entityStubs];
+        this.stubs = [...this.entityStubs];
+        this.filtered = [...this.entityFiltered];
+      } else {
+        this.postStubs = mapped;
+        this.postFiltered = [...this.postStubs];
+        this.stubs = [...this.postStubs];
+        this.filtered = [...this.postFiltered];
+      }
+      this.applySearchFilter();
       this.renderList();
       this.updateCounts();
       if (this.stubs.length === 0) {
