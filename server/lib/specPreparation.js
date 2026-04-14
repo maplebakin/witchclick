@@ -457,7 +457,7 @@ function createEntityStubRecords(cwd, entities) {
   });
 }
 
-function createPostStubRecords(cwd, postsDirectories, internalLinkHints, siteUrl) {
+function createPostStubRecords(cwd, postsDirectories, internalLinkHints, siteUrl, parentSlug = '', parentTitle = '') {
   if (!Array.isArray(internalLinkHints) || !internalLinkHints.length) return [];
   const stubs = [];
 
@@ -501,9 +501,12 @@ function createPostStubRecords(cwd, postsDirectories, internalLinkHints, siteUrl
       canonicalUrl: `${siteUrl}/post/${candidateSlug}`,
       specVersion: 2,
       draft: true,
+      stubRationale: hint.rationale || '',
+      stubParentSlug: parentSlug || '',
+      stubParentTitle: parentTitle || '',
     };
 
-    const contents = `---\n${toFrontmatterYAML(frontmatter)}\n---\n\n## Placeholder\n\nThis post was automatically created as a stub from an internal link reference. Please replace this content.\n`;
+    const contents = `---\n${toFrontmatterYAML(frontmatter)}\n---\n\n## Placeholder\n\nThis post was automatically created as a stub from an internal link reference. Please replace this content.\n\n**Stub context:**\n- Linked from: ${parentTitle || 'unknown'} (${parentSlug || 'unknown'})\n- Reason this post was linked: ${hint.rationale || 'no rationale recorded'}\n`;
 
     stubs.push({ file, contents, slug: candidateSlug, title });
   }
@@ -658,7 +661,7 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
   const postFilePath = path.join(primaryPostsDir, `${spec.slug}.md`);
 
   const entityStubs = createEntityStubRecords(cwd, spec.entities);
-  const postStubs = createPostStubRecords(cwd, postsDirectories, spec.internalLinkHints, siteUrl);
+  const postStubs = createPostStubRecords(cwd, postsDirectories, spec.internalLinkHints, siteUrl, spec.slug, spec.title);
 
   return {
     spec,

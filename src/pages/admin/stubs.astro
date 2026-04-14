@@ -4,7 +4,12 @@ import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
 import { readSettings, buildCanonicalUrl } from "../../utils/settings";
 import stubDashboardScript from "../../scripts/admin/admin-stub-dashboard.ts?url";
-import { generateStubPrompts, serializeStubEntries } from "../../../server/lib/stubPromptGenerator.js";
+import {
+  generateStubPrompts,
+  serializeStubEntries,
+  generatePostStubPrompts,
+  serializePostStubEntries,
+} from "../../../server/lib/stubPromptGenerator.js";
 
 const settings = readSettings();
 const canonical = buildCanonicalUrl(settings, { path: "/admin/stubs" });
@@ -35,8 +40,31 @@ const stubEntries = serializeStubEntries(stubData.entries).map((entry: {
   references: entry.references,
 }));
 const stubPayload = JSON.stringify(stubEntries);
+
+const postStubData = generatePostStubPrompts({ cwd: process.cwd() });
+const postStubEntries = serializePostStubEntries(postStubData.entries).map((entry: {
+  slug: string;
+  name: string;
+  prompt: string;
+  filePath?: string;
+  relativePath?: string;
+  stubRationale?: string;
+  stubParentSlug?: string;
+  stubParentTitle?: string;
+}) => ({
+  type: 'post',
+  slug: entry.slug,
+  name: entry.name,
+  prompt: entry.prompt,
+  filePath: entry.filePath || entry.relativePath || '',
+  references: [],
+  stubRationale: entry.stubRationale || '',
+  stubParentSlug: entry.stubParentSlug || '',
+  stubParentTitle: entry.stubParentTitle || '',
+}));
+const postStubPayload = JSON.stringify(postStubEntries);
 ---
-<Base title="WitchClick — Stub Entities" description="Fill in entity stubs with AI-assisted prompts." canon={canonical} wide noindex>
+<Base title="Stub Dashboard — Entities & Posts" description="Stub Dashboard — Entities & Posts" canon={canonical} wide noindex>
   <HeadSlot slot="head">
     <meta name="robots" content="noindex" />
   </HeadSlot>
@@ -69,6 +97,7 @@ const stubPayload = JSON.stringify(stubEntries);
         class="grid grid-cols-1 gap-6 lg:grid-cols-12"
         data-stub-dashboard
         data-stubs={stubPayload}
+        data-post-stubs={postStubPayload}
         data-dev-api={DEV_API}
         data-dev-key={DEV_KEY}
       >
@@ -81,6 +110,24 @@ const stubPayload = JSON.stringify(stubEntries);
             <span class="rounded-full bg-surface-accent px-3 py-1 text-[0.8rem] font-semibold uppercase tracking-wide text-accent">
               <span data-stub-count>{stubEntries.length}</span> open
             </span>
+          </div>
+          <div class="mt-4 space-y-2">
+            <div class="inline-flex rounded-full border border-line-neutral bg-surface-neutral-soft p-1">
+              <button
+                type="button"
+                data-mode-entity
+                class="rounded-full px-3 py-1 text-[0.8rem] font-semibold text-body bg-surface-base shadow-sm"
+              >
+                Entity Stubs
+              </button>
+              <button
+                type="button"
+                data-mode-post
+                class="rounded-full px-3 py-1 text-[0.8rem] font-semibold text-body-muted"
+              >
+                Post Stubs
+              </button>
+            </div>
           </div>
           <div class="mt-4 flex gap-2">
             <div class="flex-1">
@@ -159,51 +206,86 @@ const stubPayload = JSON.stringify(stubEntries);
             </div>
 
             <div class="rounded-xl border border-line-subtle bg-surface-base/70 p-4 space-y-4">
-              <div class="flex items-center justify-between gap-2">
-                <div>
-                  <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-primary">Step 2</p>
-                  <h3 class="text-lg font-semibold">Paste entity JSON</h3>
-                  <p class="text-[0.8rem] text-body-muted">Keep the keys: type, name, slug, summary, properties, related.</p>
+              <div data-step2-entity>
+                <div class="flex items-center justify-between gap-2">
+                  <div>
+                    <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-primary">Step 2</p>
+                    <h3 class="text-lg font-semibold">Paste entity JSON</h3>
+                    <p class="text-[0.8rem] text-body-muted">Keep the keys: type, name, slug, summary, properties, related.</p>
+                  </div>
+                  <div class="flex gap-2">
+                    <button
+                      type="button"
+                      data-validate-entity
+                      class="admin-btn-secondary px-3 py-1.5 text-sm font-medium"
+                    >
+                      Validate JSON
+                    </button>
+                    <button
+                      type="button"
+                      data-save-entity
+                      class="admin-btn-primary px-4 py-1.5 text-sm font-semibold"
+                    >
+                      Save Entity
+                    </button>
+                  </div>
                 </div>
-                <div class="flex gap-2">
-                  <button
-                    type="button"
-                    data-validate
-                    class="admin-btn-secondary px-3 py-1.5 text-sm font-medium"
-                  >
-                    Validate JSON
-                  </button>
-                  <button
-                    type="button"
-                    data-save
-                    class="admin-btn-primary px-4 py-1.5 text-sm font-semibold"
-                  >
-                    Save Entity
-                  </button>
-                </div>
+                <textarea
+                  data-json-input-entity
+                  class="mt-4 h-56 w-full rounded-lg border border-line-neutral bg-surface-base/60 px-3 py-2 font-mono text-[0.8rem]"
+                  placeholder='{"type":"ritual","slug":"desk-altar",...}'
+                ></textarea>
+                <p class="mt-4 text-[0.8rem] text-body-muted">
+                  Saving writes directly to <code>content/entities/&lt;type&gt;/&lt;slug&gt;.json</code>. Keep Git running to review diffs.
+                </p>
               </div>
-              <textarea
-                data-json-input
-                class="h-56 w-full rounded-lg border border-line-neutral bg-surface-base/60 px-3 py-2 font-mono text-[0.8rem]"
-                placeholder='{"type":"ritual","slug":"desk-altar",...}'
-              ></textarea>
+              <div data-step2-post class="hidden">
+                <div class="flex items-center justify-between gap-2">
+                  <div>
+                    <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-primary">Step 2</p>
+                    <h3 class="text-lg font-semibold">Paste PostSpec JSON</h3>
+                    <p class="text-[0.8rem] text-body-muted">Provide valid PostSpec v2 JSON before ingesting.</p>
+                  </div>
+                  <div class="flex gap-2">
+                    <button
+                      type="button"
+                      data-validate-post
+                      class="admin-btn-secondary px-3 py-1.5 text-sm font-medium"
+                    >
+                      Validate JSON
+                    </button>
+                    <button
+                      type="button"
+                      data-save-post
+                      class="admin-btn-primary px-4 py-1.5 text-sm font-semibold"
+                    >
+                      Ingest Post
+                    </button>
+                  </div>
+                </div>
+                <textarea
+                  data-json-input-post
+                  class="mt-4 h-56 w-full rounded-lg border border-line-neutral bg-surface-base/60 px-3 py-2 font-mono text-[0.8rem]"
+                  placeholder='{"specVersion":2,"title":"...","slug":"..."}'
+                ></textarea>
+                <p class="mt-4 text-[0.8rem] text-body-muted">
+                  Ingest sends this JSON to <code>/ingest</code> and writes/updates a markdown post in <code>src/content/posts/</code>.
+                </p>
+              </div>
               <div class="grid gap-3 md:grid-cols-3 rounded-lg border border-line-subtle bg-surface-base/50 p-3 text-sm">
                 <div>
-                  <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Summary Preview</p>
+                  <p data-preview-heading-1 class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Summary Preview</p>
                   <p class="mt-1 text-body-strong text-sm" data-preview-summary>Waiting for validation…</p>
                 </div>
                 <div>
-                  <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Properties</p>
+                  <p data-preview-heading-2 class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Properties</p>
                   <p class="mt-1 text-body-strong" data-preview-props>—</p>
                 </div>
                 <div>
-                  <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Related Entities</p>
+                  <p data-preview-heading-3 class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Related Entities</p>
                   <p class="mt-1 text-body-strong text-sm" data-preview-related>—</p>
                 </div>
               </div>
-              <p class="text-[0.8rem] text-body-muted">
-                Saving writes directly to <code>content/entities/&lt;type&gt;/&lt;slug&gt;.json</code>. Keep Git running to review diffs.
-              </p>
             </div>
 
             <p data-status class="text-sm text-body-muted" role="status" aria-live="polite" aria-atomic="true"></p>

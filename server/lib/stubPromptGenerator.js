@@ -158,6 +158,82 @@ export function serializeStubEntries(entries) {
   }));
 }
 
+export function generatePostStubPrompts(options = {}) {
+  const cwd = options.cwd || process.cwd();
+  const postsRoot = path.join(cwd, 'src', 'content', 'posts');
+  if (!fs.existsSync(postsRoot)) {
+    return { total: 0, entries: [], output: '' };
+  }
+
+  const entries = [];
+  for (const filePath of walkMarkdown(postsRoot)) {
+    try {
+      const raw = fs.readFileSync(filePath, 'utf8');
+      const parsed = matter(raw);
+      const fm = parsed.data || {};
+      const body = typeof parsed.content === 'string' ? parsed.content : '';
+      const tags = Array.isArray(fm.tags)
+        ? fm.tags.map((tag) => String(tag || '').trim().toLowerCase()).filter(Boolean)
+        : typeof fm.tags === 'string'
+          ? fm.tags.split(',').map((tag) => String(tag || '').trim().toLowerCase()).filter(Boolean)
+          : [];
+      const hasStubTag = tags.includes('stub');
+      const hasStubBody = body.includes('automatically created as a stub');
+      if (!hasStubTag && !hasStubBody) continue;
+
+      const derivedFromFilename = toSlug(path.basename(filePath, '.md'));
+      const slugSource = typeof fm.slug === 'string' && fm.slug.trim() ? fm.slug.trim() : derivedFromFilename;
+      const slug = toSlug(slugSource);
+      if (!slug) continue;
+
+      const title = typeof fm.title === 'string' && fm.title.trim() ? fm.title.trim() : startCase(slug);
+      const relativePath = path.relative(cwd, filePath);
+      const stubRationale = typeof fm.stubRationale === 'string' ? fm.stubRationale.trim() : '';
+      const stubParentSlug = typeof fm.stubParentSlug === 'string' ? fm.stubParentSlug.trim() : '';
+      const stubParentTitle = typeof fm.stubParentTitle === 'string' ? fm.stubParentTitle.trim() : '';
+
+      entries.push({
+        type: 'post',
+        slug,
+        name: title,
+        filePath: relativePath,
+        stubRationale,
+        stubParentSlug,
+        stubParentTitle,
+        prompt: buildPostStubPrompt({ title, slug, stubRationale, stubParentSlug, stubParentTitle }),
+        references: [],
+      });
+    } catch {
+      /* ignore unreadable post */
+    }
+  }
+
+  entries.sort((a, b) => a.slug.localeCompare(b.slug));
+  const output = entries.map((entry) => entry.prompt).join('\n\n');
+  return { total: entries.length, entries, output };
+}
+
+export function serializePostStubEntries(entries) {
+  return entries.map((entry) => ({
+    type: entry.type,
+    slug: entry.slug,
+    name: entry.name,
+    relativePath: entry.filePath,
+    filePath: entry.filePath,
+    prompt: entry.prompt,
+    references: Array.isArray(entry.references)
+      ? entry.references.map((ref) => ({
+          title: ref.title,
+          slug: ref.slug,
+          sourcePath: ref.sourcePath,
+        }))
+      : [],
+    stubRationale: entry.stubRationale || '',
+    stubParentSlug: entry.stubParentSlug || '',
+    stubParentTitle: entry.stubParentTitle || '',
+  }));
+}
+
 function collectEntityStubs(root, cwd) {
   if (!fs.existsSync(root)) return [];
   const items = [];
@@ -307,6 +383,28 @@ function buildPrompt(record, references) {
   }
   lines.push('', 'Return compact JSON only. No commentary, apologies, or Markdown.');
   return lines.join('\n');
+}
+
+function buildPostStubPrompt({ title, slug, stubRationale, stubParentSlug, stubParentTitle }) {
+  const linkedFrom = stubParentTitle ? `${stubParentTitle} (${stubParentSlug})` : 'unknown';
+  return [
+    'You are the Head of Content for WitchClick, a cozy secular metaphysical blog.',
+    'Generate a PostSpec v2 JSON article for the following stub post.',
+    '',
+    'Post details:',
+    `- Title: ${title}`,
+    `- Slug: ${slug}`,
+    `- Why this post was linked: ${stubRationale || 'not recorded — infer from title'}`,
+    `- Linked from post: ${linkedFrom}`,
+    '',
+    'Content guidelines:',
+    '- contentType: choose the most appropriate from: ritual, reflection, story, tarotSpread, spellwork, crystals',
+    '- wordCount: 900',
+    '- Tone: warm, grounded, secular, neurodivergent-friendly',
+    '- First outline item and section must be "Opening Reflection" with id "opening-reflection"',
+    '- heroImagePrompt: painterly and illustrative scene, not photorealistic, varies in setting/palette/mood to match the topic',
+    '- Return valid PostSpec v2 JSON only. No markdown fences, no commentary.',
+  ].join('\n');
 }
 
 function buildReferenceLines(references) {

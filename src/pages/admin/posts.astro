@@ -176,7 +176,20 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             >
               Save changes
             </button>
+            {isDev && (
+              <button
+                type="button"
+                data-tumblr-push
+                class="rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled
+              >
+                Push to Tumblr
+              </button>
+            )}
             <div data-status class="text-sm text-body-muted" role="status" aria-live="polite" aria-atomic="true"></div>
+            {isDev && (
+              <div data-tumblr-status class="text-sm text-body-muted" role="status" aria-live="polite" aria-atomic="true"></div>
+            )}
           </div>
 
           <ul data-warnings class="hidden list-disc space-y-1 rounded-lg border border-warning bg-warning/10 px-3 py-2 text-[0.8rem] text-warning"></ul>

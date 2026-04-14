@@ -1,6 +1,6 @@
 # AGENTS — WitchClick Collaboration Charter
 
-**Last Updated:** October 29, 2025
+**Last Updated:** April 12, 2026
 **Status:** ✅ Production-Ready
 
 This document guides any collaborator—mortal or metaphysical—through WitchClick's creative, cozy workflow. Blend systems thinking with soft guidance, honoring intuition while delivering reliable results.
@@ -33,13 +33,8 @@ This document guides any collaborator—mortal or metaphysical—through WitchCl
 - **Cozy & accessible**: Warm tone without being woo-woo
 
 ### Current Metrics (as of Oct 2025)
-- **Published Posts:** 28
-- **Draft Posts:** 13 (ready to publish)
-- **Entity Pages:** 83 (crystals, herbs, tarot, rituals)
-- **Total Pages:** 257 built, 244 indexable
-- **SEO Status:** ✅ Sitemap working, RSS active, meta complete
-- **Tests:** 68/68 passing
-- **Build Time:** ~4.8s average
+- Metrics in this section are historical and no longer accurate.
+- For current post/entity counts and operational status, use `LLM_PROJECT_BRIEFING.md`.
 
 ---
 
@@ -214,11 +209,11 @@ node dev-api.js          # Start admin API on port 8787
 
 ### Framework & Build
 - **Framework:** Astro 5.x (static site generation)
-- **Output Mode:** Hybrid (server in dev, static in build)
+- **Output Mode:** Static (`output: "static"`)
 - **Styling:** Tailwind CSS + custom tokens
 - **TypeScript:** Strict mode with `noUncheckedIndexedAccess`
 - **Testing:** Vitest (unit), Playwright (e2e)
-- **Package Manager:** pnpm (workspace support)
+- **Package Manager:** npm
 
 ### Directory Structure
 ```
@@ -425,15 +420,12 @@ ls content/entities/
 ## Known Issues & Roadmap
 
 ### ⚠️ Current Known Issues
-1. **Placeholder Affiliate IDs** - Must replace before monetization
-2. **Some tests have type mismatches** - Non-blocking (17 errors in test files)
-3. **Legacy content directory cleanup** - Posts now live in `src/content/posts/` to keep the pipeline predictable
+- No active known issues are tracked in this charter.
+- For current seams and risks, see `LLM_PROJECT_BRIEFING.md`.
 
 ### 🔧 Technical Debt
-1. **Align ingestion output paths** - Single source of truth for posts
-2. **Add schema validation** - Prevent malformed PostSpec JSON
-3. **Expand test coverage** - Cover pagination, reading time, entity resolution
-4. **Cache-bust post loader** - Invalidate during dev server changes
+1. **Expand test coverage** - Cover pagination, reading time, entity resolution
+2. **Cache-bust post loader** - Invalidate during dev server changes
 
 ### 🚀 Upcoming Features
 1. **Interactive Tools**
@@ -523,7 +515,7 @@ git revert <commit-sha>
 rm -rf dist/ .astro/
 
 # Rebuild node_modules
-rm -rf node_modules/ && pnpm install
+rm -rf node_modules/ && npm install
 
 # Check git status
 git status
@@ -546,4 +538,4 @@ May every contribution harmonize practicality with enchantment. Work within agre
 
 **Version:** 3.0
 **Maintained by:** The WitchClick Constellation
-**Last Audit:** October 29, 2025
+**Last Audit:** April 12, 2026

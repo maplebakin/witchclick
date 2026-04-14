@@ -5,6 +5,7 @@
 //   POST /genprompt    {topic, words, ads:'on'|'off', kofi:'on'|'off'}
 //   POST /ingest       (PostSpec v2 JSON)
 //   POST /bundle       (runs linker -> go:build)
+//   POST /tumblr-push  {slug, title, excerpt, url, heroImage, tags}
 //   POST /entities/list
 //   POST /entities/get {type, slug}
 //   POST /entities/save {type, slug, name, summary, properties, related[]}
@@ -32,6 +33,7 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { pushToTumblr } from './tools/tumblr-push.js';
 
 import { resolveGeneratorPresetKey } from './server/lib/generatorPresets.js';
 import generatorStyles from './server/lib/generatorStyles.js';
@@ -39,7 +41,12 @@ import { buildMasterPrompt } from './server/lib/promptBuilder.js';
 import { buildCursePrompt } from './server/lib/cursePromptBuilder.js';
 import { CURSE_TARGETS, CURSE_TONES, CURSE_TYPES } from './server/lib/curseSpecSchema.js';
 import { loadPromptContext } from './server/lib/promptContext.js';
-import { generateStubPrompts, serializeStubEntries } from './server/lib/stubPromptGenerator.js';
+import {
+  generateStubPrompts,
+  serializeStubEntries,
+  generatePostStubPrompts,
+  serializePostStubEntries,
+} from './server/lib/stubPromptGenerator.js';
 import { executeIngest } from './server/lib/ingestExecutor.js';
 import { resolvePostsDirectories } from './scripts/lib/contentPaths.js';
 import { frontmatterString, parseFrontmatter, readFrontmatter } from './scripts/lib/frontmatter.js';
@@ -59,6 +66,7 @@ const MAX_UPLOAD_BYTES = Number.parseInt(process.env.DEV_API_MAX_UPLOAD_BYTES ||
 const DEV_API_TOKEN = process.env.DEV_API_TOKEN || '';
 const DEV_API_CORS_ORIGIN = process.env.DEV_API_CORS_ORIGIN || '*';
 const DEV_API_LOG = process.env.DEV_API_LOG !== 'false';
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 const rawPort = process.env.DEV_API_PORT ?? process.env.PORT;
 const PORT = rawPort && Number.parseInt(rawPort, 10) > 0 ? Number.parseInt(rawPort, 10) : 8787;
@@ -79,6 +87,7 @@ const RATE_LIMITS = [
   { route: '/genprompt', windowMs: 60_000, max: 20 },
   { route: '/ingest', windowMs: 60_000, max: 6 },
   { route: '/bundle', windowMs: 60_000, max: 4 },
+  { route: '/tumblr-push', windowMs: 60_000, max: 8 },
   { route: '/posts/save', windowMs: 60_000, max: 20 },
   { route: '/posts/update', windowMs: 60_000, max: 20 },
   { route: '/posts/delete', windowMs: 60_000, max: 10 },
@@ -625,6 +634,29 @@ function parseDataUrl(value) {
   const base64 = (match[2] || '').trim().replace(/\s+/g, '');
   if (!base64) return null;
   return { mime, base64 };
+}
+
+function resolveTumblrHeroImagePath(heroImage) {
+  const raw = String(heroImage || '').trim();
+  if (!raw) return '';
+
+  if (/^https?:\/\//i.test(raw)) {
+    try {
+      const parsed = new URL(raw);
+      const pathname = decodeURIComponent(parsed.pathname || '').replace(/^\/+/, '');
+      if (!pathname) return '';
+      return path.join(CWD, 'public', pathname);
+    } catch {
+      return '';
+    }
+  }
+
+  if (path.isAbsolute(raw)) return raw;
+  if (raw.startsWith('/')) {
+    return path.join(CWD, 'public', raw.replace(/^\/+/, ''));
+  }
+
+  return path.resolve(CWD, raw);
 }
 
 function sniffImageHeader(buffer) {
@@ -2354,6 +2386,54 @@ async function withRequestBoundary(req, res, handler) {
     const urlForRouting = parsedUrl ?? new URL(req.url || '', `http://localhost:${PORT}`);
     const pathname = urlForRouting.pathname;
 
+    if (!IS_PRODUCTION && req.method === 'POST' && (req.url === '/tumblr-push' || pathname === '/tumblr-push')) {
+      try {
+        const body = await parseBody(req);
+        const payload = body && typeof body === 'object' ? body : {};
+        const slug = slugify(payload.slug || '');
+        const title = String(payload.title || '').trim();
+        const excerpt = String(payload.excerpt || '').trim();
+        const url = String(payload.url || '').trim();
+        const heroImageInput = String(payload.heroImage || '').trim();
+        const heroImage = resolveTumblrHeroImagePath(heroImageInput);
+        const tags = Array.isArray(payload.tags) ? payload.tags : [];
+
+        console.log('[dev-api]', {
+          route: '/tumblr-push',
+          action: 'attempt',
+          slug,
+          title: title || null,
+          heroImage: heroImage || null,
+          tagsCount: tags.length,
+        });
+
+        const result = await pushToTumblr({
+          title,
+          excerpt,
+          url,
+          heroImage,
+          tags,
+        });
+
+        console.log('[dev-api]', {
+          route: '/tumblr-push',
+          action: 'success',
+          slug,
+          postUrl: result.postUrl,
+        });
+
+        return send(res, 200, { ok: true, postUrl: result.postUrl });
+      } catch (e) {
+        const errorMessage = e?.message || String(e);
+        console.error('[dev-api]', {
+          route: '/tumblr-push',
+          action: 'failure',
+          error: errorMessage,
+        });
+        return send(res, 500, { ok: false, error: errorMessage });
+      }
+    }
+
     if (req.method === 'POST' && (req.url === '/posts/list' || pathname === '/posts/list')) {
       try {
         const items = await listPostsForHero();
@@ -2865,6 +2945,16 @@ async function withRequestBoundary(req, res, handler) {
           references: entry.references,
         }));
         return send(res, 200, { ok: true, total: stubs.length, stubs });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/posts/stubs') {
+      try {
+        const result = generatePostStubPrompts({ cwd: process.cwd() });
+        const stubs = serializePostStubEntries(result.entries);
+        return send(res, 200, { ok: true, stubs });
       } catch (e) {
         return send(res, 500, { ok: false, error: e?.message || String(e) });
       }

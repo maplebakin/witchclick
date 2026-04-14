@@ -25,7 +25,7 @@ export function buildBaseFields() {
     '',
     'Optional but recommended fields:',
     '- specVersion — number 2.',
-    '- heroImagePrompt — descriptive string or null.',
+    '- heroImagePrompt — a painterly, illustrative scene description (2–4 sentences) varying in setting, palette, and mood to match the post topic; or null.',
     '- altTexts — array of strings matching any described images; [] if none.',
     '- entities — array of { type, slug } if referenced.',
     '',
@@ -112,7 +112,7 @@ const makeLooseContract = (structureKey) => [
   ...buildBaseFields(),
   ...(STRUCTURE_REQUIREMENTS[structureKey] || STRUCTURE_REQUIREMENTS.reflection),
   '',
-  '- heroImagePrompt may be null; altTexts only required when images appear in markdown.'
+  '- heroImagePrompt may be null; if provided, must be a painterly scene description that varies in setting, palette, and mood — not a generic candles-and-crystals still life. altTexts only required when images appear in markdown.'
 ];
 
 const STRICT_OUTPUT_CONTRACT = [
