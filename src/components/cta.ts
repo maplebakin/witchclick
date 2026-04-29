@@ -1,6 +1,6 @@
 
 export const KOFI_CTA_VARIANTS: string[] = [
-"If this post lit a little lantern for you, you can toss a coin to the stream at Ko‑fi. It keeps the kettle warm and the words flowing.",
-"Found this spread helpful? Think of Ko‑fi as the 'bonus chest' at the end of the quest: open it and help unlock more cozy rituals.",
-"Want to support more gentle guides like this? You can tip me a tea on Ko‑fi. Every little sip helps."
+"If this post helped you find a truer lens, you can support the work on Ko-fi. It helps keep this little ritual room lit.",
+"Found this spread useful? Ko-fi helps fund more secular rituals, reflective tools, and strange little maps for nonlinear lives.",
+"Want to support more grounded magic like this? You can tip me a tea on Ko-fi. Every little sip helps keep the archive alive."
 ];
