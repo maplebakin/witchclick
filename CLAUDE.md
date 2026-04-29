@@ -5,7 +5,15 @@ Authoritative reference: `LLM_PROJECT_BRIEFING.md` (use it first when details co
 
 ## Project Overview
 
-WitchClick is a production-focused, static site platform for cozy metaphysical content. It uses an AI-driven workflow: Prompt → JSON → CLI ingest → static site. The platform is SEO-forward with internal linking and affiliate routing, built entirely as a zero-server static site.
+WitchClick is a production-focused, static site platform for a secular metaphysical value-space: ritual, tarot, symbolic action, essays, grimoire references, and reflection tools for making meaning outside productivity metrics. It uses an AI-driven workflow: Prompt → JSON → CLI ingest → static site. The platform is SEO-forward with internal linking and affiliate routing, built entirely as a zero-server static site.
+
+Brand and voice direction:
+- Ritual and tarot are secular reflective practices, not supernatural guarantees.
+- WitchClick helps readers choose perspective, reclaim attention, and preserve value that hostile or narrow systems fail to recognize.
+- Neurodivergent-friendly design remains central to the architecture and tone, but it is not the whole brand center.
+- Keep copy warm, grounded, non-gatekeeping, cozy, practical, and slightly strange.
+- Avoid academic, therapy-coded, manifesto-heavy, simplistic anti-money/anti-work, or generic wellness/productivity framing.
+- Prefer localized copy/config/prompt updates before structural code changes; avoid schema or contract edits unless explicitly requested.
 
 **Tech Stack:**
 - **Framework:** Astro 5.x (static site generation)
@@ -18,7 +26,7 @@ WitchClick is a production-focused, static site platform for cozy metaphysical c
 
 ### Core Development
 ```bash
-npm run dev              # Start Astro dev server
+npm run dev              # Starts theme watcher + dev-api.js + Astro dev server via scripts/dev-with-api.mjs
 npm run build            # Production build (runs prebuild checks + build-clean script)
 npm run preview          # Preview production build
 npm run check            # Run Astro check, TypeScript, and ESLint
@@ -29,7 +37,7 @@ npm run check            # Run Astro check, TypeScript, and ESLint
 npm run test             # Run Vitest unit tests
 npm run test:e2e         # Run Playwright e2e tests (smoke tests only)
 npm run lint             # ESLint checks (.ts, .tsx, .js, .cjs, .mjs, .astro)
-npm run linkcheck        # Validate internal/external links in built site
+npm run linkcheck        # Checks internal links only in built site (external http:// and https:// URLs are ignored)
 ```
 
 ### Content Ingestion
@@ -54,19 +62,19 @@ WitchClick uses a structured JSON specification called **PostSpec v2** to genera
 - `specVersion: 2` (required literal)
 - `title`, `slug`, `metaDescription`, `tags[4-7]`, `excerpt`
 - `outline[]`, `sections[]` (structured content)
-- `entities[]` (cross-references to crystals, herbs, tarot, etc.)
+- `entities[]` (cross-references to crystals, herbs, moon phases, planets, tarot, spreads, planetary days, and rituals)
 - `internalLinkHints[]`, `affiliateHints[]` (SEO optimization)
 - `cta`, `adPlacements[]` (monetization)
 
 ### Entity System
 
-Entities are typed content objects (crystals, herbs, moon phases, tarot, planetary days, rituals) stored in `content/entities/<type>/<slug>.json`. They:
+Entities are typed content objects (crystals, herbs, moon phases, planets, tarot, spreads, planetary days, rituals) stored in `content/entities/<type>/<slug>.json`. They:
 - Provide structured metadata for cross-referencing
 - Enable automatic internal linking
 - Support relationship graphs (via `related[]` field)
 - Are referenced in posts via `entities[]` field
 
-**Entity Types:** `crystal`, `herb`, `moonPhase`, `tarot`, `planetaryDay`, `ritual`
+**Entity Types:** `crystal`, `herb`, `moonPhase`, `planet`, `tarot`, `spread`, `planetaryDay`, `ritual`
 
 Posts can reference entities, which auto-creates stub entities if they don't exist (see `server/lib/specPreparation.js` entity stub creation).
 
@@ -87,12 +95,12 @@ Posts can reference entities, which auto-creates stub entities if they don't exi
 │   ├── components/      # Astro components
 │   ├── utils/           # Utility functions
 │   └── lib/             # Library code
-├── content/             # Legacy content directory (fallback)
-│   ├── posts/           # Legacy posts location
+├── content/             # Data files
 │   ├── entities/        # Entity JSON files
 │   ├── products.json    # Affiliate product catalog
-│   ├── settings.json    # Site settings
-│   └── white-magic-curses/ # Curse content (special feature)
+│   └── settings.json    # Site settings
+├── archive/
+│   └── curses/          # Primary curse content storage
 ├── server/              # Server-side logic (validation, preparation)
 │   └── lib/
 ├── scripts/             # CLI scripts (ingest, build helpers)
@@ -107,12 +115,9 @@ TypeScript/Vite configured with `@/` alias → `src/`:
 import { loadAllPosts } from '@/utils/posts';
 ```
 
-### Dual-Directory Content Strategy
+### Post Directory Strategy
 
-Posts can exist in either location (framework detects automatically via `resolvePostDirectory()`):
-- **Location:** `src/content/posts/` (Astro Content Collections with schema validation)
-
-Helper: `scripts/lib/contentPaths.js` → `resolvePostsDirectories()`
+Posts live in `src/content/posts/` only. The runtime resolver uses a single directory.
 
 ### Admin System
 
@@ -123,14 +128,14 @@ Helper: `scripts/lib/contentPaths.js` → `resolvePostsDirectories()`
 **Admin Features:**
 - Generate prompts for AI content creation (`/admin`, `/api/genprompt`)
 - Validate and ingest PostSpec JSON (`/api/ingest`)
-- Manage entities (`/admin/entities`, `/api/entities/*`)
+- Manage entities (`/admin/entities`, `dev-api.js` `/entities/*`; there are no `src/pages/api/entities/*` files)
 - Theme customization (`/admin/theme`)
 
 ### White Magic Curses
 
 Special content type for printable "curses" (playful rituals):
 - Schema: `server/lib/curseSpecSchema.js` (CurseSpec)
-- Storage: `content/white-magic-curses/*.md`
+- Storage: primarily `archive/curses/*.md`
 - Ingestion: Similar to posts but via curse-specific pipeline (`server/lib/cursePreparation.js`)
 - Export: Printable HTML cards generated via `/admin/downloads` or CLI
 
@@ -151,7 +156,7 @@ Posts are loaded via `src/utils/posts.ts`:
 loadAllPosts() // Returns LoadedPost[] with caching in production
 ```
 
-- Auto-detects directory (src/content/posts)
+- Uses a single post directory (`src/content/posts`)
 - Handles frontmatter via gray-matter
 - Augments posts with summaries/spoon levels if enabled
 - Filters drafts (unless explicitly requested)
@@ -241,7 +246,7 @@ See `AGENTS.md` for full collaboration guidelines (includes branching, PR format
 - `dev-api.js` - Local admin API (port 8787)
 - `scripts/ingest.mjs` - CLI content ingestion
 - `server/lib/specPreparation.js` - Core validation/preparation logic
-- `src/utils/posts.ts` - Post loading with dual-directory support
+- `src/utils/posts.ts` - Post loading from a single runtime directory (`src/content/posts`)
 - `content/products.json` - Affiliate product definitions
 - `content/themes/*.json` - Visual themes (managed via Admin Theme editor; `active.json` selects current)
 

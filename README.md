@@ -1,6 +1,8 @@
 # WitchClick
 
-WitchClick is a solo-built Astro site for cozy, secular, neurodivergent-friendly metaphysical content. The public site ships as static HTML, while local content/admin work runs through a small development API (`dev-api.js`) that handles prompt generation, ingest, post/entity editing, hero image uploads, and other admin tasks.
+WitchClick is a solo-built Astro site for a secular metaphysical value-space: rituals, tarot, symbolic references, essays, and reflection tools for making meaning outside productivity metrics. Ritual and tarot are treated as reflective practices, not supernatural guarantees. Neurodivergent-friendly design remains central to the architecture and tone, but the site is broader than ADHD-friendly tools.
+
+The public site ships as static HTML, while local content/admin work runs through a small development API (`dev-api.js`) that handles prompt generation, ingest, post/entity editing, hero image uploads, and other admin tasks.
 
 ## Tech stack
 
@@ -91,6 +93,8 @@ Open the site at `http://localhost:4321` unless Astro chooses a different port.
 - `npm run zip` — create a backup zip of the repo, excluding `node_modules`, `.git`, and `dist`.
 
 ## Content pipeline
+
+Generated content should preserve WitchClick's current positioning: warm, grounded, non-gatekeeping, cozy, practical, and slightly strange. Prompts and posts should frame ritual, tarot, grimoire references, and tools as ways to choose perspective, reclaim attention, and make meaning without promising external outcomes. Avoid academic, therapy-coded, manifesto-heavy, or generic wellness/productivity framing.
 
 ### Posts
 
