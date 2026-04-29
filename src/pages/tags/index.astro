@@ -7,7 +7,7 @@ import { canonicalTagHref, canonicalizeTagSlug, tagsFromFrontmatter } from "@/ut
 export const prerender = true;
 
 const title = "Browse by Tag";
-const description = "Every topic we've written about, in one place.";
+const description = "Follow the threads that run through the WitchClick archive: rituals, essays, tarot, symbols, moods, and recurring questions.";
 
 const posts = loadAllPosts();
 const tagMap = new Map<string, { label: string; count: number }>();
@@ -50,7 +50,7 @@ const breadcrumbs = [
     </header>
 
     {tags.length === 0 ? (
-      <p class="text-body-muted">No tags yet. Check back after the next post drop.</p>
+      <p class="text-body-muted">No threads are gathered yet. Check back after the next post lands.</p>
     ) : (
       <div class="mt-8 flex flex-wrap gap-3">
         {tags.map((tag) => (
