@@ -13,7 +13,7 @@ export function buildBaseFields() {
     '- title (name, headline) — concise post title with the primary keyword.',
     '- slug (permalink, urlSlug) — kebab-case, ≤70 characters, no spaces.',
     '- contentType — one of: "ritual", "reflection", "story", "tarotSpread", "spellwork", "crystals". MUST match the preset mode you are using.',
-    '- metaDescription (meta, description, seoDescription) — concise, cozy, non-clickbait summary.',
+    '- metaDescription (meta, description, seoDescription) — concise, warm, non-clickbait summary.',
     '- tags (keywords, labels) — array of 4–7 short strings.',
     '- excerpt — 35–55 words across 1–2 sentences.',
     '- outline — array of { heading, id } aligned to sections in the same order.',
@@ -37,75 +37,97 @@ export const BASE_FIELDS = buildBaseFields();
 
 // Preset-specific structure requirements
 export const STRUCTURE_REQUIREMENTS = {
-  reflection: [
+  curiousExplainer: [
     '',
-    'Content Structure for Reflection Essays:',
-    '- contentType: Set to "reflection"',
-    '1. Main reflection sections: 2–4 sections exploring different angles of the topic',
-    '2. Journaling Prompts: A section with 3–5 open-ended questions for self-inquiry',
-    '3. Gentle Closing: A final section with integration thoughts',
-    '- NO ritual checklists or step-by-step instructions needed',
-    '- Focus on introspection, questions, and gentle exploration'
+    'Content Structure for Curious Explainer:',
+    '- contentType: Set to "curiousExplainer"',
+    '1. 2–4 main sections exploring the idea from different angles',
+    '2. Practical Invitation: one section with low-pressure ways the reader might test the idea in real life',
+    '3. Gentle Closing: a brief closing that leaves space for the reader\'s own experience',
+    '- NO journaling prompts, NO ritual checklists, NO step-by-step instructions',
+    '- Tone: practical-curious. Blog-style. Ideas and invitations, not authority or generic wellness advice.',
   ],
-  ritual: [
+  practicalWorking: [
     '',
-    'Content Structure for Ritual Guides:',
-    '- contentType: Set to "ritual"',
-    '1. Quick/Low-Energy Variant: 3–5 numbered steps, acknowledges low-spoon readers',
+    'Content Structure for Practical Working:',
+    '- contentType: Set to "practicalWorking"',
+    '1. Quick / Low-Energy Variant: 3–5 numbered steps, acknowledges low-spoon readers',
     '2. Deep Variant: 4–7 numbered steps with optional add-ons and mindful pauses',
-    '3. Reflection Prompt: One expansive journaling question',
-    '4. Checklist/Summary: Scannable list summarizing supplies/steps/outcomes',
-    '5. Safety Note (if needed): Include if ritual involves heat, blades, or could be misread as medical advice',
-    '- Headings MUST explicitly include "Quick" (or "Low-Energy") and "Deep"'
+    '3. Reflection Prompt: one expansive question about attention, meaning, values, or perspective',
+    '4. Checklist / Summary: scannable list of supplies, steps, outcomes',
+    '5. Safety Note (if working involves heat, blades, or could be misconstrued as medical advice)',
+    '- Headings MUST explicitly include "Quick" (or "Low-Energy") and "Deep"',
+    '- Substitutions are always valid. Say so.',
   ],
-  story: [
+  reflectiveEssay: [
     '',
-    'Content Structure for Story/Vignettes:',
-    '- contentType: Set to "story"',
-    '1. Story sections: 3–5 narrative sections with sensory details and emotional arc',
-    '2. Gentle Takeaway: A brief closing reflection on what the story offers',
+    'Content Structure for Reflective Essay:',
+    '- contentType: Set to "reflectiveEssay"',
+    '1. 2–4 main sections exploring different angles of the topic',
+    '2. Journaling Prompts: 3–5 open-ended questions for self-inquiry',
+    '3. Gentle Closing: integration thoughts',
+    '- NO ritual checklists, NO step-by-step instructions',
+    '- Focus on introspection, questions, and meaning-making without turning the reader into a project',
+  ],
+  storyVignette: [
+    '',
+    'Content Structure for Story & Vignette:',
+    '- contentType: Set to "storyVignette"',
+    '1. 3–5 narrative sections with sensory detail and emotional arc',
+    '2. Reflective Takeaway: brief closing reflection on what the story offers',
     '- Write in first-person or close third-person',
-    '- NO checklists, prompts, or instructional content',
-    '- Focus on atmosphere, emotion, and everyday magic'
+    '- NO checklists, NO prompts, NO instructional content',
+    '- Focus on atmosphere, emotion, and symbolic meaning inside ordinary life',
   ],
-  tarotSpread: [
+  grimoireTarot: [
     '',
-    'Content Structure for Tarot Spreads:',
-    '- contentType: Set to "tarotSpread"',
-    '1. Spread Layout: Visual description of card positions',
-    '2. Position Meanings: Detailed explanation of each position (3–7 positions typical)',
-    '3. Reading Tips: How to interpret connections between cards',
-    '4. Reflection Questions: 2–3 questions to deepen the reading',
+    'Content Structure for Grimoire Entry — Tarot:',
+    '- contentType: Set to "grimoireTarot"',
+    '1. Spread Layout or Card Overview: visual description of positions or card meaning',
+    '2. Position Meanings or Interpretive Depth: detailed explanation (3–7 positions for spreads)',
+    '3. Reading Tips: how to interpret connections, perspectives, or tensions in the card',
+    '4. Reflection Questions: 2–3 questions to deepen the reading without treating it as prediction',
     '5. Gentle Closing: 1–2 paragraphs with integration thoughts and one internal link',
-    '- NO ritual steps or material checklists',
     '- Keep interpretations secular-friendly and archetypal',
-    '- Focus on self-reflection rather than prediction'
+    '- Focus on self-reflection rather than prediction',
   ],
-  spellwork: [
+  grimoireCrystal: [
     '',
-    'Content Structure for Spellwork:',
-    '- contentType: Set to "spellwork"',
-    '1. Ingredients & Correspondences: What you\'ll need and why',
-    '2. Step-by-Step Instructions: Numbered steps for the working',
-    '3. Variations & Substitutions: Options for different needs/availability',
-    '4. Closing & Grounding: How to complete and ground the working',
-    '5. Safety Notes: Highlight consent, mundane alternatives, and physical safety',
-    '- Emphasize that substitutions are valid',
-    '- Include mundane action steps alongside magical ones'
-  ],
-  crystals: [
-    '',
-    'Content Structure for Crystal Profiles:',
-    '- contentType: Set to "crystals"',
-    '1. Geological Properties: Scientific facts about formation, composition, appearance',
-    '2. Mindful Uses: Secular, grounded applications in daily life',
-    '3. Care & Cleansing: How to physically care for the stone',
-    '4. Pairing Ideas: What stones, practices, or intentions work well together',
-    '5. Gentle Closing: 1–2 paragraphs inviting the reader to work with the stone gently',
+    'Content Structure for Grimoire Entry — Crystal:',
+    '- contentType: Set to "grimoireCrystal"',
+    '1. Geological Properties: scientific facts about formation, composition, appearance',
+    '2. Mindful Uses: secular, grounded applications for attention, sensory anchoring, or symbolic practice',
+    '3. Care & Cleansing: how to physically care for the stone',
+    '4. Pairing Ideas: what stones, practices, or intentions work well together',
+    '5. Gentle Closing: 1–2 paragraphs inviting the reader to work with the stone',
     '- Balance scientific accuracy with metaphysical perspectives',
-    '- NO ritual checklists',
-    '- Avoid medical claims; focus on mindful intention-setting'
-  ]
+    '- NO medical claims. NO ritual checklists.',
+  ],
+  grimoireHerb: [
+    '',
+    'Content Structure for Grimoire Entry — Herb:',
+    '- contentType: Set to "grimoireHerb"',
+    '1. Botanical Profile: common name, plant family, brief growth notes',
+    '2. Historical & Folk Use: how this herb has appeared across traditions',
+    '3. Mindful Uses: secular applications — tea, smoke, tincture, kitchen, sensory anchor, or symbolic cue',
+    '4. Care & Working With It: sourcing, preparation, safety notes',
+    '5. Pairing Ideas: intentions, practices, or other herbs that work well alongside',
+    '6. Gentle Closing: 1–2 paragraphs inviting the reader in without pressure',
+    '- Be honest about what is botanical fact vs folk tradition vs personal practice',
+    '- Always include safety notes around preparation and consumption',
+  ],
+  grimoireAstrology: [
+    '',
+    'Content Structure for Grimoire Entry — Astrology:',
+    '- contentType: Set to "grimoireAstrology"',
+    '1. Core Concepts: what this placement, sign, transit, or aspect actually means',
+    '2. In Daily Life: how it shows up practically, not just symbolically',
+    '3. Working With It: reflective practices, timing, intentions, and perspective shifts',
+    '4. Common Misconceptions: honest, non-gatekeeping corrections',
+    '5. Gentle Closing: 1–2 paragraphs that leave room for the reader\'s own experience',
+    '- Treat astrology as symbolic language for self-reflection, not predictive science',
+    '- Be honest about what astrology is and isn\'t',
+  ],
 };
 
 const makeLooseContract = (structureKey) => [
@@ -155,41 +177,53 @@ const makePreset = ({ key, label, system, goal }) => ({
 
 const DEFINITIONS = [
   {
-    key: 'reflection',
-    label: 'Reflection Essay',
-    system: 'You are a gentle, practical guide. Be kind, concrete, and non-dogmatic.',
-    goal: 'A reflective, secular piece aimed at journaling and gentle self-inquiry. Focus on questions and introspection rather than step-by-step instructions.'
+    key: 'curiousExplainer',
+    label: 'Curious Explainer',
+    system: 'You are a thoughtful companion exploring an idea alongside the reader. You are not an authority delivering conclusions — you are someone genuinely curious about how symbols, attention, and perspective shape a life. Write practically and openly, with ideas and invitations rather than instructions or journaling prompts.',
+    goal: 'A blog-style exploratory piece that helps the reader understand something and try it in their own way. Practical-curious in register. No checklists, no ritual steps, no journaling prompts — just honest exploration and a usable invitation.'
   },
   {
-    key: 'ritual',
-    label: 'Ritual Guide',
-    system: 'You are a precise ritual describer. Emphasize safety, consent, and optionality.',
-    goal: 'A step-by-step ritual with materials, timing, and safety notes. Include both quick and deep variants.'
+    key: 'practicalWorking',
+    label: 'Practical Working',
+    system: 'You are a careful, consent-first guide. Emphasize safety, optionality, and symbolic action as a way to choose a lens on purpose. Write like someone who has done this themselves and knows it doesn\'t always go perfectly — and that\'s fine.',
+    goal: 'A practical guide to a ritual, spell, or working as reflective practice. Include both a quick/low-energy variant and a deep variant. Safety, consent, and substitutions are always acknowledged. No promised external outcomes.'
   },
   {
-    key: 'story',
-    label: 'Story / Vignette',
-    system: 'You are a cozy storyteller sharing first-person snapshots of everyday magic.',
-    goal: 'A narrative vignette that blends sensory detail, emotion, and gentle takeaways. No checklists or instructional content.'
+    key: 'reflectiveEssay',
+    label: 'Reflective Essay',
+    system: 'You are a thoughtful companion, not a teacher. Be genuinely curious, admit what you don\'t know, and write with the reader beside you. Leave room for the reader\'s own conclusions and their own measure of value.',
+    goal: 'A reflective, secular piece aimed at questions, attention, and meaning-making. Focus on introspection and perspective rather than step-by-step instructions.'
   },
   {
-    key: 'tarotSpread',
-    label: 'Tarot Spread',
-    system: 'You are a tarot spread designer. Be secular-friendly and practical.',
-    goal: 'A tarot spread with card positions, layout notes, and interpretive guidance. Focus on self-reflection rather than prediction.'
+    key: 'storyVignette',
+    label: 'Story & Vignette',
+    system: 'You are a patient narrator of ordinary symbolic moments. Write in first-person or close third. Let atmosphere arrive slowly. Don\'t rush the moment or overexplain the meaning.',
+    goal: 'A narrative vignette that blends sensory detail, emotion, and reflective takeaways about attention, value, or perspective. No checklists or instructional content.'
   },
   {
-    key: 'spellwork',
-    label: 'Spellwork Recipe',
-    system: 'You are a careful spellcraft mentor. Highlight consent, substitutions, and mundane options.',
-    goal: 'A spell or working with correspondences, timing, variations, and safety notes. Include both magical and mundane action steps.'
+    key: 'grimoireTarot',
+    label: 'Grimoire Entry — Tarot',
+    system: 'You are a secular tarot companion — practical, archetypal, and genuinely curious about what emerges. Treat cards as prompts, mirrors, and perspective tools, not answers. Stay unhurried.',
+    goal: 'A tarot spread or card reference with positions, layout notes, and interpretive guidance. Focus on self-reflection, values, and narrative choice rather than prediction. Secular-friendly throughout.'
   },
   {
-    key: 'crystals',
-    label: 'Crystal Profile',
-    system: 'You are a crystal caretaker who balances geology with mindful, secular use.',
-    goal: 'A crystal spotlight covering geological properties, care instructions, and practical applications. Balance scientific accuracy with metaphysical perspectives.'
-  }
+    key: 'grimoireCrystal',
+    label: 'Grimoire Entry — Crystal',
+    system: 'You are a careful observer who finds the geological and the meaningful equally interesting. Balance scientific accuracy with grounded, secular application and symbolic use. Don\'t oversell.',
+    goal: 'A crystal profile covering geological properties, care instructions, mindful secular uses, sensory anchors, and pairing ideas. No medical claims. No ritual checklists.'
+  },
+  {
+    key: 'grimoireHerb',
+    label: 'Grimoire Entry — Herb',
+    system: 'You are a grounded herbalist who respects both the botanical and the traditional without overstating either. Be honest about what is known, what is folk tradition, and what is personal symbolic practice.',
+    goal: 'An herb profile covering botanical facts, historical and folk use, mindful secular applications, sensory or symbolic cues, care and preparation, and pairing ideas. Safety notes always included.'
+  },
+  {
+    key: 'grimoireAstrology',
+    label: 'Grimoire Entry — Astrology',
+    system: 'You are a grounded astrology companion who treats the subject as a symbolic language for self-reflection and perspective, not a predictive science. Be honest about what astrology is and isn\'t. Correct misconceptions clearly and kindly.',
+    goal: 'An astrology reference piece covering a placement, sign, transit, or aspect. Practical daily applications, reflective working suggestions, and honest correction of common misconceptions.'
+  },
 ];
 
 const presets = {};
@@ -204,8 +238,14 @@ for (const def of DEFINITIONS) {
 }
 
 // Back-compat aliases
-presets.spread = presets.tarotSpread;
-presets.tarot = presets.tarotSpread;
+presets.ritual = presets.practicalWorking;
+presets.reflection = presets.reflectiveEssay;
+presets.story = presets.storyVignette;
+presets.tarotSpread = presets.grimoireTarot;
+presets.tarot = presets.grimoireTarot;
+presets.spread = presets.grimoireTarot;
+presets.crystals = presets.grimoireCrystal;
+presets.spellwork = presets.practicalWorking;
 
 export const generatorPresetOptions = DEFINITIONS.map(({ key, label, goal }) => ({
   key,

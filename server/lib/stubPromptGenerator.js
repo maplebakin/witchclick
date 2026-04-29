@@ -18,15 +18,15 @@ const TYPE_LABELS = {
 const DEFAULT_GUIDANCE = {
   label: 'Lore Entry',
   summary:
-    'Offer a 45–70 word overview that explains why this ally matters, how it feels, and how a low-spoons practitioner can work with it today.',
+    'Offer a 45–70 word overview that explains why this ally matters, how it feels, and how a low-spoons practitioner can use it for attention, meaning, or symbolic practice today.',
   properties: [
     'Include at least three properties (strings or arrays) that give tangible instructions, e.g., focus themes, tools, timings, prompts, or sensory anchors.',
-    'Highlight at least one accessibility note or gentle variation.',
+    'Highlight at least one accessibility note, capacity-aware variation, or grounding option.',
   ],
   related:
     'List 2–4 allied entries (`type:slug`) that would naturally pair with this lore. If unsure, choose adjacent staples like `ritual:desk-altar` or `crystal:amethyst`.',
   extras: [
-    'Tone stays secular, cozy, and neurodivergent-friendly.',
+    'Tone stays secular, warm, grounded, neurodivergent-aware, and focused on reflective practice.',
     'Return JSON only—no Markdown, commentary, or extra keys.',
   ],
 };
@@ -35,7 +35,7 @@ const TYPE_GUIDANCE = {
   crystal: {
     label: 'Crystal Ally',
     summary:
-      'Describe the stone’s energetic feel, everyday uses, and how it supports overstimulated or low-energy practitioners (45–65 words).',
+      'Describe the stone’s sensory feel, symbolic uses, and how it supports overstimulated or low-energy practitioners as a reflective anchor (45–65 words).',
     properties: [
       'Include `keywords` (3 calming verbs or moods).',
       'Mention body focus (`chakra`, `bodyArea`, or `nervousSystemSupport`).',
@@ -43,16 +43,16 @@ const TYPE_GUIDANCE = {
       'Offer one sensory placement idea (`placement`, `carryIdeas`, or `lowSpoonsUse`).',
     ],
     related:
-      'Pair with 2–3 allies such as herbs, rituals, or moon phases that amplify the crystal’s effect (format `type:slug`).',
+      'Pair with 2–3 allies such as herbs, rituals, or moon phases that deepen the crystal’s reflective use (format `type:slug`).',
     extras: ['Mention if it plays nicely with electronics or desks (helpful for remote workers).'],
   },
   herb: {
     label: 'Herbal Ally',
     summary:
-      'Capture the herb’s flavor, nervous-system impact, and ideal preparations without making medical claims (45–65 words).',
+      'Capture the herb’s flavor, sensory presence, and ideal preparations without making medical claims (45–65 words).',
     properties: [
       'Add `flavorProfile` or `aromaNotes`.',
-      'Detail calming actions with `idealPreparations` (tea, tincture, sachet, diffuser).',
+      'Detail grounding or sensory actions with `idealPreparations` (tea, tincture, sachet, diffuser).',
       'State `cautions` or substitutions if someone is sensitive.',
       'Share `pairings` (crystals, rituals, moon phases) or `sensoryAnchors`.',
     ],
@@ -70,7 +70,7 @@ const TYPE_GUIDANCE = {
       'Mention sensory cues (`lighting`, `soundtrack`, or `bodyFeel`).',
     ],
     related: 'Link to adjacent phases plus rituals or herbs that thrive during this phase.',
-    extras: ['Note one boundary or pacing reminder for ADHD/ND brains.'],
+    extras: ['Note one boundary or pacing reminder for ADHD/ND brains without making neurodivergence the whole point.'],
   },
   planet: {
     label: 'Planetary Mirror',
@@ -87,7 +87,7 @@ const TYPE_GUIDANCE = {
   ritual: {
     label: 'Ritual Practice',
     summary:
-      'Describe who this ritual serves, the vibe, and the outcome in 55–80 words. Mention spoon levels and substitutions.',
+      'Describe who this ritual serves, the vibe, and the reflective purpose in 55–80 words. Mention spoon levels and substitutions.',
     properties: [
       'Specify `duration` and `idealTimes` (array of day/phase contexts).',
       'List `tools` or `supplies` (array).',
@@ -95,12 +95,12 @@ const TYPE_GUIDANCE = {
       'Offer `lowSpoonsVariant` or `sensoryAnchors`.',
     ],
     related: 'Connect to crystals, herbs, and tarot spreads that appear inside the ritual.',
-    extras: ['Always include a grounding or aftercare hint.'],
+    extras: ['Always include a grounding or aftercare hint. Avoid promising external outcomes.'],
   },
   tarot: {
     label: 'Tarot Lore',
     summary:
-      'If this is a card, describe its archetype and reassurance for skeptics. If it is a spread, explain the situation it answers (55–80 words).',
+      'If this is a card, describe its archetype and reassurance for skeptics. If it is a spread, explain the perspective or situation it helps examine (55–80 words).',
     properties: [
       'Add `keywords` (upright mood words).',
       'Include `shadowWork` or `reversed` insight (even if brief).',
@@ -355,7 +355,7 @@ function buildPrompt(record, references) {
   const lines = [];
 
   lines.push(
-    `You are the Aurora Scribe for WitchClick, completing a ${typeLabel.toLowerCase()} entry for the cozy grimoire.`,
+    `You are the Aurora Scribe for WitchClick, completing a ${typeLabel.toLowerCase()} entry for a secular grimoire of symbolic practice and reflective tools.`,
   );
   lines.push('Return JSON with exactly these keys: "type", "name", "slug", "summary", "properties", "related".');
   lines.push(
@@ -378,7 +378,7 @@ function buildPrompt(record, references) {
   } else {
     lines.push(
       '',
-      'No published posts reference this entry yet—keep it grounded in secular, evidence-friendly wisdom.',
+      'No published posts reference this entry yet—keep it grounded in secular, reflective, evidence-friendly wisdom.',
     );
   }
   lines.push('', 'Return compact JSON only. No commentary, apologies, or Markdown.');
@@ -388,7 +388,7 @@ function buildPrompt(record, references) {
 function buildPostStubPrompt({ title, slug, stubRationale, stubParentSlug, stubParentTitle }) {
   const linkedFrom = stubParentTitle ? `${stubParentTitle} (${stubParentSlug})` : 'unknown';
   return [
-    'You are the Head of Content for WitchClick, a cozy secular metaphysical blog.',
+    'You are the Head of Content for WitchClick, a secular metaphysical space for making meaning outside productivity metrics.',
     'Generate a PostSpec v2 JSON article for the following stub post.',
     '',
     'Post details:',
@@ -400,7 +400,8 @@ function buildPostStubPrompt({ title, slug, stubRationale, stubParentSlug, stubP
     'Content guidelines:',
     '- contentType: choose the most appropriate from: ritual, reflection, story, tarotSpread, spellwork, crystals',
     '- wordCount: 900',
-    '- Tone: warm, grounded, secular, neurodivergent-friendly',
+    '- Tone: warm, grounded, secular, neurodivergent-aware, slightly strange, and practical',
+    '- Frame ritual, tarot, and symbolic tools as reflective practices for attention, meaning, and perspective; do not promise supernatural results',
     '- First outline item and section must be "Opening Reflection" with id "opening-reflection"',
     '- heroImagePrompt: painterly and illustrative scene, not photorealistic, varies in setting/palette/mood to match the topic',
     '- Return valid PostSpec v2 JSON only. No markdown fences, no commentary.',

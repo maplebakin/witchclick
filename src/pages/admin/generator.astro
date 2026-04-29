@@ -36,10 +36,10 @@ const styleOptions = Object.entries(generatorStyles)
   });
 
 const defaultModeDescription =
-  "Use the master prompt for the full ritual + reflection flow, or choose a template for a specialty outline.";
+  "Use the master prompt for the full ritual + reflection flow, or choose a template for a focused article shape.";
 const defaultStyleDescription =
   styleOptions.find((option) => option.key === "cozy")?.description ??
-  "Write like a gentle, imperfect friend: warm, soft, everyday metaphors.";
+  "Write with warmth, grounding, and a little strangeness: emotionally useful, clear, never bland.";
 
 // Gate: dev OR query ?key=PUBLIC_ADMIN_KEY (useful if you later switch to a server adapter)
 const isDev = import.meta.env.DEV;
@@ -72,14 +72,14 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           <div>
             <h1 class="text-2xl font-semibold text-body-strong">Generator</h1>
             <p class="text-sm text-body-muted mt-1">
-              AI-powered workflow for creating posts and curses. Generate prompts, validate JSON, preview content, and ingest to your site.
+              Workflow for creating WitchClick posts and curses. Generate prompts, validate JSON, preview content, and ingest to your site.
             </p>
           </div>
           <div class="rounded-lg border border-dashed border-line-subtle bg-surface-base/60 p-4 text-[0.8rem] text-body-muted">
             <div class="font-semibold mb-2">📝 How it works:</div>
             <ol class="space-y-2 ml-4 list-decimal">
-              <li><strong>Choose content type:</strong> Select Posts for articles or Curses for printable rituals</li>
-              <li><strong>Generate prompt:</strong> Fill in topic and preferences, get an AI-ready prompt</li>
+              <li><strong>Choose content type:</strong> Select Posts for articles or Curses for printable boundary rituals</li>
+              <li><strong>Generate prompt:</strong> Fill in topic, structure, and voice preferences for a WitchClick-ready prompt</li>
               <li><strong>Get JSON from AI:</strong> Paste the prompt into your preferred LLM and receive structured JSON</li>
               <li><strong>Validate & Preview:</strong> Check the JSON structure and preview how it'll look</li>
               <li><strong>Ingest:</strong> Save to your content directory as markdown files</li>
@@ -125,23 +125,23 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               <p class="text-[0.8rem] text-body-muted">Paste PostSpec JSON from your AI, then validate, preview, and ingest</p>
             </div>
 
-            <textarea id="spec" class="h-56 w-full admin-btn-secondary px-3 py-2 font-mono text-[0.8rem]" placeholder="Infuse the Oracle's PostSpec v2 JSON here…"></textarea>
+            <textarea id="spec" class="h-56 w-full admin-btn-secondary px-3 py-2 font-mono text-[0.8rem]" placeholder="Paste the returned PostSpec v2 JSON here…"></textarea>
 
             <div class="mt-3 space-y-4 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] lg:gap-6">
               <div class="space-y-3">
                 <div class="flex flex-col gap-2">
                   <div class="flex flex-wrap items-center gap-2 text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">
-                    <span>Binding method</span>
+                    <span>Save mode</span>
                     <div class="inline-flex rounded-full border border-line-neutral bg-surface-neutral-soft p-1" data-save-mode>
-                      <button type="button" data-mode="publish" class="rounded-full px-3 py-1 text-[0.8rem] font-semibold text-body bg-surface-base shadow-sm">Whisper to the world</button>
-                      <button type="button" data-mode="draft" class="rounded-full px-3 py-1 text-[0.8rem] font-semibold text-body-muted">Secure in the grimoire</button>
+                      <button type="button" data-mode="publish" class="rounded-full px-3 py-1 text-[0.8rem] font-semibold text-body bg-surface-base shadow-sm">Publish</button>
+                      <button type="button" data-mode="draft" class="rounded-full px-3 py-1 text-[0.8rem] font-semibold text-body-muted">Save draft</button>
                     </div>
                   </div>
                   <div class="flex flex-wrap gap-2">
-                    <button id="validateBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">✓ Verify Runes</button>
-                    <button id="previewBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">👁 Gaze into the Orb</button>
-                    <button id="ingestBtn" class="admin-btn-primary px-4 py-2 text-sm font-semibold">💾 Bind Draft</button>
-                    <button id="ingestPublishBtn" class="admin-btn-primary px-4 py-2 text-sm font-semibold">🚀 Unveil & Publish</button>
+                    <button id="validateBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">✓ Validate</button>
+                    <button id="previewBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">Preview</button>
+                    <button id="ingestBtn" class="admin-btn-primary px-4 py-2 text-sm font-semibold">Save Draft</button>
+                    <button id="ingestPublishBtn" class="admin-btn-primary px-4 py-2 text-sm font-semibold">Publish</button>
                     <button id="clearBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">Clear</button>
                   </div>
                   <div class="text-[0.8rem] text-body-muted rounded-lg border border-dashed border-line-subtle bg-surface-base/60 px-3 py-2">
@@ -617,9 +617,9 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
         $('genPrompt').addEventListener('click', async function(){
           try{
-            busy(true); setStatus('Whispering guidance...', null);
+            busy(true); setStatus('Building prompt...', null);
             var body = {
-              topic: $('topic').value || 'tea ritual for focus',
+              topic: $('topic').value || 'tarot spread for reclaiming attention',
               words: Number($('words').value || 1200),
               ads: $('ads').checked ? 'on' : 'off',
               kofi: $('kofi').checked ? 'on' : 'off',
@@ -635,7 +635,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             if(!res.ok) throw new Error((data && data.error) || ('gen failed ('+res.status+')'));
             if (!data || !data.ok) throw new Error((data && data.error) || 'gen failed');
             $('promptOut').value = (data && data.prompt) || '';
-            setStatus('Guidance whispered ✓', true);
+            setStatus('Prompt ready ✓', true);
           }catch(e){ setStatus('Prompt error: ' + (e.message||String(e)), false); }
           finally{ busy(false); }
         });
@@ -644,14 +644,14 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           var field = $('promptOut');
           try{
             await navigator.clipboard.writeText(field?.value || '');
-            setStatus('Copied spell ✓', true);
+            setStatus('Copied prompt ✓', true);
           }
           catch {
             if (field) {
               field.focus();
               field.select();
             }
-            setStatus('Press ⌘/Ctrl+C to copy the verse', null);
+            setStatus('Press ⌘/Ctrl+C to copy the prompt', null);
           }
         });
 
