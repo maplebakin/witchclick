@@ -8,8 +8,8 @@ import { readSettings, getFormEndpoint } from "../../utils/settings";
 import { createItemListSchema } from "../../utils/structuredData";
 import { buildAffiliateTarget, readProductCatalog } from "@/utils/products";
 
-const title = "Prints & Tools";
-const description = "Free printables, ritual downloads, and curated tools for your practice.";
+const title = "Ritual Tools";
+const description = "Printables, ritual supports, and curated tools for reflection, tarot, and meaning-making.";
 
 interface DownloadEntry {
   slug?: string;
@@ -171,25 +171,25 @@ const breadcrumbs = [
 
   <div class="tools-page-container">
     <header class="page-header">
-      <p class="page-header__eyebrow">Printable library</p>
+      <p class="page-header__eyebrow">Practice supports</p>
       <h1 class="page-header__title">{title}</h1>
-      <p class="page-header__lead">Free printables, ritual downloads, and curated tools for everyday magic.</p>
+      <p class="page-header__lead">Printables, ritual supports, and curated objects for choosing a lens and keeping meaning close.</p>
     </header>
 
     <!-- SECTION 1: Free Prints & Downloads -->
     <section class="tools-section">
       <div class="tools-section__header">
-        <h2 class="tools-section__title">Free Prints & Downloads</h2>
+        <h2 class="tools-section__title">Free Prints & Ritual Supports</h2>
         <p class="tools-section__description">
-          Print-at-home planners, ritual guides, and calendar reminders—all free to download and use.
+          Print-at-home planners, ritual guides, and calendar reminders for reflection, thresholds, and small acts of return.
         </p>
       </div>
 
       {readyDownloads.length === 0 && comingSoonDownloads.length === 0 ? (
         <div class="tools-empty">
           <p>
-            New printables are brewing. Visit the <a href="/curses">White Magic Curses</a> collection for printable boundary-setting cards, or explore the tools below for what is currently live.
-            If you have a wish list, drop a request in the <a href="#tools-request">printable request form</a> below.
+            New supports are in the workshop. Visit the <a href="/curses">White Magic Curses</a> collection for printable boundary-setting cards, or explore the tools below for what is currently live.
+            If you have a wish list, drop a request in the <a href="#tools-request">tool request form</a> below.
           </p>
         </div>
       ) : (
@@ -256,7 +256,7 @@ const breadcrumbs = [
       )}
 
       <div class="tools-cta">
-        <p class="tools-cta__text">Want more printables and ritual planners?</p>
+        <p class="tools-cta__text">Want more ritual supports and reflective planners?</p>
         <PrimaryButton href="/tools" iconAfter="→">
           Explore Live Tools
         </PrimaryButton>
@@ -266,9 +266,10 @@ const breadcrumbs = [
     <!-- SECTION 2: Affiliate Tools -->
     <section class="tools-section tools-section--affiliate">
       <div class="tools-section__header">
-        <h2 class="tools-section__title">Tools You Can Purchase</h2>
+        <h2 class="tools-section__title">Curated Practice Tools</h2>
         <p class="tools-section__description">
-          Curated ritual tools, journals, and supplies. Some links are affiliate-enchanted—purchases help keep the coven's candles lit.
+          Decks, journals, and supplies that can support reflective practice. Some links are affiliate links; purchases help
+          keep the ritual room lit at no extra cost to you.
         </p>
       </div>
 
@@ -313,7 +314,7 @@ const breadcrumbs = [
       <div class="tools-request__inner">
         <h2 class="tools-request__title">Request a printable or tool</h2>
         <p class="tools-request__copy">
-          Looking for something specific? Share the ritual tool, planner, or resource you want and we will add it to the cozy backlog.
+          Looking for something specific? Share the ritual support, planner, or resource you want and we will add it to the workshop list.
         </p>
         {hasFormEndpoint ? (
           <form
@@ -329,7 +330,7 @@ const breadcrumbs = [
               <textarea
                 name="request"
                 rows="3"
-                placeholder="Example: A one-page morning ritual tracker or a low-spoons cleaning reset checklist."
+                placeholder="Example: A one-page perspective reset, boundary ritual card, or low-spoons cleaning threshold."
                 class="tools-request__input"
               ></textarea>
             </label>

@@ -20,13 +20,13 @@ const recentPosts = cardPosts.slice(1);
 const hasFormEndpoint = Boolean(getFormEndpoint(readSettings()));
 ---
 
-<Base title="Non-Magickal Meanderings — WitchClick">
+<Base title="Essays & Meanderings — WitchClick">
   <header class="page-header">
-    <p class="page-header__eyebrow">Non-magickal corner</p>
-    <h1 class="page-header__title">Non-Magickal Meanderings</h1>
+    <p class="page-header__eyebrow">Essays from the threshold</p>
+    <h1 class="page-header__title">Essays & Meanderings</h1>
     <p class="page-header__lead">
-      A soft landing for the parts of my brain that aren't strictly witchy. Life updates, half-baked theories, and whatever
-      I'm currently fixated on.
+      The thinking shelf of WitchClick: essays on value, attention, grief, creativity, refusal, and living beyond the metric.
+      Less ritual recipe, more field note from the edge of a life being revalued.
     </p>
   </header>
 
@@ -51,8 +51,8 @@ const hasFormEndpoint = Boolean(getFormEndpoint(readSettings()));
   {!featuredPost && (
     <div class="no-posts">
       <p class="no-posts__text">
-        This shelf is reserved for personal reflections, non-magickal journal entries, and the softer thoughts that do not fit inside a ritual guide.
-        The archive is still quiet, but the intention is clear: essays about everyday life, media, burnout, curiosity, and whatever else keeps tugging at the thread.
+        This shelf is reserved for reflections that do not need to become ritual instructions: essays about value, attention,
+        grief, media, burnout, curiosity, and the strange little threads that keep asking to be followed.
       </p>
     </div>
   )}
@@ -90,9 +90,9 @@ const hasFormEndpoint = Boolean(getFormEndpoint(readSettings()));
 
   <section class="meanderings-signup" aria-labelledby="meanderings-signup-heading">
     <div class="meanderings-signup__content">
-      <h3 id="meanderings-signup-heading" class="meanderings-signup__title">Get the next meandering</h3>
+      <h3 id="meanderings-signup-heading" class="meanderings-signup__title">Get the next essay</h3>
       <p class="meanderings-signup__text">
-        If you want a gentle ping when a new non-magickal post goes live, use the feeds below.
+        If you want a quiet ping when a new reflection goes live, use the feeds below.
         Email signups will return when form delivery is configured.
       </p>
       {hasFormEndpoint && (
@@ -101,7 +101,7 @@ const hasFormEndpoint = Boolean(getFormEndpoint(readSettings()));
           name="meanderings-updates"
           method="POST"
           data-netlify="true"
-          data-form-success="Thanks. We will send a gentle ping when a new meandering drops."
+          data-form-success="Thanks. We will send a quiet ping when a new essay drops."
         >
           <input type="hidden" name="form-name" value="meanderings-updates" />
           <div class="meanderings-signup__fields">
@@ -129,11 +129,11 @@ const hasFormEndpoint = Boolean(getFormEndpoint(readSettings()));
     <div class="sidebar-cta__content">
       <h3 class="sidebar-cta__title">Looking for rituals?</h3>
       <p class="sidebar-cta__text">
-        If you're here for the magickal content, head back to the main page for rituals, spellwork, and cozy tools.
+        If you want a more structured practice, head back to the main archive for rituals, tarot, and practical supports.
       </p>
       <div class="sidebar-cta__links">
         <a href="/" class="sidebar-cta__link">Browse Rituals</a>
-        <a href="/tools" class="sidebar-cta__link">Printable Tools</a>
+        <a href="/tools" class="sidebar-cta__link">Ritual Tools</a>
         <a href="/entities" class="sidebar-cta__link">Browse Topics</a>
       </div>
     </div>

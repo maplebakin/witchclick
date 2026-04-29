@@ -19,13 +19,13 @@ const hasPublishedMeanderings =
 export const primaryNavLinks: NavLink[] = [
   { href: "/start", label: "Start Here" },
   { href: "/entities", label: "Grimoire" },
-  { href: "/hub", label: "Hubs", description: "Seasonal rooms for Release, Focus, and Calm" },
-  { href: "/tools", label: "Tools" },
+  { href: "/hub", label: "Hubs", description: "Entry rooms for calm, focus, release, and perspective shifts" },
+  { href: "/tools", label: "Ritual Tools" },
   ...(hasPublishedMeanderings
     ? [
         {
           href: "/meanderings",
-          label: "Meanderings",
+          label: "Essays",
           variant: "pill", // keeps your “special” highlight on this slot
         } satisfies NavLink,
       ]
@@ -33,8 +33,8 @@ export const primaryNavLinks: NavLink[] = [
 ];
 
 export const secondaryNavLinks: NavLink[] = [
-  { href: "/curses", label: "White Magic Curses", description: "Ethical boundary-setting rituals" },
-  { href: "/page/1", label: "Archive", description: "Browse every post in one place" },
+  { href: "/curses", label: "White Magic Curses", description: "Ethical refusal and boundary rituals" },
+  { href: "/page/1", label: "Archive", description: "Browse every ritual, essay, and reference in one place" },
   { href: "/tags", label: "Tags", description: "Browse all topics by tag" },
   { href: "/partners", label: "Partners", description: "Small businesses and ethical brands we love" },
 ];
