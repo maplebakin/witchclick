@@ -40,7 +40,7 @@ Doomscrolling is sneaky because it can look like rest while quietly scraping the
 
 It can also create the illusion of control. If you keep reading, maybe you will finally understand the mood of the world. Maybe you will catch the next bad thing before it catches you. Maybe you will feel prepared. But often the signal turns to static. You end up full of fragments and light, not nourishment.
 
-That does not mean the habit is stupid. It usually makes a strange kind of sense. Sometimes doomscrolling is a form of avoidance. Sometimes it is a search for stimulation when your brain feels underlit. Sometimes it is how you hover near your own worry without fully naming it. Posts like [brain fog](/post/brain-fog), [letting things slide](/post/letting-things-slide), and [rest and survival](/post/rest-and-survival) all touch the same seam: when your inner resources are low, the easiest doorway often wins.
+That does not mean the habit is stupid. It usually makes a strange kind of sense. Sometimes doomscrolling is a form of avoidance. Sometimes it is a search for stimulation when your brain feels underlit. Sometimes it is how you hover near your own worry without fully naming it. Posts like brain fog, letting things slide, and rest and survival all touch the same seam: when your inner resources are low, the easiest doorway often wins.
 
 There is also the emotional hook. Doomscrolling lets you feel connected and detached at once. You are witnessing, reacting, gathering, but not fully entering your own life. That in-between state can become oddly sticky. The scroll hums. Time blurs. Your evening drifts away.
 
@@ -50,13 +50,13 @@ A gentle shift starts when you stop treating the habit like proof of failure and
 
 A lot of free time is not truly empty. It carries residue. Maybe you are overstimulated. Maybe you are lonely. Maybe your body is tired but your mind is still pacing in circles like a cat at 3 a.m. If you only ask, 'What should I do instead of doomscrolling?' you may miss the deeper question underneath: 'What kind of care would actually meet me here?'
 
-Sometimes the answer is not productivity at all. Sometimes your free time is asking for [quiet permission](/post/quiet-permission). Sometimes it wants [gentle attention](/post/gentle-attention). Sometimes it wants a tiny ritual of re-entry, like putting your phone in another room and making tea without also trying to optimize your future.
+Sometimes the answer is not productivity at all. Sometimes your free time is asking for quiet permission. Sometimes it wants gentle attention. Sometimes it wants a tiny ritual of re-entry, like putting your phone in another room and making tea without also trying to optimize your future.
 
-There are seasons when you do not need a grand hobby or a cinematic evening routine. You need activities with a low activation cost and a decent emotional return. Something simple enough to begin before your resistance wakes up. This is why [smallest acts](/post/smallest-acts) matters. Tiny things count. Lighting a lamp. Watering a plant. Tidying one surface. Opening a journal and writing three resentful little sentences. These are not glamorous, but they help your attention leave the infinite hallway of the feed and come back into a room with walls.
+There are seasons when you do not need a grand hobby or a cinematic evening routine. You need activities with a low activation cost and a decent emotional return. Something simple enough to begin before your resistance wakes up. This is why smallest acts matters. Tiny things count. Lighting a lamp. Watering a plant. Tidying one surface. Opening a journal and writing three resentful little sentences. These are not glamorous, but they help your attention leave the infinite hallway of the feed and come back into a room with walls.
 
 Other times, free time is asking for meaning. Not in a giant life-purpose way. More like a small thread you can follow. A game. A craft. A recipe. A page in a book. A walk where you look for one interesting texture. The point is not to become the world's most enlightened person by 8:45 p.m. The point is to feel yourself existing somewhere tangible again.
 
-It may help to think of free time in categories instead of one big impossible question. You might need comfort, release, novelty, or presence. Comfort could be tea and a blanket. Release could be stretching or muttering into a notebook. Novelty could be trying a new cozy game or recipe. Presence could be [journaling](/post/journaling), [mindful breathing](/post/mindful-breathing), or simply noticing the shape of the evening light.
+It may help to think of free time in categories instead of one big impossible question. You might need comfort, release, novelty, or presence. Comfort could be tea and a blanket. Release could be stretching or muttering into a notebook. Novelty could be trying a new cozy game or recipe. Presence could be journaling, mindful breathing, or simply noticing the shape of the evening light.
 
 When you know what your system is actually asking for, it becomes easier to choose something better than the scroll without making the choice feel like punishment.
 
@@ -66,7 +66,7 @@ Here are a few gentle things to do with free time instead of doomscrolling. Not 
 
 ### If you need comfort
 - Make a warm drink and hold it with both hands for one full minute.
-- Revisit [tiny gratitude rituals](/post/tiny-gratitude-rituals) and list three things that made the day less awful.
+- Revisit tiny gratitude rituals and list three things that made the day less awful.
 - Sit somewhere soft and read two pages of anything, even if that is all you manage.
 
 ### If you need motion
@@ -77,7 +77,7 @@ Here are a few gentle things to do with free time instead of doomscrolling. Not 
 ### If you need expression
 - Open a note and write an unfiltered little weather report for your mind.
 - Draw shapes, color blocks, or absolute nonsense.
-- Try [present-moment journaling](/post/present-moment-journaling) when your thoughts feel too slippery to hold.
+- Try present-moment journaling when your thoughts feel too slippery to hold.
 
 ### If you need play
 - Spend twenty minutes with a cozy game.
@@ -85,7 +85,7 @@ Here are a few gentle things to do with free time instead of doomscrolling. Not 
 - Make a tiny playlist for the mood you wish the evening had.
 
 ### If you need grounding
-- Try [grounding practices](/post/grounding-practices) or [meditation](/post/meditation) in the lightest possible way. One breath still counts.
+- Try grounding practices or meditation in the lightest possible way. One breath still counts.
 - Touch something real: a mug, a blanket, a cool counter, a pet's fur, your own sweater sleeve.
 - Put the phone on charge in another room and let the world be slightly less reachable for half an hour.
 

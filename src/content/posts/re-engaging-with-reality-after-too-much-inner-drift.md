@@ -40,7 +40,7 @@ That does not mean you've failed at being present. It usually means something in
 
 There is a difference between reflection and over-residing. Reflection helps you notice patterns. Over-residing turns the mind into a waiting room where you keep calling your own name but never stand up when it is time to go.
 
-A rich inner life is not the enemy. It can be a sanctuary. It can hold imagination, meaning, grief, memory, and the kind of private signal that helps you stay yourself in a noisy world. Posts like [inner narrative](/post/inner-narrative) and [introspection](/post/introspection) can be companions here, because they honor the value of looking inward. The problem usually begins when the inward gaze stops being a lantern and starts becoming fog.
+A rich inner life is not the enemy. It can be a sanctuary. It can hold imagination, meaning, grief, memory, and the kind of private signal that helps you stay yourself in a noisy world. Posts like inner narrative and introspection can be companions here, because they honor the value of looking inward. The problem usually begins when the inward gaze stops being a lantern and starts becoming fog.
 
 That fog can look smart from the inside. It can feel like you are doing deep work because you are thinking constantly. But not every thought is movement. Not every insight changes anything. Sometimes you are only circling the same ache from new angles, like a player walking the edges of a map instead of entering the next area.
 
@@ -54,13 +54,13 @@ Not grand meaning. Contact.
 
 The floor under your feet. The smell of soap. The roughness of a dish towel. The sound in the room after the screen goes dark. If thought is air, contact is weight.
 
-And if the drift has been tangled up with exhaustion, numbness, or that smeared feeling where everything becomes hard to grip, [brain fog](/post/brain-fog) may speak to the same seam from a different angle. The point is not to label yourself too fast. It is to notice that disconnection has texture, and texture can be worked with.
+And if the drift has been tangled up with exhaustion, numbness, or that smeared feeling where everything becomes hard to grip, brain fog may speak to the same seam from a different angle. The point is not to label yourself too fast. It is to notice that disconnection has texture, and texture can be worked with.
 
 ## Returning Through the Senses
 
 The way back is often less intellectual than people expect. You do not argue yourself into presence. You notice your way there.
 
-That is why [grounding practices](/post/grounding-practices) can help when your mind has become louder than your actual surroundings. Not because they are magical fixes, but because they interrupt abstraction. They remind you that reality is not only an idea. It is temperature, pressure, sound, smell, timing, appetite, and movement.
+That is why grounding practices can help when your mind has become louder than your actual surroundings. Not because they are magical fixes, but because they interrupt abstraction. They remind you that reality is not only an idea. It is temperature, pressure, sound, smell, timing, appetite, and movement.
 
 Try this gently:
 
@@ -69,13 +69,13 @@ Try this gently:
 - Drink something and notice the exact moment it becomes part of your body.
 - Open a window or step outside for one minute and let the air tell you what kind of day it is.
 
-These are small acts, but small acts are often the first honest bridge. [Gentle attention](/post/gentle-attention) is useful here because attention does not have to be sharp to be real. It can be soft. It can be partial. It can wobble.
+These are small acts, but small acts are often the first honest bridge. Gentle attention is useful here because attention does not have to be sharp to be real. It can be soft. It can be partial. It can wobble.
 
 If you have been living in your head because the world feels sharp, noisy, demanding, or emotionally expensive, coming back may need to happen in doses. You do not need to fling yourself into productivity to prove you have returned. You can rejoin reality through ordinary rituals of contact: making toast, brushing your hair, straightening one corner of a room, standing in the shower long enough to feel your shoulders exist again.
 
 Sometimes people call this mindfulness, but I think of it more as re-entering the scene. You are not trying to become an enlightened statue. You are trying to become reachable to your own life.
 
-This is also where [present-moment journaling](/post/present-moment-journaling) can help. Not big autobiographical excavation. Just simple noticing. What is here. What feels heavy. What feels doable. What you are avoiding. What is actually happening, as opposed to what your mind keeps projecting.
+This is also where present-moment journaling can help. Not big autobiographical excavation. Just simple noticing. What is here. What feels heavy. What feels doable. What you are avoiding. What is actually happening, as opposed to what your mind keeps projecting.
 
 There is good language around this in [narrative identity](https://en.wikipedia.org/wiki/Narrative_identity), the idea that humans make meaning through the stories we tell about ourselves. That can be beautiful. It can also become a trap if the story replaces the lived moment. Sometimes the kindest thing you can do is let today's reality be plain instead of symbolic.
 
@@ -97,7 +97,7 @@ Stand up before the thought spiral finishes its speech.
 
 Put the laundry in a basket, not away. That still counts.
 
-The nervous system often trusts what is repeatable more than what is impressive. So if you want to re-engage with reality, it helps to shrink the scale until your body stops bracing. This is part of why [when everything feels pointless](/post/when-everything-feels-pointless) and [smallest acts](/post/smallest-acts) resonate for so many people. Meaning does not always arrive first. Sometimes action makes a tiny clearing where meaning can land later.
+The nervous system often trusts what is repeatable more than what is impressive. So if you want to re-engage with reality, it helps to shrink the scale until your body stops bracing. This is part of why [when everything feels pointless](/post/when-everything-feels-pointless) and smallest acts resonate for so many people. Meaning does not always arrive first. Sometimes action makes a tiny clearing where meaning can land later.
 
 You may also need to grieve the fantasy self that lived more elegantly in your thoughts than in your kitchen. That self may have had perfect routines, perfect words, perfect timing, perfect emotional coherence. The real self has dry hands, unfinished tasks, weird pauses, contradictory moods, and a body that needs maintenance. The real self is less polished. The real self is also the only one who gets to be alive.
 
@@ -117,7 +117,7 @@ Use these gently. You do not need to answer all of them.
 - What is one real-life action small enough that I do not need to perform courage to do it?
 - What part of ordinary life have I been treating like a symbol instead of a simple task?
 
-If you want more room to stretch these thoughts out, [reflection journal](/post/reflection-journal) can offer a steadier page to land on.
+If you want more room to stretch these thoughts out, reflection journal can offer a steadier page to land on.
 
 ## Gentle Closing
 
@@ -125,4 +125,4 @@ Re-engaging with reality is rarely a dramatic return. It is usually a series of 
 
 If you have been living in your head for a while, try not to turn that into evidence against yourself. Some seasons call us inward. Some thoughts are attempts at shelter. What matters is learning how to come back before the shelter becomes a sealed room.
 
-Return to this reflection when you notice that life has become more observed than lived. Let [grounding practices](/post/grounding-practices) or [present-moment journaling](/post/present-moment-journaling) be the first small bridge. You do not need to reclaim all of reality today. You only need to touch one true thing, and let that contact hum long enough to guide the next one.
+Return to this reflection when you notice that life has become more observed than lived. Let grounding practices or present-moment journaling be the first small bridge. You do not need to reclaim all of reality today. You only need to touch one true thing, and let that contact hum long enough to guide the next one.

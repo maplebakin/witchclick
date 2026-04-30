@@ -34,7 +34,7 @@ This ritual explores how to create a sense of sanctuary when life feels uncertai
 
 Think of this like a soft checkpoint in the middle of a foggy map. You are not lost. You are just between clear markers, and this is where you rest.
 
-If your energy is low, you might pair this with [rest and survival](/post/rest-and-survival) or [gentle self-care practices](/post/gentle-self-care-practices). If your mind is racing, [grounding practices](/post/grounding-practices) can help you settle before you begin.
+If your energy is low, you might pair this with rest and survival or gentle self-care practices. If your mind is racing, grounding practices can help you settle before you begin.
 
 ## Quick Sanctuary Variant
 
@@ -48,7 +48,7 @@ For low-energy days, when even starting feels like a lot.
 
 If your thoughts wander, that is okay. You are not trying to empty them, just to give them a place to land.
 
-This version pairs gently with [low-spoon option](/post/low-spoon-option) and [tiny gratitude rituals](/post/tiny-gratitude-rituals), especially when your capacity is thin.
+This version pairs gently with low-spoon option and tiny gratitude rituals, especially when your capacity is thin.
 
 ## Deep Sanctuary Variant
 
@@ -59,10 +59,10 @@ For when you have a little more space, or want to sink deeper into the feeling o
 3. Sit within that space. Let your body take up its shape without correcting it.
 4. Breathe slowly and notice what feels uncertain. Do not solve it. Just name it softly.
 5. Place your hand over your chest or on your object. Say: 'I can exist here, even without answers.'
-6. Spend a few minutes writing, drawing, or simply noticing. You might use [present-moment journaling](/post/present-moment-journaling) or drift through [introspection](/post/introspection).
+6. Spend a few minutes writing, drawing, or simply noticing. You might use present-moment journaling or drift through introspection.
 7. Close by acknowledging the space: 'This was a place I made.' Then gently return to your day.
 
-If emotions surface, that is part of the process. You can support yourself afterward with [post-ritual grounding methods](/post/post-ritual-grounding-methods) or [emotional reflection](/post/emotional-reflection).
+If emotions surface, that is part of the process. You can support yourself afterward with post-ritual grounding methods or emotional reflection.
 
 For a grounded perspective on why uncertainty can feel so intense, the concept of [intolerance of uncertainty](https://en.wikipedia.org/wiki/Intolerance_of_uncertainty) offers a useful lens without removing the human experience.
 
@@ -91,4 +91,4 @@ This ritual is emotional, not medical. It is meant to support moments of reflect
 
 If strong feelings arise, take a break, drink water, or step into a different room. You can always return later. Moving at your own pace is part of the practice.
 
-If you are navigating ongoing stress or mental health challenges, pairing this with [mental health](/post/mental-health) resources or [self-compassion](/post/self-compassion) practices can offer additional support.
+If you are navigating ongoing stress or mental health challenges, pairing this with mental health resources or self-compassion practices can offer additional support.
