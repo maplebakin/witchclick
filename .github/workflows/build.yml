@@ -21,16 +21,7 @@ jobs:
           elif [ -f ".tool-versions" ]; then
             version=$(grep -E '^node(js)? ' .tool-versions | head -n 1 | awk '{print $2}')
           else
-            version=$(python3 - <<'PY'
-import json
-try:
-    with open("package.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
-    print(data.get("engines", {}).get("node", ""))
-except FileNotFoundError:
-    print("")
-PY
-)
+            version=$(node -p "try { require('./package.json').engines?.node || '' } catch { '' }")
           fi
           version=$(echo "$version" | tr -d ' \t\r\n')
           if [ -z "$version" ]; then
