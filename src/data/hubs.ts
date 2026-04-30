@@ -28,19 +28,19 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
     slug: "release",
     ambient: "#f97316",
     hero: {
-      eyebrow: "Letting go with softness",
-      title: "Release rituals & composting practices",
+      eyebrow: "Threshold work",
+      title: "Release rituals & refusal practices",
       lead:
-        "Compost burnout, honour endings, and invite fresh energy with rituals that meet you where you are—whether you have 90 seconds or a weekend pocket.",
+        "Name what is complete, return what is not yours to carry, and make room for a value that does not require self-punishment.",
     },
     seoDescription:
-      "Explore WitchClick's Release hub for gentle cord-cutting rituals, boundary prompts, and seasonal partner offerings that help you let go without collapse.",
+      "Explore WitchClick's Release hub for cord-cutting rituals, boundary prompts, and reflective practices for letting go without collapse.",
     playlists: [
       {
         key: "start-here",
         title: "Start here",
-        description: "A gentle welcome into release work with rituals that return energy and make room for softness.",
-        chips: ["Energy return", "Kind closures"],
+        description: "A clear welcome into release work with rituals that return attention and make room for honest closure.",
+        chips: ["Energy return", "Clean closure"],
         posts: [
           "clean-cursing-return-energy-to-origin",
           "cozy-cursing-ritual-release-anger-banishment",
@@ -50,8 +50,8 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
       {
         key: "quick-rituals",
         title: "Quick rituals",
-        description: "Pocket-length releases when you have ten minutes and need a grounded exhale.",
-        chips: ["5-minute reset", "Calm composting"],
+        description: "Pocket-length releases when you have ten minutes and need to stop carrying the whole room.",
+        chips: ["5-minute reset", "Threshold pause"],
         posts: [
           "closing-gratitude",
           "energy-return-ritual-restore-balance",
@@ -61,8 +61,8 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
       {
         key: "deep-dives",
         title: "Deep dives",
-        description: "Longer rituals and essays for when you want to sit with endings and practice loving boundaries.",
-        chips: ["Boundary tending", "Integration"],
+        description: "Longer rituals and essays for sitting with endings, clean refusal, and boundaries that protect your future self.",
+        chips: ["Boundary tending", "Refusal"],
         posts: [
           "knowing-when-to-give-up",
           "consent-to-continue",
@@ -72,8 +72,8 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
       {
         key: "tools",
         title: "Tools & printables",
-        description: "Worksheets, prompts, and checklists that keep your release ritual grounded after the moment passes.",
-        chips: ["Checklists", "Printable prompts"],
+        description: "Worksheets, prompts, and checklists that help release work stay grounded after the first exhale.",
+        chips: ["Checklists", "Reflection prompts"],
         posts: [
           "day-after-acupuncture-recovery-gentle-body-awareness",
           "when-life-feels-on-pause",
@@ -83,7 +83,7 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
     ],
     partnerHighlight: {
       slug: "moonlit-bath-bundle",
-      blurb: "A Moonlit Bath Release Bundle from Ember & Loom pairs beautifully with the energy return ritual—refillable, low-waste, and infused with calendula.",
+      blurb: "A Moonlit Bath Release Bundle from Ember & Loom pairs with energy return work when you want the body to notice the boundary too.",
     },
     seasonSlug: "fall-boundaries-in-bloom",
   },
@@ -92,18 +92,18 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
     ambient: "#2563eb",
     hero: {
       eyebrow: "Return to attention",
-      title: "Focus rituals & gentle accountability",
+      title: "Focus rituals & attention anchors",
       lead:
-        "Somatic warm-ups, micro-plans, and co-working support for attention that feels kind and sustainable.",
+        "Somatic warm-ups, micro-plans, and reflective supports for choosing where your attention belongs next.",
     },
     seoDescription:
-      "Explore WitchClick's Focus hub for ADHD-friendly rituals, body-led planning, and partner offerings that nourish concentration without force.",
+      "Explore WitchClick's Focus hub for neurodivergent-aware rituals, body-led planning, and reflective tools that support attention without force.",
     playlists: [
       {
         key: "start-here",
         title: "Start here",
-        description: "Warm up attention with ritual teas and a primer on how WitchClick treats focus as kindness, not grind.",
-        chips: ["Tea rituals", "Gentle planning"],
+        description: "Warm up attention with ritual teas and a primer on treating focus as a chosen lens, not a grind.",
+        chips: ["Tea rituals", "Chosen focus"],
         posts: [
           "focus-tea-rituals-gentle-brains",
           "quick-low-energy-variant",
@@ -113,8 +113,8 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
       {
         key: "quick-rituals",
         title: "Quick rituals",
-        description: "Fast resets to restart momentum without overwhelming your nervous system.",
-        chips: ["Micro moves", "ADHD-friendly"],
+        description: "Fast resets for finding the next honest step without forcing your whole self into task mode.",
+        chips: ["Micro moves", "Low-spoons"],
         posts: [
           "anxiety-from-avoiding-responsibilities-gentle-rituals",
           "when-to-let-yourself-rest",
@@ -124,8 +124,8 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
       {
         key: "deep-dives",
         title: "Deep dives",
-        description: "Explore body-led planning, creative focus spreads, and stamina rituals for longer projects.",
-        chips: ["Somatic focus", "Creative flow"],
+        description: "Explore body-led planning, creative tarot spreads, and stamina rituals for work that still belongs to you.",
+        chips: ["Somatic focus", "Creative attention"],
         posts: [
           "creativity-tarot-ritual",
           "worldbuilding-tarot-spread-and-ritual",
@@ -135,8 +135,8 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
       {
         key: "tools",
         title: "Tools & printables",
-        description: "Printable check-ins and planning prompts that keep momentum gentle and sustainable.",
-        chips: ["Planning kits", "Prompt pages"],
+        description: "Printable check-ins and planning prompts that keep attention visible without making worth depend on output.",
+        chips: ["Planning kits", "Attention prompts"],
         posts: [
           "mindful-breathing",
           "reflection-journal",
@@ -146,7 +146,7 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
     ],
     partnerHighlight: {
       slug: "focus-ritual-deck",
-      blurb: "Micah's Micro Focus Ritual Deck adds tactile accountability—each card offers a stretch, a check-in, or a celebratory pause.",
+      blurb: "Micah's Micro Focus Ritual Deck adds tactile structure: each card offers a stretch, a check-in, or a pause that lets attention return.",
     },
     seasonSlug: "fall-boundaries-in-bloom",
   },
@@ -154,19 +154,19 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
     slug: "calm",
     ambient: "#22c55e",
     hero: {
-      eyebrow: "Collective soothing",
-      title: "Calm rituals & community care",
+      eyebrow: "Grounding without erasure",
+      title: "Calm rituals & steadying practices",
       lead:
-        "Grounding practices, repair scripts, and mutual-aid highlights so you can stay resourced alongside your people.",
+        "Grounding practices, repair scripts, and small anchors for staying present without pretending everything is fine.",
     },
     seoDescription:
-      "Explore WitchClick's Calm hub for nervous-system care, community soothing rituals, and partner offerings that redistribute rest.",
+      "Explore WitchClick's Calm hub for grounding rituals, repair scripts, and reflective practices that help you stay present without supernatural promises.",
     playlists: [
       {
         key: "start-here",
         title: "Start here",
-        description: "Step into the Calm hub with grounding rituals that steady breath and create immediate softness.",
-        chips: ["Grounding", "Nervous system"],
+        description: "Step into the Calm hub with grounding rituals that steady breath and give attention somewhere safe to land.",
+        chips: ["Grounding", "Safe landing"],
         posts: [
           "calm-space-during-political-unrest-2",
           "calming-strategies-when-partner-pisses-you-off",
@@ -176,8 +176,8 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
       {
         key: "quick-rituals",
         title: "Quick rituals",
-        description: "Low-spoon resets to calm spirals, reconnect with body, and invite a softer pace.",
-        chips: ["Low spoons", "Cozy pauses"],
+        description: "Low-spoon resets for interrupting spirals, reconnecting with the body, and choosing a smaller next moment.",
+        chips: ["Low spoons", "Small pauses"],
         posts: [
           "low-spoon-option",
           "gentle-heart-check-in",
@@ -187,8 +187,8 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
       {
         key: "deep-dives",
         title: "Deep dives",
-        description: "Longer practices for community soothing, mutual aid, and tending grief together.",
-        chips: ["Community care", "Tender repair"],
+        description: "Longer practices for repair, mutual aid, and tending grief without flattening it into a lesson.",
+        chips: ["Community care", "Grief tending"],
         posts: [
           "energy-return-ritual-restore-balance",
           "day-after-acupuncture-recovery-gentle-body-awareness",
@@ -198,8 +198,8 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
       {
         key: "tools",
         title: "Tools & printables",
-        description: "Downloads and prompts that help you keep calm rituals close even on wobblier days.",
-        chips: ["Worksheets", "Prompt decks"],
+        description: "Downloads and prompts that help calm practices stay reachable on wobblier days.",
+        chips: ["Worksheets", "Anchor prompts"],
         posts: [
           "safety-notes",
           "medical-care-plan",
@@ -209,7 +209,7 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
     ],
     partnerHighlight: {
       slug: "calm-breathing-orb",
-      blurb: "The Calm Breathing Orb guides paced breathing with gentle light—ideal for collective grounding before tough conversations.",
+      blurb: "The Calm Breathing Orb guides paced breathing with gentle light, useful before hard conversations or any moment that needs a steadier lens.",
     },
     seasonSlug: "fall-boundaries-in-bloom",
   },

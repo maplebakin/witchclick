@@ -4,12 +4,40 @@ import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
 import { readSettings, buildCanonicalUrl } from "../../utils/settings";
 import stubDashboardScript from "../../scripts/admin/admin-stub-dashboard.ts?url";
-import {
+import * as stubPromptGenerator from "../../../server/lib/stubPromptGenerator.js";
+
+const {
   generateStubPrompts,
   serializeStubEntries,
   generatePostStubPrompts,
   serializePostStubEntries,
-} from "../../../server/lib/stubPromptGenerator.js";
+} = stubPromptGenerator as typeof stubPromptGenerator & {
+  generatePostStubPrompts: (options?: { cwd?: string }) => {
+    total: number;
+    entries: Array<{
+      type: string;
+      slug: string;
+      name: string;
+      filePath: string;
+      stubRationale?: string;
+      stubParentSlug?: string;
+      stubParentTitle?: string;
+      prompt: string;
+      references?: Array<{ title: string; slug: string; sourcePath?: string }>;
+    }>;
+    output: string;
+  };
+  serializePostStubEntries: (entries: Array<any>) => Array<{
+    slug: string;
+    name: string;
+    prompt: string;
+    filePath?: string;
+    relativePath?: string;
+    stubRationale?: string;
+    stubParentSlug?: string;
+    stubParentTitle?: string;
+  }>;
+};
 
 const settings = readSettings();
 const canonical = buildCanonicalUrl(settings, { path: "/admin/stubs" });

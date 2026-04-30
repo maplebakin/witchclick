@@ -1,14 +1,14 @@
 {
   "cta": {
-    "eyebrow": "Stay in the circle",
+    "eyebrow": "Stay with the thread",
     "title": "Sign up for the WitchClick dispatch",
-    "description": "Two gentle emails a month with new rituals, printable drops, and secular tarot spreads. No spam, just cozy prompts.",
+    "description": "Two emails a month with secular rituals, tarot reflections, and notes on making meaning outside the metric. No spam, no promised miracles.",
     "form": {
       "action": "https://witchclick.substack.com/api/v1/free",
       "method": "post",
       "emailFieldName": "email",
       "emailPlaceholder": "you@example.com",
-      "submitLabel": "Send me the cozy notes",
+      "submitLabel": "Send me the dispatch",
       "disclaimer": "You can unsubscribe anytime."
     }
   },

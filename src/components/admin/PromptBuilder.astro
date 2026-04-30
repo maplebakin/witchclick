@@ -40,13 +40,13 @@ const {
 <Card as="section" class="lg:col-span-5">
   <div class="mb-4 space-y-2">
     <h2 class="text-xl font-semibold">Step 1: Build Generator Prompt</h2>
-    <p class="text-[0.8rem] text-body-muted">Configure your post preferences to generate an AI prompt</p>
+    <p class="text-[0.8rem] text-body-muted">Configure the topic, structure, and voice for a WitchClick-ready prompt.</p>
   </div>
   <div class="grid gap-4">
     <label class="block">
       <span class="text-[0.8rem] font-medium uppercase tracking-wide text-body-subtle">Topic</span>
-      <Input id="topic" placeholder="tea ritual for focus" />
-      <p class="mt-1 text-[0.8rem] text-body-faint">What should this post be about?</p>
+      <Input id="topic" placeholder="tarot spread for reclaiming attention" />
+      <p class="mt-1 text-[0.8rem] text-body-faint">What question, ritual, symbol, or lens should this post explore?</p>
     </label>
     <label class="block">
       <span class="text-[0.8rem] font-medium">Word count</span>
@@ -73,13 +73,13 @@ const {
     </label>
     <label class="block">
       <span class="text-[0.8rem] font-medium">Reflection Prompts (one per line)</span>
-      <Textarea id="reflectionPrompts" placeholder="e.g., How does this ritual connect you to nature?" />
-      <p class="mt-1 text-[0.8rem] text-body-faint">List specific prompts for personal reflection related to this post.</p>
+      <Textarea id="reflectionPrompts" placeholder="e.g., What measure of value are you ready to stop obeying?" />
+      <p class="mt-1 text-[0.8rem] text-body-faint">List specific reflection questions about attention, meaning, perspective, or values.</p>
     </label>
     <div class="flex gap-4 text-sm">
       <label class="inline-flex items-center gap-2">
         <input type="checkbox" id="ads" class="w-4 h-4 rounded border-line-neutral text-primary focus:ring-primary/40" />
-        <span>Weave in supportive enchantments</span>
+        <span>Include supportive recommendations</span>
       </label>
       <label class="inline-flex items-center gap-2">
         <input type="checkbox" id="kofi" checked class="w-4 h-4 rounded border-line-neutral text-primary focus:ring-primary/40" />
@@ -93,8 +93,8 @@ const {
     <p class="rounded-lg border border-dashed border-line-subtle bg-surface-neutral-soft px-3 py-2 text-[0.75rem] leading-relaxed text-body-muted">
       The generated text below includes a copy-safe wrapper so other LLMs treat it as a prompt template to forward, not a task to execute.
     </p>
-    <Textarea id="promptOut" class="font-mono text-[0.8rem] h-64" placeholder="The AI's whispered guidance will manifest here…"></Textarea>
-    <p class="text-[0.8rem] text-body-muted">Offer this parchment to your Oracle (LLM) → receive the structured spell → infuse it into the content cauldron on the right.</p>
+    <Textarea id="promptOut" class="font-mono text-[0.8rem] h-64" placeholder="The generated prompt will appear here…"></Textarea>
+    <p class="text-[0.8rem] text-body-muted">Send this prompt to your LLM, then paste the returned PostSpec JSON into the workflow on the right.</p>
   </div>
 </Card>
 
@@ -152,10 +152,10 @@ const {
       // This is a simplified version of the status update.
       // A more robust solution would use a shared state manager or event bus.
       const statusEl = document.getElementById('status');
-      if (statusEl) statusEl.textContent = 'Whispering guidance...';
+      if (statusEl) statusEl.textContent = 'Building prompt...';
 
       const body = {
-        topic: $('topic').value || 'tea ritual for focus',
+        topic: $('topic').value || 'tarot spread for reclaiming attention',
         words: Number($('words').value || 1200),
         ads: $('ads').checked ? 'on' : 'off',
         kofi: $('kofi').checked ? 'on' : 'off',
@@ -185,7 +185,7 @@ const {
       if (!data?.ok) throw new Error(data?.error || 'gen failed');
       
       promptOut.value = formatPromptTemplate(data?.prompt || '');
-      if (statusEl) statusEl.textContent = 'Guidance whispered ✓';
+      if (statusEl) statusEl.textContent = 'Prompt ready ✓';
     } catch (e) {
       const statusEl = document.getElementById('status');
       if (statusEl) statusEl.textContent = `Prompt error: ${e.message || String(e)}`;
@@ -198,14 +198,14 @@ const {
     try {
       await navigator.clipboard.writeText(promptOut?.value || '');
       const statusEl = document.getElementById('status');
-      if (statusEl) statusEl.textContent = 'Copied spell ✓';
+      if (statusEl) statusEl.textContent = 'Copied prompt ✓';
     } catch {
       if (promptOut) {
         promptOut.focus();
         promptOut.select();
       }
       const statusEl = document.getElementById('status');
-      if (statusEl) statusEl.textContent = 'Press ⌘/Ctrl+C to copy the verse';
+      if (statusEl) statusEl.textContent = 'Press ⌘/Ctrl+C to copy the prompt';
     }
   });
 </script>

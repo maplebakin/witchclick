@@ -45,7 +45,7 @@ This is also why transits are not best understood as fate. They are closer to ti
 
 That distinction matters. If you treat astrology like a verdict machine, you will either become anxious or start blaming Mercury for every dropped spoon and emotionally loaded text thread. If you treat it like symbolic weather, it becomes more useful. You can ask: what feels activated right now? What keeps coming up? What kind of lesson seems to be circling me like an NPC with an important side quest?
 
-This is where your [birth chart](/post/birth-chart) matters more than any generic horoscope. Sun-sign astrology gives you one piece of the puzzle. Transits become more personal when they are interacting with the whole layout of you. But if you do not know your whole chart yet, that does not banish you from the club. It just means you are starting with the front porch instead of the basement archive.
+This is where your birth chart matters more than any generic horoscope. Sun-sign astrology gives you one piece of the puzzle. Transits become more personal when they are interacting with the whole layout of you. But if you do not know your whole chart yet, that does not banish you from the club. It just means you are starting with the front porch instead of the basement archive.
 
 A good beginner frame is this: your birth chart is the character sheet, and transits are the current buffs, debuffs, weather effects, and surprise plot triggers. They do not erase your agency. They just make some themes louder for a while.
 
@@ -65,7 +65,7 @@ Part of the issue is that different parts of the chart do different jobs. Your s
 
 That does not mean sun-sign astrology is useless. It can still be a doorway. It can still catch themes. It can still help you notice when a larger cultural mood is brushing your own identity story. It is just not the whole enchanted pantry.
 
-This is one reason I like pairing sun-sign material with broader posts like [Sun Sign](/post/sun-sign), [Moon Sign](/post/moon-sign), and [Ascendant](/post/ascendant). Once you know those three pieces, astrology usually stops sounding like a random glitter tornado and starts sounding more like a language with grammar.
+This is one reason I like pairing sun-sign material with broader posts like Sun Sign, Moon Sign, and Ascendant. Once you know those three pieces, astrology usually stops sounding like a random glitter tornado and starts sounding more like a language with grammar.
 
 Another reason sun-sign astrology can feel both right and wrong is that astrology writing often gets flattened for mass audience use. It has to be broad enough for thousands of people. That means it tends to use themes instead of precise lived detail. A horoscope may say, 'You are being asked to rethink relationships,' but in real life that might mean anything from setting a boundary with your cousin to changing how you speak to yourself when you make a mistake.
 
@@ -105,7 +105,7 @@ Pluto intensifies. It strips, reveals, transforms, obsesses, purges, and drags b
 
 If that sounds like a lot, it is. But you do not need to memorize everything in one sitting like a celestial flash-card warrior. Start with the slow planets if you want the big themes. Jupiter, Saturn, Uranus, Neptune, and Pluto tend to describe the longer arcs people notice most strongly.
 
-Then add signs into the mix. A planet is what kind of energy. A sign is how it acts. A house is where it shows up. An aspect is how the current sky is relating to your natal chart. That is the basic grammar, and it becomes much less terrifying once you have seen it laid out calmly in a post like [Your Chart](/post/your-chart) or [Elemental Or Planetary Patterns](/post/elemental-or-planetary-patterns).
+Then add signs into the mix. A planet is what kind of energy. A sign is how it acts. A house is where it shows up. An aspect is how the current sky is relating to your natal chart. That is the basic grammar, and it becomes much less terrifying once you have seen it laid out calmly in a post like Your Chart or Elemental Or Planetary Patterns.
 
 A transit interpretation is basically a sentence built from those parts. Saturn in Pisces moving through your seventh house and contacting your natal Moon is not random mystical confetti. It is a sentence. A complicated sentence, yes. But still a sentence. It may be saying something like: emotional reality, relationship boundaries, tenderness, maturity, grief, or responsibility are being emphasized in a slow, serious, watery way.
 
@@ -119,7 +119,7 @@ That last question matters most. Astrology gets weird in a bad way when it becom
 
 Here is the good news: you do not need to become a full-time star mechanic to start noticing transits. You mostly need curiosity, your birth data if you have it, and a willingness to pay attention without forcing everything into meaning-shaped boxes.
 
-Step one is getting a chart you can actually look at. You will want your birth date, birth time, and birth place. If you do not know your birth time, you can still learn some things, but certain pieces will be fuzzier. If you are new, begin with the broad framework in [Birth Chart](/post/birth-chart) and then move outward.
+Step one is getting a chart you can actually look at. You will want your birth date, birth time, and birth place. If you do not know your birth time, you can still learn some things, but certain pieces will be fuzzier. If you are new, begin with the broad framework in Birth Chart and then move outward.
 
 Step two is learning your big three: sun, moon, and rising. If your sun is your main character energy, your moon is the emotional weather inside your ribcage, and your rising is the lens or costume through which life first meets you. Knowing all three instantly makes transit talk less annoying.
 
@@ -135,7 +135,7 @@ For example:
 
 Do not panic if a transit sounds intense. Sometimes a strong transit shows up internally before it shows up externally. Sometimes it manifests as insight, not catastrophe. Sometimes it feels like pressure because you are already standing at the seam of growth.
 
-It can also help to treat transit tracking like [Journaling](/post/journaling) with a strange little telescope attached. You are not trying to prove the system in a courtroom. You are noticing correspondences between symbol and season. When it clicks, it can be wildly clarifying. When it does not, you are still learning your own timing.
+It can also help to treat transit tracking like Journaling with a strange little telescope attached. You are not trying to prove the system in a courtroom. You are noticing correspondences between symbol and season. When it clicks, it can be wildly clarifying. When it does not, you are still learning your own timing.
 
 A soft beginner practice is to ask three questions whenever you see a transit mentioned:
 

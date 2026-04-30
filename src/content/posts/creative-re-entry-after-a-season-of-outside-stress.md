@@ -32,7 +32,7 @@ promptMetadata: {"topic":"Creative Re-Entry After a Season of Outside Stress","r
 
 Creative re-entry after outside stress can feel less like inspiration and more like standing in a doorway with your hand still on the frame. This story is about guiding yourself back to your own projects after your energy has been spent on survival, caregiving, worry, logistics, or whatever loud weather pulled your focus away. It lives in the world of gentle productivity, personal projects, and the soft awkwardness of beginning again.
 
-If that threshold feels familiar, you might also want to keep [Creative Re-Entry Ritual for Personal Projects](/post/creative-re-entry-ritual-for-personal-projects), [Returning to Quiet Projects with Gentle Hands](/post/returning-to-quiet-projects-with-gentle-hands), and [Consent To Continue](/post/consent-to-continue) nearby like small lanterns rather than instructions.
+If that threshold feels familiar, you might also want to keep [Creative Re-Entry Ritual for Personal Projects](/post/creative-re-entry-ritual-for-personal-projects), [Returning to Quiet Projects with Gentle Hands](/post/returning-to-quiet-projects-with-gentle-hands), and Consent To Continue nearby like small lanterns rather than instructions.
 
 ## The Season of Outside Things
 
@@ -60,7 +60,7 @@ Because there is a difference between not caring and being overrun.
 
 Outside stress has a way of changing the scale of everything. Your own work begins to look both too small and too huge. Too small compared to the urgent things that kept pulling you away. Too huge because re-entering means meeting yourself again, and maybe noticing where the thread snapped.
 
-On some days the person called this [Brain Fog](/post/brain-fog). On other days it felt closer to [Rest And Survival](/post/rest-and-survival), where even the smallest personal choice had to queue politely behind basic functioning. Occasionally it turned into that stale ache described in [When Everything Feels Pointless](/post/when-everything-feels-pointless), where meaning itself seemed to dim for a while, not permanently, just long enough to make everything feel like cardboard.
+On some days the person called this Brain Fog. On other days it felt closer to Rest And Survival, where even the smallest personal choice had to queue politely behind basic functioning. Occasionally it turned into that stale ache described in [When Everything Feels Pointless](/post/when-everything-feels-pointless), where meaning itself seemed to dim for a while, not permanently, just long enough to make everything feel like cardboard.
 
 Still, underneath all that, the project had not gone dead. It had gone quiet.
 
@@ -124,7 +124,7 @@ That made re-entry feel less like facing judgment and more like rejoining a conv
 
 The person clicked around slowly. Opened the notes file. Closed three irrelevant tabs. Found the sketch. Found the list. Found the half-plan underneath the newer pile of obligations. Somewhere in the process, the room began to feel less like a museum and more like a camp being set back up after weather.
 
-They thought of [Quiet Progress](/post/quiet-progress) then. Of the idea that progress does not have to announce itself with trumpets or color-coded dashboards. Sometimes it is just the moment a thing becomes reachable again.
+They thought of Quiet Progress then. Of the idea that progress does not have to announce itself with trumpets or color-coded dashboards. Sometimes it is just the moment a thing becomes reachable again.
 
 Outside, a car passed. The fridge made its ordinary humming sound. A neighbor's door thudded shut in the hallway. None of it was magical. And because none of it was magical, it was easier to believe the return could be real.
 
@@ -214,7 +214,7 @@ The tea steamed up the window a little. The spoon knocked once against the mug. 
 
 That did not mean the person launched into shame. It just meant the cost became visible.
 
-They thought, with a kind of crooked affection, of [Pauses](/post/pauses), and of how not every pause is the same. Some are nourishing. Some are protective. Some quietly sour because they were never meant to last that long. Knowing the difference is part of growing around your own patterns instead of fighting them like a cartoon enemy.
+They thought, with a kind of crooked affection, of Pauses, and of how not every pause is the same. Some are nourishing. Some are protective. Some quietly sour because they were never meant to last that long. Knowing the difference is part of growing around your own patterns instead of fighting them like a cartoon enemy.
 
 Back at the desk, they read over the little changes and found them decent.
 
@@ -300,7 +300,7 @@ They wanted work that could breathe.
 
 Work that could be returned to by a tired person, not only an ideal one.
 
-That realization connected, unexpectedly, with [Staying Exactly Yourself](/post/staying-exactly-yourself). Not in a rigid identity sense. More in the sense of allowing the work to stop cosplaying as who you think you should be. A personal project can drift away from you when it becomes too entangled with performance, too loaded with redemption, too eager to prove that you are disciplined, gifted, wise, serious, healed, or somehow finally legitimate.
+That realization connected, unexpectedly, with Staying Exactly Yourself. Not in a rigid identity sense. More in the sense of allowing the work to stop cosplaying as who you think you should be. A personal project can drift away from you when it becomes too entangled with performance, too loaded with redemption, too eager to prove that you are disciplined, gifted, wise, serious, healed, or somehow finally legitimate.
 
 Sometimes the kindest creative re-entry is not dramatic motivation. It is taking off the costume.
 
@@ -330,7 +330,7 @@ More like brushing the path a little each time you walk it.
 
 The person began leaving themselves gentle infrastructure. A note at the top of the document. A short list of live threads. A file named start-here-again. A clean surface on the desk before bed if they had the capacity. Not because they had become a lifestyle content version of themselves, but because re-entry deserves support.
 
-This support was especially important on low-energy days. Days when the mind felt porous and the body moved like wet wool. On those days, the person borrowed from [Smallest Acts](/post/smallest-acts), [Gentle Self Care Practices](/post/gentle-self-care-practices), and even [What to Do With Free Time Instead of Doomscrolling](/post/what-to-do-with-free-time-instead-of-doomscrolling), not because the project was a wellness routine, but because attention is physical. Returning to your work is easier when your senses are not being chewed on by every open loop in the room.
+This support was especially important on low-energy days. Days when the mind felt porous and the body moved like wet wool. On those days, the person borrowed from Smallest Acts, Gentle Self Care Practices, and even [What to Do With Free Time Instead of Doomscrolling](/post/what-to-do-with-free-time-instead-of-doomscrolling), not because the project was a wellness routine, but because attention is physical. Returning to your work is easier when your senses are not being chewed on by every open loop in the room.
 
 Some sessions lasted ten minutes. Some lasted an hour. Some turned out to be mostly sorting, mostly noticing, mostly sitting near the work until the work stopped flinching.
 
@@ -374,7 +374,7 @@ You do not need to storm back in.
 
 You can come back the way many real things come back: by sitting down, touching one piece, leaving a breadcrumb, and letting the work become honest enough to meet you where you actually are.
 
-If your nervous system wants permission before momentum, keep [Quiet Permission](/post/quiet-permission) and [Gentle Rituals](/post/gentle-rituals) within reach. Not as rules. As reminders that there are ways to return without violence.
+If your nervous system wants permission before momentum, keep Quiet Permission and Gentle Rituals within reach. Not as rules. As reminders that there are ways to return without violence.
 
 ## Closing Reflection
 

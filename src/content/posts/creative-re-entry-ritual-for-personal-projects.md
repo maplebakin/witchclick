@@ -32,7 +32,7 @@ promptMetadata: {"topic":"Creative Re-Entry Ritual for Personal Projects","reque
 
 Getting back into creative phases for your own projects can feel strangely tender. A personal project is not just a task on a list. It holds your taste, your hope, your weird little sparks, and sometimes your fear of seeing yourself too clearly. This creative ritual is a gentle way to return when the work still matters, but your momentum has gone quiet.
 
-Think of this as a soft loading screen for your inner world. You do not need a dramatic breakthrough. You only need a small opening. If you have been circling your ideas without touching them, this practice pairs well with [Returning to Quiet Projects with Gentle Hands](/post/returning-to-quiet-projects-with-gentle-hands), [Quiet Progress](/post/quiet-progress), and [Consent To Continue](/post/consent-to-continue). If the deeper snag is mental clutter, [When Everything Feels Pointless](/post/when-everything-feels-pointless) and [Brain Fog](/post/brain-fog) may also help you name the weather around the work.
+Think of this as a soft loading screen for your inner world. You do not need a dramatic breakthrough. You only need a small opening. If you have been circling your ideas without touching them, this practice pairs well with [Returning to Quiet Projects with Gentle Hands](/post/returning-to-quiet-projects-with-gentle-hands), Quiet Progress, and Consent To Continue. If the deeper snag is mental clutter, [When Everything Feels Pointless](/post/when-everything-feels-pointless) and Brain Fog may also help you name the weather around the work.
 
 ## Quick Creative Re-Entry Variant
 
@@ -42,11 +42,11 @@ For low-spoon days. This version is meant to get you back in the room without as
 
 2. **Make a tiny landing zone.** Open the folder, notebook, document, sketchbook, or app. Put one object nearby that feels grounding: a mug, blanket, lamp, playlist, or pen. You are not creating the perfect studio. You are making a soft seam between ordinary life and project life.
 
-3. **Set a ten-minute return.** Not a productivity sprint. Just ten minutes of presence. Read old notes. Rename a file. Reopen your last draft. Move one unfinished thread into view. If you need help letting it be small, visit [Low-Spoon Option](/post/low-spoon-option).
+3. **Set a ten-minute return.** Not a productivity sprint. Just ten minutes of presence. Read old notes. Rename a file. Reopen your last draft. Move one unfinished thread into view. If you need help letting it be small, visit Low-Spoon Option.
 
 4. **Leave a breadcrumb before you stop.** Write one sentence about what comes next: 'fix header spacing,' 'look up market stall references,' 'draft the second card meaning,' or 'decide the color palette.' Future-you deserves a lantern.
 
-5. **Close with enoughness.** Say, write, or think: 'I returned.' That counts. Tiny movement is still movement. This is close in spirit to [Smallest Acts](/post/smallest-acts) and [Quiet Permission](/post/quiet-permission).
+5. **Close with enoughness.** Say, write, or think: 'I returned.' That counts. Tiny movement is still movement. This is close in spirit to Smallest Acts and Quiet Permission.
 
 ## Deep Creative Re-Entry Variant
 
@@ -54,7 +54,7 @@ When you have a little more room, this version helps you shift from avoidance in
 
 1. **Name the project and the ache around it.** Write both in simple words. Example: 'WitchClick post series — afraid it will come out flat.' Or: 'Game guide app — overwhelmed by how many parts it needs.' This step matters because confusion loves fog, and naming things turns on a small lamp.
 
-2. **Clear a single surface.** Not the whole room. One square of desk. One chair. One browser window set. One tab group. Let the space say, 'something may begin here.' If your nervous system is jangly, borrow a settling practice from [Gentle Rituals](/post/gentle-rituals) or [Grounding Practices](/post/grounding-practices).
+2. **Clear a single surface.** Not the whole room. One square of desk. One chair. One browser window set. One tab group. Let the space say, 'something may begin here.' If your nervous system is jangly, borrow a settling practice from Gentle Rituals or Grounding Practices.
 
 3. **Gather project relics.** Pull together old drafts, sketches, screenshots, voice notes, reference links, or sticky notes. Do not judge them yet. Lay them out like clues from an old side-quest you are finally ready to resume.
 

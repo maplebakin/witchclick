@@ -11,7 +11,7 @@ import { readSettings } from "@/utils/settings";
 import { createCollectionPageSchema } from "@/utils/structuredData";
 import type { CardPost } from "@/types/post";
 
-const title = "WitchClick — Cozy secular rituals for everyday magic";
+const title = "WitchClick — Rituals for choosing your own perspective";
 
 const allPosts = loadAllPosts();
 const settings = readSettings();
@@ -35,7 +35,7 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
   {
     name: "Recent Rituals & Essays",
     url: "/",
-    description: "Gentle rituals, cozy tools, and reflections for when life feels loud.",
+    description: "Choose the lens you meet your life through, with secular rituals and tarot for reclaiming meaning beyond the metric.",
     itemType: "Article",
   },
   [latestPost, ...gridPosts].map((post) => ({
@@ -58,10 +58,11 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
       <div class="home-masthead__inner mx-auto max-w-[var(--content-max-width)]">
         <h1 class="home-masthead__title">WitchClick</h1>
         <p class="home-masthead__tagline">
-          Gentle rituals, cozy tools, and reflections for when life feels loud.
+          You get to choose the lens you live through, even when the world keeps handing you a measuring stick.
         </p>
         <p class="home-masthead__subline">
-          Small practices for shadow work, rest, and everyday magic—designed with neurodivergent brains in mind.
+          A secular ritual archive for reclaiming meaning, attention, and value outside productivity metrics. Tarot and
+          magic stay reflective here: grounded symbols, chosen perspective, no guaranteed outcomes.
         </p>
         <div class="home-masthead__sigil" aria-hidden="true"><span>✦</span></div>
       </div>
@@ -71,7 +72,7 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
       <section data-reveal class="home-posts mb-[var(--page-section-gap)]" aria-labelledby="home-posts-heading">
         <div class="mx-auto w-full max-w-4xl">
           <div class="home-posts__header">
-            <h2 id="home-posts-heading" class="font-serif text-2xl font-semibold text-body-strong sm:text-3xl">From the Grimoire</h2>
+            <h2 id="home-posts-heading" class="font-serif text-2xl font-semibold text-body-strong sm:text-3xl">Rituals for Meaning Beyond the Metric</h2>
             <a href="/page/1" class="text-sm font-medium text-brand-accent transition-colors hover:text-brand-accent hover:underline">View all →</a>
           </div>
 
@@ -146,7 +147,8 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
     <Card class="max-w-lg mx-auto text-center" padding="lg">
       <h3 class="mb-2 font-serif text-xl font-semibold text-body-strong sm:text-2xl">Looking for more?</h3>
       <p class="mb-6 text-base text-body-muted">
-        Explore printable tools, browse by topic, check out non-magickal rambles, or reach out if you need something specific.
+        Browse the archive by topic, find printable supports, read the stranger side notes, or ask for a practice that meets
+        the life you are actually living.
       </p>
       <div class="flex flex-wrap gap-3 justify-center">
         {hasPublishedMeanderings && <Button href="/meanderings" variant="secondary" size="sm">Meanderings</Button>}

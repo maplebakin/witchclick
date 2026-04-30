@@ -15,7 +15,7 @@ const HUBS = [
   {
     slug: "release",
     title: "Release",
-    description: "Let go without self-punishment. Rituals, prompts, and partner offerings that help you compost what is complete.",
+    description: "Threshold rituals, prompts, and supports for naming what is complete and choosing what no longer gets to measure you.",
     introSlug: "cozy-cursing-ritual-release-anger-banishment",
     accent: "var(--theme-warning, var(--theme-color-gold))",
     moods: ["angry", "overwhelmed", "stuck"],
@@ -23,7 +23,7 @@ const HUBS = [
   {
     slug: "focus",
     title: "Focus",
-    description: "Somatic resets, micro-accountability, and cozy planning spreads for attention that feels kind.",
+    description: "Attention rituals, tarot spreads, and small structures for returning to what matters without turning yourself into a machine.",
     introSlug: "focus-tea-rituals-gentle-brains",
     accent: "var(--theme-info, var(--theme-color-iris))",
     moods: ["scattered", "distracted", "restless"],
@@ -31,7 +31,7 @@ const HUBS = [
   {
     slug: "calm",
     title: "Calm",
-    description: "Collective soothing practices, repair scripts, and mutual-aid highlights for staying resourced together.",
+    description: "Grounding practices, repair scripts, and reflective anchors for staying present when the world keeps asking too much.",
     introSlug: "calm-space-during-political-unrest-2",
     accent: "var(--theme-success, var(--theme-color-amethyst))",
     moods: ["anxious", "overstimulated", "raw"],
@@ -117,7 +117,7 @@ const jsonLd = createCollectionPageSchema(
   {
     name: "WitchClick Hub Constellation",
     url: "/hub",
-    description: "Seasonal landing pages for Release, Focus, and Calm rituals.",
+    description: "Pathways into release, focus, and calm rituals for attention, meaning, and threshold work.",
   },
   collectionItems,
 );
@@ -130,7 +130,7 @@ const breadcrumbs = [
 
 <Base
   title="Hub Constellation — Release, Focus, Calm"
-  description="Pick how you're feeling right now and enter through Release, Focus, or Calm. Each WitchClick hub is tuned to a mood, not a topic."
+  description="Enter through Release, Focus, or Calm. Each WitchClick hub gathers rituals, essays, and tools for choosing a lens."
   ambientColor="var(--theme-color-amethyst)"
 >
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
@@ -142,8 +142,8 @@ const breadcrumbs = [
     <p class="page-header__eyebrow">Hub constellation</p>
     <h1 class="page-header__title">How are you feeling right now?</h1>
     <p class="page-header__lead">
-      Each room is tuned to a different emotional frequency. Pick the mood that fits today and step into rituals, essays,
-      and gentle tools gathered around that feeling rather than a topic.
+      Each room is a practical way into the archive. Pick the lens that fits today and step into rituals, essays, and tools
+      gathered around attention, meaning, and threshold work.
     </p>
   </header>
 
@@ -154,7 +154,7 @@ const breadcrumbs = [
           <div class="hub-featured__copy">
             <h2 id="featured-hub-title" class="hub-featured__title">{featuredHub.title}</h2>
             <p class="hub-featured__lead">{featuredHub.description}</p>
-            <p class="hub-featured__meta">{featuredHub.livePostCount} live rituals available</p>
+            <p class="hub-featured__meta">{featuredHub.livePostCount} live practices available</p>
         </div>
         <PrimaryButton href={`/hub/${featuredHub.slug}`} iconAfter="↗">
           Explore {featuredHub.title}

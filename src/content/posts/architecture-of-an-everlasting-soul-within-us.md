@@ -29,7 +29,7 @@ promptMetadata: {"topic":"The Architecture of an Everlasting Soul Within Us","re
 
 The idea of an everlasting soul can sound huge, polished, and far away. But for many of us, it arrives in smaller ways: a feeling that something in us persists, a quiet sense of recognition, or the strange comfort of knowing we are more than a single rough season. This reflection explores the architecture of an everlasting soul as a soft, symbolic framework for meaning-making rather than a fixed doctrine.
 
-Instead of treating the soul like a sealed object, we can imagine it as a kind of inner dwelling shaped by memory, attention, longing, and relationship. If that image speaks to you, think of this as a cozy side-quest in [personal myth](/post/personal-myth), where the goal is not certainty, but clearer intimacy with your own inner shape.
+Instead of treating the soul like a sealed object, we can imagine it as a kind of inner dwelling shaped by memory, attention, longing, and relationship. If that image speaks to you, think of this as a cozy side-quest in personal myth, where the goal is not certainty, but clearer intimacy with your own inner shape.
 
 ## A Soul Built From Pattern, Not Stone
 
@@ -39,7 +39,7 @@ A house is still a house after the windows are replaced, after the paint fades, 
 
 That thread may not be a static essence. It may be an organizing pattern. A way your awareness gathers meaning. A way your tenderness returns to certain truths. A way your choices echo across time.
 
-This is one reason the language of [inner narrative](/post/inner-narrative) can feel so useful. A narrative is not false just because it changes. It changes because it is alive. If the soul has architecture, maybe its beams are made of recurring values, repeated ache, remembered wonder, and the specific angle from which you meet the world.
+This is one reason the language of inner narrative can feel so useful. A narrative is not false just because it changes. It changes because it is alive. If the soul has architecture, maybe its beams are made of recurring values, repeated ache, remembered wonder, and the specific angle from which you meet the world.
 
 That idea also leaves room for mystery. You do not have to prove that the soul is measurable to notice that your life has a signature. You do not have to claim divine certainty to admit that some parts of you feel older than your current mood, and wiser than your latest fear.
 
@@ -55,9 +55,9 @@ Relationship matters here too. We do not become ourselves in a vacuum. We are al
 
 This is where an everlasting soul becomes less lonely as a concept. It does not have to mean a private glowing core detached from everyone else. It can mean that your deepest self is formed in contact. Something enduring is shaped not just by what you are, but by what you carry, what you refuse, and what you continue.
 
-There is a gentle overlap here with [collective intelligence](/post/collective-intelligence) and [human connection](/post/human-connection). We are individual, yes, but not sealed. We are distinct patterns that still learn by resonance. The soul may be everlasting not because it is isolated from the world, but because it is capable of receiving and transmitting meaning across it.
+There is a gentle overlap here with collective intelligence and human connection. We are individual, yes, but not sealed. We are distinct patterns that still learn by resonance. The soul may be everlasting not because it is isolated from the world, but because it is capable of receiving and transmitting meaning across it.
 
-Even the things you release can become part of the architecture. A room cleared of clutter is still part of the house. A grief integrated through [emotional reflection](/post/emotional-reflection) does not vanish; it changes function. It may become a window. It may become a stairwell. It may become the quiet guest room where compassion waits.
+Even the things you release can become part of the architecture. A room cleared of clutter is still part of the house. A grief integrated through emotional reflection does not vanish; it changes function. It may become a window. It may become a stairwell. It may become the quiet guest room where compassion waits.
 
 ## Why the Idea of an Everlasting Soul Still Matters
 
@@ -85,7 +85,7 @@ Use these gently. You do not need to answer all of them at once.
 - If my soul has an architecture, what feels like its foundation? What feels like a locked door? What feels like a window?
 - What changes in me have been real transformation, and what has remained quietly continuous beneath them?
 
-If you want a softer place to keep these thoughts, pairing this reflection with [journaling](/post/journaling) or a dedicated [reflection journal](/post/reflection-journal) can help you notice patterns over time instead of forcing one perfect answer today.
+If you want a softer place to keep these thoughts, pairing this reflection with journaling or a dedicated reflection journal can help you notice patterns over time instead of forcing one perfect answer today.
 
 ## Closing Reflection
 
@@ -93,4 +93,4 @@ The architecture of an everlasting soul does not have to be mapped all at once. 
 
 You are allowed to meet this idea symbolically, spiritually, skeptically, or somewhere in-between. What matters is not perfect certainty. What matters is the quality of attention you bring to your own life. An everlasting soul, in this sense, may simply be the deepest pattern of you continuing to become itself.
 
-Return to this reflection whenever your sense of self feels thin, scattered, or overly defined by external measures. Let it sit beside [staying exactly yourself](/post/staying-exactly-yourself) as a reminder that identity can be both changing and continuous. The question of the everlasting soul may never close completely, but it can still become a steady companion rather than a demand.
+Return to this reflection whenever your sense of self feels thin, scattered, or overly defined by external measures. Let it sit beside staying exactly yourself as a reminder that identity can be both changing and continuous. The question of the everlasting soul may never close completely, but it can still become a steady companion rather than a demand.

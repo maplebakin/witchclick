@@ -5,13 +5,25 @@ Repository root: `witchclick/`
 
 ## 1) Purpose and Product Intent
 
-WitchClick is a static-first Astro publishing platform for cozy, secular, neurodivergent-friendly metaphysical content.
+WitchClick is a static-first Astro publishing platform for a secular metaphysical value-space: a site for making meaning outside productivity metrics and other narrow systems that fail to recognize many people's real value. It uses ritual, tarot, symbolic action, essays, grimoire references, and printable/reflection tools as ways to choose perspective, reclaim attention, and preserve inner value.
 
 Core intent:
-- Keep the tone warm, grounded, and non-gatekeeping.
+- Keep the tone warm, grounded, non-gatekeeping, cozy, practical, and slightly strange.
 - Treat rituals/tarot as reflective practices, not supernatural guarantees.
+- Keep neurodivergent-friendly design central to the architecture and tone without reducing the whole brand to ADHD-friendly tools.
+- Avoid academic, therapy-coded, manifesto-heavy, simplistic anti-money/anti-work, or generic wellness/productivity framing.
 - Prioritize accessibility, SEO, and ethical monetization.
 - Use a structured AI content pipeline: prompt -> JSON spec -> validation/normalization -> markdown -> static build.
+
+### Current Brand Positioning
+
+Philosophical core: "The kind of person I am will never be deemed valuable in the capitalist society we have now. Therefore, I must make my own space where I can find value."
+
+Operational interpretation:
+- WitchClick helps readers build a small value-space where sensitivity, grief, intuition, creativity, slowness, weirdness, and nonlinear ways of being can matter.
+- Ritual and tarot are secular reflective practices for attention, meaning, and perspective-shifting.
+- Grimoire/entity content should read as symbolic reference, correspondences, and reflective anchors, not supernatural proof.
+- CTAs, tools, and affiliate placements should remain clear and useful while never becoming the identity of the work.
 
 ## 2) High-Level Architecture
 
@@ -30,10 +42,10 @@ Build mode:
 ## 3) Current Project Snapshot
 
 Observed in repo:
-- Posts: 168 markdown files in `src/content/posts`
-- Published posts: 59
-- Draft posts: 109
-- Entities: 197 JSON files under `content/entities`
+- Total posts: 170
+- Published: 61
+- Drafts: 109
+- Entity JSON files: 198
 - Entity folders: `crystal`, `herb`, `moonPhase`, `planet`, `planetaryDay`, `ritual`, `spread`, `tarot`
 
 ## 4) Guardrails and Collaboration Constraints
@@ -214,9 +226,15 @@ Use Cauldron for ideation/drafting workflows, then ingest into main pipeline.
 
 These are high-value caution points when touching prompt/schema code:
 
-1. Content type legacy values still appear in runtime schema.
-- `server/lib/postSpecSchema.js` still lists `guide` and `spread` in `CONTENT_TYPES`.
-- Other prompt/validator logic expects newer narrowed modes.
+1. Content types in current preset usage:
+- `curiousExplainer` — Curious Explainer
+- `practicalWorking` — Practical Working
+- `reflectiveEssay` — Reflective Essay
+- `storyVignette` — Story & Vignette
+- `grimoireTarot` — Grimoire Entry — Tarot
+- `grimoireCrystal` — Grimoire Entry — Crystal
+- `grimoireHerb` — Grimoire Entry — Herb
+- `grimoireAstrology` — Grimoire Entry — Astrology
 
 2. `category` is still present in runtime schema and frontmatter ecosystem.
 - Present in schema and utilities, even where prompt docs de-emphasize it.

@@ -12,7 +12,7 @@ import { readEvergreenBlocks } from "../../utils/blocks";
 import { collectUnique, loadRitualLabEntries } from "../../utils/ritualLab";
 
 const title = "Ritual Lab";
-const description = "Choose your intention, available time, and tools to receive a tailored ritual flow—then capture it as a printable or calendar reminder.";
+const description = "An experimental ritual workshop for testing small practices, reflective tools, and printable supports.";
 
 const entries = loadRitualLabEntries();
 const intents = collectUnique(entries.map((entry) => entry.intents));
@@ -82,7 +82,7 @@ const downloadCollectionSchema =
           name: "Ritual Lab Printables",
           url: "/lab/#downloads",
           description:
-            "Download ready-to-print planners or open them in your browser, then export to PDF for gentle ritual support.",
+            "Download ready-to-print planners or open them in your browser, then export to PDF for reflective ritual support.",
           itemType: "DigitalDocument",
         },
         downloads.map((item) => {
@@ -99,9 +99,9 @@ const downloadCollectionSchema =
     : null;
 
 const automationIdeas = [
-  "Save your chosen ritual to a shared calendar using the reminder download.",
-  "Schedule a weekly email to yourself with Buttondown's digest feature and paste the ritual steps there.",
-  "Batch print three copies of the sampler planner so you can circle back whenever you feel foggy.",
+  "Save your chosen ritual to a shared calendar so the practice can meet you again later.",
+  "Schedule a weekly email to yourself and paste the ritual steps there as a small lens reset.",
+  "Batch print three copies of the sampler planner so you can return when the thread gets hard to hold.",
 ];
 
 const samplerPreview = {
@@ -186,9 +186,10 @@ const ritualLabPayloadJson = safeJsonStringify({
   <section class="mx-auto max-w-6xl space-y-6 py-12">
     <header class="space-y-3 text-center">
       <p class="text-sm uppercase tracking-wide text-accent">Phase 2 Lab</p>
-      <h1 class="font-serif text-4xl">Prototype Ritual Generator</h1>
+      <h1 class="font-serif text-4xl">Experimental Ritual Workshop</h1>
       <p class="mx-auto max-w-2xl text-base opacity-80">
-        Pair your current intention with the tools you have on hand. The ritual lab suggests a sequence, offers alternates, and shares printable exports so you can carry the flow into your week.
+        Pair your current intention with the tools you have on hand. The lab suggests a small ritual sequence, offers
+        alternates, and shares printable exports so you can carry the chosen lens into your week.
       </p>
     </header>
 
@@ -226,7 +227,7 @@ const ritualLabPayloadJson = safeJsonStringify({
 
             <div class="space-y-2">
               <span class="block text-sm font-semibold uppercase tracking-wide text-tertiary">Tools & Texture</span>
-              <p class="text-[0.8rem] opacity-70">Pick what you have nearby—sound gear, journals, or group energy.</p>
+              <p class="text-[0.8rem] opacity-70">Pick what you have nearby: sound, paper, cards, quiet, or company.</p>
               <div class="mt-3 grid gap-2">
                 {toolOptions.map((tool) => (
                   <label class="flex items-center gap-3 rounded-2xl border border-line-muted/80 bg-surface-muted/80 px-3 py-2 text-sm font-medium text-primary transition hover:border-line-bolder dark:border-line-accent/60 dark:bg-surface-accent-midnight/30 dark:text-accent-ghost">
@@ -264,7 +265,7 @@ const ritualLabPayloadJson = safeJsonStringify({
         </section>
 
         <section class="rounded-3xl border border-line-muted/60 bg-surface-base/90 p-6 shadow-lg backdrop-blur dark:border-line-accent-deep/50 dark:bg-surface-veil/70">
-          <h3 class="font-serif text-xl">Quick Automation Seeds</h3>
+          <h3 class="font-serif text-xl">Ways to Keep the Thread</h3>
           <ul class="mt-3 list-disc space-y-2 pl-6 text-sm opacity-80">
             {automationIdeas.map((idea) => (
               <li>{idea}</li>
@@ -277,9 +278,10 @@ const ritualLabPayloadJson = safeJsonStringify({
 
   <section id="printables" class="mx-auto max-w-6xl space-y-6 py-12">
     <header class="space-y-2 text-center">
-      <h2 class="font-serif text-3xl">Printables & Planner Exports</h2>
+      <h2 class="font-serif text-3xl">Printables & Practice Exports</h2>
       <p class="mx-auto max-w-2xl text-base opacity-80">
-        Download ready-to-print planners or open them in your browser, then export to PDF. Share what you want next and leave your email if you would like updates when new printables land.
+        Download ready-to-print supports or open them in your browser, then export to PDF. Share what would help you make
+        meaning next and leave your email if you would like updates when new tools land.
       </p>
     </header>
 
@@ -297,7 +299,7 @@ const ritualLabPayloadJson = safeJsonStringify({
           <textarea
             name="request"
             rows="3"
-            placeholder="Example: A ritual check-in page or a gentle habit tracker for low-spoons mornings."
+            placeholder="Example: A ritual check-in page, perspective reset, or low-spoons threshold card."
             class="mt-2 w-full rounded-2xl border border-line-muted bg-surface-base px-4 py-3 text-sm shadow-sm focus:border-line-bold focus:outline-none focus:ring-2 focus:ring-focus/60 dark:border-line-accent dark:bg-surface-backdrop dark:text-accent-ghost"
           ></textarea>
         </label>
@@ -313,7 +315,7 @@ const ritualLabPayloadJson = safeJsonStringify({
         </label>
         <div class="flex flex-wrap items-center gap-3 text-[0.8rem] opacity-70">
           <button type="submit" class="rounded-full bg-surface-accent-strong px-4 py-2 text-inverse shadow hover:bg-surface-accent">
-            Send me future printables
+            Send me future tools
           </button>
           <span>or</span>
           <a class="rounded-full border border-line-strong px-4 py-2 font-medium text-secondary hover:border-line-bold" href="#downloads">
@@ -324,7 +326,7 @@ const ritualLabPayloadJson = safeJsonStringify({
       </form>
     ) : (
       <p class="mx-auto max-w-2xl text-center text-sm opacity-75">
-        Printable requests and email updates are temporarily offline while form delivery is being configured. You can still browse the current downloads below.
+        Tool requests and email updates are temporarily offline while form delivery is being configured. You can still browse the current downloads below.
       </p>
     )}
 
@@ -338,7 +340,7 @@ const ritualLabPayloadJson = safeJsonStringify({
 
     <div id="downloads" class="grid gap-6 md:grid-cols-2">
       {downloads.length === 0 ? (
-        <p class="text-center text-base opacity-70">New printables are brewing—check back soon.</p>
+        <p class="text-center text-base opacity-70">New practice supports are in the workshop. Check back soon.</p>
       ) : (
         downloads.map((item) => (
           <article class="flex h-full flex-col justify-between rounded-3xl border border-line-muted/60 bg-surface-base/90 p-6 shadow-lg backdrop-blur dark:border-line-accent-deep/50 dark:bg-surface-veil/70">
@@ -407,7 +409,8 @@ const ritualLabPayloadJson = safeJsonStringify({
   <section class="mx-auto max-w-6xl space-y-4 py-12">
     <h2 class="font-serif text-3xl">Reminders</h2>
     <p class="max-w-3xl text-base opacity-80">
-      Prefer nudges over memory? Download the static reminder file below to add the three-day sampler to your calendar of choice. You can also copy the ritual steps into your task manager—no tracking pixels required.
+      Prefer nudges over memory? Download the static reminder file below to add the three-day sampler to your calendar of
+      choice. You can also copy the ritual steps into your task manager. No tracking pixels required.
     </p>
     <a
       class="inline-flex items-center gap-2 rounded-full border border-line-bolder px-5 py-2 text-sm font-semibold text-primary-strong transition hover:bg-surface-soft dark:border-line-accent dark:text-accent-ghost dark:hover:bg-surface-accent-night/40"
