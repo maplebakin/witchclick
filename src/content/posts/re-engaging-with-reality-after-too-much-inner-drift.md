@@ -24,7 +24,7 @@ specVersion: 2
 category: "ritual"
 contentType: "reflection"
 cluster: "magical-productivity"
-externalLink: {"url":"https://en.wikipedia.org/wiki/Narrative_identity","anchor":"narrative](https://en.wikipedia.org/wiki/Narrative_identity%22,%22anchor%22:%22narrative) identity","description":"Background reading on how people make meaning through self-story, useful for framing over-identification with thought."}
+externalLink: {"url":"https://en.wikipedia.org/wiki/Narrative_identity","anchor":"narrative identity","description":"Background reading on how people make meaning through self-story, useful for framing over-identification with thought."}
 promptMetadata: {"topic":"Re-Engaging With Reality After Too Much Inner Drift","requestedWords":1200,"deliveredWords":1534,"toggles":{"ads":"off","kofi":"off"},"generatedAt":"2026-04-08T21:56:41.979Z"}
 ---
 
@@ -40,7 +40,7 @@ That does not mean you've failed at being present. It usually means something in
 
 There is a difference between reflection and over-residing. Reflection helps you notice patterns. Over-residing turns the mind into a waiting room where you keep calling your own name but never stand up when it is time to go.
 
-A rich inner life is not the enemy. It can be a sanctuary. It can hold imagination, meaning, grief, memory, and the kind of private signal that helps you stay yourself in a noisy world. Posts like inner narrative and introspection can be companions here, because they honor the value of looking inward. The problem usually begins when the inward gaze stops being a lantern and starts becoming fog.
+A rich inner life is not the enemy. It can be a sanctuary. It can hold imagination, meaning, grief, memory, and the kind of private signal that helps you stay yourself in a noisy world. If the drift is tangled with uncertainty, [Sanctuary in the Shadow of the Unknown](/post/sanctuary-in-the-shadow-of-the-unknown-ritual) offers a contained pause before you return. Posts like inner narrative and introspection can be companions here, because they honor the value of looking inward. The problem usually begins when the inward gaze stops being a lantern and starts becoming fog.
 
 That fog can look smart from the inside. It can feel like you are doing deep work because you are thinking constantly. But not every thought is movement. Not every insight changes anything. Sometimes you are only circling the same ache from new angles, like a player walking the edges of a map instead of entering the next area.
 

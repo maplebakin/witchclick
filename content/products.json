@@ -2,8 +2,8 @@
   "products": [
     {
       "key": "sustainable-incense",
-      "name": "Sustainable Incense Stick Set",
-      "brand": "Various Makers",
+      "name": "Browse Sustainable Incense Options",
+      "brand": "Amazon search",
       "url": "https://www.amazon.com/s?k=sustainable+incense+sticks&tag=witchclickspa-20",
       "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=sustainable_incense",
       "rel": "sponsored nofollow",
@@ -11,8 +11,8 @@
     },
     {
       "key": "altar-kit",
-      "name": "Altar Kit (Cloth, Chalice & Ritual Candles)",
-      "brand": "Curated Set",
+      "name": "Browse Altar Tool Sets",
+      "brand": "Amazon search",
       "url": "https://www.amazon.com/s?k=altar+tools+chalice+altar+cloth+ritual+candles&tag=witchclickspa-20",
       "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=altar_kit",
       "rel": "sponsored nofollow",
@@ -20,8 +20,8 @@
     },
     {
       "key": "gemstone-candle",
-      "name": "Gemstone-Infused Aromatherapy Candle",
-      "brand": "Crystal Candle Co.",
+      "name": "Browse Gemstone Candle Options",
+      "brand": "Amazon search",
       "url": "https://www.amazon.com/s?k=gemstone+infused+candle&tag=witchclickspa-20",
       "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=gemstone_candle",
       "rel": "sponsored nofollow",
@@ -29,8 +29,8 @@
     },
     {
       "key": "aroma-diffuser",
-      "name": "Ceramic Essential Oil Diffuser",
-      "brand": "CalmMist",
+      "name": "Browse Ceramic Diffuser Options",
+      "brand": "Amazon search",
       "url": "https://www.amazon.com/s?k=ceramic+essential+oil+diffuser&tag=witchclickspa-20",
       "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=aroma_diffuser",
       "rel": "sponsored nofollow",
@@ -38,8 +38,8 @@
     },
     {
       "key": "tumbled-stones",
-      "name": "Tumbled Stone Crystal Set",
-      "brand": "Crystal Collective",
+      "name": "Browse Tumbled Stone Sets",
+      "brand": "Amazon search",
       "url": "https://www.amazon.com/s?k=tumbled+stones+set&tag=witchclickspa-20",
       "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=tumbled_stones",
       "rel": "sponsored nofollow",
@@ -47,8 +47,8 @@
     },
     {
       "key": "himalayan-salt-lamp",
-      "name": "Himalayan Salt Lamp",
-      "brand": "Summit Glow",
+      "name": "Browse Salt Lamp Options",
+      "brand": "Amazon search",
       "url": "https://www.amazon.com/s?k=himalayan+salt+lamp&tag=witchclickspa-20",
       "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=himalayan_salt_lamp",
       "rel": "sponsored nofollow",
@@ -56,8 +56,8 @@
     },
     {
       "key": "singing-bowl",
-      "name": "Tibetan Singing Bowl Set",
-      "brand": "Resonant Tone",
+      "name": "Browse Singing Bowl Sets",
+      "brand": "Amazon search",
       "url": "https://www.amazon.com/s?k=singing+bowl+set&tag=witchclickspa-20",
       "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=singing_bowl",
       "rel": "sponsored nofollow",
@@ -65,8 +65,8 @@
     },
     {
       "key": "mindfulness-journal",
-      "name": "Guided Mindfulness Journal",
-      "brand": "Quiet Pages",
+      "name": "Browse Guided Mindfulness Journals",
+      "brand": "Amazon search",
       "url": "https://www.amazon.com/s?k=guided+mindfulness+journal&tag=witchclickspa-20",
       "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=mindfulness_journal",
       "rel": "sponsored nofollow",
@@ -74,8 +74,8 @@
     },
     {
       "key": "chakra-bracelet",
-      "name": "Chakra Bracelet / Mala Beads",
-      "brand": "Aura Threads",
+      "name": "Browse Chakra Bracelet and Mala Options",
+      "brand": "Amazon search",
       "url": "https://www.amazon.com/s?k=chakra+bracelet+mala&tag=witchclickspa-20",
       "utm": "utm_source=witchclick&utm_medium=affiliate&utm_campaign=chakra_bracelet",
       "rel": "sponsored nofollow",
@@ -83,6 +83,7 @@
     },
     {
       "key": "smudge-kit",
+      "published": false,
       "name": "White Sage & Palo Santo Smudge Kit",
       "brand": "Sacred Smoke",
       "url": "https://www.amazon.com/s?k=white+sage+palo+santo+kit&tag=witchclickspa-20",

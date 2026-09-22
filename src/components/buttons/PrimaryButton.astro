@@ -58,8 +58,8 @@ if (target === "_blank") {
 
 <style>
   .wc-button {
-    --btn-bg: var(--cozy-button-bg, color-mix(in srgb, var(--surface-panel-primary) 78%, var(--text-accent, var(--theme-color-gold)) 22%));
-    --btn-bg-hover: var(--cozy-button-bg-hover, color-mix(in srgb, var(--surface-panel-primary) 68%, var(--text-accent, var(--theme-color-gold)) 32%));
+    --btn-bg: color-mix(in srgb, var(--surface-panel-primary) 78%, var(--text-accent, var(--theme-color-gold)) 22%);
+    --btn-bg-hover: color-mix(in srgb, var(--surface-panel-primary) 72%, var(--text-accent, var(--theme-color-gold)) 28%);
     --btn-text: var(--theme-text-strong);
     --btn-border: color-mix(in srgb, var(--border-accent-strong) 40%, transparent 60%);
     display: inline-flex;
@@ -67,17 +67,17 @@ if (target === "_blank") {
     justify-content: center;
     gap: 0.5rem;
     padding: calc(var(--space-2) + 0.15rem) var(--space-4);
-    border-radius: var(--wc-radius-md, 0.9rem);
+    border-radius: var(--radius-2, 0.75rem);
     border: 1px solid var(--btn-border);
     background: var(--btn-bg);
     color: var(--btn-text);
-    font-family: var(--font-accent);
+    font-family: var(--font-sans);
     font-size: 0.95rem;
     font-weight: 600;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     line-height: 1.2;
-    box-shadow: var(--cozy-shadow, 0 16px 36px -28px color-mix(in srgb, var(--color-night, var(--surface-panel)) 60%, transparent 40%));
+    box-shadow: 0 14px 32px -26px color-mix(in srgb, var(--color-night, var(--surface-panel)) 54%, transparent 46%);
     transition: background 160ms ease, transform 160ms ease, color 160ms ease, border-color 160ms ease, box-shadow 200ms ease;
     text-decoration: none;
   }
@@ -87,7 +87,7 @@ if (target === "_blank") {
     background: var(--btn-bg-hover);
     color: var(--btn-text);
     border-color: color-mix(in srgb, var(--border-accent-strong) 60%, transparent 40%);
-    box-shadow: var(--cozy-shadow-hover, 0 22px 46px -30px color-mix(in srgb, var(--color-night, var(--surface-panel)) 55%, transparent 45%));
+    box-shadow: 0 18px 40px -28px color-mix(in srgb, var(--color-night, var(--surface-panel)) 48%, transparent 52%);
   }
 
   .wc-button:active {
@@ -111,8 +111,8 @@ if (target === "_blank") {
   }
 
   :global(:root[data-comfort-theme="dawn"]) .wc-button {
-    --btn-bg: var(--cozy-button-bg, color-mix(in srgb, var(--theme-text-strong) 18%, var(--text-accent, var(--theme-color-gold)) 82%));
-    --btn-bg-hover: var(--cozy-button-bg-hover, color-mix(in srgb, var(--theme-text-strong) 24%, var(--text-accent, var(--theme-color-gold)) 76%));
+    --btn-bg: color-mix(in srgb, var(--theme-text-strong) 14%, var(--text-accent, var(--theme-color-gold)) 86%);
+    --btn-bg-hover: color-mix(in srgb, var(--theme-text-strong) 20%, var(--text-accent, var(--theme-color-gold)) 80%);
     --btn-text: color-mix(in srgb, var(--theme-text-strong) 92%, white 8%);
     --btn-border: color-mix(in srgb, var(--border-accent-strong) 45%, transparent 55%);
   }

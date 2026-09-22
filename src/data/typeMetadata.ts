@@ -15,34 +15,34 @@ export type TypeMetadataEntry = {
 
 const defaultMetadata: TypeMetadataEntry = {
   title: "The Grimoire", 
-  subtitle: "Mystic knowledge awaiting discovery.",
+  subtitle: "A symbolic reference entry waiting for context.",
   introText:
-    "Every entry in the WitchClick grimoire hums with latent insight. Return soon to uncover the next revelation woven between moonlight and ink.",
+    "Every grimoire entry is a reference point, not an authority. Return soon for language, correspondences, and reflection prompts you can use as a chosen lens.",
   icon: "✨",
   themeColor: "violet-500",
-  stubLine: "This page is still gathering its energies.",
+  stubLine: "This page is still gathering its notes.",
   cardStyleClass: "from-gradient-default-start/20 to-gradient-default-end/40",
 };
 
 export const typeMetadata = {
   crystal: {
     title: "The Crystal Index",
-    subtitle: "Resonant stones and whispering gems.",
+    subtitle: "Stones as tactile symbols, anchors, and prompts.",
     introText:
-      "Trace the latticework of power coiled within each crystal. From protective wards to amplifying prisms, these stones attune any ritual to its purest frequency.",
+      "Use crystal correspondences as sensory language: color, texture, folklore, and association shaped into reflective anchors for rituals and journaling.",
     icon: "🔮",
     themeColor: "violet-500",
-    stubLine: "This crystal’s story is still faceting itself.",
+    stubLine: "This crystal entry is still being shaped.",
     cardStyleClass: "from-gradient-crystal-start/30 to-gradient-crystal-end/40",
   },
   herb: {
     title: "The Herbal Lexicon",
-    subtitle: "Greens that heal, hush, and ignite.",
+    subtitle: "Plant correspondences for attention, care, and ritual structure.",
     introText:
-      "Gather verdant allies for teas, tinctures, and spellcraft. These herbs bend their fragrant will toward soothing hearts and stirring courageous intentions.",
+      "Browse herbs as practical and symbolic companions: scent, taste, history, and sensory association arranged into grounded ritual cues.",
     icon: "🌿",
     themeColor: "emerald-500",
-    stubLine: "This herb is still rooting into the lexicon.",
+    stubLine: "This herb entry is still rooting into the index.",
     cardStyleClass: "from-gradient-herb-start/30 to-gradient-herb-end/40",
   },
   moonPhase: {
@@ -51,13 +51,13 @@ export const typeMetadata = {
     emoji: "🌙",
     slug: "moonPhase",
     title: "Moonlit Phases",
-    subtitle: "The rhythm of the sky’s turning face.",
-    description: "The rhythm of the sky’s turning face.",
+    subtitle: "A visible cycle for timing, reflection, and perspective.",
+    description: "A visible cycle for timing, reflection, and perspective.",
     introText:
-      "Chart the waxing and waning tides of lunar magic. Each phase is a compass point guiding intention, release, and the secret grammar of the night.",
+      "Use moon phases as a calendar lens: a simple way to frame beginnings, fullness, release, rest, and review without treating the sky as a command.",
     icon: "🌙",
     themeColor: "sky-400",
-    stubLine: "This moon phase is still revealing its glow.",
+    stubLine: "This moon phase entry is still collecting its notes.",
     cardStyleClass: "from-gradient-moon-start/30 to-gradient-moon-end/40",
   },
   planet: {
@@ -67,14 +67,14 @@ export const typeMetadata = {
     slug: "planet",
     title: "The Celestial Bodies",
     subtitle:
-      "The planets are not fortune tellers. They are mirrors — each one reflecting a different quality of attention back at you.",
+      "The planets are not fortune tellers. They are mirrors for different qualities of attention.",
     description:
-      "The planets are not fortune tellers. They are mirrors — each one reflecting a different quality of attention back at you.",
+      "The planets are not fortune tellers. They are mirrors for different qualities of attention.",
     introText:
-      "The planets are not fortune tellers. They are mirrors — each one reflecting a different quality of attention back at you.",
+      "Use planetary symbolism as a set of lenses for attention: drive, care, communication, constraint, expansion, and the patterns you choose to notice.",
     icon: "🪐",
     themeColor: "indigo-500",
-    stubLine: "This celestial body is still revealing its lore.",
+    stubLine: "This celestial body entry is still gathering its references.",
     cardStyleClass: "from-gradient-default-start/20 to-gradient-default-end/40",
   },
   planetaryDay: {
@@ -86,20 +86,20 @@ export const typeMetadata = {
     subtitle: "Weekday rhythms for intention and timing.",
     description: "Weekday rhythms for intention and timing.",
     introText:
-      "Follow the seven-day planetary cadence to pair rituals with the tone of each day. Use these correspondences as gentle structure for planning, focus, and release.",
+      "Use planetary days as optional structure for planning, focus, release, and reflection. The correspondence gives the day a lens; you decide whether it fits.",
     icon: "🪐",
     themeColor: "indigo-500",
-    stubLine: "This planetary day is still aligning its correspondences.",
+    stubLine: "This planetary day is still collecting its correspondences.",
     cardStyleClass: "from-gradient-default-start/20 to-gradient-default-end/40",
   },
   ritual: {
     title: "The Ritual Archive",
-    subtitle: "Practices for presence, power, and peace.",
+    subtitle: "Repeatable structures for attention, refusal, care, and change.",
     introText:
-      "Step into circles of smoke, salt, and song. These rituals kindle devotion and draw luminous boundaries for any practitioner seeking transformation.",
+      "Browse rituals as chosen structures: small sequences of action, language, and attention that help you mark a threshold and decide how to meet it.",
     icon: "🕯️",
     themeColor: "amber-500",
-    stubLine: "This ritual is still setting its sacred stage.",
+    stubLine: "This ritual entry is still being outlined.",
     cardStyleClass: "from-gradient-ritual-start/30 to-gradient-ritual-end/40",
   },
   tarot: {
@@ -109,14 +109,14 @@ export const typeMetadata = {
     slug: "tarot",
     title: "The Arcana Directory",
     subtitle:
-      "78 cards. Infinite mirrors. The tarot speaks in archetypes, seasons, and shadows.",
+      "78 cards as archetypes, questions, contrasts, and mirrors.",
     description:
-      "78 cards. Infinite mirrors. The tarot speaks in archetypes, seasons, and shadows.",
+      "78 cards as archetypes, questions, contrasts, and mirrors.",
     introText:
-      "Read the weave of fate through major and minor secrets alike. Each arcana whispers counsel, caution, and cosmic conversation for the seeker.",
+      "Use tarot as pattern-reading, not prediction. Each card offers symbolic language for naming tensions, testing perspectives, and choosing a next question.",
     icon: "🃏",
     themeColor: "violet-600",
-    stubLine: "This arcana awaits its card to be drawn.",
+    stubLine: "This card entry is still being written.",
     cardStyleClass: "from-gradient-tarot-start/30 to-gradient-tarot-end/40",
   },
   spread: {
@@ -128,10 +128,10 @@ export const typeMetadata = {
     subtitle: "Layouts for reflection, pattern reading, and play.",
     description: "Layouts for reflection, pattern reading, and play.",
     introText:
-      "Explore structured card layouts designed to surface patterns, questions, and next steps. These spreads hold space for reflection without pretending to predict your life.",
+      "Explore card layouts designed to surface patterns, questions, tensions, and next steps. A spread is a frame for attention, not a verdict.",
     icon: "🪄",
     themeColor: "amber-500",
-    stubLine: "This spread is still arranging its cards.",
+    stubLine: "This spread is still arranging its prompts.",
     cardStyleClass: "from-gradient-ritual-start/30 to-gradient-ritual-end/40",
   },
 } satisfies Record<string, TypeMetadataEntry>;

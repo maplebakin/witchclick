@@ -7,36 +7,13 @@ import stubDashboardScript from "../../scripts/admin/admin-stub-dashboard.ts?url
 import * as stubPromptGenerator from "../../../server/lib/stubPromptGenerator.js";
 
 const {
-  generateStubPrompts,
-  serializeStubEntries,
   generatePostStubPrompts,
   serializePostStubEntries,
 } = stubPromptGenerator as typeof stubPromptGenerator & {
   generatePostStubPrompts: (options?: { cwd?: string }) => {
-    total: number;
-    entries: Array<{
-      type: string;
-      slug: string;
-      name: string;
-      filePath: string;
-      stubRationale?: string;
-      stubParentSlug?: string;
-      stubParentTitle?: string;
-      prompt: string;
-      references?: Array<{ title: string; slug: string; sourcePath?: string }>;
-    }>;
-    output: string;
+    entries: Array<Record<string, any>>;
   };
-  serializePostStubEntries: (entries: Array<any>) => Array<{
-    slug: string;
-    name: string;
-    prompt: string;
-    filePath?: string;
-    relativePath?: string;
-    stubRationale?: string;
-    stubParentSlug?: string;
-    stubParentTitle?: string;
-  }>;
+  serializePostStubEntries: (entries: Array<any>) => Array<Record<string, any>>;
 };
 
 const settings = readSettings();
@@ -51,48 +28,41 @@ const canUse = isDev || !!keyOk;
 const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
 const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || "";
 
-const stubData = generateStubPrompts({ cwd: process.cwd() });
-const stubEntries = serializeStubEntries(stubData.entries).map((entry: {
-  type: string;
-  slug: string;
-  name: string;
-  relativePath: string;
-  prompt: string;
-  references: Array<{ title: string; slug: string; sourcePath?: string }>;
-}) => ({
-  type: entry.type,
-  slug: entry.slug,
-  name: entry.name,
-  prompt: entry.prompt,
-  filePath: entry.relativePath,
-  references: entry.references,
-}));
-const stubPayload = JSON.stringify(stubEntries);
-
 const postStubData = generatePostStubPrompts({ cwd: process.cwd() });
-const postStubEntries = serializePostStubEntries(postStubData.entries).map((entry: {
-  slug: string;
-  name: string;
-  prompt: string;
-  filePath?: string;
-  relativePath?: string;
-  stubRationale?: string;
-  stubParentSlug?: string;
-  stubParentTitle?: string;
-}) => ({
-  type: 'post',
+const postStubEntries = serializePostStubEntries(postStubData.entries).map((entry: Record<string, any>) => ({
+  type: "post",
   slug: entry.slug,
-  name: entry.name,
-  prompt: entry.prompt,
-  filePath: entry.filePath || entry.relativePath || '',
-  references: [],
-  stubRationale: entry.stubRationale || '',
-  stubParentSlug: entry.stubParentSlug || '',
-  stubParentTitle: entry.stubParentTitle || '',
+  name: entry.name || entry.title || entry.slug,
+  title: entry.title || entry.name || entry.slug,
+  filePath: entry.filePath || entry.relativePath || "",
+  references: Array.isArray(entry.references) ? entry.references : [],
+  status: entry.status || "stub",
+  draft: entry.draft === true,
+  category: entry.category || "",
+  postType: entry.postType || entry.contentType || "",
+  contentType: entry.contentType || entry.postType || "",
+  pillar: entry.pillar || "",
+  stubTriageStatus: entry.stubTriageStatus || "",
+  stubSuggestedAction: entry.stubSuggestedAction || "",
+  stubTriageNotes: entry.stubTriageNotes || "",
+  tags: Array.isArray(entry.tags) ? entry.tags : [],
+  entities: Array.isArray(entry.entities) ? entry.entities : [],
+  excerpt: entry.excerpt || "",
+  metaDescription: entry.metaDescription || "",
+  existingFrontmatter: entry.existingFrontmatter || "",
+  stubReason: entry.stubReason || entry.stubRationale || "",
+  stubRationale: entry.stubRationale || "",
+  stubParentSlug: entry.stubParentSlug || "",
+  stubParentTitle: entry.stubParentTitle || "",
+  generatedFrom: entry.generatedFrom || null,
+  sourceContext: Array.isArray(entry.sourceContext) ? entry.sourceContext : [],
+  relatedThemes: Array.isArray(entry.relatedThemes) ? entry.relatedThemes : [],
+  relatedEntities: Array.isArray(entry.relatedEntities) ? entry.relatedEntities : [],
+  matchedTerms: Array.isArray(entry.matchedTerms) ? entry.matchedTerms : [],
 }));
 const postStubPayload = JSON.stringify(postStubEntries);
 ---
-<Base title="Stub Dashboard — Entities & Posts" description="Stub Dashboard — Entities & Posts" canon={canonical} wide noindex>
+<Base title="Stub Prompt + Ingestion Dashboard" description="Copy external prompts, paste drafts, validate, and replace stubs safely." canon={canonical} wide noindex>
   <HeadSlot slot="head">
     <meta name="robots" content="noindex" />
   </HeadSlot>
@@ -102,231 +72,219 @@ const postStubPayload = JSON.stringify(postStubEntries);
       <AdminNav currentPath="/admin/stubs" />
 
       <section class="rounded-2xl border border-line-subtle bg-surface-base p-6 shadow-sm">
-        <div class="space-y-4">
-          <div class="space-y-2">
-            <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-primary">Entity upkeep</p>
-            <h1 class="text-2xl font-semibold text-body-strong">Stub Prompt Dashboard</h1>
-            <p class="text-sm text-body-muted">
-              Internal links sometimes auto-create placeholder entities. This dashboard helps you copy a ready-made prompt, send it to your favorite model, and paste the completed JSON back into the site.
-            </p>
-          </div>
-          <div class="rounded-xl border border-dashed border-line-subtle bg-surface-base/70 p-4 text-[0.8rem] text-body-muted">
-            <p class="font-semibold mb-1">Workflow</p>
-            <ol class="list-decimal space-y-1 pl-5">
-              <li>Select a stub in the left column.</li>
-              <li>Copy the tailored prompt and generate the entity JSON.</li>
-              <li>Paste the JSON, validate, and save directly to <code>content/entities</code>.</li>
-            </ol>
-          </div>
+        <div class="space-y-2">
+          <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-primary">Stub Prompt + Ingestion Dashboard</p>
+          <h1 class="text-2xl font-semibold text-body-strong">Stub Forge</h1>
+          <p class="max-w-3xl text-sm text-body-muted">
+            Copy a prompt, paste the finished draft, validate it, then ingest it safely.
+          </p>
         </div>
       </section>
 
       <div
         class="grid grid-cols-1 gap-6 lg:grid-cols-12"
         data-stub-dashboard
-        data-stubs={stubPayload}
         data-post-stubs={postStubPayload}
         data-dev-api={DEV_API}
         data-dev-key={DEV_KEY}
       >
-        <section class="lg:col-span-4 rounded-2xl border border-line-subtle bg-surface-base p-4 shadow-sm">
-          <div class="flex items-start justify-between gap-2">
+        <section class="rounded-2xl border border-line-subtle bg-surface-base p-4 shadow-sm lg:col-span-4">
+          <div class="flex items-start justify-between gap-3">
             <div>
-              <h2 class="text-lg font-semibold">Stub Library</h2>
-              <p class="text-[0.8rem] text-body-muted">Entities auto-created from post references.</p>
+              <h2 class="text-lg font-semibold text-body-strong">Available Stubs</h2>
+              <p class="text-[0.8rem] text-body-muted">Draft post stubs ready for a pasted markdown replacement.</p>
             </div>
             <span class="rounded-full bg-surface-accent px-3 py-1 text-[0.8rem] font-semibold uppercase tracking-wide text-accent">
-              <span data-stub-count>{stubEntries.length}</span> open
+              <span data-stub-count>{postStubEntries.length}</span> open
             </span>
           </div>
-          <div class="mt-4 space-y-2">
-            <div class="inline-flex rounded-full border border-line-neutral bg-surface-neutral-soft p-1">
-              <button
-                type="button"
-                data-mode-entity
-                class="rounded-full px-3 py-1 text-[0.8rem] font-semibold text-body bg-surface-base shadow-sm"
-              >
-                Entity Stubs
-              </button>
-              <button
-                type="button"
-                data-mode-post
-                class="rounded-full px-3 py-1 text-[0.8rem] font-semibold text-body-muted"
-              >
-                Post Stubs
-              </button>
-            </div>
+
+          <div class="mt-4 rounded-xl border border-line-subtle bg-surface-base/70 p-3" data-triage-filter-panel>
+            <label class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted" for="stub-triage-filter">Triage Filter</label>
+            <select
+              id="stub-triage-filter"
+              class="mt-1 w-full rounded-lg border border-line-neutral bg-surface-base px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              data-triage-filter
+            >
+              <option value="all">All</option>
+              <option value="strong-article-candidate">Strong article candidates</option>
+              <option value="support-reference-candidate">Support/reference</option>
+              <option value="editorial-seed">Editorial seeds</option>
+              <option value="pop-culture-review">Pop-culture review</option>
+              <option value="template-section-artifact">Template artifacts</option>
+              <option value="needs-human-decision">Needs human decision</option>
+              <option value="possible-delete-merge-candidate">Delete/merge candidates</option>
+            </select>
+            <div class="mt-3 flex flex-wrap gap-2 text-[0.72rem] text-body-muted" data-triage-counts></div>
           </div>
+
           <div class="mt-4 flex gap-2">
             <div class="flex-1">
-              <label class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Search</label>
+              <label class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted" for="stub-search">Search</label>
               <input
+                id="stub-search"
                 class="mt-1 w-full rounded-lg border border-line-neutral px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                placeholder="Search by name, slug, or type"
+                placeholder="Search by title, slug, or postType"
                 data-stub-search
               />
             </div>
             <div class="flex flex-col justify-end">
-              <button
-                type="button"
-                data-refresh
-                class="admin-btn-secondary px-3 py-2 text-sm font-medium hover:border-line-bold"
-                title="Reload stub list"
-              >
+              <button type="button" data-refresh class="admin-btn-secondary px-3 py-2 text-sm font-medium hover:border-line-bold">
                 Refresh
               </button>
             </div>
           </div>
-          <div
-            data-stub-list
-            class="mt-4 max-h-[70vh] overflow-y-auto space-y-3 pr-1"
-          >
-            <p class="text-sm text-body-muted px-2 py-3">Loading stub entries…</p>
+
+          <div data-stub-list class="mt-4 max-h-[70vh] space-y-3 overflow-y-auto pr-1">
+            <p class="px-2 py-3 text-sm text-body-muted">Loading stub entries...</p>
           </div>
         </section>
 
-        <section class="lg:col-span-8 rounded-2xl border border-line-subtle bg-surface-base p-4 shadow-sm">
-          <div data-empty-state class="flex h-full flex-col items-center justify-center gap-2 text-center text-body-muted">
-            <p class="text-lg font-semibold text-body-strong">Select a stub to get started</p>
-            <p class="text-sm">You’ll see the tailored prompt, references, and a space to paste the finished JSON.</p>
+        <section class="rounded-2xl border border-line-subtle bg-surface-base p-4 shadow-sm lg:col-span-8">
+          <div data-empty-state class="flex min-h-[50vh] flex-col items-center justify-center gap-2 text-center text-body-muted">
+            <p class="text-lg font-semibold text-body-strong">Choose a stub to begin.</p>
+            <p class="text-sm">Prompt creation, pasted draft editing, and validation do not write files.</p>
           </div>
 
           <div data-detail-panel class="hidden space-y-6">
-            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line-subtle pb-3">
-              <div>
-                <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Editing</p>
-                <h2 class="text-xl font-semibold text-body-strong" data-selected-name>—</h2>
-                <p class="text-sm text-body-muted" data-file-path>—</p>
-              </div>
-              <span class="rounded-full bg-surface-accent px-3 py-1 text-[0.8rem] font-semibold uppercase tracking-wide text-accent" data-selected-type>
-                —
-              </span>
-            </div>
-
-            <div class="rounded-xl border border-line-subtle bg-surface-base/70 p-4">
-              <div class="flex items-center justify-between gap-2">
+            <section class="rounded-xl border border-line-subtle bg-surface-base/70 p-4">
+              <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-primary">Step 1</p>
-                  <h3 class="text-lg font-semibold">Copy the prompt</h3>
-                  <p class="text-[0.8rem] text-body-muted">
-                    Paste this into your favorite LLM. It’s customized for the entity type and references.
-                  </p>
+                  <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-primary">Selected Stub</p>
+                  <h2 class="text-xl font-semibold text-body-strong" data-selected-name>-</h2>
+                  <p class="break-all text-sm text-body-muted" data-file-path>-</p>
                 </div>
-                <button
-                  type="button"
-                  class="admin-btn-primary px-3 py-1.5 text-sm font-semibold"
-                  data-copy-prompt
-                >
+                <span class="rounded-full bg-surface-accent px-3 py-1 text-[0.8rem] font-semibold uppercase tracking-wide text-accent" data-selected-type>-</span>
+              </div>
+
+              <dl class="mt-4 grid gap-3 text-sm md:grid-cols-2">
+                <div><dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-body-muted">Title</dt><dd data-overview-title class="mt-1 text-body-strong">-</dd></div>
+                <div><dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-body-muted">Slug</dt><dd data-overview-slug class="mt-1 text-body-strong">-</dd></div>
+                <div><dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-body-muted">PostType</dt><dd data-overview-post-type class="mt-1 text-body-strong">-</dd></div>
+                <div><dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-body-muted">Category</dt><dd data-overview-category class="mt-1 text-body-strong">-</dd></div>
+                <div><dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-body-muted">Current Status</dt><dd data-overview-status class="mt-1 text-body-strong">-</dd></div>
+                <div><dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-body-muted">Draft Status</dt><dd data-overview-draft class="mt-1 text-body-strong">-</dd></div>
+                <div><dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-body-muted">Tags</dt><dd data-overview-tags class="mt-1 text-body-strong">-</dd></div>
+                <div><dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-body-muted">Triage</dt><dd data-overview-triage-status class="mt-1 text-body-strong">-</dd></div>
+                <div class="md:col-span-2"><dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-body-muted">Path</dt><dd data-overview-path class="mt-1 break-all text-body-strong">-</dd></div>
+                <div class="md:col-span-2"><dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-body-muted">Existing Frontmatter To Preserve</dt><dd data-overview-frontmatter class="mt-1 whitespace-pre-wrap rounded-lg border border-line-subtle bg-surface-base/80 p-3 font-mono text-[0.78rem] text-body-muted">-</dd></div>
+              </dl>
+            </section>
+
+            <section class="rounded-xl border border-line-subtle bg-surface-base/70 p-4">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-primary">Prompt Preview</p>
+                  <h3 class="text-lg font-semibold text-body-strong">External draft prompt</h3>
+                </div>
+                <button type="button" class="admin-btn-primary px-3 py-1.5 text-sm font-semibold" data-copy-prompt>
                   Copy Prompt
                 </button>
               </div>
               <textarea
                 readonly
                 data-prompt-text
-                class="mt-3 h-56 w-full rounded-lg border border-line-neutral bg-surface-base/70 px-3 py-2 font-mono text-[0.8rem]"
+                class="mt-3 h-72 w-full rounded-lg border border-line-neutral bg-surface-base/70 px-3 py-2 font-mono text-[0.8rem]"
+                placeholder="Choose a stub to begin."
               ></textarea>
               <div class="mt-3 rounded-lg border border-dashed border-line-subtle bg-surface-base/70 p-3 text-[0.8rem] text-body-muted">
-                <p class="font-semibold mb-1">
-                  Referenced posts <span class="rounded-full bg-surface-accent px-2 py-0.5 text-[0.8rem] font-semibold text-accent" data-reference-count>0</span>
+                <p class="mb-1 font-semibold">
+                  Source Context <span class="rounded-full bg-surface-accent px-2 py-0.5 text-[0.8rem] font-semibold text-accent" data-reference-count>0</span>
                 </p>
-                <div data-reference-list class="space-y-2 text-body-muted text-[0.8rem]"></div>
+                <div data-reference-list class="space-y-2 text-[0.8rem] text-body-muted"></div>
               </div>
-            </div>
+            </section>
 
-            <div class="rounded-xl border border-line-subtle bg-surface-base/70 p-4 space-y-4">
-              <div data-step2-entity>
-                <div class="flex items-center justify-between gap-2">
-                  <div>
-                    <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-primary">Step 2</p>
-                    <h3 class="text-lg font-semibold">Paste entity JSON</h3>
-                    <p class="text-[0.8rem] text-body-muted">Keep the keys: type, name, slug, summary, properties, related.</p>
-                  </div>
-                  <div class="flex gap-2">
-                    <button
-                      type="button"
-                      data-validate-entity
-                      class="admin-btn-secondary px-3 py-1.5 text-sm font-medium"
-                    >
-                      Validate JSON
-                    </button>
-                    <button
-                      type="button"
-                      data-save-entity
-                      class="admin-btn-primary px-4 py-1.5 text-sm font-semibold"
-                    >
-                      Save Entity
-                    </button>
-                  </div>
+            <section class="rounded-xl border border-line-subtle bg-surface-base/70 p-4">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-primary">Paste Draft</p>
+                  <h3 class="text-lg font-semibold text-body-strong">Pasted Draft</h3>
+                  <p class="text-[0.8rem] text-body-muted">Paste one complete markdown file with YAML frontmatter. Pasting and editing do not write files.</p>
                 </div>
+                <button type="button" data-validate-post class="admin-btn-secondary px-3 py-1.5 text-sm font-medium">
+                  Validate Draft
+                </button>
+              </div>
+
+              <div class="mt-4 border-b border-line-subtle">
+                <div class="flex flex-wrap gap-2" role="tablist" aria-label="Draft workspace tabs">
+                  <button type="button" class="admin-btn-secondary px-3 py-1.5 text-sm font-semibold" data-tab-button="edit">Edit Draft</button>
+                  <button type="button" class="admin-btn-secondary px-3 py-1.5 text-sm font-semibold" data-tab-button="preview">Preview Draft</button>
+                  <button type="button" class="admin-btn-secondary px-3 py-1.5 text-sm font-semibold" data-tab-button="validation">Validation Results</button>
+                </div>
+              </div>
+
+              <div class="mt-4" data-tab-panel="edit">
                 <textarea
-                  data-json-input-entity
-                  class="mt-4 h-56 w-full rounded-lg border border-line-neutral bg-surface-base/60 px-3 py-2 font-mono text-[0.8rem]"
-                  placeholder='{"type":"ritual","slug":"desk-altar",...}'
+                  data-draft-input
+                  class="h-[34rem] w-full rounded-lg border border-line-neutral bg-surface-base/60 px-3 py-2 font-mono text-[0.8rem]"
+                  placeholder="Paste the completed markdown draft here after using the copied prompt in your external LLM."
                 ></textarea>
-                <p class="mt-4 text-[0.8rem] text-body-muted">
-                  Saving writes directly to <code>content/entities/&lt;type&gt;/&lt;slug&gt;.json</code>. Keep Git running to review diffs.
-                </p>
+                <p class="mt-2 text-[0.8rem]" data-draft-helper>Paste the completed markdown draft here after using the copied prompt in your external LLM.</p>
               </div>
-              <div data-step2-post class="hidden">
-                <div class="flex items-center justify-between gap-2">
-                  <div>
-                    <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-primary">Step 2</p>
-                    <h3 class="text-lg font-semibold">Paste PostSpec JSON</h3>
-                    <p class="text-[0.8rem] text-body-muted">Provide valid PostSpec v2 JSON before ingesting.</p>
-                  </div>
-                  <div class="flex gap-2">
-                    <button
-                      type="button"
-                      data-validate-post
-                      class="admin-btn-secondary px-3 py-1.5 text-sm font-medium"
-                    >
-                      Validate JSON
-                    </button>
-                    <button
-                      type="button"
-                      data-save-post
-                      class="admin-btn-primary px-4 py-1.5 text-sm font-semibold"
-                    >
-                      Ingest Post
-                    </button>
+
+              <div class="mt-4 hidden" data-tab-panel="preview">
+                <div class="rounded-lg border border-line-subtle bg-surface-base/80 p-4">
+                  <div data-draft-preview class="prose prose-sm max-w-none text-body">
+                    <p class="text-sm text-body-muted">No pasted draft.</p>
                   </div>
                 </div>
-                <textarea
-                  data-json-input-post
-                  class="mt-4 h-56 w-full rounded-lg border border-line-neutral bg-surface-base/60 px-3 py-2 font-mono text-[0.8rem]"
-                  placeholder='{"specVersion":2,"title":"...","slug":"..."}'
-                ></textarea>
-                <p class="mt-4 text-[0.8rem] text-body-muted">
-                  Ingest sends this JSON to <code>/ingest</code> and writes/updates a markdown post in <code>src/content/posts/</code>.
-                </p>
               </div>
-              <div class="grid gap-3 md:grid-cols-3 rounded-lg border border-line-subtle bg-surface-base/50 p-3 text-sm">
-                <div>
-                  <p data-preview-heading-1 class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Summary Preview</p>
-                  <p class="mt-1 text-body-strong text-sm" data-preview-summary>Waiting for validation…</p>
-                </div>
-                <div>
-                  <p data-preview-heading-2 class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Properties</p>
-                  <p class="mt-1 text-body-strong" data-preview-props>—</p>
-                </div>
-                <div>
-                  <p data-preview-heading-3 class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Related Entities</p>
-                  <p class="mt-1 text-body-strong text-sm" data-preview-related>—</p>
+
+              <div class="mt-4 hidden" data-tab-panel="validation">
+                <div data-validation-results class="space-y-4">
+                  <p class="text-sm text-body-muted">Validate the pasted draft before ingestion.</p>
                 </div>
               </div>
-            </div>
+            </section>
+
+            <section class="rounded-xl border border-danger/40 bg-danger/5 p-4">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-danger">Final Action</p>
+                  <h3 class="text-lg font-semibold text-body-strong">Ingest & Replace Stub</h3>
+                  <p class="text-[0.8rem] text-body-muted" data-ingest-helper>Validate the pasted draft before ingestion.</p>
+                </div>
+                <button type="button" data-save-post class="admin-btn-primary px-4 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50" disabled>
+                  Ingest & Replace Stub
+                </button>
+              </div>
+            </section>
 
             <p data-status class="text-sm text-body-muted" role="status" aria-live="polite" aria-atomic="true"></p>
           </div>
         </section>
+
+        <div data-confirm-modal class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+          <section
+            class="w-full max-w-lg rounded-2xl border border-line-subtle p-6 shadow-2xl"
+            style="background: var(--admin-surface-base, var(--surface-base, #ffffff)); color: var(--admin-text-body, var(--text-body, #111827));"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="replace-stub-title"
+          >
+            <h2 id="replace-stub-title" class="text-xl font-semibold text-body-strong">Replace Stub With Draft</h2>
+            <div class="mt-5 grid gap-3 text-sm text-body-muted">
+              <p class="leading-6"><strong class="text-body-strong">Title:</strong> <span data-confirm-title>-</span></p>
+              <p class="leading-6"><strong class="text-body-strong">Slug:</strong> <span data-confirm-slug>-</span></p>
+              <p class="break-all leading-6"><strong class="text-body-strong">File path:</strong> <span data-confirm-path>-</span></p>
+              <p>This will overwrite the existing stub file.</p>
+              <p>The slug must remain unchanged.</p>
+              <p>The post should remain <code>draft: true</code>.</p>
+            </div>
+            <div class="mt-6 flex flex-wrap justify-end gap-3 border-t border-line-subtle pt-4">
+              <button type="button" class="admin-btn-secondary px-4 py-2 text-sm font-semibold" data-confirm-cancel>Cancel</button>
+              <button type="button" class="admin-btn-primary px-4 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50" data-confirm-replace>Replace Stub With Draft</button>
+            </div>
+          </section>
+        </div>
       </div>
     </div>
   ) : (
     <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
       <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
-      <p class="text-body-muted">
-        This dashboard only runs in <strong>development</strong> (or with a temporary key when hosted on a server adapter).
-      </p>
+      <p class="text-body-muted">Admin access is required for this action.</p>
     </section>
   )}
 

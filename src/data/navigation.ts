@@ -1,5 +1,3 @@
-import { loadAllPosts, filterPostsByCategory, POST_CATEGORY_MEANDERING } from "@/utils/posts";
-
 export interface NavLink {
   href: string;
   label: string;
@@ -13,30 +11,20 @@ export interface AdminNavSection {
   items: NavLink[];
 }
 
-const hasPublishedMeanderings =
-  filterPostsByCategory(loadAllPosts(), POST_CATEGORY_MEANDERING).length > 0;
-
 export const primaryNavLinks: NavLink[] = [
-  { href: "/start", label: "Start Here" },
-  { href: "/entities", label: "Grimoire" },
-  { href: "/hub", label: "Hubs", description: "Entry rooms for calm, focus, release, and perspective shifts" },
-  { href: "/tools", label: "Ritual Tools" },
-  ...(hasPublishedMeanderings
-    ? [
-        {
-          href: "/meanderings",
-          label: "Essays",
-          variant: "pill", // keeps your “special” highlight on this slot
-        } satisfies NavLink,
-      ]
-    : []),
+  { href: "/start", label: "Start", description: "A guided first path into WitchClick" },
+  { href: "/curses", label: "Clean Cursing", description: "Ethical boundary rituals, energetic return, and clean refusal" },
+  { href: "/hub", label: "Rituals & Spreads", description: "Tarot spreads, grounding rituals, and symbolic workings" },
+  { href: "/entities", label: "Grimoire", description: "Symbolic reference for tarot, herbs, crystals, planets, and rituals" },
+  { href: "/search", label: "Search", description: "Find a ritual, spread, symbol, or question" },
 ];
 
 export const secondaryNavLinks: NavLink[] = [
-  { href: "/curses", label: "White Magic Curses", description: "Ethical refusal and boundary rituals" },
-  { href: "/page/1", label: "Archive", description: "Browse every ritual, essay, and reference in one place" },
-  { href: "/tags", label: "Tags", description: "Browse all topics by tag" },
-  { href: "/partners", label: "Partners", description: "Small businesses and ethical brands we love" },
+  { href: "/tags", label: "Topics", description: "Browse topics by tag" },
+  { href: "/page/1", label: "Archive", description: "Browse every published ritual and practical working" },
+  { href: "/tools", label: "Practice Tools", description: "Printables and supports for reflective practice" },
+  { href: "/partners", label: "Partners", description: "Verified community partners and affiliate disclosures" },
+  { href: "/rss.xml", label: "RSS", rel: "alternate", description: "Subscribe to WitchClick updates" },
 ];
 
 export const headerUtilityLinks: NavLink[] = [
@@ -44,7 +32,6 @@ export const headerUtilityLinks: NavLink[] = [
 ];
 
 export const footerUtilityLinks: NavLink[] = [
-  { href: "/author", label: "Authors" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
   { href: "/privacy", label: "Privacy" },

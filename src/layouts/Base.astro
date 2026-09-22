@@ -3,7 +3,6 @@
 import "@/styles/base.css";
 import "@/styles/cards.css";
 import "@/styles/tailwind.css";
-import "@/styles/themes.generated.css";
 
 import { existsSync } from "node:fs";
 import path from "node:path";
@@ -109,9 +108,10 @@ const normalizeAccountLink = (
 
 // Settings and Theme Configuration
 const settings = readSettings();
-const analytics = buildAnalyticsInjection(settings);
+const analytics = import.meta.env.DEV ? null : buildAnalyticsInjection(settings);
 const formEndpoint = getFormEndpoint(settings);
 const brandName = settings.brandName ?? "WitchClick";
+const pageDescription = description.trim() || "Small rituals, grounded tarot, symbolic tools, and field notes for when life feels loud.";
 const disclosure = settings.disclosure ?? "";
 const showAccountLink = settings.showAccountLink ?? false;
 
@@ -277,7 +277,7 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     
-    {description && <meta name="description" content={description} />}
+    <meta name="description" content={pageDescription} />
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     {noindex && <meta name="robots" content="noindex" />}
     
@@ -285,14 +285,14 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
     <meta property="og:site_name" content={brandName} />
     <meta property="og:type" content={ogType} />
     <meta property="og:title" content={title} />
-    {description && <meta property="og:description" content={description} />}
+    <meta property="og:description" content={pageDescription} />
     {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
     <meta property="og:image" content={resolvedOgImage} />
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content={twitterCard} />
     <meta name="twitter:title" content={title} />
-    {description && <meta name="twitter:description" content={description} />}
+    <meta name="twitter:description" content={pageDescription} />
     <meta name="twitter:image" content={resolvedOgImage} />
     
     <!-- Theme Color -->
@@ -742,43 +742,5 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
     <!-- Section Reveal Animations -->
     <script type="module" is:inline src={revealAnimationsModule}></script>
     
-    <div id="cookie-consent-banner" class="fixed bottom-0 left-0 right-0 z-50 p-4 hidden">
-      <div class="max-w-screen-md mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left p-4 sm:p-6 shadow-xl rounded-2xl border bg-surface-base">
-        <p class="text-sm text-body">
-          This site uses cookies to ensure you get the best experience. By clicking "Accept", you agree to our use of cookies. For more information, please see our
-          <a href="/privacy" class="text-brand-primary hover:underline">Privacy Policy</a>.
-        </p>
-        <div class="flex flex-col sm:flex-row gap-3">
-          <button id="accept-cookies" class="inline-flex items-center justify-center rounded-lg font-semibold text-center transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-60 bg-brand-primary text-white border border-brand-primary-strong hover:bg-brand-primary-strong shadow-sm hover:shadow-md px-4 py-2 text-sm">Accept</button>
-          <button id="decline-cookies" class="inline-flex items-center justify-center rounded-lg font-semibold text-center transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-60 bg-surface-base text-body-strong border border-line-neutral hover:bg-surface-soft hover:border-line-neutral-strong shadow-sm hover:shadow-md px-4 py-2 text-sm">Decline</button>
-        </div>
-      </div>
-    </div>
-
-    <script is:inline>
-      document.addEventListener('DOMContentLoaded', () => {
-        const banner = document.getElementById('cookie-consent-banner');
-        const acceptButton = document.getElementById('accept-cookies');
-        const declineButton = document.getElementById('decline-cookies');
-        const CONSENT_KEY = 'cookie_consent_status';
-
-        function setConsent(status) {
-          localStorage.setItem(CONSENT_KEY, status);
-          banner?.classList.add('hidden');
-          window.dispatchEvent(new CustomEvent('cookieConsentChanged', { detail: { status: status } }));
-        }
-
-        const consentStatus = localStorage.getItem(CONSENT_KEY);
-
-        if (consentStatus === null) {
-          banner?.classList.remove('hidden');
-        } else if (consentStatus === 'accepted') {
-          window.dispatchEvent(new CustomEvent('cookieConsentChanged', { detail: { status: 'accepted' } }));
-        }
-
-        acceptButton?.addEventListener('click', () => setConsent('accepted'));
-        declineButton?.addEventListener('click', () => setConsent('declined'));
-      });
-    </script>
   </body>
 </html>

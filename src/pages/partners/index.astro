@@ -7,6 +7,7 @@ import { readPartnerBlocks, type PartnerRecord } from "@/utils/partners";
 import { createItemListSchema } from "@/utils/structuredData";
 import { readSettings, getFormEndpoint } from "@/utils/settings";
 import HeadSlot from "@/components/HeadSlot.astro";
+import { serializeJsonForScript } from "@/utils/serializeJson";
 import { getLastUpdatedMeta } from "@/utils/lastUpdated";
 
 const partnerBlocks = readPartnerBlocks();
@@ -33,6 +34,9 @@ const communityItems = partnerSections.flatMap((section) =>
     description: partner.description,
   })),
 );
+const hasVerifiedPartners = communityItems.length > 0;
+const hasVerifiedAffiliates = partnerBlocks.affiliateHighlights.length > 0;
+const hasPublicDirectory = hasVerifiedPartners || hasVerifiedAffiliates;
 
 const jsonLd = createItemListSchema(
   settings,
@@ -53,24 +57,30 @@ const breadcrumbs = [
 const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerBlocks.updatedAt });
 ---
 <Base
-  title="Partners & Mutual Aid — WitchClick"
-  description="Meet the makers, mutual aid funds, and practitioners we partner with across WitchClick hubs."
+  title={hasPublicDirectory ? "Partners & Mutual Aid — WitchClick" : "Partner Directory Review — WitchClick"}
+  description={hasPublicDirectory
+    ? "Meet the verified makers, mutual aid funds, and practitioners WitchClick works with."
+    : "WitchClick only publishes partner listings after their identity, links, and impact claims have been reviewed."}
   ambientColor="#6366f1"
+  noindex={!hasPublicDirectory}
 >
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <HeadSlot slot="head">
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+    <script type="application/ld+json" is:inline set:html={serializeJsonForScript(jsonLd)} />
   </HeadSlot>
 
   <section class="partners-hero">
     <div class="partners-hero__inner">
       <p class="partners-hero__eyebrow">Partnership constellation</p>
-      <h1 class="partners-hero__title">Shops, funds, and practitioners we trust</h1>
+      <h1 class="partners-hero__title">
+        {hasPublicDirectory ? "Shops, funds, and practitioners we trust" : "The partner directory is under review"}
+      </h1>
       <p class="partners-hero__lead">
-        Every listing here is a relationship built through ritual collaborations, mutual aid, or seasonal co-creation. Browse by
-        focus, support a fund, or explore affiliate highlights with clear impact tags.
+        {hasPublicDirectory
+          ? "Every listing here has been reviewed before publication. Browse by focus, support a fund, or explore clearly marked affiliate highlights."
+          : "We are verifying names, destinations, and impact claims before any recommendation goes live. A warm introduction is not worth sending you toward an uncertain link."}
       </p>
-      {lastUpdated && (
+      {hasPublicDirectory && lastUpdated && (
         <p class="partners-hero__meta">
           Last updated <time datetime={lastUpdated.iso}>{lastUpdated.formatted}</time>
           {lastUpdated.isStale && <span class="partners-hero__stale">refresh in progress</span>}
@@ -78,6 +88,17 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
       )}
     </div>
   </section>
+
+  {!hasPublicDirectory && (
+    <section class="partners-section" aria-labelledby="partners-review-title">
+      <header class="partners-section__header">
+        <h2 id="partners-review-title">Nothing unverified leaves the workroom</h2>
+        <p>
+          Partner drafts remain private until WitchClick confirms the organization, destination URL, relationship, and any donation or ownership claim.
+        </p>
+      </header>
+    </section>
+  )}
 
   {partnerSections.map((section) => (
     <section class="partners-section" id={section.slug}>
@@ -180,7 +201,7 @@ const lastUpdated = getLastUpdatedMeta(import.meta.url, { fallbackDate: partnerB
         </form>
       ) : (
         <p class="partners-request__copy">
-          Partner suggestions are temporarily offline while form delivery is being configured. You can still browse the current directory and affiliate highlights.
+          Partner suggestions are temporarily offline while form delivery is being configured. The directory will reopen as verified listings are ready.
         </p>
       )}
     </div>

@@ -9,23 +9,23 @@ interface Props {
 const { showTagSuggestions = true } = Astro.props as Props;
 const uid = `search-${globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2)}`;
 const resultsId = `${uid}-results`;
+const statusId = `${uid}-status`;
 ---
 <div class="search-control" data-search>
-  <label class="sr-only" for={uid}>Search posts</label>
+  <label class="sr-only" for={uid}>Search WitchClick</label>
   <input
     id={uid}
     type="search"
-    placeholder="Search posts…"
+    placeholder="Search WitchClick…"
     class="search-input"
-    role="combobox"
-    aria-autocomplete="list"
-    aria-expanded="false"
     aria-controls={resultsId}
+    aria-describedby={statusId}
   />
+  <span id={statusId} class="sr-only" aria-live="polite" aria-atomic="true" data-search-status></span>
   <div
     id={resultsId}
     class="search-results hidden"
-    role="listbox"
+    aria-label="Search suggestions"
     data-results
   ></div>
   {showTagSuggestions && <SearchTagSuggestions inputId={uid} />}
@@ -33,11 +33,13 @@ const resultsId = `${uid}-results`;
 
 <script type="module" is:inline>
 (() => {
-  const root = document.currentScript?.previousElementSibling?.closest('[data-search]');
-  if (!(root instanceof HTMLElement)) return;
+  document.querySelectorAll('[data-search]').forEach((root) => {
+  if (!(root instanceof HTMLElement) || root.dataset.searchInitialized === 'true') return;
+  root.dataset.searchInitialized = 'true';
 
   const input = root.querySelector('input[type="search"]');
   const results = root.querySelector('[data-results]');
+  const status = root.querySelector('[data-search-status]');
   const tags = root.querySelector('[data-search-tags]');
   if (!input || !results) return;
 
@@ -46,9 +48,11 @@ const resultsId = `${uid}-results`;
   /** @type {HTMLDivElement} */
   const resultsList = results;
   /** @type {HTMLElement | null} */
+  const searchStatus = status instanceof HTMLElement ? status : null;
+  /** @type {HTMLElement | null} */
   const tagList = tags instanceof HTMLElement ? tags : null;
 
-  /** @type {Array<{ slug: string; title: string; excerpt?: string; tags?: string[] }>} */
+  /** @type {Array<{ href: string; type?: string; slug: string; title: string; excerpt?: string; tags?: string[] }>} */
   let data = [];
   let loaded = false;
 
@@ -63,6 +67,7 @@ const resultsId = `${uid}-results`;
       if (typeof console !== 'undefined') {
         console.warn('[search] Failed to load search index', error);
       }
+      if (searchStatus) searchStatus.textContent = 'Search is unavailable right now. Try the full search page.';
     }
   };
 
@@ -79,29 +84,33 @@ const resultsId = `${uid}-results`;
       .replace(/'/g, '&#39;');
 
   /**
-   * @param {Array<{ slug: string; title: string; excerpt?: string; tags?: string[] }>} items
+   * @param {Array<{ href: string; type?: string; slug: string; title: string; excerpt?: string; tags?: string[] }>} items
    */
   const render = (items) => {
     if (items.length === 0) {
       resultsList.classList.add('hidden');
       resultsList.innerHTML = '';
-      searchInput.setAttribute('aria-expanded', 'false');
+      if (searchStatus) searchStatus.textContent = searchInput.value.trim() ? 'No matching suggestions.' : '';
       return;
     }
 
-    searchInput.setAttribute('aria-expanded', 'true');
     resultsList.classList.remove('hidden');
     resultsList.innerHTML = items
       .slice(0, 8)
       .map((item) => {
         const excerpt = typeof item.excerpt === 'string' ? item.excerpt : '';
         return `
-      <a class="search-result" href="/post/${escapeHtml(item.slug)}" role="option">
+      <a class="search-result" href="${escapeHtml(item.href || `/post/${item.slug}`)}">
         <div class="search-result__title">${escapeHtml(item.title)}</div>
+        ${item.type ? `<div class="search-result__type">${escapeHtml(item.type)}</div>` : ''}
         ${excerpt ? `<div class=\"search-result__excerpt\">${escapeHtml(excerpt)}</div>` : ''}
       </a>`;
       })
       .join('');
+    if (searchStatus) {
+      const visibleCount = Math.min(items.length, 8);
+      searchStatus.textContent = `${visibleCount} suggestion${visibleCount === 1 ? '' : 's'} available. Tab to review.`;
+    }
   };
 
   const handleSearch = async () => {
@@ -149,7 +158,13 @@ const resultsId = `${uid}-results`;
 
     if (!resultsList.contains(target) && target !== searchInput) {
       resultsList.classList.add('hidden');
-      searchInput.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  searchInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      resultsList.classList.add('hidden');
+      searchInput.focus();
     }
   });
 
@@ -166,5 +181,6 @@ const resultsId = `${uid}-results`;
       searchInput.focus();
     });
   }
+  });
 })();
 </script>

@@ -94,7 +94,8 @@ export function buildAnalyticsInjection(settings: SiteSettings): AnalyticsInject
     siteOrigin,
   };
 
-  const bootstrap = `window.__WC_ANALYTICS__=${JSON.stringify(config)};`;
+  const serializedConfig = JSON.stringify(config).replace(/</g, "\\u003c");
+  const bootstrap = `window.__WC_ANALYTICS__=${serializedConfig};`;
   const runtime = `(function(){const cfg=window.__WC_ANALYTICS__;if(!cfg) return;const send=(name,detail)=>{if(!name)return;try{if(cfg.provider==='plausible'){if(typeof window.plausible==='function'){window.plausible(name,detail&&Object.keys(detail).length?{props:detail}:{})}}else if(cfg.provider==='fathom'){if(window.fathom&&typeof window.fathom.trackEvent==='function'){window.fathom.trackEvent(name)}}else if(cfg.provider==='umami'){var tracker=window.umami;if(typeof tracker==='function'){tracker(name,detail);}else if(tracker&&typeof tracker.trackEvent==='function'){tracker.trackEvent(name,detail);}}else if(cfg.provider==='simple-analytics'){if(typeof window.sa_event==='function'){window.sa_event(name,detail||{});}}}catch(e){if(typeof console!=='undefined'){console.warn('[analytics] failed to send event',e);}}};const parseProps=(value)=>{if(!value)return{};try{return JSON.parse(value);}catch{return{detail:value}}};const handler=(event)=>{const target=event.target instanceof Element?event.target.closest('[data-analytics]'):null;if(!target)return;const name=target.getAttribute('data-analytics');if(!name)return;const meta=target.getAttribute('data-analytics-meta');const propsAttr=target.getAttribute('data-analytics-props');const payload={...parseProps(propsAttr)};if(meta)payload.meta=meta;if(target instanceof HTMLAnchorElement&&target.href)payload.href=target.href;send(name,payload);};document.addEventListener('click',handler,{capture:true});const outbound=cfg.outbound&&cfg.outbound.enabled;const outboundName=(cfg.outbound&&cfg.outbound.eventName)||'outbound_click';if(outbound){const siteHost=(function(){try{return cfg.siteOrigin?new URL(cfg.siteOrigin).host:window.location.host;}catch{return window.location.host;}})();const getHost=(href)=>{try{return new URL(href).host;}catch{return null;}};document.addEventListener('click',function(event){const link=event.target instanceof Element?event.target.closest('a[href]'):null;if(!link)return;if(link.closest('[data-analytics]'))return;if(link.hasAttribute('data-analytics-ignore'))return;const href=link.href;if(!href)return;const host=getHost(href);if(!host||host===siteHost)return;const text=(link.textContent||'').trim();const payload={href};if(text)payload.text=text.slice(0,120);send(outboundName,payload);},{capture:true});}})();`;
 
   return {
@@ -114,12 +115,17 @@ function resolveScriptUrl(url: string | undefined, provider: NonNullable<Analyti
           ? DEFAULT_SIMPLE_ANALYTICS_SRC
           : DEFAULT_PLAUSIBLE_SRC;
   if (!url) return fallback;
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  if (url.startsWith("//")) return `https:${url}`;
-  if (url.startsWith("/")) {
-    return toAbsoluteUrl(url, settings);
+  const candidate = url.startsWith("//")
+    ? `https:${url}`
+    : url.startsWith("/")
+      ? toAbsoluteUrl(url, settings)
+      : url;
+  try {
+    const parsed = new URL(candidate);
+    return parsed.protocol === "https:" || parsed.protocol === "http:" ? parsed.toString() : fallback;
+  } catch {
+    return fallback;
   }
-  return url;
 }
 
 function resolvePlausibleDomain(domain: string | undefined, settings: SiteSettings): string {
@@ -143,4 +149,3 @@ function normalizePlausibleApi(value: string): string {
   const normalized = trimmed.replace(/\/$/, "");
   return normalized.endsWith("/api/event") ? normalized : `${normalized}/api/event`;
 }
-

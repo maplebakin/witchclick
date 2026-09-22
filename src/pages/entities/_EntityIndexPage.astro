@@ -24,11 +24,11 @@ const lowerTypeLabel = typeLabel.toLowerCase();
 const pageLead = [metadata.subtitle, metadata.introText].filter((value) => typeof value === "string" && value.trim().length > 0).join(" ");
 const breadcrumbs = [
   { label: "Home", href: "/" },
-  { label: "Entities", href: "/entities" },
+  { label: "Grimoire", href: "/entities" },
   { label: typeLabel },
 ];
 ---
-<Base title={metadata.title} description={metadata.subtitle} bodyDataType={type}>
+<Base title={metadata.title} description={metadata.subtitle} bodyDataType={type} noindex={entities.length === 0}>
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <section class="max-w-screen-lg mx-auto py-8 md:py-12 px-4">
     <header class="page-header">
@@ -40,9 +40,9 @@ const breadcrumbs = [
     {entities.length === 0 ? (
       <div class="mt-10 rounded-2xl border border-dashed border-line-neutral-strong bg-surface-muted p-6 text-center text-sm text-body-muted">
         <p>
-          No {lowerTypeLabel} entries are live yet. Share a note with the
-          <a class="font-semibold text-brand-primary hover:underline" href="/about">WitchClick team</a>
-          to request a feature or check back soon for fresh lore.
+          No {lowerTypeLabel} entries have completed editorial review. Try the
+          <a class="font-semibold text-brand-primary hover:underline" href="/entities">Grimoire index</a>
+          for references that are ready to use.
         </p>
       </div>
     ) : (

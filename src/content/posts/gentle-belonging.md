@@ -1,11 +1,16 @@
 ---
-title: "Gentle Belonging"
-slug: "gentle-belonging"
-excerpt: "Placeholder post for \"Gentle Belonging\"."
-metaTitle: "Gentle Belonging"
-metaDescription: "This is a placeholder post that was auto-generated from an internal link reference. Content coming soon."
-tags: ["placeholder","stub"]
-outline: ["Placeholder"]
+title: Gentle Belonging
+slug: gentle-belonging
+excerpt: Placeholder post for "Gentle Belonging".
+metaTitle: Gentle Belonging
+metaDescription: >-
+  This is a placeholder post that was auto-generated from an internal link
+  reference. Content coming soon.
+tags:
+  - placeholder
+  - stub
+outline:
+  - Placeholder
 wordCount: 50
 readingMinutes: 1
 entities: []
@@ -14,10 +19,48 @@ includeKofi: false
 affiliateAnchors: []
 internalLinkHints: []
 internalLinks: []
-publishedAt: "2025-11-21T13:18:07.692Z"
-canonicalUrl: "https://witchclick.space/post/gentle-belonging"
+publishedAt: '2025-11-21T13:18:07.692Z'
+canonicalUrl: 'https://witchclick.space/post/gentle-belonging'
 specVersion: 2
 draft: true
+stubRationale: Created as a missing article suggested by existing WitchClick content.
+generatedFrom:
+  - slug: when-your-existence-feels-like-it-takes-up-too-much-space
+    title: When Your Existence Feels Like It Takes Up Too Much Space
+    reason: Source post contains the exact stub title.
+    matchedPhrase: Gentle Belonging
+    excerpt: >-
+      ...uch-space self-worth introspection gentle-living healing belonging
+      ritual reflection [] ["gentle belonging","quiet corners","tender
+      boundaries","soft gravity","inner permission"] ## Opening Reflection There
+      are days when being a person...
+sourceContext:
+  - slug: when-your-existence-feels-like-it-takes-up-too-much-space
+    title: When Your Existence Feels Like It Takes Up Too Much Space
+    sourcePath: >-
+      src/content/posts/when-your-existence-feels-like-it-takes-up-too-much-space.md
+    reason: Source post contains the exact stub title.
+    matchedPhrase: Gentle Belonging
+    excerpt: >-
+      ...uch-space self-worth introspection gentle-living healing belonging
+      ritual reflection [] ["gentle belonging","quiet corners","tender
+      boundaries","soft gravity","inner permission"] ## Opening Reflection There
+      are days when being a person...
+relatedThemes:
+  - reflection
+  - grounding
+  - rest
+  - grief
+  - self-worth
+  - introspection
+  - gentle-living
+  - healing
+matchedTerms:
+  - Gentle Belonging
+  - belonging
+stubTriageStatus: needs-human-decision
+stubSuggestedAction: review-manually
+stubTriageNotes: 'Needs human editorial decision before generation, merge, or deletion.'
 ---
 
 ## Placeholder

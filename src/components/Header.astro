@@ -46,13 +46,14 @@ const visibleSecondary = secondaryLinks.filter((link) => link && typeof link.hre
 const visibleUtility = utilityLinks.filter((link) => link && typeof link.href === "string");
 const showComfortControls = !normalizedPath.startsWith("/admin/");
 const enableScrollReveal = !normalizedPath.startsWith("/admin/");
+const hasPrimarySearchLink = navLinks.some((link) => link.href === "/search" || link.href === "/search/");
+const hasSecondaryRssLink = visibleSecondary.some((link) =>
+  link.href === "/rss.xml" || link.href === "/feed.json"
+);
 
 function isActive(href: string): boolean {
   if (!href) return false;
   const normalized = href.endsWith("/") ? href : `${href}/`;
-  if (normalized === "/" && normalizedPath.startsWith("/post/")) {
-    return true;
-  }
   if (normalized === "/") {
     return normalizedPath === normalized;
   }
@@ -77,7 +78,7 @@ function isActive(href: string): boolean {
         aria-expanded="false"
         aria-controls="mobile-navigation"
       >
-        <span class="sr-only">Open menu</span>
+        <span class="sr-only" data-menu-label>Open menu</span>
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path
             fill="currentColor"
@@ -146,16 +147,17 @@ function isActive(href: string): boolean {
           </div>
         )}
 
-        {/* Search is a primary action, keep it near the front */}
-        <a
-          href="/search"
-          class="site-nav__button focus-ring"
-          data-search-toggle
-          aria-expanded="false"
-          aria-controls="site-search-panel"
-        >
-          Search
-        </a>
+        {!hasPrimarySearchLink && (
+          <a
+            href="/search"
+            class="site-nav__button focus-ring"
+            data-search-toggle
+            aria-expanded="false"
+            aria-controls="site-search-panel"
+          >
+            Search
+          </a>
+        )}
 
         {/* Utility links like Contact, etc. */}
         {visibleUtility.length > 0 && (
@@ -208,14 +210,15 @@ function isActive(href: string): boolean {
           </details>
         )}
 
-        {/* RSS is “meta” – last in the row */}
-        <a
-          class="site-nav__button site-nav__link--secondary focus-ring"
-          href="/feed.json"
-          rel="alternate"
-        >
-          RSS
-        </a>
+        {!hasSecondaryRssLink && (
+          <a
+            class="site-nav__button site-nav__link--secondary focus-ring"
+            href="/feed.json"
+            rel="alternate"
+          >
+            RSS
+          </a>
+        )}
       </div>
     </nav>
   </div>
@@ -224,6 +227,9 @@ function isActive(href: string): boolean {
     class="site-nav__mobile"
     data-mobile-drawer
     aria-hidden="true"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Site navigation"
   >
     <div class="site-nav__mobile-header">
       <span class="site-logo">{brandName}</span>
@@ -357,6 +363,7 @@ function isActive(href: string): boolean {
   let lastScrollY = window.scrollY;
   let scrollAccumulator = 0;
   let lastDirection = 0;
+  let menuReturnFocus = null;
 
   function setHeaderVisibility(visible) {
     if (!siteHeader || !scrollRevealEnabled) return;
@@ -364,20 +371,29 @@ function isActive(href: string): boolean {
     siteHeader.classList.toggle('site-header--visible', visible);
   }
 
-  function setMenuOpen(open) {
+  function setMenuOpen(open, restoreFocus = false) {
+    const wasOpen = mobileDrawer?.classList.contains('is-open') || false;
     if (mobileDrawer) {
       mobileDrawer.classList.toggle('is-open', open);
       mobileDrawer.setAttribute('aria-hidden', String(!open));
     }
     if (menuToggle) {
       menuToggle.setAttribute('aria-expanded', String(open));
+      const label = menuToggle.querySelector('[data-menu-label]');
+      if (label) label.textContent = open ? 'Close menu' : 'Open menu';
     }
     if (body) {
       body.setAttribute('data-menu-open', open ? 'true' : 'false');
     }
     if (open) {
+      menuReturnFocus = document.activeElement;
       setSearchOpen(false);
       setSubmenuOpen(false);
+      const closeButton = mobileDrawer?.querySelector('[data-mobile-close]');
+      if (closeButton) window.setTimeout(() => closeButton.focus(), 0);
+    } else if (wasOpen && restoreFocus) {
+      const target = menuReturnFocus instanceof HTMLElement ? menuReturnFocus : menuToggle;
+      if (target) window.setTimeout(() => target.focus(), 0);
     }
     setHeaderVisibility(true);
   }
@@ -463,7 +479,7 @@ function isActive(href: string): boolean {
 
   menuToggle?.addEventListener('click', () => {
     const next = menuToggle.getAttribute('aria-expanded') !== 'true';
-    setMenuOpen(next);
+    setMenuOpen(next, !next);
   });
 
   searchToggle?.addEventListener('click', (event) => {
@@ -473,7 +489,7 @@ function isActive(href: string): boolean {
   });
 
   mobileCloseButtons.forEach((button) => {
-    button.addEventListener('click', () => setMenuOpen(false));
+    button.addEventListener('click', () => setMenuOpen(false, true));
   });
 
   mobileLinks.forEach((link) => {
@@ -519,8 +535,23 @@ function isActive(href: string): boolean {
   submenuToggle?.addEventListener('blur', closeSubmenuOnBlur);
 
   document.addEventListener('keydown', (event) => {
+    if (event.key === 'Tab' && mobileDrawer?.classList.contains('is-open')) {
+      const focusable = Array.from(mobileDrawer.querySelectorAll('a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+        .filter((element) => element instanceof HTMLElement && element.offsetParent !== null);
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (first && last) {
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    }
     if (event.key === 'Escape') {
-      setMenuOpen(false);
+      setMenuOpen(false, true);
       setSearchOpen(false);
       setSubmenuOpen(false);
     }

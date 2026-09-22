@@ -15,6 +15,8 @@ const PartnerSchema = z
     categories: z.array(z.string()).default([]),
     contact: z.string().optional(),
     notes: z.string().optional(),
+    published: z.boolean().default(false),
+    verified: z.boolean().default(false),
   })
   .catchall(z.unknown());
 
@@ -37,6 +39,8 @@ const AffiliateHighlightSchema = z
     ethicalNote: z.string().optional(),
     ctaLabel: z.string().optional(),
     image: z.string().optional(),
+    published: z.boolean().default(false),
+    verified: z.boolean().default(false),
   })
   .catchall(z.unknown());
 
@@ -60,18 +64,39 @@ function partnersFilePath(): string {
   return path.join(process.cwd(), "content", "blocks", "partners.json");
 }
 
-export function readPartnerBlocks(): PartnerBlocks {
+export interface ReadPartnerBlocksOptions {
+  includeUnpublished?: boolean;
+}
+
+function publicPartnerBlocks(blocks: PartnerBlocks): PartnerBlocks {
+  const sections = blocks.sections
+    .map((section) => ({
+      ...section,
+      partners: section.partners.filter((partner) => partner.published && partner.verified),
+    }))
+    .filter((section) => section.partners.length > 0);
+
+  return {
+    ...blocks,
+    sections,
+    affiliateHighlights: blocks.affiliateHighlights.filter(
+      (highlight) => highlight.published && highlight.verified,
+    ),
+  };
+}
+
+export function readPartnerBlocks(options: ReadPartnerBlocksOptions = {}): PartnerBlocks {
   const filePath = partnersFilePath();
   try {
     const stat = fs.existsSync(filePath) ? fs.statSync(filePath) : null;
     if (cachedBlocks && stat && stat.mtimeMs === cachedMtime) {
-      return cachedBlocks;
+      return options.includeUnpublished ? cachedBlocks : publicPartnerBlocks(cachedBlocks);
     }
 
     if (!stat) {
       cachedBlocks = { sections: [], affiliateHighlights: [] };
       cachedMtime = 0;
-      return cachedBlocks;
+      return options.includeUnpublished ? cachedBlocks : publicPartnerBlocks(cachedBlocks);
     }
 
     const raw = fs.readFileSync(filePath, "utf8");
@@ -79,7 +104,7 @@ export function readPartnerBlocks(): PartnerBlocks {
     const data = PartnerBlocksSchema.parse(parsed);
     cachedBlocks = data;
     cachedMtime = stat.mtimeMs;
-    return data;
+    return options.includeUnpublished ? data : publicPartnerBlocks(data);
   } catch (error) {
     if (process.env.NODE_ENV !== "production") {
       console.warn("[partners] Unable to read partner blocks", error);

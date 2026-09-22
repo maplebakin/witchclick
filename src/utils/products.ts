@@ -12,6 +12,7 @@ export interface ProductRecord {
   image?: string;
   description?: string;
   summary?: string;
+  published?: boolean;
 }
 
 interface ProductCatalogDocument {
@@ -26,12 +27,22 @@ function productsFilePath(): string {
 
 export function buildAffiliateTarget(product: ProductRecord | null | undefined): string {
   const base = typeof product?.url === "string" ? product.url.trim() : "";
-  if (!base) return "";
+  if (!isSafeAffiliateTarget(base)) return "";
 
   const utm = typeof product?.utm === "string" ? product.utm.trim() : "";
   if (!utm) return base;
 
   return base.includes("?") ? `${base}&${utm}` : `${base}?${utm}`;
+}
+
+export function isSafeAffiliateTarget(value: unknown): boolean {
+  if (typeof value !== "string" || !value.trim()) return false;
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch {
+    return false;
+  }
 }
 
 export function readProductCatalog(): ProductRecord[] {
@@ -52,6 +63,7 @@ export function readProductCatalog(): ProductRecord[] {
 
     cachedProducts = products
       .filter((product): product is ProductRecord => Boolean(product) && typeof product === "object")
+      .filter((product) => product.published !== false)
       .map((product) => ({ ...product }));
     return cachedProducts;
   } catch {

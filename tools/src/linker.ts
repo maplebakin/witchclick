@@ -108,11 +108,12 @@ export function autoLink(inputHtml: string, options: AutoLinkOptions = {}): Auto
   // 1) Affiliates: only link if product exists & has URL
   for (const a of affiliateAnchors) {
     const prod = productMap.get(String(a.key));
-    if (!prod || !prod.url) continue;
+    if (!prod || !isSafeHttpUrl(prod.url)) continue;
 
     const href = withUtm(prod.url, prod.utm);
-    const rel = prod.rel || "sponsored nofollow noopener noreferrer";
-    const target = prod.target || "_blank";
+    if (!isSafeHttpUrl(href)) continue;
+    const rel = normalizeAffiliateRel(prod.rel);
+    const target = "_blank";
 
     const out = linkAcrossChunks({
       chunks,
@@ -172,6 +173,21 @@ export function autoLink(inputHtml: string, options: AutoLinkOptions = {}): Auto
 function withUtm(url: string, utm?: string): string {
   if (!utm) return url;
   return url.includes("?") ? `${url}&${utm}` : `${url}?${utm}`;
+}
+
+function isSafeHttpUrl(value: string): boolean {
+  try {
+    const parsed = new URL(String(value));
+    return parsed.protocol === "https:" || parsed.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
+function normalizeAffiliateRel(value?: string): string {
+  const tokens = new Set(String(value || "").split(/\s+/).filter(Boolean));
+  for (const token of ["sponsored", "nofollow", "noopener", "noreferrer"]) tokens.add(token);
+  return Array.from(tokens).join(" ");
 }
 
 function normalizeInternalHref(slug: string): string {

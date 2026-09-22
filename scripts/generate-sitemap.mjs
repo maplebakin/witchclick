@@ -112,7 +112,7 @@ function shouldExcludePathname(pathname) {
 
 // Generate sitemap XML
 function generateSitemap(entries, siteUrl) {
-  const urlEntries = entries.map(({ url, lastmod }) => {
+  const urlEntries = entries.map(({ url }) => {
     // Determine priority and changefreq based on URL
     let priority = '0.5';
     let changefreq = 'weekly';
@@ -133,7 +133,6 @@ function generateSitemap(entries, siteUrl) {
 
     return `  <url>
     <loc>${url}</loc>
-    <lastmod>${lastmod}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
   </url>`;
@@ -147,10 +146,9 @@ ${urlEntries}
 
 // Generate sitemap index
 function generateSitemapIndex(sitemaps) {
-  const sitemapEntries = sitemaps.map(({ url, lastmod }) => {
+  const sitemapEntries = sitemaps.map(({ url }) => {
     return `  <sitemap>
     <loc>${url}</loc>
-    <lastmod>${lastmod}</lastmod>
   </sitemap>`;
   }).join('\n');
 
@@ -179,13 +177,10 @@ function main() {
       const pathname = normalizePathname(relativePath);
       const encodedPathname = encodePathname(pathname);
       const url = new URL(encodedPathname, `${baseUrl}/`).toString();
-      const stat = fs.statSync(filePath);
-      const lastmod = stat.mtime.toISOString();
       const noindex = fileHasNoindex(filePath);
       return {
         url,
         pathname: encodedPathname,
-        lastmod,
         noindex,
       };
     })
@@ -211,21 +206,15 @@ function main() {
     const filepath = path.join(distDir, filename);
 
     fs.writeFileSync(filepath, sitemap, 'utf8');
-    const chunkLastmod = chunk.reduce((latest, entry) => {
-      if (!latest) return entry.lastmod;
-      return new Date(entry.lastmod).getTime() > new Date(latest).getTime() ? entry.lastmod : latest;
-    }, '');
     sitemapFiles.push({
       filename,
-      lastmod: chunkLastmod || new Date().toISOString(),
     });
     console.log(`✓ Generated ${filename} with ${chunk.length} URLs`);
   });
 
   // Generate sitemap index
-  const sitemapUrls = sitemapFiles.map(({ filename, lastmod }) => ({
+  const sitemapUrls = sitemapFiles.map(({ filename }) => ({
     url: new URL(`/${filename}`, `${baseUrl}/`).toString(),
-    lastmod,
   }));
   const sitemapIndex = generateSitemapIndex(sitemapUrls);
   const indexPath = path.join(distDir, 'sitemap-index.xml');

@@ -36,11 +36,9 @@ const baseClasses = [
 
 const variantClasses = {
   primary: [
-    'bg-primary',
-    'text-inverse',
+    'wc-button--primary',
     'border',
     'border-primary-strong',
-    'hover:bg-primary-strong',
     'shadow-sm',
     'hover:shadow-md',
   ],
@@ -55,11 +53,9 @@ const variantClasses = {
     'hover:shadow-md',
   ],
   danger: [
-    'bg-danger',
-    'text-inverse',
+    'wc-button--danger',
     'border',
     'border-danger-strong',
-    'hover:bg-danger-strong',
     'shadow-sm',
   ],
   ghost: [
@@ -81,7 +77,7 @@ const sizeClasses = {
 const classes = [
   ...baseClasses,
   ...variantClasses[variant],
-  ...sizeClasses[size],
+    sizeClasses[size],
   className,
 ].join(' ');
 
@@ -91,3 +87,23 @@ const Tag = href ? 'a' : 'button';
 <Tag class={classes} href={href} {...props}>
   <slot />
 </Tag>
+
+<style>
+  :global(.wc-button--primary) {
+    background: color-mix(in srgb, var(--theme-primary) 58%, black 42%);
+    color: hsl(var(--neutral-0));
+  }
+
+  :global(.wc-button--primary:hover) {
+    background: color-mix(in srgb, var(--theme-primary) 48%, black 52%);
+  }
+
+  :global(.wc-button--danger) {
+    background: color-mix(in srgb, var(--theme-error) 70%, black 30%);
+    color: hsl(var(--neutral-0));
+  }
+
+  :global(.wc-button--danger:hover) {
+    background: color-mix(in srgb, var(--theme-error) 58%, black 42%);
+  }
+</style>

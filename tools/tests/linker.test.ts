@@ -46,6 +46,21 @@ describe("autoLink (affiliate)", () => {
     // Heading should remain unlinked
     expect(html).toMatch(/<h2>\s*A5 planner\s*<\/h2>/);
   });
+
+  it("rejects unsafe product protocols and enforces affiliate rel tokens", () => {
+    const unsafe = autoLink("<p>Use this planner.</p>", {
+      affiliateAnchors: [{ key: "bad", text: "planner" }],
+      products: [{ key: "bad", url: "javascript:alert(1)" }],
+    });
+    expect(unsafe.stats.affiliateCount).toBe(0);
+    expect(unsafe.html).not.toContain("javascript:");
+
+    const safe = autoLink("<p>Use this planner.</p>", {
+      affiliateAnchors: [{ key: "safe", text: "planner" }],
+      products: [{ key: "safe", url: "https://shop.example/item", rel: "custom" }],
+    });
+    expect(safe.html).toContain('rel="custom sponsored nofollow noopener noreferrer"');
+  });
 });
 
 describe("autoLink (internal)", () => {

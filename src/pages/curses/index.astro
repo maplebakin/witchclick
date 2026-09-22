@@ -12,27 +12,63 @@ const canonical = buildCanonicalUrl(settings, { path: "/curses" });
 const curses = loadAllCurses();
 const breadcrumbs = [
   { label: "Home", href: "/" },
-  { label: "Curses" },
+  { label: "Clean Cursing" },
 ];
 ---
 
 <Base
-  title="White Magic Curses — WitchClick"
-  description="Ethical refusal rituals, energy returns, and poetic accountability practices for boundary keepers."
+  title="Clean Cursing — WitchClick"
+  description="Truth-centered curse alternatives for boundaries, accountability, energetic return, and clean refusal."
   canon={canonical}
   wide={true}
 >
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <section class="mx-auto max-w-4xl space-y-6 py-8">
     <header class="space-y-2 text-center">
-      <h1 class="text-3xl font-semibold tracking-tight text-primary">White Magic Curses</h1>
+      <p class="text-[0.8rem] uppercase tracking-[0.2em] text-accent">Boundary work without revenge theology</p>
+      <h1 class="text-3xl font-semibold tracking-tight text-primary">Clean Cursing</h1>
       <p class="text-sm text-muted">
-        Truth-centered refusal for people who need a clean way to name harm, return what is not theirs, and keep bitterness
-        from becoming the whole room.
+        Truth-centered curse alternatives for boundaries, accountability, energetic return, and clean refusal. These workings
+        are symbolic and reflective: name the harm, return what is not yours, and keep bitterness from becoming the whole room.
       </p>
     </header>
 
-    <div class="grid gap-6">
+    {curses.length > 0 && (
+      <form class="curse-filters grid gap-4 rounded-2xl border border-line-subtle bg-surface-base p-4 sm:grid-cols-[minmax(0,1fr)_12rem_auto]" data-curse-filters>
+        <label class="grid gap-1 text-sm font-semibold text-body-strong">
+          Find a working
+          <input
+            class="min-h-11 rounded-lg border border-line-neutral bg-surface-card px-3 py-2 text-body-strong"
+            type="search"
+            name="query"
+            placeholder="Try boundary, truth, release…"
+            autocomplete="off"
+            data-curse-query
+          />
+        </label>
+        <label class="grid gap-1 text-sm font-semibold text-body-strong">
+          Energy level
+          <select
+            class="min-h-11 rounded-lg border border-line-neutral bg-surface-card px-3 py-2 text-body-strong"
+            name="spoons"
+            data-curse-spoons
+          >
+            <option value="">Any energy</option>
+            <option value="low">Low spoons</option>
+            <option value="medium">Medium spoons</option>
+            <option value="high">High spoons</option>
+          </select>
+        </label>
+        <button class="min-h-11 self-end rounded-lg border border-line-neutral px-4 py-2 font-semibold text-body-strong hover:bg-surface-soft" type="reset">
+          Clear
+        </button>
+        <p class="text-sm text-body-muted sm:col-span-3" aria-live="polite" aria-atomic="true" data-curse-status>
+          Showing all {curses.length} workings.
+        </p>
+      </form>
+    )}
+
+    <div class="grid gap-6" data-curse-list>
       {curses.length ? (
         curses.map((curse) => {
           const spoonLevel = normalizeSpoonLevel(
@@ -50,7 +86,12 @@ const breadcrumbs = [
             : summarySource;
 
           return (
-            <article class="rounded-2xl border border-line-subtle bg-surface-base p-5 shadow-sm transition hover:shadow-md">
+            <article
+              class="rounded-2xl border border-line-subtle bg-surface-base p-5 shadow-sm transition hover:shadow-md"
+              data-curse-card
+              data-curse-spoon={spoonLevel ?? ""}
+              data-curse-search={`${curse.title} ${curse.invocation} ${summaryText} ${curse.tags.join(" ")}`.toLowerCase()}
+            >
               <h2 class="text-xl font-semibold text-primary">
                 <a class="curses-card__link" href={`/curses/${curse.slug}`}>{curse.title}</a>
               </h2>
@@ -85,9 +126,47 @@ const breadcrumbs = [
           to see how to request a ritual.
         </p>
       )}
+      <p class="rounded-2xl border border-line-subtle bg-surface-base p-5 text-center text-sm text-body-muted" hidden data-curse-empty>
+        No workings match those filters. Try fewer words or a different energy level.
+      </p>
     </div>
   </section>
 </Base>
+
+<script is:inline>
+  (() => {
+    const form = document.querySelector('[data-curse-filters]');
+    if (!(form instanceof HTMLFormElement)) return;
+    const queryInput = form.querySelector('[data-curse-query]');
+    const spoonsInput = form.querySelector('[data-curse-spoons]');
+    const status = form.querySelector('[data-curse-status]');
+    const cards = Array.from(document.querySelectorAll('[data-curse-card]'));
+    const empty = document.querySelector('[data-curse-empty]');
+    if (!(queryInput instanceof HTMLInputElement) || !(spoonsInput instanceof HTMLSelectElement)) return;
+
+    const update = () => {
+      const query = queryInput.value.trim().toLowerCase();
+      const spoons = spoonsInput.value;
+      let visible = 0;
+      cards.forEach((card) => {
+        if (!(card instanceof HTMLElement)) return;
+        const matchesQuery = !query || (card.dataset.curseSearch || '').includes(query);
+        const matchesSpoons = !spoons || card.dataset.curseSpoon === spoons;
+        card.hidden = !(matchesQuery && matchesSpoons);
+        if (!card.hidden) visible += 1;
+      });
+      if (empty instanceof HTMLElement) empty.hidden = visible !== 0;
+      if (status instanceof HTMLElement) {
+        status.textContent = visible === cards.length
+          ? `Showing all ${cards.length} workings.`
+          : `${visible} of ${cards.length} workings match.`;
+      }
+    };
+
+    form.addEventListener('input', update);
+    form.addEventListener('reset', () => window.setTimeout(update, 0));
+  })();
+</script>
 
 <style>
   .curses-card__link {

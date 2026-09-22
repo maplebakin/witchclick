@@ -88,10 +88,19 @@ export function loadAllCurses(): LoadedCurse[] {
     .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
     .map((entry) => entry.name);
 
-  const curses = files.map((file) => {
+  const curses = files.flatMap((file): LoadedCurse[] => {
     const fullPath = path.join(dir, file);
     const raw = fs.readFileSync(fullPath, "utf8");
     const { data, content } = matter(raw);
+    const publishValue = data?.publishDate ?? data?.publishedAt ?? data?.pubDate ?? data?.date;
+    const publishTime = publishValue ? new Date(publishValue).getTime() : null;
+    if (
+      data?.draft === true ||
+      data?.published === false ||
+      (publishTime !== null && !Number.isNaN(publishTime) && publishTime > Date.now())
+    ) {
+      return [];
+    }
     const slug = String(data?.slug ?? file.replace(/\.md$/, "")).toLowerCase();
 
     const sections = parseSections(content ?? "");
@@ -109,18 +118,21 @@ export function loadAllCurses(): LoadedCurse[] {
     const finalTags = Array.isArray(finalFrontmatter?.tags)
       ? finalFrontmatter.tags.map((tag: unknown) => String(tag))
       : tags;
+    const publicTags = Array.from(
+      new Set(finalTags.map((tag) => (tag.toLowerCase() === "white-magic" ? "clean-cursing" : tag))),
+    );
 
-    return {
+    return [{
       slug,
       title: String(finalFrontmatter?.title ?? data?.title ?? slug),
       invocation: String(finalFrontmatter?.invocation ?? data?.invocation ?? ""),
-      tags: finalTags,
+      tags: publicTags,
       frontmatter: finalFrontmatter,
       sections,
       tldr: augmented.tldr ?? (typeof finalFrontmatter?.tldr === "string" ? finalFrontmatter.tldr : undefined),
       spoons: normalizeSpoonLevel(finalFrontmatter?.spoons ?? finalFrontmatter?.spoonLevel ?? augmented.spoons) || undefined,
       totalTime: augmented.totalTime,
-    } satisfies LoadedCurse;
+    } satisfies LoadedCurse];
   });
 
   curses.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: "base" }));

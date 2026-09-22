@@ -10,13 +10,13 @@ const breadcrumbs = [
 ];
 ---
 
-<Base title="Search — WitchClick" description="Search WitchClick posts and rituals.">
+<Base title="Search — WitchClick" description="Search WitchClick rituals, Clean Cursing, Field Notes, and Grimoire references.">
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
 
   <section class="wc-section-shell">
     <header class="page-header">
       <h1 class="page-header__title">Search</h1>
-      <p class="page-header__lead">Find rituals, guides, and meanderings by keyword or tag.</p>
+      <p class="page-header__lead">Find rituals, spreads, symbols, Clean Cursing, and field notes by keyword or tag.</p>
     </header>
 
     <div class="mt-8 grid gap-4">
@@ -44,7 +44,7 @@ const breadcrumbs = [
 
     if (!(input instanceof HTMLInputElement) || !loading || !empty || !results) return;
 
-    /** @type {Array<{ slug: string; title: string; excerpt?: string; tags?: string[] }>} */
+    /** @type {Array<{ href: string; type?: string; slug: string; title: string; excerpt?: string; tags?: string[] }>} */
     let index = [];
     let loaded = false;
     let unavailable = false;
@@ -138,10 +138,12 @@ const breadcrumbs = [
         .map((item) => {
           const title = escapeHtml(item.title || item.slug || "Untitled");
           const excerpt = escapeHtml(typeof item.excerpt === "string" ? item.excerpt : "");
-          const href = `/post/${encodeURIComponent(String(item.slug || "").trim())}`;
+          const href = escapeHtml(item.href || `/post/${encodeURIComponent(String(item.slug || "").trim())}`);
+          const type = escapeHtml(item.type || "Article");
 
           return `
             <a href="${href}" class="block rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm transition-colors hover:bg-surface-soft">
+              <p class="text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-body-muted">${type}</p>
               <h2 class="text-base font-semibold text-body-strong">${title}</h2>
               ${excerpt ? `<p class=\"mt-2 text-sm text-body-muted\">${excerpt}</p>` : ""}
             </a>

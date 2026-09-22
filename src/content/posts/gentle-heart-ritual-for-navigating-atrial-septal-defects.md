@@ -26,7 +26,7 @@ outline:
 wordCount: 1515
 readingMinutes: 6
 entities: []
-includeAds: true
+includeAds: false
 includeKofi: false
 affiliateAnchors: []
 internalLinkHints:
@@ -76,7 +76,7 @@ Time: 20–30 minutes. Choose a calm window, ideally with a little rest afterwar
 
 Materials: a cozy setup (blanket, pillow), glass of water, optional soft music at low volume, a pen, and a small notebook or 'reflection journal'.
 
-1. Arrive and orient (2–3 min): Build a comfortable nest. Support your back or hips. Whisper, 'consent to continue.' Look around and name five things you see, four you feel, and three you hear. This simple orienting helps your nervous system settle so your heart has less tension to push against.
+1. Arrive and orient (2–3 min): Build a comfortable nest. Support your back or hips. Whisper, 'consent to continue.' Look around and name five things you see, four you feel, and three you hear. This gives you a simple way to notice your surroundings before writing.
 2. Gentle contact and breath (3–4 min): Place one hand over your heart and, if comfortable, the other on your belly. Breathe in through the nose and out through the mouth with easy, unforced breaths. No breathwork drills and no holding. Let your shoulders lower. If dizziness appears, ease the breath until it feels natural again.
 3. Sensation scan (3–5 min): With eyes open or soft, scan for sensations: flutters, aches, warmth, pressure, or even 'numb' or 'nothing.' Naming without judging is enough. You might simply note, 'warmth under palm' or 'quiet today.' If emotions arrive, let them be guests, not invaders.
 4. Heart-room visualization (4–6 min): Speak aloud or silently: 'My heart is a room; some doors open, some closed. All are worthy.' Imagine placing inside that room one supportive item: a chair for rest, a window for air, a small lamp for clarity. Imagine releasing one weight: a worry, an obligation, a script that tightens your chest. Take a few breaths with each image, letting your body soften around the pictures.
@@ -94,7 +94,7 @@ What is one simple act of care your heart, or your loved one's heart, quietly re
 - Materials: soft place to rest, glass of water, optional blanket or pillow, pen and reflection journal for notes.
 - Timing: quick path 3–6 minutes; deep path 20–30 minutes. Your pace, your rules.
 - Anchors: practicing with consent and gentleness; hand over heart; easy, natural breathing; micro action; closing gratitude. The Deep Heart Ritual Variant is available when you want more space, and you can always review the Safety Notes first.
-- Outcomes: a calmer nervous system, one small supportive step taken, and a few practical notes to carry forward.
+- Outcomes: a brief pause, one small supportive step taken, and a few practical notes to carry forward.
 - Flexibility: you can adapt any wording, skip any step, or end early. The quick, low-energy variant exists for a reason. Ending early is still success. These are gentle self care practices meant to be kind.
 
 ## Safety Notes
@@ -103,8 +103,8 @@ This ritual is for emotional and spiritual support, not medical care. Atrial sep
 
 General safety:
 - Avoid breath-holding, forceful breathing drills, heat exposure, or strenuous movement during the ritual.
-- If seated positions cause dizziness, lie down with your head and shoulders elevated and stop the practice.
-- If you notice new or worsening chest pain, fainting, severe shortness of breath, blue lips or fingers, or sudden swelling, pause and follow your medical plan or seek urgent evaluation.
+- If a position, movement, or breathing pattern feels uncomfortable, stop and return to the instructions in your own care plan.
+- If symptoms are new, worsening, or concerning, stop the ritual and contact your clinician or local emergency service as your care plan directs.
 - Boundaries matter. Rituals should feel supportive, never compulsory. If any part of this guide feels wrong, heavy, or unsettling, you have full permission to skip it, rewrite it, or walk away.
 
 Accessibility and consent:
@@ -118,16 +118,14 @@ This piece is meant to be reused when nerves are loud and focus is thin. Revisit
 
 Keep exploring with [Gentle Rituals for Living With Atrial Septal Defects](/post/gentle-rituals-for-living-with-atrial-septal-defects), [When Life Feels on Pause: A Gentle Ritual & Guide](/post/when-life-feels-on-pause), [Day After Acupuncture Recovery: Gentle Body Awareness](/post/day-after-acupuncture-recovery-gentle-body-awareness).
 
-For an evidence-based primer, see [Mindfulness overview (APA)](https://www.apa.org/topics/mindfulness).
+For a clinical overview of atrial septal defects and follow-up, see the [American Heart Association's ASD guide](https://www.heart.org/en/health-topics/congenital-heart-defects/about-congenital-heart-defects/atrial-septal-defect-asd).
 
-If you need a softer entry, start with sensory check-ins: notice three colors, three textures, and three sounds around you. This lowers activation so the ritual lands.
+If you need a softer entry, start with sensory check-ins: notice three colors, three textures, and three sounds around you. This keeps the ritual concrete and easy to follow.
 
 End by closing the container: wash your hands, sip water, and name one boundary you honored. Practicing the close matters as much as the action itself.
 
 Q: What if I only have five minutes? Choose one step, do it once, and call it done. Small repetitions still help.
 
-Q: How do I know it worked? Check your body: unclenched jaw, deeper breath, steadier pulse. If not, loop once more or switch to a sensory grounding option.
-
-If your attention drifts, pause to name what feels different, even if it is small. Consistency trains your system that these practices are safe to return to.
+Q: How do I know it worked? Check whether you completed the small supportive action you chose or captured a useful note for your care team. The ritual does not need to change a physical symptom to count.
 
 If your attention drifts, pause to name what feels different, even if it is small. Consistency trains your system that these practices are safe to return to.

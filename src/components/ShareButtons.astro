@@ -47,29 +47,34 @@ const shareLinks = [
     </a>
   ))}
   <button
-    id="copyLinkBtn"
+    type="button"
+    data-copy-link
     class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-surface-base text-accent hover:bg-surface-elevated transition-colors"
     aria-label="Copy link"
   >
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-link"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M9 15l6 -6"></path><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.071l-.536 .463"></path><path d="M8 19l-.463 .536a5 5 0 0 1 -7.071 -7.071l.536 -.463"></path></svg>
   </button>
+  <span class="sr-only" aria-live="polite" aria-atomic="true" data-copy-status></span>
 </div>
 
 <script is:inline>
-  document.getElementById('copyLinkBtn')?.addEventListener('click', async () => {
+  document.querySelector('[data-copy-link]')?.addEventListener('click', async (event) => {
+    const btn = event.currentTarget;
+    const status = document.querySelector('[data-copy-status]');
+    if (!(btn instanceof HTMLButtonElement)) return;
+    const initialIcon = btn.innerHTML;
     try {
       await navigator.clipboard.writeText(window.location.href);
-      // Optional: Provide visual feedback to the user
-      const btn = document.getElementById('copyLinkBtn');
-      if (btn) {
-        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-check"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M5 12l5 5l10-10"></path></svg>';
-        setTimeout(() => {
-          btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-link"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M9 15l6 -6"></path><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.071l-.536 .463"></path><path d="M8 19l-.463 .536a5 5 0 0 1 -7.071 -7.071l.536 -.463"></path></svg>';
-        }, 2000);
-      }
-    } catch (err) {
-      console.error('Failed to copy: ', err);
-      // Optional: Provide error feedback
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5l10-10"></path></svg>';
+      btn.setAttribute('aria-label', 'Link copied');
+      if (status) status.textContent = 'Link copied to clipboard.';
+      setTimeout(() => {
+        btn.innerHTML = initialIcon;
+        btn.setAttribute('aria-label', 'Copy link');
+      }, 2000);
+    } catch {
+      btn.setAttribute('aria-label', 'Copy failed');
+      if (status) status.textContent = 'Could not copy the link. Copy it from your browser address bar.';
     }
   });
 </script>

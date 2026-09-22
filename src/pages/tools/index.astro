@@ -4,11 +4,12 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import PrimaryButton from "../../components/buttons/PrimaryButton.astro";
 import fs from "node:fs";
 import HeadSlot from "@/components/HeadSlot.astro";
+import { serializeJsonForScript } from "@/utils/serializeJson";
 import { readSettings, getFormEndpoint } from "../../utils/settings";
 import { createItemListSchema } from "../../utils/structuredData";
 import { buildAffiliateTarget, readProductCatalog } from "@/utils/products";
 
-const title = "Ritual Tools";
+const title = "Practice Tools";
 const description = "Printables, ritual supports, and curated tools for reflection, tarot, and meaning-making.";
 
 interface DownloadEntry {
@@ -71,6 +72,7 @@ const readyDownloads = normalizedDownloads.filter((item) => {
 const comingSoonDownloads = normalizedDownloads.filter((item) => {
   const hasName = typeof item.name === "string" && item.name.trim().length > 0;
   if (!hasName) return false;
+  if (item.published !== true) return false;
   if (readyDownloads.includes(item)) return false;
   return true;
 });
@@ -150,7 +152,7 @@ const productListSchema =
           name: `${title} — WitchClick`,
           url: "/tools/",
           description,
-          itemType: "Product",
+          itemType: "Thing",
         },
         productItems,
       )
@@ -164,7 +166,7 @@ const breadcrumbs = [
 <Base {title} {description}>
   {productListSchema && (
     <HeadSlot slot="head">
-      <script type="application/ld+json" is:inline set:html={JSON.stringify(productListSchema)} />
+      <script type="application/ld+json" is:inline set:html={serializeJsonForScript(productListSchema)} />
     </HeadSlot>
   )}
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
@@ -188,7 +190,7 @@ const breadcrumbs = [
       {readyDownloads.length === 0 && comingSoonDownloads.length === 0 ? (
         <div class="tools-empty">
           <p>
-            New supports are in the workshop. Visit the <a href="/curses">White Magic Curses</a> collection for printable boundary-setting cards, or explore the tools below for what is currently live.
+            New supports are in the workshop. Visit the <a href="/curses">Clean Cursing</a> collection for printable boundary-setting cards, or explore the tools below for what is currently live.
             If you have a wish list, drop a request in the <a href="#tools-request">tool request form</a> below.
           </p>
         </div>
@@ -218,12 +220,9 @@ const breadcrumbs = [
                       </div>
                     )}
                     <div class="print-card__actions">
-                      <PrimaryButton href={item.target} iconAfter="↓">
-                        Download
+                      <PrimaryButton href={item.target} iconAfter="↗">
+                        Open PDF
                       </PrimaryButton>
-                      <a href="/tools" class="print-card__preview-link">
-                        View preview →
-                      </a>
                     </div>
                   </li>
                 ))}
@@ -256,9 +255,9 @@ const breadcrumbs = [
       )}
 
       <div class="tools-cta">
-        <p class="tools-cta__text">Want more ritual supports and reflective planners?</p>
-        <PrimaryButton href="/tools" iconAfter="→">
-          Explore Live Tools
+        <p class="tools-cta__text">Looking for ritual practices to go with these tools?</p>
+        <PrimaryButton href="/hub" iconAfter="→">
+          Browse Rituals & Spreads
         </PrimaryButton>
       </div>
     </section>
@@ -301,7 +300,7 @@ const breadcrumbs = [
                   dataAffiliate={true}
                   iconAfter="↗"
                 >
-                  Visit listing
+                  Browse options
                 </PrimaryButton>
               </div>
             </li>
@@ -651,18 +650,6 @@ const breadcrumbs = [
     flex-direction: column;
     gap: 0.75rem;
     margin-top: auto;
-  }
-
-  .print-card__preview-link {
-    font-size: 0.875rem;
-    color: var(--text-accent, #7c3aed);
-    text-decoration: none;
-    font-weight: 500;
-    text-align: center;
-  }
-
-  .print-card__preview-link:hover {
-    text-decoration: underline;
   }
 
   /* Tools Cards */

@@ -200,7 +200,7 @@ Nothing here is strictly required for basic local development if you are happy w
 ### Common admin variables
 
 - `PUBLIC_DEV_API` — override the admin UI's dev API base URL. Default is `http://localhost:8787`.
-- `PUBLIC_DEV_API_KEY` — dev API key the admin UI sends as `X-WC-Dev-Key`.
+- `PUBLIC_DEV_API_KEY` — dev API key the admin UI sends as `X-WC-Dev-Key`. If `DEV_API_TOKEN` is set on `dev-api.js`, this value must match it for admin write actions to succeed.
 - `PUBLIC_ADMIN_KEY` — optional query-string gate for hosted admin pages, used as `?key=...`.
 
 ### Local dev API variables

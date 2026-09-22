@@ -10,6 +10,7 @@ import { readSettings } from "@/utils/settings";
 import { getPostBySlug, extractHeroImage, getPostCategory } from "@/utils/posts";
 import { HUB_DEFINITIONS } from "@/data/hubs";
 import HeadSlot from "@/components/HeadSlot.astro";
+import { serializeJsonForScript } from "@/utils/serializeJson";
 
 const HUBS = [
   {
@@ -107,7 +108,7 @@ const featuredHub = [...hubCards].sort((a, b) => b.livePostCount - a.livePostCou
 
 const settings = readSettings();
 const collectionItems = hubCards.map((hub) => ({
-  name: `${hub.title} Hub`,
+  name: `${hub.title} Rituals & Spreads`,
   url: `/hub/${hub.slug}`,
   description: hub.description,
 }));
@@ -115,41 +116,41 @@ const collectionItems = hubCards.map((hub) => ({
 const jsonLd = createCollectionPageSchema(
   settings,
   {
-    name: "WitchClick Hub Constellation",
+    name: "WitchClick Rituals & Spreads",
     url: "/hub",
-    description: "Pathways into release, focus, and calm rituals for attention, meaning, and threshold work.",
+    description: "Pathways into release, focus, and grounding rituals, tarot spreads, and symbolic workings.",
   },
   collectionItems,
 );
 
 const breadcrumbs = [
   { label: "Home", href: "/" },
-  { label: "Hubs" },
+  { label: "Rituals & Spreads" },
 ];
 ---
 
 <Base
-  title="Hub Constellation — Release, Focus, Calm"
-  description="Enter through Release, Focus, or Calm. Each WitchClick hub gathers rituals, essays, and tools for choosing a lens."
+  title="Rituals & Spreads — Ground, Focus, Release"
+  description="Enter through Ground, Focus, or Release. Each WitchClick path gathers rituals, tarot spreads, and symbolic workings for choosing a lens."
   ambientColor="var(--theme-color-amethyst)"
 >
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <HeadSlot slot="head">
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+    <script type="application/ld+json" is:inline set:html={serializeJsonForScript(jsonLd)} />
   </HeadSlot>
 
   <header data-reveal class="page-header">
-    <p class="page-header__eyebrow">Hub constellation</p>
+    <p class="page-header__eyebrow">Rituals & spreads</p>
     <h1 class="page-header__title">How are you feeling right now?</h1>
     <p class="page-header__lead">
-      Each room is a practical way into the archive. Pick the lens that fits today and step into rituals, essays, and tools
-      gathered around attention, meaning, and threshold work.
+      Start by need, then step into a working. These paths gather rituals, tarot spreads, and symbolic supports around
+      grounding, attention, and threshold work.
     </p>
   </header>
 
   {featuredHub && (
     <section data-reveal class="hub-featured" aria-labelledby="featured-hub-title">
-      <p class="hub-featured__eyebrow">Featured hub</p>
+      <p class="hub-featured__eyebrow">Featured path</p>
         <div class="hub-featured__content">
           <div class="hub-featured__copy">
             <h2 id="featured-hub-title" class="hub-featured__title">{featuredHub.title}</h2>
@@ -168,7 +169,7 @@ const breadcrumbs = [
       {hubCards.map((hub) => (
         <article class="card-panel card-tier-2 card-panel-soft hub-card" style={`--hub-accent: ${hub.accent}`}>
           <div class="hub-card__header">
-            <p class="hub-card__eyebrow">{hub.title} hub</p>
+            <p class="hub-card__eyebrow">{hub.title} path</p>
             <h2 class="hub-card__title">{hub.title}</h2>
             <div class="hub-card__moods" aria-label={`${hub.title} mood cues`}>
               {hub.moods.map((mood) => (

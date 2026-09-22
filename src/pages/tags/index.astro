@@ -6,7 +6,7 @@ import { canonicalTagHref, canonicalizeTagSlug, tagsFromFrontmatter } from "@/ut
 
 export const prerender = true;
 
-const title = "Browse by Tag";
+const title = "Browse Topics";
 const description = "Follow the threads that run through the WitchClick archive: rituals, essays, tarot, symbols, moods, and recurring questions.";
 
 const posts = loadAllPosts();
@@ -36,7 +36,7 @@ const tags = Array.from(tagMap.entries())
 
 const breadcrumbs = [
   { label: "Home", href: "/" },
-  { label: "Browse by Tag" },
+  { label: "Topics" },
 ];
 ---
 
