@@ -87,6 +87,11 @@ heroImageSrc: /hero-images/sunday-football-tarot-spread-and-ritual.png
 heroImageAlt: 'Sunday Football Tarot: A Game-Day Spread and Ritual Guide — hero image'
 spoonLevel: low
 cluster: tarot-spreads
+labRitual:
+  intents: [connection, reflection, rest]
+  tools: [tarot, journal, pen, timer, token, game]
+  tags: [group]
+  materials: [tarot, token, journal, timer]
 ---
 ## Why tarot + football works
 

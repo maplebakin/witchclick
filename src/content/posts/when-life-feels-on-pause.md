@@ -50,6 +50,11 @@ publishedAt: '2025-10-19T16:50:11.651Z'
 canonicalUrl: 'https://witchclick.space/post/when-life-feels-on-pause'
 specVersion: 2
 cluster: cozy-witchcraft
+labRitual:
+  intents: [reset, rest, reflection]
+  tools: [timer, journal, water, aroma diffuser, singing bowl, stone, tarot, music]
+  durationMinutes: 2
+  materials: [timer, journal, water, aroma diffuser, singing bowl, tumbled stones]
 ---
 ## Opening Reflection
 

@@ -71,6 +71,10 @@ heroImageSrc: /hero-images/anxiety-from-avoiding-responsibilities-gentle-rituals
 heroImageAlt: 'When Avoiding Makes You Anxious: Gentle Rituals to Re-Enter Your Day — hero image'
 spoonLevel: low
 cluster: cozy-witchcraft
+labRitual:
+  intents: [reset, grounding, focus]
+  tools: [timer, water, tea, tarot]
+  materials: [bowl, paper]
 ---
 ## You’re Not Broken: Why Avoiding Feels Safer
 

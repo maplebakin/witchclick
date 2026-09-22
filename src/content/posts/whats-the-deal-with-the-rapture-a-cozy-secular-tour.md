@@ -56,6 +56,11 @@ canonicalUrl: 'https://witchclick.space/post/whats-the-deal-with-the-rapture-a-c
 specVersion: 2
 spoonLevel: low
 cluster: cozy-witchcraft
+labRitual:
+  intents: [perspective, grounding, reflection]
+  tools: [journal, paper, pen, stone, game, water]
+  durationMinutes: 20
+  materials: [journal, paper, pen, stone]
 ---
 ## Opening Reflection
 

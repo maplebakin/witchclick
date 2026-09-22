@@ -50,6 +50,12 @@ promptMetadata:
     kofi: 'off'
   generatedAt: '2025-10-28T20:41:22.771Z'
 cluster: cozy-witchcraft
+labRitual:
+  intents: [rest, grounding, reflection]
+  tools: [water, pillow, blanket, timer, journal, pen, music]
+  durationMinutes: 6
+  tags: [sound]
+  materials: [water, pillow, blanket, timer, journal, pen]
 ---
 ## Opening Reflection
 

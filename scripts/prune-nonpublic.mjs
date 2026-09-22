@@ -12,7 +12,6 @@ const NONPUBLIC_ROOTS = new Set([
   "admin", // Admin UI and tools
   "api", // Dev API endpoints
   "account", // Unlaunched local member shelf
-  "lab", // Internal/unfinished ritual lab
 ]);
 
 async function removeTarget(targetPath) {

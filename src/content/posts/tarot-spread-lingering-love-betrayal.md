@@ -52,6 +52,12 @@ publishedAt: '2025-10-20T15:03:54.818Z'
 canonicalUrl: 'https://witchclick.space/post/tarot-spread-lingering-love-betrayal'
 specVersion: 2
 cluster: tarot-spreads
+labRitual:
+  intents: [release, reflection, clarity]
+  tools: [tarot, candle, water, journal, pen, music, crystal]
+  durationMinutes: 30
+  tags: [solo]
+  materials: [tarot, candle, water, journal, pen, crystal]
 ---
 ## Opening Reflection
 

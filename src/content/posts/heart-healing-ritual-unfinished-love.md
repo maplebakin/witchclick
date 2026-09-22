@@ -55,6 +55,12 @@ publishedAt: '2025-10-20T14:59:30.110Z'
 canonicalUrl: 'https://witchclick.space/post/heart-healing-ritual-unfinished-love'
 specVersion: 2
 cluster: rituals-practices
+labRitual:
+  intents: [release, rest, reflection]
+  tools: [tea, candle, blanket, bowl, water, journal, pen, music, crystal]
+  durationMinutes: 30
+  tags: [solo]
+  materials: [tea, candle, blanket, bowl, water, paper, pen, crystal]
 ---
 ## Opening Reflection
 

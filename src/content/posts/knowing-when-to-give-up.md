@@ -68,6 +68,11 @@ heroImageSrc: /hero-images/knowing-when-to-give-up.png
 heroImageAlt: 'Knowing When to Give Up: A Gentle Quitter''s Guide — hero image'
 spoonLevel: high
 cluster: cozy-witchcraft
+labRitual:
+  intents: [clarity, release, reflection]
+  tools: [timer, journal, paper, tarot, stone, water, phone]
+  durationMinutes: 5
+  materials: [journal, paper, tarot, stone, water]
 ---
 ## Opening Reflection
 

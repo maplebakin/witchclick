@@ -68,6 +68,11 @@ heroImageSrc: /hero-images/calm-space-during-political-unrest-2.png
 heroImageAlt: 'Create a Calm Space During Political Unrest: A Gentle Guide — hero image'
 spoonLevel: low
 cluster: cozy-witchcraft
+labRitual:
+  intents: [grounding, reset]
+  tools: [journal, pen, water, tarot]
+  durationMinutes: 3
+  materials: [blanket, journal, pen, water, token]
 ---
 ## Why a calm space helps when the world feels loud
 

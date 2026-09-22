@@ -67,6 +67,11 @@ heroImageSrc: /hero-images/first-day-new-job-secular-tarot-spread-journal.png
 heroImageAlt: First-Day New Job Secular Tarot Spread and Journal — hero image
 spoonLevel: medium
 cluster: tarot-spreads
+labRitual:
+  intents: [grounding, clarity, focus]
+  tools: [journal, pen, tarot, tea, water, stone]
+  durationMinutes: 5
+  materials: [journal, stone, tarot, tea, water]
 ---
 ## Opening Reflection
 

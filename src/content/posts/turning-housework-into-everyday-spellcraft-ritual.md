@@ -46,6 +46,11 @@ promptMetadata:
     kofi: 'on'
   generatedAt: '2025-11-05T15:19:33.202Z'
 cluster: rituals-practices
+labRitual:
+  intents: [reset, focus, grounding]
+  tools: [broom, cloth, salt, water, bowl, mop, candle, herbs, bell, music]
+  durationMinutes: 10
+  materials: [broom, cloth, bowl, salt, water, mop, candle, herbs, bell]
 ---
 ## Opening Reflection
 

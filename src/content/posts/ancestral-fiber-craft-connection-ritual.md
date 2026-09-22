@@ -45,6 +45,11 @@ promptMetadata:
     kofi: 'off'
   generatedAt: '2025-11-06T15:41:49.337Z'
 cluster: rituals-practices
+labRitual:
+  intents: [connection, creativity, reflection]
+  tools: [yarn, thread, needle]
+  durationMinutes: 10
+  materials: [yarn, thread, needle]
 ---
 ## Opening Reflection
 

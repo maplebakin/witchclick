@@ -23,6 +23,10 @@ contentType: "ritual"
 cluster: "rituals-practices"
 externalLink: {"url":"https://en.wikipedia.org/wiki/Narrative_identity","anchor":"narrative identity","description":"Background context on how people form and protect stories about themselves."}
 promptMetadata: {"topic":"Holding Strength When You Hold Someone Accountable","requestedWords":1200,"deliveredWords":1430,"toggles":{"ads":"off","kofi":"off"},"generatedAt":"2026-05-01T12:43:23.221Z"}
+labRitual:
+  intents: [boundaries, clarity, grounding]
+  tools: [journal, paper, pen, water, tea, stone]
+  materials: [journal, paper, pen, water, tea, stone]
 ---
 
 ## Opening Reflection

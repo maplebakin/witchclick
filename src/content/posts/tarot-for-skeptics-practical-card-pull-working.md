@@ -23,6 +23,9 @@ contentType: "ritual"
 cluster: "tarot-spreads"
 externalLink: {"url":"https://www.britannica.com/topic/tarot","anchor":"tarot history overview","description":"A concise reference on tarot history and cultural context."}
 promptMetadata: {"topic":"Tarot for Skeptics: A Practical Card Pull Working","requestedWords":1200,"deliveredWords":1239,"toggles":{"ads":"off","kofi":"on"},"generatedAt":"2026-05-07T15:48:11.176Z"}
+labRitual:
+  intents: [clarity, reflection]
+  tools: [tarot, journal, water]
 ---
 
 ## Opening Reflection

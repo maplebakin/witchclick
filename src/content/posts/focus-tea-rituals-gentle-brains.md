@@ -56,6 +56,12 @@ canonicalUrl: 'https://witchclick.space/post/focus-tea-rituals-gentle-brains'
 specVersion: 2
 spoonLevel: medium
 cluster: cozy-witchcraft
+labRitual:
+  intents: [focus, reset]
+  tools: [tea, timer, journal, pen, tarot, playlist]
+  durationMinutes: 5
+  tags: [sound]
+  materials: [tea, mug, journal]
 ---
 ## Opening Reflection
 

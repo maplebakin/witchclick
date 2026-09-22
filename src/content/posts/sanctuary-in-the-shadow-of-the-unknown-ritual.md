@@ -26,6 +26,10 @@ contentType: "ritual"
 cluster: "cozy-witchcraft"
 externalLink: {"url":"https://en.wikipedia.org/wiki/Intolerance_of_uncertainty","anchor":"intolerance of uncertainty","description":"A psychological concept describing how people respond to uncertain situations and why they may feel distressing."}
 promptMetadata: {"topic":"Sanctuary in the Shadow of the Unknown Ritual","requestedWords":1200,"deliveredWords":618,"toggles":{"ads":"off","kofi":"off"},"generatedAt":"2026-04-07T13:20:13.434Z"}
+labRitual:
+  intents: [grounding, rest]
+  tools: [blanket, mug, pen, notebook, water]
+  materials: [blanket, mug, pen, notebook]
 ---
 
 ## Opening Reflection

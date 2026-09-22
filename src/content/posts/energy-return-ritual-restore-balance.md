@@ -39,6 +39,11 @@ canonicalUrl: 'https://witchclick.space/post/energy-return-ritual-restore-balanc
 specVersion: 2
 spoonLevel: high
 cluster: rituals-practices
+labRitual:
+  intents: [release, boundaries, grounding]
+  tools: [water, journal, pen, candle, bowl, salt, herbs]
+  durationMinutes: 5
+  materials: [water, journal, pen, candle, bowl, salt, herbs]
 ---
 ## Opening Reflection
 

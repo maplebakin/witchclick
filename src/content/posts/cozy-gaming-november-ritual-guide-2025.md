@@ -52,6 +52,12 @@ promptMetadata:
     ads: 'on'
     kofi: 'off'
   generatedAt: '2025-11-22T13:43:05.655Z'
+labRitual:
+  intents: [rest, reset]
+  tools: [game, timer, tea, phone, blanket]
+  durationMinutes: 30
+  tags: [sound]
+  materials: [blanket, tea, timer]
 ---
 ## Opening Reflection
 

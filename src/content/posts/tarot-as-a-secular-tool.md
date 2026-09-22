@@ -69,6 +69,10 @@ heroImageSrc: /hero-images/tarot-as-a-secular-tool.png
 heroImageAlt: 'Tarot as a Secular Tool: Pattern-Reading for Everyday Decisions — hero image'
 spoonLevel: medium
 cluster: tarot-spreads
+labRitual:
+  intents: [clarity, reflection, focus]
+  tools: [tarot, tea, journal, timer, stone, game, playlist]
+  materials: [tarot, journal, tea, stone]
 ---
 ## Opening Reflection
 

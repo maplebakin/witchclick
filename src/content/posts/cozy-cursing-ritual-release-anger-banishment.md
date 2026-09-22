@@ -42,6 +42,11 @@ canonicalUrl: 'https://witchclick.space/post/cozy-cursing-ritual-release-anger-b
 specVersion: 2
 spoonLevel: high
 cluster: clean-cursing
+labRitual:
+  intents: [release, boundaries]
+  tools: [paper, pen, candle, bowl, water, stone, journal]
+  durationMinutes: 15
+  materials: [paper, pen, bowl, shovel, candle, water, stone, journal]
 ---
 ## Opening Reflection
 
