@@ -610,7 +610,7 @@ const ritualLabPayloadJson = safeJsonStringify({
       if (payload.entries.length === 0) {
         const empty = document.createElement("p");
         empty.className = "text-sm opacity-70";
-        empty.textContent = "Ritual data not found. Add labRitual metadata to src/content/posts entries to populate this space.";
+        empty.textContent = "No ritual recommendations are available yet.";
         output.appendChild(empty);
       } else {
         update();
