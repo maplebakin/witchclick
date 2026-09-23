@@ -1,5 +1,4 @@
 ---
-import { randomUUID } from "node:crypto";
 import type { SpoonLevel } from "../utils/augment";
 
 export interface Props {
@@ -21,18 +20,16 @@ const meta: Record<SpoonLevel, { label: string; tooltip: string }> = {
   high: { label: "High spoons", tooltip: "High spoons: deep read or multi-step ritual" },
 };
 
-const tooltipId = spoonLevel ? `spoons-tip-${randomUUID().slice(0, 8)}` : "";
 ---
 {spoonLevel && (
   <span
     class:list={["card-spoon", "spoons-badge", spoonLevel && `spoons-badge--${spoonLevel}`, className]}
     data-spoon-level={spoonLevel}
-    tabindex="0"
-    aria-describedby={tooltipId}
+    aria-label={meta[spoonLevel].tooltip}
   >
     <span class="spoons-badge__dot" aria-hidden="true" />
     <span class="spoons-badge__text">{meta[spoonLevel].label}</span>
-    <span id={tooltipId} role="tooltip" class="spoons-badge__tooltip">
+    <span aria-hidden="true" class="spoons-badge__tooltip">
       {meta[spoonLevel].tooltip}
     </span>
   </span>
@@ -46,11 +43,6 @@ const tooltipId = spoonLevel ? `spoons-tip-${randomUUID().slice(0, 8)}` : "";
     gap: 0.45rem;
     cursor: default;
     outline: none;
-  }
-
-  .spoons-badge:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--text-accent, var(--theme-color-gold)) 65%, transparent);
-    outline-offset: 2px;
   }
 
   .spoons-badge__dot {
@@ -88,8 +80,7 @@ const tooltipId = spoonLevel ? `spoons-tip-${randomUUID().slice(0, 8)}` : "";
     z-index: 10;
   }
 
-  .spoons-badge:hover .spoons-badge__tooltip,
-  .spoons-badge:focus-visible .spoons-badge__tooltip {
+  .spoons-badge:hover .spoons-badge__tooltip {
     opacity: 1;
     transform: translate(-50%, 0);
   }

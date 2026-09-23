@@ -48,6 +48,11 @@ promptMetadata:
     kofi: 'off'
   generatedAt: '2025-11-07T14:38:07.105Z'
 cluster: spellcraft-theory
+labRitual:
+  intents: [clarity, reflection, grounding]
+  tools: [candle, journal, pen, water, stone, tea, walk]
+  durationMinutes: 5
+  materials: [candle, journal, pen, water, stone, lavender, rosemary]
 ---
 ## Opening Reflection
 

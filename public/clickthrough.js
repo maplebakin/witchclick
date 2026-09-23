@@ -3,38 +3,9 @@
     return;
   }
 
-  const STORAGE_KEY = "wc-affiliate-clicks";
   const DATASET_FLAG = "affiliateBound";
-  const MAX_ENTRIES = 100;
   const analyticsEnabled = Boolean(window.__WC_ANALYTICS__);
   const AFFILIATE_EVENT_NAME = "affiliate_click";
-
-  function readLog() {
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (error) {
-      console.warn("Affiliate click logging unavailable", error);
-      return [];
-    }
-  }
-
-  function writeLog(entries) {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(entries.slice(-MAX_ENTRIES)));
-    } catch (error) {
-      console.warn("Affiliate click log persistence failed", error);
-    }
-  }
-
-  function recordClick(url) {
-    if (!url) return;
-    const entries = readLog();
-    entries.push({ url, ts: new Date().toISOString() });
-    writeLog(entries);
-  }
 
   function sendClickBeacon(payload) {
     if (!analyticsEnabled) return;
@@ -77,7 +48,6 @@
     if (!(link instanceof HTMLAnchorElement)) return;
     const url = link.href;
 
-    recordClick(url);
     sendClickBeacon({ url, ts: new Date().toISOString() });
   }
 

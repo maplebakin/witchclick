@@ -202,7 +202,7 @@ function truncateSummary(value: string | undefined | null, max = 120): string {
     {_visibleTags.length > 0 && (
       <div class="card-tags card-tags--linked">
         {_visibleTags.map((t) => (
-          <a href={canonicalTagHref(String(t).toLowerCase())} class="card-pill card-tag" tabindex="-1">
+          <a href={canonicalTagHref(String(t).toLowerCase())} class="card-pill card-tag">
             #{String(t).toLowerCase()}
           </a>
         ))}

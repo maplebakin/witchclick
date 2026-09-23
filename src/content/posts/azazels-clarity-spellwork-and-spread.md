@@ -56,6 +56,11 @@ promptMetadata:
     ads: 'on'
     kofi: 'on'
   generatedAt: '2025-11-16T21:18:04.328Z'
+labRitual:
+  intents: [clarity, reflection, grounding]
+  tools: [mirror, candle, tarot, journal, pen, tea]
+  durationMinutes: 10
+  materials: [mirror, candle, tarot, journal, pen]
 ---
 ## Opening Reflection
 

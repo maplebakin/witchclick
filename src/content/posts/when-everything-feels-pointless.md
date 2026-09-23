@@ -69,6 +69,10 @@ heroImageSrc: /hero-images/when-everything-feels-pointless.png
 heroImageAlt: 'When Everything Feels Pointless: Gentle Rituals to Re-Enter Meaning — hero image'
 spoonLevel: low
 cluster: cozy-witchcraft
+labRitual:
+  intents: [reset, reflection, clarity]
+  tools: [timer, journal, tarot, stone, water, game]
+  materials: [journal, tarot, stone, timer]
 ---
 ## Opening Reflection
 

@@ -1,10 +1,11 @@
-const SETTING = 'gentle atmospheric light with an ambiguous setting, early morning or late afternoon';
-const STYLE = 'cozy witchy aesthetic, muted earthy tones, film grain, editorial still life photography, no text or lettering';
+const SETTING = 'gentle atmospheric light with a specific setting implied by the post topic, early morning or late afternoon';
+const STYLE = 'WitchClick editorial illustration, cozy but grounded, tactile textures, no text or lettering';
 const VISUAL_DIRECTIONS = [
   'Favor suggestive symbolic imagery over a literal scene',
   'Keep the composition interpretive and open-ended',
   'Let the image evoke the idea rather than illustrate it directly',
   'Use metaphorical details instead of a single obvious subject',
+  'Avoid generic candles-and-crystals stock imagery unless the post specifically asks for it',
 ];
 
 function capitalize(text: string) {
@@ -39,5 +40,5 @@ export function buildFallbackHeroPrompt(post: HeroPromptPostLike, variation = 0)
   const title = String(post?.title || post?.slug || 'Untitled post').trim() || 'Untitled post';
   const mood = deriveMood(tags);
   const direction = VISUAL_DIRECTIONS[variation % VISUAL_DIRECTIONS.length] || VISUAL_DIRECTIONS[0];
-  return `Hero image for the post titled "${title}". ${capitalize(mood)} atmosphere. ${direction}. Photographed with ${SETTING}. ${capitalize(STYLE)}.`;
+  return `Hero image prompt for a WitchClick post titled "${title}". ${capitalize(mood)} atmosphere. ${direction}. Show a concrete, emotionally precise scene that fits the reader need of the post. Render with ${SETTING}. ${capitalize(STYLE)}.`;
 }

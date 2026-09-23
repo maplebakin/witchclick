@@ -23,7 +23,7 @@ specVersion: 2
 category: "ritual"
 contentType: "reflection"
 cluster: "spellcraft-theory"
-externalLink: {"url":"https://www.britannica.com/topic/astrology","anchor":"Encyclopaedia](https://www.britannica.com/topic/astrology%22,%22anchor%22:%22Encyclopaedia) Britannica overview of astrology","description":"A broad historical and conceptual reference for readers who want grounded context."}
+externalLink: {"url":"https://www.britannica.com/topic/astrology","anchor":"Encyclopaedia Britannica overview of astrology","description":"A broad historical and conceptual reference for readers who want grounded context."}
 promptMetadata: {"topic":"Astrological Transits for Sun-Sign-Only Beginners","requestedWords":1200,"deliveredWords":3239,"toggles":{"ads":"on","kofi":"off"},"generatedAt":"2026-04-04T14:25:47.766Z"}
 ---
 
@@ -105,7 +105,7 @@ Pluto intensifies. It strips, reveals, transforms, obsesses, purges, and drags b
 
 If that sounds like a lot, it is. But you do not need to memorize everything in one sitting like a celestial flash-card warrior. Start with the slow planets if you want the big themes. Jupiter, Saturn, Uranus, Neptune, and Pluto tend to describe the longer arcs people notice most strongly.
 
-Then add signs into the mix. A planet is what kind of energy. A sign is how it acts. A house is where it shows up. An aspect is how the current sky is relating to your natal chart. That is the basic grammar, and it becomes much less terrifying once you have seen it laid out calmly in a post like Your Chart or Elemental Or Planetary Patterns.
+Then add signs into the mix. A planet is what kind of energy. A sign is how it acts. A house is where it shows up. An aspect is how the current sky is relating to your natal chart. That is the basic grammar. If visual association helps you learn it, [Yarn Colors for Your Astrological Chart: A Soft Mapping](/post/yarn-colors-astrological-chart-signs-nodes-ascendant) offers one playful way to make signs and chart points less abstract.
 
 A transit interpretation is basically a sentence built from those parts. Saturn in Pisces moving through your seventh house and contacting your natal Moon is not random mystical confetti. It is a sentence. A complicated sentence, yes. But still a sentence. It may be saying something like: emotional reality, relationship boundaries, tenderness, maturity, grief, or responsibility are being emphasized in a slow, serious, watery way.
 

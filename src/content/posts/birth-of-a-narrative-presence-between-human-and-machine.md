@@ -49,6 +49,9 @@ promptMetadata:
     kofi: 'off'
   generatedAt: '2025-11-13T13:53:51.868Z'
 cluster: ai-narrative-magic
+labRitual:
+  intents: [connection, reflection]
+  tools: [tarot]
 ---
 ## Opening Reflection
 

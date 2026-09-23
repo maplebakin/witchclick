@@ -20,6 +20,9 @@ const CalendarSeasonSchema = z
     rituals: z.array(z.string()).default([]),
     anchorPosts: z.array(CalendarAnchorSchema).default([]),
     notes: z.string().optional(),
+    published: z.boolean().default(false),
+    startsAt: z.string().optional(),
+    endsAt: z.string().optional(),
   })
   .catchall(z.unknown());
 
@@ -40,18 +43,56 @@ function calendarFilePath(): string {
   return path.join(process.cwd(), "content", "blocks", "editorial-calendar.json");
 }
 
-export function readEditorialCalendar(): EditorialCalendar {
+export interface ReadEditorialCalendarOptions {
+  includeUnpublished?: boolean;
+  now?: Date | number | string;
+}
+
+function parseBoundary(value: string | undefined): number | null {
+  if (!value) return null;
+  const timestamp = new Date(value).getTime();
+  return Number.isNaN(timestamp) ? Number.NaN : timestamp;
+}
+
+function publicEditorialCalendar(
+  calendar: EditorialCalendar,
+  now: Date | number | string = new Date(),
+): EditorialCalendar {
+  const nowTimestamp = new Date(now).getTime();
+  const safeNow = Number.isNaN(nowTimestamp) ? Date.now() : nowTimestamp;
+
+  return {
+    ...calendar,
+    seasons: calendar.seasons.filter((season) => {
+      if (!season.published) return false;
+      const startsAt = parseBoundary(season.startsAt);
+      const endsAt = parseBoundary(season.endsAt);
+      if (Number.isNaN(startsAt) || Number.isNaN(endsAt)) return false;
+      if (startsAt !== null && safeNow < startsAt) return false;
+      if (endsAt !== null && safeNow > endsAt) return false;
+      return true;
+    }),
+  };
+}
+
+export function readEditorialCalendar(
+  options: ReadEditorialCalendarOptions = {},
+): EditorialCalendar {
   const filePath = calendarFilePath();
   try {
     const stat = fs.existsSync(filePath) ? fs.statSync(filePath) : null;
     if (cachedCalendar && stat && stat.mtimeMs === cachedMtime) {
-      return cachedCalendar;
+      return options.includeUnpublished
+        ? cachedCalendar
+        : publicEditorialCalendar(cachedCalendar, options.now);
     }
 
     if (!stat) {
       cachedCalendar = { seasons: [] };
       cachedMtime = 0;
-      return cachedCalendar;
+      return options.includeUnpublished
+        ? cachedCalendar
+        : publicEditorialCalendar(cachedCalendar, options.now);
     }
 
     const raw = fs.readFileSync(filePath, "utf8");
@@ -59,7 +100,7 @@ export function readEditorialCalendar(): EditorialCalendar {
     const data = EditorialCalendarSchema.parse(parsed);
     cachedCalendar = data;
     cachedMtime = stat.mtimeMs;
-    return data;
+    return options.includeUnpublished ? data : publicEditorialCalendar(data, options.now);
   } catch (error) {
     if (process.env.NODE_ENV !== "production") {
       console.warn("[calendar] Unable to read editorial calendar", error);

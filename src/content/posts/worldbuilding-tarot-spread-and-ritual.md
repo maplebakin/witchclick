@@ -97,6 +97,11 @@ heroImageSrc: /hero-images/worldbuilding-tarot-spread-and-ritual.png
 heroImageAlt: 'Worldbuilding Tarot: A Spread & Ritual for Cohesive Lore — hero image'
 spoonLevel: medium
 cluster: tarot-spreads
+labRitual:
+  intents: [creativity, focus, reflection]
+  tools: [tarot, candle, journal, pen, timer, water, game]
+  durationMinutes: 40
+  materials: [tarot, candle, journal, pen, timer]
 ---
 ## Why tarot works for worldbuilding
 

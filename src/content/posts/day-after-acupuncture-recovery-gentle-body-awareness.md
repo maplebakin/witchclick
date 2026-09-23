@@ -43,6 +43,12 @@ canonicalUrl: 'https://witchclick.space/post/day-after-acupuncture-recovery-gent
 specVersion: 2
 spoonLevel: low
 cluster: cozy-witchcraft
+labRitual:
+  intents: [rest, grounding]
+  tools: [water, blanket, journal, paper, music]
+  durationMinutes: 8
+  materials: [blanket, journal, paper, water]
+  tags: [sound]
 ---
 ## Opening Reflection
 

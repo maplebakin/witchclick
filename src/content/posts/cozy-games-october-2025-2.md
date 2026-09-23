@@ -46,6 +46,10 @@ heroAlt: ""
 specVersion: 2
 spoonLevel: low
 cluster: cozy-witchcraft
+labRitual:
+  intents: [rest, reset]
+  tools: [game, timer, tea, blanket]
+  materials: [blanket, pillow, tea]
 ---
 ## Opening Reflection
 

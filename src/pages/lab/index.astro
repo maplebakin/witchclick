@@ -3,6 +3,7 @@ import Base from "../../layouts/Base.astro";
 import fs from "node:fs";
 import path from "node:path";
 import HeadSlot from "@/components/HeadSlot.astro";
+import { serializeJsonForScript } from "@/utils/serializeJson";
 import EvergreenCta from "@/components/blocks/EvergreenCta.astro";
 import PrintableSamplePreview from "@/components/blocks/PrintableSamplePreview.astro";
 import Testimonials from "@/components/blocks/Testimonials.astro";
@@ -180,7 +181,7 @@ const ritualLabPayloadJson = safeJsonStringify({
   <HeadSlot slot="head">
     <meta name="robots" content="noindex, nofollow" />
     {downloadCollectionSchema && (
-      <script type="application/ld+json" is:inline set:html={JSON.stringify(downloadCollectionSchema)} />
+      <script type="application/ld+json" is:inline set:html={serializeJsonForScript(downloadCollectionSchema)} />
     )}
   </HeadSlot>
   <section class="mx-auto max-w-6xl space-y-6 py-12">
@@ -473,7 +474,7 @@ const ritualLabPayloadJson = safeJsonStringify({
               <h3 class="font-serif text-xl">${entry.title}</h3>
               ${entry.summary ? `<p class="text-sm opacity-80">${entry.summary}</p>` : ""}
             </div>
-            ${entry.durationMinutes ? `<span class="rounded-full bg-surface-soft px-3 py-1 text-[0.8rem] font-semibold text-primary-strong">${entry.durationMinutes} min</span>` : ""}
+            ${entry.durationMinutes ? `<span class="rounded-full bg-surface-soft px-3 py-1 text-[0.8rem] font-semibold text-primary-strong">Route: up to ${entry.durationMinutes} min</span>` : ""}
           </div>
         `;
         container.appendChild(heading);
@@ -540,7 +541,10 @@ const ritualLabPayloadJson = safeJsonStringify({
       };
 
       const buildPlan = (state) => {
-        const scored = entries
+        const eligibleEntries = state.intent
+          ? entries.filter((entry) => entry.intents.includes(state.intent.toLowerCase()))
+          : entries;
+        const scored = eligibleEntries
           .map((entry) => ({ entry, score: scoreEntry(entry, state) }))
           .sort((a, b) => b.score - a.score || a.entry.title.localeCompare(b.entry.title));
         const primary = scored.find((item) => item.score > 0)?.entry;
@@ -574,7 +578,9 @@ const ritualLabPayloadJson = safeJsonStringify({
         } else {
           const empty = document.createElement("p");
           empty.className = "text-sm opacity-70";
-          empty.textContent = "No exact matches yet. Try toggling different tools or a longer time window.";
+          empty.textContent = state.intent
+            ? "No rituals match that intention yet. Try choosing a different intention."
+            : "No exact matches yet. Try toggling different tools or a longer time window.";
           output.appendChild(empty);
         }
 

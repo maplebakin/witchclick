@@ -8,6 +8,7 @@ import { postsToCardData } from "@/utils/postTransforms";
 import { createCollectionPageSchema } from "@/utils/structuredData";
 import { readSettings } from "@/utils/settings";
 import HeadSlot from "@/components/HeadSlot.astro";
+import { serializeJsonForScript } from "@/utils/serializeJson";
 
 export const prerender = true;
 
@@ -47,7 +48,7 @@ const jsonLd = createCollectionPageSchema(
   description={author.bio ?? `${author.name}'s stories on WitchClick`}
 >
   <HeadSlot slot="head">
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+    <script type="application/ld+json" is:inline set:html={serializeJsonForScript(jsonLd)} />
   </HeadSlot>
 
   <section class="author-page-hero">

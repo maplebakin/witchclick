@@ -64,6 +64,11 @@ heroAlt: ''
 specVersion: 2
 spoonLevel: high
 cluster: rituals-practices
+labRitual:
+  intents: [release, boundaries, grounding]
+  tools: [water, stone, candle, journal, pen]
+  durationMinutes: 7
+  materials: [water, stone, candle]
 ---
 ## Opening Reflection
 

@@ -1,47 +1,23 @@
 --- 
 import RitualSampler from '../../components/RitualSampler.astro';
 import { loadAllPosts } from '../../utils/posts';
+import { extractReflectionPrompts } from '../../utils/reflectionPrompts';
 
 export async function getStaticPaths() {
-    // Utility to extract reflection prompts from markdown if not explicitly in data
-    // This is a fallback/transitional approach if posts haven't been updated with the new field yet
-    function extractReflectionPrompts(markdownContent: string): string[] {
-        const prompts: string[] = [];
-        const reflectionHeadingPattern = /^(##+|###+)\s*Reflection Prompts\s*\n([\s\S]*?)(?=^##+|^###+|$)/gim;
-        let match;
-
-        while ((match = reflectionHeadingPattern.exec(markdownContent)) !== null) {
-            const promptsBlock = match[2] || '';
-            const promptLinePattern = /^\s*[-*]\s*(.+)$/gim; // Matches bullet points
-            let lineMatch;
-            while ((lineMatch = promptLinePattern.exec(promptsBlock)) !== null) {
-                if (lineMatch[1]) {
-                    prompts.push(lineMatch[1].trim());
-                }
-            }
-        }
-        return prompts;
-    }
-
     const posts = loadAllPosts();
-    return posts.map((post) => {
-        // Prioritize explicit reflectionPrompts field
+    return posts.flatMap((post) => {
         const postData = post.data ?? {};
-        let reflectionPrompts = Array.isArray(postData.reflectionPrompts) ? postData.reflectionPrompts : [];
+        const reflectionPrompts = extractReflectionPrompts(postData, post.content || '');
+        if (reflectionPrompts.length === 0) return [];
 
-        // Fallback: Try to extract from markdown if the field is empty or absent
-        if (reflectionPrompts.length === 0 && post.content) {
-            reflectionPrompts = extractReflectionPrompts(post.content);
-        }
-
-        return {
+        return [{
             params: { slug: post.slug },
             props: {
                 title: postData.title || post.title,
                 description: postData.description || postData.excerpt || '',
                 reflectionPrompts: reflectionPrompts,
             },
-        };
+        }];
     });
 }
 

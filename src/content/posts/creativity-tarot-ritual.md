@@ -65,6 +65,11 @@ heroImageSrc: /hero-images/creativity-tarot-ritual.png
 heroImageAlt: Tarot Ritual for When Creativity Feels Pointless — hero image
 spoonLevel: medium
 cluster: tarot-spreads
+labRitual:
+  intents: [creativity, focus, reflection]
+  tools: [timer, stone, pen, candle, tarot, journal]
+  durationMinutes: 5
+  materials: [stone, pen, candle, tarot, journal]
 ---
 ## Opening Reflection
 

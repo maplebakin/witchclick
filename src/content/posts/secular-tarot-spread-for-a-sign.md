@@ -64,6 +64,11 @@ heroImageSrc: /hero-images/secular-tarot-spread-for-a-sign.png
 heroImageAlt: Secular Tarot Spread When You're Seeking a Clear Sign — hero image
 spoonLevel: low
 cluster: tarot-spreads
+labRitual:
+  intents: [clarity, reflection]
+  tools: [tarot, journal, tea, timer, phone]
+  durationMinutes: 5
+  materials: [tarot, journal, tea, phone]
 ---
 ## Opening Reflection
 

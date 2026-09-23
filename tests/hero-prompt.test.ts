@@ -10,7 +10,7 @@ describe('buildFallbackHeroPrompt', () => {
       tags: ['ritual', 'tea', 'focus'],
     });
 
-    expect(prompt).toContain('Hero image for the post titled "Tea Ritual for Focus".');
+    expect(prompt).toContain('post titled "Tea Ritual for Focus".');
     expect(prompt).toContain('Ceremonial and intentional atmosphere.');
     expect(prompt).toContain('Favor suggestive symbolic imagery over a literal scene.');
   });
@@ -21,7 +21,7 @@ describe('buildFallbackHeroPrompt', () => {
       tags: ['tea'],
     });
 
-    expect(prompt).toContain('Hero image for the post titled "tea-ritual-for-focus".');
+    expect(prompt).toContain('post titled "tea-ritual-for-focus".');
   });
 
   it('varies the open-ended visual direction across regenerations', () => {

@@ -11,7 +11,7 @@ const impactLabel = product.impactTag?.trim();
 const ethicalNote = product.ethicalNote?.trim();
 const ctaLabel = product.ctaLabel?.trim() || "Visit partner";
 ---
-<a class:list={["card-panel", "card-tier-2", "card-panel-strong", className]} href={product.url} target="_blank" rel="nofollow noopener">
+<a class:list={["card-panel", "card-tier-2", "card-panel-strong", className]} href={product.url} target="_blank" rel="sponsored nofollow noopener noreferrer">
   <span aria-hidden class="card-radial card-radial-top" />
   <div class="card-body">
     {impactLabel && <span class="card-badge partner-impact-badge">{impactLabel}</span>}

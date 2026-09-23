@@ -35,6 +35,11 @@ canonicalUrl: 'https://witchclick.space/post/when-to-let-yourself-rest'
 specVersion: 2
 spoonLevel: low
 cluster: rituals-practices
+labRitual:
+  intents: [rest, grounding, clarity]
+  tools: [timer, journal, tarot, tea, water, playlist, phone]
+  durationMinutes: 5
+  materials: [journal, tarot, tea, water, timer]
 ---
 ## Opening Reflection
 

@@ -46,6 +46,11 @@ promptMetadata:
     kofi: 'off'
   generatedAt: '2025-11-06T16:32:26.802Z'
 cluster: tarot-spreads
+labRitual:
+  intents: [connection, reflection, creativity]
+  tools: [tarot, yarn, candle, journal]
+  durationMinutes: 15
+  materials: [yarn, candle, family photo]
 ---
 ## Opening Reflection
 

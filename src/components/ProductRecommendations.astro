@@ -1,4 +1,6 @@
 ---
+import { buildAffiliateTarget } from "@/utils/products";
+
 interface ProductInput {
   key?: string;
   name?: string;
@@ -21,7 +23,7 @@ const { products = [], title = "Affiliate recommendations", class: className = "
 const filtered = Array.isArray(products)
   ? products
       .map((product) => ({ ...product }))
-      .filter((product) => typeof product?.url === "string" && product.url.trim().length > 0)
+      .filter((product) => Boolean(buildAffiliateTarget(product)))
   : [];
 
 const display = filtered.slice(0, 3);
@@ -29,15 +31,10 @@ const display = filtered.slice(0, 3);
 const containerClass = ["product-recs", "soft-card", className].filter(Boolean).join(" ");
 
 function buildHref(product: ProductInput): string {
-  if (product?.key) {
+  if (product?.key && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(product.key)) {
     return `/go/${product.key}`;
   }
-  const base = typeof product?.url === "string" ? product.url : "";
-  if (!base) return "#";
-  if (product?.utm && !base.includes("?")) {
-    return `${base}?${product.utm}`;
-  }
-  return base;
+  return buildAffiliateTarget(product);
 }
 
 function resolveImageSources(product: ProductInput) {
@@ -79,7 +76,9 @@ function escapeSvgText(value: string): string {
     <ul class="product-recs-list">
       {display.map((product) => {
         const href = buildHref(product);
-        const rel = product?.rel ?? "sponsored nofollow";
+        const rel = Array.from(
+          new Set(`${product?.rel ?? ""} sponsored nofollow noopener noreferrer`.trim().split(/\s+/)),
+        ).join(" ");
         const imageSources = resolveImageSources(product);
         return (
           <li class="product-card">
@@ -109,7 +108,7 @@ function escapeSvgText(value: string): string {
                 class="product-card-button"
                 data-affiliate="true"
               >
-                Buy Now
+                Browse options
               </a>
             </div>
           </li>

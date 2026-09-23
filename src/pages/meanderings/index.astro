@@ -9,7 +9,7 @@ import { readSettings, getFormEndpoint } from "@/utils/settings";
 
 const allPosts = loadAllPosts();
 
-// Filter for meandering posts only
+// Filter for field-note posts only
 const meanderingPosts = filterPostsByCategory(allPosts, POST_CATEGORY_MEANDERING);
 
 // Transform to card data
@@ -20,12 +20,12 @@ const recentPosts = cardPosts.slice(1);
 const hasFormEndpoint = Boolean(getFormEndpoint(readSettings()));
 ---
 
-<Base title="Essays & Meanderings — WitchClick">
+<Base title="Field Notes — WitchClick">
   <header class="page-header">
-    <p class="page-header__eyebrow">Essays from the threshold</p>
-    <h1 class="page-header__title">Essays & Meanderings</h1>
+    <p class="page-header__eyebrow">Field notes from the threshold</p>
+    <h1 class="page-header__title">Field Notes</h1>
     <p class="page-header__lead">
-      The thinking shelf of WitchClick: essays on value, attention, grief, creativity, refusal, and living beyond the metric.
+      Essays, reflections, and symbolic notes on value, attention, grief, creativity, refusal, and living beyond the metric.
       Less ritual recipe, more field note from the edge of a life being revalued.
     </p>
   </header>
@@ -34,7 +34,7 @@ const hasFormEndpoint = Boolean(getFormEndpoint(readSettings()));
     <article class="featured-post">
       <a href={`/post/${featuredPost.slug}`} class="featured-post__link">
         <div class="featured-post__content">
-          <span class="featured-post__label">Latest Meandering</span>
+          <span class="featured-post__label">Latest Field Note</span>
           <h2 class="featured-post__title">{featuredPost.title}</h2>
           <p class="featured-post__excerpt">{featuredPost.tldr || featuredPost.excerpt}</p>
           <div class="featured-post__meta">
@@ -60,7 +60,7 @@ const hasFormEndpoint = Boolean(getFormEndpoint(readSettings()));
   {recentPosts.length > 0 && (
     <section class="posts-section" aria-labelledby="recent-posts-heading">
       <div class="posts-section__header">
-        <h2 id="recent-posts-heading" class="posts-section__title">All Meanderings</h2>
+        <h2 id="recent-posts-heading" class="posts-section__title">All Field Notes</h2>
       </div>
       <div class="posts-grid">
         {recentPosts.map((post) => (
@@ -133,8 +133,8 @@ const hasFormEndpoint = Boolean(getFormEndpoint(readSettings()));
       </p>
       <div class="sidebar-cta__links">
         <a href="/" class="sidebar-cta__link">Browse Rituals</a>
-        <a href="/tools" class="sidebar-cta__link">Ritual Tools</a>
-        <a href="/entities" class="sidebar-cta__link">Browse Topics</a>
+        <a href="/tools" class="sidebar-cta__link">Practice Tools</a>
+        <a href="/tags" class="sidebar-cta__link">Browse Topics</a>
       </div>
     </div>
   </aside>
@@ -268,7 +268,7 @@ const hasFormEndpoint = Boolean(getFormEndpoint(readSettings()));
     grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
   }
 
-  /* Meanderings Signup */
+  /* Field Notes Signup */
   .meanderings-signup {
     margin: var(--page-section-gap) 0;
   }

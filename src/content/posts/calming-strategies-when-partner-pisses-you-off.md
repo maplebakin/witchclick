@@ -72,6 +72,10 @@ heroImageSrc: /hero-images/calming-strategies-when-partner-pisses-you-off.png
 heroImageAlt: 'When Your Partner Pisses You Off: Calm-First Rituals That Keep Love in the Room — hero image'
 spoonLevel: high
 cluster: rituals-practices
+labRitual:
+  intents: [grounding, release, boundaries]
+  tools: [timer, water, tea, stone, paper]
+  durationMinutes: 1.5
 ---
 ## Body Before Story: Why You’re Heated
 

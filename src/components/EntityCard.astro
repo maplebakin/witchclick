@@ -61,10 +61,9 @@ const accentBadgeBg = `color-mix(in srgb, ${accentTone} 14%, transparent)`;
 const accentBadgeBorder = `color-mix(in srgb, ${accentTone} 26%, transparent)`;
 const accentBadgeText = "var(--theme-text-accent, var(--text-accent))";
 const accentPlaceholder = "var(--theme-text-muted, var(--text-muted))";
-const accentStar = accentTone;
 
 const cardGradientClass = theme?.cardStyleClass ?? "from-gradient-default-start/20 to-gradient-default-end/40";
-const stubLine = theme?.stubLine ?? "Lore pending — the scribes are still etching this entry.";
+const stubLine = theme?.stubLine ?? "Entry in progress — this reference is still being drafted.";
 
 const themeVarString = toCssVariables({
   "entity-border": accentBorder,
@@ -80,7 +79,6 @@ const themeVarString = toCssVariables({
   "entity-badge-border": accentBadgeBorder,
   "entity-badge-text": accentBadgeText,
   "entity-placeholder": accentPlaceholder,
-  "entity-star": accentStar,
 });
 
 const displaySummary = variant === "grimoire" ? (stubFromSummary ? "" : summaryText) : summaryText;
@@ -101,19 +99,13 @@ const typeLabel =
     href={`/entities/${type}/${slug}`}
     class:list={[
       "focus-ring",
-      "entity-card relative block h-full overflow-hidden rounded-3xl border bg-gradient-to-br via-surface-base/80 p-6 shadow-[0_20px_45px_-25px_hsl(var(--neutral-8) / 0.35)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_25px_60px_-30px_hsl(var(--neutral-8) / 0.45)]",
+      "entity-card relative block h-full overflow-hidden rounded-xl border bg-gradient-to-br via-surface-base/80 p-6 shadow-[0_12px_30px_-24px_hsl(var(--neutral-8)_/_0.28)] transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_38px_-26px_hsl(var(--neutral-8)_/_0.34)]",
       cardGradientClass,
       showStubBadge && "opacity-60",
     ]}
     style={themeVarString ? `${themeVarString};` : undefined}
   >
     <span aria-hidden class="entity-card-overlay pointer-events-none absolute inset-0" />
-    <span aria-hidden class="entity-card-orb pointer-events-none absolute -top-8 right-8 h-28 w-28 rounded-full border" />
-    <span
-      aria-hidden
-      class="entity-card-glow pointer-events-none absolute bottom-0 left-0 h-24 w-24 -translate-x-10 translate-y-12 rotate-12"
-    />
-    <span aria-hidden class="entity-card-star pointer-events-none absolute top-5 right-6 text-4xl">✶</span>
 
     <div class="entity-card-inner relative z-10 flex h-full flex-col gap-4">
       <div class="flex items-start justify-start gap-3 flex-wrap">
@@ -126,7 +118,7 @@ const typeLabel =
 </div>
 
       <div class="entity-card-copy flex flex-1 flex-col space-y-3">
-        <h3 class="entity-card-title text-2xl font-serif tracking-wide drop-shadow-[0_1px_0_hsl(var(--neutral-0) / 0.6)]">
+        <h3 class="entity-card-title text-2xl font-serif tracking-wide">
           {name}
         </h3>
         {summaryContent && (
@@ -167,21 +159,8 @@ const typeLabel =
   }
 
   .entity-card-overlay {
-    background: radial-gradient(circle at top, var(--entity-overlay, color-mix(in srgb, var(--theme-color-gold) 16%, transparent)), transparent 65%);
-  }
-
-  .entity-card-orb {
-    border-color: var(--entity-border, color-mix(in srgb, var(--theme-color-gold) 24%, transparent));
-    background: radial-gradient(circle at top, var(--entity-overlay, color-mix(in srgb, var(--theme-color-gold) 16%, transparent)), transparent 70%);
-    filter: blur(2px);
-  }
-
-  .entity-card-glow {
-    background: linear-gradient(135deg, var(--entity-overlay, color-mix(in srgb, var(--theme-color-gold) 14%, transparent)) 0%, transparent 80%);
-  }
-
-  .entity-card-star {
-    color: var(--entity-star, var(--theme-color-gold, var(--theme-text-accent, var(--text-accent))));
+    background: linear-gradient(180deg, var(--entity-overlay, color-mix(in srgb, var(--theme-color-gold) 8%, transparent)), transparent 58%);
+    opacity: 0.45;
   }
 
     .entity-card-label {

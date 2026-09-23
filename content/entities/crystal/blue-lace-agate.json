@@ -20,8 +20,6 @@
     "lowSpoonsUse": "Hold for a few breaths before answering messages or starting a task."
   },
   "related": [
-    "herb:chamomile",
-    "ritual:gentle-heart-check-in",
-    "moonPhase:waxing-moon"
+    "herb:chamomile"
   ]
 }

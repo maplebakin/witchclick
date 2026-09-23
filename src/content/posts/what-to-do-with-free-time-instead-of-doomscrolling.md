@@ -24,7 +24,7 @@ specVersion: 2
 category: "ritual"
 contentType: "reflection"
 cluster: "magical-productivity"
-externalLink: {"url":"https://en.wikipedia.org/wiki/Attention","anchor":"attention","description":"A](https://en.wikipedia.org/wiki/Attention%22,%22anchor%22:%22attention%22,%22description%22:%22A) simple overview of attention as a limited cognitive resource, useful for understanding why scrolling can feel gripping and draining."}
+externalLink: {"url":"https://en.wikipedia.org/wiki/Attention","anchor":"attention","description":"A simple overview of attention as a limited cognitive resource, useful for understanding why scrolling can feel gripping and draining."}
 promptMetadata: {"topic":"What to Do With Free Time Instead of Doomscrolling","requestedWords":1200,"deliveredWords":1357,"toggles":{"ads":"off","kofi":"off"},"generatedAt":"2026-04-06T17:57:15.066Z"}
 ---
 
@@ -42,13 +42,13 @@ It can also create the illusion of control. If you keep reading, maybe you will 
 
 That does not mean the habit is stupid. It usually makes a strange kind of sense. Sometimes doomscrolling is a form of avoidance. Sometimes it is a search for stimulation when your brain feels underlit. Sometimes it is how you hover near your own worry without fully naming it. Posts like brain fog, letting things slide, and rest and survival all touch the same seam: when your inner resources are low, the easiest doorway often wins.
 
-There is also the emotional hook. Doomscrolling lets you feel connected and detached at once. You are witnessing, reacting, gathering, but not fully entering your own life. That in-between state can become oddly sticky. The scroll hums. Time blurs. Your evening drifts away.
+There is also the emotional hook. Doomscrolling lets you feel connected and detached at once. You are witnessing, reacting, gathering, but not fully entering your own life. That in-between state can become oddly sticky. The scroll hums. Time blurs. Your evening drifts away. If the feed has made your own surroundings feel far away, [Re-Engaging With Reality After Too Much Inner Drift](/post/re-engaging-with-reality-after-too-much-inner-drift) offers a sensory route back.
 
 A gentle shift starts when you stop treating the habit like proof of failure and start treating it like data. What does the scroll give you right before it takes too much? Numbing? Company? Frictionless stimulation? A way to postpone the ache of deciding what you actually want?
 
 ## What Your Free Time Might Actually Be Asking For
 
-A lot of free time is not truly empty. It carries residue. Maybe you are overstimulated. Maybe you are lonely. Maybe your body is tired but your mind is still pacing in circles like a cat at 3 a.m. If you only ask, 'What should I do instead of doomscrolling?' you may miss the deeper question underneath: 'What kind of care would actually meet me here?'
+A lot of free time is not truly empty. It carries residue. Maybe you are overstimulated. Maybe you are lonely. Maybe your body is tired but your mind is still pacing in circles like a cat at 3 a.m. If you only ask, 'What should I do instead of doomscrolling?' you may miss the deeper question underneath: 'What kind of care would actually meet me here?' If the residue feels more like being stuck between chapters, [When Life Feels on Pause](/post/when-life-feels-on-pause) meets that state without turning it into another demand.
 
 Sometimes the answer is not productivity at all. Sometimes your free time is asking for quiet permission. Sometimes it wants gentle attention. Sometimes it wants a tiny ritual of re-entry, like putting your phone in another room and making tea without also trying to optimize your future.
 

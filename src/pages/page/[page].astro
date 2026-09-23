@@ -7,6 +7,7 @@ import { postToCardData } from "../../utils/postTransforms";
 import { readSettings } from "../../utils/settings";
 import { createCollectionPageSchema } from "../../utils/structuredData";
 import HeadSlot from "@/components/HeadSlot.astro";
+import { serializeJsonForScript } from "@/utils/serializeJson";
 
 export const prerender = true;
 
@@ -36,7 +37,7 @@ const { page, totalPages, pagePosts } = Astro.props as {
 };
 
 const settings = readSettings();
-const pageUrl = page > 1 ? `/page/${page}` : "/";
+const pageUrl = `/page/${page}`;
 
 // Transform posts to card data
 const cardPosts = pagePosts.map(postToCardData);
@@ -56,9 +57,9 @@ const pageItemList = createCollectionPageSchema(
   })),
 );
 ---
-<Base title={`WitchClick — Page ${page}`}>
+<Base title={`WitchClick Archive — Page ${page}`} description={`Browse published WitchClick rituals and practical workings, page ${page}.`} canon={pageUrl}>
   <HeadSlot slot="head">
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(pageItemList)} />
+    <script type="application/ld+json" is:inline set:html={serializeJsonForScript(pageItemList)} />
   </HeadSlot>
 
   <section class="archive-section wc-section-shell">

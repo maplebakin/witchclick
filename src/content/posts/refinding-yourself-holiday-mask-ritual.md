@@ -23,6 +23,11 @@ specVersion: 2
 category: "ritual"
 contentType: "ritual"
 promptMetadata: {"topic":"Refinding Yourself Under the Holiday Mask Ritual","requestedWords":1200,"deliveredWords":1024,"toggles":{"ads":"off","kofi":"off"},"generatedAt":"2025-12-31T17:14:18.437Z"}
+labRitual:
+  intents: [reflection, boundaries, reset]
+  tools: [candle, blanket, tea, journal, paper, stone, timer, water]
+  durationMinutes: 5
+  materials: [blanket, candle, journal, paper, stone, timer, tea, water]
 ---
 
 ## Opening Reflection

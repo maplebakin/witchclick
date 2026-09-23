@@ -84,8 +84,6 @@ const typeLabel = ent.type
   .map((part) => (part ? part.charAt(0).toUpperCase() + part.slice(1) : ""))
   .join(" ");
 
-const typeLabelLower = typeLabel.toLowerCase();
-
 function startCase(value: string): string {
   return value
     .split(/[-_\s]+/)
@@ -104,18 +102,18 @@ const entityDisplayName = startCase(
 
 const breadcrumbs = [
   { label: "Home", href: "/" },
-  { label: "Entities", href: "/entities" },
+  { label: "Grimoire", href: "/entities" },
   { label: typeLabel, href: `/entities/${ent.type}` },
   { label: entityDisplayName },
 ];
 
 const outboundHeading = ent.type === "ritual"
-  ? "Tools woven into this ritual"
-  : "Allies woven into this lore";
+  ? "References used in this practice"
+  : "Related references";
 
 const inboundHeading = ent.type === "ritual"
-  ? "Companion rituals & lore"
-  : "Rituals that call on this ally";
+  ? "Related practices and references"
+  : "Practices that reference this entry";
 
 type PropertyDisplay =
   | { kind: "text"; text: string }
@@ -234,7 +232,7 @@ const hasDisplayRelations = outboundDisplayRelations.length > 0 || showInboundRe
 const relatedPostsHeading = ent.type === "ritual" ? "Related Posts" : inboundHeading;
 const relatedPostsSubheading = ent.type === "ritual"
   ? "Guides and essays already tied to this ritual."
-  : "Rituals and guides that already reference this ally.";
+  : "Rituals and guides that already reference this entry.";
 ---
 <Base title={`${ent.name} — ${typeLabel} — WitchClick`} wide ambientColor={accentHex} noindex={isStub} containerClass="entity-page-shell">
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
@@ -247,7 +245,7 @@ const relatedPostsSubheading = ent.type === "ritual"
     </a>
     {isStub && (
       <div class="rounded-lg border border-dashed border-line-neutral bg-surface-soft px-4 py-3 text-sm text-body-muted mb-6">
-        This entry is a placeholder. Full lore is being inscribed - check back soon.
+        This entry is a placeholder. This reference is still being drafted - check back soon.
       </div>
     )}
     <header class="entity-hero">
@@ -266,7 +264,7 @@ const relatedPostsSubheading = ent.type === "ritual"
 
     {isStub ? (
       <section class="card-panel card-tier-2 card-panel-soft entity-stub-card" aria-live="polite">
-        <h2 class="entity-stub-heading">Lore in Progress</h2>
+        <h2 class="entity-stub-heading">Entry in Progress</h2>
         <p class="entity-stub-copy">{metadata.stubLine}</p>
         <div
           class="entity-stub-subscribe"
@@ -276,7 +274,7 @@ const relatedPostsSubheading = ent.type === "ritual"
           data-entity-slug={ent.slug}
           data-entity-name={entityDisplayName}
         >
-          <p class="entity-stub-subscribe-title">Want a gentle heads-up when this lore is ready?</p>
+          <p class="entity-stub-subscribe-title">Want a heads-up when this entry is ready?</p>
           <form class="entity-stub-subscribe-form">
             <label class="entity-stub-subscribe-label">
               Email address
@@ -403,7 +401,7 @@ const relatedPostsSubheading = ent.type === "ritual"
 
             {showInboundRelationSection && (
               <section class="entity-relations-section entity-detail-subsection">
-                <h2 class="entity-section-title">{ent.type === "ritual" ? inboundHeading : "Related Lore"}</h2>
+                <h2 class="entity-section-title">{ent.type === "ritual" ? inboundHeading : "Related References"}</h2>
                 <ul class="entity-relations-list">
                   {inboundDisplayRelations.map((relation) => (
                     <li>
@@ -431,9 +429,9 @@ const relatedPostsSubheading = ent.type === "ritual"
       <section class="entity-graph-section" aria-labelledby="relationship-graph-heading">
         <div class="entity-graph-header">
           <div class="entity-graph-heading-group">
-            <h2 id="relationship-graph-heading" class="entity-graph-title">Connection Web</h2>
+            <h2 id="relationship-graph-heading" class="entity-graph-title">Reference Connections</h2>
             <p class="entity-graph-description">
-              Visual map of how this {typeLabel.toLowerCase()} connects to other allies and rituals in our collection.
+              Visual map of how this {typeLabel.toLowerCase()} connects to related entries and practices in the collection.
               <button
                 type="button"
                 class="entity-graph-help"
@@ -453,11 +451,11 @@ const relatedPostsSubheading = ent.type === "ritual"
             <ul class="entity-graph-legend-list">
               <li>
                 <span class="entity-graph-legend-dot entity-graph-legend-dot--outbound"></span>
-                <strong>Outbound:</strong> This {typeLabel.toLowerCase()} references these allies
+                <strong>Outbound:</strong> This {typeLabel.toLowerCase()} references these entries
               </li>
               <li>
                 <span class="entity-graph-legend-dot entity-graph-legend-dot--inbound"></span>
-                <strong>Inbound:</strong> These allies or rituals reference this {typeLabel.toLowerCase()}
+                <strong>Inbound:</strong> These entries or practices reference this {typeLabel.toLowerCase()}
               </li>
               <li>
                 <span class="entity-graph-legend-dot entity-graph-legend-dot--center"></span>
@@ -496,11 +494,11 @@ const relatedPostsSubheading = ent.type === "ritual"
       ) : (
         <div class="entity-related-placeholder">
           <p>
-            No posts have woven {entityDisplayName} into our rituals yet. Visit the
+            No posts reference {entityDisplayName} in our rituals yet. Visit the
             {" "}
-            <a href="/hub">Lore Hub</a>
+            <a href="/hub">Rituals & Spreads</a>
             {" "}
-            to share a story or request a {typeLabelLower} update.
+            to explore related practices.
           </p>
         </div>
       )}
@@ -571,11 +569,11 @@ const relatedPostsSubheading = ent.type === "ritual"
 
   .entity-hero {
     position: relative;
-    border-radius: 2rem;
+    border-radius: 1.15rem;
     padding: clamp(2rem, 6vw, 4rem);
     overflow: hidden;
     background: linear-gradient(135deg, var(--entity-accent-surface, color-mix(in srgb, var(--theme-color-iris, #4b2a63) 10%, transparent 90%)), var(--theme-surface-base));
-    box-shadow: 0 28px 60px -35px var(--entity-accent-shadow, color-mix(in srgb, var(--theme-color-iris, #4b2a63) 20%, transparent 80%));
+    box-shadow: 0 18px 42px -32px var(--entity-accent-shadow, color-mix(in srgb, var(--theme-color-iris, #4b2a63) 16%, transparent 84%));
   }
 
   .entity-hero::before {
@@ -585,13 +583,13 @@ const relatedPostsSubheading = ent.type === "ritual"
     height: 60%;
     border-radius: 50%;
     background: radial-gradient(circle at top, var(--entity-accent, color-mix(in srgb, var(--theme-color-amethyst) 45%, transparent)), transparent 70%);
-    opacity: 0.25;
+    opacity: 0.12;
   }
 
   .entity-hero-sheen {
     position: absolute;
     inset: 0;
-    background: linear-gradient(160deg, color-mix(in srgb, var(--theme-text-primary) 30%, transparent), transparent 60%);
+    background: linear-gradient(160deg, color-mix(in srgb, var(--theme-text-primary) 10%, transparent), transparent 60%);
     mix-blend-mode: screen;
     pointer-events: none;
   }
@@ -670,7 +668,7 @@ const relatedPostsSubheading = ent.type === "ritual"
     display: grid;
     gap: 0.75rem;
     padding: 1rem 1.15rem;
-    border-radius: 1rem;
+    border-radius: 0.85rem;
     border: 1px solid color-mix(in srgb, var(--entity-accent-border, color-mix(in srgb, var(--theme-color-amethyst) 24%, transparent)) 60%, transparent 40%);
     background: color-mix(in srgb, var(--theme-surface-panel, var(--surface-panel)) 72%, transparent 28%);
   }
@@ -706,7 +704,7 @@ const relatedPostsSubheading = ent.type === "ritual"
   .entity-property-chip {
     display: inline-flex;
     align-items: center;
-    border-radius: 999px;
+    border-radius: var(--radius-2, 0.75rem);
     border: 1px solid color-mix(in srgb, var(--entity-accent-border, color-mix(in srgb, var(--theme-color-amethyst) 26%, transparent)) 70%, transparent 30%);
     background: color-mix(in srgb, var(--theme-surface-base, var(--surface-base)) 78%, transparent 22%);
     color: var(--theme-text-body, var(--text-body));
@@ -766,7 +764,7 @@ const relatedPostsSubheading = ent.type === "ritual"
     border-style: dashed;
     border-color: color-mix(in srgb, var(--entity-accent-border, color-mix(in srgb, var(--theme-color-amethyst) 28%, transparent)) 85%, var(--card-panel-border, currentColor) 15%);
     background:
-      radial-gradient(circle at top, color-mix(in srgb, var(--entity-accent-highlight, color-mix(in srgb, var(--theme-color-amethyst) 12%, transparent)) 65%, transparent) 0%, transparent 65%),
+      radial-gradient(circle at top, color-mix(in srgb, var(--entity-accent-highlight, color-mix(in srgb, var(--theme-color-amethyst) 8%, transparent)) 40%, transparent) 0%, transparent 65%),
       var(--card-panel-surface);
     text-align: center;
     display: grid;
@@ -788,7 +786,7 @@ const relatedPostsSubheading = ent.type === "ritual"
     display: grid;
     gap: 0.75rem;
     padding: 1rem;
-    border-radius: var(--wc-radius-lg, 1.25rem);
+    border-radius: var(--radius-2, 0.75rem);
     border: 1px solid color-mix(in srgb, var(--entity-accent-border, rgba(76, 29, 149, 0.2)) 65%, transparent 35%);
     background: color-mix(in srgb, var(--card-panel-surface, #fffaf4) 82%, var(--entity-accent-surface, rgba(76, 29, 149, 0.08)) 18%);
   }
@@ -817,7 +815,7 @@ const relatedPostsSubheading = ent.type === "ritual"
 
   .entity-stub-subscribe-input {
     width: 100%;
-    border-radius: var(--wc-radius-md, 0.9rem);
+    border-radius: var(--radius-2, 0.75rem);
     border: 1px solid color-mix(in srgb, var(--entity-accent-border, rgba(76, 29, 149, 0.25)) 70%, transparent 30%);
     background: var(--cozy-input-bg, #fffaf5);
     padding: 0.65rem 0.85rem;
@@ -886,9 +884,9 @@ const relatedPostsSubheading = ent.type === "ritual"
 
   .entity-related-placeholder {
     padding: 1.75rem;
-    border-radius: var(--card-radius, 1.5rem);
+    border-radius: var(--card-radius, 1rem);
     background:
-      radial-gradient(circle at top right, color-mix(in srgb, var(--entity-accent-highlight, color-mix(in srgb, var(--theme-color-amethyst) 15%, transparent)) 35%, transparent) 0%, transparent 70%),
+      radial-gradient(circle at top right, color-mix(in srgb, var(--entity-accent-highlight, color-mix(in srgb, var(--theme-color-amethyst) 8%, transparent)) 24%, transparent) 0%, transparent 70%),
       var(--card-panel-surface);
     border: 1px dashed color-mix(in srgb, var(--entity-accent-border, color-mix(in srgb, var(--theme-color-amethyst) 25%, transparent)) 85%, transparent 15%);
     text-align: center;
@@ -946,7 +944,7 @@ const relatedPostsSubheading = ent.type === "ritual"
   .entity-graph-help:hover {
     border-color: var(--entity-accent, color-mix(in srgb, var(--theme-color-gold, #d4af37) 45%, var(--theme-color-iris, #4b2a63) 55%));
     background: color-mix(in srgb, var(--entity-accent-surface, color-mix(in srgb, var(--theme-color-iris, #4b2a63) 10%, transparent 90%)) 100%, transparent 0%);
-    transform: scale(1.1);
+    transform: scale(1.04);
   }
 
   .entity-graph-help:focus-visible {
@@ -1023,7 +1021,7 @@ const relatedPostsSubheading = ent.type === "ritual"
     .entity-hero,
     .entity-stub-card,
     .entity-related {
-      border-radius: 1.5rem;
+      border-radius: 1rem;
     }
 
     .entity-hero-title {
@@ -1119,7 +1117,7 @@ const relatedPostsSubheading = ent.type === "ritual"
 
     if (!devApi || !type || !slug) {
       if (submit instanceof HTMLButtonElement) submit.disabled = true;
-      setStatus('Notifications open soon. Check back when the cozy mail room is ready.', 'warning');
+      setStatus('Notifications open soon. Check back when reference updates are ready.', 'warning');
       return;
     }
 
@@ -1146,7 +1144,7 @@ const relatedPostsSubheading = ent.type === "ritual"
         }
 
         if (data.status === 'complete') {
-          setStatus('This lore is already complete. Refresh to see the latest.', 'warning');
+          setStatus('This entry is already complete. Refresh to see the latest.', 'warning');
         } else if (data.status === 'existing') {
           setStatus(`You are already on the list for ${name}.`, 'success');
         } else {

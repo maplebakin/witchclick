@@ -64,6 +64,11 @@ heroImageSrc: /hero-images/secular-tarot-in-psychological-practice.png
 heroImageAlt: 'Secular Tarot in Psychological Practice: A Gentle Guide — hero image'
 spoonLevel: low
 cluster: tarot-spreads
+labRitual:
+  intents: [clarity, reflection]
+  tools: [tarot, journal, pen, water, timer]
+  durationMinutes: 5
+  materials: [tarot, journal, pen, water]
 ---
 ## Opening Reflection
 

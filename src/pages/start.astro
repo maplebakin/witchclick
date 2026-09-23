@@ -2,6 +2,7 @@
 import Base from "@/layouts/Base.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import HeadSlot from "@/components/HeadSlot.astro";
+import { serializeJsonForScript } from "@/utils/serializeJson";
 import Button from "@/components/ui/Button.astro";
 import { readSettings } from "@/utils/settings";
 import { canonicalTagHref } from "@/utils/tags";
@@ -41,7 +42,7 @@ const jsonLd = {
 
 <Base {title} description={description}>
   <HeadSlot slot="head">
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+    <script type="application/ld+json" is:inline set:html={serializeJsonForScript(jsonLd)} />
   </HeadSlot>
 
   <div class="wc-section-shell">
@@ -78,7 +79,7 @@ const jsonLd = {
 
       <section id="start-three-ways" class="start-flow-section mb-12 bg-surface-soft dark:bg-surface-inverse-muted p-6 rounded-lg" data-section-label="Three Ways to Begin">
         <h2 class="mt-0">Three Ways to Begin</h2>
-        <p>Pick the entry point that matches what you need to reframe right now:</p>
+        <p>Pick the practice path that matches what you need to reframe right now:</p>
 
         <div class="grid md:grid-cols-3 gap-6 not-prose my-8">
           <a href="/hub/calm" class="block p-6 bg-surface-card dark:bg-surface-inverse-soft rounded-lg shadow-sm hover:shadow-md transition-shadow border-l-4 border-line-accent">
@@ -186,9 +187,9 @@ const jsonLd = {
       <section id="start-tools" class="start-flow-section mb-12" data-section-label="Tools & Resources">
         <h2>Tools & Resources</h2>
         <ul>
-          <li><a href="/curses">White Magic Curses</a> — Ethical boundary-setting rituals</li>
-          <li><a href="/tools">Ritual Tools</a> — Printables, decks, journals, and supports for reflective practice</li>
-          <li><a href="/partners">Partners</a> — Small businesses and ethical brands we love</li>
+          <li><a href="/curses">Clean Cursing</a> — Ethical boundary-setting, energetic return, and poetic accountability rituals</li>
+          <li><a href="/tools">Practice Tools</a> — Printables, decks, journals, and supports for reflective practice</li>
+          <li><a href="/partners">Partners</a> — Verified community partners and affiliate disclosures</li>
         </ul>
       </section>
 

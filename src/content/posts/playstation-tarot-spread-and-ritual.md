@@ -95,6 +95,11 @@ heroImageSrc: /hero-images/playstation-tarot-spread-and-ritual.png
 heroImageAlt: 'PlayStation Tarot: Cozy Game-Night Spread & Ritual — hero image'
 spoonLevel: low
 cluster: tarot-spreads
+labRitual:
+  intents: [connection, rest, reflection]
+  tools: [tarot, journal, pen, timer, game, candle, playlist]
+  tags: [group]
+  materials: [tarot, pen, journal, timer, token, controller]
 ---
 ## Why tarot + PlayStation works
 

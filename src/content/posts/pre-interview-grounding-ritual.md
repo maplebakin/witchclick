@@ -65,6 +65,11 @@ heroImageSrc: /hero-images/pre-interview-grounding-ritual.png
 heroImageAlt: 'Pre-Interview Grounding Ritual: Quick and Deep Guide — hero image'
 spoonLevel: medium
 cluster: rituals-practices
+labRitual:
+  intents: [grounding, clarity, focus]
+  tools: [timer, journal, water, tea, tarot, stone]
+  durationMinutes: 5
+  materials: [journal, water, tea, stone, timer]
 ---
 ## Opening Reflection
 

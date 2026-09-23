@@ -14,11 +14,13 @@ try {
   }
 } catch {}
 
-if (!data) { return; }
+if (!data || data.published === false) { return; }
 const hasExternal = !!(data.url && data.url.trim());
-const href = hasExternal ? data.url : (data.file || '#');
+const rawHref = hasExternal ? data.url : (data.file || '');
+const href = /^(?:https?:\/\/|\/)/i.test(rawHref) ? rawHref : '';
+if (!href) { return; }
 const target = hasExternal ? '_blank' : undefined;
-const rel = hasExternal ? 'noopener' : undefined;
+const rel = hasExternal ? 'sponsored nofollow noopener noreferrer' : undefined;
 ---
 <aside class="my-8">
   <div class="card-panel card-tier-2 card-panel-strong card-panel-static">
@@ -64,7 +66,7 @@ const rel = hasExternal ? 'noopener' : undefined;
             data-analytics="download_click"
             data-analytics-meta={data.id}
           >
-            {hasExternal ? "Buy now" : "Download"}
+            {hasExternal ? "Browse options" : "Open download"}
           </a>
           <a
             href="/tools"

@@ -4,6 +4,7 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { readSettings, buildCanonicalUrl } from "../../utils/settings";
 import { loadAllCurses, getCurseBySlug, resetCurseCache } from "../../utils/curses";
 import HeadSlot from "@/components/HeadSlot.astro";
+import { serializeJsonForScript } from "@/utils/serializeJson";
 import SpoonsBadge from "../../components/SpoonsBadge.astro";
 import { normalizeSpoonLevel } from "../../utils/augment";
 
@@ -28,7 +29,7 @@ if (!curse) {
 
 const settings = readSettings();
 const title = curse.title;
-const description = curse.invocation || "White magic curse to return energy with clarity.";
+const description = curse.invocation || "Clean refusal ritual, formerly framed as a white magic curse, to return energy with clarity.";
 const canonical = buildCanonicalUrl(settings, { path: `/curses/${curse.slug}` });
 const generator = curse.frontmatter?.generator ?? {};
 const journaling = typeof generator?.journalingFollowUp === "string" ? generator.journalingFollowUp : "";
@@ -36,6 +37,8 @@ const altarItem = typeof generator?.altarItem === "string" ? generator.altarItem
 const sigilName = typeof generator?.sigilName === "string" ? generator.sigilName : "";
 const tldr = typeof curse.tldr === "string" ? curse.tldr : typeof curse.frontmatter?.tldr === "string" ? curse.frontmatter.tldr : "";
 const spoonLevel = normalizeSpoonLevel(curse.spoons ?? curse.frontmatter?.spoons ?? curse.frontmatter?.spoonLevel);
+const ritualText = curse.sections.map((section) => section.content).join("\n");
+const usesLiveFire = /\b(?:candle|flame|incense|hot wax|burn(?:ing|ed)?)\b/i.test(ritualText);
 
 function sectionToPlainText(value: string): string {
   return value
@@ -70,19 +73,19 @@ const ritualJsonLd = {
 
 const breadcrumbs = [
   { label: "Home", href: "/" },
-  { label: "Curses", href: "/curses/" },
+  { label: "Clean Cursing", href: "/curses/" },
   { label: title },
 ];
 ---
 
 <Base title={title} description={description} canon={canonical} wide={true}>
   <HeadSlot slot="head">
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(ritualJsonLd)} />
+    <script type="application/ld+json" is:inline set:html={serializeJsonForScript(ritualJsonLd)} />
   </HeadSlot>
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
   <article class="mx-auto max-w-3xl space-y-6 py-10">
     <header class="space-y-3 text-center">
-      <p class="text-[0.8rem] uppercase tracking-[0.2em] text-accent">White Magic Curse</p>
+      <p class="text-[0.8rem] uppercase tracking-[0.2em] text-accent">Clean Cursing Ritual</p>
       <h1 class="text-3xl font-semibold text-primary">{title}</h1>
       {curse.invocation && (
         <p class="text-sm italic text-secondary">{curse.invocation}</p>
@@ -130,6 +133,16 @@ const breadcrumbs = [
         )}
       </dl>
     </header>
+
+    {usesLiveFire && (
+      <aside class="rounded-2xl border border-warning bg-warning-soft p-5 text-sm text-body-strong" aria-labelledby="fire-safety-heading">
+        <h2 id="fire-safety-heading" class="text-base font-semibold text-body-strong">Keep the fire symbolic, not literal</h2>
+        <p class="mt-2">
+          An LED candle or an unlit stand-in works. If you use flame, stay with it on a heat-safe surface, keep hair, fabric,
+          children, and pets clear, and extinguish it before the ritual ends. Do not pour hot wax onto ordinary glass.
+        </p>
+      </aside>
+    )}
 
     <div class="prose prose-purple mx-auto max-w-none">
       {curse.sections.map((section) => {

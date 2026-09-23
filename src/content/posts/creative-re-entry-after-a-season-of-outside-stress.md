@@ -24,7 +24,7 @@ specVersion: 2
 category: "ritual"
 contentType: "story"
 cluster: "magical-productivity"
-externalLink: {"url":"https://en.wikipedia.org/wiki/Narrative_identity","anchor":"narrative](https://en.wikipedia.org/wiki/Narrative_identity%22,%22anchor%22:%22narrative) identity","description":"A grounded overview of how people build meaning through self-story, useful context for why returning to old creative work can feel emotionally charged."}
+externalLink: {"url":"https://en.wikipedia.org/wiki/Narrative_identity","anchor":"narrative identity","description":"A grounded overview of how people build meaning through self-story, useful context for why returning to old creative work can feel emotionally charged."}
 promptMetadata: {"topic":"Creative Re-Entry After a Season of Outside Stress","requestedWords":1200,"deliveredWords":3603,"toggles":{"ads":"off","kofi":"off"},"generatedAt":"2026-04-14T14:06:04.069Z"}
 ---
 

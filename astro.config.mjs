@@ -68,7 +68,7 @@ export default defineConfig({
   },
 
   server: {
-    host: true,
+    host: process.env.HOST === "0.0.0.0" ? "0.0.0.0" : "127.0.0.1",
     // port: 4321,
   },
 

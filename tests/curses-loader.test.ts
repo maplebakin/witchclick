@@ -45,5 +45,7 @@ describe('loadAllCurses', () => {
     expect(firstCurse).toBeDefined();
     expect(firstCurse?.slug).toBe('mirror-truth');
     expect(firstCurse?.sections.length ?? 0).toBeGreaterThan(0);
+    expect(firstCurse?.tags).toContain('clean-cursing');
+    expect(firstCurse?.tags).not.toContain('white-magic');
   });
 });

@@ -61,7 +61,7 @@ const rootStyle = {
     <style>
       @page {
         size: A4;
-        margin: 1in;
+        margin: 0.5in;
       }
 
       :root {
@@ -76,14 +76,14 @@ const rootStyle = {
       body {
         margin: 0;
         color: var(--text);
-        background: var(--theme-surface-plain);
+        background: var(--surface-plain);
         font-family: var(--font-body);
       }
 
       main {
-        background: var(--theme-surface-card);
+        background: var(--surface-card);
         border-radius: 16px;
-        padding: 2.5rem;
+        padding: clamp(1rem, 5vw, 2.5rem);
         box-shadow: var(--shadow-soft);
         min-height: calc(100vh - 2rem);
       }
@@ -112,7 +112,7 @@ const rootStyle = {
         border: 2px solid var(--border-subtle);
         border-radius: 16px;
         padding: 1.25rem;
-        background: var(--theme-surface-elevated);
+        background: var(--surface-elevated);
         margin-top: 1.5rem;
       }
 
@@ -145,6 +145,26 @@ const rootStyle = {
         text-align: center;
       }
 
+      .print-control {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 10;
+        min-height: 44px;
+        border: 2px solid var(--accent);
+        border-radius: 999px;
+        padding: 0.65rem 1rem;
+        background: var(--surface-plain);
+        color: var(--text);
+        font: 600 0.9rem/1 var(--font-body);
+        cursor: pointer;
+      }
+
+      .print-control:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+      }
+
       @media print {
         body {
           background: white;
@@ -152,12 +172,15 @@ const rootStyle = {
         main {
           box-shadow: none;
           border-radius: 0;
-          padding: 1.25in;
+          padding: 0;
+          min-height: auto;
         }
+        .print-control { display: none; }
       }
     </style>
   </head>
   <body>
+    <button type="button" class="print-control" data-print-control>Print / save PDF</button>
     <main style={{ "--accent": accent }}>
       <header>
         <h1>{title}</h1>
@@ -188,7 +211,10 @@ const rootStyle = {
         </section>
       )}
 
-      <footer>Crafted by Mira Ash, for the WitchClick coven. May your rituals be kind and your spells true.</footer>
+      <footer>Crafted by WitchClick. May your rituals be kind and your spells true.</footer>
     </main>
+    <script is:inline>
+      document.querySelector('[data-print-control]')?.addEventListener('click', () => window.print());
+    </script>
   </body>
 </html>

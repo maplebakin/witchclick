@@ -9,6 +9,7 @@ import { getPostBySlug, extractTagChips } from "@/utils/posts";
 import { readPartnerBlocks } from "@/utils/partners";
 import { readEditorialCalendar } from "@/utils/editorialCalendar";
 import HeadSlot from "@/components/HeadSlot.astro";
+import { serializeJsonForScript } from "@/utils/serializeJson";
 import { HUB_DEFINITIONS } from "@/data/hubs";
 
 export const prerender = true;
@@ -96,7 +97,7 @@ const season = hub.seasonSlug ? calendar.seasons.find((entry) => entry.slug === 
 
 const breadcrumbs = [
   { label: "Home", href: "/" },
-  { label: "Hubs", href: "/hub/" },
+  { label: "Rituals & Spreads", href: "/hub/" },
   { label: hub.hero.title },
 ];
 ---
@@ -108,7 +109,7 @@ const breadcrumbs = [
 >
   <Breadcrumbs slot="breadcrumbs" items={breadcrumbs} />
     <HeadSlot slot="head">
-      <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+      <script type="application/ld+json" is:inline set:html={serializeJsonForScript(jsonLd)} />
     </HeadSlot>
 
   <section class="hub-hero">

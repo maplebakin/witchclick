@@ -23,6 +23,11 @@ specVersion: 2
 category: "ritual"
 contentType: "ritual"
 promptMetadata: {"topic":"Slicing Through Self-Delusion: A Gentle Clarity Ritual","requestedWords":1200,"deliveredWords":1072,"toggles":{"ads":"on","kofi":"off"},"generatedAt":"2025-12-03T14:24:29.760Z"}
+labRitual:
+  intents: [clarity, grounding, reflection]
+  tools: [candle, stone, paper, pen, journal, tarot, water]
+  durationMinutes: 5
+  materials: [candle, stone, paper, pen, journal, tarot, water]
 ---
 
 ## Opening Reflection

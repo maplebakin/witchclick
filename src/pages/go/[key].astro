@@ -1,5 +1,6 @@
 ---
 import { buildAffiliateTarget, readProductCatalog } from "@/utils/products";
+import { serializeJsonForScript } from "@/utils/serializeJson";
 
 export const prerender = true;
 
@@ -37,16 +38,14 @@ const { key, name, target } = Astro.props as {
     <meta name="robots" content="noindex,nofollow" />
     <link rel="canonical" href={target} />
     <meta http-equiv="refresh" content={`0;url=${target}`} />
-    <script is:inline define:vars={{ target }}>
-      window.location.replace(target);
-    </script>
+    <script is:inline set:html={`window.location.replace(${serializeJsonForScript(target)});`} />
   </head>
   <body>
     <main>
       <p>
         Redirecting to
         {" "}
-        <a href={target} rel="sponsored nofollow">{name}</a>
+        <a href={target} rel="sponsored nofollow noopener noreferrer">{name}</a>
         .
       </p>
       <p>If nothing happens, use the link above.</p>

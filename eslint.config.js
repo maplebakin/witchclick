@@ -9,7 +9,9 @@ export default [
   {
     ignores: [
       "dist",
+      "**/dist/**",
       "node_modules",
+      "**/node_modules/**",
       "playwright-report",
       "coverage",
       "tools/_compiled/**",

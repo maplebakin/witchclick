@@ -51,12 +51,12 @@
   --glass-hover: color-mix(in hsl, hsl(var(--surface-hover)) 82%, transparent 18%);
   --glass-border: color-mix(in hsl, hsl(var(--border-subtle)) 65%, transparent 35%);
   --glass-border-strong: color-mix(in hsl, hsl(var(--border-strong)) 72%, transparent 28%);
-  --glass-highlight: color-mix(in hsl, hsl(var(--text-accent)) 28%, transparent 72%);
-  --glass-glow: color-mix(in hsl, hsl(var(--text-accent)) 18%, transparent 82%);
-  --glass-shadow-soft: 0 22px 55px -32px hsl(var(--neutral-9) / 0.65);
-  --glass-shadow-strong: 0 32px 85px -36px hsl(var(--neutral-9) / 0.78);
-  --glass-blur: 16px;
-  --glass-noise-opacity: 0.08;
+  --glass-highlight: color-mix(in hsl, hsl(var(--text-accent)) 16%, transparent 84%);
+  --glass-glow: color-mix(in hsl, hsl(var(--text-accent)) 10%, transparent 90%);
+  --glass-shadow-soft: 0 18px 42px -30px hsl(var(--neutral-9) / 0.58);
+  --glass-shadow-strong: 0 26px 64px -34px hsl(var(--neutral-9) / 0.7);
+  --glass-blur: 10px;
+  --glass-noise-opacity: 0.04;
 
   --border-subtle: hsl(var(--neutral-6) / 0.42);
   --border-strong: hsl(var(--neutral-4) / 0.6);
@@ -116,8 +116,8 @@
 
   /* === Shadows/Elevation (transparent, stackable) === */
   --shadow-1: 0 1px 2px hsl(0 0% 0% / 0.25);
-  --shadow-2: 0 4px 12px hsl(0 0% 0% / 0.25);
-  --shadow-3: 0 10px 30px hsl(0 0% 0% / 0.35);
+  --shadow-2: 0 4px 10px hsl(0 0% 0% / 0.22);
+  --shadow-3: 0 10px 24px hsl(0 0% 0% / 0.3);
   --ring-focus: 0 0 0 3px hsl(var(--accent-1) / 0.62);
 
   /* === Motion === */
@@ -193,8 +193,8 @@
 
   /* Entity hub card semantic aliases */
   --entity-card-border: var(--theme-entity-card-border, color-mix(in srgb, var(--theme-border-subtle, var(--border-subtle)) 78%, transparent 22%));
-  --entity-card-glow: var(--theme-entity-card-glow, color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 20%, transparent 80%));
-  --entity-card-highlight: var(--theme-entity-card-highlight, color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 12%, transparent 88%));
+  --entity-card-glow: var(--theme-entity-card-glow, color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 12%, transparent 88%));
+  --entity-card-highlight: var(--theme-entity-card-highlight, color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 7%, transparent 93%));
   --entity-card-surface-top: var(--theme-entity-card-surface-top, var(--theme-surface-card, var(--surface-card)));
   --entity-card-surface-bottom: var(--theme-entity-card-surface-bottom, var(--theme-surface-panel, var(--surface-panel)));
   --entity-card-heading: var(--theme-entity-card-heading, var(--theme-text-strong, var(--text-strong)));
@@ -220,8 +220,8 @@
   --glass-hover: color-mix(in hsl, hsl(var(--surface-hover)) 88%, white 12%);
   --glass-border: color-mix(in hsl, hsl(var(--border-subtle)) 65%, transparent 35%);
   --glass-border-strong: color-mix(in hsl, hsl(var(--border-strong)) 70%, transparent 30%);
-  --glass-highlight: color-mix(in hsl, hsl(var(--text-accent)) 24%, transparent 76%);
-  --glass-glow: color-mix(in hsl, hsl(var(--text-accent)) 16%, transparent 84%);
+  --glass-highlight: color-mix(in hsl, hsl(var(--text-accent)) 14%, transparent 86%);
+  --glass-glow: color-mix(in hsl, hsl(var(--text-accent)) 8%, transparent 92%);
 
   --text-strong: hsl(260 30% 18% / 1);
   --text-body: hsl(260 28% 24% / 0.92);

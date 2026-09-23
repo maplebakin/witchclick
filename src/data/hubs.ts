@@ -34,7 +34,7 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
         "Name what is complete, return what is not yours to carry, and make room for a value that does not require self-punishment.",
     },
     seoDescription:
-      "Explore WitchClick's Release hub for cord-cutting rituals, boundary prompts, and reflective practices for letting go without collapse.",
+      "Explore WitchClick's Release practice path for cord-cutting rituals, boundary prompts, and reflective practices for letting go without collapse.",
     playlists: [
       {
         key: "start-here",
@@ -97,7 +97,7 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
         "Somatic warm-ups, micro-plans, and reflective supports for choosing where your attention belongs next.",
     },
     seoDescription:
-      "Explore WitchClick's Focus hub for neurodivergent-aware rituals, body-led planning, and reflective tools that support attention without force.",
+      "Explore WitchClick's Focus practice path for neurodivergent-aware rituals, body-led planning, and reflective tools that support attention without force.",
     playlists: [
       {
         key: "start-here",
@@ -160,12 +160,12 @@ export const HUB_DEFINITIONS: Record<string, HubDefinition> = {
         "Grounding practices, repair scripts, and small anchors for staying present without pretending everything is fine.",
     },
     seoDescription:
-      "Explore WitchClick's Calm hub for grounding rituals, repair scripts, and reflective practices that help you stay present without supernatural promises.",
+      "Explore WitchClick's Calm practice path for grounding rituals, repair scripts, and reflective practices that help you stay present without supernatural promises.",
     playlists: [
       {
         key: "start-here",
         title: "Start here",
-        description: "Step into the Calm hub with grounding rituals that steady breath and give attention somewhere safe to land.",
+        description: "Step into the Calm path with grounding rituals that steady breath and give attention somewhere safe to land.",
         chips: ["Grounding", "Safe landing"],
         posts: [
           "calm-space-during-political-unrest-2",

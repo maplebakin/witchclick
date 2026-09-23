@@ -55,6 +55,11 @@ heroAlt: ''
 specVersion: 2
 spoonLevel: low
 cluster: rituals-practices
+labRitual:
+  intents: [grounding, reflection]
+  tools: [journal, paper, markers]
+  durationMinutes: 5
+  materials: [paper, markers, journal]
 ---
 ## Opening Reflection
 

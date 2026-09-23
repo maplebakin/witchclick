@@ -55,6 +55,11 @@ canonicalUrl: 'https://witchclick.space/post/using-different-perspectives-a-gent
 specVersion: 2
 spoonLevel: medium
 cluster: cozy-witchcraft
+labRitual:
+  intents: [perspective, clarity, reflection]
+  tools: [journal, timer, pen, cards, tea, stone]
+  durationMinutes: 20
+  materials: [journal, timer, cards]
 ---
 ## Opening Reflection
 

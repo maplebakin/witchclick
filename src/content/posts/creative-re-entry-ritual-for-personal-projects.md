@@ -26,6 +26,11 @@ contentType: "ritual"
 cluster: "magical-productivity"
 externalLink: {"url":"https://en.wikipedia.org/wiki/Narrative_identity","anchor":"narrative identity overview","description":"Background context on how people make meaning through self-story, which can shape creative re-entry."}
 promptMetadata: {"topic":"Creative Re-Entry Ritual for Personal Projects","requestedWords":1200,"deliveredWords":1149,"toggles":{"ads":"off","kofi":"off"},"generatedAt":"2026-04-13T13:50:56.629Z"}
+labRitual:
+  intents: [creativity, focus, reset]
+  tools: [timer, notebook, tea, water]
+  durationMinutes: 10
+  materials: [notebook, timer]
 ---
 
 ## Opening Reflection

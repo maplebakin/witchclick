@@ -23,6 +23,11 @@ specVersion: 2
 category: "ritual"
 contentType: "ritual"
 promptMetadata: {"topic":"December Clean Curses for Messy, Tender Human Hearts","requestedWords":1200,"deliveredWords":1054,"toggles":{"ads":"on","kofi":"off"},"generatedAt":"2025-12-02T18:00:47.859Z"}
+labRitual:
+  intents: [release, boundaries, grounding]
+  tools: [candle, bowl, paper, journal, pen, water, stone]
+  durationMinutes: 10
+  materials: [candle, bowl, paper, journal, pen, water, stone]
 ---
 
 ## Opening Reflection

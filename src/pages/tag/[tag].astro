@@ -6,6 +6,7 @@ import { postsToCardData } from "../../utils/postTransforms";
 import { readSettings } from "../../utils/settings";
 import { createCollectionPageSchema } from "../../utils/structuredData";
 import HeadSlot from "@/components/HeadSlot.astro";
+import { serializeJsonForScript } from "@/utils/serializeJson";
 import { buildTagRouteEntries, canonicalTagHref, canonicalizeTagSlug, tagsFromFrontmatter } from "@/utils/tags";
 
 export const prerender = true;
@@ -45,9 +46,9 @@ const cards = postsToCardData(taggedPosts);
 const collectionSchema = createCollectionPageSchema(
   settings,
   {
-    name: `Tag: ${label}`,
+    name: `Topic: ${label}`,
     url: canonicalTagHref(normalizedTag),
-    description: `Posts filed under the ${label} tag`,
+    description: `Posts filed under the ${label} topic`,
     itemType: "Article",
   },
   cards.map((card) => ({
@@ -62,34 +63,38 @@ const collectionSchema = createCollectionPageSchema(
     <head>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <title>Redirecting tag — WitchClick</title>
+      <title>Redirecting topic — WitchClick</title>
       <meta name="robots" content="noindex,nofollow" />
       <link rel="canonical" href={redirectTo} />
       <meta http-equiv="refresh" content={`0;url=${redirectTo}`} />
       <script
         is:inline
-        set:html={`window.location.replace(${JSON.stringify(redirectTo)});`}
+        set:html={`window.location.replace(${serializeJsonForScript(redirectTo)});`}
       />
     </head>
     <body>
       <p>
-        Redirecting to the canonical tag page:
+        Redirecting to the canonical topic page:
         {" "}
         <a href={redirectTo}>{redirectTo}</a>
       </p>
     </body>
   </html>
 ) : (
-  <Base title={`Tag: ${label} — WitchClick`}>
+  <Base
+    title={`Topic: ${label} — WitchClick`}
+    description={`Explore WitchClick articles filed under ${label}.`}
+    canon={canonicalTagHref(normalizedTag)}
+    noindex={cards.length < 2}
+  >
     <HeadSlot slot="head">
-      <link rel="canonical" href={canonicalTagHref(normalizedTag)} />
-      <script type="application/ld+json" is:inline set:html={JSON.stringify(collectionSchema)} />
+      <script type="application/ld+json" is:inline set:html={serializeJsonForScript(collectionSchema)} />
     </HeadSlot>
 
-    <h1 class="mb-6">Tag: {label}</h1>
+    <h1 class="mb-6">Topic: {label}</h1>
     {cards.length === 0 ? (
       <p class="text-cloud-muted">
-        No posts found for this tag yet. <a class="underline" href="/">Back to home</a>.
+        No posts found for this topic yet. <a class="underline" href="/">Back to home</a>.
       </p>
     ) : (
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">

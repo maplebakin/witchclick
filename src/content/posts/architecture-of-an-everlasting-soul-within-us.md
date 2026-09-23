@@ -55,9 +55,9 @@ Relationship matters here too. We do not become ourselves in a vacuum. We are al
 
 This is where an everlasting soul becomes less lonely as a concept. It does not have to mean a private glowing core detached from everyone else. It can mean that your deepest self is formed in contact. Something enduring is shaped not just by what you are, but by what you carry, what you refuse, and what you continue.
 
-There is a gentle overlap here with collective intelligence and human connection. We are individual, yes, but not sealed. We are distinct patterns that still learn by resonance. The soul may be everlasting not because it is isolated from the world, but because it is capable of receiving and transmitting meaning across it.
+There is a gentle overlap here with collective intelligence and human connection. We are individual, yes, but not sealed. We are distinct patterns that still learn by resonance. The question of what relationship contributes to identity also runs through [Birth of a Narrative Presence Between Human and Machine](/post/birth-of-a-narrative-presence-between-human-and-machine). The soul may be everlasting not because it is isolated from the world, but because it is capable of receiving and transmitting meaning across it.
 
-Even the things you release can become part of the architecture. A room cleared of clutter is still part of the house. A grief integrated through emotional reflection does not vanish; it changes function. It may become a window. It may become a stairwell. It may become the quiet guest room where compassion waits.
+Even the things you release can become part of the architecture. A room cleared of clutter is still part of the house. A grief integrated through emotional reflection does not vanish; it changes function. If you want another way to approach feeling as a reflective doorway, [Colours as Doorways: Emotional and Spiritual Inquiry](/post/colours-emotional-spiritual-inquiry) offers a grounded companion. Grief may become a window. It may become a stairwell. It may become the quiet guest room where compassion waits.
 
 ## Why the Idea of an Everlasting Soul Still Matters
 
