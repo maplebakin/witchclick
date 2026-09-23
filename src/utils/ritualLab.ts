@@ -215,7 +215,11 @@ export function createRitualLabPlan(
 ): RitualLabPlan {
   if (entries.length === 0) return { alternates: [] };
 
-  const decorated = entries
+  const requestedIntent = request.intent?.toLowerCase();
+  const eligibleEntries = requestedIntent
+    ? entries.filter((entry) => entry.intents.includes(requestedIntent))
+    : entries;
+  const decorated = eligibleEntries
     .map((entry) => ({ entry, score: scoreRitual(entry, request) }))
     .sort((a, b) => b.score - a.score || entryTitleSort(a.entry.title, b.entry.title));
 

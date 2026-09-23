@@ -310,6 +310,58 @@ test.describe("site smoke", () => {
     expect(networkFailures, "Network requests should succeed").toEqual([]);
   });
 
+  test("Ritual Lab recommendations respect intent and explain route duration", async ({ page }) => {
+    const response = await page.goto("/lab", { waitUntil: "networkidle" });
+    expect(response?.status()).toBe(200);
+
+    const entries = await page.locator("#ritual-lab-data").evaluate((node) => {
+      const payload = JSON.parse(node.textContent || "{}") as {
+        entries?: { intents?: string[] }[];
+      };
+      return payload.entries ?? [];
+    });
+    expect(entries).toHaveLength(44);
+    const intents = [...new Set(entries.flatMap((entry) => entry.intents ?? []))];
+    expect(intents).toHaveLength(11);
+    expect(await page.locator('select[name="intent"] option').count()).toBe(11);
+
+    const intent = page.locator('select[name="intent"]');
+    const time = page.locator('select[name="time"]');
+    const game = page.locator('input[name="tools"][value="game"]');
+    await intent.selectOption("rest");
+    await time.selectOption("40");
+    await game.check();
+    await expect(page.locator("#ritual-output h3").first()).toContainText("Cozy Gaming November");
+
+    await intent.evaluate((select) => {
+      if (!(select instanceof HTMLSelectElement)) return;
+      select.add(new Option("Unmatched", "__no_matching_intent__"));
+      select.value = "__no_matching_intent__";
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    await expect(page.locator("#ritual-output h3")).toHaveCount(0);
+    await expect(page.locator("#ritual-output")).toContainText("No rituals match that intention");
+
+    await intent.evaluate((select) => {
+      if (!(select instanceof HTMLSelectElement)) return;
+      select.value = "";
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    await expect(page.locator("#ritual-output h3").first()).toBeVisible();
+
+    await intent.selectOption("release");
+    await game.uncheck();
+    await page.locator('input[name="tools"][value="paper"]').check();
+    const quickVariant = page.locator("#ritual-output h3").filter({
+      hasText: "Cozy Cursing Ritual: Release Anger Through Banishment",
+    });
+    await expect(quickVariant).toBeVisible();
+    const durationLabel = await quickVariant.evaluate(
+      (heading) => heading.parentElement?.parentElement?.querySelector("span")?.textContent?.trim(),
+    );
+    expect(durationLabel).toBe("Route: up to 15 min");
+  });
+
   test("entity pages surface related post cards", async ({ page }) => {
     const entity = findEntityWithRelatedPost();
     test.skip(!entity, "No entities with related posts found in content");
