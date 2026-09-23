@@ -13,6 +13,7 @@ interface Props {
   secondaryNavLinks?: NavLink[];
   utilityLinks?: NavLink[];
   disclosure?: string;
+  currentPath?: string;
 }
 
 const {
@@ -21,6 +22,7 @@ const {
   secondaryNavLinks = [],
   utilityLinks = [],
   disclosure = "",
+  currentPath = "/",
 } = Astro.props as Props;
 
 const hasDisclosure = typeof disclosure === "string" && disclosure.trim().length > 0;
@@ -28,7 +30,10 @@ const isNavLink = (link: NavLink | undefined | null): link is NavLink =>
   Boolean(link && typeof link.href === "string" && typeof link.label === "string");
 
 const primaryNav = navLinks.filter(isNavLink);
-const secondaryNav = secondaryNavLinks.filter(isNavLink);
+const normalizedPath = currentPath.endsWith("/") ? currentPath : `${currentPath}/`;
+const secondaryNav = secondaryNavLinks
+  .filter(isNavLink)
+  .filter((link) => !(normalizedPath === "/tools/" && /^\/tools\/?$/.test(link.href)));
 const utilityNav = utilityLinks.filter(isNavLink);
 ---
 <footer class="site-footer" aria-label="Site footer">

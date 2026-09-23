@@ -42,7 +42,12 @@ const visibleAdminSections = adminSections.filter((section) =>
   section && Array.isArray(section.items) && section.items.length > 0
 );
 const hasAdminLinks = visibleAdminSections.length > 0;
-const visibleSecondary = secondaryLinks.filter((link) => link && typeof link.href === "string");
+const visibleSecondary = secondaryLinks.filter(
+  (link) =>
+    link &&
+    typeof link.href === "string" &&
+    !(normalizedPath === "/tools/" && /^\/tools\/?$/.test(link.href)),
+);
 const visibleUtility = utilityLinks.filter((link) => link && typeof link.href === "string");
 const showComfortControls = !normalizedPath.startsWith("/admin/");
 const enableScrollReveal = !normalizedPath.startsWith("/admin/");
