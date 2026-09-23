@@ -5,6 +5,7 @@ import { loadAllPosts } from "../../utils/posts";
 import { postsToCardData } from "../../utils/postTransforms";
 import { readSettings } from "../../utils/settings";
 import { createCollectionPageSchema } from "../../utils/structuredData";
+import { loadAllCurses } from "../../utils/curses";
 import HeadSlot from "@/components/HeadSlot.astro";
 import { serializeJsonForScript } from "@/utils/serializeJson";
 import { buildTagRouteEntries, canonicalTagHref, canonicalizeTagSlug, tagsFromFrontmatter } from "@/utils/tags";
@@ -13,7 +14,8 @@ export const prerender = true;
 
 export function getStaticPaths() {
   const posts = loadAllPosts();
-  return buildTagRouteEntries(posts).map((entry) => ({
+  const curses = loadAllCurses();
+  return buildTagRouteEntries(posts, curses.map((curse) => curse.tags)).map((entry) => ({
     params: { tag: entry.routeTag },
     props: entry,
   }));
@@ -28,6 +30,7 @@ const { routeTag, canonicalTag, label, redirectTo } = Astro.props as {
 const normalizedTag = canonicalizeTagSlug(canonicalTag || routeTag);
 const settings = readSettings();
 const allPosts = loadAllPosts();
+const allCurses = loadAllCurses();
 
 const taggedPosts = allPosts
   .filter((post) => {
@@ -42,20 +45,31 @@ const taggedPosts = allPosts
 
 // Transform to card data
 const cards = postsToCardData(taggedPosts);
+const taggedCurses = allCurses
+  .filter((curse) => curse.tags.some((tagValue) => canonicalizeTagSlug(tagValue) === normalizedTag))
+  .sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: "base" }));
+const resultCount = cards.length + taggedCurses.length;
 
 const collectionSchema = createCollectionPageSchema(
   settings,
   {
     name: `Topic: ${label}`,
     url: canonicalTagHref(normalizedTag),
-    description: `Posts filed under the ${label} topic`,
-    itemType: "Article",
+    description: `Posts and clean cursing rituals filed under the ${label} topic`,
+    itemType: "CreativeWork",
   },
-  cards.map((card) => ({
-    name: card.title,
-    url: `/post/${card.slug}`,
-    description: card.tldr ?? card.excerpt,
-  })),
+  [
+    ...cards.map((card) => ({
+      name: card.title,
+      url: `/post/${card.slug}`,
+      description: card.tldr ?? card.excerpt,
+    })),
+    ...taggedCurses.map((curse) => ({
+      name: curse.title,
+      url: `/curses/${curse.slug}`,
+      description: curse.tldr ?? curse.invocation,
+    })),
+  ],
 );
 ---
 {redirectTo ? (
@@ -85,14 +99,14 @@ const collectionSchema = createCollectionPageSchema(
     title={`Topic: ${label} — WitchClick`}
     description={`Explore WitchClick articles filed under ${label}.`}
     canon={canonicalTagHref(normalizedTag)}
-    noindex={cards.length < 2}
+    noindex={resultCount < 2}
   >
     <HeadSlot slot="head">
       <script type="application/ld+json" is:inline set:html={serializeJsonForScript(collectionSchema)} />
     </HeadSlot>
 
     <h1 class="mb-6">Topic: {label}</h1>
-    {cards.length === 0 ? (
+    {resultCount === 0 ? (
       <p class="text-cloud-muted">
         No posts found for this topic yet. <a class="underline" href="/">Back to home</a>.
       </p>
@@ -118,6 +132,16 @@ const collectionSchema = createCollectionPageSchema(
               category: card.category,
             }}
           />
+        ))}
+        {taggedCurses.map((curse) => (
+          <article class="rounded-2xl border border-line-subtle bg-surface-base p-5 shadow-sm transition hover:shadow-md">
+            <h2 class="text-xl font-semibold text-primary">
+              <a class="curses-card__link" href={`/curses/${curse.slug}`}>{curse.title}</a>
+            </h2>
+            {(curse.tldr || curse.invocation) && (
+              <p class="curses-card__summary">{curse.tldr || curse.invocation}</p>
+            )}
+          </article>
         ))}
       </div>
     )}

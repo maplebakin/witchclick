@@ -2,7 +2,8 @@
 import Base from "@/layouts/Base.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import { loadAllPosts } from "@/utils/posts";
-import { canonicalTagHref, canonicalizeTagSlug, tagsFromFrontmatter } from "@/utils/tags";
+import { buildCanonicalTagRecords, canonicalTagHref } from "@/utils/tags";
+import { loadAllCurses } from "@/utils/curses";
 
 export const prerender = true;
 
@@ -10,29 +11,8 @@ const title = "Browse Topics";
 const description = "Follow the threads that run through the WitchClick archive: rituals, essays, tarot, symbols, moods, and recurring questions.";
 
 const posts = loadAllPosts();
-const tagMap = new Map<string, { label: string; count: number }>();
-
-for (const post of posts) {
-  for (const tag of tagsFromFrontmatter(post.data ?? {})) {
-    const canonical = canonicalizeTagSlug(tag);
-    if (!canonical) continue;
-
-    const existing = tagMap.get(canonical);
-    if (existing) {
-      existing.count += 1;
-    } else {
-      tagMap.set(canonical, { label: tag, count: 1 });
-    }
-  }
-}
-
-const tags = Array.from(tagMap.entries())
-  .map(([canonical, data]) => ({
-    canonical,
-    label: data.label,
-    count: data.count,
-  }))
-  .sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" }));
+const curses = loadAllCurses();
+const tags = buildCanonicalTagRecords(posts, curses.map((curse) => curse.tags));
 
 const breadcrumbs = [
   { label: "Home", href: "/" },

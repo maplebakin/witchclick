@@ -7,6 +7,7 @@ import HeadSlot from "@/components/HeadSlot.astro";
 import { serializeJsonForScript } from "@/utils/serializeJson";
 import SpoonsBadge from "../../components/SpoonsBadge.astro";
 import { normalizeSpoonLevel } from "../../utils/augment";
+import { canonicalTagHref } from "../../utils/tags";
 
 export const prerender = true;
 
@@ -92,7 +93,7 @@ const breadcrumbs = [
       )}
       <div class="flex flex-wrap justify-center gap-2 text-[0.8rem] uppercase tracking-wide text-tertiary">
         {curse.tags.map((tag) => (
-          <span class="rounded-full border border-line-muted px-2 py-0.5">{tag}</span>
+          <a class="rounded-full border border-line-muted px-2 py-0.5" href={canonicalTagHref(tag)}>{tag}</a>
         ))}
       </div>
       {(spoonLevel || tldr) && (

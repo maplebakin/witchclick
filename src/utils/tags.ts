@@ -59,11 +59,13 @@ function isSafeRouteTag(value: string): boolean {
   return !value.includes("/");
 }
 
-export function buildCanonicalTagRecords(posts: Array<{ data?: Record<string, unknown> | null }>): CanonicalTagRecord[] {
+export function buildCanonicalTagRecords(
+  posts: Array<{ data?: Record<string, unknown> | null }>,
+  additionalTagGroups: string[][] = [],
+): CanonicalTagRecord[] {
   const map = new Map<string, { label: string; aliases: Set<string>; count: number }>();
 
-  for (const post of posts) {
-    const tags = tagsFromFrontmatter(post.data ?? {});
+  const addTags = (tags: string[]) => {
     for (const tag of tags) {
       const canonical = canonicalizeTagSlug(tag);
       if (!canonical) continue;
@@ -81,6 +83,14 @@ export function buildCanonicalTagRecords(posts: Array<{ data?: Record<string, un
         entry.aliases.add(legacy);
       }
     }
+  };
+
+  for (const post of posts) {
+    addTags(tagsFromFrontmatter(post.data ?? {}));
+  }
+
+  for (const tags of additionalTagGroups) {
+    addTags(tags.map((tag) => normalizeTagLabel(tag)).filter(Boolean));
   }
 
   return Array.from(map.entries())
@@ -93,8 +103,11 @@ export function buildCanonicalTagRecords(posts: Array<{ data?: Record<string, un
     .sort((a, b) => a.canonical.localeCompare(b.canonical));
 }
 
-export function buildTagRouteEntries(posts: Array<{ data?: Record<string, unknown> | null }>): TagRouteEntry[] {
-  const records = buildCanonicalTagRecords(posts);
+export function buildTagRouteEntries(
+  posts: Array<{ data?: Record<string, unknown> | null }>,
+  additionalTagGroups: string[][] = [],
+): TagRouteEntry[] {
+  const records = buildCanonicalTagRecords(posts, additionalTagGroups);
   const entries: TagRouteEntry[] = [];
 
   for (const record of records) {
