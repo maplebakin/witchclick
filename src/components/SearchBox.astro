@@ -83,6 +83,13 @@ const statusId = `${uid}-status`;
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
 
+  const normalizeSearchText = (value) =>
+    String(value ?? '')
+      .toLowerCase()
+      .replace(/[-_]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
   /**
    * @param {Array<{ href: string; type?: string; slug: string; title: string; excerpt?: string; tags?: string[] }>} items
    */
@@ -115,7 +122,7 @@ const statusId = `${uid}-status`;
 
   const handleSearch = async () => {
     const query = searchInput.value.trim().toLowerCase();
-    const normalizedQuery = query.startsWith('#') ? query.slice(1) : query;
+    const normalizedQuery = normalizeSearchText(query.startsWith('#') ? query.slice(1) : query);
     if (!normalizedQuery) {
       render([]);
       return;
@@ -127,7 +134,7 @@ const statusId = `${uid}-status`;
 
     const items = data.filter((item) => {
       const tags = Array.isArray(item.tags) ? item.tags : [];
-      const haystack = `${item.title} ${item.excerpt ?? ''} ${tags.join(' ')}`.toLowerCase();
+      const haystack = normalizeSearchText(`${item.title} ${item.excerpt ?? ''} ${tags.join(' ')}`);
       return haystack.includes(normalizedQuery);
     });
 

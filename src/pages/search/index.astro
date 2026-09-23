@@ -75,6 +75,13 @@ const breadcrumbs = [
     const prefersReducedMotion = () =>
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+    const normalizeSearchText = (value) =>
+      String(value ?? "")
+        .toLowerCase()
+        .replace(/[-_]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
     const runResultEnterAnimation = () => {
       const cards = Array.from(results.children);
 
@@ -134,7 +141,7 @@ const breadcrumbs = [
       }
 
       results.innerHTML = items
-        .slice(0, 24)
+        .slice(0, 8)
         .map((item) => {
           const title = escapeHtml(item.title || item.slug || "Untitled");
           const excerpt = escapeHtml(typeof item.excerpt === "string" ? item.excerpt : "");
@@ -172,10 +179,10 @@ const breadcrumbs = [
         return;
       }
 
-      const normalized = query.startsWith("#") ? query.slice(1) : query;
+      const normalized = normalizeSearchText(query.startsWith("#") ? query.slice(1) : query);
       const matches = index.filter((item) => {
         const tags = Array.isArray(item.tags) ? item.tags.join(" ") : "";
-        const haystack = `${item.title || ""} ${item.excerpt || ""} ${tags}`.toLowerCase();
+        const haystack = normalizeSearchText(`${item.title || ""} ${item.excerpt || ""} ${tags}`);
         return haystack.includes(normalized);
       });
 
