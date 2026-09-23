@@ -116,7 +116,7 @@ This turned out to matter more than expected.
 
 Because the fantasy of the abandoned project had become worse than the reality. In imagination it was a sprawling, incoherent thing. Embarrassing. Overcomplicated. Full of evidence that the person had once believed they could hold a bigger shape than they now could. But on screen it was simpler. Messy, yes. Incomplete, yes. But not monstrous.
 
-There were sentences that still held. Notes that were surprisingly useful. Fragments that made the person smile in spite of themselves. One ridiculous placeholder line that said something like fix this ugly goblin section later, and that tiny flash of old humor did more good than any formal productivity advice might have.
+There were sentences that still held. Notes that were surprisingly useful. Fragments that made the person smile in spite of themselves. One ridiculous line that said something like fix this ugly goblin section later, and that tiny flash of old humor did more good than any formal productivity advice might have.
 
 The project had not frozen in sacred perfection while waiting. It had remained human.
 
