@@ -9,6 +9,7 @@ export interface ExecuteIngestOptions {
   draft?: boolean;
   forceCategory?: string;
   targetWordCount?: number;
+  allowExistingSlug?: boolean;
 }
 
 export interface ExecuteIngestResult {

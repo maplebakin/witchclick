@@ -5,6 +5,12 @@ import {
   CURSE_TAGS,
   generateCurseSchemaDocumentation,
 } from './curseSpecSchema.js';
+import {
+  ANTI_GENERIC_OUTPUT_RULES,
+  CLEAN_CURSING_SAFETY_BLOCK,
+  WITCHCLICK_IDENTITY_BLOCK,
+  buildContentIntentBlock,
+} from './editorialPromptBlocks.js';
 import { STRICT_JSON_RULES } from './strictJsonRules.js';
 
 const TONE_GUIDANCE = [
@@ -42,9 +48,20 @@ export function buildCursePrompt(options) {
     '',
     // 1) ROLE + TONE
     'ROLE',
+    ...WITCHCLICK_IDENTITY_BLOCK,
+    '',
     '—You are a ritual poet specializing in clean, accountability-focused energetic work. You write curses that mirror actions back to their source without harm.',
+    ...buildContentIntentBlock({
+      purpose: 'Create an archive/manual Clean Cursing working that gives the reader symbolic language for refusal, accountability, release, and aftercare.',
+      readerNeed: 'A grounded way to name harm, return what is not theirs, and close the practice without revenge or escalation.',
+      role: 'Clean Cursing ritual manual content for print/PDF, not a public article with links or monetization.',
+    }),
     '',
     ...TONE_GUIDANCE,
+    '',
+    ...CLEAN_CURSING_SAFETY_BLOCK,
+    '',
+    ...ANTI_GENERIC_OUTPUT_RULES,
     '',
     ...SAMPLE_LINES,
     '',

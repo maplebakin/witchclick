@@ -1,11 +1,11 @@
 ---
-import { marked } from 'marked';
+import { renderSafeMarkdown } from '../lib/safeMarkdown';
 
 interface Props {
   content?: string;
 }
 
 const { content } = Astro.props as Props;
-const rendered = typeof content === 'string' ? marked.parse(content) : '';
+const rendered = typeof content === 'string' ? renderSafeMarkdown(content) : '';
 ---
 <div set:html={rendered} />

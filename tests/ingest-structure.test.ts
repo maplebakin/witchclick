@@ -71,6 +71,27 @@ describe('validateStructure contentType handling', () => {
 });
 
 describe('frontmatter persistence', () => {
+  it('drops external-link metadata when URL fragments leak into its text fields', () => {
+    const spec = createBaseSpec();
+    spec.outline = spec.sections.map((section: PostSpecV2["sections"][number], index: number) => ({
+      heading: section.heading,
+      id: index === 0 ? 'opening-reflection' : section.heading.toLowerCase().replace(/\s+/g, '-'),
+    }));
+    spec.externalLink = {
+      url: 'https://example.com/reference',
+      anchor: 'reference](https://example.com%22,%22anchor%22:%22reference)',
+      description: 'Background reading.',
+    };
+
+    const prepared = prepareSpecForPersistence(spec, {
+      cwd: process.cwd(),
+      postsDirectories: ['/tmp/test-posts'],
+    });
+
+    expect(prepared.spec.externalLink).toBeUndefined();
+    expect(prepared.warnings).toContain('Removed malformed externalLink metadata from raw spec.');
+  });
+
   it('persists category and contentType to frontmatter for ritual posts', () => {
     const spec = createBaseSpec();
     spec.category = 'meandering';

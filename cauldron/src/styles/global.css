@@ -24,11 +24,11 @@ a:focus-visible {
 }
 
 button {
-  @apply inline-flex items-center justify-center gap-2 rounded-md border border-line-inverse-strong/70 bg-surface-inverse/60 px-4 py-2 text-sm font-semibold text-inverse-soft transition-colors duration-200 ease-out hover:border-line-inverse hover:bg-surface-inverse-soft/70 hover:text-inverse disabled:cursor-not-allowed disabled:border-line-inverse-strong disabled:bg-surface-inverse/40 disabled:text-muted-subtle;
+  @apply inline-flex items-center justify-center gap-2 rounded-md border border-line-inverse-muted bg-surface-inverse px-4 py-2 text-sm font-semibold text-inverse-soft transition-colors duration-200 ease-out hover:border-line-inverse hover:bg-surface-inverse-soft hover:text-inverse disabled:cursor-not-allowed disabled:border-line-inverse-muted disabled:bg-surface-inverse disabled:text-inverse-muted;
 }
 
 :is(input, textarea, select) {
-  @apply w-full rounded-lg border border-line-inverse-strong/70 bg-surface-inverse/60 px-4 py-2 text-sm text-inverse-soft placeholder:text-muted-subtle transition-colors duration-200 ease-out focus-visible:border-line-inverse-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-muted/30 disabled:cursor-not-allowed disabled:border-line-inverse-strong disabled:bg-surface-inverse/40 disabled:text-muted-subtle;
+  @apply w-full rounded-lg border border-line-inverse-muted bg-surface-inverse px-4 py-2 text-sm text-inverse-soft placeholder:text-inverse-muted transition-colors duration-200 ease-out focus-visible:border-line-inverse-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus disabled:cursor-not-allowed disabled:border-line-inverse-muted disabled:bg-surface-inverse disabled:text-inverse-muted;
 }
 
 button:focus-visible,

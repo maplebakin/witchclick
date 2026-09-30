@@ -1,7 +1,25 @@
 // server/lib/promptFragments.js
 // Shared prompt fragments for buildMasterPrompt.
 
-import { buildBaseFields, STRUCTURE_REQUIREMENTS, generatorPresetOptions } from './generatorPresets.js';
+import {
+  buildBaseFields,
+  CONTENT_TYPE_BY_PRESET,
+  STRUCTURE_REQUIREMENTS,
+  generatorPresetOptions,
+} from './generatorPresets.js';
+import {
+  ANTI_GENERIC_OUTPUT_RULES,
+  CLEAN_CURSING_SAFETY_BLOCK,
+  FIELD_NOTES_BLOCK,
+  GRIMOIRE_REFERENCE_BLOCK,
+  POP_CULTURE_REVIEW_BLOCK,
+  RITUALS_AND_SPREADS_BLOCK,
+  SOURCE_CONTEXT_USAGE_RULES,
+  TAROT_SAFETY_BLOCK,
+  WITCHCLICK_IDENTITY_BLOCK,
+  buildContentIntentBlock,
+  renderPostSpecV2Skeleton,
+} from './editorialPromptBlocks.js';
 
 function formatScore(score) {
   if (typeof score !== 'number' || Number.isNaN(score)) return null;
@@ -51,7 +69,14 @@ export function buildHeaderFragment({ brandName }) {
     'WITCHCLICK POSTSPEC GENERATOR — MASTER PROMPT',
     '(Role, rules, inputs, and JSON contract. Paste this whole thing into a fresh chat, then edit the INPUTS block.)',
     '',
-    `You are a content author for a secular metaphysical platform called "${safeBrand}". Your job is to produce a single, honest, production-ready article spec that helps readers make meaning, choose perspective on purpose, and reclaim attention outside systems that measure people poorly. SEO structure, internal linking, and affiliate placement are built into the process below, but they are scaffolding, not the identity of the work.`,
+    `You are a content author for "${safeBrand}". Your job is to produce a single, honest, production-ready article spec that helps readers make meaning, choose perspective on purpose, and reclaim attention outside systems that measure people poorly. SEO structure, internal linking, and affiliate placement are built into the process below, but they are scaffolding, not the identity of the work.`,
+    ...WITCHCLICK_IDENTITY_BLOCK,
+    '',
+    ...buildContentIntentBlock({
+      purpose: 'Create one editorially useful WitchClick article, not merely schema-valid JSON.',
+      readerNeed: 'Meet a real reader state: confusion, overwhelm, curiosity, grief, boundary pressure, symbolic exploration, or low-capacity practice.',
+      role: 'Fit the article into WitchClick as Clean Cursing, Rituals & Spreads, Grimoire/reference, Field Notes, Tarot/spread, or an intentional pop-culture reflection.',
+    }),
     '',
   ];
 }
@@ -107,6 +132,10 @@ export const NON_NEGOTIABLES_FRAGMENT = [
   '• Faith transition and deconstruction topics: Write with extra care. Acknowledge that leaving or questioning a religious tradition can be emotionally complex. Never mock or minimize the original tradition. Center the reader\'s autonomy and pace. Avoid triumphalist "I escaped religion" framing; prefer curious, tender, non-prescriptive language.',
   '• Use inclusive language; no gendered assumptions; no gatekeeping.',
   '• Keep outline and section ordering aligned so each heading maps cleanly.',
+  '',
+  ...ANTI_GENERIC_OUTPUT_RULES.map((line) => `• ${line.replace(/^- /, '')}`),
+  '',
+  ...SOURCE_CONTEXT_USAGE_RULES.map((line) => `• ${line.replace(/^- /, '')}`),
   '',
 ];
 
@@ -179,11 +208,25 @@ export const BASE_VALIDATION_FRAGMENT = buildBaseValidationFragment();
 
 function buildTypeStructureFragment() {
   const sections = [];
-  sections.push('TYPE-SPECIFIC STRUCTURE CONTRACTS (apply the block that matches your chosen contentType):');
+  sections.push('TYPE-SPECIFIC STRUCTURE CONTRACTS (apply the block that matches your selected preset and valid schema contentType):');
+  sections.push('');
+  sections.push('PILLAR FRAMES');
+  for (const block of [
+    CLEAN_CURSING_SAFETY_BLOCK,
+    RITUALS_AND_SPREADS_BLOCK,
+    GRIMOIRE_REFERENCE_BLOCK,
+    FIELD_NOTES_BLOCK,
+    TAROT_SAFETY_BLOCK,
+    POP_CULTURE_REVIEW_BLOCK,
+  ]) {
+    for (const line of block) sections.push(`  ${line}`);
+    sections.push('');
+  }
   for (const { key, label } of generatorPresetOptions) {
     const requirements = STRUCTURE_REQUIREMENTS[key] || [];
+    const schemaContentType = CONTENT_TYPE_BY_PRESET[key] || key;
     sections.push('');
-    sections.push(`${label.toUpperCase()} — set contentType: "${key}"`);
+    sections.push(`${label.toUpperCase()} — set contentType to valid schema value: "${schemaContentType}"`);
     if (!requirements.length) {
       sections.push('  • No additional structure requirements beyond the base validation.');
       continue;
@@ -205,7 +248,9 @@ export const TYPE_STRUCTURE_FRAGMENT = buildTypeStructureFragment();
 export const RETURN_FORMAT_FRAGMENT = [
   'RETURN FORMAT',
   '• Return JSON ONLY. No backticks, no commentary. Valid JSON, double-quoted keys/strings.',
-  '• Return a JSON object that can be normalized into PostSpec v2. Common field aliases are accepted. The server handles normalization.',
+  '• Return the exact PostSpec v2 field names shown here; do not rely on aliases.',
+  renderPostSpecV2Skeleton({ includeExternalLink: true }),
+  '• Return the completed JSON object only. Do not wrap it in Markdown fences.',
   '',
 ];
 
@@ -273,7 +318,7 @@ export function buildProcessFragment() {
     '   • Draft a slug in kebab-case reflecting the primary intent; avoid collisions with existingPostTitles and existingPostSlugs.',
     '2) Title, contentType & meta',
     '   • Title 47–63 chars with primary keyword.',
-    '   • Set contentType to match the content structure you will generate. Choose from curiousExplainer, practicalWorking, reflectiveEssay, storyVignette, grimoireTarot, grimoireCrystal, grimoireHerb, or grimoireAstrology.',
+    '   • Choose a preset structure from curiousExplainer, practicalWorking, reflectiveEssay, storyVignette, grimoireTarot, grimoireCrystal, grimoireHerb, or grimoireAstrology, then set contentType to the valid schema value named in that preset block.',
     '   • Meta 150–160 chars; warm, clear, non-clickbait.',
     '3) Tags & excerpt',
     '   • 4–7 tags. Excerpt 1–2 sentences that entice the click without hype.',

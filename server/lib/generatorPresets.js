@@ -1,5 +1,16 @@
 import { STRICT_JSON_RULES } from './strictJsonRules.js';
 
+export const CONTENT_TYPE_BY_PRESET = {
+  curiousExplainer: 'guide',
+  practicalWorking: 'ritual',
+  reflectiveEssay: 'reflection',
+  storyVignette: 'story',
+  grimoireTarot: 'tarotSpread',
+  grimoireCrystal: 'crystals',
+  grimoireHerb: 'guide',
+  grimoireAstrology: 'guide',
+};
+
 function formatSectionsRequirement() {
   return '- sections (body, content) — array of { heading, markdown|content }.';
 }
@@ -7,12 +18,14 @@ function formatSectionsRequirement() {
 // Base contract fields that all presets share
 export function buildBaseFields() {
   return [
-    'Return a JSON object that can be normalized into PostSpec v2 using relaxed keys and aliases.',
+    'Return a JSON object that matches the PostSpec v2 validation target. Use the exact canonical field names below.',
     '',
-    'Required fields (aliases allowed):',
+    'Required fields:',
     '- title (name, headline) — concise post title with the primary keyword.',
     '- slug (permalink, urlSlug) — kebab-case, ≤70 characters, no spaces.',
-    '- contentType — one of: "ritual", "reflection", "story", "tarotSpread", "spellwork", "crystals". MUST match the preset mode you are using.',
+    '- category — one of: "ritual", "meandering".',
+    '- contentType — one of: "ritual", "guide", "spread", "reflection", "story", "tarotSpread", "spellwork", "crystals". Use the valid schema value mapped to the selected preset.',
+    '- cluster — one of: "tarot-spreads", "rituals-practices", "clean-cursing", "ai-narrative-magic", "shadow-work", "cozy-witchcraft", "motherquest", "spellcraft-theory", "magical-productivity".',
     '- metaDescription (meta, description, seoDescription) — concise, warm, non-clickbait summary.',
     '- tags (keywords, labels) — array of 4–7 short strings.',
     '- excerpt — 35–55 words across 1–2 sentences.',
@@ -40,7 +53,8 @@ export const STRUCTURE_REQUIREMENTS = {
   curiousExplainer: [
     '',
     'Content Structure for Curious Explainer:',
-    '- contentType: Set to "curiousExplainer"',
+    '- contentType: Set to "guide"',
+    '- Pillar: Field Notes / support-reference depending on topic.',
     '1. 2–4 main sections exploring the idea from different angles',
     '2. Practical Invitation: one section with low-pressure ways the reader might test the idea in real life',
     '3. Gentle Closing: a brief closing that leaves space for the reader\'s own experience',
@@ -50,7 +64,8 @@ export const STRUCTURE_REQUIREMENTS = {
   practicalWorking: [
     '',
     'Content Structure for Practical Working:',
-    '- contentType: Set to "practicalWorking"',
+    '- contentType: Set to "ritual" unless the topic is explicitly spellwork.',
+    '- Pillar: Rituals & Spreads. If Clean Cursing is involved, use the Clean Cursing safety frame.',
     '1. Quick / Low-Energy Variant: 3–5 numbered steps, acknowledges low-spoon readers',
     '2. Deep Variant: 4–7 numbered steps with optional add-ons and mindful pauses',
     '3. Reflection Prompt: one expansive question about attention, meaning, values, or perspective',
@@ -62,7 +77,8 @@ export const STRUCTURE_REQUIREMENTS = {
   reflectiveEssay: [
     '',
     'Content Structure for Reflective Essay:',
-    '- contentType: Set to "reflectiveEssay"',
+    '- contentType: Set to "reflection"',
+    '- Pillar: Field Notes.',
     '1. 2–4 main sections exploring different angles of the topic',
     '2. Journaling Prompts: 3–5 open-ended questions for self-inquiry',
     '3. Gentle Closing: integration thoughts',
@@ -72,7 +88,8 @@ export const STRUCTURE_REQUIREMENTS = {
   storyVignette: [
     '',
     'Content Structure for Story & Vignette:',
-    '- contentType: Set to "storyVignette"',
+    '- contentType: Set to "story"',
+    '- Pillar: Field Notes / narrative reflection.',
     '1. 3–5 narrative sections with sensory detail and emotional arc',
     '2. Reflective Takeaway: brief closing reflection on what the story offers',
     '- Write in first-person or close third-person',
@@ -82,7 +99,8 @@ export const STRUCTURE_REQUIREMENTS = {
   grimoireTarot: [
     '',
     'Content Structure for Grimoire Entry — Tarot:',
-    '- contentType: Set to "grimoireTarot"',
+    '- contentType: Set to "tarotSpread" for spreads or "guide" for a short tarot reference.',
+    '- Pillar: Tarot / Grimoire.',
     '1. Spread Layout or Card Overview: visual description of positions or card meaning',
     '2. Position Meanings or Interpretive Depth: detailed explanation (3–7 positions for spreads)',
     '3. Reading Tips: how to interpret connections, perspectives, or tensions in the card',
@@ -94,7 +112,8 @@ export const STRUCTURE_REQUIREMENTS = {
   grimoireCrystal: [
     '',
     'Content Structure for Grimoire Entry — Crystal:',
-    '- contentType: Set to "grimoireCrystal"',
+    '- contentType: Set to "crystals"',
+    '- Pillar: Grimoire / Reference.',
     '1. Geological Properties: scientific facts about formation, composition, appearance',
     '2. Mindful Uses: secular, grounded applications for attention, sensory anchoring, or symbolic practice',
     '3. Care & Cleansing: how to physically care for the stone',
@@ -106,7 +125,8 @@ export const STRUCTURE_REQUIREMENTS = {
   grimoireHerb: [
     '',
     'Content Structure for Grimoire Entry — Herb:',
-    '- contentType: Set to "grimoireHerb"',
+    '- contentType: Set to "guide"',
+    '- Pillar: Grimoire / Reference.',
     '1. Botanical Profile: common name, plant family, brief growth notes',
     '2. Historical & Folk Use: how this herb has appeared across traditions',
     '3. Mindful Uses: secular applications — tea, smoke, tincture, kitchen, sensory anchor, or symbolic cue',
@@ -119,7 +139,8 @@ export const STRUCTURE_REQUIREMENTS = {
   grimoireAstrology: [
     '',
     'Content Structure for Grimoire Entry — Astrology:',
-    '- contentType: Set to "grimoireAstrology"',
+    '- contentType: Set to "guide"',
+    '- Pillar: Grimoire / Reference.',
     '1. Core Concepts: what this placement, sign, transit, or aspect actually means',
     '2. In Daily Life: how it shows up practically, not just symbolically',
     '3. Working With It: reflective practices, timing, intentions, and perspective shifts',
@@ -143,7 +164,9 @@ const STRICT_OUTPUT_CONTRACT = [
   '  "specVersion": 2,',
   '  "title": "",',
   '  "slug": "",',
+  '  "category": "ritual",',
   '  "contentType": "",',
+  '  "cluster": "rituals-practices",',
   '  "metaDescription": "",',
   '  "tags": [""],',
   '  "excerpt": "",',
@@ -158,6 +181,7 @@ const STRICT_OUTPUT_CONTRACT = [
   '  "altTexts": [],',
   '  "internalLinkHints": [],',
   '  "affiliateHints": [],',
+  '  "externalLink": { "url": "", "anchor": "", "description": "" },',
   '  "cta": { "type": "none" },',
   '  "adPlacements": []',
   '}',

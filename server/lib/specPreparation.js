@@ -157,6 +157,11 @@ function salvageExternalUrl(value) {
   }
 }
 
+function hasMalformedExternalText(value) {
+  const text = toTrimmedString(value);
+  return !text || /https?:\/\/|%22|\]\(|[{}]/i.test(text);
+}
+
 function sanitizeRawSpec(rawSpec) {
   const warnings = [];
   if (!isPlainObject(rawSpec)) {
@@ -184,6 +189,14 @@ function sanitizeRawSpec(rawSpec) {
     } else {
       delete sanitized.externalLink;
       recordSanitization(warnings, 'Removed unsalvageable externalLink field from raw spec.');
+    }
+    if (
+      isPlainObject(sanitized.externalLink) &&
+      (hasMalformedExternalText(sanitized.externalLink.anchor) ||
+        hasMalformedExternalText(sanitized.externalLink.description))
+    ) {
+      delete sanitized.externalLink;
+      recordSanitization(warnings, 'Removed malformed externalLink metadata from raw spec.');
     }
   }
 
@@ -587,7 +600,9 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
     normalizationReport.push(`slug-reuse:${baseSlug}`);
   }
 
-  const uniqueSlug = ensureUniqueSlug(baseSlug, postsDirectories, { fallback: 'post' });
+  const uniqueSlug = options.allowExistingSlug
+    ? baseSlug
+    : ensureUniqueSlug(baseSlug, postsDirectories, { fallback: 'post' });
   if (uniqueSlug !== spec.slug) {
     normalizationReport.push(`slug→${uniqueSlug}`);
     spec.slug = uniqueSlug;

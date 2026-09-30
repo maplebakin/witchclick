@@ -2,15 +2,20 @@ title: Clean Cursing Ritual
 goal: |
   Draft a PostSpec v2 ritual for returning disruptive energy to its origin without collateral damage.
 context:
+  - WitchClick is a secular mystical publishing hub and living grimoire for symbolic self-work.
+  - The voice is cozy, strange, grounded, emotionally precise, practical, and welcoming to skeptics.
   - Audience is secular witches seeking focused, gentle banishment and energetic release.
   - Emphasize grounding, naming, and gentle, intentional unbinding rather than revenge.
+  - The reader should leave with a practical symbolic boundary ritual, clear aftercare, and no pressure to believe in supernatural certainty.
 requirements:
   - Provide 4-5 outline items with stable IDs.
   - Include stage-by-stage ritual instructions and aftercare guidance.
   - Integrate one genuinely helpful resource recommendation.
+  - Return valid PostSpec v2 JSON only, using exact field names expected by the WitchClick validation pipeline.
 notes:
   - Maintain a tone of confident, compassionate boundary-setting.
   - Mention mirrored shields or reflective visualization.
+  - Avoid generic wellness language, revenge fantasy, coercion, harassment, supernatural harm claims, placeholder text, and markdown fences.
 safeguards:
   - Explicitly frame all "curses," "banishment," and "unbinding" as metaphorical, energetic, or psychological practices.
   - Emphasize that rituals do not involve causing physical, emotional, or spiritual harm to others or self.

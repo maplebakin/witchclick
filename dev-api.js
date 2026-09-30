@@ -48,6 +48,7 @@ import {
   serializePostStubEntries,
 } from './server/lib/stubPromptGenerator.js';
 import { executeIngest } from './server/lib/ingestExecutor.js';
+import { CONTENT_TYPES, ENTITY_TYPES, POST_CATEGORIES } from './server/lib/postSpecSchema.js';
 import { resolvePostsDirectories } from './scripts/lib/contentPaths.js';
 import { frontmatterString, parseFrontmatter, readFrontmatter } from './scripts/lib/frontmatter.js';
 import { isValidSlug, slugify } from './shared/slugify.js';
@@ -64,7 +65,10 @@ import {
 const MAX_BODY_BYTES = Number.parseInt(process.env.DEV_API_MAX_BODY_BYTES || '', 10) || 5 * 1024 * 1024; // 5MB default
 const MAX_UPLOAD_BYTES = Number.parseInt(process.env.DEV_API_MAX_UPLOAD_BYTES || '', 10) || 10 * 1024 * 1024; // 10MB default
 const DEV_API_TOKEN = process.env.DEV_API_TOKEN || '';
-const DEV_API_CORS_ORIGIN = process.env.DEV_API_CORS_ORIGIN || '*';
+const DEV_API_CORS_ORIGINS = String(process.env.DEV_API_CORS_ORIGIN || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter((origin) => origin && origin !== '*');
 const DEV_API_LOG = process.env.DEV_API_LOG !== 'false';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
@@ -72,7 +76,6 @@ const rawPort = process.env.DEV_API_PORT ?? process.env.PORT;
 const PORT = rawPort && Number.parseInt(rawPort, 10) > 0 ? Number.parseInt(rawPort, 10) : 8787;
 const HOST = process.env.HOST ?? process.env.DEV_API_HOST ?? '127.0.0.1';
 const CWD = process.cwd();
-let parsedUrl = null;
 const writeLocks = new Map();
 const ENTITY_SUBSCRIPTIONS_PATH = path.join(CWD, 'content', 'notifications', 'entity-subscriptions.json');
 const ENTITY_NOTIFICATIONS_PATH = path.join(CWD, 'content', 'notifications', 'entity-notifications.json');
@@ -103,19 +106,57 @@ function listPostDirsForCollisions() {
 
 function send(res, code, data) {
   const body = JSON.stringify(data);
-  res.writeHead(code, {
+  const headers = {
     'Content-Type': 'application/json; charset=utf-8',
-    'Access-Control-Allow-Origin': DEV_API_CORS_ORIGIN,
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-WC-Dev-Key',
     'Access-Control-Allow-Methods': 'POST, OPTIONS'
-  });
+  };
+  if (res._wcCorsOrigin) {
+    headers['Access-Control-Allow-Origin'] = res._wcCorsOrigin;
+    headers.Vary = 'Origin';
+  }
+  res.writeHead(code, headers);
   res.end(body);
+}
+
+function resolveAllowedCorsOrigin(req) {
+  const origin = typeof req.headers?.origin === 'string' ? req.headers.origin.trim() : '';
+  if (!origin) return null;
+  if (DEV_API_CORS_ORIGINS.includes(origin)) return origin;
+  if (DEV_API_CORS_ORIGINS.length > 0) return false;
+  try {
+    const parsed = new URL(origin);
+    const isLoopback = parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1' || parsed.hostname === '[::1]';
+    return isLoopback && (parsed.protocol === 'http:' || parsed.protocol === 'https:') ? origin : false;
+  } catch {
+    return false;
+  }
 }
 
 function readJSON(p) {
   try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return null; }
 }
 function ensureDir(p) { fs.mkdirSync(p, { recursive: true }); }
+function toFrontmatterYAML(obj) {
+  const lines = [];
+  for (const [key, value] of Object.entries(obj || {})) {
+    if (value === undefined) continue;
+    if (value === null) {
+      lines.push(`${key}: null`);
+      continue;
+    }
+    if (typeof value === 'string') {
+      lines.push(`${key}: ${JSON.stringify(value)}`);
+      continue;
+    }
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      lines.push(`${key}: ${value}`);
+      continue;
+    }
+    lines.push(`${key}: ${JSON.stringify(value)}`);
+  }
+  return lines.join('\n');
+}
 function writeFileAtomic(filePath, contents, encoding = 'utf8') {
   const dir = path.dirname(filePath);
   ensureDir(dir);
@@ -333,7 +374,7 @@ async function saveCurseFromEditor(payload) {
   const fmBlock = fmLines.join('\n').replace(/\s+$/, '');
   let bodyBlock = parsed.rest ? String(parsed.rest) : '';
   bodyBlock = bodyBlock.replace(/\r\n?/g, '\n');
-  if (bodyBlock && !bodyBlock.endsWith('\\n')) bodyBlock += '\\n';
+  if (bodyBlock && !bodyBlock.endsWith('\n')) bodyBlock += '\n';
 
   const fileContents = `---${newline}${fmBlock ? `${fmBlock}${newline}` : ''}---${newline}${bodyBlock ? bodyBlock.replace(/\n/g, newline) : ''}`;
   await withLock(`curse:${normalizedSlug}`, () => writeFileAtomic(targetFile, fileContents, 'utf8'));
@@ -636,27 +677,65 @@ function parseDataUrl(value) {
   return { mime, base64 };
 }
 
-function resolveTumblrHeroImagePath(heroImage) {
+function decodeBase64Payload(value) {
+  const base64 = String(value || '').trim();
+  if (!base64 || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(base64)) {
+    return null;
+  }
+  try {
+    const buffer = Buffer.from(base64, 'base64');
+    return buffer.length > 0 ? buffer : null;
+  } catch {
+    return null;
+  }
+}
+
+function normalizeImageMime(value) {
+  return value === 'image/jpg' ? 'image/jpeg' : value;
+}
+
+function hasMatchingFileHeader(buffer, mime) {
+  if (mime === 'application/pdf') {
+    return buffer.length >= 5 && buffer.subarray(0, 5).toString('ascii') === '%PDF-';
+  }
+  const sniffed = sniffImageHeader(buffer);
+  return Boolean(sniffed) && sniffed === normalizeImageMime(mime);
+}
+
+function resolveTumblrHeroImagePath(heroImage, slug) {
   const raw = String(heroImage || '').trim();
   if (!raw) return '';
+  if (!isValidSlug(slug)) throw new Error('A valid post slug is required for Tumblr media.');
+
+  const allowedRoot = path.resolve(CWD, 'public', 'images', 'hero', slug);
+  let candidate = '';
 
   if (/^https?:\/\//i.test(raw)) {
     try {
       const parsed = new URL(raw);
       const pathname = decodeURIComponent(parsed.pathname || '').replace(/^\/+/, '');
-      if (!pathname) return '';
-      return path.join(CWD, 'public', pathname);
+      if (pathname) candidate = path.resolve(CWD, 'public', pathname);
     } catch {
-      return '';
+      throw new Error('Invalid Tumblr hero image URL.');
     }
+  } else if (path.isAbsolute(raw)) {
+    candidate = path.resolve(raw);
+  } else if (raw.startsWith('/')) {
+    candidate = path.resolve(CWD, 'public', raw.replace(/^\/+/, ''));
+  } else {
+    candidate = path.resolve(CWD, raw);
   }
 
-  if (path.isAbsolute(raw)) return raw;
-  if (raw.startsWith('/')) {
-    return path.join(CWD, 'public', raw.replace(/^\/+/, ''));
+  const relative = path.relative(allowedRoot, candidate);
+  if (!candidate || relative.startsWith('..') || path.isAbsolute(relative)) {
+    throw new Error('Tumblr hero image must be inside public/images/hero/<slug>/.');
   }
-
-  return path.resolve(CWD, raw);
+  if (!fs.existsSync(candidate) || !fs.statSync(candidate).isFile()) {
+    throw new Error('Tumblr hero image file was not found.');
+  }
+  const header = fs.readFileSync(candidate).subarray(0, 16);
+  if (!sniffImageHeader(header)) throw new Error('Tumblr hero image is not a supported image file.');
+  return candidate;
 }
 
 function sniffImageHeader(buffer) {
@@ -1132,6 +1211,304 @@ async function deletePostBySlug(slug) {
   };
 }
 
+function isPostStubRecord(found) {
+  if (!found) return false;
+  const tags = Array.isArray(found.data?.tags)
+    ? found.data.tags.map((tag) => String(tag || '').trim().toLowerCase())
+    : typeof found.data?.tags === 'string'
+      ? found.data.tags.split(',').map((tag) => tag.trim().toLowerCase())
+      : [];
+  const body = typeof found.rest === 'string' ? found.rest : '';
+  return tags.includes('stub') || tags.includes('placeholder') || body.includes('automatically created as a stub');
+}
+
+function looksLikeUnfinishedGeneratedContent(value) {
+  return /(?:TODO\s*:|\[TODO\]|FIXME\b|lorem ipsum|placeholder article|this is a stub|replace this|insert content here|coming soon)/i.test(String(value || ''));
+}
+
+function mergePostTags(existingTags, nextTags) {
+  const blocked = new Set(['stub', 'placeholder']);
+  const values = [
+    ...(Array.isArray(existingTags) ? existingTags : []),
+    ...(Array.isArray(nextTags) ? nextTags : []),
+  ];
+  const seen = new Set();
+  const merged = [];
+  for (const value of values) {
+    const tag = String(value || '').trim();
+    if (!tag) continue;
+    const key = tag.toLowerCase();
+    if (blocked.has(key) || seen.has(key)) continue;
+    seen.add(key);
+    merged.push(tag);
+  }
+  return merged;
+}
+
+function preservedStubMetadata(existingData) {
+  const preserved = {};
+  for (const key of [
+    'stubRationale',
+    'stubParentSlug',
+    'stubParentTitle',
+    'generatedFrom',
+    'sourceContext',
+    'relatedThemes',
+    'relatedEntities',
+    'matchedTerms',
+    'stubTriageStatus',
+    'stubSuggestedAction',
+    'stubTriageNotes',
+  ]) {
+    if (existingData?.[key] !== undefined) preserved[key] = existingData[key];
+  }
+  return preserved;
+}
+
+function normalizeFrontmatterCategory(value) {
+  const candidate = String(value || '').trim();
+  return POST_CATEGORIES.includes(candidate) ? candidate : 'ritual';
+}
+
+function normalizeFrontmatterContentType(...values) {
+  for (const value of values) {
+    const candidate = String(value || '').trim();
+    if (CONTENT_TYPES.includes(candidate)) return candidate;
+  }
+  return '';
+}
+
+function normalizeMarkdownDraftFrontmatter(data, found) {
+  const frontmatter = { ...(data || {}) };
+  const postType = normalizeFrontmatterContentType(
+    frontmatter.contentType,
+    frontmatter.postType,
+    found.data?.contentType,
+    found.data?.postType,
+  );
+  const category = normalizeFrontmatterCategory(frontmatter.category || found.data?.category);
+  const title = frontmatter.title || found.data?.title;
+  const slug = frontmatter.slug || found.data?.slug;
+  const next = {
+    ...frontmatter,
+    ...preservedStubMetadata(found.data),
+    title,
+    slug,
+    category,
+    draft: true,
+    wasStub: true,
+    stubResolvedAt: new Date().toISOString(),
+  };
+  if (postType) {
+    next.postType = postType;
+    next.contentType = postType;
+  } else {
+    delete next.postType;
+    delete next.contentType;
+  }
+  next.tags = mergePostTags(found.data?.tags, frontmatter.tags);
+  return next;
+}
+
+function normalizePastedMarkdownDraft(raw) {
+  let normalized = String(raw || '').replace(/\r\n?/g, '\n').replace(/^\uFEFF/, '').trim();
+  const fenced = normalized.match(/^```(?:markdown|md)?[ \t]*\n([\s\S]*?)\n```[ \t]*$/i);
+  if (fenced) {
+    normalized = String(fenced[1] || '').replace(/^\uFEFF/, '').trim();
+  }
+  const frontmatterStart = normalized.search(/^---[ \t]*$/m);
+  if (frontmatterStart > 0) {
+    normalized = normalized.slice(frontmatterStart).trim();
+  }
+  return normalized;
+}
+
+function parsePastedMarkdownDraft(raw) {
+  const markdown = normalizePastedMarkdownDraft(raw);
+  if (!markdown) throw new Error('Pasted markdown draft is required.');
+
+  let parsed;
+  try {
+    parsed = parseFrontmatter(markdown);
+  } catch (err) {
+    const error = new Error(`Could not parse the pasted markdown/frontmatter: ${err?.message || String(err)}`);
+    error.code = 'PARSE_ERROR';
+    throw error;
+  }
+
+  if (!frontmatterString(parsed.data, 'slug')) {
+    const match = markdown.match(/^---[ \t]*\n([\s\S]*?)\n---[ \t]*(?:\n|$)/);
+    if (match) {
+      const slugMatch = (match[1] || '').match(/(?:^|\n)\s*slug\s*:\s*(?:"([^"]+)"|'([^']+)'|([^\n#]+))/i);
+      if (slugMatch) {
+        parsed.data.slug = String(slugMatch[1] || slugMatch[2] || slugMatch[3] || '').trim();
+      }
+    }
+  }
+
+  return { markdown, parsed };
+}
+
+function isDraftTrueValue(value) {
+  return value === true || (typeof value === 'string' && value.trim().toLowerCase() === 'true');
+}
+
+async function replacePostStubWithMarkdownDraft(payload, options = {}) {
+  const originalSlug = slugify(String(payload?.stubSlug || payload?.slug || ''));
+  if (!originalSlug) throw new Error('stubSlug is required');
+
+  const found = findPostFileBySlug(originalSlug);
+  if (!found) {
+    const err = new Error('Post stub not found');
+    err.code = 'NOT_FOUND';
+    throw err;
+  }
+  if (!isPostStubRecord(found)) {
+    const err = new Error('Refusing to replace this post because it is not detected as a stub.');
+    err.code = 'NOT_STUB';
+    throw err;
+  }
+
+  const { parsed } = parsePastedMarkdownDraft(payload?.markdown);
+
+  const rawSlug = frontmatterString(parsed.data, 'slug');
+  const specSlug = slugify(rawSlug);
+  if (!specSlug) throw new Error('Pasted draft slug is required.');
+  if (specSlug !== originalSlug) {
+    const err = new Error(`The pasted draft slug must exactly match the selected stub slug.`);
+    err.code = 'SLUG_MISMATCH';
+    throw err;
+  }
+
+  const draftValue = parsed.data?.draft;
+  if (!isDraftTrueValue(draftValue)) {
+    throw new Error('Pasted draft must keep draft: true.');
+  }
+
+  const title = frontmatterString(parsed.data, 'title');
+  if (!title) throw new Error('Pasted draft title is required.');
+
+  const markdownBody = typeof parsed.rest === 'string' ? parsed.rest.trim() : '';
+  if (!markdownBody) throw new Error('Pasted draft body is empty.');
+  if (looksLikeUnfinishedGeneratedContent(`${JSON.stringify(parsed.data)}\n${markdownBody}`)) {
+    throw new Error('Pasted draft still looks like placeholder or TODO content.');
+  }
+
+  const nextFrontmatter = normalizeMarkdownDraftFrontmatter(parsed.data, found);
+  const newline = /\r\n/.test(found.raw || '') ? '\r\n' : '\n';
+  const fmBlock = toFrontmatterYAML(nextFrontmatter).replace(/\n/g, newline);
+  const bodyBlock = markdownBody.replace(/\r\n?/g, '\n').replace(/\n/g, newline);
+  const contents = `---${newline}${fmBlock}${newline}---${newline}${bodyBlock.endsWith(newline) ? bodyBlock : `${bodyBlock}${newline}`}`;
+  const relativePath = path.relative(CWD, found.file).replace(/\\/g, '/');
+  const wordCount = markdownBody.split(/\s+/).filter(Boolean).length;
+  const warnings = [];
+  if (wordCount < 300) warnings.push('Draft is under 300 words; review depth before publishing.');
+
+  if (options.dryRun) {
+    return {
+      slug: originalSlug,
+      path: relativePath,
+      saved: false,
+      words: wordCount,
+      warnings,
+      frontmatter: nextFrontmatter,
+    };
+  }
+
+  await withLock(`post:${originalSlug}`, () => writeFileAtomic(found.file, contents, 'utf8'));
+  return {
+    slug: originalSlug,
+    path: relativePath,
+    saved: true,
+    words: wordCount,
+    warnings,
+  };
+}
+
+async function replacePostStubWithDraft(payload, options = {}) {
+  if (typeof payload?.markdown === 'string') {
+    return replacePostStubWithMarkdownDraft(payload, options);
+  }
+
+  const originalSlug = slugify(String(payload?.stubSlug || payload?.slug || payload?.spec?.slug || ''));
+  if (!originalSlug) throw new Error('stubSlug is required');
+
+  const found = findPostFileBySlug(originalSlug);
+  if (!found) {
+    const err = new Error('Post stub not found');
+    err.code = 'NOT_FOUND';
+    throw err;
+  }
+  if (!isPostStubRecord(found)) {
+    const err = new Error('Refusing to replace this post because it is not detected as a stub.');
+    err.code = 'NOT_STUB';
+    throw err;
+  }
+
+  const rawSpec = payload?.spec && typeof payload.spec === 'object' ? payload.spec : payload;
+  const specSlug = slugify(String(rawSpec?.slug || ''));
+  if (!specSlug) throw new Error('PostSpec slug is required');
+  if (specSlug !== originalSlug) {
+    const err = new Error(`PostSpec slug "${specSlug}" does not match selected stub "${originalSlug}".`);
+    err.code = 'SLUG_MISMATCH';
+    throw err;
+  }
+
+  const prepared = prepareSpecForPersistence(rawSpec || {}, {
+    cwd: CWD,
+    postsDirectories: listPostDirsForCollisions(),
+    draft: true,
+    allowExistingSlug: true,
+    targetWordCount: 1200,
+  });
+
+  const parsedPrepared = parseFrontmatter(prepared.post.contents);
+  const markdownBody = typeof parsedPrepared.rest === 'string' ? parsedPrepared.rest : '';
+  if (!markdownBody.trim()) throw new Error('Prepared article body is empty.');
+  if (looksLikeUnfinishedGeneratedContent(markdownBody)) {
+    throw new Error('Prepared article still looks like placeholder or TODO content.');
+  }
+
+  const nextFrontmatter = {
+    ...prepared.frontmatter,
+    ...preservedStubMetadata(found.data),
+    tags: mergePostTags(found.data?.tags, prepared.frontmatter?.tags),
+    category: prepared.frontmatter?.category || found.data?.category,
+    contentType: prepared.frontmatter?.contentType || found.data?.contentType,
+    draft: true,
+    wasStub: true,
+    stubResolvedAt: new Date().toISOString(),
+  };
+
+  const newline = /\r\n/.test(found.raw || '') ? '\r\n' : '\n';
+  const fmBlock = toFrontmatterYAML(nextFrontmatter).replace(/\n/g, newline);
+  const bodyBlock = markdownBody.replace(/\r\n?/g, '\n').replace(/\n/g, newline);
+  const contents = `---${newline}${fmBlock}${newline}---${newline}${bodyBlock.endsWith(newline) ? bodyBlock : `${bodyBlock}${newline}`}`;
+
+  const relativePath = path.relative(CWD, found.file).replace(/\\/g, '/');
+  if (options.dryRun) {
+    return {
+      slug: originalSlug,
+      path: relativePath,
+      saved: false,
+      words: prepared.wordCount,
+      warnings: prepared.warnings || [],
+      normalizationReport: prepared.normalizationReport || [],
+      frontmatter: nextFrontmatter,
+    };
+  }
+
+  await withLock(`post:${originalSlug}`, () => writeFileAtomic(found.file, contents, 'utf8'));
+  return {
+    slug: originalSlug,
+    path: relativePath,
+    saved: true,
+    words: prepared.wordCount,
+    warnings: prepared.warnings || [],
+    normalizationReport: prepared.normalizationReport || [],
+  };
+}
+
 function resolvePrimaryPostsDir() {
   const [first] = listPostDirsForCollisions();
   return first || path.join(CWD, 'content', 'posts');
@@ -1183,14 +1560,39 @@ function parseBody(req) {
         return out;
       }
 
-      // Existing cleanups: BOM + trailing commas (keep these)
-      const base = buf.replace(/^\uFEFF/, '').replace(/,\s*([}\]])/g, '$1');
+      function removeTrailingCommasOutsideStrings(s) {
+        let out = '', inStr = false, esc = false;
+        for (let i = 0; i < s.length; i++) {
+          const ch = s[i];
+          if (inStr) {
+            out += ch;
+            if (esc) esc = false;
+            else if (ch === '\\') esc = true;
+            else if (ch === '"') inStr = false;
+            continue;
+          }
+          if (ch === '"') {
+            inStr = true;
+            out += ch;
+            continue;
+          }
+          if (ch === ',') {
+            let cursor = i + 1;
+            while (/\s/.test(s[cursor] || '')) cursor += 1;
+            if (s[cursor] === '}' || s[cursor] === ']') continue;
+          }
+          out += ch;
+        }
+        return out;
+      }
+
+      const base = buf.replace(/^\uFEFF/, '');
 
       // Strategy 1: normal parse
       try { return resolve(JSON.parse(base)); } catch {}
 
-      // Strategy 2: fix stray backslashes outside strings (e.g. "tags":\[)
-      const fixed = deBackslashOutsideStrings(base);
+      // Strategy 2: narrowly repair common model-output syntax outside quoted strings.
+      const fixed = deBackslashOutsideStrings(removeTrailingCommasOutsideStrings(base));
       try { return resolve(JSON.parse(fixed)); } catch {}
 
       // Strategy 3: double-encoded body (JSON string containing JSON)
@@ -1202,7 +1604,9 @@ function parseBody(req) {
       } catch {}
 
       // Last resort: show a concise preview to help debug
-      return reject(new Error('Invalid JSON after cleanup. Starts with: ' + base.slice(0, 120)));
+      const error = new Error('Invalid JSON after cleanup. Starts with: ' + base.slice(0, 120));
+      error.status = 400;
+      return reject(error);
     });
   });
 }
@@ -1305,7 +1709,7 @@ function assertMaxLen(label, value, max) {
 }
 
 // ---------- GENPROMPT (shared with CLI) ----------
-function buildGenprompt({ topic, words, ads, kofi, contentType, styleDirective }) {
+function buildGenprompt({ topic, words, ads, kofi, contentType, styleDirective, mode, style }) {
   const context = loadPromptContext({ cwd: CWD });
   const allowed = Array.isArray(context.allowedAffiliateKeys)
     ? context.allowedAffiliateKeys
@@ -1317,11 +1721,15 @@ function buildGenprompt({ topic, words, ads, kofi, contentType, styleDirective }
     ? context.existingPostSlugs
     : [];
 
+  const resolvedContentType = contentType || resolveGeneratorPresetKey(String(mode || '')) || undefined;
+  const styleKey = String(style || '').trim().toLowerCase();
+  const resolvedStyleDirective = styleDirective || generatorStyles[styleKey] || generatorStyles.cozy;
+
   return buildMasterPrompt({
     topic,
     words,
-    contentType,
-    styleDirective,
+    contentType: resolvedContentType,
+    styleDirective: resolvedStyleDirective,
     ads,
     kofi,
     brandName: context.brandName ?? 'WitchClick',
@@ -1331,6 +1739,10 @@ function buildGenprompt({ topic, words, ads, kofi, contentType, styleDirective }
     allowedAffiliateKeys: allowed,
     engagementSignals: context.engagementSignals,
   });
+}
+
+function buildPresetPrompt({ topic, styleDirective, contentType, words = 1200, ads = 'off', kofi = 'on' }) {
+  return buildGenprompt({ topic, words, ads, kofi, contentType, styleDirective });
 }
 
 // ---------- POSTS ----------
@@ -1577,7 +1989,7 @@ async function saveThemeRecord(payload) {
 async function setActiveThemeRecord(payload) {
   const mode = normalizeThemeMode(payload?.mode);
   const slug = typeof payload?.slug === 'string' ? payload.slug.trim() : '';
-  if (!slug) throw new Error('slug required');
+  if (!isValidSlug(slug)) throw new Error('valid slug required');
 
   const filePath = path.join(THEMES_DIR, `${slug}.json`);
   if (!fs.existsSync(filePath)) throw new Error('theme not found');
@@ -1603,7 +2015,7 @@ async function setActiveThemeRecord(payload) {
 
 async function deleteThemeRecord(payload) {
   const slug = typeof payload?.slug === 'string' ? payload.slug.trim() : '';
-  if (!slug) throw new Error('slug required');
+  if (!isValidSlug(slug)) throw new Error('valid slug required');
 
   const filePath = path.join(THEMES_DIR, `${slug}.json`);
   if (!fs.existsSync(filePath)) throw new Error('theme not found');
@@ -1771,8 +2183,9 @@ async function listDownloads() {
 }
 
 async function getDownload({ slug }) {
-  if (!slug) throw new Error('slug is required');
-  const file = path.join(CWD, 'content', 'downloads', `${String(slug)}.json`);
+  const normalizedSlug = String(slug || '').trim();
+  if (!isValidSlug(normalizedSlug)) throw new Error('valid slug is required');
+  const file = path.join(CWD, 'content', 'downloads', `${normalizedSlug}.json`);
   if (!fs.existsSync(file)) throw new Error('not found');
   const data = JSON.parse(fs.readFileSync(file, 'utf8'));
   return { data };
@@ -1876,21 +2289,28 @@ async function listEntities() {
 }
 
 async function getEntity({ type, slug }) {
-  if (!type || !slug) throw new Error('type and slug are required');
-  const file = path.join(CWD, 'content', 'entities', String(type), `${String(slug)}.json`);
+  const normalizedType = String(type || '').trim();
+  const normalizedSlug = String(slug || '').trim();
+  if (!ENTITY_TYPES.includes(normalizedType) || !isValidSlug(normalizedSlug)) {
+    const error = new Error('valid entity type and slug are required');
+    error.status = 400;
+    throw error;
+  }
+  const file = path.join(CWD, 'content', 'entities', normalizedType, `${normalizedSlug}.json`);
   if (!fs.existsSync(file)) throw new Error('not found');
   const j = JSON.parse(fs.readFileSync(file, 'utf8'));
   return { data: j };
 }
 
 async function saveEntity({ type, slug, name, summary, properties, related }) {
-  if (!type) throw new Error('type required');
+  const normalizedType = String(type || '').trim();
+  if (!ENTITY_TYPES.includes(normalizedType)) throw new Error('valid entity type required');
   if (!slug && !name) throw new Error('slug or name required');
   const s = slugify(slug || name);
   if (!s) throw new Error('invalid slug');
   assertMaxLen('entity name', name || s, 140);
   assertMaxLen('entity summary', summary || '', 400);
-  const file = path.join(CWD, 'content', 'entities', String(type), `${s}.json`);
+  const file = path.join(CWD, 'content', 'entities', normalizedType, `${s}.json`);
   let wasStub = false;
   if (fs.existsSync(file)) {
     try {
@@ -1905,7 +2325,7 @@ async function saveEntity({ type, slug, name, summary, properties, related }) {
   const propsJson = JSON.stringify(props);
   if (propsJson.length > 4000) throw new Error('properties too large');
   const payload = {
-    type: String(type),
+    type: normalizedType,
     slug: s,
     name: String(name || '').trim() || s.replace(/-/g,' ').replace(/\b\w/g, m=>m.toUpperCase()),
     summary: String(summary || ''),
@@ -1917,19 +2337,20 @@ async function saveEntity({ type, slug, name, summary, properties, related }) {
   let notified = [];
   if (wasStub && !isNowStub) {
     const result = await notifyEntitySubscribers({
-      type: String(type),
+      type: normalizedType,
       slug: s,
       name: payload.name,
       summary: payload.summary,
     });
     notified = result.notified;
   }
-  return { path: `content/entities/${type}/${s}.json`, slug: s, type, notified };
+  return { path: `content/entities/${normalizedType}/${s}.json`, slug: s, type: normalizedType, notified };
 }
 
 async function deleteEntity({ type, slug }) {
   if (!type || !slug) throw new Error('type and slug are required');
   const normalizedType = String(type);
+  if (!ENTITY_TYPES.includes(normalizedType)) throw new Error('invalid entity type');
   const normalizedSlug = slugify(slug);
   if (!normalizedSlug) throw new Error('invalid slug');
   const file = path.join(CWD, 'content', 'entities', normalizedType, `${normalizedSlug}.json`);
@@ -2113,7 +2534,6 @@ async function withRequestBoundary(req, res, handler) {
 // ---------- HTTP SERVER ----------
   const server = http.createServer(async (req, res) => {
     await withRequestBoundary(req, res, async () => {
-      parsedUrl = null;
     const startTime = Date.now();
     if (typeof res.on === 'function') {
       res.on('finish', () => {
@@ -2122,8 +2542,17 @@ async function withRequestBoundary(req, res, handler) {
     }
 
     const remote = req.socket?.remoteAddress || '';
-    const route = req.url || '';
-    const isPublicEndpoint = PUBLIC_ENDPOINTS.has(route);
+    const requestUrl = new URL(req.url || '/', `http://localhost:${PORT}`);
+    const pathname = requestUrl.pathname;
+    const route = pathname;
+    const allowedCorsOrigin = resolveAllowedCorsOrigin(req);
+    if (allowedCorsOrigin === false) {
+      return send(res, 403, { ok: false, error: 'Forbidden origin' });
+    }
+    res._wcCorsOrigin = allowedCorsOrigin;
+    if (req.method === 'OPTIONS') return send(res, 204, { ok: true });
+
+    const isPublicEndpoint = PUBLIC_ENDPOINTS.has(pathname);
     const loopback = remote === '127.0.0.1' || remote === '::1' || remote.startsWith('::ffff:127.');
 
     if (!isPublicEndpoint) {
@@ -2132,14 +2561,12 @@ async function withRequestBoundary(req, res, handler) {
       }
       if (DEV_API_TOKEN) {
         const token = req.headers['x-wc-dev-key'] || req.headers['authorization'];
-        const tokenValue = Array.isArray(token) ? token[0] : (token || '').replace(/^Bearer\\s+/i, '');
+        const tokenValue = Array.isArray(token) ? token[0] : (token || '').replace(/^Bearer\s+/i, '');
         if (tokenValue !== DEV_API_TOKEN) {
           return send(res, 401, { ok: false, error: 'Unauthorized' });
         }
       }
     }
-
-    if (req.method === 'OPTIONS') return send(res, 204, { ok: true });
 
     const rateResult = checkRateLimit(remote || 'unknown', route);
     if (!rateResult.ok) {
@@ -2229,8 +2656,7 @@ async function withRequestBoundary(req, res, handler) {
     }
 
     if (req.method === 'POST') {
-      parsedUrl = new URL(req.url, `http://localhost:${PORT}`);
-      if (parsedUrl.pathname === '/ingest') {
+      if (pathname === '/ingest') {
         const payload = await parseBody(req);
         if (!payload) {
           return send(res, 400, {
@@ -2240,7 +2666,7 @@ async function withRequestBoundary(req, res, handler) {
         }
 
         const queryDryRun = (() => {
-          const flag = parsedUrl.searchParams.get('dryRun');
+          const flag = requestUrl.searchParams.get('dryRun');
           return flag === 'true' || flag === '1';
         })();
         const bodyDryRun = typeof payload === 'object' && payload
@@ -2249,7 +2675,7 @@ async function withRequestBoundary(req, res, handler) {
         const dryRun = queryDryRun || bodyDryRun;
 
         const queryDraft = (() => {
-          const flag = parsedUrl.searchParams.get('draft');
+          const flag = requestUrl.searchParams.get('draft');
           return flag === 'true' || flag === '1';
         })();
         const bodyDraft = typeof payload === 'object' && payload
@@ -2322,7 +2748,7 @@ async function withRequestBoundary(req, res, handler) {
             normalizations: e?.normalizations || [],
           });
         }
-      } else if (parsedUrl.pathname === '/curses/ingest') {
+      } else if (pathname === '/curses/ingest') {
         const payload = await parseBody(req);
         if (!payload) {
           return send(res, 400, {
@@ -2332,7 +2758,7 @@ async function withRequestBoundary(req, res, handler) {
         }
 
         const queryDryRun = (() => {
-          const flag = parsedUrl.searchParams.get('dryRun');
+          const flag = requestUrl.searchParams.get('dryRun');
           return flag === 'true' || flag === '1';
         })();
         const bodyDryRun = typeof payload === 'object' && payload
@@ -2383,9 +2809,6 @@ async function withRequestBoundary(req, res, handler) {
       });
     }
 
-    const urlForRouting = parsedUrl ?? new URL(req.url || '', `http://localhost:${PORT}`);
-    const pathname = urlForRouting.pathname;
-
     if (!IS_PRODUCTION && req.method === 'POST' && (req.url === '/tumblr-push' || pathname === '/tumblr-push')) {
       try {
         const body = await parseBody(req);
@@ -2395,7 +2818,7 @@ async function withRequestBoundary(req, res, handler) {
         const excerpt = String(payload.excerpt || '').trim();
         const url = String(payload.url || '').trim();
         const heroImageInput = String(payload.heroImage || '').trim();
-        const heroImage = resolveTumblrHeroImagePath(heroImageInput);
+        const heroImage = resolveTumblrHeroImagePath(heroImageInput, slug);
         const tags = Array.isArray(payload.tags) ? payload.tags : [];
 
         console.log('[dev-api]', {
@@ -2475,6 +2898,32 @@ async function withRequestBoundary(req, res, handler) {
       } catch (e) {
         const status = e?.code === 'NOT_FOUND' ? 404 : e?.code === 'SLUG_CONFLICT' ? 409 : 400;
         return send(res, status, { ok: false, error: e?.message || String(e) });
+      }
+    }
+
+    if (req.method === 'POST' && (req.url === '/posts/replace-stub' || pathname === '/posts/replace-stub')) {
+      try {
+        const body = await parseBody(req);
+        const dryRun =
+          requestUrl.searchParams.get('dryRun') === 'true' ||
+          body?.dryRun === true ||
+          body?.dryRun === 'true';
+        const data = await replacePostStubWithDraft(body || {}, { dryRun });
+        return send(res, 200, { ok: true, ...data });
+      } catch (e) {
+        const status =
+          e?.code === 'NOT_FOUND' ? 404 :
+          e?.code === 'SLUG_MISMATCH' ? 409 :
+          e?.code === 'NOT_STUB' ? 409 :
+          Array.isArray(e?.errors) ? 400 :
+          400;
+        return send(res, status, {
+          ok: false,
+          error: e?.errors?.[0] || e?.message || String(e),
+          errors: Array.isArray(e?.errors) ? e.errors : [],
+          warnings: Array.isArray(e?.warnings) ? e.warnings : [],
+          normalizations: Array.isArray(e?.normalizations) ? e.normalizations : [],
+        });
       }
     }
 
@@ -2565,15 +3014,14 @@ async function withRequestBoundary(req, res, handler) {
         const sanitized = sanitizeHeroFilename(body.filename, fallbackExt);
         const base = sanitized.base;
         const ext = fallbackExt;
-        const buffer = Buffer.from(parsed.base64, 'base64');
-        if (!buffer.length) {
-          return send(res, 400, { ok: false, error: 'Image data was empty' });
+        const buffer = decodeBase64Payload(parsed.base64);
+        if (!buffer) {
+          return send(res, 400, { ok: false, error: 'Image data was invalid or empty' });
         }
         if (buffer.length > MAX_UPLOAD_BYTES) {
           return send(res, 413, { ok: false, error: `Image exceeds limit (${buffer.length} > ${MAX_UPLOAD_BYTES})` });
         }
-        const sniffed = sniffImageHeader(buffer);
-        if (sniffed && sniffed !== parsed.mime) {
+        if (!hasMatchingFileHeader(buffer, parsed.mime)) {
           return send(res, 400, { ok: false, error: 'Image header mismatch' });
         }
         const targetDir = path.join(HERO_IMAGE_ROOT, slug);
@@ -2632,11 +3080,15 @@ async function withRequestBoundary(req, res, handler) {
           return send(res, 400, { ok: false, error: 'Unsupported mime; allowed: PDF or PNG/JPG/WEBP images' });
         }
 
-        const { base, ext } = sanitizeHeroFilename(body.filename, fallbackExt);
-        const buffer = Buffer.from(parsed.base64, 'base64');
-        if (!buffer.length) return send(res, 400, { ok: false, error: 'File data was empty' });
+        const { base } = sanitizeHeroFilename(body.filename, fallbackExt);
+        const ext = fallbackExt;
+        const buffer = decodeBase64Payload(parsed.base64);
+        if (!buffer) return send(res, 400, { ok: false, error: 'File data was invalid or empty' });
         if (buffer.length > MAX_UPLOAD_BYTES) {
           return send(res, 413, { ok: false, error: `File exceeds limit (${buffer.length} > ${MAX_UPLOAD_BYTES})` });
+        }
+        if (!hasMatchingFileHeader(buffer, parsed.mime)) {
+          return send(res, 400, { ok: false, error: 'File header does not match its declared type' });
         }
 
         const targetDir = path.join(DOWNLOADS_ROOT, slug, 'files');
@@ -2671,15 +3123,15 @@ async function withRequestBoundary(req, res, handler) {
         const fallbackExt = MIME_EXTENSION_MAP[parsed.mime];
         if (!fallbackExt) return send(res, 400, { ok: false, error: 'Unsupported image mime type' });
 
-        const { base, ext } = sanitizeHeroFilename(body.filename, fallbackExt);
-        const buffer = Buffer.from(parsed.base64, 'base64');
-        if (!buffer.length) return send(res, 400, { ok: false, error: 'Image data was empty' });
+        const { base } = sanitizeHeroFilename(body.filename, fallbackExt);
+        const ext = fallbackExt;
+        const buffer = decodeBase64Payload(parsed.base64);
+        if (!buffer) return send(res, 400, { ok: false, error: 'Image data was invalid or empty' });
         if (buffer.length > MAX_UPLOAD_BYTES) {
           return send(res, 413, { ok: false, error: `Image exceeds limit (${buffer.length} > ${MAX_UPLOAD_BYTES})` });
         }
-        const sniffed = sniffImageHeader(buffer);
-        if (sniffed && !sniffed.startsWith('image/')) {
-          return send(res, 400, { ok: false, error: 'Invalid image header' });
+        if (!hasMatchingFileHeader(buffer, parsed.mime)) {
+          return send(res, 400, { ok: false, error: 'Image header mismatch' });
         }
 
         const targetDir = path.join(DOWNLOADS_ROOT, slug, 'cover');
@@ -2787,9 +3239,15 @@ async function withRequestBoundary(req, res, handler) {
         const sanitized = sanitizeHeroFilename(body.filename, fallbackExt);
         const base = sanitized.base;
         const ext = fallbackExt;
-        const buffer = Buffer.from(parsed.base64, 'base64');
-        if (!buffer.length) {
-          return send(res, 400, { ok: false, error: 'Image data was empty' });
+        const buffer = decodeBase64Payload(parsed.base64);
+        if (!buffer) {
+          return send(res, 400, { ok: false, error: 'Image data was invalid or empty' });
+        }
+        if (buffer.length > MAX_UPLOAD_BYTES) {
+          return send(res, 413, { ok: false, error: `Image exceeds limit (${buffer.length} > ${MAX_UPLOAD_BYTES})` });
+        }
+        if (!hasMatchingFileHeader(buffer, parsed.mime)) {
+          return send(res, 400, { ok: false, error: 'Image header mismatch' });
         }
         ensureDir(THEME_BACKGROUNDS_ROOT);
         const finalName = ensureUniqueFilename(THEME_BACKGROUNDS_ROOT, base, ext);
@@ -2839,7 +3297,7 @@ async function withRequestBoundary(req, res, handler) {
         const data = await getDownload({ slug: body?.slug });
         return send(res, 200, { ok: true, ...data });
       } catch (e) {
-        return send(res, 404, { ok: false, error: e.message || String(e) });
+        return send(res, e?.status === 400 ? 400 : 404, { ok: false, error: e.message || String(e) });
       }
     }
 
@@ -2976,7 +3434,7 @@ async function withRequestBoundary(req, res, handler) {
         const data = await getEntity({ type: body?.type, slug: body?.slug });
         return send(res, 200, { ok: true, ...data });
       } catch (e) {
-        return send(res, 404, { ok: false, error: e.message || String(e) });
+        return send(res, e?.status === 400 ? 400 : 404, { ok: false, error: e.message || String(e) });
       }
     }
 
@@ -3016,6 +3474,20 @@ async function withRequestBoundary(req, res, handler) {
         const body = await parseBody(req);
         if (!body || !Array.isArray(body.products)) {
           return send(res, 400, { ok: false, error: 'products array required' });
+        }
+        for (const product of body.products) {
+          const key = String(product?.key || '').trim();
+          const target = String(product?.url || '').trim();
+          let safeTarget = false;
+          try {
+            const parsed = new URL(target);
+            safeTarget = parsed.protocol === 'https:' || parsed.protocol === 'http:';
+          } catch {
+            safeTarget = false;
+          }
+          if (!isValidSlug(key) || !safeTarget) {
+            return send(res, 400, { ok: false, error: 'Each product requires a slug key and an http(s) URL.' });
+          }
         }
         const productsPath = path.join(CWD, 'content', 'products.json');
         const data = { products: body.products };
@@ -3245,6 +3717,7 @@ const adminPipelineHelpers = {
   generateMetaDescription,
   normalizeTags,
   buildGenprompt,
+  buildPresetPrompt,
   prepareSpecForPersistence,
   persistPreparedSpec,
 };
@@ -3257,12 +3730,19 @@ export {
   generateMetaDescription,
   normalizeTags,
   buildGenprompt,
+  buildPresetPrompt,
   prepareSpecForPersistence,
   persistPreparedSpec,
+  normalizePastedMarkdownDraft,
+  parsePastedMarkdownDraft,
+  replacePostStubWithDraft,
   adminPipelineHelpers,
   listThemes,
   saveThemeRecord,
   setActiveThemeRecord,
   deleteThemeRecord,
   attachHeroToPost,
+  getEntity,
+  parseBody,
+  server,
 };

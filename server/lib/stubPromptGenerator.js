@@ -4,6 +4,19 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
+import {
+  ANTI_GENERIC_OUTPUT_RULES,
+  CLEAN_CURSING_SAFETY_BLOCK,
+  GRIMOIRE_REFERENCE_BLOCK,
+  POP_CULTURE_REVIEW_BLOCK,
+  RITUAL_REFERENCE_GUIDE_BLOCK,
+  SOURCE_CONTEXT_USAGE_RULES,
+  TAROT_SAFETY_BLOCK,
+  WITCHCLICK_IDENTITY_BLOCK,
+  buildContentIntentBlock,
+  renderEntityJsonSkeleton,
+  renderPostSpecV2Skeleton,
+} from './editorialPromptBlocks.js';
 
 const TYPE_LABELS = {
   crystal: 'Crystal',
@@ -125,6 +138,7 @@ const TYPE_GUIDANCE = {
 };
 
 const MAX_REFERENCES = 5;
+const POST_STUB_BODY_PHRASE = 'automatically created as a stub';
 
 export function generateStubPrompts(options = {}) {
   const cwd = options.cwd || process.cwd();
@@ -177,8 +191,8 @@ export function generatePostStubPrompts(options = {}) {
         : typeof fm.tags === 'string'
           ? fm.tags.split(',').map((tag) => String(tag || '').trim().toLowerCase()).filter(Boolean)
           : [];
-      const hasStubTag = tags.includes('stub');
-      const hasStubBody = body.includes('automatically created as a stub');
+      const hasStubTag = tags.includes('stub') || tags.includes('placeholder');
+      const hasStubBody = body.includes(POST_STUB_BODY_PHRASE);
       if (!hasStubTag && !hasStubBody) continue;
 
       const derivedFromFilename = toSlug(path.basename(filePath, '.md'));
@@ -191,17 +205,71 @@ export function generatePostStubPrompts(options = {}) {
       const stubRationale = typeof fm.stubRationale === 'string' ? fm.stubRationale.trim() : '';
       const stubParentSlug = typeof fm.stubParentSlug === 'string' ? fm.stubParentSlug.trim() : '';
       const stubParentTitle = typeof fm.stubParentTitle === 'string' ? fm.stubParentTitle.trim() : '';
+      const category = typeof fm.category === 'string' ? fm.category.trim() : '';
+      const contentType = typeof fm.contentType === 'string' ? fm.contentType.trim() : '';
+      const pillar = typeof fm.pillar === 'string' ? fm.pillar.trim() : '';
+      const excerpt = typeof fm.excerpt === 'string' ? fm.excerpt.trim() : '';
+      const stubTriageStatus = typeof fm.stubTriageStatus === 'string' ? fm.stubTriageStatus.trim() : '';
+      const stubSuggestedAction = typeof fm.stubSuggestedAction === 'string' ? fm.stubSuggestedAction.trim() : '';
+      const stubTriageNotes = typeof fm.stubTriageNotes === 'string' ? fm.stubTriageNotes.trim() : '';
+      const entities = Array.isArray(fm.entities) ? fm.entities : [];
+      const relatedThemes = normalizeStringArray(fm.relatedThemes || fm.themes || fm.tags);
+      const matchedTerms = normalizeStringArray(fm.matchedTerms || fm.matchedPhrases);
+      const generatedFrom = normalizeGeneratedFrom(fm.generatedFrom);
+      const savedSourceContext = normalizeSourceContext(fm.sourceContext);
+      const parentContext = findSourcePostContext(cwd, {
+        slug: stubParentSlug,
+        title: stubParentTitle,
+        reason: stubRationale,
+        matchedPhrase: matchedTerms[0] || title,
+      });
+      const sourceContext = mergeSourceContext(savedSourceContext, parentContext ? [parentContext] : []);
+      const stubArticle = {
+        type: 'post',
+        slug,
+        title,
+        name: title,
+        status: 'stub',
+        draft: fm.draft === true,
+        filePath: relativePath,
+        existingFrontmatter: parsed.matter || '',
+        category,
+        contentType,
+        pillar,
+        stubTriageStatus,
+        stubSuggestedAction,
+        stubTriageNotes,
+        tags: normalizeStringArray(fm.tags),
+        entities,
+        excerpt,
+        stubReason: stubRationale,
+        stubRationale,
+        generatedFrom,
+        sourceContext,
+        relatedThemes,
+        relatedEntities: normalizeRelatedEntities(fm.relatedEntities || entities),
+        matchedTerms,
+        stubParentSlug,
+        stubParentTitle,
+      };
 
       entries.push({
-        type: 'post',
+        ...stubArticle,
         slug,
         name: title,
         filePath: relativePath,
-        stubRationale,
-        stubParentSlug,
-        stubParentTitle,
-        prompt: buildPostStubPrompt({ title, slug, stubRationale, stubParentSlug, stubParentTitle }),
-        references: [],
+        prompt: generateStubArticlePrompt(stubArticle),
+        references: sourceContext.map((ref) => ({
+          title: ref.title,
+          slug: ref.slug,
+          sourcePath: ref.sourcePath,
+          excerpt: ref.excerpt,
+          reason: ref.reason,
+          matchedPhrase: ref.matchedPhrase,
+          suggestedAngle: ref.suggestedAngle,
+          adminHref: ref.adminHref,
+          publicHref: ref.publicHref,
+        })),
       });
     } catch {
       /* ignore unreadable post */
@@ -218,6 +286,19 @@ export function serializePostStubEntries(entries) {
     type: entry.type,
     slug: entry.slug,
     name: entry.name,
+    title: entry.title || entry.name,
+    status: entry.status || 'stub',
+    draft: entry.draft === true,
+    category: entry.category || '',
+    contentType: entry.contentType || '',
+    pillar: entry.pillar || '',
+    stubTriageStatus: entry.stubTriageStatus || '',
+    stubSuggestedAction: entry.stubSuggestedAction || '',
+    stubTriageNotes: entry.stubTriageNotes || '',
+    tags: Array.isArray(entry.tags) ? entry.tags : [],
+    entities: Array.isArray(entry.entities) ? entry.entities : [],
+    excerpt: entry.excerpt || '',
+    existingFrontmatter: entry.existingFrontmatter || '',
     relativePath: entry.filePath,
     filePath: entry.filePath,
     prompt: entry.prompt,
@@ -226,12 +307,201 @@ export function serializePostStubEntries(entries) {
           title: ref.title,
           slug: ref.slug,
           sourcePath: ref.sourcePath,
+          excerpt: ref.excerpt,
+          reason: ref.reason,
+          matchedPhrase: ref.matchedPhrase,
+          suggestedAngle: ref.suggestedAngle,
+          adminHref: ref.adminHref,
+          publicHref: ref.publicHref,
         }))
       : [],
+    stubReason: entry.stubReason || entry.stubRationale || '',
     stubRationale: entry.stubRationale || '',
     stubParentSlug: entry.stubParentSlug || '',
     stubParentTitle: entry.stubParentTitle || '',
+    generatedFrom: entry.generatedFrom || null,
+    sourceContext: Array.isArray(entry.sourceContext) ? entry.sourceContext : [],
+    relatedThemes: Array.isArray(entry.relatedThemes) ? entry.relatedThemes : [],
+    relatedEntities: Array.isArray(entry.relatedEntities) ? entry.relatedEntities : [],
+    matchedTerms: Array.isArray(entry.matchedTerms) ? entry.matchedTerms : [],
   }));
+}
+
+export function generateStubArticlePrompt(stubArticle) {
+  const tags = normalizeStringArray(stubArticle?.tags);
+  const entities = normalizeRelatedEntities(stubArticle?.entities || stubArticle?.relatedEntities);
+  const sourceContext = normalizeSourceContext(stubArticle?.sourceContext || stubArticle?.references);
+  const relatedThemes = normalizeStringArray(stubArticle?.relatedThemes);
+  const matchedTerms = normalizeStringArray(stubArticle?.matchedTerms);
+  const contentType = String(stubArticle?.contentType || '').trim() || 'choose the best valid PostSpec contentType';
+  const category = String(stubArticle?.category || '').trim() || 'choose the best valid category';
+  const pillar = String(stubArticle?.pillar || '').trim();
+  const triageStatus = String(stubArticle?.stubTriageStatus || '').trim();
+  const title = String(stubArticle?.title || stubArticle?.name || '').trim();
+  const slug = toSlug(String(stubArticle?.slug || '').trim());
+  const isCleanCursing = [title, slug, category, contentType, pillar, ...tags]
+    .join(' ')
+    .toLowerCase()
+    .includes('curs');
+  const isRitual = /ritual|spell|working|curse|cursing/i.test([title, contentType, category, ...tags].join(' '));
+  const isTarot = /tarot|spread/i.test([title, contentType, category, ...tags].join(' '));
+  const isReference = /reference|guide|grimoire|glossary|support/i.test([title, contentType, category, pillar, ...tags].join(' '));
+  const isPopCultureReview = triageStatus === 'pop-culture-review';
+
+  const lines = [
+    ...WITCHCLICK_IDENTITY_BLOCK,
+    '',
+    'Write the missing full article that belongs in this exact stub location. Use the source context to connect this article to WitchClick’s existing internal world. Do not mention that the final article was generated from a stub.',
+    ...buildContentIntentBlock({
+      purpose: 'Turn a useful post stub into a complete article that solves the reader problem implied by its title, metadata, and source context.',
+      readerNeed: 'A practical, emotionally precise guide or reflection that can be used immediately without belief requirements.',
+      role: 'A durable WitchClick article that can be linked from existing posts and future grimoire work.',
+    }),
+    '',
+    ...ANTI_GENERIC_OUTPUT_RULES,
+    '',
+    ...SOURCE_CONTEXT_USAGE_RULES,
+    '',
+    'Stub metadata:',
+    `- Title: ${title || '(missing title)'}`,
+    `- Slug: ${slug || '(missing slug)'}`,
+    `- contentType: ${contentType}`,
+    `- category: ${category}`,
+    `- pillar: ${pillar || '(not recorded)'}`,
+    `- tags: ${tags.length ? tags.join(', ') : '(none recorded)'}`,
+    `- entities: ${entities.length ? entities.map(formatEntityForPrompt).join(', ') : '(none recorded)'}`,
+    `- why this stub exists: ${String(stubArticle?.stubReason || stubArticle?.stubRationale || '').trim() || 'No explicit reason was saved; infer from the title, slug, source context, and WitchClick pillars.'}`,
+  ];
+
+  if (relatedThemes.length || matchedTerms.length) {
+    lines.push(
+      '',
+      'Related signals:',
+      `- related themes: ${relatedThemes.length ? relatedThemes.join(', ') : '(none recorded)'}`,
+      `- matched terms or phrases: ${matchedTerms.length ? matchedTerms.join(', ') : '(none recorded)'}`,
+    );
+  }
+
+  if (sourceContext.length) {
+    lines.push('', 'Source context from existing WitchClick posts:');
+    sourceContext.slice(0, MAX_REFERENCES).forEach((source, index) => {
+      const excerpt = cleanSourceExcerpt(source.excerpt, source);
+      lines.push(
+        `${index + 1}. ${source.title || source.slug || 'Untitled source'}`,
+        `   - slug: ${source.slug || '(missing)'}`,
+        `   - relevant excerpt: ${excerpt || '(no excerpt saved)'}`,
+        `   - reason: ${source.reason || '(not recorded)'}`,
+        `   - matched phrase: ${source.matchedPhrase || '(not recorded)'}`,
+        `   - suggested angle: ${source.suggestedAngle || '(not recorded)'}`,
+      );
+    });
+  } else {
+    lines.push('', 'Source context: No source context was saved for this stub yet. Use available metadata only.');
+  }
+
+  if (isCleanCursing) {
+    lines.push(
+      '',
+      ...CLEAN_CURSING_SAFETY_BLOCK,
+    );
+  }
+
+  if (isRitual || isCleanCursing) {
+    lines.push(
+      '',
+      ...RITUAL_REFERENCE_GUIDE_BLOCK,
+      '',
+      'Required article sections when relevant to this topic:',
+      '- Introduction',
+      '- What this working is for',
+      '- What this working is not for',
+      '- Quick / Low-Energy version',
+      '- Deep version',
+      '- Reflection prompts',
+      '- Checklist / Summary',
+      '- Closing note',
+    );
+  }
+
+  if (isTarot) {
+    lines.push('', ...TAROT_SAFETY_BLOCK);
+  }
+
+  if (isReference) {
+    lines.push('', ...GRIMOIRE_REFERENCE_BLOCK);
+  }
+
+  if (isPopCultureReview) {
+    lines.push('', ...POP_CULTURE_REVIEW_BLOCK);
+  }
+
+  lines.push(
+    '',
+    'Required output format:',
+    '- Return valid PostSpec v2 JSON only. No Markdown fences, no commentary, no preface.',
+    '- Keep the slug exactly the same as the stub slug above.',
+    '- Use this exact PostSpec v2 shape and field names:',
+    renderPostSpecV2Skeleton({ title, slug, contentType, category }),
+    '- Return the completed JSON object only. Do not wrap it in Markdown fences.',
+    '- The first outline item and first section should be a real article section, not "Placeholder" or "Stub".',
+    '- The body must be complete draft article content, not notes, TODOs, or instructions for a future writer.',
+  );
+
+  return lines.join('\n');
+}
+
+function cleanSourceExcerpt(value, source = {}) {
+  try {
+    let text = String(value || '');
+    if (!text.trim()) return '';
+
+    const title = String(source.title || '').trim();
+    const slug = String(source.slug || '').trim();
+    const slugWords = slug ? slug.replace(/-/g, ' ') : '';
+
+    text = text
+      .replace(/\s+/g, ' ')
+      .replace(/\[\s*\]\s*\[(?:"[^"]*"\s*,?\s*)+\]/g, ' ')
+      .replace(/\[(?:"[^"]*"\s*,?\s*)+\]/g, ' ')
+      .replace(/(?:"[^"]*"\s*,\s*)+"[^"]*"\s*\]/g, ' ')
+      .replace(/\[\s*\]/g, ' ')
+      .replace(/#{1,6}\s*/g, ' ')
+      .trim();
+
+    const headingMatch = text.match(/\b(?:Opening Reflection|What This (?:Ritual|Working|Practice) Is For|How To Use This|Why This Matters)\b/i);
+    if (headingMatch?.index !== undefined && headingMatch.index >= 0) {
+      text = text.slice(headingMatch.index + headingMatch[0].length).trim();
+    }
+
+    for (const duplicate of [title, slug, slugWords]) {
+      if (!duplicate) continue;
+      const pattern = new RegExp(`^(?:\\.\\.\\.\\s*)?${escapeRegex(duplicate)}\\s*`, 'i');
+      text = text.replace(pattern, '').trim();
+    }
+
+    text = text
+      .replace(/^(?:[.,;:!?—-]|\.\.\.)+\s*/, '')
+      .replace(/^[a-z]{1,24}\s+(?=[A-Z])/g, '')
+      .replace(/\s*(?:[.,;:!?—-]|\.\.\.)+$/, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const maxLength = 220;
+    if (text.length <= maxLength) return text;
+
+    const sentenceEnd = text.slice(0, maxLength).search(/[.!?](?=\s+[A-Z0-9]|$)(?!.*[.!?](?=\s+[A-Z0-9]|$))/);
+    if (sentenceEnd >= 80) return `${text.slice(0, sentenceEnd + 1).trim()}...`;
+
+    const trimmed = text.slice(0, maxLength);
+    const wordEnd = trimmed.lastIndexOf(' ');
+    return `${trimmed.slice(0, wordEnd > 120 ? wordEnd : maxLength).trim()}...`;
+  } catch {
+    return String(value || '').replace(/\s+/g, ' ').trim().slice(0, 220);
+  }
+}
+
+function escapeRegex(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function collectEntityStubs(root, cwd) {
@@ -348,6 +618,134 @@ function normalizeEntity(entry) {
   return null;
 }
 
+function normalizeStringArray(value) {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item || '').trim()).filter(Boolean);
+  }
+  if (typeof value === 'string') {
+    return value.split(',').map((item) => item.trim()).filter(Boolean);
+  }
+  return [];
+}
+
+function normalizeGeneratedFrom(value) {
+  if (!value) return null;
+  if (typeof value === 'string') return value.trim() || null;
+  if (typeof value === 'object') return value;
+  return null;
+}
+
+function normalizeRelatedEntities(value) {
+  if (!Array.isArray(value)) return [];
+  return value.map((entry) => {
+    if (typeof entry === 'string') return entry.trim();
+    if (entry && typeof entry === 'object') {
+      const type = typeof entry.type === 'string' ? entry.type.trim() : '';
+      const slug = typeof entry.slug === 'string' ? entry.slug.trim() : '';
+      if (type && slug) return `${type}:${toSlug(slug)}`;
+      if (slug) return toSlug(slug);
+    }
+    return '';
+  }).filter(Boolean);
+}
+
+function normalizeSourceContext(value) {
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => {
+    if (!item || typeof item !== 'object') return null;
+    const slug = typeof item.slug === 'string' ? toSlug(item.slug) : '';
+    const title = typeof item.title === 'string' ? item.title.trim() : '';
+    const sourcePath = typeof item.sourcePath === 'string' ? item.sourcePath.trim() : '';
+    const excerpt = typeof item.excerpt === 'string' ? item.excerpt.trim() : '';
+    const reason = typeof item.reason === 'string' ? item.reason.trim() : '';
+    const matchedPhrase = typeof item.matchedPhrase === 'string' ? item.matchedPhrase.trim() : '';
+    const suggestedAngle = typeof item.suggestedAngle === 'string' ? item.suggestedAngle.trim() : '';
+    const adminHref = typeof item.adminHref === 'string' ? item.adminHref.trim() : '';
+    const publicHref = typeof item.publicHref === 'string' ? item.publicHref.trim() : '';
+    if (!slug && !title && !excerpt) return null;
+    return {
+      title: title || startCase(slug),
+      slug,
+      sourcePath,
+      excerpt,
+      reason,
+      matchedPhrase,
+      suggestedAngle,
+      adminHref: adminHref || (slug ? `/admin/posts?slug=${encodeURIComponent(slug)}` : ''),
+      publicHref: publicHref || (slug ? `/post/${slug}` : ''),
+    };
+  }).filter(Boolean);
+}
+
+function mergeSourceContext(...groups) {
+  const seen = new Set();
+  const merged = [];
+  for (const group of groups) {
+    for (const source of normalizeSourceContext(group)) {
+      const key = source.slug || source.title || source.excerpt;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      merged.push(source);
+    }
+  }
+  return merged;
+}
+
+function findSourcePostContext(cwd, details) {
+  const slug = toSlug(String(details?.slug || ''));
+  const roots = [path.join(cwd, 'src', 'content', 'posts'), path.join(cwd, 'content', 'posts')];
+  let found = null;
+  if (slug) {
+    for (const root of roots) {
+      const direct = path.join(root, `${slug}.md`);
+      if (fs.existsSync(direct)) {
+        found = direct;
+        break;
+      }
+    }
+  }
+  if (!found) return null;
+  try {
+    const raw = fs.readFileSync(found, 'utf8');
+    const parsed = matter(raw);
+    const fm = parsed.data || {};
+    const title = typeof fm.title === 'string' && fm.title.trim()
+      ? fm.title.trim()
+      : String(details?.title || '').trim() || startCase(slug);
+    const excerpt = typeof fm.excerpt === 'string' && fm.excerpt.trim()
+      ? fm.excerpt.trim()
+      : firstTextExcerpt(parsed.content);
+    return {
+      title,
+      slug,
+      sourcePath: path.relative(cwd, found),
+      excerpt,
+      reason: String(details?.reason || '').trim(),
+      matchedPhrase: String(details?.matchedPhrase || '').trim(),
+      suggestedAngle: String(details?.suggestedAngle || details?.reason || '').trim(),
+      adminHref: `/admin/posts?slug=${encodeURIComponent(slug)}`,
+      publicHref: `/post/${slug}`,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function firstTextExcerpt(markdown) {
+  const text = String(markdown || '')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/\[[^\]]+\]\([^)]+\)/g, (match) => match.replace(/^\[|\]\([^)]+\)$/g, ''))
+    .replace(/[*_>`~-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return text.length > 280 ? `${text.slice(0, 277).trim()}...` : text;
+}
+
+function formatEntityForPrompt(entity) {
+  return String(entity || '').trim();
+}
+
 function buildPrompt(record, references) {
   const guide = TYPE_GUIDANCE[record.type] || DEFAULT_GUIDANCE;
   const typeLabel = TYPE_LABELS[record.type] || guide.label || 'Entity';
@@ -355,13 +753,28 @@ function buildPrompt(record, references) {
   const lines = [];
 
   lines.push(
+    ...WITCHCLICK_IDENTITY_BLOCK,
+    '',
     `You are the Aurora Scribe for WitchClick, completing a ${typeLabel.toLowerCase()} entry for a secular grimoire of symbolic practice and reflective tools.`,
   );
-  lines.push('Return JSON with exactly these keys: "type", "name", "slug", "summary", "properties", "related".');
+  lines.push(...buildContentIntentBlock({
+    purpose: `Create a concise ${typeLabel.toLowerCase()} reference entry that can support internal links, grimoire browsing, and article context.`,
+    readerNeed: 'A quick, useful explanation of what this entity means and how to work with it gently.',
+    role: 'A short grimoire/reference record, not a padded article.',
+  }));
+  lines.push('', ...GRIMOIRE_REFERENCE_BLOCK);
+  if (record.type === 'tarot') lines.push('', ...TAROT_SAFETY_BLOCK);
+  lines.push('', ...ANTI_GENERIC_OUTPUT_RULES);
+  lines.push('', 'Return JSON with exactly these keys: "type", "name", "slug", "summary", "properties", "related".');
   lines.push(
     `Fixed values — "type": "${record.type}", "slug": "${record.slug}", "name": "${startCase(record.name)}".`,
     '',
   );
+  lines.push('Required entity JSON shape:', renderEntityJsonSkeleton({
+    type: record.type,
+    slug: record.slug,
+    name: startCase(record.name),
+  }), 'Return the completed entity JSON object only. Do not wrap it in Markdown fences.', '');
   lines.push(`Summary: ${guide.summary}`, '', 'Properties:');
   const propertyInstructions = guide.properties && guide.properties.length ? guide.properties : DEFAULT_GUIDANCE.properties;
   for (const note of propertyInstructions) {

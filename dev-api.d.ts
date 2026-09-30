@@ -22,7 +22,7 @@ export declare function generateMetaDescription(
   options?: Record<string, unknown>,
 ): string;
 export declare function normalizeTags(tags: unknown): string[];
-export declare function buildGenprompt(options: Record<string, unknown>): { prompt: string };
+export declare function buildGenprompt(options: Record<string, unknown>): string;
 export declare function buildPresetPrompt(options: {
   preset: {
     system: string;
@@ -35,6 +35,9 @@ export declare function buildPresetPrompt(options: {
   strict?: boolean;
   styleDirective?: string;
   contentType?: string;
+  words?: number;
+  ads?: "on" | "off";
+  kofi?: "on" | "off";
 }): string;
 
 export declare function prepareSpecForPersistence(
@@ -42,6 +45,20 @@ export declare function prepareSpecForPersistence(
   options?: PrepareSpecOptions,
 ): PreparedSpec;
 export declare function persistPreparedSpec(prepared: PreparedSpec): Promise<PersistResult>;
+export declare function normalizePastedMarkdownDraft(raw: unknown): string;
+export declare function parsePastedMarkdownDraft(raw: unknown): {
+  markdown: string;
+  parsed: {
+    data: Record<string, unknown>;
+    content: string;
+    lines: string[];
+    rest: string;
+  };
+};
+export declare function replacePostStubWithDraft(
+  payload: Record<string, unknown>,
+  options?: { dryRun?: boolean },
+): Promise<Record<string, unknown>>;
 
 export interface AdminPipelineHelpers {
   savePostFromWrite: typeof savePostFromWrite;
@@ -57,6 +74,7 @@ export interface AdminPipelineHelpers {
 }
 
 export declare const adminPipelineHelpers: AdminPipelineHelpers;
+export declare const server: import("node:http").Server;
 
 export type AdminThemeRequiredField = "primary" | "accent" | "background" | "fontSerif" | "fontScript";
 

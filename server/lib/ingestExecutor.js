@@ -17,6 +17,7 @@ import { resolvePostsDirectories } from '../../scripts/lib/contentPaths.js';
  *   draft?: boolean;
  *   forceCategory?: string;
  *   targetWordCount?: number;
+ *   allowExistingSlug?: boolean;
  * }} options
  */
 export async function executeIngest(rawSpec, options = {}) {
@@ -34,6 +35,7 @@ export async function executeIngest(rawSpec, options = {}) {
     draft: options.draft,
     forceCategory: options.forceCategory,
     targetWordCount: options.targetWordCount,
+    allowExistingSlug: options.allowExistingSlug,
   });
 
   let persistence = null;

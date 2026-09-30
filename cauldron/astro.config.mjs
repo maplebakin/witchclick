@@ -17,7 +17,7 @@ export default defineConfig({
   outDir: './dist',
   server: {
     port: 4370,
-    host: true,
+    host: process.env.HOST === "0.0.0.0" ? "0.0.0.0" : "127.0.0.1",
   },
   integrations: [
     tailwind({

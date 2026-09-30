@@ -21,6 +21,9 @@ export interface PrepareSpecOptions {
   allowedAffiliateKeys?: string[];
   sourcePath?: string;
   generatedAt?: string;
+  draft?: boolean;
+  forceCategory?: string;
+  allowExistingSlug?: boolean;
   engagementSignals?: {
     tags?: Array<{
       tag: string;
@@ -42,6 +45,7 @@ export interface PrepareSpecOptions {
 export interface PersistResult {
   postPath: string;
   createdEntities: string[];
+  createdPosts?: string[];
 }
 
 export function prepareSpecForPersistence(
