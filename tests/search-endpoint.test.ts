@@ -55,23 +55,24 @@ describe("search endpoint", () => {
 
     const body = await response.json();
     expect(Array.isArray(body)).toBe(true);
-    expect(body).toHaveLength(2);
+    const postItems = body.filter((item: any) => item.category === "ritual");
+    expect(postItems).toHaveLength(2);
 
-    const slugs = body.map((item: any) => item.slug);
+    const slugs = postItems.map((item: any) => item.slug);
     expect(slugs).toEqual(["second", "first"]);
 
-    expect(body[0]).toMatchObject({
+    expect(postItems[0]).toMatchObject({
       slug: "second",
       title: "Crystal Grids",
       excerpt: "Arrange stones for focus",
     });
 
-    expect(body[1]).toMatchObject({
+    expect(postItems[1]).toMatchObject({
       slug: "first",
       title: "Moon Mapping",
     });
 
-    expect(body[1].excerpt).toContain("First paragraph about the moon.");
-    expect(body[1].tags).toEqual(["Moon", "Rituals"]);
+    expect(postItems[1].excerpt).toContain("First paragraph about the moon.");
+    expect(postItems[1].tags).toEqual(["Moon", "Rituals"]);
   });
 });

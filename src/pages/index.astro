@@ -129,6 +129,22 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
       </div>
     </header>
 
+    <section data-reveal class="home-section home-states" aria-labelledby="home-states-heading">
+      <div class="home-section__header home-section__header--compact">
+        <p class="home-section__eyebrow">Start by need</p>
+        <h2 id="home-states-heading" class="home-section__title">If you are arriving with a feeling, start there.</h2>
+      </div>
+      <div class="home-state-grid">
+        {stateCards.map((card) => (
+          <a class="home-state-card focus-ring" href={card.href}>
+            <span class="home-state-card__need">{card.need}</span>
+            <span class="home-state-card__label">{card.label}</span>
+            <span class="home-state-card__description">{card.description}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
     <section data-reveal class="home-section home-doorways" aria-labelledby="home-pillars-heading">
       <div class="home-section__header">
         <p class="home-section__eyebrow">Main shelves</p>
@@ -144,22 +160,6 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
             <span class="home-doorway-card__label">{card.label}</span>
             <span class="home-doorway-card__description">{card.description}</span>
             <span class="home-doorway-card__action">{card.action} &rarr;</span>
-          </a>
-        ))}
-      </div>
-    </section>
-
-    <section data-reveal class="home-section home-states" aria-labelledby="home-states-heading">
-      <div class="home-section__header home-section__header--compact">
-        <p class="home-section__eyebrow">Start by need</p>
-        <h2 id="home-states-heading" class="home-section__title">If you are arriving with a feeling, start there.</h2>
-      </div>
-      <div class="home-state-grid">
-        {stateCards.map((card) => (
-          <a class="home-state-card focus-ring" href={card.href}>
-            <span class="home-state-card__need">{card.need}</span>
-            <span class="home-state-card__label">{card.label}</span>
-            <span class="home-state-card__description">{card.description}</span>
           </a>
         ))}
       </div>
@@ -196,7 +196,7 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
             {latestPostHasImage && (
               <img
                 src={latestPost.heroImageSrc || latestPost.heroImage}
-                alt={latestPost.heroAlt || latestPost.heroImageAlt || `Hero image for ${latestPost.title}`}
+                alt=""
                 class="home-posts__hero-image"
                 loading="eager"
                 decoding="async"

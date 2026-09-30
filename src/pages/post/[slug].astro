@@ -237,7 +237,6 @@ const readingMinutes = data.readingMinutes;
 const spoonLevel = normalizeSpoonLevel(data.spoons ?? data.spoonLevel);
 const tldr = data.tldr || '';
 const heroImage = data.heroImage || '';
-const heroAlt = data.heroAlt || title;
 
 let ctaType: "kofi" | "download" | "none" = "none";
 let ctaId: string | undefined;
@@ -341,7 +340,7 @@ const jsonLd = {
             <div class:list={["flex flex-col gap-8 lg:gap-10", heroImage && "lg:flex-row lg:items-start"]}>
               {heroImage && (
                 <figure class="relative aspect-[4/3] overflow-hidden rounded-xl border border-line-neutral-strong/60 bg-surface-soft shadow-sm lg:w-[42%]">
-                  <img class="h-full w-full object-cover" src={heroImage} alt={heroAlt} loading="eager" />
+                  <img class="h-full w-full object-cover" src={heroImage} alt="" loading="eager" />
                 </figure>
               )}
               <div class="flex flex-1 flex-col gap-5">

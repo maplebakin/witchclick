@@ -16,7 +16,7 @@ function parseLines(description?: string) {
     .map((line) => line.replace(/\*\*/g, ""));
 }
 ---
-<PrintablePlanner title="Three-Day Ritual Sampler" description={summary}>
+<PrintablePlanner title="Three-Day Ritual Sampler" description={summary} robots="noindex, nofollow">
   <section class="grid three-columns">
     {steps.map((step) => (
       <article class="card">

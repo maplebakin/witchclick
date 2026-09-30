@@ -12,6 +12,8 @@ export async function GET(context: APIContext) {
     "Allow: /",
     "Disallow: /api/",
     "Disallow: /admin/",
+    "Disallow: /author",
+    "Disallow: /account",
     `Sitemap: ${origin}/sitemap-index.xml`,
     "",
   ].join("\n");

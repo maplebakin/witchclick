@@ -1,7 +1,6 @@
 ---
 import SpoonsBadge from "./SpoonsBadge.astro";
 import { extractHeroImage } from "@/utils/posts";
-import { canonicalTagHref } from "@/utils/tags";
 
 export interface Props {
   // Either pass a whole post object (frontmatter-ish)...
@@ -113,7 +112,6 @@ const heroContext = {
 
 const heroImageData = extractHeroImage(heroContext)
 const _heroSrc = typeof heroImageData.src === 'string' ? heroImageData.src : ''
-const _heroAlt = typeof heroImageData.alt === 'string' && heroImageData.alt.trim() ? heroImageData.alt : _title
 const _hasHero = Boolean(_heroSrc)
 const _cardLabel = _title ? `Read ${_title}` : 'Read post'
 const _isCompact = layout === 'bento-compact'
@@ -164,7 +162,7 @@ function truncateSummary(value: string | undefined | null, max = 120): string {
       {_hasHero && (
         <img
           src={_heroSrc}
-          alt={_heroAlt}
+          alt=""
           loading="lazy"
           decoding="async"
           class="card-figure__media"
@@ -172,7 +170,7 @@ function truncateSummary(value: string | undefined | null, max = 120): string {
       )}
       {!_hasHero && (
         <div class="card-figure__placeholder" aria-hidden="true">
-          <span class="card-figure__initial">{_title.charAt(0).toUpperCase()}</span>
+          <span class="card-figure__initial" aria-hidden="true">✦</span>
         </div>
       )}
     </div>
@@ -200,11 +198,11 @@ function truncateSummary(value: string | undefined | null, max = 120): string {
       {!_isCompact && _summary && <p class="card-subtle">{_summary}</p>}
     </div>
     {_visibleTags.length > 0 && (
-      <div class="card-tags card-tags--linked">
+      <div class="card-tags">
         {_visibleTags.map((t) => (
-          <a href={canonicalTagHref(String(t).toLowerCase())} class="card-pill card-tag">
+          <span class="card-pill card-tag">
             #{String(t).toLowerCase()}
-          </a>
+          </span>
         ))}
       </div>
     )}
@@ -225,16 +223,6 @@ function truncateSummary(value: string | undefined | null, max = 120): string {
 
   .ritual-card > :not(.ritual-card__overlay-link) {
     pointer-events: none;
-  }
-
-  .ritual-card .card-tags--linked,
-  .ritual-card .card-tags--linked * {
-    pointer-events: auto;
-  }
-
-  .ritual-card .card-tags--linked {
-    position: relative;
-    z-index: 20;
   }
 
   .ritual-card--bento-featured .card-figure {

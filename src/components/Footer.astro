@@ -31,10 +31,15 @@ const isNavLink = (link: NavLink | undefined | null): link is NavLink =>
 
 const primaryNav = navLinks.filter(isNavLink);
 const normalizedPath = currentPath.endsWith("/") ? currentPath : `${currentPath}/`;
+const primaryFeedHref = "/rss.xml";
+const feedHrefs = new Set([primaryFeedHref, "/feed.json"]);
 const secondaryNav = secondaryNavLinks
   .filter(isNavLink)
-  .filter((link) => !(normalizedPath === "/tools/" && /^\/tools\/?$/.test(link.href)));
-const utilityNav = utilityLinks.filter(isNavLink);
+  .filter((link) => !(normalizedPath === "/tools/" && /^\/tools\/?$/.test(link.href)))
+  .filter((link) => link.href !== primaryFeedHref);
+const utilityNav = utilityLinks
+  .filter(isNavLink)
+  .filter((link) => !feedHrefs.has(link.href) && !secondaryNav.some((navLink) => navLink.href === link.href));
 ---
 <footer class="site-footer" aria-label="Site footer">
   <div class="wc-container site-footer__inner">
@@ -77,19 +82,16 @@ const utilityNav = utilityLinks.filter(isNavLink);
       <div>
         <p class="site-footer__title">Stay connected</p>
         <p class="site-footer__blurb">
-          Subscribe for new reflections, ritual prompts, and practical notes for living beyond the metric.
+          Follow by RSS for new reflections, ritual prompts, and practical notes for living beyond the metric.
         </p>
         <div class="site-footer__meta">
-          <PrimaryButton href="/contact" iconAfter="↗">
-            Reach out
+          <PrimaryButton href={primaryFeedHref} rel="alternate" iconAfter="↗">
+            Follow by RSS
           </PrimaryButton>
         </div>
         <div class="site-footer__feeds">
           <p class="site-footer__feeds-label">Self-host updates</p>
           <div class="site-footer__feed-links">
-            <a class="site-footer__feed focus-ring" href="/rss.xml" rel="alternate" data-analytics="subscribe_rss">
-              RSS feed
-            </a>
             <a class="site-footer__feed focus-ring" href="/feed.json" rel="alternate" data-analytics="subscribe_json">
               JSON feed
             </a>

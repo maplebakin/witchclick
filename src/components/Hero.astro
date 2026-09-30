@@ -25,8 +25,12 @@ const ctaDescriptionId = noteText ? `hero-cta-note-${slugify(title)}` : undefine
 
 const heroSrc = typeof heroImageSrc === 'string' ? heroImageSrc.trim() : '';
 const hasHeroImage = heroSrc.length > 0;
+const providedHeroAlt = typeof heroImageAlt === 'string' ? heroImageAlt.trim() : '';
+const isPathLikeHeroAlt = /^(?:https?:)?\/\//i.test(providedHeroAlt)
+  || /(?:^|\/)(?:images|hero-images)(?:\/|$)|chatgpt-image/i.test(providedHeroAlt)
+  || /(?:^|\/)[^/]+\.(?:avif|gif|jpe?g|png|svg|webp)(?:[?#]|$)/i.test(providedHeroAlt);
 const heroAlt = hasHeroImage
-  ? (typeof heroImageAlt === 'string' && heroImageAlt.trim().length ? heroImageAlt.trim() : title)
+  ? (isPathLikeHeroAlt ? '' : providedHeroAlt)
   : '';
 const providedSrcset = typeof heroImageSrcset === 'string' ? heroImageSrcset.trim() : '';
 const autoSrcset = hasHeroImage
