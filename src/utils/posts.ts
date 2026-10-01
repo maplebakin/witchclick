@@ -389,9 +389,20 @@ function extractImageSource(value: unknown): string {
   return "";
 }
 
+function isPathLikeImageAlt(value: string): boolean {
+  return /^(?:https?:)?\/\//i.test(value)
+    || /(?:^|\/)(?:images|hero-images)(?:\/|$)|chatgpt-image/i.test(value)
+    || /(?:^|\/)[^/]+\.(?:avif|gif|jpe?g|png|svg|webp)(?:[?#]|$)/i.test(value);
+}
+
+function normalizeImageAlt(value: string): string {
+  const trimmed = value.trim();
+  return trimmed && !isPathLikeImageAlt(trimmed) ? trimmed : "";
+}
+
 function extractImageAlt(value: unknown): string {
   if (!value) return "";
-  if (typeof value === "string") return value.trim();
+  if (typeof value === "string") return normalizeImageAlt(value);
   if (typeof value !== "object") return "";
 
   const record = value as Record<string, any>;
@@ -399,8 +410,9 @@ function extractImageAlt(value: unknown): string {
 
   for (const key of altKeys) {
     const candidate = record[key];
-    if (typeof candidate === "string" && candidate.trim()) {
-      return candidate.trim();
+    if (typeof candidate === "string") {
+      const normalized = normalizeImageAlt(candidate);
+      if (normalized) return normalized;
     }
   }
 
