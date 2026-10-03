@@ -1,0 +1,177 @@
+/*
+ * Autumn Window — mulberry variant. CSS custom properties only.
+ * Naming: COLOR-TOKENS.md / TOKEN-CATEGORIES.md; theme scope: THEMES.md.
+ * Public Base.astro activates data-theme="autumn-window"; midnight
+ * is the default, data-comfort-theme="dawn" selects the secondary light mode.
+ * No font declarations: preserve Cinzel display and Cormorant Garamond body.
+ *
+ * Usage contract:
+ * - Opaque neutral surfaces; never spread mulberry into page/card fills.
+ * - Mulberry is for a single bookmark per page and key interactive details.
+ * - Blue replaces teal for focus rings and margin details.
+ * - Spoon colors support labels and 1/2/3 dots for Low/Medium/High;
+ *   high means more effort, never danger. Do not use status/error tokens.
+ * - New semantic tokens are documented alongside their declarations below.
+ * - Comfort hooks: data-comfort-mode="calm" or "plain" on the root.
+ *   autumn-window.css consumes these tokens; comfort preferences persist the
+ *   mode and reveal/card scripts honor it. The shared header supplies the only
+ *   bookmark. Imagery is hidden in place in plain mode to preserve geometry.
+ *
+ * Contrast contract: all text/link colors are valid on base, panel/card,
+ * and elevated/hover surfaces. Plain mode's transparent fills inherit base.
+ */
+
+:root[data-theme="autumn-window"] {
+  /* Surfaces: warm charcoal, no accent washes. */
+  --surface-base: #242120;
+  --surface-panel: #2A2624;
+  --surface-card: var(--surface-panel);
+  --surface-elevated: #302B28;
+  --surface-hover: var(--surface-elevated);
+  --surface-panel-primary: var(--surface-panel);
+  --surface-panel-secondary: var(--surface-panel);
+  --surface-card-hover: var(--surface-hover);
+  --surface-muted: var(--surface-panel);
+  --surface-plain: var(--surface-base);
+  --background: var(--surface-base);
+  --page-background: var(--surface-base);
+  --header-background: var(--surface-base);
+  --card-panel-surface: var(--surface-card);
+  --card-panel-surface-strong: var(--surface-panel);
+
+  /* Text: opaque so contrast does not depend on compositing. */
+  --text-strong: #F0E8DD;
+  --text-body: #E8DED1;
+  --text-muted: #BFB2A3;
+  --text-subtle: var(--text-muted);
+  --text-primary: var(--text-strong);
+  --text-secondary: var(--text-body);
+  --text-tertiary: var(--text-muted);
+  --text-hint: var(--text-muted);
+  --text-disabled: var(--text-muted);
+  --heading: var(--text-strong);
+  --footer-text: var(--text-body);
+  --footer-text-muted: var(--text-muted);
+
+  /* Accent primitives: whole CSS colors; restrained, no teal fallback. */
+  --accent-mulberry: #B98F9D; /* Primary: bookmark/key interactive highlights. */
+  --accent-blue: #A8BBC3; /* Secondary: chipped-window focus/margin details. */
+  --primary: var(--accent-mulberry);
+  --secondary: var(--accent-blue);
+  --accent: var(--accent-mulberry);
+  --accent-strong: var(--accent-mulberry);
+  --text-accent: var(--accent-mulberry);
+  --text-accent-strong: var(--accent-mulberry);
+  --link-color: var(--accent-mulberry);
+
+  /* Structural borders remain neutral; accent borders are opt-in details. */
+  --border-subtle: #504640;
+  --border-strong: #84766B;
+  --border-accent-subtle: var(--border-subtle);
+  --border-accent-medium: var(--border-strong);
+  --border-accent-strong: var(--accent-mulberry);
+  --border-accent-hover: var(--accent-mulberry);
+  --surface-plain-border: var(--border-subtle);
+  --card-panel-border: var(--border-subtle);
+  --card-panel-border-soft: var(--border-subtle);
+  --card-panel-border-strong: var(--border-strong);
+  --chip-background: var(--surface-panel);
+  --chip-border: var(--border-subtle);
+  --card-tag-bg: var(--chip-background);
+  --card-tag-text: var(--text-muted);
+  --card-tag-border: var(--chip-border);
+
+  /* Focus: solid blue, no colored glow. */
+  --focus-ring: var(--accent-blue);
+  --focus-ring-color: var(--accent-blue);
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 3px;
+  --focus-ring-base-shadow: var(--surface-base);
+  --focus-ring-shadow: 0 0 0 3px var(--surface-base), 0 0 0 6px var(--accent-blue);
+  --ring-focus: var(--focus-ring-shadow);
+
+  /* Spoon-level ink/dot colors, intentionally separate from status semantics. */
+  --spoon-low: #AABA96; /* Sage/moss; label Low, one dot. */
+  --spoon-medium: #CEAF78; /* Warm brass/amber; label Medium, two dots. */
+  --spoon-high: #D3A080; /* Warm ember; label High, three dots, not danger. */
+
+  /* Effects: neutral fills and a light grain; no accent-colored room wash. */
+  --glass-surface: var(--surface-panel);
+  --glass-surface-strong: var(--surface-elevated);
+  --glass-card: var(--surface-card);
+  --glass-hover: var(--surface-hover);
+  --glass-border: var(--border-subtle);
+  --glass-border-strong: var(--border-strong);
+  --glass-highlight: transparent;
+  --glass-glow: transparent;
+  --glass-blur: 0px;
+  --glass-noise-opacity: 0.025;
+  --gradient-purple-radial: none;
+  --gradient-gold-radial: none;
+
+  /* Consumer hooks: texture image/opacity, visibility, bookmark budget. */
+  --texture-image: none; /* No image asset introduced by this token file. */
+  --texture-opacity: var(--glass-noise-opacity);
+  --imagery-display: block;
+  --ornament-display: block;
+  --bookmark-color: var(--accent-mulberry);
+  --bookmark-max-count: 1; /* Per-page composition rule, not a CSS counter. */
+
+  /* Motion defaults; calm/plain application also disables legacy durations. */
+  --dur-fast: 120ms;
+  --dur-med: 200ms;
+  --dur-slow: 320ms;
+}
+
+:root[data-theme="autumn-window"][data-comfort-theme="dawn"] {
+  /* Same warm family: parchment, mulberry, chipped blue. */
+  --surface-base: #F2EADF;
+  --surface-panel: #EDE3D6;
+  --surface-elevated: #E6DBCC;
+  --text-strong: #302724;
+  --text-body: #382F2A;
+  --text-muted: #65584F;
+  --accent-mulberry: #754452;
+  --accent-blue: #426575;
+  --border-subtle: #C8B8A5;
+  --border-strong: #8B7764;
+  --spoon-low: #4F6544;
+  --spoon-medium: #705829;
+  --spoon-high: #825236;
+}
+
+/* Calm retains readable surfaces, imagery, type, labels, and focus. */
+:root[data-theme="autumn-window"][data-comfort-mode="calm"],
+:root[data-theme="autumn-window"][data-comfort-mode="plain"] {
+  --texture-image: none;
+  --texture-opacity: 0;
+  --glass-noise-opacity: 0;
+  --dur-fast: 0ms;
+  --dur-med: 0ms;
+  --dur-slow: 0ms;
+}
+
+/* Plain retains the page background/type/labels/focus, removes decorative fills. */
+:root[data-theme="autumn-window"][data-comfort-mode="plain"] {
+  --imagery-display: none;
+  --ornament-display: none;
+  --bookmark-color: transparent;
+  --bookmark-max-count: 0;
+  --surface-panel: transparent;
+  --surface-card: transparent;
+  --surface-elevated: transparent;
+  --surface-hover: transparent;
+  --surface-plain: transparent;
+  --chip-background: transparent;
+  --glass-surface: transparent;
+  --glass-surface-strong: transparent;
+  --glass-card: transparent;
+  --glass-hover: transparent;
+  --glass-highlight: transparent;
+  --glass-glow: transparent;
+  --glass-shadow-soft: none;
+  --glass-shadow-strong: none;
+  --shadow-card: none;
+  --shadow-card-hover: none;
+  --surface-plain-shadow: none;
+}

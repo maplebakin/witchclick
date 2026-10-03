@@ -242,49 +242,49 @@
 :root[data-comfort-theme="dawn"] .prose-ol\:text-inverse ol,
 :root[data-comfort-theme="dawn"] .prose-li\:text-inverse li,
 :root[data-comfort-theme="dawn"] .prose-invert {
-  color: hsl(260 30% 18% / 1) !important;
+  color: var(--text-strong) !important;
 }
 
 :root[data-comfort-theme="dawn"] .text-inverse-soft,
 :root[data-comfort-theme="dawn"] .prose-em\:text-inverse-soft em,
 :root[data-comfort-theme="dawn"] .prose-blockquote\:text-inverse-soft blockquote {
-  color: hsl(260 28% 28% / 0.88) !important;
+  color: var(--text-body) !important;
 }
 
 :root[data-comfort-theme="dawn"] .text-inverse-muted,
 :root[data-comfort-theme="dawn"] .prose-figcaption\:text-inverse-muted figcaption {
-  color: hsl(260 20% 40% / 0.85) !important;
+  color: var(--text-muted) !important;
 }
 
 /* Dawn theme: make accent-soft links readable on light backgrounds */
 :root[data-comfort-theme="dawn"] .prose-a\:text-accent-soft a,
 :root[data-comfort-theme="dawn"] .text-accent-soft {
-  color: hsl(270 60% 45% / 1) !important;
+  color: var(--link-color, var(--text-accent)) !important;
 }
 
 /* Dawn theme: adjust code styling for light backgrounds */
 :root[data-comfort-theme="dawn"] .prose-code\:text-accent-soft code {
-  color: hsl(270 55% 42% / 1) !important;
+  color: var(--text-accent) !important;
 }
 
 :root[data-comfort-theme="dawn"] .prose-code\:bg-surface-inverse-muted\/30 code {
-  background-color: hsl(260 25% 92% / 1) !important;
+  background-color: var(--surface-elevated) !important;
 }
 
 :root[data-comfort-theme="dawn"] .prose-pre\:bg-surface-inverse-muted pre {
-  background-color: hsl(260 25% 94% / 1) !important;
+  background-color: var(--surface-panel) !important;
 }
 
 :root[data-comfort-theme="dawn"] .prose-pre\:text-inverse-soft pre {
-  color: hsl(260 28% 24% / 0.92) !important;
+  color: var(--text-body) !important;
 }
 
 /* Dawn theme: adjust blockquote border for light backgrounds */
 :root[data-comfort-theme="dawn"] .prose-blockquote\:border-accent-soft\/30 blockquote {
-  border-left-color: hsl(270 55% 55% / 0.4) !important;
+  border-left-color: var(--border-strong) !important;
 }
 
 /* Dawn theme: adjust hr border for light backgrounds */
 :root[data-comfort-theme="dawn"] .prose-hr\:border-line-inverse\/30 hr {
-  border-color: hsl(260 16% 80% / 1) !important;
+  border-color: var(--border-subtle) !important;
 }

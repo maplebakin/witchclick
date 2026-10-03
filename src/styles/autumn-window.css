@@ -1,0 +1,283 @@
+/* Autumn Window application: color/effects only; preserve geometry and fonts. */
+:root[data-theme="autumn-window"],
+:root[data-theme="autumn-window"][data-comfort-theme="dawn"] {
+  /* Reassert aliases above legacy dawn fallbacks without duplicating colors. */
+  --surface-card: var(--surface-panel);
+  --surface-hover: var(--surface-elevated);
+  --surface-panel-primary: var(--surface-panel);
+  --surface-panel-secondary: var(--surface-panel);
+  --surface-muted: var(--surface-panel);
+  --text-subtle: var(--text-muted);
+  --text-primary: var(--text-strong);
+  --text-secondary: var(--text-body);
+  --text-tertiary: var(--text-muted);
+  --text-hint: var(--text-muted);
+  --text-disabled: var(--text-muted);
+  --text-accent: var(--accent-mulberry);
+  --text-accent-strong: var(--accent-mulberry);
+  --link-color: var(--accent-mulberry);
+  --focus-ring: var(--accent-blue);
+  --focus-ring-color: var(--accent-blue);
+  --focus-ring-base-shadow: var(--surface-base);
+  --focus-ring-shadow: 0 0 0 3px var(--surface-base), 0 0 0 6px var(--accent-blue);
+  --glass-surface: var(--surface-panel);
+  --glass-surface-strong: var(--surface-elevated);
+  --glass-card: var(--surface-card);
+  --glass-hover: var(--surface-hover);
+  --glass-highlight: transparent;
+  --glass-glow: transparent;
+  /* Compatibility aliases for existing public components and utilities. */
+  --theme-primary: var(--accent-mulberry);
+  --theme-accent: var(--accent-mulberry);
+  --theme-background: var(--surface-base);
+  --theme-surface-base: var(--surface-base);
+  --theme-surface-panel: var(--surface-panel);
+  --theme-surface-card: var(--surface-card);
+  --theme-text-strong: var(--text-strong);
+  --theme-text-body: var(--text-body);
+  --theme-text-muted: var(--text-muted);
+  --theme-text-subtle: var(--text-muted);
+  --theme-text-accent: var(--link-color);
+  --theme-text-accent-strong: var(--link-color);
+  --theme-border-subtle: var(--border-subtle);
+  --theme-border-strong: var(--border-strong);
+  --theme-color-night: var(--surface-base);
+  --theme-color-midnight: var(--surface-base);
+  --theme-color-dusk: var(--surface-panel);
+  --theme-color-gold: var(--text-muted);
+  --theme-color-iris: var(--accent-mulberry);
+  --theme-color-amethyst: var(--accent-mulberry);
+  --theme-text-primary: var(--text-body);
+  --theme-text-heading: var(--text-strong);
+  --ink-strong: var(--text-strong);
+  --ink-body: var(--text-body);
+  --ink-muted: var(--text-muted);
+  --page-bg-color: var(--surface-base);
+  --layout-shell-background: var(--surface-base);
+  --layout-shell-background-plain: var(--surface-base);
+  --layout-shell-ink: var(--text-body);
+  --layout-shell-ink-plain: var(--text-body);
+  --layout-main-plain-surface: var(--surface-panel);
+  --layout-main-plain-overlay: none;
+  --layout-main-plain-border-color: var(--border-subtle);
+  --header-background: var(--surface-panel);
+  --header-surface: var(--surface-panel);
+  --header-edge: var(--border-subtle);
+  --header-border: var(--border-subtle);
+  --header-highlight: transparent;
+  --footer-background: var(--surface-panel);
+  --panel-surface: var(--surface-panel);
+  --panel-surface-strong: var(--surface-panel);
+  --panel-surface-soft: var(--surface-card);
+  --panel-muted-surface: var(--surface-card);
+  --panel-muted-text: var(--text-muted);
+  --panel-border-strong: var(--border-strong);
+  --panel-border-soft: var(--border-subtle);
+  --card-panel-surface-cozy: var(--surface-card);
+  --card-panel-surface-strong-cozy: var(--surface-panel);
+  --card-highlight: none;
+  --card-highlight-alt: none;
+  --card-highlight-soft: none;
+  --card-badge-bg: var(--surface-panel);
+  --card-badge-border: var(--border-subtle);
+  --card-badge-text: var(--text-body);
+  --card-spoon-bg: var(--surface-panel);
+  --card-spoon-border: var(--border-subtle);
+  --card-spoon-text: var(--text-body);
+  --card-focus-outline: var(--focus-ring-color);
+  --card-focus-ring: var(--focus-ring-shadow);
+  --card-focus-ring-strong: var(--focus-ring-shadow);
+  --comfort-chip-text-strong: var(--text-strong);
+  --comfort-chip-text: var(--text-body);
+  --cozy-surface-gradient: var(--surface-panel);
+  --cozy-input-bg: var(--surface-panel);
+  --cozy-input-bg-hover: var(--surface-hover);
+  --cozy-input-border: var(--border-strong);
+  --cozy-input-border-focus: var(--focus-ring-color);
+  --accent-purple-soft: var(--link-color);
+  --accent-purple-strong: var(--link-color);
+  --surface-seasonal-panel-highlight: var(--surface-panel);
+  --surface-chip-accent: var(--surface-panel);
+  --entity-card-surface-top: var(--surface-card);
+  --entity-card-surface-bottom: var(--surface-panel);
+  --entity-card-highlight: transparent;
+  --entity-card-glow: transparent;
+  --entity-card-heading: var(--text-strong);
+  --entity-card-text: var(--text-body);
+  --entity-card-label: var(--text-muted);
+}
+
+:root[data-theme="autumn-window"] body {
+  background: var(--surface-base);
+  color: var(--text-body);
+}
+
+:root[data-theme="autumn-window"] :is(.site-header, .site-footer) {
+  background: var(--surface-panel);
+  border-color: var(--border-subtle);
+  color: var(--text-body);
+}
+
+:root[data-theme="autumn-window"] :is(.home-masthead, .home-state-card, .home-posts__hero > a, .card-panel, .site-nav__submenu, .site-nav__mobile, .site-search-panel__dialog, .comfort-settings__panel) {
+  background: var(--surface-panel);
+  border-color: var(--border-subtle);
+  color: var(--text-body);
+}
+
+:root[data-theme="autumn-window"] :is(.home-state-card:hover, .card-panel:hover) {
+  border-color: var(--border-strong);
+}
+
+/* Preserve the original computed border dimensions while replacing colors. */
+:root[data-theme="autumn-window"] :is(.home-state-card, .home-posts__hero > a, .site-search-panel__dialog, .site-footer, .card-panel, .card-figure) {
+  border-width: 0 !important;
+}
+
+:root[data-theme="autumn-window"][data-comfort-theme="dawn"] .card-panel {
+  border-width: 1px !important;
+}
+
+:root[data-theme="autumn-window"][data-comfort-theme="dawn"] .card-figure {
+  border-bottom-width: 1px !important;
+}
+
+:root[data-theme="autumn-window"] :is(.site-logo, h1, h2, h3, h4, h5, h6, strong, .card-heading, .home-state-card__label, .site-footer__title) {
+  color: var(--text-strong);
+}
+
+:root[data-theme="autumn-window"] :is(.prose, .prose p, .prose li, .home-masthead__tagline, .card-subtle, .site-footer__blurb) {
+  color: var(--text-body);
+}
+
+:root[data-theme="autumn-window"] :is(.home-masthead__eyebrow, .home-section__eyebrow, .home-state-card__need, .home-state-card__description, .home-posts__hero-description, .home-posts__reading-time, .card-metadata, .card-eyebrow, .site-footer__disclosure, .site-footer__feeds-label, .site-footer__copyright, .site-nav__submenu-meta) {
+  color: var(--text-muted);
+}
+
+:root[data-theme="autumn-window"] :is(a, .site-nav__link, .site-nav__button, .site-nav__submenu-link, .site-nav__mobile-link, .site-footer__link, .site-footer__feed, .home-text-link, .prose a) {
+  color: var(--link-color);
+}
+
+/* Keep text hierarchy inside encompassing card links. */
+:root[data-theme="autumn-window"] :is(.ritual-card, .home-posts__hero > a, .home-state-card) {
+  color: var(--text-body);
+}
+
+:root[data-theme="autumn-window"] :is(.site-logo, .home-state-card__label, .card-heading, .home-posts__hero-title) {
+  color: var(--text-strong);
+}
+
+:root[data-theme="autumn-window"] :is(.wc-button, .wc-btn, .site-nav__button, .site-nav__mobile-toggle, .site-nav__mobile-close, .site-footer__feed, .card-pill, .category-badge, .comfort-settings__summary) {
+  background: var(--surface-panel);
+  border-color: var(--border-strong);
+  color: var(--link-color);
+}
+
+:root[data-theme="autumn-window"] :is(.wc-button, .wc-btn, .site-nav__button):hover {
+  background: var(--surface-hover);
+  border-color: var(--accent-mulberry);
+}
+
+:root[data-theme="autumn-window"] :is(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color) !important;
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow) !important;
+}
+
+:root[data-theme="autumn-window"] :is(.card-figure, .card-figure__placeholder, .card-figure__initial, .home-posts__hero-image) {
+  background: var(--surface-card);
+  border-color: var(--border-subtle);
+  color: var(--text-muted);
+}
+
+:root[data-theme="autumn-window"] :is(.card-spoon, .ritual-card[data-spoon-level]) {
+  --card-spoon-bg: var(--surface-panel);
+  --card-spoon-border: var(--border-subtle);
+  --card-spoon-text: var(--text-body);
+}
+
+/* Retire decorative washes, moon glyphs, sparkles, and duplicate ribbons. */
+:root[data-theme="autumn-window"] :is(.card-radial, .comfort-settings__sparkle, .card-figure__initial) {
+  visibility: hidden;
+}
+
+:root[data-theme="autumn-window"] :is(.home-masthead, .card-panel, .site-main__container--plain, .site-logo)::before,
+:root[data-theme="autumn-window"] :is(.site-nav__link, .site-nav__button, .prose a)::after {
+  visibility: hidden;
+}
+
+/* Exactly one out-of-flow bookmark: reuse the shared header's existing rule. */
+:root[data-theme="autumn-window"] .site-header::after {
+  inset-inline: var(--wc-container-padding) auto;
+  width: 3rem;
+  background: var(--bookmark-color);
+  opacity: 1;
+}
+
+:root[data-theme="autumn-window"] body::before,
+:root[data-theme="autumn-window"][data-comfort-theme="dawn"] body::before {
+  opacity: var(--texture-opacity);
+}
+
+/* Modes consume tokens even where legacy declarations hardcode durations. */
+:root[data-theme="autumn-window"][data-comfort-mode="calm"],
+:root[data-theme="autumn-window"][data-comfort-mode="plain"],
+:root[data-theme="autumn-window"][data-comfort-mode="calm"] *,
+:root[data-theme="autumn-window"][data-comfort-mode="plain"] *,
+:root[data-theme="autumn-window"][data-comfort-mode="calm"] *::before,
+:root[data-theme="autumn-window"][data-comfort-mode="plain"] *::before,
+:root[data-theme="autumn-window"][data-comfort-mode="calm"] *::after,
+:root[data-theme="autumn-window"][data-comfort-mode="plain"] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+:root[data-theme="autumn-window"]:is([data-comfort-mode="calm"], [data-comfort-mode="plain"]) :is([data-reveal], .card-panel[data-animate]) {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+}
+
+:root[data-theme="autumn-window"]:is([data-comfort-mode="calm"], [data-comfort-mode="plain"]) :is(.site-logo:hover, .card-panel:hover, .card-figure__media, .home-state-card:hover, .site-footer__link:hover, .site-footer__feed:hover) {
+  transform: none;
+}
+
+/* Plain: keep image-slot geometry and accessible UI icons/labels; hide pixels. */
+:root[data-theme="autumn-window"][data-comfort-mode="plain"] :is(body img, body picture, body video, body canvas, .card-figure__initial) {
+  visibility: hidden;
+}
+
+:root[data-theme="autumn-window"][data-comfort-mode="plain"] .site-header::after {
+  visibility: hidden;
+}
+
+:root[data-theme="autumn-window"][data-comfort-mode="plain"] body::before,
+:root[data-theme="autumn-window"][data-comfort-mode="plain"] main *::before,
+:root[data-theme="autumn-window"][data-comfort-mode="plain"] main *::after {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="autumn-window"][data-comfort-mode="plain"] body * {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+:root[data-theme="autumn-window"][data-comfort-mode="plain"] :is(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  box-shadow: var(--focus-ring-shadow) !important;
+}
+
+/* Spoon dots encode effort, not ornament; retain them when fills are stripped. */
+:root[data-theme="autumn-window"][data-comfort-mode="plain"] .spoons-badge__dot {
+  background: var(--spoon-color) !important;
+}
+
+:root[data-theme="autumn-window"][data-comfort-mode="plain"] .spoons-badge--medium .spoons-badge__dot {
+  background: radial-gradient(circle at 20% 50%, var(--spoon-color) 0 1.5px, transparent 1.6px), radial-gradient(circle at 80% 50%, var(--spoon-color) 0 1.5px, transparent 1.6px) !important;
+}
+
+:root[data-theme="autumn-window"][data-comfort-mode="plain"] .spoons-badge--high .spoons-badge__dot {
+  background: radial-gradient(circle at 50% 20%, var(--spoon-color) 0 1.5px, transparent 1.6px), radial-gradient(circle at 20% 80%, var(--spoon-color) 0 1.5px, transparent 1.6px), radial-gradient(circle at 80% 80%, var(--spoon-color) 0 1.5px, transparent 1.6px) !important;
+}

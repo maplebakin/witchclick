@@ -265,11 +265,6 @@
   --card-focus-ring: var(--card-focus-ring-strong);
 }
 
-.card-tier-3 {
-  --card-elevation-base: var(--elevation-tier-3);
-  --card-elevation-hover: var(--elevation-tier-3);
-}
-
 /* ---------------------------------------------------------------------------
    Card Radial Highlights
    --------------------------------------------------------------------------- */
@@ -376,14 +371,6 @@
   text-transform: uppercase;
   color: var(--card-spoon-text);
   box-shadow: 0 10px 28px -18px rgba(15, 23, 42, 0.35);
-}
-
-.card-spoon__icon {
-  font-size: 0.75rem;
-}
-
-.card-spoon__label {
-  white-space: nowrap;
 }
 
 /* Spoon Level Variants - Midnight Theme */
@@ -597,18 +584,3 @@
 /* ---------------------------------------------------------------------------
    Post Article Card Container
    --------------------------------------------------------------------------- */
-
-.post-article-unified-card {
-  background:
-    var(--card-highlight-soft),
-    var(--card-panel-surface-strong, var(--surface-panel-primary));
-  border: 1px solid var(--card-panel-border-strong);
-  border-radius: var(--card-radius);
-  padding: clamp(2rem, 5vw, 3rem);
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-  box-shadow: var(--elevation-tier-2);
-}

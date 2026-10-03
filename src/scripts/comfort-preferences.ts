@@ -3,10 +3,12 @@ const LEGACY_KEYS = ['comfort-preferences'];
 
 type ComfortTheme = 'midnight' | 'dawn';
 type ComfortFont = 'serif' | 'sans';
+type ComfortMode = 'standard' | 'calm' | 'plain';
 
 export type ComfortPreferences = {
   theme: ComfortTheme;
   font: ComfortFont;
+  mode: ComfortMode;
 };
 
 type ComfortPartial = Partial<ComfortPreferences>;
@@ -23,7 +25,7 @@ declare global {
   }
 }
 
-const defaults: ComfortPreferences = { theme: 'midnight', font: 'serif' };
+const defaults: ComfortPreferences = { theme: 'midnight', font: 'serif', mode: 'standard' };
 
 const listeners = new Set<(prefs: ComfortPreferences) => void>();
 let current: ComfortPreferences = { ...defaults };
@@ -59,6 +61,7 @@ function parsePreferences(raw: unknown): ComfortPreferences {
   return {
     theme: theme ?? base.theme,
     font: font ?? base.font,
+    mode: record.mode === 'calm' || record.mode === 'plain' ? record.mode : base.mode,
   };
 }
 
@@ -88,6 +91,12 @@ function applyToDom(prefs: ComfortPreferences) {
   const root = document.documentElement;
   const body = document.body;
   if (!root) return;
+  if (prefs.mode === 'calm' || prefs.mode === 'plain') {
+    root.setAttribute('data-comfort-mode', prefs.mode);
+    document.getAnimations?.().forEach((animation) => animation.cancel());
+  } else {
+    root.removeAttribute('data-comfort-mode');
+  }
   const midnightSlug = root.getAttribute('data-theme-midnight');
   const dawnSlug = root.getAttribute('data-theme-dawn');
 
@@ -130,6 +139,7 @@ function notify() {
 
 function setPreferences(partial: ComfortPartial) {
   const next: ComfortPreferences = {
+    mode: partial.mode === 'calm' || partial.mode === 'plain' || partial.mode === 'standard' ? partial.mode : current.mode,
     theme:
       partial.theme === 'dawn'
         ? 'dawn'

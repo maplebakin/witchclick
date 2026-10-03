@@ -10,6 +10,8 @@ const isStacked = variant === 'stacked';
 const summaryId = `comfort-summary-${variant}`;
 const fontToggleId = `comfort-font-${variant}`;
 const themeToggleId = `comfort-theme-${variant}`;
+const calmToggleId = `comfort-calm-${variant}`;
+const plainToggleId = `comfort-plain-${variant}`;
 ---
 <details
   class:list={["comfort-settings", isStacked && "comfort-settings--stacked"].filter(Boolean)}
@@ -44,8 +46,32 @@ const themeToggleId = `comfort-theme-${variant}`;
         data-comfort-theme-toggle
       />
       <label class="comfort-settings__label" for={themeToggleId}>
-        <span class="comfort-settings__label-text">Calm parchment contrast</span>
+        <span class="comfort-settings__label-text">Light parchment contrast</span>
         <span class="comfort-settings__description">Soften gradients for a gentler glow.</span>
+      </label>
+    </div>
+    <div class="comfort-settings__option">
+      <input
+        id={calmToggleId}
+        class="comfort-settings__control"
+        type="checkbox"
+        data-comfort-mode-toggle="calm"
+      />
+      <label class="comfort-settings__label" for={calmToggleId}>
+        <span class="comfort-settings__label-text">Calm mode</span>
+        <span class="comfort-settings__description">Turn off textures and motion.</span>
+      </label>
+    </div>
+    <div class="comfort-settings__option">
+      <input
+        id={plainToggleId}
+        class="comfort-settings__control"
+        type="checkbox"
+        data-comfort-mode-toggle="plain"
+      />
+      <label class="comfort-settings__label" for={plainToggleId}>
+        <span class="comfort-settings__label-text">Plain-text mode</span>
+        <span class="comfort-settings__description">Hide imagery, decoration, and fills; turn off motion.</span>
       </label>
     </div>
   </div>
@@ -67,11 +93,14 @@ const themeToggleId = `comfort-theme-${variant}`;
       if (!comfort) return false;
 
       const fontToggles = Array.from(
-        host.querySelectorAll<HTMLInputElement>('[data-comfort-font-toggle]')
-      );
+        host.querySelectorAll('[data-comfort-font-toggle]')
+      ).filter((toggle) => toggle instanceof HTMLInputElement);
       const themeToggles = Array.from(
-        host.querySelectorAll<HTMLInputElement>('[data-comfort-theme-toggle]')
-      );
+        host.querySelectorAll('[data-comfort-theme-toggle]')
+      ).filter((toggle) => toggle instanceof HTMLInputElement);
+      const modeToggles = Array.from(
+        host.querySelectorAll('[data-comfort-mode-toggle]')
+      ).filter((toggle) => toggle instanceof HTMLInputElement);
 
       const sync = (prefs) => {
         fontToggles.forEach((toggle) => {
@@ -79,6 +108,9 @@ const themeToggleId = `comfort-theme-${variant}`;
         });
         themeToggles.forEach((toggle) => {
           toggle.checked = prefs.theme === 'dawn';
+        });
+        modeToggles.forEach((toggle) => {
+          toggle.checked = prefs.mode === toggle.dataset.comfortModeToggle;
         });
       };
 
@@ -93,6 +125,11 @@ const themeToggleId = `comfort-theme-${variant}`;
       themeToggles.forEach((toggle) => {
         toggle.addEventListener('change', () => {
           comfort.set({ theme: toggle.checked ? 'dawn' : 'midnight' });
+        });
+      });
+      modeToggles.forEach((toggle) => {
+        toggle.addEventListener('change', () => {
+          comfort.set({ mode: toggle.checked ? toggle.dataset.comfortModeToggle : 'standard' });
         });
       });
 

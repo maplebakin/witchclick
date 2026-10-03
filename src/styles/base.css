@@ -9,8 +9,9 @@
 /* Import editable color token overrides */
 @import "./color-tokens.generated.css";
 
-/* Import generated theme CSS */
-@import "./themes.generated.css";
+/* Public theme: generated seasonal presets remain owned by the theme editor. */
+@import "./autumn-window.tokens.css";
+@import "./autumn-window.css";
 
 /* ---------------------------------------------------------------------------
    Design Tokens
@@ -602,20 +603,6 @@ main {
 /* ---------------------------------------------------------------------------
    Glass Utilities
    --------------------------------------------------------------------------- */
-
-.glass-panel {
-  background: var(--cozy-surface-gradient, var(--glass-surface));
-  border: 1px solid var(--glass-border);
-  border-radius: var(--wc-radius-lg, 1rem);
-  backdrop-filter: blur(var(--glass-blur, 16px));
-  box-shadow: var(--glass-shadow-soft, var(--shadow-soft));
-}
-
-.glass-panel--strong {
-  background: var(--cozy-surface-gradient, var(--glass-surface-strong));
-  border-color: var(--glass-border-strong, var(--glass-border));
-  box-shadow: var(--glass-shadow-strong, var(--shadow-3));
-}
 
 .glass-veil {
   background: color-mix(in srgb, var(--glass-highlight, var(--text-accent)) 35%, transparent 65%);

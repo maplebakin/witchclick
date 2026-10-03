@@ -52,7 +52,7 @@ function setupCardAnimations() {
   }
 
   // Respect reduced motion while keeping cards visible.
-  if (motionPreference.matches) {
+  if (motionPreference.matches || /^(calm|plain)$/.test(document.documentElement.getAttribute('data-comfort-mode') ?? '')) {
     revealImmediately(cards);
     return () => {};
   }
@@ -64,6 +64,11 @@ function setupCardAnimations() {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
           const card = entry.target;
+          if (/^(calm|plain)$/.test(document.documentElement.getAttribute('data-comfort-mode') ?? '')) {
+            revealImmediately([card]);
+            observer.unobserve(card);
+            return;
+          }
           if (card.dataset.animate === "done") {
             observer.unobserve(card);
             return;

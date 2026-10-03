@@ -1,7 +1,7 @@
 const STORAGE_KEY = 'witchclick-comfort';
 const LEGACY_KEYS = ['comfort-preferences'];
 
-const defaults = { theme: 'midnight', font: 'serif' };
+const defaults = { theme: 'midnight', font: 'serif', mode: 'standard' };
 
 const listeners = new Set();
 let current = { ...defaults };
@@ -37,6 +37,7 @@ function parsePreferences(raw) {
   return {
     theme: theme ?? base.theme,
     font: font ?? base.font,
+    mode: record.mode === 'calm' || record.mode === 'plain' ? record.mode : base.mode,
   };
 }
 
@@ -66,6 +67,12 @@ function applyToDom(prefs) {
   const root = document.documentElement;
   const body = document.body;
   if (!root) return;
+  if (prefs.mode === 'calm' || prefs.mode === 'plain') {
+    root.setAttribute('data-comfort-mode', prefs.mode);
+    document.getAnimations?.().forEach((animation) => animation.cancel());
+  } else {
+    root.removeAttribute('data-comfort-mode');
+  }
   const midnightSlug = root.getAttribute('data-theme-midnight');
   const dawnSlug = root.getAttribute('data-theme-dawn');
   const setThemeSlug = (slug) => {
@@ -107,6 +114,7 @@ function notify() {
 
 function setPreferences(partial) {
   const next = {
+    mode: partial.mode === 'calm' || partial.mode === 'plain' || partial.mode === 'standard' ? partial.mode : current.mode,
     theme:
       partial.theme === 'dawn'
         ? 'dawn'

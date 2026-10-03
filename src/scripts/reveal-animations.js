@@ -50,7 +50,7 @@ function setupRevealAnimations() {
   const motionPreference = window.matchMedia(MOTION_QUERY);
 
   // Fail open: if any capability is missing, keep sections visible.
-  if (!supportsWAAPI || !supportsObserver || motionPreference.matches) {
+  if (!supportsWAAPI || !supportsObserver || motionPreference.matches || /^(calm|plain)$/.test(document.documentElement.getAttribute('data-comfort-mode') ?? '')) {
     markVisible(sections);
     return () => {};
   }
@@ -61,6 +61,11 @@ function setupRevealAnimations() {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         const section = entry.target;
+        if (/^(calm|plain)$/.test(document.documentElement.getAttribute('data-comfort-mode') ?? '')) {
+          markVisible([section]);
+          observer.unobserve(section);
+          return;
+        }
 
         if (section.dataset.revealState === "done") {
           observer.unobserve(section);

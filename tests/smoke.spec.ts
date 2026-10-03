@@ -4,6 +4,34 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import matter from "gray-matter";
 
+test("comfort modes persist and synchronize desktop and mobile controls", async ({ page }) => {
+  await page.goto("/");
+  const desktop = page.locator(".site-nav__actions .comfort-settings");
+  await desktop.locator("summary").click();
+  await desktop.locator('[data-comfort-mode-toggle="calm"]').check();
+  await expect(page.locator("html")).toHaveAttribute("data-comfort-mode", "calm");
+  await expect(page.locator("html")).toHaveCSS("scroll-behavior", "auto");
+  await expect(page.locator('.site-nav__mobile [data-comfort-mode-toggle="calm"]')).toBeChecked();
+
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-comfort-mode", "calm");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator("[data-menu-toggle]").click();
+  const mobile = page.locator(".site-nav__mobile .comfort-settings");
+  await mobile.locator('[data-comfort-mode-toggle="plain"]').check();
+  await expect(page.locator("html")).toHaveAttribute("data-comfort-mode", "plain");
+  await expect(page.locator("html")).toHaveCSS("scroll-behavior", "auto");
+  await expect(desktop.locator('[data-comfort-mode-toggle="plain"]')).toBeChecked();
+  await expect(desktop.locator('[data-comfort-mode-toggle="calm"]')).not.toBeChecked();
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-comfort-mode", "plain");
+  await page.locator("[data-menu-toggle]").click();
+  const plain = mobile.locator('[data-comfort-mode-toggle="plain"]');
+  await plain.focus();
+  await plain.press("Space");
+  await expect(page.locator("html")).not.toHaveAttribute("data-comfort-mode", /.+/);
+});
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "..");

@@ -49,8 +49,8 @@ const meta: Record<SpoonLevel, { label: string; tooltip: string }> = {
     width: 0.55rem;
     height: 0.55rem;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--card-spoon-text, hsl(var(--neutral-1) / 1)) 88%, transparent 12%);
-    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--card-spoon-border, hsl(var(--accent-3) / 0.35)) 75%, transparent 25%);
+    background: var(--spoon-color, var(--text-muted));
+    box-shadow: none;
   }
 
   .spoons-badge__text {
@@ -70,9 +70,9 @@ const meta: Record<SpoonLevel, { label: string; tooltip: string }> = {
     line-height: 1.4;
     text-transform: none;
     letter-spacing: normal;
-    color: var(--theme-text-body);
-    background: color-mix(in srgb, hsl(var(--theme-surface-card)) 85%, var(--text-accent, var(--theme-color-gold)) 15%);
-    border: 1px solid color-mix(in srgb, var(--text-accent, var(--theme-color-gold)) 20%, transparent);
+    color: var(--text-body);
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
     box-shadow: 0 10px 28px -22px hsl(var(--neutral-8) / 0.55);
     pointer-events: none;
     opacity: 0;
@@ -99,18 +99,29 @@ const meta: Record<SpoonLevel, { label: string; tooltip: string }> = {
     border-top: inherit;
   }
 
-  .spoons-badge--low .spoons-badge__dot {
-    background: color-mix(in srgb, hsl(var(--green-3) / 0.25) 80%, transparent 20%);
-    box-shadow: inset 0 0 0 2px hsl(var(--green-3) / 0.45);
+  .spoons-badge--low {
+    --spoon-color: var(--spoon-low, var(--text-muted));
   }
 
+  .spoons-badge--medium {
+    --spoon-color: var(--spoon-medium, var(--text-muted));
+  }
+
+  .spoons-badge--high {
+    --spoon-color: var(--spoon-high, var(--text-muted));
+  }
+
+  /* One/two/three dots in the existing slot: effort also reads without hue. */
   .spoons-badge--medium .spoons-badge__dot {
-    background: color-mix(in srgb, hsl(var(--accent-3) / 0.25) 80%, transparent 20%);
-    box-shadow: inset 0 0 0 2px hsl(var(--accent-3) / 0.48);
+    background:
+      radial-gradient(circle at 20% 50%, var(--spoon-color) 0 1.5px, transparent 1.6px),
+      radial-gradient(circle at 80% 50%, var(--spoon-color) 0 1.5px, transparent 1.6px);
   }
 
   .spoons-badge--high .spoons-badge__dot {
-    background: color-mix(in srgb, hsl(var(--red-3) / 0.25) 80%, transparent 20%);
-    box-shadow: inset 0 0 0 2px hsl(var(--red-3) / 0.48);
+    background:
+      radial-gradient(circle at 50% 20%, var(--spoon-color) 0 1.5px, transparent 1.6px),
+      radial-gradient(circle at 20% 80%, var(--spoon-color) 0 1.5px, transparent 1.6px),
+      radial-gradient(circle at 80% 80%, var(--spoon-color) 0 1.5px, transparent 1.6px);
   }
 </style>

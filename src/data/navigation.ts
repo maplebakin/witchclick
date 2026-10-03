@@ -20,8 +20,8 @@ export const primaryNavLinks: NavLink[] = [
 ];
 
 export const secondaryNavLinks: NavLink[] = [
-  { href: "/tags", label: "Topics", description: "Browse topics by tag" },
-  { href: "/page/1", label: "Archive", description: "Browse every published ritual and practical working" },
+  { href: "/tags", label: "Tags", description: "Browse topics by tag" },
+  { href: "/page/1", label: "All Workings", description: "Browse every published ritual and practical working" },
   { href: "/tools", label: "Practice Tools", description: "Printables and supports for reflective practice" },
   { href: "/partners", label: "Partners", description: "Verified community partners and affiliate disclosures" },
   { href: "/rss.xml", label: "RSS", rel: "alternate", description: "Subscribe to WitchClick updates" },

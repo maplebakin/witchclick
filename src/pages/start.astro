@@ -284,14 +284,17 @@ const jsonLd = {
     };
 
     guideButton.addEventListener("click", () => {
+      const reduceMotion = /^(calm|plain)$/.test(document.documentElement.getAttribute('data-comfort-mode') ?? '')
+        || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const behavior = reduceMotion ? "instant" : "smooth";
       const target = guideButton.dataset.target || "";
       if (target === "#top") {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({ top: 0, behavior });
         return;
       }
       const section = document.querySelector(target);
       if (section instanceof HTMLElement) {
-        section.scrollIntoView({ behavior: "smooth", block: "start" });
+        section.scrollIntoView({ behavior, block: "start" });
       }
     });
 

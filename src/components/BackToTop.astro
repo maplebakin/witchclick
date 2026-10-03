@@ -134,11 +134,13 @@
       }
     }
 
-    // Scroll to top smoothly
+    // Read the current preference on each click, including changes made in-page.
     function scrollToTop() {
+      const reduceMotion = /^(calm|plain)$/.test(document.documentElement.getAttribute('data-comfort-mode') ?? '')
+        || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       window.scrollTo({
         top: 0,
-        behavior: 'smooth'
+        behavior: reduceMotion ? 'instant' : 'smooth'
       });
     }
 

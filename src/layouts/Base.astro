@@ -114,12 +114,13 @@ const brandName = settings.brandName ?? "WitchClick";
 const pageDescription = description.trim() || "Small rituals, grounded tarot, symbolic tools, and field notes for when life feels loud.";
 const disclosure = settings.disclosure ?? "";
 const showAccountLink = settings.showAccountLink ?? false;
+const useAutumnWindow = !/^\/admin(?:\/|$)/.test(Astro.url?.pathname ?? "/");
 
 // Theme Setup
 // getActiveThemes memoizes in production but automatically re-reads when
 // the admin saves new presets. See src/utils/theme.ts for cache details.
 const { midnight: midnightTheme, dawn: dawnTheme } = getActiveThemes();
-const themeMetaColor = sanitizeColor(midnightTheme?.primary, FALLBACK_COLORS.midnight.primary);
+const themeMetaColor = useAutumnWindow ? "#242120" : sanitizeColor(midnightTheme?.primary, FALLBACK_COLORS.midnight.primary);
 
 // Ambient Color Configuration
 const fallbackPrimary = sanitizeColor(midnightTheme?.primary, FALLBACK_COLORS.midnight.primary);
@@ -145,7 +146,9 @@ const bodyStyleEntries = [
   ["--ambient-overlay", ambientOverlay],
 ] as const;
 
-const bodyStyle = bodyStyleEntries.map(([key, value]) => `${key}: ${value}`).join("; ");
+const bodyStyle = useAutumnWindow
+  ? "--ambient-color: var(--surface-base); --ambient-highlight: var(--surface-elevated); --ambient-aurora: var(--surface-panel); --ambient-depth: var(--surface-base); --ambient-shadow: var(--surface-base); --ambient-overlay: var(--surface-panel)"
+  : bodyStyleEntries.map(([key, value]) => `${key}: ${value}`).join("; ");
 
 // SEO and Meta Configuration
 const ogUrl = ogImage ? toAbsoluteUrl(ogImage, settings) : "";
@@ -266,8 +269,8 @@ function detectThemeScope(pathname: string): string | null {
 const themeScope = detectThemeScope(currentPath);
 
 // Get active theme slugs for both modes (midnight is default)
-const midnightThemeSlug = midnightTheme?.slug || 'cozy-midnight';
-const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
+const midnightThemeSlug = useAutumnWindow ? 'autumn-window' : midnightTheme?.slug || 'cozy-midnight';
+const dawnThemeSlug = useAutumnWindow ? 'autumn-window' : dawnTheme?.slug || 'cozy-dawn';
 ---
 
 <!doctype html>
@@ -341,6 +344,7 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
             return {
               theme: parsed.theme === 'dawn' ? 'dawn' : null,
               font: parsed.font === 'sans' ? 'sans' : null,
+              mode: parsed.mode === 'calm' || parsed.mode === 'plain' ? parsed.mode : null,
             };
           } catch (error) {
             return null;
@@ -352,6 +356,7 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
           const root = document.documentElement;
 
           if (!root) return;
+          if (prefs?.mode) root.setAttribute('data-comfort-mode', prefs.mode);
 
           const applyTheme = (theme) => {
             if (theme === 'dawn') {
@@ -459,6 +464,9 @@ const dawnThemeSlug = dawnTheme?.slug || 'cozy-dawn';
     <script is:inline>
       (function () {
         try {
+          // The public redesign owns its palette; saved editor tokens must not
+          // replace its semantic colors or focus ring. Admin retains its loader.
+          if (document.documentElement.getAttribute("data-theme") === "autumn-window") return;
           const saved = localStorage.getItem("wc-active-theme");
           if (!saved) {
             return;

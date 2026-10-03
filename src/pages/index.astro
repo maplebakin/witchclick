@@ -257,8 +257,7 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
   }
 
   .home-masthead__eyebrow,
-  .home-section__eyebrow,
-  .home-doorway-card__eyebrow {
+  .home-section__eyebrow {
     margin: 0;
     font-size: 0.76rem;
     font-weight: 700;
@@ -286,36 +285,6 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
     color: var(--theme-text-body, var(--text-body));
   }
 
-  .home-masthead__subline {
-    margin: 1rem auto 0;
-    max-width: 62ch;
-    font-size: 1rem;
-    line-height: 1.68;
-    color: var(--theme-text-muted, var(--text-muted));
-  }
-
-  .home-masthead__actions {
-    margin-top: 1.5rem;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-  }
-
-  .home-masthead__actions :global(a),
-  .home-masthead__actions :global(button) {
-    min-height: 44px;
-    padding: 0.7rem 1.05rem;
-    border-radius: var(--radius-2, 0.75rem);
-    line-height: 1.15;
-  }
-
-  .home-masthead__actions :global(a:first-child),
-  .home-masthead__actions :global(button:first-child) {
-    box-shadow: 0 12px 28px -22px var(--theme-text-accent-strong, var(--text-accent));
-  }
-
   .home-section {
     margin-block: var(--page-section-gap);
   }
@@ -339,20 +308,13 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
     color: var(--theme-text-strong, var(--text-strong));
   }
 
-  .home-section__lead {
-    margin: 0;
-    max-width: 62ch;
-    color: var(--theme-text-muted, var(--text-muted));
-    line-height: 1.65;
-  }
-
   .home-doorway-grid {
     display: grid;
     gap: 0.85rem;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
   }
 
-  .home-doorway-card,
+
   .home-state-card {
     position: relative;
     display: grid;
@@ -369,25 +331,13 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
     overflow: hidden;
   }
 
-  .home-doorway-card--pillar::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background:
-      linear-gradient(90deg, color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 48%, transparent 52%), transparent 42%) left top / 3px 100% no-repeat,
-      radial-gradient(120% 75% at 12% 0%, color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 10%, transparent 90%), transparent 64%);
-    opacity: 0.8;
-  }
 
-  .home-doorway-card > *,
   .home-state-card > * {
     position: relative;
     z-index: 1;
   }
 
-  .home-doorway-card:hover,
-  .home-doorway-card:focus-visible,
+
   .home-state-card:hover,
   .home-state-card:focus-visible {
     transform: translateY(-1px);
@@ -395,7 +345,7 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
     box-shadow: var(--elevation-tier-2, 0 14px 32px rgba(0, 0, 0, 0.08));
   }
 
-  .home-doorway-card__label,
+
   .home-state-card__label {
     font-size: 1.1rem;
     font-weight: 750;
@@ -403,18 +353,11 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
     color: var(--theme-text-strong, var(--text-strong));
   }
 
-  .home-doorway-card__description,
+
   .home-state-card__description {
     color: var(--theme-text-muted, var(--text-muted));
     line-height: 1.58;
     font-size: 0.94rem;
-  }
-
-  .home-doorway-card__action {
-    margin-top: 0.25rem;
-    font-size: 0.84rem;
-    font-weight: 700;
-    color: var(--theme-text-accent-strong, var(--text-accent));
   }
 
   .home-state-grid {
@@ -431,27 +374,6 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
     font-size: 0.86rem;
     font-weight: 650;
     color: var(--theme-text-muted, var(--text-muted));
-  }
-
-  .home-approach {
-    padding-block: clamp(1.25rem, 3vw, 1.75rem);
-    border-top: 1px solid var(--theme-border-subtle, var(--line-subtle));
-    border-bottom: 1px solid var(--theme-border-subtle, var(--line-subtle));
-  }
-
-  .home-approach__list {
-    list-style: none;
-    display: grid;
-    gap: 0.7rem;
-    margin: 1rem 0 0;
-    padding: 0;
-  }
-
-  .home-approach__list li {
-    padding-left: 1rem;
-    border-left: 2px solid color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 44%, transparent 56%);
-    color: var(--theme-text-body, var(--text-body));
-    line-height: 1.6;
   }
 
   .home-posts__header {
@@ -574,17 +496,6 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
   @media (max-width: 719px) {
     .home-masthead {
       text-align: left;
-    }
-
-    .home-masthead__actions {
-      align-items: stretch;
-      justify-content: flex-start;
-      gap: 0.6rem;
-    }
-
-    .home-masthead__actions :global(a),
-    .home-masthead__actions :global(button) {
-      width: 100%;
     }
 
     .home-posts__hero-meta {
