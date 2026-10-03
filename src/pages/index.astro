@@ -87,7 +87,7 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
   })),
 ) : null;
 ---
-<Base {title}>
+<Base {title} desktopWide>
   {collectionSchema && (
     <HeadSlot slot="head">
       <script type="application/ld+json" is:inline set:html={serializeJsonForScript(collectionSchema)} />
@@ -222,6 +222,13 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
 <style>
   .home-shell {
     width: 100%;
+    max-width: 96rem;
+    margin-inline: auto;
+  }
+
+  .home-masthead,
+  .home-states,
+  .home-doorways {
     max-width: 72rem;
     margin-inline: auto;
   }
@@ -409,13 +416,13 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
 
   .home-posts__hero-image {
     width: 100%;
-    height: clamp(11rem, 32vw, 17.5rem);
-    max-height: 280px;
+    height: clamp(18rem, 40vw, 36rem);
     object-fit: cover;
     background: color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 14%, transparent 86%);
   }
 
   .home-posts__hero-content {
+    max-width: 72rem;
     padding: clamp(1rem, 2vw, 1.4rem);
   }
 
