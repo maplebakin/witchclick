@@ -44,18 +44,21 @@ const pillarCards = [
 const stateCards = [
   {
     label: "Ground",
+    glyph: "cairn",
     href: "/hub/calm",
     need: "I need somewhere steady to land.",
     description: "Grounding rituals and quiet anchors for returning to the body.",
   },
   {
     label: "Focus",
+    glyph: "focus",
     href: "/hub/focus",
     need: "I need to choose where attention goes.",
     description: "Attention rituals, tarot spreads, and small structures that do not turn you into a machine.",
   },
   {
     label: "Release",
+    glyph: "threshold",
     href: "/hub/release",
     need: "I need to stop carrying this.",
     description: "Threshold rituals and clean cursing practices for giving the weight a shape.",
@@ -98,11 +101,19 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
     <header data-reveal class="home-masthead">
       <div class="home-masthead__inner">
         <p class="home-masthead__eyebrow">Secular mystical publishing hub</p>
-        <h1 class="home-masthead__title">WitchClick is a living grimoire for symbolic self-work.</h1>
+        <h1 class="home-masthead__title">WitchClick is a living grimoire for symbolic self&#8209;work.</h1>
         <p class="home-masthead__tagline">
           Clean curses, tarot spreads, rituals, and reference notes for turning feeling into form.
         </p>
       </div>
+      <figure class="home-transition-art" aria-hidden="true">
+        <img
+          src="/images/hero/creative-re-entry-ritual-for-personal-projects/chatgpt-image-apr-14-2026-10_12_00-am.png"
+          alt=""
+          loading="eager"
+          decoding="async"
+        />
+      </figure>
     </header>
 
     <section data-reveal class="home-section home-states" aria-labelledby="home-states-heading">
@@ -113,6 +124,28 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
       <div class="home-state-grid">
         {stateCards.map((card) => (
           <a class="home-state-card focus-ring" href={card.href}>
+            <span class="home-state-card__topline">
+              {card.glyph === "cairn" && (
+                <svg class="home-state-card__glyph" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                  <path d="m16 4-5 6h10l-5-6Z" />
+                  <path d="m7 17 3-5h12l3 5H7Z" />
+                  <path d="m4 27 3-7h18l3 7H4Z" />
+                </svg>
+              )}
+              {card.glyph === "focus" && (
+                <svg class="home-state-card__glyph" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                  <circle cx="16" cy="16" r="10" />
+                  <circle cx="16" cy="16" r="2" />
+                </svg>
+              )}
+              {card.glyph === "threshold" && (
+                <svg class="home-state-card__glyph" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                  <path d="M8 27V7h16v20M4 27h24" />
+                  <path d="M17 12v10m-4-4 4 4 4-4" />
+                </svg>
+              )}
+              <span class="home-state-card__action" aria-hidden="true">Choose <span>→</span></span>
+            </span>
             <span class="home-state-card__need">{card.need}</span>
             <span class="home-state-card__label">{card.label}</span>
             <span class="home-state-card__description">{card.description}</span>
@@ -220,17 +253,84 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
 </Base>
 
 <style>
+  :global(:root[data-scope="homepage"]) {
+    --home-content-max: 80rem;
+    --home-page-gutter: clamp(1.25rem, 6vw, 2.75rem);
+    --home-nav-gutter: clamp(1.25rem, 4vw, 2.75rem);
+    --home-spine-gutter: max(
+      calc(var(--home-page-gutter) + var(--home-nav-gutter)),
+      calc(50vw - 40rem)
+    );
+  }
+
+  :global(:root[data-scope="homepage"] .site-header__inner) {
+    --wc-container-max: calc(
+      var(--home-content-max) + var(--home-spine-gutter) + var(--home-spine-gutter)
+    );
+    --wc-container-padding: var(--home-spine-gutter);
+  }
+
   .home-shell {
     width: 100%;
-    max-width: 96rem;
+    max-width: var(--home-content-max);
     margin-inline: auto;
   }
 
   .home-masthead,
   .home-states,
   .home-doorways {
-    max-width: 72rem;
+    max-width: var(--home-content-max);
     margin-inline: auto;
+  }
+
+  .home-transition-art {
+    position: absolute;
+    z-index: 0;
+    top: calc(100% - 4.5rem);
+    right: calc(0px - min(14rem, max(0px, calc(var(--home-spine-gutter) - 1rem))));
+    width: min(14rem, calc(var(--home-spine-gutter) + 2.5rem));
+    aspect-ratio: 4 / 5;
+    margin: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .home-transition-art img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 62%;
+    filter: saturate(0.68) contrast(0.9) brightness(0.92) sepia(0.08);
+  }
+
+  .home-masthead::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse 58% 78% at 50% 42%,
+      color-mix(in srgb, #F1C991 5%, transparent) 0%,
+      transparent 72%
+    );
+  }
+
+  .home-masthead::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--text-strong) 6%, transparent 94%) 0px,
+      transparent 1px,
+      transparent 2px,
+      color-mix(in srgb, var(--text-strong) 6%, transparent 94%) 3px
+    );
+    opacity: var(--texture-opacity, 0.025);
   }
 
   .home-masthead {
@@ -243,17 +343,7 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
       linear-gradient(160deg, color-mix(in srgb, var(--theme-surface-panel, var(--surface-panel)) 88%, transparent 12%), color-mix(in srgb, var(--theme-surface-base, var(--surface-base)) 96%, transparent 4%));
     box-shadow: var(--elevation-tier-2, 0 18px 44px rgba(0, 0, 0, 0.08));
     text-align: center;
-    overflow: hidden;
-  }
-
-  .home-masthead::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background:
-      linear-gradient(90deg, transparent, color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 16%, transparent 84%), transparent) top / 100% 1px no-repeat,
-      linear-gradient(90deg, transparent, color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 10%, transparent 90%), transparent) bottom / 100% 1px no-repeat;
+    overflow: visible;
   }
 
   .home-masthead__inner {
@@ -266,7 +356,7 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
   .home-masthead__eyebrow,
   .home-section__eyebrow {
     margin: 0;
-    font-size: 0.76rem;
+    font-size: 0.8125rem;
     font-weight: 700;
     line-height: 1.3;
     letter-spacing: 0.08em;
@@ -276,10 +366,11 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
 
   .home-masthead__title {
     margin: 0.45rem 0 0;
-    font-family: var(--font-serif);
+    font-family: var(--font-heading);
     font-size: clamp(2.1rem, 5.5vw, 4rem);
     font-weight: 700;
     line-height: 1.08;
+    text-wrap: balance;
     color: var(--theme-text-strong, var(--text-strong));
   }
 
@@ -309,9 +400,10 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
 
   .home-section__title {
     margin: 0;
-    font-family: var(--font-serif);
+    font-family: var(--font-heading);
     font-size: clamp(1.65rem, 3vw, 2.35rem);
     line-height: 1.14;
+    text-wrap: balance;
     color: var(--theme-text-strong, var(--text-strong));
   }
 
@@ -325,9 +417,10 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
   .home-state-card {
     position: relative;
     display: grid;
-    gap: 0.55rem;
+    grid-template-rows: auto auto auto 1fr auto;
+    gap: 0.65rem;
     min-height: 100%;
-    padding: 1rem;
+    padding: 24px;
     border: 1px solid var(--theme-border-subtle, var(--line-subtle));
     border-radius: var(--radius-3, 1rem);
     background: color-mix(in srgb, var(--theme-surface-panel, var(--surface-panel)) 82%, transparent 18%);
@@ -336,6 +429,47 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
     box-shadow: var(--elevation-tier-1, 0 8px 20px rgba(0, 0, 0, 0.05));
     transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
     overflow: hidden;
+  }
+
+  .home-state-card__topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 2rem;
+  }
+
+  .home-state-card__glyph {
+    display: block;
+    width: 2rem;
+    height: 2rem;
+    color: var(--accent-mulberry);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .home-state-card__action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--accent-mulberry);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .home-state-card__action span {
+    font-size: 1rem;
+    line-height: 1;
+    transition: transform 160ms ease;
+  }
+
+  .home-state-card:hover .home-state-card__action span,
+  .home-state-card:focus-visible .home-state-card__action span {
+    transform: translateX(2px);
   }
 
 
@@ -354,7 +488,7 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
 
 
   .home-state-card__label {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     font-weight: 750;
     line-height: 1.2;
     color: var(--theme-text-strong, var(--text-strong));
@@ -492,6 +626,10 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
   @media (max-width: 820px) {
     .home-state-grid {
       grid-template-columns: 1fr;
+    }
+
+    .home-transition-art {
+      display: none;
     }
 
     .home-posts__header {

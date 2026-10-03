@@ -142,6 +142,11 @@
   border-color: var(--border-strong);
 }
 
+/* Need-router cards retain their quiet neutral hairline in this theme. */
+:root[data-theme="autumn-window"] .home-states .home-state-card {
+  border: 1px solid var(--border-subtle) !important;
+}
+
 /* Preserve the original computed border dimensions while replacing colors. */
 :root[data-theme="autumn-window"] :is(.home-state-card, .home-posts__hero > a, .site-search-panel__dialog, .site-footer, .card-panel, .card-figure) {
   border-width: 0 !important;
@@ -230,7 +235,7 @@
   visibility: hidden;
 }
 
-:root[data-theme="autumn-window"] :is(.home-masthead, .card-panel, .site-main__container--plain, .site-logo)::before,
+:root[data-theme="autumn-window"] :is(.card-panel, .site-main__container--plain, .site-logo)::before,
 :root[data-theme="autumn-window"] :is(.site-nav__link, .site-nav__button, .prose a)::after {
   visibility: hidden;
 }
@@ -238,7 +243,7 @@
 /* Exactly one out-of-flow bookmark: reuse the shared header's existing rule. */
 :root[data-theme="autumn-window"] .site-header::after,
 :root[data-theme="autumn-window"][data-comfort-theme="dawn"] .site-header::after {
-  inset-inline: var(--wc-container-padding, 1.5rem) auto;
+  inset-inline: var(--home-spine-gutter, var(--wc-container-padding, 1.5rem)) auto;
   inset-block-end: -1.25rem;
   width: 0.75rem;
   height: 1.5rem;
