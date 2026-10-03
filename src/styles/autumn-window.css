@@ -1,4 +1,4 @@
-/* Autumn Window application: color/effects only; preserve geometry and fonts. */
+/* Autumn Window application: preserve fonts/layout; compact the homepage hero. */
 :root[data-theme="autumn-window"],
 :root[data-theme="autumn-window"][data-comfort-theme="dawn"] {
   /* Reassert aliases above legacy dawn fallbacks without duplicating colors. */
@@ -118,10 +118,19 @@
   color: var(--text-body);
 }
 
-:root[data-theme="autumn-window"] :is(.home-masthead, .home-state-card, .home-posts__hero > a, .card-panel, .site-nav__submenu, .site-nav__mobile, .site-search-panel__dialog, .comfort-settings__panel) {
+:root[data-theme="autumn-window"] :is(.home-state-card, .home-posts__hero > a, .card-panel, .site-nav__submenu, .site-nav__mobile, .site-search-panel__dialog, .comfort-settings__panel) {
   background: var(--surface-panel);
   border-color: var(--border-subtle);
   color: var(--text-body);
+}
+
+/* Let the short introduction sit on the page, within reach of the need router. */
+:root[data-theme="autumn-window"] .home-masthead {
+  padding: clamp(0.5rem, 1.5vw, 1rem) 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 :root[data-theme="autumn-window"] :is(.home-state-card:hover, .card-panel:hover) {
@@ -166,6 +175,22 @@
   color: var(--text-strong);
 }
 
+/* Small interaction marks, never an accent-filled card. These are navigation
+ * links, so active means hover/focus/press rather than a persisted selection. */
+:root[data-theme="autumn-window"] .home-state-card:is(:hover, :focus-visible, :active, [aria-current="page"]) {
+  box-shadow: inset 3px 0 0 var(--accent-mulberry);
+}
+
+:root[data-theme="autumn-window"] .home-state-card:is(:hover, :focus-visible, :active, [aria-current="page"]) .home-state-card__label {
+  color: var(--accent-mulberry);
+}
+
+:root[data-theme="autumn-window"] :is(.home-text-link, .prose a) {
+  text-decoration: underline;
+  text-decoration-color: var(--accent-mulberry);
+  text-underline-offset: 0.2em;
+}
+
 :root[data-theme="autumn-window"] :is(.wc-button, .wc-btn, .site-nav__button, .site-nav__mobile-toggle, .site-nav__mobile-close, .site-footer__feed, .card-pill, .category-badge, .comfort-settings__summary) {
   background: var(--surface-panel);
   border-color: var(--border-strong);
@@ -206,10 +231,14 @@
 }
 
 /* Exactly one out-of-flow bookmark: reuse the shared header's existing rule. */
-:root[data-theme="autumn-window"] .site-header::after {
-  inset-inline: var(--wc-container-padding) auto;
-  width: 3rem;
+:root[data-theme="autumn-window"] .site-header::after,
+:root[data-theme="autumn-window"][data-comfort-theme="dawn"] .site-header::after {
+  inset-inline: var(--wc-container-padding, 1.5rem) auto;
+  inset-block-end: -1.25rem;
+  width: 0.75rem;
+  height: 1.5rem;
   background: var(--bookmark-color);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 75%, 0 100%);
   opacity: 1;
 }
 
