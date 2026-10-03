@@ -50,6 +50,8 @@ export interface Props {
   cardImage?: unknown
   cardImageAlt?: string
   layout?: 'default' | 'bento-featured' | 'bento-compact'
+  showTags?: boolean
+  showImagePlaceholder?: boolean
 }
 
 const {
@@ -75,6 +77,8 @@ const {
   cardImage,
   cardImageAlt,
   layout = 'default',
+  showTags = true,
+  showImagePlaceholder = true,
 } = Astro.props as Props
 
 const link = href || (post?.slug ? `/post/${post.slug}` : '#')
@@ -116,7 +120,7 @@ const _hasHero = Boolean(_heroSrc)
 const _cardLabel = _title ? `Read ${_title}` : 'Read post'
 const _isCompact = layout === 'bento-compact'
 const _isFeatured = layout === 'bento-featured'
-const _visibleTags = _isCompact ? _tags.slice(0, 1) : _tags.slice(0, 6)
+const _visibleTags = showTags ? (_isCompact ? _tags.slice(0, 1) : _tags.slice(0, 6)) : []
 
 function formatDate(value?: string){
   if (!value) return '';
@@ -157,7 +161,7 @@ function truncateSummary(value: string | undefined | null, max = 120): string {
   </a>
   <span aria-hidden class="card-radial card-radial-top" />
   <span aria-hidden class="card-radial card-radial-bottom" />
-  {!_isCompact && (
+  {!_isCompact && (_hasHero || showImagePlaceholder) && (
     <div class="card-figure" data-has-image={_hasHero ? 'true' : undefined}>
       {_hasHero && (
         <img
@@ -168,7 +172,7 @@ function truncateSummary(value: string | undefined | null, max = 120): string {
           class="card-figure__media"
         />
       )}
-      {!_hasHero && (
+      {!_hasHero && showImagePlaceholder && (
         <div class="card-figure__placeholder" aria-hidden="true">
           <span class="card-figure__initial" aria-hidden="true">✦</span>
         </div>

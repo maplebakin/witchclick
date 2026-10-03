@@ -146,6 +146,7 @@ export function autoLinkAffiliates(
         affiliateAnchors: [{ key: prod.key, text: a }],
         products: [prod],
         firstOccurrenceOnly: true,
+        matchWhole: true,
       });
 
       if (stats.affiliateCount > 0) {

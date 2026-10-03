@@ -19,4 +19,20 @@ describe("autoLinkAffiliates", () => {
     const a = suggestAnchorsForProduct(products[1]);
     expect(a.some((s) => /Tea Strainer/i.test(s))).toBe(true);
   });
+
+  it("does not link an anchor inside a longer word", () => {
+    const crystalBook = {
+      key: "crystal-bible",
+      name: "The Crystal Bible (Judy Hall)",
+      url: "https://shop/crystal-bible",
+    };
+    const out = autoLinkAffiliates(
+      "<p>The hallway is quiet, but the hall is bright.</p>",
+      [crystalBook],
+    );
+
+    expect(out.count).toBe(1);
+    expect(out.html).toContain("The hallway is quiet");
+    expect(out.html).toContain(">hall</a> is bright");
+  });
 });
