@@ -126,11 +126,16 @@
 
 /* Let the short introduction sit on the page, within reach of the need router. */
 :root[data-theme="autumn-window"] .home-masthead {
-  padding: clamp(0.5rem, 1.5vw, 1rem) 0;
+  padding: 0.25rem 0;
   border: 0;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
+}
+
+/* Keep the first interactive choices close to the compact introduction. */
+:root[data-theme="autumn-window"] .home-states {
+  margin-block-start: clamp(1.25rem, 3vw, 2rem);
 }
 
 :root[data-theme="autumn-window"] :is(.home-state-card:hover, .card-panel:hover) {
