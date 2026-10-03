@@ -72,6 +72,9 @@ jobs:
       - name: SEO audit
         run: npm run audit:seo
 
+      - name: Build
+        run: npm run build
+
       - name: Internal link check
         run: npm run linkcheck
 
