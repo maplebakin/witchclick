@@ -43,7 +43,7 @@ Allow about two minutes, or whatever time you have. Bring a book or notebook and
 3. **Mark one thing to carry.** Choose a memory, skill, value, or small detail you want to keep. It could be the courage to ask, a recipe, or the way someone listened. Place your marker between the pages.
 4. **Let the book rest.** Close its covers and say, if useful: 'This chapter has a place. I can stop reading it for now.' Put it down. Look at one ordinary thing nearby before returning to your day.
 
-You do not need a changed mood to finish. For more ways to work within limited capacity, explore the [low-spoon option](/post/low-spoon-option). Leaving the bookmark in place is enough.
+You do not need a changed mood to finish. Leaving the bookmark in place is enough.
 
 ## Deep Chapter-Closing Ritual
 
@@ -51,9 +51,9 @@ Set aside ten to twenty minutes if that feels available. Gather a notebook or lo
 
 ### Give the ending somewhere to sit
 
-1. **Make a modest boundary around the time.** Clear a patch of table or settle beside a window. Keep your eyes open if you prefer. Notice the light and the surface beneath your hands. You might use [gentle grounding practices](/post/grounding-practices) before beginning. There is no special state you need to reach.
+1. **Make a modest boundary around the time.** Clear a patch of table or settle beside a window. Keep your eyes open if you prefer. Notice the light and the surface beneath your hands. You might use [gentle grounding practices](/post/sanctuary-in-the-shadow-of-the-unknown-ritual) before beginning. There is no special state you need to reach.
 2. **Describe what has actually changed.** Write a few concrete lines. A shift ended. A conversation will happen differently. A plan no longer fits the available life. Separate what you know from what you fear or hope. 'We will never speak again' is different from 'We are not speaking now.' Let the page hold only what you can honestly name.
-3. **Make room for the mixed account.** Under three small headings, note what mattered, what was difficult, and what remains unknown. A single phrase beneath each is plenty. You can value a season and dislike parts of it. You can miss something you chose to leave. If words come more easily with company, [a simple journaling practice](/post/journaling) offers another doorway. Gratitude is optional; accuracy matters more.
+3. **Make room for the mixed account.** Under three small headings, note what mattered, what was difficult, and what remains unknown. A single phrase beneath each is plenty. You can value a season and dislike parts of it. You can miss something you chose to leave. If words come more easily with company, a simple journaling practice offers another doorway. Gratitude is optional; accuracy matters more.
 
 ### Choose what crosses the margin
 
@@ -61,7 +61,7 @@ Set aside ten to twenty minutes if that feels available. Gather a notebook or lo
 5. **Set down one demand.** On a separate scrap, finish: 'For now, I am setting down the demand to…' Perhaps you are tired of explaining the whole ending, making it beautiful, or knowing what comes next. Fold the scrap and place it beneath the book. Keep any practical responsibility separate: a bill, appointment, or necessary message still needs its own place. Symbolic release can change your stance toward a task; it does not complete the task.
 6. **Mark the page and return.** Put your bookmark beside the notes and turn to a blank page. Leave it blank, or write: 'There is room here.' Then close the notebook. Feel its weight before setting it down. Drink some water, stretch your fingers, or attend to a familiar household task. Choose whether to keep the folded scrap, recycle it, or revisit it another day.
 
-There is no need to send these notes to anyone. If the chapter involves a relationship, your private ritual can mark your choices while leaving the other person's choices with them. [Forgiveness and boundaries](/post/forgiveness-and-boundaries) may offer a useful companion when care and distance need to coexist.
+There is no need to send these notes to anyone. If the chapter involves a relationship, your private ritual can mark your choices while leaving the other person's choices with them.
 
 ## Reflection Prompt
 
