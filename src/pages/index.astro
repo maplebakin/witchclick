@@ -112,6 +112,8 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
           alt=""
           loading="eager"
           decoding="async"
+          width="1024"
+          height="1536"
         />
       </figure>
     </header>
@@ -171,7 +173,7 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
             </div>
 
             <article class="home-posts__hero">
-              <a href={`/post/${latestPost.slug}`} class="group block focus-ring">
+              <a href={`/post/${latestPost.slug}`} class:list={["group focus-ring", latestPostHasImage && "home-posts__hero-link--illustrated"]}>
                 {latestPostHasImage && (
                   <img
                     src={latestPost.heroImageSrc || latestPost.heroImage}
@@ -255,19 +257,13 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
 <style>
   :global(:root[data-scope="homepage"]) {
     --home-content-max: 80rem;
-    --home-page-gutter: clamp(1.25rem, 6vw, 2.75rem);
-    --home-nav-gutter: clamp(1.25rem, 4vw, 2.75rem);
-    --home-spine-gutter: max(
-      calc(var(--home-page-gutter) + var(--home-nav-gutter)),
-      calc(50vw - 40rem)
-    );
+    --home-page-gutter: clamp(1.25rem, 4vw, 2.75rem);
+    --home-spine-gutter: max(var(--home-page-gutter), calc((100vw - var(--home-content-max)) / 2));
   }
 
-  :global(:root[data-scope="homepage"] .site-header__inner) {
-    --wc-container-max: calc(
-      var(--home-content-max) + var(--home-spine-gutter) + var(--home-spine-gutter)
-    );
-    --wc-container-padding: var(--home-spine-gutter);
+  :global(:root[data-scope="homepage"] :is(.site-header__inner, .site-main__container)) {
+    --wc-container-max: calc(var(--home-content-max) + var(--home-page-gutter) * 2);
+    --wc-container-padding: var(--home-page-gutter);
   }
 
   .home-shell {
@@ -284,14 +280,12 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
   }
 
   .home-transition-art {
-    position: absolute;
-    z-index: 0;
-    top: calc(100% - 4.5rem);
-    right: calc(0px - min(14rem, max(0px, calc(var(--home-spine-gutter) - 1rem))));
-    width: min(14rem, calc(var(--home-spine-gutter) + 2.5rem));
-    aspect-ratio: 4 / 5;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 5 / 4;
     margin: 0;
     overflow: hidden;
+    border-radius: var(--radius-3, 1rem);
     pointer-events: none;
   }
 
@@ -335,6 +329,10 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
 
   .home-masthead {
     position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(1.5rem, 4vw, 3.5rem);
     padding: clamp(2rem, 5vw, 3.75rem);
     border: 1px solid color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 22%, var(--theme-border-subtle, var(--border-subtle)) 78%);
     border-radius: clamp(1.15rem, 3vw, 1.75rem);
@@ -342,15 +340,14 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
       radial-gradient(90% 70% at 50% 0%, color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 12%, transparent 88%), transparent 72%),
       linear-gradient(160deg, color-mix(in srgb, var(--theme-surface-panel, var(--surface-panel)) 88%, transparent 12%), color-mix(in srgb, var(--theme-surface-base, var(--surface-base)) 96%, transparent 4%));
     box-shadow: var(--elevation-tier-2, 0 18px 44px rgba(0, 0, 0, 0.08));
-    text-align: center;
+    text-align: left;
     overflow: visible;
   }
 
   .home-masthead__inner {
     position: relative;
     z-index: 1;
-    margin-inline: auto;
-    max-width: 56rem;
+    max-width: 42rem;
   }
 
   .home-masthead__eyebrow,
@@ -367,7 +364,7 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
   .home-masthead__title {
     margin: 0.45rem 0 0;
     font-family: var(--font-heading);
-    font-size: clamp(2.1rem, 5.5vw, 4rem);
+    font-size: clamp(2rem, 3.4vw, 3.15rem);
     font-weight: 700;
     line-height: 1.08;
     text-wrap: balance;
@@ -375,9 +372,9 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
   }
 
   .home-masthead__tagline {
-    margin: 0.85rem auto 0;
-    max-width: 38ch;
-    font-size: clamp(1.22rem, 2.3vw, 1.55rem);
+    margin: 1rem 0 0;
+    max-width: 48ch;
+    font-size: clamp(1.15rem, 1.6vw, 1.4rem);
     line-height: 1.42;
     font-weight: 600;
     color: var(--theme-text-body, var(--text-body));
@@ -417,7 +414,7 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
   .home-state-card {
     position: relative;
     display: grid;
-    grid-template-rows: auto auto auto 1fr auto;
+    grid-template-rows: auto auto auto 1fr;
     gap: 0.65rem;
     min-height: 100%;
     padding: 24px;
@@ -550,14 +547,22 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
 
   .home-posts__hero-image {
     width: 100%;
-    height: clamp(18rem, 40vw, 36rem);
+    height: 100%;
+    min-height: 20rem;
+    max-height: 28rem;
     object-fit: cover;
     background: color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 14%, transparent 86%);
   }
 
+  .home-posts__hero > .home-posts__hero-link--illustrated {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    align-items: center;
+  }
+
   .home-posts__hero-content {
     max-width: 72rem;
-    padding: clamp(1rem, 2vw, 1.4rem);
+    padding: clamp(1.5rem, 3vw, 2.5rem);
   }
 
   .home-posts__hero-content--text-only {
@@ -628,8 +633,24 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
       grid-template-columns: 1fr;
     }
 
+    .home-masthead {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
     .home-transition-art {
-      display: none;
+      aspect-ratio: 16 / 7;
+      max-height: 15rem;
+    }
+
+    .home-posts__hero > .home-posts__hero-link--illustrated {
+      grid-template-columns: 1fr;
+    }
+
+    .home-posts__hero-image {
+      height: auto;
+      min-height: 0;
+      aspect-ratio: 16 / 9;
     }
 
     .home-posts__header {
