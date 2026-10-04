@@ -1834,7 +1834,8 @@ main {
 .site-footer__nav--inline {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  align-items: center;
+  gap: 0.5rem 0.75rem;
 }
 
 .site-footer__tail {
@@ -1867,14 +1868,19 @@ main {
 }
 
 .site-footer__nav--inline li {
-  position: relative;
-  padding-right: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0;
+}
+
+.site-footer__nav--inline .site-footer__link {
+  white-space: nowrap;
 }
 
 .site-footer__nav--inline li::after {
   content: "•";
-  position: absolute;
-  right: -0.65rem;
+  flex: none;
   color: color-mix(in srgb, var(--text-muted) 65%, transparent 35%);
 }
 
