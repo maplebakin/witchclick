@@ -51,7 +51,7 @@ Set aside ten to twenty minutes if that feels available. Gather a notebook or lo
 
 ### Give the ending somewhere to sit
 
-1. **Make a modest boundary around the time.** Clear a patch of table or settle beside a window. Keep your eyes open if you prefer. Notice the light and the surface beneath your hands. You might use gentle grounding practices before beginning. There is no special state you need to reach.
+1. **Make a modest boundary around the time.** Clear a patch of table or settle beside a window. Keep your eyes open if you prefer. Notice the light and the surface beneath your hands. You might use [gentle grounding practices](/post/sanctuary-in-the-shadow-of-the-unknown-ritual) before beginning. There is no special state you need to reach.
 2. **Describe what has actually changed.** Write a few concrete lines. A shift ended. A conversation will happen differently. A plan no longer fits the available life. Separate what you know from what you fear or hope. 'We will never speak again' is different from 'We are not speaking now.' Let the page hold only what you can honestly name.
 3. **Make room for the mixed account.** Under three small headings, note what mattered, what was difficult, and what remains unknown. A single phrase beneath each is plenty. You can value a season and dislike parts of it. You can miss something you chose to leave. If words come more easily with company, a simple journaling practice offers another doorway. Gratitude is optional; accuracy matters more.
 
