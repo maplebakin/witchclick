@@ -43,40 +43,51 @@ export const footerUtilityLinks: NavLink[] = [
 
 export const adminNavSections: AdminNavSection[] = [
   {
-    label: "Content",
+    label: "Dashboard",
     items: [
-      { href: "/admin", label: "Dashboard" },
-      { href: "/admin/generator", label: "Generator" },
-      { href: "/admin/staging", label: "Staging" },
-      { href: "/admin/write", label: "Write" },
-      { href: "/admin/posts", label: "Posts" },
-      { href: "/admin/curses", label: "Curses" },
+      { href: "/admin", label: "Work queues", description: "Overview and next actions" },
     ]
   },
   {
-    label: "Manage",
+    label: "Create",
     items: [
-      { href: "/admin/entities", label: "Entities" },
-      { href: "/admin/stubs", label: "Entity Stubs" },
-      { href: "/admin/authors", label: "Authors" },
-      { href: "/admin/partners", label: "Partners" },
-      { href: "/admin/calendar", label: "Calendar" },
-      { href: "/admin/downloads", label: "Downloads" },
+      { href: "/admin/generator", label: "Generate a post", description: "Build prompts and save generated posts" },
+      { href: "/admin/write", label: "Write a post", description: "Compose a new post in Markdown" },
+      { href: "/admin/curses", label: "Generate a curse", description: "Build prompts and ingest curses" },
     ]
   },
   {
-    label: "Design",
+    label: "Review",
     items: [
-      { href: "/admin/theme", label: "Theme" },
-      { href: "/admin/hero", label: "Hero Images" },
-      { href: "/admin/home", label: "Homepage" },
+      { href: "/admin/staging", label: "Review drafts", description: "Review, compare, and publish draft posts" },
+      { href: "/admin/stubs", label: "Triage post stubs", description: "Review post stubs and replace them with completed drafts" },
+      { href: "/admin/hero", label: "Complete hero images", description: "Upload artwork and attach it to posts" },
     ]
   },
   {
-    label: "Settings",
+    label: "Library",
     items: [
-      { href: "/admin/products", label: "Products" },
-      { href: "/admin/settings", label: "Settings" },
+      { href: "/admin/posts", label: "Posts", description: "Browse and edit existing posts" },
+      { href: "/admin/entities", label: "Entities", description: "Create and edit entities, including entity stubs" },
+      { href: "/admin/curses/archive", label: "Curse archive & editor", description: "Browse and edit archived curses" },
+      { href: "/admin/downloads", label: "Downloads", description: "Create, edit, and archive download records" },
+      { href: "/admin/authors", label: "Authors", description: "Create and edit author profiles" },
+    ]
+  },
+  {
+    label: "Site",
+    items: [
+      { href: "/admin/home", label: "Homepage", description: "Configure homepage content" },
+      { href: "/admin/calendar", label: "Seasonal calendar", description: "Configure seasons, anchors, and rituals" },
+      { href: "/admin/partners", label: "Partners & community", description: "Configure partner sections and affiliate highlights" },
+      { href: "/admin/products", label: "Affiliate products", description: "Configure the affiliate product catalogue" },
+      { href: "/admin/theme", label: "Themes & typography", description: "Configure palettes, fonts, and theme scopes" },
+    ]
+  },
+  {
+    label: "System",
+    items: [
+      { href: "/admin/settings", label: "Site settings", description: "Configure site settings" },
     ]
   }
 ];

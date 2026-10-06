@@ -1,44 +1,40 @@
 /* ===========================================================================
-   ADMIN PANEL STYLES - WCAG AA Compliant
+   ADMIN PANEL STYLES
    
-   All colors in this file are tested for WCAG AA accessibility compliance.
-   These styles override Tailwind utilities with accessible alternatives.
+   Admin text and surfaces follow the active theme tokens.
+   Autumn Window overrides below keep meaningful text opaque and readable.
    =========================================================================== */
 
 /* ---------------------------------------------------------------------------
    Theme-aware admin tokens with WCAG fallbacks
    --------------------------------------------------------------------------- */
 :root {
-  /* Normalize runtime HSL component tokens into real colors before mixing */
-  --admin-base-text-strong: hsl(var(--text-heading, var(--text-strong, 0 0% 100% / 1)));
-  --admin-base-text-body: hsl(var(--text-body, 0 0% 16% / 1));
-  --admin-base-text-muted: hsl(var(--text-muted, 0 0% 42% / 1));
-
-  /* Text aligns to runtime theme tokens; mixed with dark fallback to avoid white-on-white */
-  --admin-text-strong: color-mix(in srgb, var(--admin-base-text-strong) 35%, #0f172a 65%);
-  --admin-text-body: color-mix(in srgb, var(--admin-base-text-body) 35%, #0f172a 65%);
-  --admin-text-muted: color-mix(in srgb, var(--admin-base-text-muted) 40%, #0f172a 60%);
-  --admin-text-subtle: color-mix(in srgb, var(--admin-base-text-muted) 45%, #0f172a 55%);
-  --admin-text-muted-strong: color-mix(in srgb, var(--admin-base-text-muted) 42%, #0f172a 58%);
-  --admin-text-muted-soft: color-mix(in srgb, var(--admin-base-text-muted) 48%, #0f172a 52%);
-  --admin-text-muted-subtle: color-mix(in srgb, var(--admin-base-text-muted) 52%, #0f172a 48%);
-
-  /* Surfaces pull from card/panel tokens set by the theme editor */
-  --admin-surface-base: hsl(var(--card-panel-surface, var(--surface-base, 0 0% 100% / 1)));
-  --admin-surface-muted: hsl(var(--card-panel-surface-strong, var(--surface-card, var(--surface-panel, 0 0% 96% / 1))));
-  --admin-border-subtle: hsl(var(--card-panel-border, var(--border-subtle, 0 0% 86% / 1)));
-  --admin-border-strong: hsl(var(--card-panel-border-strong, var(--border-strong, 0 0% 70% / 1)));
-  --admin-accent: var(--text-accent, #7c3aed);
-  --admin-accent-soft: color-mix(in srgb, var(--admin-accent) 14%, white 86%);
-  --admin-accent-soft-hover: color-mix(in srgb, var(--admin-accent) 22%, white 78%);
-  --admin-accent-border: color-mix(in srgb, var(--admin-accent) 42%, transparent 58%);
-  --admin-accent-text: color-mix(in srgb, var(--admin-accent) 85%, black 15%);
-  --admin-hover-bg: color-mix(in srgb, var(--admin-surface-muted, #f3f4f6) 92%, transparent 8%);
+  /* Theme tokens are complete CSS colors, not HSL channel lists. */
+  --admin-base-text-strong: var(--text-strong);
+  --admin-base-text-body: var(--text-body);
+  --admin-base-text-muted: var(--text-muted);
+  --admin-text-strong: var(--admin-base-text-strong);
+  --admin-text-body: var(--admin-base-text-body);
+  --admin-text-muted: var(--admin-base-text-muted);
+  --admin-text-subtle: var(--admin-base-text-muted);
+  --admin-text-muted-strong: var(--admin-base-text-muted);
+  --admin-text-muted-soft: var(--admin-base-text-muted);
+  --admin-text-muted-subtle: var(--admin-base-text-muted);
+  --admin-surface-base: var(--surface-base);
+  --admin-surface-muted: var(--surface-panel);
+  --admin-border-subtle: var(--border-subtle);
+  --admin-border-strong: var(--border-strong);
+  --admin-accent: var(--accent-mulberry, var(--text-accent));
+  --admin-accent-soft: var(--admin-surface-muted);
+  --admin-accent-soft-hover: var(--surface-elevated);
+  --admin-accent-border: var(--admin-accent);
+  --admin-accent-text: var(--admin-accent);
+  --admin-hover-bg: var(--surface-elevated);
   --admin-border-neutral: var(--admin-border-subtle);
   --admin-surface-hover: var(--admin-hover-bg);
   --admin-text-primary: var(--admin-text-strong);
   --admin-icon-muted: var(--admin-text-muted);
-  --admin-focus: var(--focus-ring-color, var(--focus-ring, #2563eb));
+  --admin-focus: var(--accent-blue, var(--focus-ring-color));
 }
 
 /* ---------------------------------------------------------------------------
@@ -472,11 +468,93 @@ h6 {
    Links in Admin Context
    --------------------------------------------------------------------------- */
 
-a:not(.admin-nav-link):not(.site-nav__link):not([class*="button"]) {
+main:has([data-admin-nav]) a:not(.admin-nav-link):not(.admin-nav-quick-link):not([class*="button"]) {
   color: var(--link-color, var(--text-accent, #6d28d9)); /* uses theme link */
   text-decoration: underline;
 }
 
-a:not(.admin-nav-link):not(.site-nav__link):not([class*="button"]):hover {
+main:has([data-admin-nav]) a:not(.admin-nav-link):not(.admin-nav-quick-link):not([class*="button"]):hover {
   color: color-mix(in srgb, var(--link-color, var(--text-accent, #6d28d9)) 78%, black 22%);
+}
+
+/* Autumn Window admin workspace only: leave public header/navigation styling
+ * and public-page surfaces to their existing theme rules. */
+:root:has([data-admin-nav]) main {
+  color: var(--admin-text-body);
+  background-color: var(--admin-surface-base);
+}
+
+:root:has([data-admin-nav]) main :is(
+  [class*="bg-surface"], [class*="bg-neutral-"], [class*="bg-white"],
+  .admin-dashboard__hero, .admin-dashboard__panel,
+  .admin-dashboard__stat, .admin-dashboard__list-item, .admin-badge, .admin-status
+) {
+  background: var(--admin-surface-muted) !important;
+}
+
+:root:has([data-admin-nav]) main :is(
+  .font-mono, .text-secondary, .text-inverse, .text-inverse-soft,
+  [class*="text-neutral-"], .text-white,
+  .text-success, .text-info, .text-warning, .text-danger,
+  .admin-badge, .admin-status
+) {
+  color: var(--admin-text-body) !important;
+}
+
+:root:has([data-admin-nav]) main :is(
+  .text-body-faint, .text-inverse-subtle, .text-muted, .text-muted-subtle
+) {
+  color: var(--admin-text-muted) !important;
+}
+
+:root:has([data-admin-nav]) main :is(input, select, textarea) {
+  color: var(--admin-text-body) !important;
+  background-color: var(--admin-surface-base) !important;
+  border-color: var(--admin-border-strong) !important;
+  opacity: 1 !important;
+}
+
+:root:has([data-admin-nav]) main :is(input, textarea) {
+  background-image: none !important;
+}
+
+:root:has([data-admin-nav]) main :is(input, textarea)::placeholder {
+  color: var(--admin-text-muted) !important;
+  opacity: 1 !important;
+}
+
+:root:has([data-admin-nav]) main :is(input, select, textarea):focus {
+  outline: 2px solid var(--admin-focus) !important;
+  outline-offset: 2px;
+  box-shadow: none !important;
+}
+
+:root:has([data-admin-nav]) main :is(.admin-btn-primary, .admin-btn-secondary) {
+  background: var(--admin-surface-muted) !important;
+  color: var(--admin-text-body) !important;
+  border-color: var(--admin-border-strong) !important;
+}
+
+:root:has([data-admin-nav]) main .admin-btn-primary {
+  border-color: var(--admin-accent) !important;
+}
+
+:root:has([data-admin-nav]) main :is(.admin-btn-primary, .admin-btn-secondary):is(:hover, :focus-visible) {
+  background: var(--admin-surface-hover) !important;
+  color: var(--admin-text-strong) !important;
+}
+
+:root:has([data-admin-nav]) main a:not(.admin-nav-link):not(.admin-nav-quick-link):hover {
+  color: var(--admin-text-strong);
+}
+
+:root:has([data-admin-nav]) main :is(button:disabled, [class~="opacity-50"], [class~="opacity-60"], [class~="opacity-70"], [class~="opacity-75"], [class~="opacity-80"]) {
+  opacity: 0.85 !important;
+}
+
+/* Plain mode removes theme panels; admin controls still need opaque fills. */
+:root:has([data-admin-nav])[data-comfort-mode="plain"] {
+  --admin-surface-muted: var(--surface-base);
+  --admin-accent-soft-hover: var(--surface-base);
+  --admin-hover-bg: var(--surface-base);
 }

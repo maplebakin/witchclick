@@ -7,6 +7,7 @@
  */
 
 import "@/styles/admin.css";
+import autumnWindowTokens from "@/styles/autumn-window.tokens.css?raw";
 import QuickActions from "@/components/QuickActions.astro";
 import GlobalSearch from "@/components/GlobalSearch.astro";
 
@@ -15,78 +16,84 @@ interface Props {
 }
 
 const { currentPath = "" } = Astro.props;
+// Reuse the existing palette on admin pages without changing Base's theme selection.
+const adminThemeTokens = autumnWindowTokens.replaceAll(
+  ':root[data-theme="autumn-window"]',
+  ':root:has([data-admin-nav])',
+);
 
 const navSections = [
   {
-    label: "Content Creation",
+    label: "Dashboard",
     items: [
-      { href: "/admin", label: "Dashboard", description: "Overview and quick actions" },
-      { href: "/admin/generator", label: "Generator", description: "Generate posts from prompts" },
-      { href: "/admin/staging", label: "Staging", description: "Review and publish drafts" },
-      { href: "/admin/write", label: "Write", description: "Compose posts in markdown" },
-      { href: "/admin/posts", label: "Posts", description: "Edit existing posts" },
-      { href: "/admin/curses", label: "Curses", description: "Generate, archive, and edit curses" },
+      { href: "/admin", label: "Work queues", description: "Overview and next actions" },
     ]
   },
   {
-    label: "Content Management",
+    label: "Create",
     items: [
-      { href: "/admin/entities", label: "Entities", description: "Manage crystals, herbs, tarot" },
-      { href: "/admin/stubs", label: "Stubs", description: "Promote entity and post stubs into full content." },
-      { href: "/admin/authors", label: "Authors", description: "Manage author profiles" },
-      { href: "/admin/partners", label: "Partners", description: "Partner relationships" },
-      { href: "/admin/calendar", label: "Calendar", description: "Editorial calendar" },
-      { href: "/admin/downloads", label: "Downloads", description: "Digital downloads" },
+      { href: "/admin/generator", label: "Generate a post", description: "Build prompts and save generated posts" },
+      { href: "/admin/write", label: "Write a post", description: "Compose a new post in Markdown" },
+      { href: "/admin/curses", label: "Generate a curse", description: "Build prompts and ingest curses" },
     ]
   },
   {
-    label: "Customization",
+    label: "Review",
     items: [
-      { href: "/admin/theme", label: "Theme", description: "Colors and typography" },
-      { href: "/admin/hero", label: "Hero Images", description: "Upload hero images" },
-      { href: "/admin/home", label: "Homepage", description: "Configure homepage" },
+      { href: "/admin/staging", label: "Review drafts", description: "Review, compare, and publish draft posts" },
+      { href: "/admin/stubs", label: "Triage post stubs", description: "Review post stubs and replace them with completed drafts" },
+      { href: "/admin/hero", label: "Complete hero images", description: "Upload artwork and attach it to posts" },
+    ]
+  },
+  {
+    label: "Library",
+    items: [
+      { href: "/admin/posts", label: "Posts", description: "Browse and edit existing posts" },
+      { href: "/admin/entities", label: "Entities", description: "Create and edit entities, including entity stubs" },
+      { href: "/admin/curses/archive", label: "Curse archive & editor", description: "Browse and edit archived curses" },
+      { href: "/admin/downloads", label: "Downloads", description: "Create, edit, and archive download records" },
+      { href: "/admin/authors", label: "Authors", description: "Create and edit author profiles" },
+    ]
+  },
+  {
+    label: "Site",
+    items: [
+      { href: "/admin/home", label: "Homepage", description: "Configure homepage content" },
+      { href: "/admin/calendar", label: "Seasonal calendar", description: "Configure seasons, anchors, and rituals" },
+      { href: "/admin/partners", label: "Partners & community", description: "Configure partner sections and affiliate highlights" },
+      { href: "/admin/products", label: "Affiliate products", description: "Configure the affiliate product catalogue" },
+      { href: "/admin/theme", label: "Themes & typography", description: "Configure palettes, fonts, and theme scopes" },
     ]
   },
   {
     label: "System",
     items: [
-      { href: "/admin/products", label: "Products", description: "Affiliate products" },
-      { href: "/admin/settings", label: "Settings", description: "Site configuration" },
+      { href: "/admin/settings", label: "Site settings", description: "Configure site settings" },
     ]
   }
 ];
 
 const quickLinks = [
-  { href: "/admin", label: "Dashboard", description: "Overview", tone: "neutral" },
-  { href: "/admin/posts", label: "Posts", description: "Edit posts", tone: "accent" },
-  { href: "/admin/entities", label: "Entities", description: "Manage entities", tone: "accent" },
-  { href: "/admin/hero", label: "Hero", description: "Add hero art", tone: "accent" },
-  { href: "/admin/generator", label: "Generator", description: "Create drafts", tone: "accent" },
-  { href: "/admin/staging", label: "Staging", description: "Publish drafts", tone: "accent" },
+  { href: "/admin", label: "Work queues", description: "Overview and next actions", tone: "neutral" },
+  { href: "/admin/generator", label: "Generate a post", description: "Create posts from prompts", tone: "accent" },
+  { href: "/admin/staging", label: "Review drafts", description: "Review and publish drafts", tone: "accent" },
+  { href: "/admin/posts", label: "Posts", description: "Browse and edit posts", tone: "accent" },
 ] as const;
 
-function isActive(itemPath: string, current: string): boolean {
-  if (!current) return false;
-  // Exact match for index
-  if (itemPath === "/admin" && current === "/admin") return true;
-  // Prefix match for other pages
-  if (itemPath !== "/admin" && current.startsWith(itemPath)) return true;
-  return false;
-}
+// Match complete path segments and select only the most specific destination.
+const currentPage = navSections
+  .flatMap((section) => section.items)
+  .filter((item) => item.href === currentPath || (
+    item.href !== "/admin" && currentPath.startsWith(`${item.href}/`)
+  ))
+  .sort((a, b) => b.href.length - a.href.length)[0];
+const activeHref = currentPage?.href;
+const currentPageLabel = currentPage?.label ?? "Admin Panel";
+const currentPageDescription = currentPage?.description ?? "";
 
-// Find current page info
-let currentPageLabel = "Admin Panel";
-let currentPageDescription = "";
-for (const section of navSections) {
-  for (const item of section.items) {
-    if (isActive(item.href, currentPath)) {
-      currentPageLabel = item.label;
-      currentPageDescription = item.description;
-      break;
-    }
-  }
-}
 ---
+
+<style is:global set:html={adminThemeTokens}></style>
 
 <nav aria-label="Admin navigation" class="admin-nav" data-admin-nav>
   <div class="admin-nav-header">
@@ -144,7 +151,7 @@ for (const section of navSections) {
           <h3 class="admin-nav-section-label">{section.label}</h3>
           <ul class="admin-nav-list">
             {section.items.map((item) => {
-              const active = isActive(item.href, currentPath);
+              const active = item.href === activeHref;
               return (
                 <li>
                   <a
@@ -275,7 +282,7 @@ for (const section of navSections) {
   }
 
   .admin-nav-trigger:focus-visible {
-    outline: 2px solid var(--admin-accent);
+    outline: 2px solid var(--admin-focus);
     outline-offset: 2px;
   }
 
@@ -309,7 +316,7 @@ for (const section of navSections) {
 
   .admin-nav-trigger-label {
     display: block;
-    font-size: 0.875rem;
+    font-size: 0.95rem;
     font-weight: 600;
     color: var(--admin-text-primary);
     line-height: 1.25;
@@ -317,9 +324,9 @@ for (const section of navSections) {
 
   .admin-nav-trigger-description {
     display: block;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: var(--admin-text-muted);
-    line-height: 1.2;
+    line-height: 1.4;
   }
 
   .admin-nav-trigger-chevron {
@@ -338,7 +345,8 @@ for (const section of navSections) {
     align-items: center;
     gap: 0.5rem;
     flex-wrap: wrap;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    min-width: 0;
   }
 
   .admin-nav-quick-link {
@@ -346,6 +354,10 @@ for (const section of navSections) {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.125rem;
+    min-height: 2.75rem;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
     padding: 0.625rem 0.875rem;
     border-radius: 0.75rem;
     text-decoration: none;
@@ -360,7 +372,7 @@ for (const section of navSections) {
 
   .admin-nav-quick-link--accent:hover {
     background: var(--admin-accent-soft-hover);
-    color: color-mix(in srgb, var(--admin-accent) 90%, black 10%);
+    color: var(--admin-accent-text);
     border-color: var(--admin-accent);
     box-shadow: 0 1px 3px 0 hsl(var(--accent-2) / 0.2);
   }
@@ -378,15 +390,15 @@ for (const section of navSections) {
   }
 
   .admin-nav-quick-link-label {
-    font-size: 0.875rem;
+    font-size: 0.95rem;
     font-weight: 600;
-    line-height: 1.1;
+    line-height: 1.4;
   }
 
   .admin-nav-quick-link-description {
-    font-size: 0.75rem;
-    line-height: 1.1;
-    opacity: 0.8;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    opacity: 1;
   }
 
   .admin-nav-dropdown {
@@ -408,16 +420,18 @@ for (const section of navSections) {
 
   .admin-nav-dropdown-content {
     background: var(--admin-surface-base);
-    border: 1px solid var(--admin-border-subtle);
+    border: 1px solid var(--admin-border-strong);
     border-radius: 1rem;
     padding: 1rem;
-    box-shadow: 0 10px 25px -5px hsl(var(--neutral-9) / 0.1), 0 8px 10px -6px hsl(var(--neutral-9) / 0.1);
+    box-shadow: 0 18px 48px rgb(0 0 0 / 0.5), 0 4px 12px rgb(0 0 0 / 0.3);
+    backdrop-filter: none;
     max-height: calc(100vh - 10rem);
     overflow-y: auto;
   }
 
   .admin-nav-section {
     display: grid;
+    align-content: start;
     gap: 0.5rem;
     padding-bottom: 1rem;
     margin-bottom: 1rem;
@@ -431,7 +445,7 @@ for (const section of navSections) {
   }
 
   .admin-nav-section-label {
-    font-size: 0.6875rem;
+    font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -445,6 +459,7 @@ for (const section of navSections) {
     margin: 0;
     display: grid;
     gap: 0.25rem;
+    align-content: start;
   }
 
   .admin-nav-link {
@@ -472,15 +487,15 @@ for (const section of navSections) {
   }
 
   .admin-nav-link-label {
-    font-size: 0.875rem;
+    font-size: 0.95rem;
     font-weight: 600;
     color: var(--admin-text-strong);
   }
 
   .admin-nav-link-description {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: var(--admin-text-muted);
-    line-height: 1.2;
+    line-height: 1.4;
   }
 
   .admin-nav-link--active .admin-nav-link-label {
@@ -489,6 +504,13 @@ for (const section of navSections) {
 
   .admin-nav-link--active .admin-nav-link-description {
     color: var(--admin-accent);
+  }
+
+  @media (max-width: 767px) {
+    .admin-nav-header {
+      flex-direction: column;
+      align-items: stretch;
+    }
   }
 
   /* Responsive: grid on larger screens */

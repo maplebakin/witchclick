@@ -612,15 +612,16 @@ function isActive(href: string): boolean {
   }
 
   .site-nav__button--admin {
-    background: color-mix(in srgb, var(--glass-surface-strong, var(--header-background)) 78%, var(--glass-highlight, var(--theme-color-gold)) 22%);
-    border-color: color-mix(in srgb, var(--glass-border-strong, var(--header-border)) 82%, transparent 18%);
-    color: color-mix(in srgb, var(--layout-shell-ink) 95%, white 5%);
+    background: var(--surface-base);
+    border-color: var(--border-strong);
+    color: var(--text-strong);
   }
 
   .site-nav__button--admin:hover,
   .site-nav__button--admin:focus-visible {
-    background: color-mix(in srgb, var(--glass-hover, var(--header-background)) 76%, var(--glass-highlight, var(--theme-color-gold)) 24%);
-    border-color: color-mix(in srgb, var(--glass-border-strong, var(--header-border)) 68%, var(--glass-highlight, var(--theme-color-gold)) 32%);
+    background: var(--surface-hover);
+    border-color: var(--accent-mulberry, var(--text-accent));
+    outline-color: var(--focus-ring-color);
   }
 
   .site-nav__item--submenu {
@@ -694,11 +695,14 @@ function isActive(href: string): boolean {
     margin-top: var(--space-2);
     padding: clamp(var(--space-4), 2vw, var(--space-5));
     border-radius: 1rem;
-    border: 1px solid color-mix(in srgb, var(--glass-border, var(--header-border)) 85%, transparent 15%);
-    background: color-mix(in srgb, var(--glass-surface-strong, var(--header-background)) 94%, transparent 6%);
-    backdrop-filter: blur(var(--glass-blur, 16px));
-    box-shadow: var(--glass-shadow-strong, var(--shadow-soft));
+    border: 1px solid var(--border-strong);
+    background: var(--surface-base);
+    color: var(--text-body);
+    backdrop-filter: none;
+    box-shadow: 0 18px 48px rgb(0 0 0 / 0.5), 0 4px 12px rgb(0 0 0 / 0.3);
     min-width: clamp(24rem, 38vw, 36rem);
+    max-height: calc(100dvh - 7rem);
+    overflow-y: auto;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-0.35rem);
@@ -720,6 +724,7 @@ function isActive(href: string): boolean {
 
   .site-nav__admin-section {
     display: grid;
+    align-content: start;
     gap: var(--space-2);
   }
 
@@ -729,10 +734,10 @@ function isActive(href: string): boolean {
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: none;
-    color: color-mix(in srgb, var(--layout-shell-ink) 88%, white 12%);
+    color: var(--text-muted);
     margin: 0;
     padding-bottom: var(--space-1);
-    border-bottom: 1px solid color-mix(in srgb, var(--header-border) 52%, transparent 48%);
+    border-bottom: 1px solid var(--border-strong);
   }
 
   .site-nav__admin-list {
@@ -748,10 +753,12 @@ function isActive(href: string): boolean {
     padding: var(--space-2) var(--space-3);
     border-radius: 0.75rem;
     border: 1px solid transparent;
-    background: color-mix(in srgb, var(--glass-card, var(--header-background)) 82%, transparent 18%);
-    color: color-mix(in srgb, var(--layout-shell-ink) 90%, white 10%);
+    background: var(--surface-base);
+    color: var(--text-body);
     font-family: var(--font-body-ui);
-    font-size: 0.85rem;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    min-height: 2.75rem;
     letter-spacing: 0.02em;
     text-decoration: none;
     transition:
@@ -763,13 +770,16 @@ function isActive(href: string): boolean {
 
   .site-nav__admin-link:hover,
   .site-nav__admin-link:focus-visible {
-    border-color: color-mix(in srgb, var(--glass-border, var(--header-border)) 65%, var(--glass-highlight, var(--theme-color-iris)) 35%);
-    background: color-mix(in srgb, var(--glass-hover, var(--header-background)) 80%, var(--glass-highlight, var(--theme-color-iris)) 20%);
-    color: var(--comfort-chip-text-strong, var(--theme-text-accent-strong));
+    border-color: var(--accent-mulberry, var(--text-accent));
+    background: var(--surface-hover);
+    color: var(--text-strong);
+    outline-color: var(--focus-ring-color);
     transform: translateX(0.125rem);
   }
 
   .site-nav__mobile-admin {
+    background: var(--surface-base);
+    color: var(--text-body);
     margin-top: var(--space-7);
     padding-top: var(--space-4);
     border-top: 1px solid color-mix(in srgb, var(--header-border) 55%, transparent 45%);
@@ -788,7 +798,7 @@ function isActive(href: string): boolean {
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: none;
-    color: var(--layout-shell-ink, var(--text-strong));
+    color: var(--text-muted);
     margin: 0;
   }
 
@@ -798,6 +808,22 @@ function isActive(href: string): boolean {
     margin: 0;
     display: grid;
     gap: var(--space-2);
+  }
+
+  .site-nav__mobile-admin .site-nav__mobile-link {
+    background: var(--surface-base);
+    color: var(--text-body);
+    font-size: 0.95rem;
+    line-height: 1.4;
+    min-height: 2.75rem;
+    opacity: 1;
+  }
+
+  .site-nav__mobile-admin .site-nav__mobile-link:hover,
+  .site-nav__mobile-admin .site-nav__mobile-link:focus-visible {
+    background: var(--surface-hover);
+    color: var(--text-strong);
+    outline-color: var(--focus-ring-color);
   }
 
   .site-nav__mobile-section {
