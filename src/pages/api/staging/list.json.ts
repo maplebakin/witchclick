@@ -6,9 +6,10 @@ import {
   readAllPostRecords,
   resolveCanonicalPostsDirectory,
 } from '../../../utils/postFiles';
-import { json, jsonError, requireMutatingAccess } from '../_mutating';
+import { json, jsonError, requireStagingAccess } from '../_mutating';
+import { getStagingReadiness, type StagingReadiness } from '../../../utils/adminQueues';
 
-interface DraftPost {
+interface DraftPost extends StagingReadiness {
   slug: string;
   title: string;
   excerpt: string;
@@ -26,13 +27,14 @@ interface DraftPost {
 }
 
 export async function GET({ request }: { request: Request }) {
-  const denied = requireMutatingAccess(request);
+  const denied = requireStagingAccess(request);
   if (denied) return denied;
 
   try {
     const postsDir = resolveCanonicalPostsDirectory();
     const drafts: DraftPost[] = [];
     const records = readAllPostRecords(postsDir);
+    const readiness = getStagingReadiness(records);
 
     for (const record of records) {
       const { data, slug, fileName } = record;
@@ -40,6 +42,7 @@ export async function GET({ request }: { request: Request }) {
       // Only include drafts
       if (data.draft === true) {
         drafts.push({
+          ...readiness.get(slug)!,
           slug,
           title: data.title || 'Untitled',
           excerpt: data.excerpt || '',

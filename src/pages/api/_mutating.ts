@@ -138,6 +138,33 @@ export function requireMutatingAccess(request: Request): Response | null {
   return requireAdminAuth(request);
 }
 
+/** Staging only: this exemption is for a loopback-bound local dev server.
+ * Never enable it when sharing the dev server on a LAN (e.g. npm run dev:host).
+ */
+export function requireStagingAccess(request: Request): Response | null {
+  const devOnly = ensureDevOnly();
+  if (devOnly) return devOnly;
+
+  const isLoopback = (hostname: string) => ["localhost", "127.0.0.1", "::1"].includes(
+    hostname.replace(/^\[|\]$/g, ""),
+  );
+  const port = (url: URL) => url.port || (url.protocol === "https:" ? "443" : url.protocol === "http:" ? "80" : "");
+  if (process.env.WITCHCLICK_STAGING_LOOPBACK === "1" &&
+      !["forwarded", "x-forwarded-for", "x-forwarded-host", "x-forwarded-proto"].some((header) => request.headers.has(header))) {
+    try {
+      const url = new URL(request.url);
+      const originHeader = request.headers.get("origin");
+      const origin = originHeader === null ? null : new URL(originHeader);
+      if (isLoopback(url.hostname) && (!origin || (isLoopback(origin.hostname) && port(origin) === port(url)))) {
+        return null;
+      }
+    } catch {
+      // Malformed origins never qualify; use the existing token check below.
+    }
+  }
+  return requireAdminAuth(request);
+}
+
 export type MutatingAccessPolicy = "mutating" | "dev-only" | "auth-only" | "public";
 
 export function enforceMutatingAccess(

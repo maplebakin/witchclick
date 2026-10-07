@@ -15,8 +15,6 @@ const url = new URL(Astro.request.url);
 const keyOk = ADMIN_KEY && url.searchParams.get("key") === ADMIN_KEY;
 const canUse = isDev || !!keyOk;
 
-const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
-const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || "";
 ---
 
 <Base
@@ -32,7 +30,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
   {
     canUse ? (
-      <div class="space-y-6" data-staging-root data-dev-api={DEV_API} data-dev-key={DEV_KEY}>
+      <div class="space-y-6" data-staging-root>
         <AdminNav currentPath="/admin/staging" />
 
         <section class="rounded-2xl border border-line-subtle bg-surface-base p-6 shadow-sm">
@@ -59,8 +57,8 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
                   Ingest posts with <code>?draft=true</code> or use "Save as Draft" to stage them
                 </li>
                 <li>Review drafts here - compare different versions of the same topic</li>
-                <li>Publish the best version or delete unwanted drafts</li>
-                <li>Drafts won't appear on the site until published</li>
+                <li>Review preparation checks, then make a draft publicly eligible locally or permanently remove it</li>
+                <li>Checks passed still requires final editorial review. Publishing here does not build or deploy the site.</li>
               </ol>
             </div>
           </div>
@@ -94,6 +92,19 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               ×
             </button>
           </div>
+
+          <label class="mb-4 flex flex-wrap items-center gap-3 text-sm">
+            <span>Readiness</span>
+            <select id="readinessFilter" class="admin-btn-secondary px-3 py-2">
+              <option value="all">All</option>
+              <option value="checks-passed">Checks passed</option>
+              <option value="needs-work">Needs work</option>
+              <option value="missing-hero">Missing hero</option>
+              <option value="placeholder-stub">Placeholder/stub</option>
+              <option value="unknown">Unknown</option>
+            </select>
+          </label>
+          <p id="stagingStatus" class="mb-3 text-sm text-body-muted" role="status" aria-live="polite"></p>
 
           <div id="draftsList" class="space-y-4">
             <div class="py-8 text-center text-body-muted">Loading drafts...</div>
@@ -145,25 +156,29 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 	      <script is:inline>
 	        (function () {
 	          var root = document.querySelector("[data-staging-root]");
-	          var DEV_API = root?.getAttribute("data-dev-api") || "http://localhost:8787";
-	          var DEV_KEY = root?.getAttribute("data-dev-key") || "";
+              if (!root) return;
 	          var requestedSlug = new URLSearchParams(window.location.search).get("slug") || "";
 	          var filteredDrafts = [];
 	          var $ = function (id) {
 	            return document.getElementById(id);
 	          };
 
-	          function withDevKey(options) {
-	            var headers = options && options.headers ? Object.assign({}, options.headers) : {};
-	            if (DEV_KEY) headers["X-WC-Dev-Key"] = DEV_KEY;
-	            return Object.assign({}, options || {}, { headers: headers });
-	          }
+          function checkStagingAccess(response) {
+            if (response.status === 401 || response.status === 403) {
+              throw new Error("Staging actions are locked. Use the opt-in local loopback exemption or authorized token authentication. Never enable the exemption when sharing the dev server on a LAN.");
+            }
+          }
 
-	          function apiFetch(path, options) {
-	            return fetch(DEV_API + path, withDevKey(options));
-	          }
-
-	          var drafts = [];
+          var drafts = [];
+          var pending = new Set();
+          var stateLabels = { 'checks-passed': 'Checks passed — final review needed', 'needs-work': 'Needs work', 'missing-hero': 'Missing hero', 'placeholder-stub': 'Placeholder/stub', 'unknown': 'Unknown' };
+          function draftState(draft) { return Object.hasOwn(stateLabels, draft.state) ? draft.state : 'unknown'; }
+          function draftReasons(draft) { return Array.isArray(draft.reasons) && draft.reasons.length ? draft.reasons : ['Readiness was not provided by the server. Refresh before publishing.']; }
+          function publishAllowed(draft) { return draft.canPublish === true && ['checks-passed', 'missing-hero'].includes(draftState(draft)); }
+          function setPending(slug, on) {
+            if (on) pending.add(slug); else pending.delete(slug);
+            renderDrafts();
+          }
 
           function getSearchQuery() {
             return (($("draftSearch") && $("draftSearch").value) || "").trim().toLowerCase();
@@ -179,11 +194,11 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
           function getVisibleDrafts() {
             var query = getSearchQuery();
-            if (!query) return drafts.slice();
+            var state = $('readinessFilter').value;
             return drafts.filter(function (draft) {
-              var title = String(draft.title || "").toLowerCase();
-              var slug = String(draft.slug || "").toLowerCase();
-              return title.includes(query) || slug.includes(query);
+              var title = String(draft.title || '').toLowerCase();
+              var slug = String(draft.slug || '').toLowerCase();
+              return (state === 'all' || draftState(draft) === state) && (!query || title.includes(query) || slug.includes(query));
             });
           }
 
@@ -228,8 +243,9 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 	              $("draftsList").innerHTML =
 	                '<div class="py-8 text-center text-body-muted">Loading drafts...</div>';
 
-	              var res = await apiFetch("/staging/list", { method: "POST" });
-	              var data = await res.json();
+	              var res = await fetch("/api/staging/list.json", { method: "POST" });
+	              checkStagingAccess(res);
+              var data = await res.json();
 
               if (!data.ok) throw new Error(data.error || "Failed to load drafts");
 
@@ -237,10 +253,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               updateSearchUi();
               renderDrafts();
             } catch (e) {
-              $("draftsList").innerHTML =
-                '<div class="py-8 text-center text-danger">Error: ' +
-                (e.message || String(e)) +
-                "</div>";
+              $("draftsList").textContent = 'Error: ' + (e.message || String(e));
             }
           }
 
@@ -304,7 +317,6 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               list.innerHTML = html;
             }
 
-	            attachCardListeners();
 	            if (requestedSlug) {
 	              var match = list.querySelector('[data-slug="' + requestedSlug.replace(/"/g, '&quot;') + '"]');
 	              if (match && typeof match.scrollIntoView === "function") {
@@ -320,7 +332,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
             var html = '<div class="' + cardClass + '" data-slug="' + escapeHtml(draft.slug) + '">';
 
-            html += '<div class="flex items-start justify-between gap-4">';
+            html += '<div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">';
             html += '<div class="min-w-0 flex-1">';
             html +=
               '<h4 class="font-semibold text-body-strong">' + escapeHtml(draft.title) + "</h4>";
@@ -360,21 +372,28 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               html += "</div>";
             }
 
+            html += '<p class="mt-3 text-sm font-semibold">' + escapeHtml(stateLabels[draftState(draft)]) + '</p>';
+            html += '<ul class="mt-1 list-disc pl-5 text-sm">' + draftReasons(draft).map(function(reason){ return '<li>' + escapeHtml(reason) + '</li>'; }).join('') + '</ul>';
+            var secondary = (Array.isArray(draft.blockers) ? draft.blockers : []).filter(function(blocker){ return !draftReasons(draft).some(function(reason){ return reason.includes(blocker); }); });
+            if (secondary.length) html += '<p class="mt-2 text-sm">Blockers: ' + secondary.map(escapeHtml).join('; ') + '</p>';
             html += "</div>";
 
+            var disabled = pending.has(draft.slug) ? ' disabled' : '';
+            var publishDisabled = pending.has(draft.slug) || !publishAllowed(draft) ? ' disabled' : '';
+            var publishLabel = pending.has(draft.slug) ? 'Working…' : publishAllowed(draft) ? 'Make publicly eligible locally' : 'Publication blocked';
             html += '<div class="flex flex-shrink-0 flex-col gap-2">';
             html +=
               '<button class="preview-btn admin-btn-secondary px-3 py-1.5 text-[0.8rem] font-medium" data-slug="' +
               escapeHtml(draft.slug) +
-              '">Preview</button>';
+              '"' + disabled + '>Preview</button>';
             html +=
-              '<button class="publish-btn admin-btn-primary px-3 py-1.5 text-[0.8rem] font-semibold" data-slug="' +
+              '<button class="publish-btn ' + (publishAllowed(draft) ? 'admin-btn-primary' : 'admin-btn-secondary') + ' px-3 py-1.5 text-[0.8rem] font-semibold" data-slug="' +
               escapeHtml(draft.slug) +
-              '">Publish</button>';
+              '"' + publishDisabled + '>' + publishLabel + '</button>';
             html +=
               '<button class="delete-btn admin-btn-secondary px-3 py-1.5 text-[0.8rem] font-medium text-danger" data-slug="' +
               escapeHtml(draft.slug) +
-              '">Delete</button>';
+              '"' + disabled + '>Delete draft</button>';
             html += "</div>";
 
             html += "</div></div>";
@@ -384,50 +403,31 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           function escapeHtml(text) {
             var div = document.createElement("div");
             div.appendChild(document.createTextNode(text));
-            return div.innerHTML;
+            return div.innerHTML.replace(/"/g, '&quot;');
           }
 
-          function attachCardListeners() {
-            // Preview buttons
-            document.querySelectorAll(".preview-btn").forEach(function (btn) {
-              btn.addEventListener("click", function () {
-                var slug = btn.getAttribute("data-slug");
-                previewDraft(slug);
-              });
-            });
-
-            // Publish buttons
-            document.querySelectorAll(".publish-btn").forEach(function (btn) {
-              btn.addEventListener("click", function () {
-                var slug = btn.getAttribute("data-slug");
-                publishDraft(slug);
-              });
-            });
-
-            // Delete buttons
-            document.querySelectorAll(".delete-btn").forEach(function (btn) {
-              btn.addEventListener("click", function () {
-                var slug = btn.getAttribute("data-slug");
-                deleteDraft(slug);
-              });
-            });
-
-            // Compare topic buttons
-            document.querySelectorAll(".compare-topic-btn").forEach(function (btn) {
-              btn.addEventListener("click", function () {
-                var topic = btn.getAttribute("data-topic");
-                compareByTopic(topic);
-              });
-            });
-          }
+          // Bind once on the list; rerenders and comparisons never rebind controls.
+          $('draftsList').addEventListener('click', function(event) {
+            var button = event.target.closest('button');
+            if (!button || button.disabled || !$('draftsList').contains(button)) return;
+            var slug = button.getAttribute('data-slug');
+            if (slug && pending.has(slug)) return;
+            if (button.classList.contains('preview-btn')) previewDraft(slug);
+            else if (button.classList.contains('publish-btn')) publishDraft(slug);
+            else if (button.classList.contains('delete-btn')) deleteDraft(slug);
+            else if (button.classList.contains('compare-topic-btn')) compareByTopic(button.getAttribute('data-topic'));
+          });
 
           async function previewDraft(slug) {
+            if (pending.has(slug)) return;
+            setPending(slug, true);
             try {
               var res = await fetch("/api/staging/preview.json", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ slug: slug }),
               });
+              checkStagingAccess(res);
               var data = await res.json();
 
               if (!data.ok) throw new Error(data.error || "Failed to load preview");
@@ -437,7 +437,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               $("previewSection").scrollIntoView({ behavior: "smooth" });
             } catch (e) {
               alert("Error loading preview: " + (e.message || String(e)));
-            }
+            } finally { setPending(slug, false); }
           }
 
           function renderPreview(data) {
@@ -492,6 +492,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ slug: draft.slug }),
               });
+              checkStagingAccess(res);
               return res.json();
             });
 
@@ -520,17 +521,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
                 '<h3 class="font-semibold text-body-strong">' +
                 escapeHtml(post.frontmatter.title) +
                 "</h3>";
-              html +=
-                '<div class="flex gap-2">';
-              html +=
-                '<button class="publish-btn admin-btn-primary px-2.5 py-1 text-[0.8rem] font-semibold" data-slug="' +
-                escapeHtml(post.slug) +
-                '">Publish</button>';
-              html +=
-                '<button class="delete-btn admin-btn-secondary px-2.5 py-1 text-[0.8rem] font-medium text-danger" data-slug="' +
-                escapeHtml(post.slug) +
-                '">Delete</button>';
-              html += "</div></div>";
+              html += "</div>";
 
               html += '<div class="mb-2 text-[0.8rem] text-body-muted">';
               html += post.frontmatter.wordCount + " words • ";
@@ -558,56 +549,62 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             }
 
             content.innerHTML = html;
-            attachCardListeners();
           }
 
           async function publishDraft(slug) {
-            if (!confirm("Publish this draft? It will become visible on the site.")) return;
-
+            var draft = drafts.find(function(item){ return item.slug === slug; });
+            if (!draft || pending.has(slug) || !publishAllowed(draft)) return;
+            var noHero = draftState(draft) === 'missing-hero';
+            var message = 'Make “' + draft.title + '” (' + slug + ') publicly eligible locally? This does not build or deploy the site.';
+            if (noHero) message = 'You are publishing without a hero image or complete hero metadata.\n' + draftReasons(draft).join('; ') + '\n' + message;
+            if (draft.visibilityBlockers && draft.visibilityBlockers.length) message += '\nRemaining visibility blockers: ' + draft.visibilityBlockers.join('; ');
+            if (!confirm(message)) return;
+            setPending(slug, true);
             try {
-              var res = await fetch("/api/staging/publish.json", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ slug: slug }),
+              var res = await fetch('/api/staging/publish.json', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ slug: slug, acknowledgeMissingHero: noHero }),
               });
+              checkStagingAccess(res);
               var data = await res.json();
-
-              if (!data.ok) throw new Error(data.error || "Failed to publish");
-
-              alert("Published: " + data.title);
-              loadDrafts();
-              $("comparisonSection").classList.add("hidden");
-              $("previewSection").classList.add("hidden");
+              if (!data.ok) {
+                await loadDrafts();
+                throw new Error(data.error || 'Failed to publish');
+              }
+              var result = data.message || 'Saved. Check local public eligibility; the site has not been built or deployed.';
+              if (Array.isArray(data.warnings) && data.warnings.length) result += '\nArtwork warnings: ' + data.warnings.join('; ');
+              $('stagingStatus').textContent = result;
+              await loadDrafts();
+              $('comparisonSection').classList.add('hidden');
+              $('previewSection').classList.add('hidden');
             } catch (e) {
-              alert("Error publishing: " + (e.message || String(e)));
-            }
+              $('stagingStatus').textContent = 'Publication rejected: ' + (e.message || String(e));
+            } finally { setPending(slug, false); }
           }
 
           async function deleteDraft(slug) {
-            if (!confirm("Delete this draft permanently? This cannot be undone.")) return;
-
+            var draft = drafts.find(function(item){ return item.slug === slug; });
+            if (!draft || pending.has(slug)) return;
+            if (!confirm('Permanently remove the draft file for “' + draft.title + '” (' + slug + ')? This cannot be undone.')) return;
+            setPending(slug, true);
             try {
-              var res = await fetch("/api/staging/delete.json", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ slug: slug }),
+              var res = await fetch('/api/staging/delete.json', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug: slug }),
               });
+              checkStagingAccess(res);
               var data = await res.json();
-
-              if (!data.ok) throw new Error(data.error || "Failed to delete");
-
-              alert("Deleted: " + data.title);
-              loadDrafts();
-              $("comparisonSection").classList.add("hidden");
-              $("previewSection").classList.add("hidden");
-            } catch (e) {
-              alert("Error deleting: " + (e.message || String(e)));
-            }
+              if (!data.ok) throw new Error(data.error || 'Failed to delete');
+              $('stagingStatus').textContent = 'Draft file permanently removed: ' + data.title + ' (' + slug + ').';
+              await loadDrafts();
+              $('comparisonSection').classList.add('hidden'); $('previewSection').classList.add('hidden');
+            } catch (e) { $('stagingStatus').textContent = 'Deletion failed: ' + (e.message || String(e)); }
+            finally { setPending(slug, false); }
           }
 
           // Event listeners
           $("refreshBtn").addEventListener("click", loadDrafts);
           $("groupByTopic").addEventListener("change", renderDrafts);
+          $("readinessFilter").addEventListener("change", renderDrafts);
           $("draftSearch").addEventListener("input", function () {
             updateSearchUi();
             renderDrafts();

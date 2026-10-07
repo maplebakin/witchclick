@@ -2,10 +2,10 @@
 // Get full content of a draft post for preview/comparison
 
 import { findPostRecordBySlug, getCanonicalPostDisplayPath, resolveCanonicalPostsDirectory } from '../../../utils/postFiles';
-import { json, jsonError, parseJsonBody, readValidatedSlug, requireMutatingAccess } from '../_mutating';
+import { json, jsonError, parseJsonBody, readValidatedSlug, requireStagingAccess } from '../_mutating';
 
 export async function POST({ request }: { request: Request }) {
-  const denied = requireMutatingAccess(request);
+  const denied = requireStagingAccess(request);
   if (denied) return denied;
 
   try {

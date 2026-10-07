@@ -3,11 +3,12 @@
 
 import fs from 'node:fs';
 import {
-  findPostRecordBySlug,
+  readAllPostRecords,
   getCanonicalPostDisplayPath,
   resolveCanonicalPostsDirectory,
 } from '../../../utils/postFiles';
-import { json, jsonError, parseJsonBody, readValidatedSlug, requireMutatingAccess } from '../_mutating';
+import { json, jsonError, parseJsonBody, readValidatedSlug, requireStagingAccess } from '../_mutating';
+import { getStagingReadiness, getVisibilityBlockers } from '../../../utils/adminQueues';
 
 function toFrontmatterYAML(obj: Record<string, unknown>) {
   const lines: string[] = [];
@@ -31,7 +32,7 @@ function toFrontmatterYAML(obj: Record<string, unknown>) {
 }
 
 export async function POST({ request }: { request: Request }) {
-  const denied = requireMutatingAccess(request);
+  const denied = requireStagingAccess(request);
   if (denied) return denied;
 
   try {
@@ -44,7 +45,14 @@ export async function POST({ request }: { request: Request }) {
     const slug = slugResult.slug;
 
     const postsDir = resolveCanonicalPostsDirectory();
-    const record = findPostRecordBySlug(slug, postsDir);
+    let records: ReturnType<typeof readAllPostRecords>;
+    try {
+      records = readAllPostRecords(postsDir);
+    } catch {
+      const reason = 'Readiness unknown: current post records could not be read or parsed. Nothing was written.';
+      return jsonError(409, 'READINESS_UNKNOWN', reason, { state: 'unknown', reasons: [reason], blockers: [reason] });
+    }
+    const record = records.find((candidate) => candidate.slug === slug);
     if (!record) {
       return jsonError(404, 'NOT_FOUND', `Post not found: ${slug}`);
     }
@@ -54,9 +62,20 @@ export async function POST({ request }: { request: Request }) {
       return jsonError(400, 'INVALID_STATE', 'Post is not a draft');
     }
 
+    // Recompute from the current file and artwork. Browser claims are never used.
+    const readiness = getStagingReadiness(records).get(slug)!;
+    if (!readiness.canPublish) {
+      return jsonError(409, 'NOT_READY', readiness.reasons.join('; '), readiness);
+    }
+    if (readiness.state === 'missing-hero' && body.acknowledgeMissingHero !== true) {
+      return jsonError(409, 'HERO_ACK_REQUIRED', 'Confirm publishing without a hero image or complete hero metadata.', readiness);
+    }
+
     // Remove draft status and update publishedAt to now
     data.draft = false;
     data.publishedAt = new Date().toISOString();
+    const visibilityBlockers = getVisibilityBlockers(data);
+    const publiclyEligibleLocally = visibilityBlockers.length === 0;
 
     // Rebuild the file
     const newContent = `---\n${toFrontmatterYAML(data)}\n---\n${markdown}`;
@@ -68,6 +87,13 @@ export async function POST({ request }: { request: Request }) {
       title: data.title,
       publishedAt: data.publishedAt,
       path: getCanonicalPostDisplayPath(fileName),
+      warnings: readiness.artworkWarnings,
+      missingHero: readiness.state === 'missing-hero',
+      visibilityBlockers,
+      publiclyEligibleLocally,
+      message: publiclyEligibleLocally
+        ? 'Saved: publicly eligible locally. The site has not been built or deployed.'
+        : `Saved, but not publicly eligible locally: ${visibilityBlockers.join('; ')}. The site has not been built or deployed.`,
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);

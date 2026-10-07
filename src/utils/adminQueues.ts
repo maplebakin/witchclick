@@ -1,3 +1,7 @@
+import fs from "node:fs";
+import path from "node:path";
+import { extractHeroImage } from "./posts";
+
 /** Read-only, snapshot-based preparation checks. These are not editorial approval. */
 export const queueDefinitions = [
   { id: "decision", title: "Needs decision", empty: "No placeholders need a decision." },
@@ -46,7 +50,7 @@ function publicationDate(data: Record<string, unknown>) {
   return { timestamp: 0, invalid: supplied };
 }
 
-export function classifyAdminQueues(posts: QueuePost[], stubs: QueueStub[], now = Date.now()): AdminQueues {
+export function classifyAdminQueues(posts: QueuePost[], stubs: QueueStub[], now = Date.now(), options: { visibilityWarnings?: boolean } = {}): AdminQueues {
   const queues: AdminQueues = { decision: [], work: [], heroes: [], ready: [], recent: [] };
   const stubMap = new Map(stubs.map((stub) => [stub.slug, stub]));
   const grouped = new Map<string, QueuePost[]>();
@@ -74,13 +78,13 @@ export function classifyAdminQueues(posts: QueuePost[], stubs: QueueStub[], now 
     if (!text(data.metaDescription)) problems.push("Missing meta description");
     if (!tags.some(Boolean)) problems.push("Missing tags");
     if (draft && !date.timestamp && !date.invalid) problems.push("Missing publication date");
-    if (data.published === false) problems.push("published:false blocks public eligibility; review publication settings in Posts");
+    if (!options.visibilityWarnings && data.published === false) problems.push("published:false blocks public eligibility; review publication settings in Posts");
     if (typeof post.content === "string") {
       const body = post.content.replace(/<!--[\s\S]*?-->/g, "").replace(/[#*_`\s]/g, "");
       if (!body) problems.push("Empty post body");
       if (unfinished.test(post.content)) problems.push("Unfinished template markers in body");
     }
-    if (scheduled) problems.push("Future publication date: review scheduling before publishing");
+    if (!options.visibilityWarnings && scheduled) problems.push("Future publication date: review scheduling before publishing");
     const art = post.artwork;
     const artProblems: string[] = [];
     if (!art?.src) artProblems.push("Missing hero image");
@@ -121,4 +125,60 @@ export function classifyAdminQueues(posts: QueuePost[], stubs: QueueStub[], now 
   }
   for (const definition of queueDefinitions) queues[definition.id].sort((a, b) => definition.id === "recent" ? b.timestamp - a.timestamp || a.title.localeCompare(b.title) : a.title.localeCompare(b.title));
   return queues;
+}
+
+export type StagingState = "placeholder-stub" | "needs-work" | "missing-hero" | "checks-passed" | "unknown";
+export interface StagingReadiness {
+  state: StagingState;
+  reasons: string[];
+  blockers: string[];
+  artworkWarnings: string[];
+  visibilityBlockers: string[];
+  canPublish: boolean;
+}
+
+/** Visibility follows the public loader; this never changes publication metadata. */
+export function getVisibilityBlockers(data: Record<string, unknown>, now = Date.now()): string[] {
+  const blockers: string[] = [];
+  if (data.draft === true) blockers.push("draft:true");
+  if (data.published === false) blockers.push("published:false");
+  if (publicationDate(data).timestamp > now) blockers.push("Future publication date");
+  return blockers;
+}
+
+/** Server-side adapter: full records and current local artwork, never persisted readiness. */
+export function getStagingReadiness(records: QueuePost[], cwd = process.cwd(), now = Date.now()): Map<string, StagingReadiness> {
+  const posts = records.map((record): QueuePost => {
+    const hero = extractHeroImage(record.data);
+    let availability: "present" | "missing" | "unknown" = "unknown";
+    try {
+      if (hero.src?.startsWith("/") && !hero.src.startsWith("//")) {
+        const publicDir = path.resolve(cwd, "public");
+        const heroPath = path.resolve(publicDir, `.${decodeURIComponent(hero.src.split(/[?#]/)[0]!)}`);
+        if (heroPath.startsWith(`${publicDir}${path.sep}`)) {
+          availability = fs.existsSync(heroPath) && fs.statSync(heroPath).isFile() ? "present" : "missing";
+        }
+      }
+    } catch {
+      // An unreadable or unresolvable image remains unknown, never checks-passed.
+    }
+    return { ...record, artwork: { ...hero, availability } };
+  });
+  const queues = classifyAdminQueues(posts, [], now, { visibilityWarnings: true });
+  const results = new Map<string, StagingReadiness>();
+  for (const definition of queueDefinitions) {
+    for (const item of queues[definition.id]) {
+      const state: StagingState = definition.id === "decision" ? "placeholder-stub" : item.state === "Unknown" ? "unknown" : definition.id === "work" ? "needs-work" : definition.id === "heroes" ? "missing-hero" : "checks-passed";
+      const record = records.find((candidate) => candidate.slug === item.slug)!;
+      const reasons = [item.reason];
+      const artworkWarnings = definition.id === "heroes" ? [item.reason] : item.blockers.filter((blocker) => /hero/i.test(blocker));
+      const visibilityBlockers = getVisibilityBlockers(record.data ?? {}, now).filter((blocker) => blocker !== "draft:true");
+      const hardBlocked = !["checks-passed", "missing-hero"].includes(state);
+      results.set(item.slug, {
+        state, reasons, blockers: [...new Set([...(hardBlocked ? reasons : []), ...item.blockers, ...visibilityBlockers])], artworkWarnings, visibilityBlockers,
+        canPublish: state === "checks-passed" || state === "missing-hero",
+      });
+    }
+  }
+  return results;
 }
