@@ -1,0 +1,62 @@
+---
+interface Props {
+  mode?: 'picker' | 'embedded';
+  slug?: string;
+  devApi?: string;
+  devKey?: string;
+  lockedMessage?: string;
+}
+const { mode = 'embedded', slug = '', devApi = 'http://localhost:8787', devKey = '', lockedMessage = 'Available after this post is saved.' } = Astro.props;
+---
+<div data-hero-workflow data-mode={mode} data-hero-slug={slug} data-dev-api={devApi} data-dev-key={devKey} data-locked-message={lockedMessage} class="space-y-4">
+  <div data-picker hidden={mode !== 'picker'} class="space-y-3">
+    <label class="block">Find a post<input data-post-search type="search" class="mt-1 w-full rounded-lg border border-line-neutral bg-surface-base p-3" placeholder="Search title or slug" /></label>
+    <label class="block">Selected post<select data-post-select class="mt-1 w-full rounded-lg border border-line-neutral bg-surface-base p-3"><option value="">Select a post</option></select></label>
+    <details><summary class="cursor-pointer py-2">Recent posts</summary><div data-recent-posts class="space-y-2"></div></details>
+    <details><summary class="cursor-pointer py-2">Posts needing hero images</summary><div data-missing-hero-posts class="space-y-2"></div></details>
+  </div>
+  <p data-workflow-identity class="break-words font-semibold text-body-strong"></p>
+  <p data-workflow-status role="status" aria-live="polite">{lockedMessage}</p>
+  <button data-load-retry type="button" hidden class="admin-btn-secondary px-3 py-2">Retry loading hero status</button>
+  <div data-workspace hidden class="space-y-4">
+    <section class="space-y-3 rounded-xl border border-line-neutral p-4">
+      <h4 class="font-semibold">Hero prompt</h4>
+      <p data-prompt-source class="text-sm text-body-muted"></p>
+      <textarea data-hero-prompt aria-label="Hero image prompt" class="h-40 w-full rounded-lg border border-line-neutral bg-surface-base p-3"></textarea>
+      <div class="flex flex-wrap gap-3">
+        <button data-copy-hero-prompt type="button" class="admin-btn-secondary px-3 py-2">Copy hero prompt</button>
+        <button data-regenerate-prompt type="button" class="admin-btn-secondary px-3 py-2">Generate another prompt</button>
+        <button data-save-prompt type="button" class="admin-btn-secondary px-3 py-2">Save prompt to post</button>
+      </div>
+      <p data-prompt-status role="status" class="text-sm"></p>
+    </section>
+    <section class="space-y-3 rounded-xl border border-line-neutral p-4">
+      <h4 class="font-semibold">Upload artwork and describe it</h4>
+      <p class="text-sm text-body-muted">PNG, JPG or WEBP, up to 5 MB. Prefer under 3.5 MB to allow for base64 request overhead.</p>
+      <label data-drop-zone class="block rounded-lg border border-dashed border-line-neutral p-4">Choose or drop artwork<input data-file-input type="file" accept="image/png,image/jpeg,image/webp" class="mt-2 block max-w-full" /></label>
+      <p data-file-info class="break-words text-sm"></p>
+      <p data-preview-placeholder class="text-sm text-body-muted">Your preview will appear here once you choose an image.</p>
+      <img data-preview hidden alt="Selected artwork preview" class="h-40 w-full rounded-lg object-contain" />
+      <p data-existing-hero class="break-words text-sm"></p>
+      <label class="block">Alt text<input data-alt-input type="text" class="mt-1 w-full rounded-lg border border-line-neutral bg-surface-base p-3" placeholder="Describe the meaningful imagery" /></label>
+      <button data-upload-confirm type="button" disabled class="admin-btn-primary px-3 py-2">Upload artwork</button>
+      <p data-upload-status role="status" class="break-words text-sm"></p>
+    </section>
+    <section class="space-y-3 rounded-xl border border-line-neutral p-4">
+      <h4 class="font-semibold">Attach and verify</h4>
+      <div data-attach-summary class="space-y-2 break-words text-sm"></div>
+      <button data-submit type="button" disabled class="admin-btn-primary px-3 py-2">Attach to post</button>
+      <button data-retry-verification type="button" hidden class="admin-btn-secondary px-3 py-2">Retry verification only</button>
+      <button data-refresh-hero type="button" class="admin-btn-secondary px-3 py-2">Refresh hero status</button>
+      <div data-success hidden class="space-y-2 text-sm" role="status"></div>
+    </section>
+  </div>
+  <div data-pending-uploads class="space-y-2 break-words text-sm" role="status"></div>
+  <p data-workflow-error hidden class="break-words text-sm text-danger" role="alert"></p>
+</div>
+<script>
+  import { mountHeroWorkflow } from '../../scripts/admin/hero-workflow';
+  function init() { document.querySelectorAll<HTMLElement>('[data-hero-workflow]').forEach(root => mountHeroWorkflow(root)); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
+  else init();
+</script>

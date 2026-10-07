@@ -2,6 +2,8 @@
 import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 import fs from "node:fs";
+import { loadEnv } from "vite";
+import { resolveLocalDevApi } from "./scripts/lib/dev-api-config.mjs";
 import path from "node:path";
 import { fileURLToPath } from 'node:url';
 
@@ -74,6 +76,14 @@ export default defineConfig({
 
   // ✅ Vite alias so `@/…` resolves to `src/…`
   vite: {
+    plugins: [{
+      name: 'witchclick-local-admin-api',
+      apply: 'serve',
+      config(_config, { mode }) {
+        const { origin } = resolveLocalDevApi({ ...loadEnv(mode, process.cwd(), ''), ...process.env });
+        return { define: { 'import.meta.env.PUBLIC_DEV_API': JSON.stringify(origin) } };
+      },
+    }],
     define: {
       __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
     },

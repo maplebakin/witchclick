@@ -1,3 +1,5 @@
+import { mountHeroWorkflow } from './hero-workflow';
+
 type StubReference = {
   title?: string;
   slug?: string;
@@ -75,6 +77,9 @@ class StubDashboard {
   private triageFilter = 'all';
   private parsedDraft: ParsedDraft | null = null;
   private validation: ValidationState = { passed: false, input: '', fingerprint: '', successes: [], warnings: [], errors: [] };
+  private heroContext: { slug: string; title: string } | null = null;
+  private heroStep: HTMLElement | null = null;
+  private heroRoot: HTMLElement | null = null;
   private revision = 0;
   private validating = false;
   private replacing = false;
@@ -236,6 +241,8 @@ class StubDashboard {
   }
 
   private cacheElements() {
+    this.heroStep = this.root.querySelector('[data-forge-hero-step]');
+    this.heroRoot = this.root.querySelector('[data-hero-workflow]');
     this.listEl = this.root.querySelector('[data-stub-list]');
     this.searchInput = this.root.querySelector('[data-stub-search]');
     this.triageFilterSelect = this.root.querySelector('[data-triage-filter]');
@@ -385,6 +392,7 @@ class StubDashboard {
   private selectStub(key: string) {
     if (this.replacing || this.loadState !== 'ready') return;
     const entry = this.postStubs.find((stub) => stub.key === key);
+    this.resetHeroStep(Boolean(entry));
     this.selectedKey = entry ? entry.key : null;
     this.parsedDraft = null;
     this.invalidateValidation();
@@ -800,7 +808,13 @@ Write the full article here with the required sections.
       this.closeConfirmModal();
       this.invalidateValidation();
       this.resultEl.innerHTML = `<p>Placeholder replaced with a draft. The result is forced to draft and has not been published.${typeof data?.path === 'string' ? ` Destination: ${escapeHtml(data.path)}.` : ''}</p><p><a class="underline" href="/admin/posts?slug=${encodeURIComponent(entry.slug)}">Open draft in Posts</a> · <a class="underline" href="/admin/staging">Review drafts in Staging</a></p>`;
+      const title = this.parsedDraft?.title || entry.title || entry.name;
       this.removeStub(entry.slug);
+      this.heroContext = { slug: entry.slug, title };
+      // Keep this completed draft tied to this history entry when returning from Hero.
+      history.replaceState({ ...history.state, postStubHero: this.heroContext }, '');
+      if (this.heroStep) this.heroStep.hidden = false;
+      void this.loadHeroStep();
       await this.fetchStubs();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to replace post stub';
@@ -976,6 +990,39 @@ Write the full article here with the required sections.
     this.updateActionState();
   }
 
+  private resetHeroStep(selected: boolean) {
+    this.heroContext = null;
+    const state = { ...history.state };
+    delete state.postStubHero;
+    history.replaceState(state, '');
+    if (this.heroStep) this.heroStep.hidden = !selected;
+    if (this.heroRoot) mountHeroWorkflow(this.heroRoot).reset();
+  }
+
+  private loadHeroStep() {
+    if (!this.heroContext || !this.heroRoot) return;
+    void mountHeroWorkflow(this.heroRoot).setPost({
+      slug: this.heroContext.slug, expectedTitle: this.heroContext.title, requireDraft: true,
+    });
+  }
+
+  private selectRequestedStub() {
+    const requestedSlug = new URLSearchParams(window.location.search).get('slug');
+    if (requestedSlug === null) return;
+    // A deep link must remain visible even when the browser restores old controls.
+    if (this.searchInput) this.searchInput.value = '';
+    this.triageFilter = 'all';
+    if (this.triageFilterSelect) this.triageFilterSelect.value = 'all';
+    this.applySearchFilter();
+    const entry = this.postStubs.find(stub => stub.slug === requestedSlug);
+    if (!entry) {
+      this.noticeEl.textContent = `The requested post stub “${requestedSlug}” is unavailable. It may have been completed, removed, or renamed. Select another stub from the full list.`;
+      return;
+    }
+    this.selectStub(entry.key);
+    if (window.innerWidth < 768) this.detailPanel?.scrollIntoView?.({ block: 'start' });
+  }
+
   private async fetchStubs() {
     if (this.fetching) return;
     this.fetching = true;
@@ -997,6 +1044,15 @@ Write the full article here with the required sections.
       this.emptyState?.classList.remove('hidden');
       this.applySearchFilter();
       this.noticeEl.textContent = '';
+      if (!this.heroContext) {
+        const saved = history.state?.postStubHero;
+        const requested = new URLSearchParams(window.location.search).get('slug');
+        if (saved && typeof saved.slug === 'string' && typeof saved.title === 'string' && (!requested || requested === saved.slug)) {
+          this.heroContext = { slug: saved.slug, title: saved.title };
+          if (this.heroStep) this.heroStep.hidden = false;
+          void this.loadHeroStep();
+        } else this.selectRequestedStub();
+      }
     } catch (error) {
       this.loadState = 'error';
       this.detailPanel?.classList.add('hidden');

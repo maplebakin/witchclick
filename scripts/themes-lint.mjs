@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Lightweight lint for theme presets:
- * - Valid JSON in content/themes/*.json
+ * - Valid JSON in docs/archive/theme-system/legacy-presets/*.json
  * - Required fields present in settings
  * - Unique slug + mode pairs
  */
@@ -9,7 +9,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 const REQUIRED_FIELDS = ["primary", "accent", "background", "fontSerif", "fontScript"];
-const THEMES_DIR = path.join(process.cwd(), "content", "themes");
+const THEMES_DIR = path.join(process.cwd(), "docs", "archive", "theme-system", "legacy-presets");
 const IGNORED_FILES = new Set(["active.json"]);
 
 async function readThemeFiles() {
@@ -24,7 +24,7 @@ async function readThemeFiles() {
       )
       .map((entry) => path.join(THEMES_DIR, entry.name));
   } catch (error) {
-    console.error("No theme directory found at content/themes:", error?.message ?? error);
+    console.error("No archived theme directory found at docs/archive/theme-system/legacy-presets:", error?.message ?? error);
     process.exit(1);
   }
 }

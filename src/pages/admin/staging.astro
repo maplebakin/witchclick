@@ -14,6 +14,8 @@ const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
 const url = new URL(Astro.request.url);
 const keyOk = ADMIN_KEY && url.searchParams.get("key") === ADMIN_KEY;
 const canUse = isDev || !!keyOk;
+const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://127.0.0.1:8787";
+const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || "";
 
 ---
 
@@ -30,7 +32,7 @@ const canUse = isDev || !!keyOk;
 
   {
     canUse ? (
-      <div class="space-y-6" data-staging-root>
+      <div class="space-y-6" data-staging-root data-dev-api={DEV_API} data-dev-key={DEV_KEY}>
         <AdminNav currentPath="/admin/staging" />
 
         <section class="rounded-2xl border border-line-subtle bg-surface-base p-6 shadow-sm">
@@ -163,9 +165,17 @@ const canUse = isDev || !!keyOk;
 	            return document.getElementById(id);
 	          };
 
+          var devApi = (root.dataset.devApi || 'http://127.0.0.1:8787').replace(/\/+$/, '');
+          function apiFetch(path, options) {
+            options = options || {};
+            options.headers = Object.assign({}, options.headers || {});
+            if (root.dataset.devKey) options.headers['X-WC-Dev-Key'] = root.dataset.devKey;
+            return fetch(devApi + path, options);
+          }
+
           function checkStagingAccess(response) {
             if (response.status === 401 || response.status === 403) {
-              throw new Error("Staging actions are locked. Use the opt-in local loopback exemption or authorized token authentication. Never enable the exemption when sharing the dev server on a LAN.");
+              throw new Error("Staging actions are locked by the local dev API. If DEV_API_TOKEN is configured, use its matching authorized dev API key. Otherwise run dev-api.js bound to loopback.");
             }
           }
 
@@ -243,7 +253,7 @@ const canUse = isDev || !!keyOk;
 	              $("draftsList").innerHTML =
 	                '<div class="py-8 text-center text-body-muted">Loading drafts...</div>';
 
-	              var res = await fetch("/api/staging/list.json", { method: "POST" });
+	              var res = await apiFetch("/staging/list", { method: "POST" });
 	              checkStagingAccess(res);
               var data = await res.json();
 
@@ -422,7 +432,7 @@ const canUse = isDev || !!keyOk;
             if (pending.has(slug)) return;
             setPending(slug, true);
             try {
-              var res = await fetch("/api/staging/preview.json", {
+              var res = await apiFetch("/staging/preview", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ slug: slug }),
@@ -487,7 +497,7 @@ const canUse = isDev || !!keyOk;
 
             // Load full content for comparison
             var promises = topicDrafts.map(async function (draft) {
-              var res = await fetch("/api/staging/preview.json", {
+              var res = await apiFetch("/staging/preview", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ slug: draft.slug }),
@@ -561,7 +571,7 @@ const canUse = isDev || !!keyOk;
             if (!confirm(message)) return;
             setPending(slug, true);
             try {
-              var res = await fetch('/api/staging/publish.json', {
+              var res = await apiFetch('/staging/publish', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ slug: slug, acknowledgeMissingHero: noHero }),
               });
@@ -588,7 +598,7 @@ const canUse = isDev || !!keyOk;
             if (!confirm('Permanently remove the draft file for “' + draft.title + '” (' + slug + ')? This cannot be undone.')) return;
             setPending(slug, true);
             try {
-              var res = await fetch('/api/staging/delete.json', {
+              var res = await apiFetch('/staging/delete', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug: slug }),
               });
               checkStagingAccess(res);

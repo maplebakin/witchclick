@@ -1,6 +1,7 @@
 --- 
 // src/layouts/Base.astro
 import "@/styles/base.css";
+import "@/styles/admin.css"; import "@/theme-kits/autumn-window/1.0.0/kit.css"; import "@/styles/autumn-window-kit-adapter.css";
 import "@/styles/cards.css";
 import "@/styles/tailwind.css";
 
@@ -19,7 +20,6 @@ import {
 } from "@/data/navigation";
 import { readSettings, buildCanonicalUrl, toAbsoluteUrl, getFormEndpoint } from "@/utils/settings";
 import { buildAnalyticsInjection } from "@/utils/analytics";
-import { getActiveThemes } from "@/utils/theme";
 import { mixColors } from "@/utils/color";
 import cardAnimationsModule from "@/scripts/card-animations.js?url";
 import revealAnimationsModule from "@/scripts/reveal-animations.js?url";
@@ -59,17 +59,15 @@ const {
 } = Astro.props as LayoutProps;
 
 // Constants
-const FALLBACK_COLORS = {
-  midnight: {
-    primary: "#d18c47",
-    accent: "#d4af37",
-    background: "#07020f",
-  },
-  dawn: {
-    primary: "#9b86c8",
-    accent: "#caa043",
-    background: "#f6f0e8",
-  },
+// Static compatibility outputs for admin metadata, ambient bindings, and comfort
+// controls. These identifiers are not resolved against editor presets. The admin
+// shell's actual palette remains owned by admin.css.
+const ADMIN_COMPATIBILITY_THEME = {
+  midnightSlug: "autumn-twilight",
+  dawnSlug: "test-light",
+  primary: "#b8847a",
+  accent: "#be958d",
+  background: "#1d1716",
 } as const;
 
 const PLAIN_READING_ROUTE_PATTERNS = [
@@ -116,25 +114,15 @@ const disclosure = settings.disclosure ?? "";
 const showAccountLink = settings.showAccountLink ?? false;
 const useAutumnWindow = !/^\/admin(?:\/|$)/.test(Astro.url?.pathname ?? "/");
 
-// Theme Setup
-// getActiveThemes memoizes in production but automatically re-reads when
-// the admin saves new presets. See src/utils/theme.ts for cache details.
-const { midnight: midnightTheme, dawn: dawnTheme } = getActiveThemes();
-const themeMetaColor = useAutumnWindow ? "#242120" : sanitizeColor(midnightTheme?.primary, FALLBACK_COLORS.midnight.primary);
+// Public colours come from Autumn Window; admin compatibility outputs are static.
+const themeMetaColor = useAutumnWindow ? "#242120" : ADMIN_COMPATIBILITY_THEME.primary;
 
 // Ambient Color Configuration
-const fallbackPrimary = sanitizeColor(midnightTheme?.primary, FALLBACK_COLORS.midnight.primary);
-const fallbackAccent = sanitizeColor(midnightTheme?.accent, FALLBACK_COLORS.midnight.accent);
-const fallbackBackground = sanitizeColor(
-  midnightTheme?.background,
-  FALLBACK_COLORS.midnight.background,
-);
-
-const ambientBase = sanitizeColor(ambientColor, fallbackPrimary);
+const ambientBase = sanitizeColor(ambientColor, ADMIN_COMPATIBILITY_THEME.primary);
 const ambientHighlight = mixColors(ambientBase, "#ffffff", 0.24);
-const ambientAurora = mixColors(ambientBase, fallbackAccent, 0.45);
-const ambientDepth = mixColors(ambientBase, fallbackBackground, 0.52);
-const ambientShadow = mixColors(fallbackBackground, "#000000", 0.32);
+const ambientAurora = mixColors(ambientBase, ADMIN_COMPATIBILITY_THEME.accent, 0.45);
+const ambientDepth = mixColors(ambientBase, ADMIN_COMPATIBILITY_THEME.background, 0.52);
+const ambientShadow = mixColors(ADMIN_COMPATIBILITY_THEME.background, "#000000", 0.32);
 const ambientOverlay = mixColors(ambientBase, "#000000", 0.18);
 
 const bodyStyleEntries = [
@@ -182,6 +170,8 @@ const canonicalUrl = buildCanonicalUrl(settings, { canonical: canon, astroUrl: A
 
 // Navigation Configuration
 const currentPath = Astro.url?.pathname ?? "/";
+const isAdminRoute = currentPath === "/admin" || currentPath.startsWith("/admin/");
+const useAutumnWindowKit = useAutumnWindow && !isAdminRoute;
 const isPlainReadingRoute = PLAIN_READING_ROUTE_PATTERNS.some((pattern) => pattern.test(currentPath));
 
 const containerClassList = [
@@ -268,13 +258,13 @@ function detectThemeScope(pathname: string): string | null {
 // Detect theme scope for the current page (reusing existing currentPath variable)
 const themeScope = detectThemeScope(currentPath);
 
-// Get active theme slugs for both modes (midnight is default)
-const midnightThemeSlug = useAutumnWindow ? 'autumn-window' : midnightTheme?.slug || 'cozy-midnight';
-const dawnThemeSlug = useAutumnWindow ? 'autumn-window' : dawnTheme?.slug || 'cozy-dawn';
+// Keep the mode attributes consumed by comfort controls, without preset reads.
+const midnightThemeSlug = useAutumnWindow ? 'autumn-window' : ADMIN_COMPATIBILITY_THEME.midnightSlug;
+const dawnThemeSlug = useAutumnWindow ? 'autumn-window' : ADMIN_COMPATIBILITY_THEME.dawnSlug;
 ---
 
 <!doctype html>
-<html lang="en" class="h-full" data-scope={themeScope || undefined} data-theme={midnightThemeSlug} data-theme-midnight={midnightThemeSlug} data-theme-dawn={dawnThemeSlug}>
+<html data-admin-shell={isAdminRoute || undefined} lang="en" class:list={["h-full", useAutumnWindowKit && "wc-kit-autumn-window"]} data-wc-kit-mode={useAutumnWindowKit ? "midnight" : undefined} data-scope={themeScope || undefined} data-theme={midnightThemeSlug} data-theme-midnight={midnightThemeSlug} data-theme-dawn={dawnThemeSlug}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -450,91 +440,24 @@ const dawnThemeSlug = useAutumnWindow ? 'autumn-window' : dawnTheme?.slug || 'co
     data-entity-type={bodyDataType || undefined}
   >
     <a class="skip-link" href="#main">Skip to content</a>
-    <!-- Base.astro: persistent theme loader (runtime site-wide)
-
-         This script applies custom theme tokens on every page load.
-         Token System Architecture:
-         - localStorage key: "wc-active-theme" (set by theme-manager.ts)
-         - Token format: HSL for colors, hex for status colors
-         - Aligned with: src/styles/tokens.css (fallback defaults)
-         - Aligned with: theme-manager.ts applyThemeToDocument()
-
-         Both admin and public pages use identical token names for consistency.
-    -->
+    <!-- Keep kit mode synchronized with the reader's Dawn preference. -->
     <script is:inline>
       (function () {
         try {
-          // The public redesign owns its palette; saved editor tokens must not
-          // replace its semantic colors or focus ring. Admin retains its loader.
-          if (document.documentElement.getAttribute("data-theme") === "autumn-window") return;
-          const saved = localStorage.getItem("wc-active-theme");
-          if (!saved) {
-            return;
-          }
-          const t = JSON.parse(saved);
           const root = document.documentElement;
-
-          // set mode attributes
-          const modeAttr = t.id && t.id.includes("dawn") || t.mode === "light" || t.mode === "dawn" ? "dawn" : "midnight";
-          // Use actual theme slug instead of hardcoded values
-          const themeSlug = t.slug || t.id || (modeAttr === "dawn" ? "cozy-dawn" : "cozy-midnight");
-          root.setAttribute("data-theme", themeSlug);
-          // Only set data-comfort-theme for dawn mode (matches applyThemeToDocument behavior)
-          if (modeAttr === "dawn") {
-            root.setAttribute("data-comfort-theme", "dawn");
-          } else {
-            root.removeAttribute("data-comfort-theme");
+          if (root.classList.contains('wc-kit-autumn-window')) {
+            const syncKitMode = () => {
+              const mode = root.getAttribute('data-comfort-theme') === 'dawn' ? 'dawn' : 'midnight';
+              if (root.getAttribute('data-wc-kit-mode') !== mode) root.setAttribute('data-wc-kit-mode', mode);
+            };
+            syncKitMode();
+            new MutationObserver(syncKitMode).observe(root, {
+              attributes: true,
+              attributeFilter: ['data-comfort-theme'],
+            });
           }
-
-          // apply tokens
-          const map = {
-            "--accent-1": "accent1","--accent-2": "accent2","--accent-3": "accent3",
-            "--surface-base": "surfaceBase","--surface-panel": "surfacePanel","--surface-card": "surfaceCard",
-            "--surface-elevated": "surfaceElevated","--surface-hover": "surfaceHover",
-            "--text-strong": "textStrong","--text-body": "textBody","--text-muted": "textMuted",
-            "--border-subtle": "borderSubtle","--border-strong": "borderStrong",
-            "--page-bg-base": "pageBackground",
-            "--header-bg-base": "headerBackground","--header-border-base": "headerBorder",
-            "--footer-bg-base": "footerBackground","--footer-border-base": "footerBorder"
-          };
-          const tokens = t.tokens || {};
-          let appliedCount = 0;
-          Object.entries(map).forEach(([cssVar, key]) => {
-            const val = tokens[key];
-            if (typeof val === "string" && val.startsWith("hsl(")) {
-              // Strip "hsl(" prefix and ")" suffix to get just the HSL components
-              const stripped = val.replace("hsl(", "").replace(")", "");
-              root.style.setProperty(cssVar, stripped);
-              appliedCount++;
-            }
-          });
-
-          // Status colors (plain hex values)
-          const statusMap = {
-            "--success": "success","--warning": "warning","--error": "error","--info": "info"
-          };
-          let statusCount = 0;
-          Object.entries(statusMap).forEach(([cssVar, key]) => {
-            const val = tokens[key];
-            if (typeof val === "string" && val.startsWith("#")) {
-              root.style.setProperty(cssVar, val);
-              statusCount++;
-            }
-          });
-
-          // derive accent-linked globals
-          const get = (v) => getComputedStyle(root).getPropertyValue(v).trim();
-          const accent1Value = get("--accent-1");
-          const accent1Full = `hsl(${accent1Value})`;
-          root.style.setProperty("--text-accent", accent1Value);
-          root.style.setProperty("--ring-focus", `0 0 0 3px ${accent1Full}`);
-          root.style.setProperty("--link-color", accent1Full);
-
-          void appliedCount;
-          void statusCount;
-          void get;
         } catch (e) {
-          // Theme token overrides are optional; fail silent in production.
+          // Mode synchronization is optional when browser APIs are unavailable.
         }
       })();
     </script>

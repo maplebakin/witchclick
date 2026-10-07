@@ -3,10 +3,7 @@ import Base from "../../layouts/Base.astro";
 import { readSettings, buildCanonicalUrl } from "../../utils/settings";
 import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
-import HeroPostSelector from "@/components/admin/HeroPostSelector.astro";
-import HeroPromptLoader from "@/components/admin/HeroPromptLoader.astro";
-import ImageUploader from "@/components/admin/ImageUploader.astro";
-import HeroAttacher from "@/components/admin/HeroAttacher.astro";
+import HeroWorkflow from "@/components/admin/HeroWorkflow.astro";
 
 const settings = readSettings();
 const canonical = buildCanonicalUrl(settings, { path: "/admin/hero" });
@@ -19,8 +16,6 @@ const canUse = isDev || !!keyOk;
 
 const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
 const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || "";
-const site = Astro.url?.origin ?? "";
-const preselectedPost = url.searchParams.get("post") ?? "";
 ---
 <Base
   title="WitchClick — Hero Image Uploader"
@@ -38,12 +33,9 @@ const preselectedPost = url.searchParams.get("post") ?? "";
       <AdminNav currentPath="/admin/hero" />
 
       <section
-        id="heroUploader"
         class="mx-auto max-w-4xl space-y-6"
         data-dev-api={DEV_API}
         data-dev-key={DEV_KEY}
-        data-site-origin={site}
-        data-preselected-post={preselectedPost}
       >
         <header class="space-y-2 rounded-2xl border border-line-subtle bg-surface-base p-6 shadow-sm">
           <h1 class="text-2xl font-semibold text-body-strong">Hero Image Uploader</h1>
@@ -57,12 +49,7 @@ const preselectedPost = url.searchParams.get("post") ?? "";
           </p>
         </header>
 
-        <ol class="space-y-6">
-          <HeroPostSelector />
-          <HeroPromptLoader />
-          <ImageUploader />
-          <HeroAttacher />
-        </ol>
+        <HeroWorkflow mode="picker" devApi={DEV_API} devKey={DEV_KEY} lockedMessage="Select a post to prepare its hero image." />
       </section>
     </div>
   ) : (
@@ -77,57 +64,4 @@ const preselectedPost = url.searchParams.get("post") ?? "";
     </section>
   )}
 
-  {canUse && (
-    <script is:inline>
-      window.heroUploaderPosts = [];
-
-      const heroUploaderRoot = document.getElementById('heroUploader');
-      const preselectedSlug = heroUploaderRoot?.getAttribute('data-preselected-post') || '';
-
-      window.heroUploaderState = {
-        preselectedSlug,
-        selectionToken: 0,
-        existingHeroPath: '',
-        postTitle: '',
-        draft: false,
-        pendingUploads: [],
-        selectedSlug: '',
-        altText: '',
-        uploadedImagePath: '',
-        uploadStatus: 'idle',
-        attachStatus: 'idle',
-      };
-
-      window.setHeroUploaderState = function setHeroUploaderState(patch) {
-        window.heroUploaderState = Object.assign({}, window.heroUploaderState || {}, patch || {});
-        document.dispatchEvent(
-          new CustomEvent('hero-state-changed', {
-            detail: { state: window.heroUploaderState }
-          })
-        );
-      };
-
-      const postSelect = heroUploaderRoot?.querySelector('[data-post-select]');
-      if (postSelect) {
-        postSelect.addEventListener('change', (e) => {
-          const newSlug = e.target.value;
-          const previous = window.heroUploaderState || {};
-          const post = window.heroUploaderPosts.find((item) => item.slug === newSlug);
-          window.setHeroUploaderState({
-            selectionToken: (previous.selectionToken || 0) + 1,
-            selectedSlug: newSlug || '',
-            postTitle: post?.title || newSlug || '',
-            draft: post?.draft === true,
-            existingHeroPath: post?.heroImage || '',
-            altText: post?.heroImageAlt || post?.heroAlt || '',
-            uploadedImagePath: '',
-            uploadStatus: 'idle',
-            attachStatus: 'idle',
-            filePending: false,
-          });
-          document.dispatchEvent(new CustomEvent('post-selected', { detail: { slug: newSlug } }));
-        });
-      }
-    </script>
-  )}
 </Base>

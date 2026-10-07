@@ -155,8 +155,8 @@ function setupBrowser(drafts: any[], handler?: (url: string, body: any) => Promi
   dom.window.fetch = vi.fn(async (input, options) => {
     const url = String(input); const body = JSON.parse(String(options?.body || "{}")); calls.push({ url, body });
     const custom = handler && await handler(url, body); if (custom) return custom;
-    if (url.endsWith("list.json")) return response({ ok: true, drafts });
-    if (url.endsWith("preview.json")) return response({ ok: true, slug: body.slug, frontmatter: { title: body.slug, tags: [], wordCount: 400, publishedAt: "2025-01-01" }, markdown: "## Practice\nBreathe." });
+    if (url.endsWith("/staging/list")) return response({ ok: true, drafts });
+    if (url.endsWith("/staging/preview")) return response({ ok: true, slug: body.slug, frontmatter: { title: body.slug, tags: [], wordCount: 400, publishedAt: "2025-01-01" }, markdown: "## Practice\nBreathe." });
     return response({ ok: true, message: "Saved: publicly eligible locally. Not built or deployed." });
   });
   dom.window.eval(pageScript);
@@ -169,7 +169,7 @@ describe("Staging browser actions and server annotation filters", () => {
   it("uses the Astro annotated list and combines all readiness filters with search and topic grouping", async () => {
     const states = ["checks-passed", "needs-work", "missing-hero", "placeholder-stub", "unknown"];
     const ui = setupBrowser(states.map((state) => uiDraft(state, state))); await ui.loaded();
-    expect(ui.calls[0]!.url).toBe("/api/staging/list.json");
+    expect(ui.calls[0]!.url).toBe("http://127.0.0.1:8787/staging/list");
     for (const state of states) {
       ui.$<HTMLSelectElement>("readinessFilter").value = state; ui.$("readinessFilter").dispatchEvent(new ui.dom.window.Event("change"));
       expect(ui.$("draftsList").querySelectorAll(".publish-btn")).toHaveLength(1);
@@ -183,7 +183,7 @@ describe("Staging browser actions and server annotation filters", () => {
   it("keeps comparison read-only, with one action location and one request on repeated clicks", async () => {
     let release!: () => void; const wait = new Promise<void>((resolve) => { release = resolve; });
     const ui = setupBrowser([uiDraft("first"), uiDraft("second")], async (url) => {
-      if (url.endsWith("publish.json")) { await wait; return new Response(JSON.stringify({ ok: true, message: "Saved: publicly eligible locally." })); }
+      if (url.endsWith("/staging/publish")) { await wait; return new Response(JSON.stringify({ ok: true, message: "Saved: publicly eligible locally." })); }
       return undefined;
     });
     await ui.loaded(); ui.$<HTMLInputElement>("groupByTopic").checked = true; ui.$("groupByTopic").dispatchEvent(new ui.dom.window.Event("change"));
@@ -194,26 +194,26 @@ describe("Staging browser actions and server annotation filters", () => {
     expect(pendingButton.disabled).toBe(true); pendingButton.dispatchEvent(new ui.dom.window.Event("click", { bubbles: true }));
     expect(ui.$("draftsList").querySelector<HTMLButtonElement>('.delete-btn[data-slug="first"]')!.disabled).toBe(true);
     expect(ui.$("draftsList").querySelector<HTMLButtonElement>('.publish-btn[data-slug="second"]')!.disabled).toBe(false);
-    expect(ui.calls.filter((call) => call.url.endsWith("publish.json"))).toHaveLength(1);
+    expect(ui.calls.filter((call) => call.url.endsWith("/staging/publish"))).toHaveLength(1);
     release(); await vi.waitFor(() => expect(ui.$("stagingStatus").textContent).toContain("publicly eligible locally"));
     await ui.idle();
   });
   it("requires explicit no-hero confirmation and sends acknowledgment only after acceptance", async () => {
     const ui = setupBrowser([uiDraft("art", "missing-hero")]); await ui.loaded();
     ui.dom.window.confirm = vi.fn(() => false); ui.$("draftsList").querySelector<HTMLButtonElement>(".publish-btn")!.click();
-    expect(ui.dom.window.confirm).toHaveBeenCalledWith(expect.stringContaining("publishing without a hero image")); expect(ui.calls.filter((call) => call.url.endsWith("publish.json"))).toHaveLength(0);
+    expect(ui.dom.window.confirm).toHaveBeenCalledWith(expect.stringContaining("publishing without a hero image")); expect(ui.calls.filter((call) => call.url.endsWith("/staging/publish"))).toHaveLength(0);
     ui.dom.window.confirm = vi.fn(() => true); ui.$("draftsList").querySelector<HTMLButtonElement>(".publish-btn")!.click();
-    await vi.waitFor(() => expect(ui.calls.find((call) => call.url.endsWith("publish.json"))?.body).toEqual({ slug: "art", acknowledgeMissingHero: true }));
+    await vi.waitFor(() => expect(ui.calls.find((call) => call.url.endsWith("/staging/publish"))?.body).toEqual({ slug: "art", acknowledgeMissingHero: true }));
     await ui.idle();
   });
   it("names the exact title and slug in permanent delete confirmation", async () => {
     const ui = setupBrowser([uiDraft("exact-slug")]); await ui.loaded(); ui.dom.window.confirm = vi.fn(() => false);
     ui.$("draftsList").querySelector<HTMLButtonElement>(".delete-btn")!.click();
     expect(ui.dom.window.confirm).toHaveBeenCalledWith('Permanently remove the draft file for “Title exact-slug” (exact-slug)? This cannot be undone.');
-    expect(ui.calls.filter((call) => call.url.endsWith("delete.json"))).toHaveLength(0);
+    expect(ui.calls.filter((call) => call.url.endsWith("/staging/delete"))).toHaveLength(0);
   });
   it("shows Phase 3A's locked message for unauthorized publication", async () => {
-    const ui = setupBrowser([uiDraft("locked")], (url) => url.endsWith("publish.json") ? new Response("{}", { status: 401 }) : undefined); await ui.loaded();
+    const ui = setupBrowser([uiDraft("locked")], (url) => url.endsWith("/staging/publish") ? new Response("{}", { status: 401 }) : undefined); await ui.loaded();
     ui.$("draftsList").querySelector<HTMLButtonElement>(".publish-btn")!.click(); await vi.waitFor(() => expect(ui.$("stagingStatus").textContent).toContain("Staging actions are locked"));
   });
 });

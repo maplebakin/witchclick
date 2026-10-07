@@ -103,7 +103,7 @@ export function classifyAdminQueues(posts: QueuePost[], stubs: QueueStub[], now 
       queue = "decision";
       const triage = text(stub?.stubTriageStatus) || text(data.stubTriageStatus);
       item.reason = triage ? `Stub triage: ${triage.replace(/-/g, " ")}. Confirm its next step in Post Stub Forge.` : "Placeholder content has no triage decision yet.";
-      item.href = "/admin/stubs"; item.action = "Open Post Stub Forge";
+      item.href = `/admin/stubs?slug=${encodeURIComponent(slug)}`; item.action = "Open Post Stub Forge";
     } else if (unknown.length || ((draft || scheduled) && problems.length)) {
       queue = "work";
       item.reason = [...unknown, ...problems].join("; ");

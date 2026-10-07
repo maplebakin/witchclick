@@ -1,4 +1,7 @@
 import fs from "node:fs";
+import ts from "typescript";
+import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
+import { buildFallbackHeroPrompt } from "../src/utils/heroPrompt";
 import fsp from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -11,6 +14,11 @@ import { createPostSpec } from "./postSpecTestUtils";
 
 const source = fs.readFileSync(new URL("../src/pages/admin/generator.astro", import.meta.url), "utf8");
 const script = source.match(/<script is:inline>([\s\S]*?)<\/script>/)![1]!;
+const heroMarkup = fs.readFileSync(new URL('../src/components/admin/HeroWorkflow.astro', import.meta.url), 'utf8').split('\n---\n')[1]!.split('<script>')[0]!
+  .replace(/hidden=\{mode !== 'picker'\}/g, 'hidden').replace(/data-locked-message=\{lockedMessage\}/g, 'data-locked-message="Locked — available after this post is saved."')
+  .replace(/>\{lockedMessage\}</g, '>Locked — available after this post is saved.<').replace(/data-mode=\{mode\}/g, 'data-mode="embedded"')
+  .replace(/data-hero-slug=\{slug\}/g, 'data-hero-slug=""').replace(/data-dev-api=\{devApi\}/g, 'data-dev-api="http://fixture.local"').replace(/data-dev-key=\{devKey\}/g, 'data-dev-key=""');
+const heroScript = ts.transpileModule(fs.readFileSync(new URL('../src/scripts/admin/hero-workflow.ts', import.meta.url), 'utf8').replace(/^import .*;$/gm, '').replace(/^export /gm, ''), { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None } }).outputText;
 interface Request { url: URL; body: Record<string, any>; dry: boolean }
 const doms: JSDOM[] = [];
 const directories: string[] = [];
@@ -20,7 +28,7 @@ afterEach(() => {
 });
 const response = (data: unknown, ok = true) => ({ ok, status: ok ? 200 : 400, text: async () => JSON.stringify(data), json: async () => data });
 function setup(handler?: (request: Request) => Promise<ReturnType<typeof response> | undefined> | ReturnType<typeof response> | undefined) {
-  const dom = new JSDOM(`<div data-panel-root data-dev-api="http://fixture.local"><div data-panel="posts"></div>
+  const dom = new JSDOM(`<div data-panel-root data-dev-api="http://fixture.local"><div data-panel="posts"></div><section data-generator-hero data-panel="posts">${heroMarkup}</section><div data-panel="curses" class="hidden"></div><button data-panel-toggle="posts"></button><button data-panel-toggle="curses"></button>
     <textarea id="spec"></textarea><div id="status"></div><div id="specSummary"></div><div id="preview"></div>
     <p id="saveOutcome"></p><p id="bundleStatus"></p><details id="bundleDetails"><pre id="bundleError"></pre></details>
     ${["validateBtn", "previewBtn", "ingestBtn", "ingestPublishBtn", "clearBtn", "retryBundleBtn", "genPrompt", "copyPrompt"].map((id) => `<button id="${id}"></button>`).join("")}
@@ -30,6 +38,7 @@ function setup(handler?: (request: Request) => Promise<ReturnType<typeof respons
   const window = dom.window;
   window.HTMLElement.prototype.scrollIntoView = () => {};
   Object.assign(window, { WitchClick: { normalizeDraftSpec } });
+  Object.assign(window, { parseYaml, stringifyYaml, buildFallbackHeroPrompt });
   window.confirm = vi.fn(() => true);
   const requests: Request[] = [];
   window.fetch = vi.fn(async (url, options) => {
@@ -38,9 +47,12 @@ function setup(handler?: (request: Request) => Promise<ReturnType<typeof respons
     const custom = handler && await handler(request);
     if (custom) return custom as Response;
     if (request.url.pathname === "/posts/list") return response({ ok: true, items: [{ title: "Source post", slug: "source-post", tags: ["source"] }] }) as Response;
+    if (request.url.pathname === "/posts/load") return response({ ok: true, slug: request.body.slug, frontmatter: stringifyYaml({slug: request.body.slug, title: "Saved post", draft: true, tags: ["cozy"]}) }) as Response;
     if (request.url.pathname === "/bundle") return response({ ok: true }) as Response;
     return response({ ok: true, spec: request.body, saved: !request.dry, slug: request.body.slug, warnings: [], errors: [] }) as Response;
   });
+  window.eval(heroScript+'\nwindow.testHeroMount = mountHeroWorkflow;');
+  (window as any).testHeroMount(window.document.querySelector('[data-hero-workflow]'));
   window.eval(script);
   const element = <T extends HTMLElement = HTMLElement>(id: string) => window.document.getElementById(id) as T;
   const edit = (value: unknown) => {
@@ -190,6 +202,41 @@ describe("Generator action model", () => {
     expect(saved.data.draft).toBe(true);
     expect(saved.data.slug).not.toBe("source-post");
     expect(ui.element("saveOutcome").textContent).toContain("Saved draft");
+  });
+});
+
+describe('Generator embedded hero target', () => {
+  it('starts locked, activates only the final saved slug, and ignores JSON edits and copy-as-template', async () => {
+    let saved = 0;
+    const ui = setup(request => request.url.pathname === '/ingest' && !request.dry ? response({ok:true,saved:true,slug:++saved === 1 ? 'collision-resolved-slug' : 'second-saved-slug'}) : undefined);
+    const root = ui.window.document.querySelector<HTMLElement>('[data-hero-workflow]')!;
+    expect(root.querySelector<HTMLElement>('[data-workspace]')!.hidden).toBe(true);
+    expect(root.textContent).toContain('available after this post is saved');
+    ui.edit(createPostSpec({slug:'pasted-slug'})); ui.click('ingestBtn'); await ui.idle();
+    await vi.waitFor(() => expect(root.querySelector<HTMLElement>('[data-workspace]')!.hidden).toBe(false));
+    expect(root.dataset.heroSlug).toBe('collision-resolved-slug');
+    ui.edit(createPostSpec({slug:'unsaved-edits'})); expect(root.dataset.heroSlug).toBe('collision-resolved-slug');
+    ui.window.document.querySelector<HTMLButtonElement>('[data-recent-insert]')!.click();
+    expect(root.dataset.heroSlug).toBe('collision-resolved-slug');
+    ui.click('ingestBtn'); await ui.idle(); expect(root.dataset.heroSlug).toBe('second-saved-slug');
+    expect(ui.requests.filter(r=>r.url.pathname==='/posts/load').map(r=>r.body.slug)).toEqual(['collision-resolved-slug','second-saved-slug']);
+  });
+  it('keeps hero optional on a failed load and hides the entire step for curses', async () => {
+    const ui = setup(request=>request.url.pathname==='/posts/load'?response({ok:false,error:'Unavailable'},false):undefined);
+    ui.edit(createPostSpec()); ui.click('ingestBtn'); await ui.idle();
+    expect(ui.element('saveOutcome').textContent).toContain('Saved draft');
+    await vi.waitFor(()=>expect(ui.window.document.querySelector('[data-workflow-status]')!.textContent).toContain('could not be loaded'));
+    ui.window.document.querySelector<HTMLButtonElement>('[data-panel-toggle="curses"]')!.click();
+    expect(ui.window.document.querySelector('[data-generator-hero]')!.classList.contains('hidden')).toBe(true);
+    expect(ui.element<HTMLButtonElement>('ingestBtn').disabled).toBe(false);
+  });
+  it('does not activate hero for template copying or an unconfirmed save', async () => {
+    const ui = setup(request=>request.url.pathname==='/ingest'&&!request.dry?response({ok:true,saved:false}):undefined);
+    await vi.waitFor(()=>expect(ui.window.document.querySelector('[data-recent-insert]')).not.toBeNull());
+    ui.window.document.querySelector<HTMLButtonElement>('[data-recent-insert]')!.click();
+    expect(ui.window.document.querySelector<HTMLElement>('[data-workspace]')!.hidden).toBe(true);
+    ui.edit(createPostSpec());ui.click('ingestBtn');await ui.idle();
+    expect(ui.requests.some(r=>r.url.pathname==='/posts/load')).toBe(false);
   });
 });
 

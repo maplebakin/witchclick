@@ -5,6 +5,8 @@
 
 This document explains WitchClick's theme system, including how to create custom themes, the auto-generation process, and usage guidelines.
 
+> **Historical preset-generation workflow — retired:** WitchClick now consumes the Autumn Window kit. Preset generation is no longer part of build/dev startup; `themes:build` and `themes:watch` are retired commands. The legacy generator and its outputs are removed; historical preset and colour-token JSON is preserved in `docs/archive/theme-system/` with checksums. Generation examples below describe the old workflow, not current operating instructions.
+
 ---
 
 ## Table of Contents
@@ -135,13 +137,9 @@ touch content/themes/winter-frost.json
 }
 ```
 
-### Step 2: Generate CSS
+### Step 2: Generate CSS (retired)
 
-Run the theme generator:
-
-```bash
-npm run themes:build
-```
+Historically, the retired `themes:build` command generated the following output. No preset-generation command is required for the Autumn Window kit.
 
 **Output:**
 ```
@@ -386,46 +384,29 @@ This can be used to load the appropriate theme based on user's comfort preferenc
 
 ## Build Integration
 
-### Automatic Generation
+### Automatic Generation (retired)
 
-Themes are automatically regenerated during the build process:
+Preset generation is no longer part of build or dev startup. WitchClick now consumes the Autumn Window kit. The remaining prebuild steps are proxy setup and admin script compilation:
 
 ```json
 {
   "scripts": {
-    "prebuild": "node ./scripts/ensure-npm-proxy.mjs && node ./scripts/generate-theme-css.mjs",
-    "build": "node ./scripts/build-clean.mjs && node ./scripts/generate-sitemap.mjs"
+    "prebuild": "node ./scripts/ensure-npm-proxy.mjs && npm run build:admin-scripts"
   }
 }
 ```
 
-**Build Flow:**
-1. `npm run build` triggers `prebuild`
-2. `prebuild` runs theme generator
-3. CSS and metadata are generated
-4. Astro build includes generated CSS
+The legacy generator and its CSS/metadata outputs remain unhooked for a later removal phase.
 
-### Manual Generation
+### Manual Generation (retired)
 
-Generate themes on-demand:
-
-```bash
-# Generate once
-npm run themes:build
-
-# Watch mode (future enhancement)
-npm run themes:watch
-```
+The former `themes:build` and `themes:watch` commands have been retired. Do not use the historical preset-generation workflow for current build/dev startup.
 
 ### CI/CD Integration
 
-Ensure themes are generated in CI pipelines:
+No theme-generation step is required. The former example's `themes:build` step is retired; retain the existing site build step:
 
 ```yaml
-# .github/workflows/build.yml
-- name: Generate themes
-  run: npm run themes:build
-
 - name: Build site
   run: npm run build
 ```
@@ -449,7 +430,7 @@ Ensure themes are generated in CI pipelines:
 - **Edit generated CSS manually** — Changes will be overwritten
 - **Use spaces in slugs** — Stick to kebab-case
 - **Create themes with poor contrast** — Accessibility is critical
-- **Skip the generator** — Always run `npm run themes:build` after changes
+- **Historical instruction (retired)** — The former requirement to always run `themes:build` no longer applies; the Autumn Window kit does not require preset generation.
 - **Hardcode theme values** — Use CSS custom properties instead
 - **Mix mode themes** — Don't use dark colors in `dawn` mode themes
 
@@ -508,7 +489,7 @@ Ensure themes are generated in CI pipelines:
 ### Theme Not Applying
 
 **Check:**
-1. Did you run `npm run themes:build`?
+1. Historical generator troubleshooting is retired: `themes:build` is no longer available; current public colours come from the Autumn Window kit.
 2. Is `data-theme` attribute set correctly?
 3. Is `themes.generated.css` imported in `base.css`?
 4. Clear browser cache and hard refresh
@@ -530,11 +511,13 @@ Ensure themes are generated in CI pipelines:
 
 ---
 
-## Admin API Endpoints
+## Historical Admin API Endpoints — retired
 
-The admin dashboard now proxies to Astro serverless functions so you can manage
-themes without running the local `dev-api.js` server in production. All routes
-mirror the JSON contracts used by the legacy dev API.
+The editor-only client and Astro `/api/themes/*` wrappers have been retired.
+`/admin/theme` is now a read-only Autumn Window kit manifest viewer and does not
+call theme APIs. The legacy `dev-api.js` theme, background, and colour-token
+endpoints and preset-writing CLI have also been retired. The contracts and
+authentication notes below describe removed routes, not available APIs.
 
 | Method | URL                      | Auth | Description |
 |--------|--------------------------|------|-------------|
@@ -565,7 +548,7 @@ credentials.
 
 ## Future Enhancements
 
-- [ ] Watch mode for development (`themes:watch`)
+- Retired: preset watch mode (`themes:watch`); no generator runs during dev startup.
 - [ ] Theme preview generator (screenshot automation)
 - [ ] Contrast ratio validation in generator
 - [ ] Theme inheritance (extend base themes)

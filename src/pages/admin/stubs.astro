@@ -1,4 +1,5 @@
 ---
+import HeroWorkflow from "@/components/admin/HeroWorkflow.astro";
 import Base from "../../layouts/Base.astro";
 import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
@@ -254,6 +255,10 @@ const postStubPayload = JSON.stringify(postStubEntries);
 
             <p data-status class="text-sm text-body-muted" role="status" aria-live="polite" aria-atomic="true"></p>
           </div>
+          <section data-forge-hero-step hidden class="mt-6 space-y-3 rounded-xl border border-line-subtle bg-surface-base p-4" aria-labelledby="forge-hero-heading">
+            <h3 id="forge-hero-heading" class="text-lg font-semibold text-body-strong">Step 4 — Hero image</h3>
+            <HeroWorkflow mode="embedded" devApi={DEV_API} devKey={DEV_KEY} lockedMessage="Locked — available once this stub has been replaced by an ingested draft." />
+          </section>
         </section>
 
         <div data-confirm-modal class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 p-4 backdrop-blur-sm">

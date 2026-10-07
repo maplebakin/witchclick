@@ -1,18 +1,32 @@
+/* Admin styles never apply to public routes or candidate-theme samples. */
+@scope ([data-admin-shell]) to ([data-theme-preview]:not(html):not([data-theme-swatches])) {
 /* ===========================================================================
    ADMIN PANEL STYLES
    
-   Admin text and surfaces follow the active theme tokens.
-   Autumn Window overrides below keep meaningful text opaque and readable.
+   Admin owns its palette independently of public themes and kits.
+   Shell values retain the established warm charcoal/mulberry appearance.
    =========================================================================== */
 
 /* ---------------------------------------------------------------------------
-   Theme-aware admin tokens with WCAG fallbacks
+   Admin-owned palette and semantic tokens
    --------------------------------------------------------------------------- */
-:root {
+:scope[data-admin-shell] {
+  /* Fixed shell palette: never derived from public tokens or editor preview. */
+  --admin-palette-surface-base: #242120;
+  --admin-palette-surface-panel: #2A2624;
+  --admin-palette-surface-elevated: #302B28;
+  --admin-palette-text-strong: #F0E8DD;
+  --admin-palette-text-body: #E8DED1;
+  --admin-palette-text-muted: #BFB2A3;
+  --admin-palette-border-subtle: #504640;
+  --admin-palette-border-strong: #84766B;
+  --admin-palette-accent-mulberry: #B98F9D;
+  --admin-palette-accent-blue: #A8BBC3;
+
   /* Theme tokens are complete CSS colors, not HSL channel lists. */
-  --admin-base-text-strong: var(--text-strong);
-  --admin-base-text-body: var(--text-body);
-  --admin-base-text-muted: var(--text-muted);
+  --admin-base-text-strong: var(--admin-palette-text-strong);
+  --admin-base-text-body: var(--admin-palette-text-body);
+  --admin-base-text-muted: var(--admin-palette-text-muted);
   --admin-text-strong: var(--admin-base-text-strong);
   --admin-text-body: var(--admin-base-text-body);
   --admin-text-muted: var(--admin-base-text-muted);
@@ -20,21 +34,21 @@
   --admin-text-muted-strong: var(--admin-base-text-muted);
   --admin-text-muted-soft: var(--admin-base-text-muted);
   --admin-text-muted-subtle: var(--admin-base-text-muted);
-  --admin-surface-base: var(--surface-base);
-  --admin-surface-muted: var(--surface-panel);
-  --admin-border-subtle: var(--border-subtle);
-  --admin-border-strong: var(--border-strong);
-  --admin-accent: var(--accent-mulberry, var(--text-accent));
+  --admin-surface-base: var(--admin-palette-surface-base);
+  --admin-surface-muted: var(--admin-palette-surface-panel);
+  --admin-border-subtle: var(--admin-palette-border-subtle);
+  --admin-border-strong: var(--admin-palette-border-strong);
+  --admin-accent: var(--admin-palette-accent-mulberry);
   --admin-accent-soft: var(--admin-surface-muted);
-  --admin-accent-soft-hover: var(--surface-elevated);
+  --admin-accent-soft-hover: var(--admin-palette-surface-elevated);
   --admin-accent-border: var(--admin-accent);
   --admin-accent-text: var(--admin-accent);
-  --admin-hover-bg: var(--surface-elevated);
+  --admin-hover-bg: var(--admin-palette-surface-elevated);
   --admin-border-neutral: var(--admin-border-subtle);
   --admin-surface-hover: var(--admin-hover-bg);
   --admin-text-primary: var(--admin-text-strong);
   --admin-icon-muted: var(--admin-text-muted);
-  --admin-focus: var(--accent-blue, var(--focus-ring-color));
+  --admin-focus: var(--admin-palette-accent-blue);
 }
 
 /* ---------------------------------------------------------------------------
@@ -479,12 +493,12 @@ main:has([data-admin-nav]) a:not(.admin-nav-link):not(.admin-nav-quick-link):not
 
 /* Autumn Window admin workspace only: leave public header/navigation styling
  * and public-page surfaces to their existing theme rules. */
-:root:has([data-admin-nav]) main {
+:scope:has([data-admin-nav]) main {
   color: var(--admin-text-body);
   background-color: var(--admin-surface-base);
 }
 
-:root:has([data-admin-nav]) main :is(
+:scope:has([data-admin-nav]) main :is(
   [class*="bg-surface"], [class*="bg-neutral-"], [class*="bg-white"],
   .admin-dashboard__hero, .admin-dashboard__panel,
   .admin-dashboard__stat, .admin-dashboard__list-item, .admin-badge, .admin-status
@@ -492,7 +506,7 @@ main:has([data-admin-nav]) a:not(.admin-nav-link):not(.admin-nav-quick-link):not
   background: var(--admin-surface-muted) !important;
 }
 
-:root:has([data-admin-nav]) main :is(
+:scope:has([data-admin-nav]) main :is(
   .font-mono, .text-secondary, .text-inverse, .text-inverse-soft,
   [class*="text-neutral-"], .text-white,
   .text-success, .text-info, .text-warning, .text-danger,
@@ -501,60 +515,261 @@ main:has([data-admin-nav]) a:not(.admin-nav-link):not(.admin-nav-quick-link):not
   color: var(--admin-text-body) !important;
 }
 
-:root:has([data-admin-nav]) main :is(
+:scope:has([data-admin-nav]) main :is(
   .text-body-faint, .text-inverse-subtle, .text-muted, .text-muted-subtle
 ) {
   color: var(--admin-text-muted) !important;
 }
 
-:root:has([data-admin-nav]) main :is(input, select, textarea) {
+:scope:has([data-admin-nav]) main :is(input, select, textarea) {
   color: var(--admin-text-body) !important;
   background-color: var(--admin-surface-base) !important;
   border-color: var(--admin-border-strong) !important;
   opacity: 1 !important;
 }
 
-:root:has([data-admin-nav]) main :is(input, textarea) {
+:scope:has([data-admin-nav]) main :is(input, textarea) {
   background-image: none !important;
 }
 
-:root:has([data-admin-nav]) main :is(input, textarea)::placeholder {
+:scope:has([data-admin-nav]) main :is(input, textarea)::placeholder {
   color: var(--admin-text-muted) !important;
   opacity: 1 !important;
 }
 
-:root:has([data-admin-nav]) main :is(input, select, textarea):focus {
+:scope:has([data-admin-nav]) main :is(input, select, textarea):focus {
   outline: 2px solid var(--admin-focus) !important;
   outline-offset: 2px;
   box-shadow: none !important;
 }
 
-:root:has([data-admin-nav]) main :is(.admin-btn-primary, .admin-btn-secondary) {
+:scope:has([data-admin-nav]) main :is(.admin-btn-primary, .admin-btn-secondary) {
   background: var(--admin-surface-muted) !important;
   color: var(--admin-text-body) !important;
   border-color: var(--admin-border-strong) !important;
 }
 
-:root:has([data-admin-nav]) main .admin-btn-primary {
+:scope:has([data-admin-nav]) main .admin-btn-primary {
   border-color: var(--admin-accent) !important;
 }
 
-:root:has([data-admin-nav]) main :is(.admin-btn-primary, .admin-btn-secondary):is(:hover, :focus-visible) {
+:scope:has([data-admin-nav]) main :is(.admin-btn-primary, .admin-btn-secondary):is(:hover, :focus-visible) {
   background: var(--admin-surface-hover) !important;
   color: var(--admin-text-strong) !important;
 }
 
-:root:has([data-admin-nav]) main a:not(.admin-nav-link):not(.admin-nav-quick-link):hover {
+:scope:has([data-admin-nav]) main a:not(.admin-nav-link):not(.admin-nav-quick-link):hover {
   color: var(--admin-text-strong);
 }
 
-:root:has([data-admin-nav]) main :is(button:disabled, [class~="opacity-50"], [class~="opacity-60"], [class~="opacity-70"], [class~="opacity-75"], [class~="opacity-80"]) {
+:scope:has([data-admin-nav]) main :is(button:disabled, [class~="opacity-50"], [class~="opacity-60"], [class~="opacity-70"], [class~="opacity-75"], [class~="opacity-80"]) {
   opacity: 0.85 !important;
 }
 
-/* Plain mode removes theme panels; admin controls still need opaque fills. */
-:root:has([data-admin-nav])[data-comfort-mode="plain"] {
-  --admin-surface-muted: var(--surface-base);
-  --admin-accent-soft-hover: var(--surface-base);
-  --admin-hover-bg: var(--surface-base);
+/* One owner for shell backgrounds, regardless of public theme/comfort mode.
+ * The legacy editor still emits inert --preview-* variables on html. Only
+ * explicit preview/sample consumers may use them; never bind shell tokens to them.
+ * Inside @scope, :scope is the admin html element (not :root).
+ */
+:scope[data-admin-shell], body, main {
+  background: var(--admin-surface-base) !important;
+  color: var(--admin-text-body);
+}
+body {
+  --surface-base: var(--admin-surface-base);
+  --surface-panel: var(--admin-surface-muted);
+  --surface-muted: var(--admin-surface-muted);
+  --surface-elevated: var(--admin-surface-hover);
+  --surface-hover: var(--admin-surface-hover);
+  --text-body: var(--admin-text-body);
+  --text-strong: var(--admin-text-strong);
+  --text-heading: var(--admin-text-strong);
+  --text-muted: var(--admin-text-muted);
+  --text-accent: var(--admin-accent);
+  --link-color: var(--admin-accent);
+  --border-subtle: var(--admin-border-subtle);
+  --border-strong: var(--admin-border-strong);
+  --header-background: var(--admin-surface-base);
+  --theme-surface-base: var(--admin-surface-base);
+  --theme-surface-soft: var(--admin-surface-muted);
+  --theme-text-primary: var(--admin-text-strong);
+  --theme-text-body: var(--admin-text-body);
+  --theme-text-muted: var(--admin-text-muted);
+  --theme-border-subtle: var(--admin-border-subtle);
+}
+.quick-actions__trigger, .site-nav__button--utility, .site-search-panel__dialog {
+  background: var(--admin-surface-muted) !important;
+  color: var(--admin-text-body) !important;
+  border-color: var(--admin-border-subtle) !important;
+}
+:scope[data-admin-shell] .site-header :is(.site-nav__link, .site-nav__button, .site-nav__toggle) {
+  background: var(--admin-surface-muted) !important;
+  color: var(--admin-text-body) !important;
+  border-color: var(--admin-border-subtle) !important;
+}
+:scope[data-admin-shell] .site-header .site-logo { color: var(--admin-accent) !important; }
+[data-admin-nav] { background: var(--admin-surface-base) !important; }
+body::before, body::after { background: none !important; }
+/* Public header/footer and utility surfaces are chrome on admin routes too. */
+body > header, body > footer, .site-header, .site-footer {
+  background: var(--admin-surface-base) !important;
+  color: var(--admin-text-body) !important;
+  border-color: var(--admin-border-subtle) !important;
+}
+main :is([class*="bg-"], .theme-shell, .token-section, .token-swatch, .theme-cta) {
+  background: var(--admin-surface-muted) !important;
+  border-color: var(--admin-border-subtle) !important;
+}
+main :is(.theme-cta, .token-swatch__name) { color: var(--admin-text-strong) !important; }
+main .token-swatch__value { color: var(--admin-text-muted) !important; }
+main :is(.theme-cta, .token-swatch).copied { box-shadow: 0 0 0 2px var(--admin-focus); }
+
+/* Admin-only compatibility bindings, formerly injected by AdminNav.
+ * Keep existing aliases and comfort-state behaviour without importing a public
+ * palette. These root values do not replace the fixed --admin-palette-* shell.
+ * :scope:has(...) retains the original selector specificity; @scope keeps these
+ * declarations local to Admin, including against later unscoped card defaults.
+ */
+:scope:has([data-admin-nav]) {
+  --surface-base: var(--admin-palette-surface-base);
+  --surface-panel: var(--admin-palette-surface-panel);
+  --surface-card: var(--surface-panel);
+  --surface-elevated: var(--admin-palette-surface-elevated);
+  --surface-hover: var(--surface-elevated);
+  --surface-panel-primary: var(--surface-panel);
+  --surface-panel-secondary: var(--surface-panel);
+  --surface-card-hover: var(--surface-hover);
+  --surface-muted: var(--surface-panel);
+  --surface-plain: var(--surface-base);
+  --background: var(--surface-base);
+  --page-background: var(--surface-base);
+  --header-background: var(--surface-base);
+  --card-panel-surface: var(--surface-card);
+  --card-panel-surface-strong: var(--surface-panel);
+
+  --text-strong: var(--admin-palette-text-strong);
+  --text-body: var(--admin-palette-text-body);
+  --text-muted: var(--admin-palette-text-muted);
+  --text-subtle: var(--text-muted);
+  --text-primary: var(--text-strong);
+  --text-secondary: var(--text-body);
+  --text-tertiary: var(--text-muted);
+  --text-hint: var(--text-muted);
+  --text-disabled: var(--text-muted);
+  --heading: var(--text-strong);
+  --footer-text: var(--text-body);
+  --footer-text-muted: var(--text-muted);
+
+  --accent-mulberry: var(--admin-palette-accent-mulberry);
+  --accent-blue: var(--admin-palette-accent-blue);
+  --primary: var(--accent-mulberry);
+  --secondary: var(--accent-blue);
+  --accent: var(--accent-mulberry);
+  --accent-strong: var(--accent-mulberry);
+  --text-accent: var(--accent-mulberry);
+  --text-accent-strong: var(--accent-mulberry);
+  --link-color: var(--accent-mulberry);
+
+  --border-subtle: var(--admin-palette-border-subtle);
+  --border-strong: var(--admin-palette-border-strong);
+  --border-accent-subtle: var(--border-subtle);
+  --border-accent-medium: var(--border-strong);
+  --border-accent-strong: var(--accent-mulberry);
+  --border-accent-hover: var(--accent-mulberry);
+  --surface-plain-border: var(--border-subtle);
+  --card-panel-border: var(--border-subtle);
+  --card-panel-border-soft: var(--border-subtle);
+  --card-panel-border-strong: var(--border-strong);
+  --chip-background: var(--surface-panel);
+  --chip-border: var(--border-subtle);
+  --card-tag-bg: var(--chip-background);
+  --card-tag-text: var(--text-muted);
+  --card-tag-border: var(--chip-border);
+
+  --focus-ring: var(--accent-blue);
+  --focus-ring-color: var(--accent-blue);
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 3px;
+  --focus-ring-base-shadow: var(--surface-base);
+  --focus-ring-shadow: 0 0 0 3px var(--surface-base), 0 0 0 6px var(--accent-blue);
+  --ring-focus: var(--focus-ring-shadow);
+
+  --spoon-low: #AABA96;
+  --spoon-medium: #CEAF78;
+  --spoon-high: #D3A080;
+
+  --glass-surface: var(--surface-panel);
+  --glass-surface-strong: var(--surface-elevated);
+  --glass-card: var(--surface-card);
+  --glass-hover: var(--surface-hover);
+  --glass-border: var(--border-subtle);
+  --glass-border-strong: var(--border-strong);
+  --glass-highlight: transparent;
+  --glass-glow: transparent;
+  --glass-blur: 0px;
+  --glass-noise-opacity: 0.025;
+  --gradient-purple-radial: none;
+  --gradient-gold-radial: none;
+
+  --texture-image: none;
+  --texture-opacity: var(--glass-noise-opacity);
+  --imagery-display: block;
+  --ornament-display: block;
+  --bookmark-color: var(--accent-mulberry);
+  --bookmark-max-count: 1;
+
+  --dur-fast: 120ms;
+  --dur-med: 200ms;
+  --dur-slow: 320ms;
+}
+
+:scope:has([data-admin-nav])[data-comfort-theme="dawn"] {
+  --surface-base: #F2EADF;
+  --surface-panel: #EDE3D6;
+  --surface-elevated: #E6DBCC;
+  --text-strong: #302724;
+  --text-body: #382F2A;
+  --text-muted: #65584F;
+  --accent-mulberry: #754452;
+  --accent-blue: #426575;
+  --border-subtle: #C8B8A5;
+  --border-strong: #8B7764;
+  --spoon-low: #4F6544;
+  --spoon-medium: #705829;
+  --spoon-high: #825236;
+}
+
+:scope:has([data-admin-nav])[data-comfort-mode="calm"],
+:scope:has([data-admin-nav])[data-comfort-mode="plain"] {
+  --texture-image: none;
+  --texture-opacity: 0;
+  --glass-noise-opacity: 0;
+  --dur-fast: 0ms;
+  --dur-med: 0ms;
+  --dur-slow: 0ms;
+}
+
+:scope:has([data-admin-nav])[data-comfort-mode="plain"] {
+  --imagery-display: none;
+  --ornament-display: none;
+  --bookmark-color: transparent;
+  --bookmark-max-count: 0;
+  --surface-panel: transparent;
+  --surface-card: transparent;
+  --surface-elevated: transparent;
+  --surface-hover: transparent;
+  --surface-plain: transparent;
+  --chip-background: transparent;
+  --glass-surface: transparent;
+  --glass-surface-strong: transparent;
+  --glass-card: transparent;
+  --glass-hover: transparent;
+  --glass-highlight: transparent;
+  --glass-glow: transparent;
+  --glass-shadow-soft: none;
+  --glass-shadow-strong: none;
+  --shadow-card: none;
+  --shadow-card-hover: none;
+  --surface-plain-shadow: none;
+}
 }

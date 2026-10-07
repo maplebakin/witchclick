@@ -1,262 +1,74 @@
-import fs from "node:fs/promises";
-import path from "node:path";
-import os from "node:os";
-import { beforeEach, afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
+import fs from 'node:fs';
+import { createHash } from 'node:crypto';
+import path from 'node:path';
+import { describe, expect, it } from 'vitest';
 
-import type {
-  AdminThemeListing,
-  AdminThemeRecord,
-  AdminThemeSettings,
-} from "../dev-api.js";
+const root = path.resolve(import.meta.dirname, '..');
+const read = (file: string) => fs.readFileSync(path.join(root, file), 'utf8');
+const retiredHelpers = [
+  'listThemes', 'saveThemeRecord', 'setActiveThemeRecord', 'deleteThemeRecord',
+  'readThemeRecord', 'readActiveThemeMapping', 'extractThemeValues',
+  'mergeThemeSettings', 'normalizeThemeMode', 'toTitleCase',
+];
 
-let tempDir: string;
-let cwdSpy: MockInstance<() => string> | undefined;
-let listThemes: () => Promise<AdminThemeListing>;
-let saveThemeRecord: (payload: Record<string, unknown>) => Promise<AdminThemeRecord>;
-let setActiveThemeRecord: (
-  payload: Record<string, unknown>,
-) => Promise<{ active: AdminThemeListing["active"]; theme: AdminThemeRecord }>;
-
-async function prepareTempDir() {
-  tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "wc-admin-theme-"));
-  cwdSpy = vi.spyOn(process, "cwd");
-  cwdSpy.mockReturnValue(tempDir);
+function sourceFiles(directory: string): string[] {
+  return fs.readdirSync(path.join(root, directory), { withFileTypes: true }).flatMap(entry => {
+    const file = `${directory}/${entry.name}`;
+    return entry.isDirectory() ? sourceFiles(file) : /\.(astro|[cm]?js|tsx?)$/.test(file) ? [file] : [];
+  });
 }
 
-async function cleanupTempDir() {
-  if (cwdSpy) cwdSpy.mockRestore();
-  if (tempDir) {
-    await fs.rm(tempDir, { recursive: true, force: true });
-  }
-}
-
-function expectThemeHasAllSettings(settings: AdminThemeSettings) {
-  expect(settings.primary).toBeTypeOf("string");
-  expect(settings.accent).toBeTypeOf("string");
-  expect(settings.background).toBeTypeOf("string");
-  expect(settings.fontSerif).toBeTypeOf("string");
-  expect(settings.fontScript).toBeTypeOf("string");
-}
-
-describe("admin theme dashboard", () => {
-  beforeEach(async () => {
-    process.env.VITEST = "true";
-    await prepareTempDir();
-    vi.resetModules();
-    ({
-      listThemes,
-      saveThemeRecord,
-      setActiveThemeRecord,
-    } = await import("../dev-api.js"));
+describe('legacy preset runtime retirement', () => {
+  it.each(['src/utils/theme.ts', 'shared/theme-cache.js', 'shared/theme-cache.d.ts'])('keeps %s absent', file => {
+    expect(fs.existsSync(path.join(root, file))).toBe(false);
   });
 
-  afterEach(async () => {
-    await cleanupTempDir();
-    vi.resetModules();
-  });
-
-  it("saves custom themes and activates them for midnight and dawn", async () => {
-    const midnightTheme = await saveThemeRecord({
-      mode: "midnight",
-      label: "Test Midnight",
-      settings: {
-        primary: "#332244",
-        accent: "#d4a373",
-        background: "#120725",
-        fontSerif: "Literata",
-        fontScript: "Parisienne",
-        textPrimary: "#ede7ff",
-        linkColor: "#c084fc",
-        cardFocusOutline: "0 0 0 3px rgba(208, 163, 115, 0.42)",
-        fontHeading: "Cinzel",
-        backgroundImage: "url(/images/theme/test-midnight.png)",
-      },
-    });
-
-    expect(midnightTheme.slug).toBe("test-midnight");
-    expect(midnightTheme.mode).toBe("midnight");
-    expectThemeHasAllSettings(midnightTheme.settings);
-    expect(midnightTheme.settings.textPrimary).toBe("#ede7ff");
-    expect(midnightTheme.settings.linkColor).toBe("#c084fc");
-    expect(midnightTheme.settings.cardFocusOutline).toBe("0 0 0 3px rgba(208, 163, 115, 0.42)");
-    expect(midnightTheme.settings.fontHeading).toBe("Cinzel");
-    expect(midnightTheme.settings.backgroundImage).toBe("url(/images/theme/test-midnight.png)");
-
-    const dawnTheme = await saveThemeRecord({
-      mode: "dawn",
-      label: "Test Dawn",
-      settings: {
-        primary: "#8c6bb1",
-        accent: "#e8b923",
-        background: "#f7f1e5",
-        fontSerif: "Literata",
-        fontScript: "Parisienne",
-        textPrimary: "#2f1f3f",
-        linkColor: "#d97706",
-      },
-    });
-
-    expect(dawnTheme.slug).toBe("test-dawn");
-    expect(dawnTheme.mode).toBe("dawn");
-    expectThemeHasAllSettings(dawnTheme.settings);
-    expect(dawnTheme.settings.textPrimary).toBe("#2f1f3f");
-    expect(dawnTheme.settings.linkColor).toBe("#d97706");
-
-    const themeDir = path.join(tempDir, "content", "themes");
-    const midnightFile = JSON.parse(
-      await fs.readFile(path.join(themeDir, `${midnightTheme.slug}.json`), "utf8"),
-    );
-    const dawnFile = JSON.parse(
-      await fs.readFile(path.join(themeDir, `${dawnTheme.slug}.json`), "utf8"),
-    );
-
-    expect(midnightFile.settings).toEqual(midnightTheme.settings);
-    expect(dawnFile.settings).toEqual(dawnTheme.settings);
-
-    const listing = await listThemes();
-    expect(listing.items.midnight.map((t) => t.slug)).toContain(midnightTheme.slug);
-    expect(listing.items.dawn.map((t) => t.slug)).toContain(dawnTheme.slug);
-    expect(listing.active.midnight).toBeNull();
-    expect(listing.active.dawn).toBeNull();
-
-    const activatedMidnight = await setActiveThemeRecord({
-      mode: "midnight",
-      slug: midnightTheme.slug,
-    });
-    expect(activatedMidnight.active.midnight).toBe(midnightTheme.slug);
-    expect(activatedMidnight.active.dawn).toBeNull();
-
-    const activatedDawn = await setActiveThemeRecord({
-      mode: "dawn",
-      slug: dawnTheme.slug,
-    });
-    expect(activatedDawn.active.midnight).toBe(midnightTheme.slug);
-    expect(activatedDawn.active.dawn).toBe(dawnTheme.slug);
-
-    const activeFile = JSON.parse(
-      await fs.readFile(path.join(themeDir, "active.json"), "utf8"),
-    );
-    expect(activeFile).toEqual({ midnight: midnightTheme.slug, dawn: dawnTheme.slug });
-
-  });
-
-  it("fills in default fonts when they are left blank in the payload", async () => {
-    const theme = await saveThemeRecord({
-      mode: "dawn",
-      label: "Minimal Dawn",
-      settings: {
-        primary: "#7b6f95",
-        accent: "#e9c46a",
-        background: "#fef9ef",
-      },
-    });
-
-    expect(theme.settings.fontSerif).toBe("Literata");
-    expect(theme.settings.fontScript).toBe("Parisienne");
-  });
-
-  it("preserves glass token fields when saving themes", async () => {
-    const payload = {
-      mode: "midnight",
-      label: "Glass Test",
-      settings: {
-        primary: "#331144",
-        accent: "#c58af3",
-        background: "#0f0820",
-        fontSerif: "Literata",
-        fontScript: "Parisienne",
-        glassSurface: "rgba(20, 18, 31, 0.78)",
-        glassBorderStrong: "#d4af37",
-        glassGlow: "#f8f3ff",
-        glassBlur: "22px",
-        glassNoiseOpacity: "0.12",
-      },
-    } as const;
-
-    const saved = await saveThemeRecord(payload);
-    expect(saved.settings.glassSurface).toBe(payload.settings.glassSurface);
-    expect(saved.settings.glassBorderStrong).toBe(payload.settings.glassBorderStrong);
-    expect(saved.settings.glassGlow).toBe(payload.settings.glassGlow);
-    expect(saved.settings.glassBlur).toBe("22px");
-    expect(saved.settings.glassNoiseOpacity).toBe("0.12");
-
-    const themeDir = path.join(tempDir, "content", "themes");
-    const savedFile = JSON.parse(
-      await fs.readFile(path.join(themeDir, `${saved.slug}.json`), "utf8"),
-    );
-    expect(savedFile.settings.glassSurface).toBe(payload.settings.glassSurface);
-    expect(savedFile.settings.glassNoiseOpacity).toBe(payload.settings.glassNoiseOpacity);
-
-    const listing = await listThemes();
-    const roundTrip = listing.items.midnight.find((item) => item.slug === saved.slug);
-    expect(roundTrip?.settings.glassGlow).toBe(payload.settings.glassGlow);
-    expect(roundTrip?.settings.glassBlur).toBe(payload.settings.glassBlur);
-  });
-
-  it("resets the theme cache after save, update, and delete operations", async () => {
-    const originalNodeEnv = process.env.NODE_ENV;
-    const originalVitest = process.env.VITEST;
-    process.env.NODE_ENV = "production";
-    delete process.env.VITEST;
-
-    vi.resetModules();
-
-    const themeCacheModule = await import("../shared/theme-cache.js");
-    const resetSpy = vi.spyOn(themeCacheModule, "resetThemeCache");
-
-    const {
-      saveThemeRecord: save,
-      setActiveThemeRecord: activate,
-      deleteThemeRecord: remove,
-    } = await import("../dev-api.js");
-    const { getActiveThemes } = await import("../src/utils/theme.ts");
-
-    try {
-      const basePayload = {
-        mode: "midnight",
-        label: "Cache Test",
-        settings: {
-          primary: "#112233",
-          accent: "#d4a373",
-          background: "#120725",
-          fontSerif: "Literata",
-          fontScript: "Parisienne",
-        },
-      } as const;
-
-      await save(basePayload);
-      await activate({ mode: "midnight", slug: "cache-test" });
-
-      const initial = getActiveThemes();
-      expect(initial.midnight.slug).toBe("cache-test");
-      expect(initial.midnight.primary).toBe("#112233");
-
-      await save({
-        ...basePayload,
-        settings: {
-          ...basePayload.settings,
-          primary: "#334455",
-          background: "#1a1324",
-        },
-      });
-
-      const refreshed = getActiveThemes();
-      expect(refreshed.midnight.primary).toBe("#334455");
-
-      await remove({ slug: "cache-test" });
-
-      const afterDelete = getActiveThemes();
-      expect(afterDelete.midnight.slug).toBe("default-midnight");
-
-      expect(resetSpy).toHaveBeenCalledTimes(4);
-    } finally {
-      resetSpy.mockRestore();
-      process.env.NODE_ENV = originalNodeEnv;
-      if (typeof originalVitest === "undefined") {
-        delete process.env.VITEST;
-      } else {
-        process.env.VITEST = originalVitest;
-      }
+  it('removes preset helpers, constants and the cache import from dev-api', () => {
+    const source = read('dev-api.js');
+    for (const name of retiredHelpers) expect(source).not.toMatch(new RegExp(`\\b${name}\\b`));
+    expect(source).not.toMatch(/THEMES_DIR|ACTIVE_THEME_FILE|THEME_REQUIRED_FIELDS|THEME_EXTRA_FIELDS|THEME_OPTIONAL_FIELDS|THEME_ALL_FIELDS|DEFAULT_THEME_SETTINGS|theme-cache|resetThemeCache/);
+    const declarations = read('dev-api.d.ts');
+    for (const name of retiredHelpers.slice(0, 4)) {
+      expect(declarations).not.toMatch(new RegExp(`export declare function ${name}\\b`));
     }
   });
+
+  it('does not expose preset writers at runtime while retaining non-theme exports', async () => {
+    const api = await import('../dev-api.js');
+    for (const name of retiredHelpers) expect(api).not.toHaveProperty(name);
+    for (const name of ['savePostFromWrite', 'attachHeroToPost', 'getEntity', 'parseBody', 'server']) {
+      expect(api).toHaveProperty(name);
+    }
+  });
+
+  it('leaves no executable preset resolver/cache consumers', () => {
+    const reference = /(?:from\s*|import\s*\(?|require\s*\()\s*['"][^'"]*(?:utils\/theme(?:\.ts)?|theme-cache(?:\.js)?)['"]/;
+    for (const file of [...sourceFiles('src'), ...sourceFiles('scripts'), ...sourceFiles('shared')]) {
+      expect(read(file), file).not.toMatch(reference);
+    }
+    expect(JSON.stringify(JSON.parse(read('package.json')).scripts)).not.toMatch(/theme-cache|utils\/theme/);
+  });
+  it('preserves the archived data checksums and removes the old runtime paths', () => {
+    const archive = 'docs/archive/theme-system';
+    const entries = read(`${archive}/checksums.sha256`).trim().split('\n');
+    expect(entries).toHaveLength(17);
+    const paths = new Set<string>();
+    for (const line of entries) {
+      const match = /^([a-f0-9]{64}) {2}(.+)$/.exec(line);
+      expect(match, line).not.toBeNull();
+      const [, expected, file] = match!;
+      expect(file).not.toMatch(/^(?:\/|\.\.)/);
+      expect(paths.has(file!)).toBe(false);
+      paths.add(file!);
+      const bytes = fs.readFileSync(path.join(root, archive, file!));
+      expect(createHash('sha256').update(bytes).digest('hex'), file).toBe(expected);
+    }
+    expect([...paths].filter(file => file.startsWith('legacy-presets/'))).toHaveLength(15);
+    for (const file of ['content/themes', 'content/theme.json', 'content/color-tokens.json']) {
+      expect(fs.existsSync(path.join(root, file)), file).toBe(false);
+    }
+    expect(fs.existsSync(path.join(root, 'src/styles/color-tokens.generated.css'))).toBe(true);
+    expect(read('scripts/themes-lint.mjs')).toContain('"docs", "archive", "theme-system", "legacy-presets"');
+  });
+
 });

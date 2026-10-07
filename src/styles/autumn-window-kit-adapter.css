@@ -1,0 +1,125 @@
+/*
+ * Default public adapter for the versioned Autumn Window kit.
+ *
+ * Base.astro provides the host and mode only on public Autumn Window roots;
+ * admin roots are excluded. Missing kit variables fall back to their exact
+ * pre-kit semantic color values. The five Dawn card/tag recipes retain their
+ * original composition; kit colours are inputs, not replacements for mixes.
+ * --footer-border stays unmapped: its consumers require HSL channels inside
+ * hsl(), not a complete colour. Autumn Window continues to own that fallback.
+ *
+ * Plain mode is excluded so its transparent-surface behavior remains owned by
+ * WitchClick. Calm mode, typography, geometry, and component recipes are not
+ * changed here.
+ */
+
+:root.wc-kit-autumn-window[data-theme="autumn-window"][data-wc-kit-mode="midnight"]:not([data-admin-shell]):not([data-comfort-theme="dawn"]):not([data-comfort-mode="plain"]) {
+  --surface-base: var(--wc-kit-surface-base, rgb(36, 33, 32));
+  --surface-panel: var(--wc-kit-surface-panel, rgb(42, 38, 36));
+  --surface-card: var(--wc-kit-surface-card, rgb(42, 38, 36));
+  --surface-elevated: var(--wc-kit-surface-elevated, rgb(48, 43, 40));
+  --surface-hover: var(--wc-kit-surface-hover, rgb(48, 43, 40));
+  --surface-muted: var(--wc-kit-surface-muted, rgb(42, 38, 36));
+  --border-subtle: var(--wc-kit-border-subtle, rgb(80, 70, 64));
+  --border-strong: var(--wc-kit-border-strong, rgb(132, 118, 107));
+  --text-strong: var(--wc-kit-text-strong, rgb(240, 232, 221));
+  --text-body: var(--wc-kit-text-body, rgb(232, 222, 209));
+  --text-muted: var(--wc-kit-text-muted, rgb(191, 178, 163));
+  --link-color: var(--wc-kit-link-foreground, rgb(185, 143, 157));
+  --panel-surface: var(--wc-kit-action-background, rgb(42, 38, 36));
+  --primary: var(--wc-kit-action-foreground, rgb(185, 143, 157));
+  --cozy-input-border: var(--wc-kit-action-border, rgb(132, 118, 107));
+  --cozy-input-bg-hover: var(--wc-kit-action-hover-background, rgb(48, 43, 40));
+  --border-accent-hover: var(--wc-kit-action-hover-border, rgb(185, 143, 157));
+  --card-panel-surface-cozy: var(--wc-kit-card-background, rgb(42, 38, 36));
+  --surface-card-hover: var(--wc-kit-card-hover-background, rgb(48, 43, 40));
+  --ink-body: var(--wc-kit-card-foreground, rgb(232, 222, 209));
+  --heading: var(--wc-kit-card-heading, rgb(240, 232, 221));
+  --text-tertiary: var(--wc-kit-card-muted, rgb(191, 178, 163));
+  --card-panel-border-soft: var(--wc-kit-card-border, rgb(80, 70, 64));
+  --card-panel-border-strong: var(--wc-kit-card-border-strong, rgb(132, 118, 107));
+  --card-tag-bg: var(--wc-kit-tag-background, rgb(42, 38, 36));
+  --card-tag-text: var(--wc-kit-tag-foreground, rgb(191, 178, 163));
+  --card-tag-border: var(--wc-kit-tag-border, rgb(80, 70, 64));
+  --header-background: var(--wc-kit-header-background, rgb(42, 38, 36));
+  --header-border: var(--wc-kit-header-border, rgb(80, 70, 64));
+  --text-secondary: var(--wc-kit-header-foreground, rgb(232, 222, 209));
+  --text-primary: var(--wc-kit-header-heading, rgb(240, 232, 221));
+  --text-accent-strong: var(--wc-kit-header-link, rgb(185, 143, 157));
+  --footer-background: var(--wc-kit-footer-background, rgb(42, 38, 36));
+  --footer-text: var(--wc-kit-footer-foreground, rgb(232, 222, 209));
+  --footer-text-muted: var(--wc-kit-footer-muted, rgb(191, 178, 163));
+  --text-accent: var(--wc-kit-footer-link, rgb(185, 143, 157));
+  --entity-card-surface-top: var(--wc-kit-entity-surface-top, rgb(42, 38, 36));
+  --entity-card-surface-bottom: var(--wc-kit-entity-surface-bottom, rgb(42, 38, 36));
+  --entity-card-highlight: var(--wc-kit-entity-highlight, rgba(0, 0, 0, 0));
+  --entity-card-glow: var(--wc-kit-entity-glow, rgba(0, 0, 0, 0));
+  --entity-card-heading: var(--wc-kit-entity-heading, rgb(240, 232, 221));
+  --entity-card-text: var(--wc-kit-entity-foreground, rgb(232, 222, 209));
+  --entity-card-label: var(--wc-kit-entity-muted, rgb(191, 178, 163));
+  --entity-card-cta: var(--wc-kit-entity-action, rgb(185, 143, 157));
+  --entity-card-cta-hover: var(--wc-kit-entity-action-hover, rgb(185, 143, 157));
+  --focus-ring-color: var(--wc-kit-focus-foreground, rgb(168, 187, 195));
+  --focus-ring-base-shadow: var(--wc-kit-focus-base, rgb(36, 33, 32));
+  --accent-mulberry: var(--wc-kit-brand-mulberry, rgb(185, 143, 157));
+  --accent-blue: var(--wc-kit-brand-window-blue, rgb(168, 187, 195));
+  --spoon-low: var(--wc-kit-spoon-low, rgb(170, 186, 150));
+  --spoon-medium: var(--wc-kit-spoon-medium, rgb(206, 175, 120));
+  --spoon-high: var(--wc-kit-spoon-high, rgb(211, 160, 128));
+}
+
+:root.wc-kit-autumn-window[data-theme="autumn-window"][data-comfort-theme="dawn"][data-wc-kit-mode="dawn"]:not([data-admin-shell]):not([data-comfort-mode="plain"]) {
+  --surface-base: var(--wc-kit-surface-base, rgb(242, 234, 223));
+  --surface-panel: var(--wc-kit-surface-panel, rgb(237, 227, 214));
+  --surface-card: var(--wc-kit-surface-card, rgb(237, 227, 214));
+  --surface-elevated: var(--wc-kit-surface-elevated, rgb(230, 219, 204));
+  --surface-hover: var(--wc-kit-surface-hover, rgb(230, 219, 204));
+  --surface-muted: var(--wc-kit-surface-muted, rgb(237, 227, 214));
+  --border-subtle: var(--wc-kit-border-subtle, rgb(200, 184, 165));
+  --border-strong: var(--wc-kit-border-strong, rgb(139, 119, 100));
+  --text-strong: var(--wc-kit-text-strong, rgb(48, 39, 36));
+  --text-body: var(--wc-kit-text-body, rgb(56, 47, 42));
+  --text-muted: var(--wc-kit-text-muted, rgb(101, 88, 79));
+  --link-color: var(--wc-kit-link-foreground, rgb(117, 68, 82));
+  --panel-surface: var(--wc-kit-action-background, rgb(237, 227, 214));
+  --primary: var(--wc-kit-action-foreground, rgb(117, 68, 82));
+  --cozy-input-border: var(--wc-kit-action-border, rgb(139, 119, 100));
+  --cozy-input-bg-hover: var(--wc-kit-action-hover-background, rgb(230, 219, 204));
+  --border-accent-hover: var(--wc-kit-action-hover-border, rgb(117, 68, 82));
+  --card-panel-surface-cozy: var(--wc-kit-card-background, rgb(237, 227, 214));
+  --surface-card-hover: var(--wc-kit-card-hover-background, rgb(230, 219, 204));
+  --ink-body: var(--wc-kit-card-foreground, rgb(56, 47, 42));
+  --heading: var(--wc-kit-card-heading, rgb(48, 39, 36));
+  --text-tertiary: var(--wc-kit-card-muted, rgb(101, 88, 79));
+  /* cards.css Dawn recipes: preserve alpha and body-ink mixing exactly. */
+  --card-panel-border-soft: color-mix(in srgb, var(--wc-kit-card-border, #C8B8A5) 70%, transparent 30%);
+  --card-panel-border-strong: color-mix(in srgb, var(--wc-kit-card-border-strong, #8B7764) 92%, transparent 8%);
+  --card-tag-bg: color-mix(in srgb, var(--wc-kit-tag-background, #EDE3D6) 92%, transparent 8%);
+  --card-tag-text: color-mix(in srgb, var(--wc-kit-text-body, #382F2A) 90%, black 10%);
+  --card-tag-border: color-mix(in srgb, var(--wc-kit-tag-border, #C8B8A5) 85%, transparent 15%);
+  --header-background: var(--wc-kit-header-background, rgb(237, 227, 214));
+  --header-border: var(--wc-kit-header-border, rgb(200, 184, 165));
+  --text-secondary: var(--wc-kit-header-foreground, rgb(56, 47, 42));
+  --text-primary: var(--wc-kit-header-heading, rgb(48, 39, 36));
+  --text-accent-strong: var(--wc-kit-header-link, rgb(117, 68, 82));
+  --footer-background: var(--wc-kit-footer-background, rgb(237, 227, 214));
+  --footer-text: var(--wc-kit-footer-foreground, rgb(56, 47, 42));
+  --footer-text-muted: var(--wc-kit-footer-muted, rgb(101, 88, 79));
+  --text-accent: var(--wc-kit-footer-link, rgb(117, 68, 82));
+  --entity-card-surface-top: var(--wc-kit-entity-surface-top, rgb(237, 227, 214));
+  --entity-card-surface-bottom: var(--wc-kit-entity-surface-bottom, rgb(237, 227, 214));
+  --entity-card-highlight: var(--wc-kit-entity-highlight, rgba(0, 0, 0, 0));
+  --entity-card-glow: var(--wc-kit-entity-glow, rgba(0, 0, 0, 0));
+  --entity-card-heading: var(--wc-kit-entity-heading, rgb(48, 39, 36));
+  --entity-card-text: var(--wc-kit-entity-foreground, rgb(56, 47, 42));
+  --entity-card-label: var(--wc-kit-entity-muted, rgb(101, 88, 79));
+  --entity-card-cta: var(--wc-kit-entity-action, rgb(117, 68, 82));
+  --entity-card-cta-hover: var(--wc-kit-entity-action-hover, rgb(117, 68, 82));
+  --focus-ring-color: var(--wc-kit-focus-foreground, rgb(66, 101, 117));
+  --focus-ring-base-shadow: var(--wc-kit-focus-base, rgb(242, 234, 223));
+  --accent-mulberry: var(--wc-kit-brand-mulberry, rgb(117, 68, 82));
+  --accent-blue: var(--wc-kit-brand-window-blue, rgb(66, 101, 117));
+  --spoon-low: var(--wc-kit-spoon-low, rgb(79, 101, 68));
+  --spoon-medium: var(--wc-kit-spoon-medium, rgb(112, 88, 41));
+  --spoon-high: var(--wc-kit-spoon-high, rgb(130, 82, 54));
+}

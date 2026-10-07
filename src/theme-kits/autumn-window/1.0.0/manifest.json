@@ -1,0 +1,4555 @@
+{
+  "schemaVersion": "1.0.0",
+  "contractVersion": "1.0.0",
+  "kitId": "witchclick.autumn-window",
+  "version": "1.0.0",
+  "cssFile": "kit.css",
+  "namespace": "--wc-kit-",
+  "supportedModes": [
+    "midnight",
+    "dawn"
+  ],
+  "provenance": {
+    "note": "Inert proof artifact extracted from the exact current Autumn Window token values. Alias values are resolved to literals from the theme token file and its application layer; no colors were synthesized. A missing role means the current Autumn Window source does not define that semantic color.",
+    "sources": [
+      "src/styles/autumn-window.tokens.css",
+      "src/styles/autumn-window.css"
+    ],
+    "modeMapping": {
+      "midnight": "Autumn Window default root token block",
+      "dawn": "Autumn Window root token block with data-comfort-theme=\"dawn\" plus shared application aliases"
+    }
+  },
+  "integrity": {
+    "algorithm": "SHA-256",
+    "sha256": "5392ca805057be31a1f0599a5260c3a7555438e910dd6b8fcb601843b52d72b0"
+  },
+  "roles": [
+    {
+      "id": "surface.base",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-surface-base",
+          "value": "#242120",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-base"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-surface-base",
+          "value": "#F2EADF",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-base"
+          }
+        }
+      }
+    },
+    {
+      "id": "surface.panel",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-surface-panel",
+          "value": "#2A2624",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-panel"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-surface-panel",
+          "value": "#EDE3D6",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-panel"
+          }
+        }
+      }
+    },
+    {
+      "id": "surface.card",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-surface-card",
+          "value": "#2A2624",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-card"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-surface-card",
+          "value": "#EDE3D6",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-card"
+          }
+        }
+      }
+    },
+    {
+      "id": "surface.elevated",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-surface-elevated",
+          "value": "#302B28",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-elevated"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-surface-elevated",
+          "value": "#E6DBCC",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-elevated"
+          }
+        }
+      }
+    },
+    {
+      "id": "surface.hover",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-surface-hover",
+          "value": "#302B28",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-hover"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-surface-hover",
+          "value": "#E6DBCC",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-hover"
+          }
+        }
+      }
+    },
+    {
+      "id": "surface.muted",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-surface-muted",
+          "value": "#2A2624",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-muted"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-surface-muted",
+          "value": "#EDE3D6",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-muted"
+          }
+        }
+      }
+    },
+    {
+      "id": "border.subtle",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-border-subtle",
+          "value": "#504640",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--border-subtle"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-border-subtle",
+          "value": "#C8B8A5",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--border-subtle"
+          }
+        }
+      }
+    },
+    {
+      "id": "border.strong",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-border-strong",
+          "value": "#84766B",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--border-strong"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-border-strong",
+          "value": "#8B7764",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--border-strong"
+          }
+        }
+      }
+    },
+    {
+      "id": "text.strong",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-text-strong",
+          "value": "#F0E8DD",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--text-strong"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-text-strong",
+          "value": "#302724",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--text-strong"
+          }
+        }
+      }
+    },
+    {
+      "id": "text.body",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-text-body",
+          "value": "#E8DED1",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--text-body"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-text-body",
+          "value": "#382F2A",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--text-body"
+          }
+        }
+      }
+    },
+    {
+      "id": "text.muted",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-text-muted",
+          "value": "#BFB2A3",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--text-muted"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-text-muted",
+          "value": "#65584F",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--text-muted"
+          }
+        }
+      }
+    },
+    {
+      "id": "link.foreground",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-link-foreground",
+          "value": "#B98F9D",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--link-color"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-link-foreground",
+          "value": "#754452",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--link-color"
+          }
+        }
+      }
+    },
+    {
+      "id": "action.background",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-action-background",
+          "value": "#2A2624",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-panel"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-action-background",
+          "value": "#EDE3D6",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-panel"
+          }
+        }
+      }
+    },
+    {
+      "id": "action.foreground",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-action-foreground",
+          "value": "#B98F9D",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--link-color"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-action-foreground",
+          "value": "#754452",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--link-color"
+          }
+        }
+      }
+    },
+    {
+      "id": "action.border",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-action-border",
+          "value": "#84766B",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--border-strong"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-action-border",
+          "value": "#8B7764",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--border-strong"
+          }
+        }
+      }
+    },
+    {
+      "id": "action.hover.background",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-action-hover-background",
+          "value": "#302B28",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-hover"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-action-hover-background",
+          "value": "#E6DBCC",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-hover"
+          }
+        }
+      }
+    },
+    {
+      "id": "action.hover.border",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-action-hover-border",
+          "value": "#B98F9D",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--accent-mulberry"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-action-hover-border",
+          "value": "#754452",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--accent-mulberry"
+          }
+        }
+      }
+    },
+    {
+      "id": "card.background",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-card-background",
+          "value": "#2A2624",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-card"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-card-background",
+          "value": "#EDE3D6",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-card"
+          }
+        }
+      }
+    },
+    {
+      "id": "card.hover.background",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-card-hover-background",
+          "value": "#302B28",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-card-hover"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-card-hover-background",
+          "value": "#E6DBCC",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-card-hover"
+          }
+        }
+      }
+    },
+    {
+      "id": "card.foreground",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-card-foreground",
+          "value": "#E8DED1",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--text-body"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-card-foreground",
+          "value": "#382F2A",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--text-body"
+          }
+        }
+      }
+    },
+    {
+      "id": "card.heading",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-card-heading",
+          "value": "#F0E8DD",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--text-strong"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-card-heading",
+          "value": "#302724",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--text-strong"
+          }
+        }
+      }
+    },
+    {
+      "id": "card.muted",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-card-muted",
+          "value": "#BFB2A3",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--text-muted"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-card-muted",
+          "value": "#65584F",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--text-muted"
+          }
+        }
+      }
+    },
+    {
+      "id": "card.border",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-card-border",
+          "value": "#504640",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--card-panel-border"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-card-border",
+          "value": "#C8B8A5",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--card-panel-border"
+          }
+        }
+      }
+    },
+    {
+      "id": "card.border.strong",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-card-border-strong",
+          "value": "#84766B",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--card-panel-border-strong"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-card-border-strong",
+          "value": "#8B7764",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--card-panel-border-strong"
+          }
+        }
+      }
+    },
+    {
+      "id": "tag.background",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-tag-background",
+          "value": "#2A2624",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--card-tag-bg"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-tag-background",
+          "value": "#EDE3D6",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--card-tag-bg"
+          }
+        }
+      }
+    },
+    {
+      "id": "tag.foreground",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-tag-foreground",
+          "value": "#BFB2A3",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--card-tag-text"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-tag-foreground",
+          "value": "#65584F",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--card-tag-text"
+          }
+        }
+      }
+    },
+    {
+      "id": "tag.border",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-tag-border",
+          "value": "#504640",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--card-tag-border"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-tag-border",
+          "value": "#C8B8A5",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--card-tag-border"
+          }
+        }
+      }
+    },
+    {
+      "id": "header.background",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-header-background",
+          "value": "#2A2624",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--header-background"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-header-background",
+          "value": "#EDE3D6",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--header-background"
+          }
+        }
+      }
+    },
+    {
+      "id": "header.border",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-header-border",
+          "value": "#504640",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--header-border"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-header-border",
+          "value": "#C8B8A5",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--header-border"
+          }
+        }
+      }
+    },
+    {
+      "id": "header.foreground",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-header-foreground",
+          "value": "#E8DED1",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--text-body"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-header-foreground",
+          "value": "#382F2A",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--text-body"
+          }
+        }
+      }
+    },
+    {
+      "id": "header.heading",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-header-heading",
+          "value": "#F0E8DD",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--text-strong"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-header-heading",
+          "value": "#302724",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--text-strong"
+          }
+        }
+      }
+    },
+    {
+      "id": "header.link",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-header-link",
+          "value": "#B98F9D",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--link-color"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-header-link",
+          "value": "#754452",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--link-color"
+          }
+        }
+      }
+    },
+    {
+      "id": "footer.background",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-footer-background",
+          "value": "#2A2624",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--footer-background"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-footer-background",
+          "value": "#EDE3D6",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--footer-background"
+          }
+        }
+      }
+    },
+    {
+      "id": "footer.border",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-footer-border",
+          "value": "#504640",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--border-subtle"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-footer-border",
+          "value": "#C8B8A5",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--border-subtle"
+          }
+        }
+      }
+    },
+    {
+      "id": "footer.foreground",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-footer-foreground",
+          "value": "#E8DED1",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--footer-text"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-footer-foreground",
+          "value": "#382F2A",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--footer-text"
+          }
+        }
+      }
+    },
+    {
+      "id": "footer.muted",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-footer-muted",
+          "value": "#BFB2A3",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--footer-text-muted"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-footer-muted",
+          "value": "#65584F",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--footer-text-muted"
+          }
+        }
+      }
+    },
+    {
+      "id": "footer.link",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-footer-link",
+          "value": "#B98F9D",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--link-color"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-footer-link",
+          "value": "#754452",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--link-color"
+          }
+        }
+      }
+    },
+    {
+      "id": "entity.surface.top",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-entity-surface-top",
+          "value": "#2A2624",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--entity-card-surface-top"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-entity-surface-top",
+          "value": "#EDE3D6",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--entity-card-surface-top"
+          }
+        }
+      }
+    },
+    {
+      "id": "entity.surface.bottom",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-entity-surface-bottom",
+          "value": "#2A2624",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--entity-card-surface-bottom"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-entity-surface-bottom",
+          "value": "#EDE3D6",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--entity-card-surface-bottom"
+          }
+        }
+      }
+    },
+    {
+      "id": "entity.highlight",
+      "requirement": "optional",
+      "status": "optional",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-entity-highlight",
+          "value": "transparent",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--entity-card-highlight"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-entity-highlight",
+          "value": "transparent",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--entity-card-highlight"
+          }
+        }
+      }
+    },
+    {
+      "id": "entity.glow",
+      "requirement": "optional",
+      "status": "optional",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-entity-glow",
+          "value": "transparent",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--entity-card-glow"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-entity-glow",
+          "value": "transparent",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--entity-card-glow"
+          }
+        }
+      }
+    },
+    {
+      "id": "entity.heading",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-entity-heading",
+          "value": "#F0E8DD",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--entity-card-heading"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-entity-heading",
+          "value": "#302724",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--entity-card-heading"
+          }
+        }
+      }
+    },
+    {
+      "id": "entity.foreground",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-entity-foreground",
+          "value": "#E8DED1",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--entity-card-text"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-entity-foreground",
+          "value": "#382F2A",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--entity-card-text"
+          }
+        }
+      }
+    },
+    {
+      "id": "entity.muted",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-entity-muted",
+          "value": "#BFB2A3",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--entity-card-label"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-entity-muted",
+          "value": "#65584F",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--entity-card-label"
+          }
+        }
+      }
+    },
+    {
+      "id": "entity.border",
+      "requirement": "required",
+      "status": "missing",
+      "modes": {
+        "midnight": {
+          "status": "missing",
+          "reason": "The entity border is a fallback opacity recipe from the neutral border token; Autumn Window supplies the border input but no entity-border literal."
+        },
+        "dawn": {
+          "status": "missing",
+          "reason": "The entity border is a fallback opacity recipe from the neutral border token; Autumn Window supplies the border input but no entity-border literal."
+        }
+      },
+      "classification": "ADAPTER RECIPE",
+      "owningLayer": "Global entity-card token adapter in tokens.css",
+      "sourceEvidence": {
+        "summary": "The entity border is a fallback opacity recipe from the neutral border token; Autumn Window supplies the border input but no entity-border literal.",
+        "modes": {
+          "midnight": {
+            "runtimeValue": "color-mix(in srgb, #504640 78%, transparent 22%)",
+            "citations": [
+              {
+                "file": "src/styles/tokens.css",
+                "line": 195,
+                "excerpt": "--entity-card-border:"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 42,
+                "excerpt": "--theme-border-subtle: var(--border-subtle);"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 68,
+                "excerpt": "--border-subtle: #504640;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--theme-border-subtle",
+                "value": "#504640"
+              }
+            ]
+          },
+          "dawn": {
+            "runtimeValue": "color-mix(in srgb, #C8B8A5 78%, transparent 22%)",
+            "citations": [
+              {
+                "file": "src/styles/tokens.css",
+                "line": 195,
+                "excerpt": "--entity-card-border:"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 42,
+                "excerpt": "--theme-border-subtle: var(--border-subtle);"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 136,
+                "excerpt": "--border-subtle: #C8B8A5;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--theme-border-subtle",
+                "value": "#C8B8A5"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "entity.action",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-entity-action",
+          "value": "#B98F9D",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--theme-text-accent"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-entity-action",
+          "value": "#754452",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--theme-text-accent"
+          }
+        }
+      },
+      "classification": "KIT ROLE",
+      "owningLayer": "Autumn Window semantic accent aliases",
+      "sourceEvidence": {
+        "summary": "The entity CTA fallback resolves through the Autumn Window text-accent alias to the same stable mulberry link color in both modes.",
+        "modes": {
+          "midnight": {
+            "value": "#B98F9D",
+            "runtimeValue": "--theme-text-accent -> --link-color -> --accent-mulberry -> #B98F9D",
+            "citations": [
+              {
+                "file": "src/styles/tokens.css",
+                "line": 203,
+                "excerpt": "--entity-card-cta:"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 40,
+                "excerpt": "--theme-text-accent:"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 18,
+                "excerpt": "--link-color: var(--accent-mulberry);"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 57,
+                "excerpt": "--accent-mulberry:"
+              }
+            ]
+          },
+          "dawn": {
+            "value": "#754452",
+            "runtimeValue": "--theme-text-accent -> --link-color -> --accent-mulberry -> #754452",
+            "citations": [
+              {
+                "file": "src/styles/tokens.css",
+                "line": 203,
+                "excerpt": "--entity-card-cta:"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 40,
+                "excerpt": "--theme-text-accent:"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 18,
+                "excerpt": "--link-color: var(--accent-mulberry);"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 134,
+                "excerpt": "--accent-mulberry:"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "entity.action.hover",
+      "requirement": "optional",
+      "status": "optional",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-entity-action-hover",
+          "value": "#B98F9D",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--theme-text-accent-strong"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-entity-action-hover",
+          "value": "#754452",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--theme-text-accent-strong"
+          }
+        }
+      },
+      "classification": "KIT ROLE",
+      "owningLayer": "Autumn Window semantic accent aliases",
+      "sourceEvidence": {
+        "summary": "The entity CTA fallback resolves through the Autumn Window text-accent alias to the same stable mulberry link color in both modes.",
+        "modes": {
+          "midnight": {
+            "value": "#B98F9D",
+            "runtimeValue": "--theme-text-accent-strong -> --link-color -> --accent-mulberry -> #B98F9D",
+            "citations": [
+              {
+                "file": "src/styles/tokens.css",
+                "line": 204,
+                "excerpt": "--entity-card-cta-hover:"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 41,
+                "excerpt": "--theme-text-accent-strong:"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 18,
+                "excerpt": "--link-color: var(--accent-mulberry);"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 57,
+                "excerpt": "--accent-mulberry:"
+              }
+            ]
+          },
+          "dawn": {
+            "value": "#754452",
+            "runtimeValue": "--theme-text-accent-strong -> --link-color -> --accent-mulberry -> #754452",
+            "citations": [
+              {
+                "file": "src/styles/tokens.css",
+                "line": 204,
+                "excerpt": "--entity-card-cta-hover:"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 41,
+                "excerpt": "--theme-text-accent-strong:"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 18,
+                "excerpt": "--link-color: var(--accent-mulberry);"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 134,
+                "excerpt": "--accent-mulberry:"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "entity.icon",
+      "requirement": "optional",
+      "status": "missing",
+      "modes": {
+        "midnight": {
+          "status": "missing",
+          "reason": "The icon color is mixed per section from a theme-icon fallback and the section themeColor. That input varies by entity category, so it is not one global Autumn Window color."
+        },
+        "dawn": {
+          "status": "missing",
+          "reason": "The icon color is mixed per section from a theme-icon fallback and the section themeColor. That input varies by entity category, so it is not one global Autumn Window color."
+        }
+      },
+      "classification": "COMPONENT/DATA-OWNED",
+      "owningLayer": "EntityHubCard component plus type metadata",
+      "sourceEvidence": {
+        "summary": "The icon color is a component-local 65/35 mix whose second input is section.themeColor and therefore varies by entity category. In the active Autumn Window scope the theme-icon token is absent, so the inline fallback self-references --entity-card-icon and does not resolve to one global color.",
+        "modes": {
+          "midnight": {
+            "runtimeValue": "color-mix(in srgb, var(--theme-entity-card-icon, var(--entity-card-icon)) 65%, <section.themeColor> 35%); theme icon token is unset and the local fallback self-references; root accent fallback would be #B98F9D, but is not the computed icon value",
+            "citations": [
+              {
+                "file": "src/components/EntityHubCard.astro",
+                "line": 25,
+                "excerpt": "const accent = resolveTailwindColor(section.themeColor);"
+              },
+              {
+                "file": "src/components/EntityHubCard.astro",
+                "line": 28,
+                "excerpt": "'--entity-card-icon': `color-mix(in srgb, var(--theme-entity-card-icon, var(--entity-card-icon)) 65%, ${accent} 35%)`"
+              },
+              {
+                "file": "src/styles/tokens.css",
+                "line": 205,
+                "excerpt": "--entity-card-icon:"
+              },
+              {
+                "file": "src/data/typeMetadata.ts",
+                "line": 34,
+                "excerpt": "themeColor: \"violet-500\","
+              },
+              {
+                "file": "src/data/typeMetadata.ts",
+                "line": 44,
+                "excerpt": "themeColor: \"emerald-500\","
+              },
+              {
+                "file": "src/data/typeMetadata.ts",
+                "line": 59,
+                "excerpt": "themeColor: \"sky-400\","
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--theme-entity-card-icon",
+                "value": "unset in public Autumn Window scope"
+              },
+              {
+                "token": "section.themeColor",
+                "value": "per-category Tailwind color"
+              },
+              {
+                "token": "root --entity-card-icon fallback",
+                "value": "#B98F9D",
+                "context": "overridden by the self-referential inline declaration"
+              }
+            ],
+            "resolution": "The icon declaration is component/data-owned and has no resolved global literal in the active Autumn Window scope."
+          },
+          "dawn": {
+            "runtimeValue": "color-mix(in srgb, var(--theme-entity-card-icon, var(--entity-card-icon)) 65%, <section.themeColor> 35%); theme icon token is unset and the local fallback self-references; root accent fallback would be #754452, but is not the computed icon value",
+            "citations": [
+              {
+                "file": "src/components/EntityHubCard.astro",
+                "line": 25,
+                "excerpt": "const accent = resolveTailwindColor(section.themeColor);"
+              },
+              {
+                "file": "src/components/EntityHubCard.astro",
+                "line": 28,
+                "excerpt": "'--entity-card-icon': `color-mix(in srgb, var(--theme-entity-card-icon, var(--entity-card-icon)) 65%, ${accent} 35%)`"
+              },
+              {
+                "file": "src/styles/tokens.css",
+                "line": 205,
+                "excerpt": "--entity-card-icon:"
+              },
+              {
+                "file": "src/data/typeMetadata.ts",
+                "line": 34,
+                "excerpt": "themeColor: \"violet-500\","
+              },
+              {
+                "file": "src/data/typeMetadata.ts",
+                "line": 44,
+                "excerpt": "themeColor: \"emerald-500\","
+              },
+              {
+                "file": "src/data/typeMetadata.ts",
+                "line": 59,
+                "excerpt": "themeColor: \"sky-400\","
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 134,
+                "excerpt": "--accent-mulberry: #754452;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--theme-entity-card-icon",
+                "value": "unset in public Autumn Window scope"
+              },
+              {
+                "token": "section.themeColor",
+                "value": "per-category Tailwind color"
+              },
+              {
+                "token": "root --entity-card-icon fallback",
+                "value": "#754452",
+                "context": "overridden by the self-referential inline declaration"
+              }
+            ],
+            "resolution": "The icon declaration is component/data-owned and has no resolved global literal in the active Autumn Window scope."
+          }
+        }
+      }
+    },
+    {
+      "id": "focus.foreground",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-focus-foreground",
+          "value": "#A8BBC3",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--focus-ring-color"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-focus-foreground",
+          "value": "#426575",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--focus-ring-color"
+          }
+        }
+      }
+    },
+    {
+      "id": "focus.base",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-focus-base",
+          "value": "#242120",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--focus-ring-base-shadow"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-focus-base",
+          "value": "#F2EADF",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--focus-ring-base-shadow"
+          }
+        }
+      }
+    },
+    {
+      "id": "comfort.surface",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-comfort-surface",
+          "value": "#2A2624",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-panel"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-comfort-surface",
+          "value": "#EDE3D6",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--surface-panel"
+          }
+        }
+      }
+    },
+    {
+      "id": "comfort.foreground",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-comfort-foreground",
+          "value": "#E8DED1",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--comfort-chip-text"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-comfort-foreground",
+          "value": "#382F2A",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--comfort-chip-text"
+          }
+        }
+      }
+    },
+    {
+      "id": "comfort.foreground.strong",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-comfort-foreground-strong",
+          "value": "#F0E8DD",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--comfort-chip-text-strong"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-comfort-foreground-strong",
+          "value": "#302724",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--comfort-chip-text-strong"
+          }
+        }
+      }
+    },
+    {
+      "id": "comfort.input.background",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-comfort-input-background",
+          "value": "#2A2624",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--cozy-input-bg"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-comfort-input-background",
+          "value": "#EDE3D6",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--cozy-input-bg"
+          }
+        }
+      }
+    },
+    {
+      "id": "comfort.input.hover.background",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-comfort-input-hover-background",
+          "value": "#302B28",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--cozy-input-bg-hover"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-comfort-input-hover-background",
+          "value": "#E6DBCC",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--cozy-input-bg-hover"
+          }
+        }
+      }
+    },
+    {
+      "id": "comfort.input.border",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-comfort-input-border",
+          "value": "#84766B",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--cozy-input-border"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-comfort-input-border",
+          "value": "#8B7764",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--cozy-input-border"
+          }
+        }
+      }
+    },
+    {
+      "id": "comfort.input.focus",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-comfort-input-focus",
+          "value": "#A8BBC3",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--cozy-input-border-focus"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-comfort-input-focus",
+          "value": "#426575",
+          "source": {
+            "file": "src/styles/autumn-window.css",
+            "variable": "--cozy-input-border-focus"
+          }
+        }
+      }
+    },
+    {
+      "id": "comfort.chip.background",
+      "requirement": "optional",
+      "status": "missing",
+      "modes": {
+        "midnight": {
+          "status": "missing",
+          "reason": "The chip fill is a mode-specific translucent color-mix. It consumes the legacy overlay ladder and is not an Autumn Window solid color."
+        },
+        "dawn": {
+          "status": "missing",
+          "reason": "The chip fill is a mode-specific translucent color-mix. It consumes the legacy overlay ladder and is not an Autumn Window solid color."
+        }
+      },
+      "classification": "ADAPTER RECIPE",
+      "owningLayer": "Legacy comfort token recipes in base.css",
+      "sourceEvidence": {
+        "summary": "The chip fill is a mode-specific translucent color-mix. It consumes the legacy overlay ladder and is not an Autumn Window solid color.",
+        "modes": {
+          "midnight": {
+            "runtimeValue": "color-mix(in srgb, var(--color-overlay) 45%, transparent 55%); --color-overlay falls back to hsl(260 22% 12% / 0.78)",
+            "citations": [
+              {
+                "file": "src/styles/base.css",
+                "line": 162,
+                "excerpt": "--comfort-chip-bg: color-mix(in srgb, var(--color-overlay) 45%, transparent 55%);"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 63,
+                "excerpt": "--color-overlay: var(--theme-color-overlay, hsl(var(--neutral-8) / 0.78));"
+              },
+              {
+                "file": "src/styles/tokens.css",
+                "line": 21,
+                "excerpt": "--neutral-8: 260 22% 12%;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--color-overlay",
+                "value": "hsl(260 22% 12% / 0.78)"
+              }
+            ]
+          },
+          "dawn": {
+            "runtimeValue": "color-mix(in srgb, var(--color-overlay) 18%, white 82%); --color-overlay is hsl(260 20% 96% / 0.48)",
+            "citations": [
+              {
+                "file": "src/styles/base.css",
+                "line": 274,
+                "excerpt": "--comfort-chip-bg: color-mix(in srgb, var(--color-overlay) 18%, white 82%);"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 224,
+                "excerpt": "--color-overlay: hsl(var(--neutral-1) / 0.48);"
+              },
+              {
+                "file": "src/styles/tokens.css",
+                "line": 14,
+                "excerpt": "--neutral-1: 260 20% 96%;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--color-overlay",
+                "value": "hsl(260 20% 96% / 0.48)"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "comfort.chip.border",
+      "requirement": "optional",
+      "status": "missing",
+      "modes": {
+        "midnight": {
+          "status": "missing",
+          "reason": "The chip border is an opacity-mixed generic border input; midnight and dawn use different neutral generations and mix weights."
+        },
+        "dawn": {
+          "status": "missing",
+          "reason": "The chip border is an opacity-mixed generic border input; midnight and dawn use different neutral generations and mix weights."
+        }
+      },
+      "classification": "ADAPTER RECIPE",
+      "owningLayer": "Legacy comfort token recipes in base.css",
+      "sourceEvidence": {
+        "summary": "The chip border is an opacity-mixed generic border input; midnight and dawn use different neutral generations and mix weights.",
+        "modes": {
+          "midnight": {
+            "runtimeValue": "color-mix(in srgb, var(--color-border) 72%, transparent 28%); --color-border falls back to hsl(260 12% 28% / 0.65)",
+            "citations": [
+              {
+                "file": "src/styles/base.css",
+                "line": 164,
+                "excerpt": "--comfort-chip-border: color-mix(in srgb, var(--color-border) 72%, transparent 28%);"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 61,
+                "excerpt": "--color-border: var(--theme-color-border, hsl(var(--neutral-6) / 0.65));"
+              },
+              {
+                "file": "src/styles/tokens.css",
+                "line": 19,
+                "excerpt": "--neutral-6: 260 12% 28%;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--color-border",
+                "value": "hsl(260 12% 28% / 0.65)"
+              }
+            ]
+          },
+          "dawn": {
+            "runtimeValue": "color-mix(in srgb, var(--color-border) 42%, transparent 58%); --color-border is hsl(260 8% 55% / 0.35)",
+            "citations": [
+              {
+                "file": "src/styles/base.css",
+                "line": 276,
+                "excerpt": "--comfort-chip-border: color-mix(in srgb, var(--color-border) 42%, transparent 58%);"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 222,
+                "excerpt": "--color-border: hsl(var(--neutral-4) / 0.35);"
+              },
+              {
+                "file": "src/styles/tokens.css",
+                "line": 17,
+                "excerpt": "--neutral-4: 260 8% 55%;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--color-border",
+                "value": "hsl(260 8% 55% / 0.35)"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "comfort.chip.accent",
+      "requirement": "optional",
+      "status": "missing",
+      "modes": {
+        "midnight": {
+          "status": "missing",
+          "reason": "The control accent is a 70/30 mixture of amethyst and gold aliases. Autumn Window maps those inputs to mulberry and muted text, but the recipe remains component-specific."
+        },
+        "dawn": {
+          "status": "missing",
+          "reason": "The control accent is a 70/30 mixture of amethyst and gold aliases. Autumn Window maps those inputs to mulberry and muted text, but the recipe remains component-specific."
+        }
+      },
+      "classification": "ADAPTER RECIPE",
+      "owningLayer": "Legacy comfort token recipe with Autumn Window accent aliases",
+      "sourceEvidence": {
+        "summary": "The control accent is a 70/30 mixture of amethyst and gold aliases. Autumn Window maps those inputs to mulberry and muted text, but the recipe remains component-specific.",
+        "modes": {
+          "midnight": {
+            "runtimeValue": "color-mix(in srgb, #B98F9D 70%, #BFB2A3 30%)",
+            "citations": [
+              {
+                "file": "src/styles/base.css",
+                "line": 169,
+                "excerpt": "--comfort-chip-accent: color-mix(in srgb, var(--color-amethyst) 70%, var(--color-gold) 30%);"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 47,
+                "excerpt": "--theme-color-gold: var(--text-muted);"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 49,
+                "excerpt": "--theme-color-amethyst: var(--accent-mulberry);"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 57,
+                "excerpt": "--accent-mulberry: #B98F9D;"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 45,
+                "excerpt": "--text-muted: #BFB2A3;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--color-amethyst",
+                "value": "#B98F9D"
+              },
+              {
+                "token": "--color-gold",
+                "value": "#BFB2A3"
+              }
+            ]
+          },
+          "dawn": {
+            "runtimeValue": "color-mix(in srgb, #754452 70%, #65584F 30%)",
+            "citations": [
+              {
+                "file": "src/styles/base.css",
+                "line": 169,
+                "excerpt": "--comfort-chip-accent: color-mix(in srgb, var(--color-amethyst) 70%, var(--color-gold) 30%);"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 47,
+                "excerpt": "--theme-color-gold: var(--text-muted);"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 49,
+                "excerpt": "--theme-color-amethyst: var(--accent-mulberry);"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 134,
+                "excerpt": "--accent-mulberry: #754452;"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 133,
+                "excerpt": "--text-muted: #65584F;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--color-amethyst",
+                "value": "#754452"
+              },
+              {
+                "token": "--color-gold",
+                "value": "#65584F"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "comfort.tray.background",
+      "requirement": "optional",
+      "status": "missing",
+      "modes": {
+        "midnight": {
+          "status": "missing",
+          "reason": "The tray surface is a mode-specific translucent mix; dawn switches both the source overlay and the recipe."
+        },
+        "dawn": {
+          "status": "missing",
+          "reason": "The tray surface is a mode-specific translucent mix; dawn switches both the source overlay and the recipe."
+        }
+      },
+      "classification": "ADAPTER RECIPE",
+      "owningLayer": "Legacy comfort token recipes in base.css",
+      "sourceEvidence": {
+        "summary": "The tray surface is a mode-specific translucent mix; dawn switches both the source overlay and the recipe.",
+        "modes": {
+          "midnight": {
+            "runtimeValue": "color-mix(in srgb, var(--color-overlay-strong) 45%, transparent 55%); --color-overlay-strong falls back to hsl(260 26% 8% / 0.84)",
+            "citations": [
+              {
+                "file": "src/styles/base.css",
+                "line": 170,
+                "excerpt": "--comfort-tray-surface: color-mix(in srgb, var(--color-overlay-strong) 45%, transparent 55%);"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 64,
+                "excerpt": "--color-overlay-strong: var(--theme-color-overlay-strong, hsl(var(--neutral-9) / 0.84));"
+              },
+              {
+                "file": "src/styles/tokens.css",
+                "line": 22,
+                "excerpt": "--neutral-9: 260 26% 8%;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--color-overlay-strong",
+                "value": "hsl(260 26% 8% / 0.84)"
+              }
+            ]
+          },
+          "dawn": {
+            "runtimeValue": "color-mix(in srgb, var(--color-overlay) 16%, white 84%); --color-overlay is hsl(260 20% 96% / 0.48)",
+            "citations": [
+              {
+                "file": "src/styles/base.css",
+                "line": 281,
+                "excerpt": "--comfort-tray-surface: color-mix(in srgb, var(--color-overlay) 16%, white 84%);"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 224,
+                "excerpt": "--color-overlay: hsl(var(--neutral-1) / 0.48);"
+              },
+              {
+                "file": "src/styles/tokens.css",
+                "line": 14,
+                "excerpt": "--neutral-1: 260 20% 96%;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--color-overlay",
+                "value": "hsl(260 20% 96% / 0.48)"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "comfort.tray.border",
+      "requirement": "optional",
+      "status": "missing",
+      "modes": {
+        "midnight": {
+          "status": "missing",
+          "reason": "The tray border is an opacity-mixed generic border. Its dawn recipe uses a different source token and transparency weight."
+        },
+        "dawn": {
+          "status": "missing",
+          "reason": "The tray border is an opacity-mixed generic border. Its dawn recipe uses a different source token and transparency weight."
+        }
+      },
+      "classification": "ADAPTER RECIPE",
+      "owningLayer": "Legacy comfort token recipes in base.css",
+      "sourceEvidence": {
+        "summary": "The tray border is an opacity-mixed generic border. Its dawn recipe uses a different source token and transparency weight.",
+        "modes": {
+          "midnight": {
+            "runtimeValue": "color-mix(in srgb, var(--color-border) 60%, transparent 40%); --color-border falls back to hsl(260 12% 28% / 0.65)",
+            "citations": [
+              {
+                "file": "src/styles/base.css",
+                "line": 171,
+                "excerpt": "--comfort-tray-border: color-mix(in srgb, var(--color-border) 60%, transparent 40%);"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 61,
+                "excerpt": "--color-border: var(--theme-color-border, hsl(var(--neutral-6) / 0.65));"
+              },
+              {
+                "file": "src/styles/tokens.css",
+                "line": 19,
+                "excerpt": "--neutral-6: 260 12% 28%;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--color-border",
+                "value": "hsl(260 12% 28% / 0.65)"
+              }
+            ]
+          },
+          "dawn": {
+            "runtimeValue": "color-mix(in srgb, var(--color-border) 36%, transparent 64%); --color-border is hsl(260 8% 55% / 0.35)",
+            "citations": [
+              {
+                "file": "src/styles/base.css",
+                "line": 282,
+                "excerpt": "--comfort-tray-border: color-mix(in srgb, var(--color-border) 36%, transparent 64%);"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 222,
+                "excerpt": "--color-border: hsl(var(--neutral-4) / 0.35);"
+              },
+              {
+                "file": "src/styles/tokens.css",
+                "line": 17,
+                "excerpt": "--neutral-4: 260 8% 55%;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--color-border",
+                "value": "hsl(260 8% 55% / 0.35)"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "comfort.hint",
+      "requirement": "optional",
+      "status": "missing",
+      "modes": {
+        "midnight": {
+          "status": "missing",
+          "reason": "Hint ink is mixed toward white in midnight and black in dawn; it is not one fixed muted color."
+        },
+        "dawn": {
+          "status": "missing",
+          "reason": "Hint ink is mixed toward white in midnight and black in dawn; it is not one fixed muted color."
+        }
+      },
+      "classification": "ADAPTER RECIPE",
+      "owningLayer": "Legacy comfort token recipes using Autumn Window muted text",
+      "sourceEvidence": {
+        "summary": "Hint ink is mixed toward white in midnight and black in dawn; it is not one fixed muted color.",
+        "modes": {
+          "midnight": {
+            "runtimeValue": "color-mix(in srgb, #BFB2A3 85%, white 15%)",
+            "citations": [
+              {
+                "file": "src/styles/base.css",
+                "line": 174,
+                "excerpt": "--comfort-tray-hint: color-mix(in srgb, var(--ink-muted) 85%, white 15%);"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 54,
+                "excerpt": "--ink-muted: var(--text-muted);"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 45,
+                "excerpt": "--text-muted: #BFB2A3;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--ink-muted",
+                "value": "#BFB2A3"
+              }
+            ]
+          },
+          "dawn": {
+            "runtimeValue": "color-mix(in srgb, #65584F 60%, black 40%)",
+            "citations": [
+              {
+                "file": "src/styles/base.css",
+                "line": 285,
+                "excerpt": "--comfort-tray-hint: color-mix(in srgb, var(--ink-muted) 60%, black 40%);"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 54,
+                "excerpt": "--ink-muted: var(--text-muted);"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 133,
+                "excerpt": "--text-muted: #65584F;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--ink-muted",
+                "value": "#65584F"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "brand.mulberry",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-brand-mulberry",
+          "value": "#B98F9D",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--accent-mulberry"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-brand-mulberry",
+          "value": "#754452",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--accent-mulberry"
+          }
+        }
+      }
+    },
+    {
+      "id": "brand.window-blue",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-brand-window-blue",
+          "value": "#A8BBC3",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--accent-blue"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-brand-window-blue",
+          "value": "#426575",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--accent-blue"
+          }
+        }
+      }
+    },
+    {
+      "id": "spoon.low",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-spoon-low",
+          "value": "#AABA96",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--spoon-low"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-spoon-low",
+          "value": "#4F6544",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--spoon-low"
+          }
+        }
+      }
+    },
+    {
+      "id": "spoon.medium",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-spoon-medium",
+          "value": "#CEAF78",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--spoon-medium"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-spoon-medium",
+          "value": "#705829",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--spoon-medium"
+          }
+        }
+      }
+    },
+    {
+      "id": "spoon.high",
+      "requirement": "required",
+      "status": "required",
+      "modes": {
+        "midnight": {
+          "status": "present",
+          "variable": "--wc-kit-spoon-high",
+          "value": "#D3A080",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--spoon-high"
+          }
+        },
+        "dawn": {
+          "status": "present",
+          "variable": "--wc-kit-spoon-high",
+          "value": "#825236",
+          "source": {
+            "file": "src/styles/autumn-window.tokens.css",
+            "variable": "--spoon-high"
+          }
+        }
+      }
+    },
+    {
+      "id": "status.success.foreground",
+      "requirement": "required",
+      "status": "missing",
+      "modes": {
+        "midnight": {
+          "status": "missing",
+          "reason": "The public form status foreground is color-mixed from the legacy green primitive and mode-specific strong ink. Tailwind success text instead reads an unset generated theme token, so the semantic role is not a literal kit color."
+        },
+        "dawn": {
+          "status": "missing",
+          "reason": "The public form status foreground is color-mixed from the legacy green primitive and mode-specific strong ink. Tailwind success text instead reads an unset generated theme token, so the semantic role is not a literal kit color."
+        }
+      },
+      "classification": "ADAPTER RECIPE",
+      "owningLayer": "Global form-status component plus Tailwind status adapter",
+      "sourceEvidence": {
+        "summary": "The public form status foreground is color-mixed from the legacy green primitive and mode-specific strong ink. Tailwind success text instead reads an unset generated theme token, so the semantic role is not a literal kit color.",
+        "modes": {
+          "midnight": {
+            "runtimeValue": "color-mix(in srgb, hsl(150 50% 45% / 1) 75%, #F0E8DD 25%)",
+            "citations": [
+              {
+                "file": "src/styles/base.css",
+                "line": 2020,
+                "excerpt": "color-mix(in srgb, hsl(var(--green-3) / 1) 75%, var(--ink-strong, currentColor) 25%)"
+              },
+              {
+                "file": "src/styles/tokens.css",
+                "line": 31,
+                "excerpt": "--green-3: 150 50% 45%;"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 52,
+                "excerpt": "--ink-strong: var(--text-strong);"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 43,
+                "excerpt": "--text-strong: #F0E8DD;"
+              },
+              {
+                "file": "src/lib/theme/colors.cjs",
+                "line": 32,
+                "excerpt": "success: 'var(--theme-success)',"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 1,
+                "excerpt": "const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.cjs');"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 8,
+                "excerpt": "colors: {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 10,
+                "excerpt": "@import \"./color-tokens.generated.css\";"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 13,
+                "excerpt": "@import \"./autumn-window.tokens.css\";"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 283,
+                "excerpt": "const midnightThemeSlug = useAutumnWindow ? 'autumn-window'"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 481,
+                "excerpt": "if (document.documentElement.getAttribute(\"data-theme\") === \"autumn-window\") return;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--green-3",
+                "value": "150 50% 45%"
+              },
+              {
+                "token": "--ink-strong",
+                "value": "#F0E8DD"
+              },
+              {
+                "token": "--theme-success",
+                "value": "unset for Autumn Window; Tailwind path unresolved"
+              }
+            ]
+          },
+          "dawn": {
+            "runtimeValue": "color-mix(in srgb, hsl(150 50% 45% / 1) 75%, #302724 25%)",
+            "citations": [
+              {
+                "file": "src/styles/base.css",
+                "line": 2020,
+                "excerpt": "color-mix(in srgb, hsl(var(--green-3) / 1) 75%, var(--ink-strong, currentColor) 25%)"
+              },
+              {
+                "file": "src/styles/tokens.css",
+                "line": 31,
+                "excerpt": "--green-3: 150 50% 45%;"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 52,
+                "excerpt": "--ink-strong: var(--text-strong);"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 131,
+                "excerpt": "--text-strong: #302724;"
+              },
+              {
+                "file": "src/lib/theme/colors.cjs",
+                "line": 32,
+                "excerpt": "success: 'var(--theme-success)',"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 1,
+                "excerpt": "const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.cjs');"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 8,
+                "excerpt": "colors: {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 10,
+                "excerpt": "@import \"./color-tokens.generated.css\";"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 13,
+                "excerpt": "@import \"./autumn-window.tokens.css\";"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 283,
+                "excerpt": "const midnightThemeSlug = useAutumnWindow ? 'autumn-window'"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 481,
+                "excerpt": "if (document.documentElement.getAttribute(\"data-theme\") === \"autumn-window\") return;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--green-3",
+                "value": "150 50% 45%"
+              },
+              {
+                "token": "--ink-strong",
+                "value": "#302724"
+              },
+              {
+                "token": "--theme-success",
+                "value": "unset for Autumn Window; Tailwind path unresolved"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "status.success.background",
+      "requirement": "required",
+      "status": "missing",
+      "modes": {
+        "midnight": {
+          "status": "missing",
+          "reason": "The adapter recipe has no Autumn Window --theme-success input; no background is set by .wc-form-status."
+        },
+        "dawn": {
+          "status": "missing",
+          "reason": "The adapter recipe has no Autumn Window --theme-success input; no background is set by .wc-form-status."
+        }
+      },
+      "classification": "ADAPTER RECIPE",
+      "owningLayer": "Tailwind semantic status-color adapter; no form-status surface owner",
+      "sourceEvidence": {
+        "summary": "Tailwind success-soft is a color-mix recipe, but --theme-success is not assigned for Autumn Window and the public form-status component has no background color.",
+        "modes": {
+          "midnight": {
+            "runtimeValue": "color-mix(in hsl, var(--theme-success) 14%, transparent)",
+            "citations": [
+              {
+                "file": "src/lib/theme/colors.cjs",
+                "line": 33,
+                "excerpt": "'success-soft': 'color-mix(in hsl, var(--theme-success) 14%, transparent)',"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 2008,
+                "excerpt": ".wc-form-status {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 2012,
+                "excerpt": "color: color-mix(in srgb, var(--ink-muted, currentColor) 85%, white 15%);"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 1,
+                "excerpt": "const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.cjs');"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 8,
+                "excerpt": "colors: {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 10,
+                "excerpt": "@import \"./color-tokens.generated.css\";"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 13,
+                "excerpt": "@import \"./autumn-window.tokens.css\";"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 283,
+                "excerpt": "const midnightThemeSlug = useAutumnWindow ? 'autumn-window'"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 481,
+                "excerpt": "if (document.documentElement.getAttribute(\"data-theme\") === \"autumn-window\") return;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--theme-success",
+                "value": "not assigned in Autumn Window"
+              }
+            ],
+            "resolution": "The adapter recipe has no Autumn Window --theme-success input; no background is set by .wc-form-status."
+          },
+          "dawn": {
+            "runtimeValue": "color-mix(in hsl, var(--theme-success) 14%, transparent)",
+            "citations": [
+              {
+                "file": "src/lib/theme/colors.cjs",
+                "line": 33,
+                "excerpt": "'success-soft': 'color-mix(in hsl, var(--theme-success) 14%, transparent)',"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 2008,
+                "excerpt": ".wc-form-status {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 2012,
+                "excerpt": "color: color-mix(in srgb, var(--ink-muted, currentColor) 85%, white 15%);"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 1,
+                "excerpt": "const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.cjs');"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 8,
+                "excerpt": "colors: {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 10,
+                "excerpt": "@import \"./color-tokens.generated.css\";"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 13,
+                "excerpt": "@import \"./autumn-window.tokens.css\";"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 283,
+                "excerpt": "const midnightThemeSlug = useAutumnWindow ? 'autumn-window'"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 481,
+                "excerpt": "if (document.documentElement.getAttribute(\"data-theme\") === \"autumn-window\") return;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--theme-success",
+                "value": "not assigned in Autumn Window"
+              }
+            ],
+            "resolution": "The adapter recipe has no Autumn Window --theme-success input; no background is set by .wc-form-status."
+          }
+        }
+      }
+    },
+    {
+      "id": "status.warning.foreground",
+      "requirement": "required",
+      "status": "missing",
+      "modes": {
+        "midnight": {
+          "status": "missing",
+          "reason": "No global warning foreground resolves under data-theme=\"autumn-window\"; the cited fallback is specific to a hub accent."
+        },
+        "dawn": {
+          "status": "missing",
+          "reason": "No global warning foreground resolves under data-theme=\"autumn-window\"; the cited fallback is specific to a hub accent."
+        }
+      },
+      "classification": "UNRESOLVED",
+      "owningLayer": "No global Autumn Window status token; Tailwind status adapter and page-local hub accents",
+      "sourceEvidence": {
+        "summary": "Tailwind warning text reads --theme-warning, which has no Autumn Window assignment. A hub-only accent fallback exists, but it is component context and does not define a global status foreground.",
+        "modes": {
+          "midnight": {
+            "runtimeValue": "--theme-warning is unresolved; the hub-only fallback 21 resolves to #BFB2A3",
+            "citations": [
+              {
+                "file": "src/lib/theme/colors.cjs",
+                "line": 35,
+                "excerpt": "warning: 'var(--theme-warning)',"
+              },
+              {
+                "file": "src/pages/hub/index.astro",
+                "line": 21,
+                "excerpt": "--theme-warning"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 47,
+                "excerpt": "--theme-color-gold:"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 45,
+                "excerpt": "--text-muted:"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 1,
+                "excerpt": "const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.cjs');"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 8,
+                "excerpt": "colors: {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 10,
+                "excerpt": "@import \"./color-tokens.generated.css\";"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 13,
+                "excerpt": "@import \"./autumn-window.tokens.css\";"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 283,
+                "excerpt": "const midnightThemeSlug = useAutumnWindow ? 'autumn-window'"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 481,
+                "excerpt": "if (document.documentElement.getAttribute(\"data-theme\") === \"autumn-window\") return;"
+              },
+              {
+                "file": "src/styles/tokens.css",
+                "line": 32,
+                "excerpt": "--amber-3: 38 90% 50%;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--theme-warning",
+                "value": "not assigned in Autumn Window"
+              },
+              {
+                "token": 21,
+                "value": "#BFB2A3",
+                "context": "Hub accent only"
+              }
+            ],
+            "resolution": "No global warning foreground resolves under data-theme=\"autumn-window\"; the cited fallback is specific to a hub accent."
+          },
+          "dawn": {
+            "runtimeValue": "--theme-warning is unresolved; the hub-only fallback 21 resolves to #65584F",
+            "citations": [
+              {
+                "file": "src/lib/theme/colors.cjs",
+                "line": 35,
+                "excerpt": "warning: 'var(--theme-warning)',"
+              },
+              {
+                "file": "src/pages/hub/index.astro",
+                "line": 21,
+                "excerpt": "--theme-warning"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 47,
+                "excerpt": "--theme-color-gold:"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 133,
+                "excerpt": "--text-muted:"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 1,
+                "excerpt": "const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.cjs');"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 8,
+                "excerpt": "colors: {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 10,
+                "excerpt": "@import \"./color-tokens.generated.css\";"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 13,
+                "excerpt": "@import \"./autumn-window.tokens.css\";"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 283,
+                "excerpt": "const midnightThemeSlug = useAutumnWindow ? 'autumn-window'"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 481,
+                "excerpt": "if (document.documentElement.getAttribute(\"data-theme\") === \"autumn-window\") return;"
+              },
+              {
+                "file": "src/styles/tokens.css",
+                "line": 32,
+                "excerpt": "--amber-3: 38 90% 50%;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--theme-warning",
+                "value": "not assigned in Autumn Window"
+              },
+              {
+                "token": 21,
+                "value": "#65584F",
+                "context": "Hub accent only"
+              }
+            ],
+            "resolution": "No global warning foreground resolves under data-theme=\"autumn-window\"; the cited fallback is specific to a hub accent."
+          }
+        }
+      }
+    },
+    {
+      "id": "status.warning.background",
+      "requirement": "required",
+      "status": "missing",
+      "modes": {
+        "midnight": {
+          "status": "missing",
+          "reason": "The adapter recipe has no Autumn Window --theme-warning input; no background is set by .wc-form-status."
+        },
+        "dawn": {
+          "status": "missing",
+          "reason": "The adapter recipe has no Autumn Window --theme-warning input; no background is set by .wc-form-status."
+        }
+      },
+      "classification": "ADAPTER RECIPE",
+      "owningLayer": "Tailwind semantic status-color adapter; no form-status surface owner",
+      "sourceEvidence": {
+        "summary": "Tailwind warning-soft is a color-mix recipe, but --theme-warning is not assigned for Autumn Window and the public form-status component has no background color.",
+        "modes": {
+          "midnight": {
+            "runtimeValue": "color-mix(in hsl, var(--theme-warning) 14%, transparent)",
+            "citations": [
+              {
+                "file": "src/lib/theme/colors.cjs",
+                "line": 36,
+                "excerpt": "'warning-soft': 'color-mix(in hsl, var(--theme-warning) 14%, transparent)',"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 2008,
+                "excerpt": ".wc-form-status {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 2012,
+                "excerpt": "color: color-mix(in srgb, var(--ink-muted, currentColor) 85%, white 15%);"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 1,
+                "excerpt": "const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.cjs');"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 8,
+                "excerpt": "colors: {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 10,
+                "excerpt": "@import \"./color-tokens.generated.css\";"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 13,
+                "excerpt": "@import \"./autumn-window.tokens.css\";"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 283,
+                "excerpt": "const midnightThemeSlug = useAutumnWindow ? 'autumn-window'"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 481,
+                "excerpt": "if (document.documentElement.getAttribute(\"data-theme\") === \"autumn-window\") return;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--theme-warning",
+                "value": "not assigned in Autumn Window"
+              }
+            ],
+            "resolution": "The adapter recipe has no Autumn Window --theme-warning input; no background is set by .wc-form-status."
+          },
+          "dawn": {
+            "runtimeValue": "color-mix(in hsl, var(--theme-warning) 14%, transparent)",
+            "citations": [
+              {
+                "file": "src/lib/theme/colors.cjs",
+                "line": 36,
+                "excerpt": "'warning-soft': 'color-mix(in hsl, var(--theme-warning) 14%, transparent)',"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 2008,
+                "excerpt": ".wc-form-status {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 2012,
+                "excerpt": "color: color-mix(in srgb, var(--ink-muted, currentColor) 85%, white 15%);"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 1,
+                "excerpt": "const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.cjs');"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 8,
+                "excerpt": "colors: {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 10,
+                "excerpt": "@import \"./color-tokens.generated.css\";"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 13,
+                "excerpt": "@import \"./autumn-window.tokens.css\";"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 283,
+                "excerpt": "const midnightThemeSlug = useAutumnWindow ? 'autumn-window'"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 481,
+                "excerpt": "if (document.documentElement.getAttribute(\"data-theme\") === \"autumn-window\") return;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--theme-warning",
+                "value": "not assigned in Autumn Window"
+              }
+            ],
+            "resolution": "The adapter recipe has no Autumn Window --theme-warning input; no background is set by .wc-form-status."
+          }
+        }
+      }
+    },
+    {
+      "id": "status.error.foreground",
+      "requirement": "required",
+      "status": "missing",
+      "modes": {
+        "midnight": {
+          "status": "missing",
+          "reason": "The public form status foreground is color-mixed from the legacy red primitive and mode-specific strong ink. Tailwind danger text instead reads an unset generated theme token, so the semantic role is not a literal kit color."
+        },
+        "dawn": {
+          "status": "missing",
+          "reason": "The public form status foreground is color-mixed from the legacy red primitive and mode-specific strong ink. Tailwind danger text instead reads an unset generated theme token, so the semantic role is not a literal kit color."
+        }
+      },
+      "classification": "ADAPTER RECIPE",
+      "owningLayer": "Global form-status component plus Tailwind status adapter",
+      "sourceEvidence": {
+        "summary": "The public form status foreground is color-mixed from the legacy red primitive and mode-specific strong ink. Tailwind danger text instead reads an unset generated theme token, so the semantic role is not a literal kit color.",
+        "modes": {
+          "midnight": {
+            "runtimeValue": "color-mix(in srgb, hsl(352 78% 56% / 1) 78%, #F0E8DD 22%)",
+            "citations": [
+              {
+                "file": "src/styles/base.css",
+                "line": 2024,
+                "excerpt": "color-mix(in srgb, hsl(var(--red-3) / 1) 78%, var(--ink-strong, currentColor) 22%)"
+              },
+              {
+                "file": "src/styles/tokens.css",
+                "line": 33,
+                "excerpt": "--red-3: 352 78% 56%;"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 52,
+                "excerpt": "--ink-strong: var(--text-strong);"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 43,
+                "excerpt": "--text-strong: #F0E8DD;"
+              },
+              {
+                "file": "src/lib/theme/colors.cjs",
+                "line": 38,
+                "excerpt": "danger: 'var(--theme-error)',"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 1,
+                "excerpt": "const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.cjs');"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 8,
+                "excerpt": "colors: {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 10,
+                "excerpt": "@import \"./color-tokens.generated.css\";"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 13,
+                "excerpt": "@import \"./autumn-window.tokens.css\";"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 283,
+                "excerpt": "const midnightThemeSlug = useAutumnWindow ? 'autumn-window'"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 481,
+                "excerpt": "if (document.documentElement.getAttribute(\"data-theme\") === \"autumn-window\") return;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--red-3",
+                "value": "352 78% 56%"
+              },
+              {
+                "token": "--ink-strong",
+                "value": "#F0E8DD"
+              },
+              {
+                "token": "--theme-error",
+                "value": "unset for Autumn Window; Tailwind path unresolved"
+              }
+            ]
+          },
+          "dawn": {
+            "runtimeValue": "color-mix(in srgb, hsl(352 78% 56% / 1) 78%, #302724 22%)",
+            "citations": [
+              {
+                "file": "src/styles/base.css",
+                "line": 2024,
+                "excerpt": "color-mix(in srgb, hsl(var(--red-3) / 1) 78%, var(--ink-strong, currentColor) 22%)"
+              },
+              {
+                "file": "src/styles/tokens.css",
+                "line": 33,
+                "excerpt": "--red-3: 352 78% 56%;"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 52,
+                "excerpt": "--ink-strong: var(--text-strong);"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 131,
+                "excerpt": "--text-strong: #302724;"
+              },
+              {
+                "file": "src/lib/theme/colors.cjs",
+                "line": 38,
+                "excerpt": "danger: 'var(--theme-error)',"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 1,
+                "excerpt": "const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.cjs');"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 8,
+                "excerpt": "colors: {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 10,
+                "excerpt": "@import \"./color-tokens.generated.css\";"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 13,
+                "excerpt": "@import \"./autumn-window.tokens.css\";"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 283,
+                "excerpt": "const midnightThemeSlug = useAutumnWindow ? 'autumn-window'"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 481,
+                "excerpt": "if (document.documentElement.getAttribute(\"data-theme\") === \"autumn-window\") return;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--red-3",
+                "value": "352 78% 56%"
+              },
+              {
+                "token": "--ink-strong",
+                "value": "#302724"
+              },
+              {
+                "token": "--theme-error",
+                "value": "unset for Autumn Window; Tailwind path unresolved"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "status.error.background",
+      "requirement": "required",
+      "status": "missing",
+      "modes": {
+        "midnight": {
+          "status": "missing",
+          "reason": "The adapter recipe has no Autumn Window --theme-error input; no background is set by .wc-form-status."
+        },
+        "dawn": {
+          "status": "missing",
+          "reason": "The adapter recipe has no Autumn Window --theme-error input; no background is set by .wc-form-status."
+        }
+      },
+      "classification": "ADAPTER RECIPE",
+      "owningLayer": "Tailwind semantic status-color adapter; no form-status surface owner",
+      "sourceEvidence": {
+        "summary": "Tailwind error-soft is a color-mix recipe, but --theme-error is not assigned for Autumn Window and the public form-status component has no background color.",
+        "modes": {
+          "midnight": {
+            "runtimeValue": "color-mix(in hsl, var(--theme-error) 14%, transparent)",
+            "citations": [
+              {
+                "file": "src/lib/theme/colors.cjs",
+                "line": 39,
+                "excerpt": "'danger-soft': 'color-mix(in hsl, var(--theme-error) 14%, transparent)',"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 2008,
+                "excerpt": ".wc-form-status {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 2012,
+                "excerpt": "color: color-mix(in srgb, var(--ink-muted, currentColor) 85%, white 15%);"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 1,
+                "excerpt": "const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.cjs');"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 8,
+                "excerpt": "colors: {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 10,
+                "excerpt": "@import \"./color-tokens.generated.css\";"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 13,
+                "excerpt": "@import \"./autumn-window.tokens.css\";"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 283,
+                "excerpt": "const midnightThemeSlug = useAutumnWindow ? 'autumn-window'"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 481,
+                "excerpt": "if (document.documentElement.getAttribute(\"data-theme\") === \"autumn-window\") return;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--theme-error",
+                "value": "not assigned in Autumn Window"
+              }
+            ],
+            "resolution": "The adapter recipe has no Autumn Window --theme-error input; no background is set by .wc-form-status."
+          },
+          "dawn": {
+            "runtimeValue": "color-mix(in hsl, var(--theme-error) 14%, transparent)",
+            "citations": [
+              {
+                "file": "src/lib/theme/colors.cjs",
+                "line": 39,
+                "excerpt": "'danger-soft': 'color-mix(in hsl, var(--theme-error) 14%, transparent)',"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 2008,
+                "excerpt": ".wc-form-status {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 2012,
+                "excerpt": "color: color-mix(in srgb, var(--ink-muted, currentColor) 85%, white 15%);"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 1,
+                "excerpt": "const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.cjs');"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 8,
+                "excerpt": "colors: {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 10,
+                "excerpt": "@import \"./color-tokens.generated.css\";"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 13,
+                "excerpt": "@import \"./autumn-window.tokens.css\";"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 283,
+                "excerpt": "const midnightThemeSlug = useAutumnWindow ? 'autumn-window'"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 481,
+                "excerpt": "if (document.documentElement.getAttribute(\"data-theme\") === \"autumn-window\") return;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--theme-error",
+                "value": "not assigned in Autumn Window"
+              }
+            ],
+            "resolution": "The adapter recipe has no Autumn Window --theme-error input; no background is set by .wc-form-status."
+          }
+        }
+      }
+    },
+    {
+      "id": "status.info.foreground",
+      "requirement": "required",
+      "status": "missing",
+      "modes": {
+        "midnight": {
+          "status": "missing",
+          "reason": "No global info foreground resolves under data-theme=\"autumn-window\"; the cited fallback is specific to a hub accent."
+        },
+        "dawn": {
+          "status": "missing",
+          "reason": "No global info foreground resolves under data-theme=\"autumn-window\"; the cited fallback is specific to a hub accent."
+        }
+      },
+      "classification": "UNRESOLVED",
+      "owningLayer": "No global Autumn Window status token; Tailwind status adapter and page-local hub accents",
+      "sourceEvidence": {
+        "summary": "Tailwind info text reads --theme-info, which has no Autumn Window assignment. A hub-only accent fallback exists, but it is component context and does not define a global status foreground.",
+        "modes": {
+          "midnight": {
+            "runtimeValue": "--theme-info is unresolved; the hub-only fallback 29 resolves to #B98F9D",
+            "citations": [
+              {
+                "file": "src/lib/theme/colors.cjs",
+                "line": 29,
+                "excerpt": "info: 'var(--theme-info)',"
+              },
+              {
+                "file": "src/pages/hub/index.astro",
+                "line": 29,
+                "excerpt": "--theme-info"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 48,
+                "excerpt": "--theme-color-iris:"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 57,
+                "excerpt": "--accent-mulberry:"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 1,
+                "excerpt": "const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.cjs');"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 8,
+                "excerpt": "colors: {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 10,
+                "excerpt": "@import \"./color-tokens.generated.css\";"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 13,
+                "excerpt": "@import \"./autumn-window.tokens.css\";"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 283,
+                "excerpt": "const midnightThemeSlug = useAutumnWindow ? 'autumn-window'"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 481,
+                "excerpt": "if (document.documentElement.getAttribute(\"data-theme\") === \"autumn-window\") return;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--theme-info",
+                "value": "not assigned in Autumn Window"
+              },
+              {
+                "token": 29,
+                "value": "#B98F9D",
+                "context": "Hub accent only"
+              }
+            ],
+            "resolution": "No global info foreground resolves under data-theme=\"autumn-window\"; the cited fallback is specific to a hub accent."
+          },
+          "dawn": {
+            "runtimeValue": "--theme-info is unresolved; the hub-only fallback 29 resolves to #754452",
+            "citations": [
+              {
+                "file": "src/lib/theme/colors.cjs",
+                "line": 29,
+                "excerpt": "info: 'var(--theme-info)',"
+              },
+              {
+                "file": "src/pages/hub/index.astro",
+                "line": 29,
+                "excerpt": "--theme-info"
+              },
+              {
+                "file": "src/styles/autumn-window.css",
+                "line": 48,
+                "excerpt": "--theme-color-iris:"
+              },
+              {
+                "file": "src/styles/autumn-window.tokens.css",
+                "line": 134,
+                "excerpt": "--accent-mulberry:"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 1,
+                "excerpt": "const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.cjs');"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 8,
+                "excerpt": "colors: {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 10,
+                "excerpt": "@import \"./color-tokens.generated.css\";"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 13,
+                "excerpt": "@import \"./autumn-window.tokens.css\";"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 283,
+                "excerpt": "const midnightThemeSlug = useAutumnWindow ? 'autumn-window'"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 481,
+                "excerpt": "if (document.documentElement.getAttribute(\"data-theme\") === \"autumn-window\") return;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--theme-info",
+                "value": "not assigned in Autumn Window"
+              },
+              {
+                "token": 29,
+                "value": "#754452",
+                "context": "Hub accent only"
+              }
+            ],
+            "resolution": "No global info foreground resolves under data-theme=\"autumn-window\"; the cited fallback is specific to a hub accent."
+          }
+        }
+      }
+    },
+    {
+      "id": "status.info.background",
+      "requirement": "required",
+      "status": "missing",
+      "modes": {
+        "midnight": {
+          "status": "missing",
+          "reason": "The adapter recipe has no Autumn Window --theme-info input; no background is set by .wc-form-status."
+        },
+        "dawn": {
+          "status": "missing",
+          "reason": "The adapter recipe has no Autumn Window --theme-info input; no background is set by .wc-form-status."
+        }
+      },
+      "classification": "ADAPTER RECIPE",
+      "owningLayer": "Tailwind semantic status-color adapter; no form-status surface owner",
+      "sourceEvidence": {
+        "summary": "Tailwind info-soft is a color-mix recipe, but --theme-info is not assigned for Autumn Window and the public form-status component has no background color.",
+        "modes": {
+          "midnight": {
+            "runtimeValue": "color-mix(in hsl, var(--theme-info) 14%, transparent)",
+            "citations": [
+              {
+                "file": "src/lib/theme/colors.cjs",
+                "line": 30,
+                "excerpt": "'info-soft': 'color-mix(in hsl, var(--theme-info) 14%, transparent)',"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 2008,
+                "excerpt": ".wc-form-status {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 2012,
+                "excerpt": "color: color-mix(in srgb, var(--ink-muted, currentColor) 85%, white 15%);"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 1,
+                "excerpt": "const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.cjs');"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 8,
+                "excerpt": "colors: {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 10,
+                "excerpt": "@import \"./color-tokens.generated.css\";"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 13,
+                "excerpt": "@import \"./autumn-window.tokens.css\";"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 283,
+                "excerpt": "const midnightThemeSlug = useAutumnWindow ? 'autumn-window'"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 481,
+                "excerpt": "if (document.documentElement.getAttribute(\"data-theme\") === \"autumn-window\") return;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--theme-info",
+                "value": "not assigned in Autumn Window"
+              }
+            ],
+            "resolution": "The adapter recipe has no Autumn Window --theme-info input; no background is set by .wc-form-status."
+          },
+          "dawn": {
+            "runtimeValue": "color-mix(in hsl, var(--theme-info) 14%, transparent)",
+            "citations": [
+              {
+                "file": "src/lib/theme/colors.cjs",
+                "line": 30,
+                "excerpt": "'info-soft': 'color-mix(in hsl, var(--theme-info) 14%, transparent)',"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 2008,
+                "excerpt": ".wc-form-status {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 2012,
+                "excerpt": "color: color-mix(in srgb, var(--ink-muted, currentColor) 85%, white 15%);"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 1,
+                "excerpt": "const { simplifiedColors, mapToLegacySemanticNames } = require('./src/lib/theme/colors.cjs');"
+              },
+              {
+                "file": "tailwind.config.cjs",
+                "line": 8,
+                "excerpt": "colors: {"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 10,
+                "excerpt": "@import \"./color-tokens.generated.css\";"
+              },
+              {
+                "file": "src/styles/base.css",
+                "line": 13,
+                "excerpt": "@import \"./autumn-window.tokens.css\";"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 283,
+                "excerpt": "const midnightThemeSlug = useAutumnWindow ? 'autumn-window'"
+              },
+              {
+                "file": "src/layouts/Base.astro",
+                "line": 481,
+                "excerpt": "if (document.documentElement.getAttribute(\"data-theme\") === \"autumn-window\") return;"
+              }
+            ],
+            "inputs": [
+              {
+                "token": "--theme-info",
+                "value": "not assigned in Autumn Window"
+              }
+            ],
+            "resolution": "The adapter recipe has no Autumn Window --theme-info input; no background is set by .wc-form-status."
+          }
+        }
+      }
+    }
+  ],
+  "contrasts": [
+    {
+      "mode": "midnight",
+      "foregroundRole": "text.strong",
+      "backgroundRole": "surface.base",
+      "foregroundVariable": "--wc-kit-text-strong",
+      "backgroundVariable": "--wc-kit-surface-base",
+      "purpose": "text strong on page",
+      "ratio": 13.17
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "text.strong",
+      "backgroundRole": "surface.panel",
+      "foregroundVariable": "--wc-kit-text-strong",
+      "backgroundVariable": "--wc-kit-surface-panel",
+      "purpose": "text strong on panel",
+      "ratio": 12.34
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "text.strong",
+      "backgroundRole": "surface.elevated",
+      "foregroundVariable": "--wc-kit-text-strong",
+      "backgroundVariable": "--wc-kit-surface-elevated",
+      "purpose": "text strong on elevated surface",
+      "ratio": 11.51
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "text.body",
+      "backgroundRole": "surface.base",
+      "foregroundVariable": "--wc-kit-text-body",
+      "backgroundVariable": "--wc-kit-surface-base",
+      "purpose": "body text on page",
+      "ratio": 12.03
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "text.body",
+      "backgroundRole": "surface.panel",
+      "foregroundVariable": "--wc-kit-text-body",
+      "backgroundVariable": "--wc-kit-surface-panel",
+      "purpose": "body text on panel",
+      "ratio": 11.28
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "text.body",
+      "backgroundRole": "surface.elevated",
+      "foregroundVariable": "--wc-kit-text-body",
+      "backgroundVariable": "--wc-kit-surface-elevated",
+      "purpose": "body text on elevated surface",
+      "ratio": 10.52
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "text.muted",
+      "backgroundRole": "surface.base",
+      "foregroundVariable": "--wc-kit-text-muted",
+      "backgroundVariable": "--wc-kit-surface-base",
+      "purpose": "muted text on page",
+      "ratio": 7.7
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "text.muted",
+      "backgroundRole": "surface.panel",
+      "foregroundVariable": "--wc-kit-text-muted",
+      "backgroundVariable": "--wc-kit-surface-panel",
+      "purpose": "muted text on panel",
+      "ratio": 7.22
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "text.muted",
+      "backgroundRole": "surface.elevated",
+      "foregroundVariable": "--wc-kit-text-muted",
+      "backgroundVariable": "--wc-kit-surface-elevated",
+      "purpose": "muted text on elevated surface",
+      "ratio": 6.73
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "link.foreground",
+      "backgroundRole": "surface.base",
+      "foregroundVariable": "--wc-kit-link-foreground",
+      "backgroundVariable": "--wc-kit-surface-base",
+      "purpose": "link on page",
+      "ratio": 5.69
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "link.foreground",
+      "backgroundRole": "surface.panel",
+      "foregroundVariable": "--wc-kit-link-foreground",
+      "backgroundVariable": "--wc-kit-surface-panel",
+      "purpose": "link on panel",
+      "ratio": 5.34
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "link.foreground",
+      "backgroundRole": "surface.elevated",
+      "foregroundVariable": "--wc-kit-link-foreground",
+      "backgroundVariable": "--wc-kit-surface-elevated",
+      "purpose": "link on elevated surface",
+      "ratio": 4.98
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "action.foreground",
+      "backgroundRole": "action.background",
+      "foregroundVariable": "--wc-kit-action-foreground",
+      "backgroundVariable": "--wc-kit-action-background",
+      "purpose": "action label on action surface",
+      "ratio": 5.34
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "action.foreground",
+      "backgroundRole": "action.hover.background",
+      "foregroundVariable": "--wc-kit-action-foreground",
+      "backgroundVariable": "--wc-kit-action-hover-background",
+      "purpose": "action label on hover surface",
+      "ratio": 4.98
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "tag.foreground",
+      "backgroundRole": "tag.background",
+      "foregroundVariable": "--wc-kit-tag-foreground",
+      "backgroundVariable": "--wc-kit-tag-background",
+      "purpose": "tag label on tag surface",
+      "ratio": 7.22
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "header.foreground",
+      "backgroundRole": "header.background",
+      "foregroundVariable": "--wc-kit-header-foreground",
+      "backgroundVariable": "--wc-kit-header-background",
+      "purpose": "header body text",
+      "ratio": 11.28
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "header.heading",
+      "backgroundRole": "header.background",
+      "foregroundVariable": "--wc-kit-header-heading",
+      "backgroundVariable": "--wc-kit-header-background",
+      "purpose": "header heading",
+      "ratio": 12.34
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "header.link",
+      "backgroundRole": "header.background",
+      "foregroundVariable": "--wc-kit-header-link",
+      "backgroundVariable": "--wc-kit-header-background",
+      "purpose": "header link",
+      "ratio": 5.34
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "footer.foreground",
+      "backgroundRole": "footer.background",
+      "foregroundVariable": "--wc-kit-footer-foreground",
+      "backgroundVariable": "--wc-kit-footer-background",
+      "purpose": "footer body text",
+      "ratio": 11.28
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "footer.muted",
+      "backgroundRole": "footer.background",
+      "foregroundVariable": "--wc-kit-footer-muted",
+      "backgroundVariable": "--wc-kit-footer-background",
+      "purpose": "footer muted text",
+      "ratio": 7.22
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "footer.link",
+      "backgroundRole": "footer.background",
+      "foregroundVariable": "--wc-kit-footer-link",
+      "backgroundVariable": "--wc-kit-footer-background",
+      "purpose": "footer link",
+      "ratio": 5.34
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "entity.heading",
+      "backgroundRole": "entity.surface.top",
+      "foregroundVariable": "--wc-kit-entity-heading",
+      "backgroundVariable": "--wc-kit-entity-surface-top",
+      "purpose": "entity heading",
+      "ratio": 12.34
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "entity.foreground",
+      "backgroundRole": "entity.surface.top",
+      "foregroundVariable": "--wc-kit-entity-foreground",
+      "backgroundVariable": "--wc-kit-entity-surface-top",
+      "purpose": "entity body text",
+      "ratio": 11.28
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "entity.muted",
+      "backgroundRole": "entity.surface.top",
+      "foregroundVariable": "--wc-kit-entity-muted",
+      "backgroundVariable": "--wc-kit-entity-surface-top",
+      "purpose": "entity label",
+      "ratio": 7.22
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "comfort.foreground",
+      "backgroundRole": "comfort.surface",
+      "foregroundVariable": "--wc-kit-comfort-foreground",
+      "backgroundVariable": "--wc-kit-comfort-surface",
+      "purpose": "comfort control text",
+      "ratio": 11.28
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "comfort.foreground.strong",
+      "backgroundRole": "comfort.surface",
+      "foregroundVariable": "--wc-kit-comfort-foreground-strong",
+      "backgroundVariable": "--wc-kit-comfort-surface",
+      "purpose": "comfort control strong text",
+      "ratio": 12.34
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "focus.foreground",
+      "backgroundRole": "focus.base",
+      "foregroundVariable": "--wc-kit-focus-foreground",
+      "backgroundVariable": "--wc-kit-focus-base",
+      "purpose": "focus ring against its base",
+      "ratio": 8.04
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "brand.mulberry",
+      "backgroundRole": "surface.base",
+      "foregroundVariable": "--wc-kit-brand-mulberry",
+      "backgroundVariable": "--wc-kit-surface-base",
+      "purpose": "mulberry accent on page",
+      "ratio": 5.69
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "brand.window-blue",
+      "backgroundRole": "surface.base",
+      "foregroundVariable": "--wc-kit-brand-window-blue",
+      "backgroundVariable": "--wc-kit-surface-base",
+      "purpose": "window blue on page",
+      "ratio": 8.04
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "spoon.low",
+      "backgroundRole": "card.background",
+      "foregroundVariable": "--wc-kit-spoon-low",
+      "backgroundVariable": "--wc-kit-card-background",
+      "purpose": "low spoon ink on card",
+      "ratio": 7.26
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "spoon.medium",
+      "backgroundRole": "card.background",
+      "foregroundVariable": "--wc-kit-spoon-medium",
+      "backgroundVariable": "--wc-kit-card-background",
+      "purpose": "medium spoon ink on card",
+      "ratio": 7.16
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "spoon.high",
+      "backgroundRole": "card.background",
+      "foregroundVariable": "--wc-kit-spoon-high",
+      "backgroundVariable": "--wc-kit-card-background",
+      "purpose": "high spoon ink on card",
+      "ratio": 6.5
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "text.strong",
+      "backgroundRole": "surface.base",
+      "foregroundVariable": "--wc-kit-text-strong",
+      "backgroundVariable": "--wc-kit-surface-base",
+      "purpose": "text strong on page",
+      "ratio": 12.22
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "text.strong",
+      "backgroundRole": "surface.panel",
+      "foregroundVariable": "--wc-kit-text-strong",
+      "backgroundVariable": "--wc-kit-surface-panel",
+      "purpose": "text strong on panel",
+      "ratio": 11.49
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "text.strong",
+      "backgroundRole": "surface.elevated",
+      "foregroundVariable": "--wc-kit-text-strong",
+      "backgroundVariable": "--wc-kit-surface-elevated",
+      "purpose": "text strong on elevated surface",
+      "ratio": 10.66
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "text.body",
+      "backgroundRole": "surface.base",
+      "foregroundVariable": "--wc-kit-text-body",
+      "backgroundVariable": "--wc-kit-surface-base",
+      "purpose": "body text on page",
+      "ratio": 10.95
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "text.body",
+      "backgroundRole": "surface.panel",
+      "foregroundVariable": "--wc-kit-text-body",
+      "backgroundVariable": "--wc-kit-surface-panel",
+      "purpose": "body text on panel",
+      "ratio": 10.3
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "text.body",
+      "backgroundRole": "surface.elevated",
+      "foregroundVariable": "--wc-kit-text-body",
+      "backgroundVariable": "--wc-kit-surface-elevated",
+      "purpose": "body text on elevated surface",
+      "ratio": 9.56
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "text.muted",
+      "backgroundRole": "surface.base",
+      "foregroundVariable": "--wc-kit-text-muted",
+      "backgroundVariable": "--wc-kit-surface-base",
+      "purpose": "muted text on page",
+      "ratio": 5.75
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "text.muted",
+      "backgroundRole": "surface.panel",
+      "foregroundVariable": "--wc-kit-text-muted",
+      "backgroundVariable": "--wc-kit-surface-panel",
+      "purpose": "muted text on panel",
+      "ratio": 5.41
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "text.muted",
+      "backgroundRole": "surface.elevated",
+      "foregroundVariable": "--wc-kit-text-muted",
+      "backgroundVariable": "--wc-kit-surface-elevated",
+      "purpose": "muted text on elevated surface",
+      "ratio": 5.02
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "link.foreground",
+      "backgroundRole": "surface.base",
+      "foregroundVariable": "--wc-kit-link-foreground",
+      "backgroundVariable": "--wc-kit-surface-base",
+      "purpose": "link on page",
+      "ratio": 6.51
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "link.foreground",
+      "backgroundRole": "surface.panel",
+      "foregroundVariable": "--wc-kit-link-foreground",
+      "backgroundVariable": "--wc-kit-surface-panel",
+      "purpose": "link on panel",
+      "ratio": 6.12
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "link.foreground",
+      "backgroundRole": "surface.elevated",
+      "foregroundVariable": "--wc-kit-link-foreground",
+      "backgroundVariable": "--wc-kit-surface-elevated",
+      "purpose": "link on elevated surface",
+      "ratio": 5.68
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "action.foreground",
+      "backgroundRole": "action.background",
+      "foregroundVariable": "--wc-kit-action-foreground",
+      "backgroundVariable": "--wc-kit-action-background",
+      "purpose": "action label on action surface",
+      "ratio": 6.12
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "action.foreground",
+      "backgroundRole": "action.hover.background",
+      "foregroundVariable": "--wc-kit-action-foreground",
+      "backgroundVariable": "--wc-kit-action-hover-background",
+      "purpose": "action label on hover surface",
+      "ratio": 5.68
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "tag.foreground",
+      "backgroundRole": "tag.background",
+      "foregroundVariable": "--wc-kit-tag-foreground",
+      "backgroundVariable": "--wc-kit-tag-background",
+      "purpose": "tag label on tag surface",
+      "ratio": 5.41
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "header.foreground",
+      "backgroundRole": "header.background",
+      "foregroundVariable": "--wc-kit-header-foreground",
+      "backgroundVariable": "--wc-kit-header-background",
+      "purpose": "header body text",
+      "ratio": 10.3
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "header.heading",
+      "backgroundRole": "header.background",
+      "foregroundVariable": "--wc-kit-header-heading",
+      "backgroundVariable": "--wc-kit-header-background",
+      "purpose": "header heading",
+      "ratio": 11.49
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "header.link",
+      "backgroundRole": "header.background",
+      "foregroundVariable": "--wc-kit-header-link",
+      "backgroundVariable": "--wc-kit-header-background",
+      "purpose": "header link",
+      "ratio": 6.12
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "footer.foreground",
+      "backgroundRole": "footer.background",
+      "foregroundVariable": "--wc-kit-footer-foreground",
+      "backgroundVariable": "--wc-kit-footer-background",
+      "purpose": "footer body text",
+      "ratio": 10.3
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "footer.muted",
+      "backgroundRole": "footer.background",
+      "foregroundVariable": "--wc-kit-footer-muted",
+      "backgroundVariable": "--wc-kit-footer-background",
+      "purpose": "footer muted text",
+      "ratio": 5.41
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "footer.link",
+      "backgroundRole": "footer.background",
+      "foregroundVariable": "--wc-kit-footer-link",
+      "backgroundVariable": "--wc-kit-footer-background",
+      "purpose": "footer link",
+      "ratio": 6.12
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "entity.heading",
+      "backgroundRole": "entity.surface.top",
+      "foregroundVariable": "--wc-kit-entity-heading",
+      "backgroundVariable": "--wc-kit-entity-surface-top",
+      "purpose": "entity heading",
+      "ratio": 11.49
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "entity.foreground",
+      "backgroundRole": "entity.surface.top",
+      "foregroundVariable": "--wc-kit-entity-foreground",
+      "backgroundVariable": "--wc-kit-entity-surface-top",
+      "purpose": "entity body text",
+      "ratio": 10.3
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "entity.muted",
+      "backgroundRole": "entity.surface.top",
+      "foregroundVariable": "--wc-kit-entity-muted",
+      "backgroundVariable": "--wc-kit-entity-surface-top",
+      "purpose": "entity label",
+      "ratio": 5.41
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "comfort.foreground",
+      "backgroundRole": "comfort.surface",
+      "foregroundVariable": "--wc-kit-comfort-foreground",
+      "backgroundVariable": "--wc-kit-comfort-surface",
+      "purpose": "comfort control text",
+      "ratio": 10.3
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "comfort.foreground.strong",
+      "backgroundRole": "comfort.surface",
+      "foregroundVariable": "--wc-kit-comfort-foreground-strong",
+      "backgroundVariable": "--wc-kit-comfort-surface",
+      "purpose": "comfort control strong text",
+      "ratio": 11.49
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "focus.foreground",
+      "backgroundRole": "focus.base",
+      "foregroundVariable": "--wc-kit-focus-foreground",
+      "backgroundVariable": "--wc-kit-focus-base",
+      "purpose": "focus ring against its base",
+      "ratio": 5.26
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "brand.mulberry",
+      "backgroundRole": "surface.base",
+      "foregroundVariable": "--wc-kit-brand-mulberry",
+      "backgroundVariable": "--wc-kit-surface-base",
+      "purpose": "mulberry accent on page",
+      "ratio": 6.51
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "brand.window-blue",
+      "backgroundRole": "surface.base",
+      "foregroundVariable": "--wc-kit-brand-window-blue",
+      "backgroundVariable": "--wc-kit-surface-base",
+      "purpose": "window blue on page",
+      "ratio": 5.26
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "spoon.low",
+      "backgroundRole": "card.background",
+      "foregroundVariable": "--wc-kit-spoon-low",
+      "backgroundVariable": "--wc-kit-card-background",
+      "purpose": "low spoon ink on card",
+      "ratio": 5.05
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "spoon.medium",
+      "backgroundRole": "card.background",
+      "foregroundVariable": "--wc-kit-spoon-medium",
+      "backgroundVariable": "--wc-kit-card-background",
+      "purpose": "medium spoon ink on card",
+      "ratio": 5.31
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "spoon.high",
+      "backgroundRole": "card.background",
+      "foregroundVariable": "--wc-kit-spoon-high",
+      "backgroundVariable": "--wc-kit-card-background",
+      "purpose": "high spoon ink on card",
+      "ratio": 5.16
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "focus.foreground",
+      "backgroundRole": "surface.panel",
+      "foregroundVariable": "--wc-kit-focus-foreground",
+      "backgroundVariable": "--wc-kit-surface-panel",
+      "purpose": "focus ring against panel",
+      "ratio": 7.54
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "focus.foreground",
+      "backgroundRole": "surface.elevated",
+      "foregroundVariable": "--wc-kit-focus-foreground",
+      "backgroundVariable": "--wc-kit-surface-elevated",
+      "purpose": "focus ring against elevated surface",
+      "ratio": 7.03
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "border.subtle",
+      "backgroundRole": "surface.base",
+      "foregroundVariable": "--wc-kit-border-subtle",
+      "backgroundVariable": "--wc-kit-surface-base",
+      "purpose": "subtle border against page surface",
+      "ratio": 1.74
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "border.subtle",
+      "backgroundRole": "surface.panel",
+      "foregroundVariable": "--wc-kit-border-subtle",
+      "backgroundVariable": "--wc-kit-surface-panel",
+      "purpose": "subtle border against panel surface",
+      "ratio": 1.64
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "border.strong",
+      "backgroundRole": "surface.panel",
+      "foregroundVariable": "--wc-kit-border-strong",
+      "backgroundVariable": "--wc-kit-surface-panel",
+      "purpose": "strong border against panel surface",
+      "ratio": 3.41
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "border.strong",
+      "backgroundRole": "surface.elevated",
+      "foregroundVariable": "--wc-kit-border-strong",
+      "backgroundVariable": "--wc-kit-surface-elevated",
+      "purpose": "strong border against elevated surface",
+      "ratio": 3.19
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "action.border",
+      "backgroundRole": "action.background",
+      "foregroundVariable": "--wc-kit-action-border",
+      "backgroundVariable": "--wc-kit-action-background",
+      "purpose": "action border against action surface",
+      "ratio": 3.41
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "action.hover.border",
+      "backgroundRole": "action.hover.background",
+      "foregroundVariable": "--wc-kit-action-hover-border",
+      "backgroundVariable": "--wc-kit-action-hover-background",
+      "purpose": "action hover border against hover surface",
+      "ratio": 4.98
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "card.border",
+      "backgroundRole": "card.background",
+      "foregroundVariable": "--wc-kit-card-border",
+      "backgroundVariable": "--wc-kit-card-background",
+      "purpose": "card border against card surface",
+      "ratio": 1.64
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "card.border.strong",
+      "backgroundRole": "card.background",
+      "foregroundVariable": "--wc-kit-card-border-strong",
+      "backgroundVariable": "--wc-kit-card-background",
+      "purpose": "strong card border against card surface",
+      "ratio": 3.41
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "tag.border",
+      "backgroundRole": "tag.background",
+      "foregroundVariable": "--wc-kit-tag-border",
+      "backgroundVariable": "--wc-kit-tag-background",
+      "purpose": "tag border against tag surface",
+      "ratio": 1.64
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "header.border",
+      "backgroundRole": "header.background",
+      "foregroundVariable": "--wc-kit-header-border",
+      "backgroundVariable": "--wc-kit-header-background",
+      "purpose": "header border against header surface",
+      "ratio": 1.64
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "footer.border",
+      "backgroundRole": "footer.background",
+      "foregroundVariable": "--wc-kit-footer-border",
+      "backgroundVariable": "--wc-kit-footer-background",
+      "purpose": "footer border against footer surface",
+      "ratio": 1.64
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "comfort.input.border",
+      "backgroundRole": "comfort.input.background",
+      "foregroundVariable": "--wc-kit-comfort-input-border",
+      "backgroundVariable": "--wc-kit-comfort-input-background",
+      "purpose": "comfort input border against input surface",
+      "ratio": 3.41
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "comfort.input.focus",
+      "backgroundRole": "comfort.input.background",
+      "foregroundVariable": "--wc-kit-comfort-input-focus",
+      "backgroundVariable": "--wc-kit-comfort-input-background",
+      "purpose": "comfort input focus color against input surface",
+      "ratio": 7.54
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "focus.foreground",
+      "backgroundRole": "surface.panel",
+      "foregroundVariable": "--wc-kit-focus-foreground",
+      "backgroundVariable": "--wc-kit-surface-panel",
+      "purpose": "focus ring against panel",
+      "ratio": 4.94
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "focus.foreground",
+      "backgroundRole": "surface.elevated",
+      "foregroundVariable": "--wc-kit-focus-foreground",
+      "backgroundVariable": "--wc-kit-surface-elevated",
+      "purpose": "focus ring against elevated surface",
+      "ratio": 4.59
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "border.subtle",
+      "backgroundRole": "surface.base",
+      "foregroundVariable": "--wc-kit-border-subtle",
+      "backgroundVariable": "--wc-kit-surface-base",
+      "purpose": "subtle border against page surface",
+      "ratio": 1.62
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "border.subtle",
+      "backgroundRole": "surface.panel",
+      "foregroundVariable": "--wc-kit-border-subtle",
+      "backgroundVariable": "--wc-kit-surface-panel",
+      "purpose": "subtle border against panel surface",
+      "ratio": 1.53
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "border.strong",
+      "backgroundRole": "surface.panel",
+      "foregroundVariable": "--wc-kit-border-strong",
+      "backgroundVariable": "--wc-kit-surface-panel",
+      "purpose": "strong border against panel surface",
+      "ratio": 3.37
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "border.strong",
+      "backgroundRole": "surface.elevated",
+      "foregroundVariable": "--wc-kit-border-strong",
+      "backgroundVariable": "--wc-kit-surface-elevated",
+      "purpose": "strong border against elevated surface",
+      "ratio": 3.12
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "action.border",
+      "backgroundRole": "action.background",
+      "foregroundVariable": "--wc-kit-action-border",
+      "backgroundVariable": "--wc-kit-action-background",
+      "purpose": "action border against action surface",
+      "ratio": 3.37
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "action.hover.border",
+      "backgroundRole": "action.hover.background",
+      "foregroundVariable": "--wc-kit-action-hover-border",
+      "backgroundVariable": "--wc-kit-action-hover-background",
+      "purpose": "action hover border against hover surface",
+      "ratio": 5.68
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "card.border",
+      "backgroundRole": "card.background",
+      "foregroundVariable": "--wc-kit-card-border",
+      "backgroundVariable": "--wc-kit-card-background",
+      "purpose": "card border against card surface",
+      "ratio": 1.53
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "card.border.strong",
+      "backgroundRole": "card.background",
+      "foregroundVariable": "--wc-kit-card-border-strong",
+      "backgroundVariable": "--wc-kit-card-background",
+      "purpose": "strong card border against card surface",
+      "ratio": 3.37
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "tag.border",
+      "backgroundRole": "tag.background",
+      "foregroundVariable": "--wc-kit-tag-border",
+      "backgroundVariable": "--wc-kit-tag-background",
+      "purpose": "tag border against tag surface",
+      "ratio": 1.53
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "header.border",
+      "backgroundRole": "header.background",
+      "foregroundVariable": "--wc-kit-header-border",
+      "backgroundVariable": "--wc-kit-header-background",
+      "purpose": "header border against header surface",
+      "ratio": 1.53
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "footer.border",
+      "backgroundRole": "footer.background",
+      "foregroundVariable": "--wc-kit-footer-border",
+      "backgroundVariable": "--wc-kit-footer-background",
+      "purpose": "footer border against footer surface",
+      "ratio": 1.53
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "comfort.input.border",
+      "backgroundRole": "comfort.input.background",
+      "foregroundVariable": "--wc-kit-comfort-input-border",
+      "backgroundVariable": "--wc-kit-comfort-input-background",
+      "purpose": "comfort input border against input surface",
+      "ratio": 3.37
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "comfort.input.focus",
+      "backgroundRole": "comfort.input.background",
+      "foregroundVariable": "--wc-kit-comfort-input-focus",
+      "backgroundVariable": "--wc-kit-comfort-input-background",
+      "purpose": "comfort input focus color against input surface",
+      "ratio": 4.94
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "entity.action",
+      "backgroundRole": "entity.surface.top",
+      "foregroundVariable": "--wc-kit-entity-action",
+      "backgroundVariable": "--wc-kit-entity-surface-top",
+      "purpose": "entity CTA on entity surface",
+      "ratio": 5.34
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "entity.action",
+      "backgroundRole": "entity.surface.top",
+      "foregroundVariable": "--wc-kit-entity-action",
+      "backgroundVariable": "--wc-kit-entity-surface-top",
+      "purpose": "entity CTA on entity surface",
+      "ratio": 6.12
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "entity.action.hover",
+      "backgroundRole": "entity.surface.top",
+      "foregroundVariable": "--wc-kit-entity-action-hover",
+      "backgroundVariable": "--wc-kit-entity-surface-top",
+      "purpose": "entity CTA hover on entity surface",
+      "ratio": 5.34
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "entity.action.hover",
+      "backgroundRole": "entity.surface.top",
+      "foregroundVariable": "--wc-kit-entity-action-hover",
+      "backgroundVariable": "--wc-kit-entity-surface-top",
+      "purpose": "entity CTA hover on entity surface",
+      "ratio": 6.12
+    }
+  ],
+  "excludedWitchClickConcerns": [
+    "typography",
+    "spacing",
+    "geometry",
+    "shadow recipes",
+    "motion",
+    "calm/plain behavior",
+    "component layout"
+  ],
+  "missingContrastPairs": [
+    {
+      "mode": "midnight",
+      "foregroundRole": "status.success.foreground",
+      "backgroundRole": "status.success.background",
+      "reason": "Autumn Window does not define status foreground or background colors; the separate generated theme palette is not this kit source."
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "status.warning.foreground",
+      "backgroundRole": "status.warning.background",
+      "reason": "Autumn Window does not define status foreground or background colors; the separate generated theme palette is not this kit source."
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "status.error.foreground",
+      "backgroundRole": "status.error.background",
+      "reason": "Autumn Window does not define status foreground or background colors; the separate generated theme palette is not this kit source."
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "status.info.foreground",
+      "backgroundRole": "status.info.background",
+      "reason": "Autumn Window does not define status foreground or background colors; the separate generated theme palette is not this kit source."
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "entity.border",
+      "backgroundRole": "entity.surface.top",
+      "reason": "Autumn Window defines no entity border color."
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "entity.icon",
+      "backgroundRole": "entity.surface.top",
+      "reason": "Autumn Window defines no entity icon color."
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "comfort.foreground",
+      "backgroundRole": "comfort.chip.background",
+      "reason": "Autumn Window supplies comfort text color but no chip background color."
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "comfort.chip.border",
+      "backgroundRole": "comfort.chip.background",
+      "reason": "Autumn Window defines neither comfort chip border nor chip background colors."
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "comfort.chip.accent",
+      "backgroundRole": "comfort.chip.background",
+      "reason": "Autumn Window defines neither comfort chip accent nor chip background colors."
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "comfort.hint",
+      "backgroundRole": "comfort.tray.background",
+      "reason": "Autumn Window supplies neither a comfort hint color nor tray background color."
+    },
+    {
+      "mode": "midnight",
+      "foregroundRole": "comfort.tray.border",
+      "backgroundRole": "comfort.tray.background",
+      "reason": "Autumn Window defines neither comfort tray border nor tray background colors."
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "status.success.foreground",
+      "backgroundRole": "status.success.background",
+      "reason": "Autumn Window does not define status foreground or background colors; the separate generated theme palette is not this kit source."
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "status.warning.foreground",
+      "backgroundRole": "status.warning.background",
+      "reason": "Autumn Window does not define status foreground or background colors; the separate generated theme palette is not this kit source."
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "status.error.foreground",
+      "backgroundRole": "status.error.background",
+      "reason": "Autumn Window does not define status foreground or background colors; the separate generated theme palette is not this kit source."
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "status.info.foreground",
+      "backgroundRole": "status.info.background",
+      "reason": "Autumn Window does not define status foreground or background colors; the separate generated theme palette is not this kit source."
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "entity.border",
+      "backgroundRole": "entity.surface.top",
+      "reason": "Autumn Window defines no entity border color."
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "entity.icon",
+      "backgroundRole": "entity.surface.top",
+      "reason": "Autumn Window defines no entity icon color."
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "comfort.foreground",
+      "backgroundRole": "comfort.chip.background",
+      "reason": "Autumn Window supplies comfort text color but no chip background color."
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "comfort.chip.border",
+      "backgroundRole": "comfort.chip.background",
+      "reason": "Autumn Window defines neither comfort chip border nor chip background colors."
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "comfort.chip.accent",
+      "backgroundRole": "comfort.chip.background",
+      "reason": "Autumn Window defines neither comfort chip accent nor chip background colors."
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "comfort.hint",
+      "backgroundRole": "comfort.tray.background",
+      "reason": "Autumn Window supplies neither a comfort hint color nor tray background color."
+    },
+    {
+      "mode": "dawn",
+      "foregroundRole": "comfort.tray.border",
+      "backgroundRole": "comfort.tray.background",
+      "reason": "Autumn Window defines neither comfort tray border nor tray background colors."
+    }
+  ]
+}

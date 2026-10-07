@@ -7,7 +7,6 @@
  */
 
 import "@/styles/admin.css";
-import autumnWindowTokens from "@/styles/autumn-window.tokens.css?raw";
 import QuickActions from "@/components/QuickActions.astro";
 import GlobalSearch from "@/components/GlobalSearch.astro";
 
@@ -16,12 +15,6 @@ interface Props {
 }
 
 const { currentPath = "" } = Astro.props;
-// Reuse the existing palette on admin pages without changing Base's theme selection.
-const adminThemeTokens = autumnWindowTokens.replaceAll(
-  ':root[data-theme="autumn-window"]',
-  ':root:has([data-admin-nav])',
-);
-
 const navSections = [
   {
     label: "Dashboard",
@@ -62,7 +55,7 @@ const navSections = [
       { href: "/admin/calendar", label: "Seasonal calendar", description: "Configure seasons, anchors, and rituals" },
       { href: "/admin/partners", label: "Partners & community", description: "Configure partner sections and affiliate highlights" },
       { href: "/admin/products", label: "Affiliate products", description: "Configure the affiliate product catalogue" },
-      { href: "/admin/theme", label: "Themes & typography", description: "Configure palettes, fonts, and theme scopes" },
+      { href: "/admin/theme", label: "Palettes", description: "Ingested colour palettes and semantic coverage" },
     ]
   },
   {
@@ -93,7 +86,8 @@ const currentPageDescription = currentPage?.description ?? "";
 
 ---
 
-<style is:global set:html={adminThemeTokens}></style>
+<!-- Preserve the non-rendering sibling used by existing space-y layouts. -->
+<style is:global set:html={"/* Admin palette ownership: src/styles/admin.css. */"}></style>
 
 <nav aria-label="Admin navigation" class="admin-nav" data-admin-nav>
   <div class="admin-nav-header">

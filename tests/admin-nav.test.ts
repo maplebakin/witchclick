@@ -17,8 +17,7 @@ interface NavItem {
 }
 
 function navigation(currentPath: string) {
-  const autumnWindowTokens = fs.readFileSync(new URL("../src/styles/autumn-window.tokens.css", import.meta.url), "utf8");
-  return runInNewContext(script, { Astro: { props: { currentPath } }, autumnWindowTokens }) as {
+  return runInNewContext(script, { Astro: { props: { currentPath } } }) as {
     navSections: Array<{ label: string; items: NavItem[] }>;
     quickLinks: NavItem[];
     activeHref?: string;
@@ -31,7 +30,7 @@ const expectedSections = [
   ["Create", [["/admin/generator", "Generate a post"], ["/admin/write", "Write a post"], ["/admin/curses", "Generate a curse"]]],
   ["Review", [["/admin/staging", "Review drafts"], ["/admin/stubs", "Post Stub Forge"], ["/admin/hero", "Complete hero images"]]],
   ["Library", [["/admin/posts", "Posts"], ["/admin/entities", "Entities"], ["/admin/curses/archive", "Curse archive & editor"], ["/admin/downloads", "Downloads"], ["/admin/authors", "Authors"]]],
-  ["Site", [["/admin/home", "Homepage"], ["/admin/calendar", "Seasonal calendar"], ["/admin/partners", "Partners & community"], ["/admin/products", "Affiliate products"], ["/admin/theme", "Themes & typography"]]],
+  ["Site", [["/admin/home", "Homepage"], ["/admin/calendar", "Seasonal calendar"], ["/admin/partners", "Partners & community"], ["/admin/products", "Affiliate products"], ["/admin/theme", "Palettes"]]],
   ["System", [["/admin/settings", "Site settings"]]],
 ] as const;
 
@@ -68,6 +67,7 @@ describe("admin navigation", () => {
     ["/admin/curses/archive", "/admin/curses/archive", "Curse archive & editor"],
     ["/admin/curses/archive/item", "/admin/curses/archive", "Curse archive & editor"],
     ["/admin/posts", "/admin/posts", "Posts"],
+    ["/admin/theme", "/admin/theme", "Palettes"],
   ])("selects only the most specific item for %s", (currentPath, href, label) => {
     const nav = navigation(currentPath);
     const activeItems = nav.navSections.flatMap(section => section.items).filter(item => item.href === nav.activeHref);

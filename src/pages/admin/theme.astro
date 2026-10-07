@@ -1,526 +1,154 @@
 ---
-/* eslint-disable astro/no-unused-css-selector */
 import Base from "../../layouts/Base.astro";
-import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
 import { readSettings, buildCanonicalUrl } from "../../utils/settings";
+import { discoverIngestedPalettes, paletteAnchor } from "@/lib/ingested-palettes";
 
 const settings = readSettings();
 const canonical = buildCanonicalUrl(settings, { path: "/admin/theme" });
-
-const isDev = import.meta.env.DEV;
 const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
-const url = new URL(Astro.request.url);
-const keyOk = ADMIN_KEY && url.searchParams.get("key") === ADMIN_KEY;
-const authorized = isDev || !!keyOk;
-
+const authorized = import.meta.env.DEV || !!(ADMIN_KEY && Astro.url.searchParams.get("key") === ADMIN_KEY);
+const palettes = discoverIngestedPalettes();
 const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
-const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || "";
 ---
-<Base
-  title="WitchClick — Theme Admin"
-  description="Design, preview, and launch WitchClick themes."
-  canon={canonical}
-  wide={true}
-  noindex={true}
->
-  <HeadSlot slot="head">
-    <meta name="robots" content="noindex" />
-  </HeadSlot>
-
+<Base title="WitchClick — Ingested palettes" description="Ingested colour palettes and semantic coverage." canon={canonical} wide={true} noindex={true}>
   {authorized ? (
-    <div class="space-y-8">
+    <div class="palette-shelf space-y-6" data-theme-manifest-viewer>
       <AdminNav currentPath="/admin/theme" />
-
-      <section class="theme-shell rounded-3xl border border-line-subtle bg-surface-base/80 p-6 shadow-lg" data-theme-preview>
-        <header class="theme-header mb-4 flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p class="text-[0.8rem] font-semibold uppercase tracking-[0.28em] text-body-muted">Theme Admin</p>
-            <h1 class="text-2xl font-semibold leading-tight text-body-strong">Runtime tokens</h1>
-            <p class="text-sm text-body-muted">Swatches grouped to match the editor layout.</p>
-          </div>
-          <a href="#themeEditorRoot" class="theme-cta">Go to editor</a>
-        </header>
-
-        <section class="rounded-2xl border border-line-subtle bg-surface-base/80 p-5 shadow-md backdrop-blur">
-          <div class="flex flex-wrap items-center justify-between gap-3">
-            <div class="space-y-1">
-              <p class="text-[0.8rem] font-semibold uppercase tracking-[0.24em] text-body-muted">Token Sections</p>
-              <h2 class="text-lg font-semibold text-body-strong">Organized swatches</h2>
-              <p class="text-sm text-body-muted">Click to copy resolved values coming from the current preview theme.</p>
-            </div>
-            <span class="rounded-full bg-surface-soft px-3 py-1 text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Live values</span>
-          </div>
-
-          <div class="token-grid mt-5">
-            <article class="token-section">
-              <header>
-                <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Foundation</p>
-                <h3 class="text-base font-semibold text-body-strong">Neutrals & page</h3>
-              </header>
-              <div class="token-section__swatches">
-                <button type="button" class="token-swatch" data-token-swatch="page-background" style="--swatch-color: var(--page-shell-bg);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">page-background</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-                <button type="button" class="token-swatch" data-token-swatch="surface-plain" style="--swatch-color: var(--panel-surface);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">surface-plain</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-                <button type="button" class="token-swatch" data-token-swatch="surface-strong" style="--swatch-color: var(--panel-strong);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">surface-strong</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-              </div>
-            </article>
-
-            <article class="token-section">
-              <header>
-                <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Brand/Core</p>
-                <h3 class="text-base font-semibold text-body-strong">Accent ladder</h3>
-              </header>
-              <div class="token-section__swatches">
-                <button type="button" class="token-swatch" data-token-swatch="brand-primary" style="--swatch-color: var(--brand-accent);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">brand-primary</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-                <button type="button" class="token-swatch" data-token-swatch="brand-secondary" style="--swatch-color: var(--brand-secondary);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">brand-secondary</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-                <button type="button" class="token-swatch" data-token-swatch="brand-glow" style="--swatch-color: var(--glass-glow);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">brand-glow</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-              </div>
-            </article>
-
-            <article class="token-section">
-              <header>
-                <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Text Palette</p>
-                <h3 class="text-base font-semibold text-body-strong">Copy & links</h3>
-              </header>
-              <div class="token-section__swatches">
-                <button type="button" class="token-swatch" data-token-swatch="text-heading" style="--swatch-color: var(--text-heading-token);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">text-heading</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-                <button type="button" class="token-swatch" data-token-swatch="text-body" style="--swatch-color: var(--text-body-token);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">text-body</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-                <button type="button" class="token-swatch" data-token-swatch="text-muted" style="--swatch-color: var(--text-muted-token);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">text-muted</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-                <button type="button" class="token-swatch" data-token-swatch="link" style="--swatch-color: var(--link-color-token);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">link</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-              </div>
-            </article>
-
-            <article class="token-section">
-              <header>
-                <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Glass & Cards</p>
-                <h3 class="text-base font-semibold text-body-strong">Overlays</h3>
-              </header>
-              <div class="token-section__swatches">
-                <button type="button" class="token-swatch" data-token-swatch="glass-surface" style="--swatch-color: var(--glass-surface);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">glass-surface</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-                <button type="button" class="token-swatch" data-token-swatch="glass-border" style="--swatch-color: var(--glass-border);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">glass-border</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-                <button type="button" class="token-swatch" data-token-swatch="card-panel" style="--swatch-color: var(--panel-surface-strong);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">card-panel</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-                <button type="button" class="token-swatch" data-token-swatch="card-border" style="--swatch-color: var(--card-border-strong);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">card-border</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-              </div>
-            </article>
-
-            <article class="token-section">
-              <header>
-                <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Entity + Status</p>
-                <h3 class="text-base font-semibold text-body-strong">Contrast checks</h3>
-              </header>
-              <div class="token-section__swatches">
-                <button type="button" class="token-swatch" data-token-swatch="entity-surface" style="--swatch-color: var(--entity-surface);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">entity-surface</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-                <button type="button" class="token-swatch" data-token-swatch="success" style="--swatch-color: var(--status-success);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">success</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-                <button type="button" class="token-swatch" data-token-swatch="warning" style="--swatch-color: var(--status-warning);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">warning</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-                <button type="button" class="token-swatch" data-token-swatch="error" style="--swatch-color: var(--status-error);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">error</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-              </div>
-            </article>
-
-            <article class="token-section">
-              <header>
-                <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">Admin</p>
-                <h3 class="text-base font-semibold text-body-strong">Back-compat</h3>
-              </header>
-              <div class="token-section__swatches">
-                <button type="button" class="token-swatch" data-token-swatch="admin-surface" style="--swatch-color: var(--admin-surface);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">admin-surface</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-                <button type="button" class="token-swatch" data-token-swatch="admin-accent" style="--swatch-color: var(--admin-accent-token);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">admin-accent</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-                <button type="button" class="token-swatch" data-token-swatch="focus-ring" style="--swatch-color: var(--focus-ring-token);">
-                  <span class="token-swatch__dot"></span>
-                  <div>
-                    <span class="token-swatch__name">focus-ring</span>
-                    <span class="token-swatch__value" data-token-value>—</span>
-                  </div>
-                </button>
-              </div>
-            </article>
-          </div>
-        </section>
-
-        <section class="rounded-2xl border border-line-subtle bg-surface-base/80 p-5 shadow-md backdrop-blur mt-5">
-          <div class="flex items-start justify-between gap-3">
-            <div>
-              <p class="text-[0.8rem] font-semibold uppercase tracking-[0.22em] text-body-muted">Theme Editor</p>
-              <h2 class="text-lg font-semibold text-body-strong">Manage palettes</h2>
-              <p class="text-sm text-body-muted">Use the full editor for palettes, scopes, imports, and exports. The preview and swatches above stay in sync.</p>
-            </div>
-            <a class="theme-cta" href="#themeEditorRoot">Open editor</a>
-          </div>
-          <div
-            id="themeEditorRoot"
-            data-dev-api={DEV_API}
-            data-dev-key={DEV_KEY}
-            data-theme-watch={import.meta.env.DEV ? "auto" : "manual"}
-            class="mt-5 rounded-xl border border-dashed border-line-subtle bg-surface-base/70 p-5 text-center text-sm text-body-muted"
-          >
-            <p class="font-medium text-primary">Loading Theme Editor…</p>
-            <p class="mt-2 text-[0.8rem]">Fetching presets from the development API.</p>
-          </div>
-        </section>
+      <header><h1>Ingested palettes</h1><p>Colour examples and required-semantic coverage for each ingested kit.</p></header>
+      <section class="kit-panel" data-palette-ingest data-dev-api={DEV_API} aria-labelledby="ingest-heading">
+        <h2 id="ingest-heading">Ingest palette</h2>
+        <p>Add a manifest and its matching CSS to the shelf. This does not activate a palette.</p>
+        <div class="ingest-inputs">
+          <label>manifest.json<input data-manifest-file type="file" accept=".json,application/json" /></label>
+          <label>kit.css<input data-css-file type="file" accept=".css,text/css" /></label>
+          <label>Admin token<input data-admin-token type="password" autocomplete="off" spellcheck="false" /><span>Used for this request only; never stored.</span></label>
+        </div>
+        <button type="button" data-ingest-button disabled>Ingest</button>
+        <p data-ingest-status data-state="locked" role="status" aria-live="polite">Palette ingestion is locked. Enter an admin token and select both files to continue.</p>
       </section>
+      <label class="palette-jump">Go to palette
+        <select data-palette-jump disabled={!palettes.length}>
+          <option value="">Choose a palette</option>
+          {palettes.map(palette => <option value={paletteAnchor(palette.manifest.kitId, palette.manifest.version)}>{palette.name} — {palette.manifest.version}</option>)}
+        </select>
+      </label>
+      {palettes.length ? palettes.map(palette => (
+        <article class="kit-panel" tabindex="-1" id={paletteAnchor(palette.manifest.kitId, palette.manifest.version)} data-palette={palette.manifest.kitId} data-palette-version={palette.manifest.version}>
+          <header class="palette-heading">
+            <div><h2>{palette.name}</h2><p>Version {palette.manifest.version}</p></div>
+            <span class="palette-status">{palette.status}</span>
+          </header>
+          <p class="coverage" data-required-semantics>Required semantics: <strong>{palette.requiredSemantics ? "Yes" : `No — ${palette.missing.length} roles missing`}</strong></p>
+          <div class="palette-modes">
+            {palette.modes.map(({ mode, swatches }) => (
+              <section aria-label={`${palette.name} ${mode}`}>
+                <h3>{mode}</h3>
+                <div class="palette-swatches">
+                  {swatches.map(swatch => (
+                    <div class="palette-sample">
+                      <span class="palette-swatch" aria-hidden="true" data-kit-swatch={swatch.id} data-kit-swatch-mode={mode} style={`background-color: ${swatch.value};`}></span>
+                      <span>{swatch.label}</span><code>{swatch.value}</code>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+          <details>
+            <summary>Kit details</summary>
+            <dl>
+              <div><dt>Kit ID</dt><dd>{palette.manifest.kitId}</dd></div>
+              <div><dt>Schema / contract</dt><dd>{palette.manifest.schemaVersion} / {palette.manifest.contractVersion}</dd></div>
+              <div><dt>CSS / namespace</dt><dd>{palette.manifest.cssFile} / {palette.manifest.namespace}</dd></div>
+              <div><dt>Integrity ({palette.manifest.integrity.algorithm})</dt><dd data-kit-integrity><code>{palette.manifest.integrity.sha256}</code></dd></div>
+              <div><dt>Contrast records</dt><dd data-kit-contrast-count>{palette.manifest.contrasts.length}</dd></div>
+              <div><dt>Unrecorded contrast pairs</dt><dd>{palette.manifest.missingContrastPairs.length}</dd></div>
+            </dl>
+            <h3>Missing roles</h3>
+            <p>{palette.missingRequired.length} required; {palette.missing.length - palette.missingRequired.length} optional.</p>
+            {palette.missing.length ? <ul>{palette.missing.map(role => <li data-kit-missing-role={role.id}><code>{role.id}</code> ({role.requirement}){role.classification && ` — ${role.classification}`}{role.owningLayer && ` · ${role.owningLayer}`}</li>)}</ul> : <p>No roles are missing.</p>}
+          </details>
+        </article>
+      )) : <section class="kit-panel"><p>No palettes have been ingested yet.</p></section>}
     </div>
-  ) : (
-    <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
-      <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
-      <p class="text-body-muted">These tools only run in <strong>development</strong> (or with a temporary key when hosted on a server adapter).</p>
-      <ol class="mx-auto mt-4 list-decimal space-y-2 text-left text-sm text-body-muted">
-        <li>Run <code>npm run dev</code> locally.</li>
-        <li>Use the ingestion CLI: <code>npm run ingest ./path/to/post.json</code>.</li>
-        <li>If you later switch to serverless, set <code>PUBLIC_ADMIN_KEY</code> and visit <code>/admin?key=…</code>.</li>
-      </ol>
-    </section>
-  )}
-
-  {authorized && (
-    <script type="module" is:inline>
-      const globalWindow = window;
-      if (!globalWindow.__themeEditorLoaded) {
-        globalWindow.__themeEditorLoaded = true;
-        import("/src/scripts/theme-editor-entry.ts");
-      }
-    </script>
-  )}
-
-  {authorized && (
-    <script type="module" is:inline>
-      const swatches = Array.from(document.querySelectorAll("[data-token-swatch]"));
-
-      const toReadableColor = (value) => {
-        const rgba = value.match(/^rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\)$/i);
-        if (rgba) {
-          const [, r, g, b, a] = rgba;
-          const hex = `#${[r, g, b].map((v) => Number(v).toString(16).padStart(2, "0")).join("")}`;
-          if (a !== undefined && a !== "" && a !== "1") {
-            const alpha = Math.round(Number(a) * 255)
-              .toString(16)
-              .padStart(2, "0");
-            return `${hex}${alpha}`;
-          }
-          return hex;
-        }
-        return value;
-      };
-
-      const refreshSwatches = () => {
-        const seenValues = new Set();
-        swatches.forEach((swatch) => {
-          const valueEl = swatch.querySelector("[data-token-value]");
-          const dot = swatch.querySelector(".token-swatch__dot");
-          const styleTarget = dot || swatch;
-          const computed = getComputedStyle(styleTarget);
-          const resolvedColor = computed.backgroundColor?.trim() || "";
-          const fallback = getComputedStyle(swatch).getPropertyValue("--swatch-color").trim();
-          const formatted = toReadableColor(
-            resolvedColor && resolvedColor !== "rgba(0, 0, 0, 0)" ? resolvedColor : fallback
-          ).trim();
-          const isDuplicate = formatted ? seenValues.has(formatted) : false;
-          if (formatted) {
-            seenValues.add(formatted);
-          }
-
-          swatch.dataset.value = formatted || fallback || resolvedColor;
-          if (valueEl) {
-            valueEl.textContent = isDuplicate ? "" : formatted || "—";
-            valueEl.classList.toggle("is-duplicate", isDuplicate);
-          }
-        });
-      };
-
-      refreshSwatches();
-      const docObserver = new MutationObserver(refreshSwatches);
-      docObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["style", "data-theme"] });
-
-      const preview = document.querySelector("[data-theme-preview]");
-      if (preview) {
-        const previewObserver = new MutationObserver(refreshSwatches);
-        previewObserver.observe(preview, { attributes: true, subtree: true, attributeFilter: ["style"] });
-      }
-
-      swatches.forEach((swatch) => {
-        swatch.addEventListener("click", async () => {
-          const value = swatch.dataset.value;
-          if (!value) return;
-          try {
-            await navigator.clipboard.writeText(value);
-            swatch.classList.add("copied");
-            setTimeout(() => swatch.classList.remove("copied"), 900);
-          } catch {
-            swatch.classList.add("copied");
-            setTimeout(() => swatch.classList.remove("copied"), 900);
-          }
-        });
-      });
-    </script>
-  )}
-
-  <style>
-    /* eslint-disable astro/no-unused-css-selector */
-    :global(html[data-theme-preview="active"]),
-    :global(html[data-theme-preview="active"]) body {
-      --surface-base: var(--preview-background, var(--theme-surface-base));
-      --panel-surface: var(--preview-cardPanelSurface, var(--glass-surface, var(--theme-surface-base)));
-      --panel-border: var(--preview-cardPanelBorder, var(--glass-border, var(--border-subtle)));
-      --text-body: var(--preview-textBody, var(--text-body));
-      --text-heading: var(--preview-textHeading, var(--text-heading));
-      --text-muted: var(--preview-textMuted, var(--theme-text-muted));
-      background: color-mix(in srgb, var(--theme-surface-base) 92%, transparent 8%);
-      color: var(--theme-text-body);
-    }
-
-    [data-theme-preview] {
-      --page-shell-bg: var(--preview-background, var(--theme-surface-base));
-      --panel-surface: var(--preview-cardPanelSurface, var(--glass-surface));
-      --panel-surface-strong: var(--preview-cardPanelSurfaceStrong, var(--glass-surface-strong));
-      --panel-strong: var(--preview-surfacePlain, var(--glass-surface-strong));
-      --panel-border: var(--preview-cardPanelBorder, var(--glass-border));
-      --card-border-strong: var(--preview-cardPanelBorderStrong, var(--glass-border-strong));
-      --header-background: var(--preview-headerBackground, var(--glass-surface));
-      --header-border: var(--preview-headerBorder, var(--glass-border));
-      --text-body: var(--preview-textBody, var(--theme-text-body));
-      --text-heading-token: var(--preview-textHeading, var(--text-heading));
-      --text-body-token: var(--preview-textPrimary, var(--theme-text-primary));
-      --text-muted-token: var(--preview-textMuted, var(--theme-text-muted));
-      --link-color-token: var(--preview-linkColor, var(--theme-link-color));
-      --brand-accent: var(--preview-primary, var(--theme-text-accent));
-      --brand-secondary: var(--preview-textAccent, var(--theme-text-accent));
-      --cta: var(--preview-primary, var(--theme-text-accent));
-      --cta-hover: color-mix(in srgb, var(--cta) 82%, white 18%);
-      --glass-hover-token: var(--preview-glassHover, var(--glass-hover));
-      --entity-surface: var(--preview-entityCardSurfaceTop, var(--glass-surface));
-      --entity-surface-strong: var(--preview-entityCardSurfaceBottom, var(--glass-surface-strong));
-      --entity-border: var(--preview-entityCardBorder, var(--glass-border-strong));
-      --entity-glow: var(--preview-entityCardGlow, var(--glass-glow));
-      --entity-tile-bg: color-mix(in srgb, var(--entity-surface) 82%, transparent);
-      --admin-surface: var(--preview-adminSurface, var(--admin-surface-base, var(--theme-surface-base)));
-      --admin-accent-token: var(--preview-adminAccent, var(--admin-accent));
-      --focus-ring-token: var(--preview-focusRingColor, var(--theme-focus-ring-color));
-      --status-success: var(--preview-success, var(--success));
-      --status-warning: var(--preview-warning, var(--warning));
-      --status-error: var(--preview-error, var(--error));
-      --line-subtle: var(--brand-accent);
-    }
-
-    .theme-shell {
-      max-width: 1200px;
-      margin: 0 auto;
-      background: color-mix(in srgb, var(--page-shell-bg) 95%, black 5%);
-      box-shadow: var(--theme-shadow-soft);
-    }
-
-    .theme-cta {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      padding: 0.85rem 1rem;
-      border-radius: var(--radius-2);
-      background: color-mix(in srgb, var(--brand-accent) 92%, white 8%);
-      color: var(--theme-text-strong);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      border: 1px solid color-mix(in srgb, var(--brand-accent) 45%, white 14%);
-      box-shadow: 0 8px 30px color-mix(in srgb, var(--brand-accent) 45%, transparent);
-      transition: transform var(--dur-med) var(--ease-out-curve), box-shadow var(--dur-med) var(--ease-out-curve);
-    }
-
-    .theme-cta:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 12px 40px color-mix(in srgb, var(--brand-accent) 55%, transparent);
-    }
-
-    .token-grid {
-      display: grid;
-      gap: 1rem;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    }
-
-    .token-section {
-      border: 1px solid var(--theme-panel-border);
-      background: color-mix(in srgb, var(--panel-surface) 86%, transparent);
-      border-radius: var(--radius-2);
-      padding: 1rem;
-      box-shadow: var(--theme-shadow-soft);
-    }
-
-    .token-section__swatches {
-      margin-top: 0.75rem;
-      display: grid;
-      gap: 0.5rem;
-    }
-
-    .token-swatch {
-      width: 100%;
-      text-align: left;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 0.85rem;
-      border-radius: 12px;
-      border: 1px solid color-mix(in srgb, var(--theme-panel-border) 80%, transparent);
-      background: color-mix(in srgb, var(--swatch-color) 85%, transparent);
-      cursor: pointer;
-      transition: transform var(--dur-fast) var(--ease-out-curve), box-shadow var(--dur-fast) var(--ease-out-curve);
-      color: var(--theme-text-body);
-    }
-
-    .token-swatch:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--theme-shadow-soft);
-    }
-
-    .token-swatch__dot {
-      height: 2.25rem;
-      width: 2.25rem;
-      border-radius: var(--radius-1);
-      border: 1px solid color-mix(in srgb, var(--theme-panel-border) 70%, transparent);
-      background: var(--swatch-color);
-      box-shadow: inset 0 0 0 1px color-mix(in srgb, #fff 20%, transparent);
-      flex-shrink: 0;
-    }
-
-    .token-swatch__name {
-      display: block;
-      font-weight: 700;
-      font-size: 13px;
-      color: var(--text-heading-token);
-    }
-
-    .token-swatch__value {
-      display: block;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      color: var(--text-muted-token);
-      word-break: break-all;
-      min-height: 1.1em;
-    }
-
-    .token-swatch.copied {
-      box-shadow: 0 0 0 2px var(--focus-ring-token);
-    }
-
-    .token-swatch__value.is-duplicate {
-      visibility: hidden;
-    }
-    /* eslint-enable astro/no-unused-css-selector */
-  </style>
+  ) : <section class="kit-panel"><h1>Local admin access required</h1><p>Open this shelf in the local development session or use the existing admin access requirements.</p></section>}
 </Base>
+<style>
+  .ingest-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 1rem; margin-block: 1rem; }
+  label { display: grid; gap: .5rem; } input, select { max-width: 100%; min-width: 0; padding: .65rem; color: var(--admin-text-body); background: var(--admin-surface-base); border: 1px solid var(--admin-border-strong); border-radius: .4rem; }
+  label span { font-size: .85rem; }
+  button { padding: .6rem 1rem; border: 1px solid var(--admin-border-strong); border-radius: .4rem; background: var(--admin-surface-base); color: var(--admin-text-strong); }
+  button:disabled { cursor: not-allowed; } button:focus-visible, input:focus-visible, select:focus-visible, article:focus-visible { outline: 3px solid var(--admin-focus); outline-offset: 3px; }
+  [data-ingest-status] { margin-top: 1rem; overflow-wrap: anywhere; }
+  article { scroll-margin-top: 7rem; }
+  .palette-shelf { color: var(--admin-text-body); }
+  .kit-panel { padding: clamp(1rem, 3vw, 1.75rem); background: var(--admin-surface-muted); color: var(--admin-text-body); border: 1px solid var(--admin-border-subtle); border-radius: 1rem; }
+  h1, h2, h3 { color: var(--admin-text-strong); line-height: 1.35; }
+  h1 { font-size: 1.8rem; } h2 { font-size: 1.45rem; } h3 { font-size: 1rem; margin-block: 1rem .75rem; }
+  p, li, dd { line-height: 1.6; }
+  .palette-heading { display: flex; align-items: start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .palette-heading p, dt { color: var(--admin-text-muted); }
+  .palette-status { border: 1px solid var(--admin-border-strong); border-radius: 1rem; padding: .2rem .75rem; }
+  .coverage { margin-block: 1rem; }
+  .palette-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: 1.5rem; }
+  .palette-swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 6rem), 1fr)); gap: .85rem; }
+  .palette-sample { display: grid; gap: .25rem; align-content: start; font-size: .85rem; line-height: 1.5; }
+  .palette-swatch { display: block; height: 2.5rem; border: 1px solid var(--admin-border-strong); border-radius: .4rem; }
+  code, dd { overflow-wrap: anywhere; } code { font-size: .85rem; }
+  details { margin-top: 1.5rem; border-top: 1px solid var(--admin-border-subtle); }
+  summary { padding-block: 1rem; color: var(--admin-text-strong); cursor: pointer; }
+  summary:focus-visible { outline: 3px solid var(--admin-focus); outline-offset: 3px; }
+  dl { display: grid; gap: .75rem; } dd { margin: 0; }
+  ul { list-style: disc; padding-left: 1.25rem; }
+</style>
+
+<script>
+  const panel = document.querySelector<HTMLElement>('[data-palette-ingest]');
+  if (panel) {
+    const manifestFile = panel.querySelector<HTMLInputElement>('[data-manifest-file]')!;
+    const cssFile = panel.querySelector<HTMLInputElement>('[data-css-file]')!;
+    const token = panel.querySelector<HTMLInputElement>('[data-admin-token]')!;
+    const button = panel.querySelector<HTMLButtonElement>('[data-ingest-button]')!;
+    const status = panel.querySelector<HTMLElement>('[data-ingest-status]')!;
+    let pending = false;
+    const message = (state: string, text: string) => { status.dataset.state = state; status.textContent = text; };
+    const update = () => {
+      button.disabled = pending || !token.value.trim() || !manifestFile.files?.length || !cssFile.files?.length;
+    };
+    for (const input of [manifestFile, cssFile, token]) input.addEventListener('input', () => {
+      if (!pending) message(token.value.trim() ? 'ready' : 'locked', token.value.trim() ? 'Select both files, then ingest. The palette will be shelved, not active.' : 'Palette ingestion is locked. An admin token is required.');
+      update();
+    });
+    button.addEventListener('click', async () => {
+      if (button.disabled || pending) return;
+      pending = true; update();
+      for (const input of [manifestFile, cssFile, token]) input.disabled = true;
+      message('loading', 'Validating and shelving palette…');
+      try {
+        const manifest = await manifestFile.files![0]!.text();
+        const css = await cssFile.files![0]!.text();
+        const response = await fetch(`${panel.dataset.devApi}/palettes/ingest`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token.value.trim()}` }, body: JSON.stringify({ manifest, css }) });
+        if (response.status === 401 || response.status === 403) { message('locked', 'Palette ingestion is locked. A valid admin token is required; loopback access alone does not unlock it.'); return; }
+        const result = await response.json();
+        if (!response.ok || !result.ok) throw new Error(result.error || 'Palette ingestion failed.');
+        message('success', `${result.kitId} ${result.version} — Required semantics: ${result.requiredSemantics ? 'Yes' : `No — ${result.missingCount} missing`}. Destination: ${result.path}. Shelved, not active. Refresh or restart the dev server if the shelf has not updated.`);
+        manifestFile.value = ''; cssFile.value = ''; token.value = '';
+      } catch (error) { message('error', error instanceof Error ? error.message : 'Palette ingestion failed.'); }
+      finally { pending = false; for (const input of [manifestFile, cssFile, token]) input.disabled = false; update(); }
+    });
+  }
+  const jump = document.querySelector<HTMLSelectElement>('[data-palette-jump]');
+  const focusPalette = () => {
+    let id: string;
+    try { id = decodeURIComponent(location.hash.slice(1)); } catch { return; }
+    const card = document.getElementById(id);
+    if (!card?.hasAttribute('data-palette')) return;
+    if (jump) jump.value = id;
+    card.focus({ preventScroll: true });
+    card.scrollIntoView({ block: 'start', behavior: 'auto' });
+  };
+  jump?.addEventListener('change', () => { if (jump.value) { location.hash = jump.value; focusPalette(); } });
+  window.addEventListener('hashchange', focusPalette);
+  focusPalette();
+</script>

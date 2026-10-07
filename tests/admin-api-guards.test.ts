@@ -190,7 +190,7 @@ describe("Staging opt-in loopback access", () => {
     const source = fs.readFileSync(new URL("../src/pages/admin/staging.astro", import.meta.url), "utf8");
     const helper = source.match(/function checkStagingAccess\(response\) \{[\s\S]*?\n {10}\}/)![0];
     const check = new Function(`${helper}; return checkStagingAccess;`)() as (response: { status: number }) => void;
-    for (const status of [401, 403]) expect(() => check({ status })).toThrow(/Staging actions are locked.*loopback exemption or authorized token authentication/);
+    for (const status of [401, 403]) expect(() => check({ status })).toThrow(/Staging actions are locked.*local dev API.*DEV_API_TOKEN/);
     for (const status of [200, 400, 404, 500]) expect(() => check({ status })).not.toThrow();
   });
 });

@@ -1,3 +1,4 @@
+import { tsImport } from 'tsx/esm/api';
 // dev-api.js (ESM)
 // Minimal local API for WitchClick admin with safe YAML quoting.
 // Endpoints:
@@ -27,6 +28,10 @@
 //   POST /authors/save {slug, name, title, pronouns, bio, focus, specialties[], links[]}
 //   POST /authors/delete {slug}
 
+import { createHash } from 'node:crypto';
+import postcss from 'postcss';
+import { requireAdminAuth } from './src/pages/api/_mutating.ts';
+import { summarizePalette, discoverIngestedPalettes } from './src/lib/ingested-palettes.ts';
 import http from 'node:http';
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
@@ -52,7 +57,6 @@ import { CONTENT_TYPES, ENTITY_TYPES, POST_CATEGORIES } from './server/lib/postS
 import { resolvePostsDirectories } from './scripts/lib/contentPaths.js';
 import { frontmatterString, parseFrontmatter, readFrontmatter } from './scripts/lib/frontmatter.js';
 import { isValidSlug, slugify } from './shared/slugify.js';
-import { resetThemeCache } from './shared/theme-cache.js';
 import {
   prepareSpecForPersistence,
   persistPreparedSpec,
@@ -418,104 +422,9 @@ async function deleteCurseBySlug(slug) {
 
 const HERO_IMAGE_ROOT = path.join(CWD, 'public', 'images', 'hero');
 const DOWNLOADS_ROOT = path.join(CWD, 'public', 'downloads');
-const THEME_BACKGROUNDS_ROOT = path.join(CWD, 'public', 'images', 'theme-backgrounds');
-const THEMES_DIR = path.join(CWD, 'content', 'themes');
-const ACTIVE_THEME_FILE = path.join(THEMES_DIR, 'active.json');
 const CURSE_ARCHIVE_DIR = path.join(CWD, 'archive', 'curses');
 const CURSE_LEGACY_DIR = path.join(CWD, 'content', 'white-magic-curses');
 ensureDir(CURSE_ARCHIVE_DIR);
-
-const THEME_REQUIRED_FIELDS = ['primary', 'accent', 'background', 'fontSerif', 'fontScript'];
-const THEME_EXTRA_FIELDS = [
-  'colorMidnight', 'colorNight', 'colorIris', 'colorAmethyst', 'colorDusk', 'colorGold', 'colorRune', 'colorFog', 'colorInk',
-  'colorMuted', 'colorBorder', 'colorBorderStrong', 'colorOverlay', 'colorOverlayStrong',
-  'surfacePlain', 'surfacePlainBorder', 'cardPanelSurface', 'cardPanelSurfaceStrong', 'cardPanelBorder', 'cardPanelBorderStrong', 'cardPanelBorderSoft',
-  'glassSurface', 'glassSurfaceStrong', 'glassCard', 'glassHover', 'glassBorder', 'glassBorderStrong', 'glassHighlight', 'glassGlow', 'glassShadowSoft', 'glassShadowStrong', 'glassBlur', 'glassNoiseOpacity',
-  'textSecondary', 'textTertiary', 'textStrong', 'textHint', 'textDisabled', 'textBody', 'textSubtle', 'textAccent', 'textAccentStrong',
-  'inkBody', 'inkStrong', 'inkMuted', 'linkColor',
-  'cardBadgeBg', 'cardBadgeBorder', 'cardBadgeText', 'cardTagBg', 'cardTagBorder', 'cardTagText', 'cardSpoonBg', 'cardSpoonBorder', 'cardSpoonText',
-  'focusRingColor', 'cardFocusOutline',
-  'fontHeading', 'fontAccent',
-  'shadowSoft', 'shadowStrong',
-  'success', 'warning', 'error', 'info',
-  'entityCardBorder', 'entityCardGlow', 'entityCardHighlight', 'entityCardSurfaceTop', 'entityCardSurfaceBottom',
-  'entityCardHeading', 'entityCardText', 'entityCardLabel', 'entityCardCta', 'entityCardCtaHover', 'entityCardIcon', 'entityCardIconShadow',
-  'headerBackground', 'headerBorder', 'headerText', 'headerTextHover',
-  'footerBackground', 'footerBorder', 'footerText', 'footerTextMuted',
-  'backgroundImage',
-  'textPrimary', 'textHeading', 'textMuted'
-];
-const THEME_OPTIONAL_FIELDS = ['textPrimary', 'textHeading', 'textMuted', 'backgroundImage', 'fontHeading', 'fontAccent', ...THEME_EXTRA_FIELDS];
-const THEME_ALL_FIELDS = Array.from(new Set([...THEME_REQUIRED_FIELDS, ...THEME_OPTIONAL_FIELDS]));
-const DEFAULT_THEME_SETTINGS = {
-  midnight: {
-    primary: '#6b21a8',
-    accent: '#d9b2c4',
-    background: '#faf7f5',
-    textPrimary: '#1f1630',
-    textHeading: '#120725',
-    textMuted: '#6b5d70',
-    fontSerif: 'Literata',
-    fontScript: 'Parisienne'
-  },
-  dawn: {
-    primary: '#9b86c8',
-    accent: '#caa043',
-    background: '#f6f0e8',
-    textPrimary: '#1f1630',
-    textHeading: '#120725',
-    textMuted: '#6b5d70',
-    fontSerif: 'Literata',
-    fontScript: 'Parisienne'
-  }
-};
-
-const COLOR_TOKENS_FILE = path.join(CWD, 'content', 'color-tokens.json');
-const COLOR_TOKEN_CSS_FILE = path.join(CWD, 'src', 'styles', 'color-tokens.generated.css');
-const COLOR_TOKEN_KEYS = [
-  'textPrimary',
-  'textSecondary',
-  'textTertiary',
-  'textHint',
-  'textDisabled',
-  'textBody',
-  'textSubtle',
-  'textAccent',
-  'textAccentStrong',
-  'textStrong',
-  'textMuted',
-  'linkColor'
-];
-const DEFAULT_COLOR_TOKENS = {
-  midnight: {
-    textPrimary: '#f4f1ff',
-    textSecondary: '#f4f1ff',
-    textTertiary: '#f4f1ff',
-    textHint: '#f4f1ff',
-    textDisabled: '#f4f1ff',
-    textBody: '#f9f5ff',
-    textSubtle: '#f9f5ff',
-    textAccent: '#d4af37',
-    textAccentStrong: '#d4af37',
-    textStrong: '#f9f5ff',
-    textMuted: '#f9f5ff',
-    linkColor: '#e0c07d'
-  },
-  dawn: {
-    textPrimary: '#2c1b3d',
-    textSecondary: '#2c1b3d',
-    textTertiary: '#2c1b3d',
-    textHint: '#2c1b3d',
-    textDisabled: '#2c1b3d',
-    textBody: '#573f73',
-    textSubtle: '#573f73',
-    textAccent: '#9b86c8',
-    textAccentStrong: '#573f73',
-    textStrong: '#3a2854',
-    textMuted: '#573f73',
-    linkColor: '#caa043'
-  }
-};
 
 const MIME_EXTENSION_MAP = {
   'image/jpeg': '.jpg',
@@ -524,93 +433,6 @@ const MIME_EXTENSION_MAP = {
   'image/webp': '.webp',
   'application/pdf': '.pdf',
 };
-
-function cloneDefaultColorTokens() {
-  return {
-    midnight: { ...DEFAULT_COLOR_TOKENS.midnight },
-    dawn: { ...DEFAULT_COLOR_TOKENS.dawn },
-  };
-}
-
-function toCssVarName(key) {
-  return `--${key.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}`;
-}
-
-function normalizeColorTokenState(raw) {
-  const defaults = cloneDefaultColorTokens();
-  const tokens = {
-    midnight: { ...defaults.midnight },
-    dawn: { ...defaults.dawn },
-  };
-
-  if (raw && typeof raw === 'object') {
-    const sourceTokens = raw.tokens && typeof raw.tokens === 'object' ? raw.tokens : {};
-    ['midnight', 'dawn'].forEach((mode) => {
-      const values = sourceTokens[mode];
-      if (!values || typeof values !== 'object') return;
-      COLOR_TOKEN_KEYS.forEach((key) => {
-        const value = values[key];
-        if (typeof value === 'string' && value.trim()) {
-          tokens[mode][key] = value.trim();
-        }
-      });
-    });
-  }
-
-  const updatedAt = typeof raw?.updatedAt === 'string' && raw.updatedAt.trim()
-    ? raw.updatedAt.trim()
-    : new Date().toISOString();
-
-  return {
-    schemaVersion: 1,
-    updatedAt,
-    tokens,
-  };
-}
-
-async function writeColorTokenCss(state) {
-  const defaults = cloneDefaultColorTokens();
-  const tokens = {
-    midnight: { ...defaults.midnight, ...(state?.tokens?.midnight || {}) },
-    dawn: { ...defaults.dawn, ...(state?.tokens?.dawn || {}) },
-  };
-  const timestamp = state?.updatedAt || new Date().toISOString();
-
-  const midnightLines = COLOR_TOKEN_KEYS.map((key) => {
-    const value = tokens.midnight[key] ?? defaults.midnight[key] ?? '';
-    return `  ${toCssVarName(key)}: ${value};`;
-  });
-  const dawnLines = COLOR_TOKEN_KEYS.map((key) => {
-    const value = tokens.dawn[key] ?? defaults.dawn[key] ?? '';
-    return `  ${toCssVarName(key)}: ${value};`;
-  });
-
-  const css = `/**\n * AUTO-GENERATED COLOR TOKENS\n * Generated: ${timestamp}\n * Source: content/color-tokens.json\n */\n\n:root {\n${midnightLines.join('\n')}\n}\n\n:root[data-comfort-theme="dawn"] {\n${dawnLines.join('\n')}\n}\n`;
-
-  ensureDir(path.dirname(COLOR_TOKEN_CSS_FILE));
-  await fsp.writeFile(COLOR_TOKEN_CSS_FILE, css, 'utf8');
-}
-
-async function loadColorTokens() {
-  const raw = readJSON(COLOR_TOKENS_FILE);
-  const state = normalizeColorTokenState(raw);
-  await writeColorTokenCss(state);
-  return state;
-}
-
-async function saveColorTokens(payload) {
-  if (!payload || typeof payload !== 'object' || typeof payload.tokens !== 'object') {
-    throw new Error('tokens object required');
-  }
-
-  const state = normalizeColorTokenState({ tokens: payload.tokens });
-  state.updatedAt = new Date().toISOString();
-
-  ensureDir(path.dirname(COLOR_TOKENS_FILE));
-  await fsp.writeFile(COLOR_TOKENS_FILE, JSON.stringify(state, null, 2), 'utf8');
-  await writeColorTokenCss(state);
-  return state;
-}
 
 function toStringArray(value) {
   if (Array.isArray(value)) {
@@ -833,64 +655,12 @@ async function listPostsForHero() {
   return items;
 }
 
-async function listDraftPosts() {
-  const directories = resolvePostsDirectories({ root: CWD });
-  const draftsBySlug = new Map();
-
-  for (const postsDir of directories) {
-    let entries = [];
-    try {
-      entries = await fsp.readdir(postsDir, { withFileTypes: true });
-    } catch {
-      continue;
-    }
-
-    for (const entry of entries) {
-      if (!entry.isFile()) continue;
-      if (!entry.name.toLowerCase().endsWith('.md')) continue;
-
-      const file = path.join(postsDir, entry.name);
-      const fileSlug = path.basename(entry.name, path.extname(entry.name));
-
-      try {
-        const raw = await fsp.readFile(file, 'utf8');
-        const parsed = parseFrontmatter(raw);
-        if (parsed?.data?.draft !== true) continue;
-
-        const fmSlug = frontmatterString(parsed.data, 'slug');
-        const slug = fmSlug && isValidSlug(fmSlug) ? fmSlug : fileSlug;
-        if (!isValidSlug(slug) || draftsBySlug.has(slug)) continue;
-
-        const excerpt = frontmatterString(parsed.data, 'excerpt');
-        const publishedAt =
-          frontmatterString(parsed.data, 'publishedAt') ||
-          frontmatterString(parsed.data, 'pubDate') ||
-          new Date().toISOString();
-        const promptMetadata =
-          parsed.data && typeof parsed.data.promptMetadata === 'object' && parsed.data.promptMetadata !== null
-            ? parsed.data.promptMetadata
-            : undefined;
-
-        draftsBySlug.set(slug, {
-          slug,
-          title: frontmatterString(parsed.data, 'title') || 'Untitled',
-          excerpt: excerpt || '',
-          tags: toStringArray(parsed.data?.tags),
-          wordCount: Number(parsed.data?.wordCount || 0),
-          readingMinutes: Number(parsed.data?.readingMinutes || 1),
-          publishedAt,
-          filePath: path.relative(CWD, file).replace(/\\/g, '/'),
-          promptMetadata,
-        });
-      } catch {
-        // Skip unreadable draft files
-      }
-    }
-  }
-
-  const drafts = Array.from(draftsBySlug.values());
-  drafts.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-  return drafts;
+// Scoped TS loading reuses Astro's current-file readiness operations without
+// executing its access guards or requiring a global loader for node dev-api.js.
+let stagingOperations;
+async function getStagingOperations() {
+  stagingOperations ??= tsImport('./src/utils/staging.ts', import.meta.url);
+  return stagingOperations;
 }
 
 async function attachHeroToPost({ slug, heroImage, heroAlt }) {
@@ -1911,270 +1681,6 @@ function run(cmd, args, cwd = CWD) {
   });
 }
 
-// ---------- THEMES ----------
-async function listThemes() {
-  ensureDir(THEMES_DIR);
-  let files = [];
-  try {
-    files = fs.readdirSync(THEMES_DIR).filter((f) => f.endsWith('.json') && f !== 'active.json');
-  } catch {
-    files = [];
-  }
-
-  const items = { midnight: [], dawn: [] };
-  for (const file of files) {
-    const filePath = path.join(THEMES_DIR, file);
-    try {
-      const theme = readThemeRecord(filePath);
-      items[theme.mode].push(theme);
-    } catch {
-      // ignore malformed theme files
-    }
-  }
-
-  items.midnight.sort((a, b) => {
-    // Sort by category first, then by label
-    const catCompare = (a.category || 'custom').localeCompare(b.category || 'custom');
-    if (catCompare !== 0) return catCompare;
-    return a.label.localeCompare(b.label);
-  });
-  items.dawn.sort((a, b) => {
-    const catCompare = (a.category || 'custom').localeCompare(b.category || 'custom');
-    if (catCompare !== 0) return catCompare;
-    return a.label.localeCompare(b.label);
-  });
-
-  const active = readActiveThemeMapping();
-  return { items, active };
-}
-
-async function saveThemeRecord(payload) {
-  const mode = normalizeThemeMode(payload?.mode);
-  const label = typeof payload?.label === 'string' ? payload.label.trim() : '';
-  const slugInput = typeof payload?.slug === 'string' ? payload.slug : '';
-  const slug = slugify(slugInput || label);
-  if (!slug) throw new Error('label or slug required');
-
-  const category = typeof payload?.category === 'string' ? payload.category.trim() : 'custom';
-
-  const settingsSource = {
-    ...extractThemeValues(payload),
-    ...extractThemeValues(payload?.settings),
-  };
-
-  const settings = mergeThemeSettings(settingsSource, mode, `theme payload (${slug})`);
-
-  // Extract and validate overrides if provided
-  let overrides;
-  if (payload?.overrides && Array.isArray(payload.overrides)) {
-    overrides = payload.overrides
-      .filter((override) => override && typeof override.scope === 'string' && override.scope.trim())
-      .map((override) => ({
-        scope: override.scope.trim(),
-        variables: extractThemeValues(override.variables || {}),
-      }))
-      .filter((override) => Object.keys(override.variables).length > 0);
-
-    // Only include overrides if there are any valid ones
-    if (overrides.length === 0) {
-      overrides = undefined;
-    }
-  }
-
-  const record = {
-    slug,
-    label: label || toTitleCase(slug),
-    mode,
-    category,
-    settings,
-  };
-
-  // Add overrides to record if they exist
-  if (overrides) {
-    record.overrides = overrides;
-  }
-
-  ensureDir(THEMES_DIR);
-  const filePath = path.join(THEMES_DIR, `${slug}.json`);
-  await fsp.writeFile(filePath, JSON.stringify(record, null, 2), 'utf8');
-
-  const _active = readActiveThemeMapping();
-  resetThemeCache();
-  return record;
-}
-
-async function setActiveThemeRecord(payload) {
-  const mode = normalizeThemeMode(payload?.mode);
-  const slug = typeof payload?.slug === 'string' ? payload.slug.trim() : '';
-  if (!isValidSlug(slug)) throw new Error('valid slug required');
-
-  const filePath = path.join(THEMES_DIR, `${slug}.json`);
-  if (!fs.existsSync(filePath)) throw new Error('theme not found');
-
-  const theme = readThemeRecord(filePath);
-  if (theme.mode !== mode) {
-    throw new Error(`Theme ${theme.slug} is configured for ${theme.mode}, not ${mode}.`);
-  }
-
-  const active = readActiveThemeMapping();
-  const next = {
-    midnight: active.midnight,
-    dawn: active.dawn,
-  };
-  next[mode] = theme.slug;
-
-  ensureDir(THEMES_DIR);
-  await fsp.writeFile(ACTIVE_THEME_FILE, JSON.stringify(next, null, 2), 'utf8');
-
-  resetThemeCache();
-  return { active: next, theme };
-}
-
-async function deleteThemeRecord(payload) {
-  const slug = typeof payload?.slug === 'string' ? payload.slug.trim() : '';
-  if (!isValidSlug(slug)) throw new Error('valid slug required');
-
-  const filePath = path.join(THEMES_DIR, `${slug}.json`);
-  if (!fs.existsSync(filePath)) throw new Error('theme not found');
-
-  const theme = readThemeRecord(filePath);
-  await fsp.unlink(filePath);
-
-  const active = readActiveThemeMapping();
-  const next = {
-    midnight: active.midnight,
-    dawn: active.dawn,
-  };
-
-  if (next.midnight === slug && theme.mode === 'midnight') {
-    next.midnight = null;
-  }
-  if (next.dawn === slug && theme.mode === 'dawn') {
-    next.dawn = null;
-  }
-
-  if (next.midnight !== active.midnight || next.dawn !== active.dawn) {
-    ensureDir(THEMES_DIR);
-    await fsp.writeFile(ACTIVE_THEME_FILE, JSON.stringify(next, null, 2), 'utf8');
-  }
-
-  resetThemeCache();
-  return { slug, mode: theme.mode, active: next };
-}
-
-function readThemeRecord(filePath) {
-  const raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-  if (!raw || typeof raw !== 'object') throw new Error('Invalid theme file');
-
-  const slugRaw = typeof raw.slug === 'string' ? raw.slug.trim() : '';
-  const slug = slugRaw || path.basename(filePath, path.extname(filePath));
-  const mode = normalizeThemeMode(raw.mode);
-  const labelRaw = typeof raw.label === 'string' ? raw.label.trim() : '';
-  const label = labelRaw || toTitleCase(slug);
-  const category = typeof raw.category === 'string' ? raw.category.trim() : 'custom';
-  const settingsSource = {
-    ...extractThemeValues(raw),
-    ...extractThemeValues(raw.settings),
-  };
-  const settings = mergeThemeSettings(settingsSource, mode, filePath);
-
-  const record = { slug, label, mode, category, settings };
-
-  // Include overrides if they exist in the file
-  if (raw.overrides && Array.isArray(raw.overrides) && raw.overrides.length > 0) {
-    record.overrides = raw.overrides;
-  }
-
-  return record;
-}
-
-function readActiveThemeMapping() {
-  try {
-    const raw = JSON.parse(fs.readFileSync(ACTIVE_THEME_FILE, 'utf8'));
-    if (!raw || typeof raw !== 'object') return { midnight: null, dawn: null };
-    const midnight = typeof raw.midnight === 'string' ? raw.midnight.trim() : '';
-    const dawn = typeof raw.dawn === 'string' ? raw.dawn.trim() : '';
-    return {
-      midnight: midnight || null,
-      dawn: dawn || null,
-    };
-  } catch {
-    return { midnight: null, dawn: null };
-  }
-}
-
-function extractThemeValues(source) {
-  const values = {};
-  if (!source || typeof source !== 'object') return values;
-  const allFields = THEME_ALL_FIELDS;
-  for (const key of allFields) {
-    const value = source[key];
-    if (typeof value === 'string' && value.trim()) {
-      values[key] = value;
-    }
-  }
-  return values;
-}
-
-function mergeThemeSettings(raw, mode, sourceName) {
-  const base = { ...DEFAULT_THEME_SETTINGS[mode] };
-  if (!base) {
-    throw new Error(`Unknown theme mode: ${mode}`);
-  }
-
-  const allFields = THEME_ALL_FIELDS;
-  const entries = raw && typeof raw === 'object' ? Object.entries(raw) : [];
-  for (const [key, value] of entries) {
-    if (!allFields.includes(key)) continue;
-    if (value === undefined || value === null) continue;
-    if (typeof value !== 'string') {
-      throw new Error(`[themes] ${key} in ${sourceName} must be a string.`);
-    }
-    const trimmed = value.trim();
-    if (!trimmed) {
-      if (THEME_REQUIRED_FIELDS.includes(key)) {
-        throw new Error(`[themes] ${key} in ${sourceName} cannot be empty.`);
-      }
-      continue; // Skip empty optional fields
-    }
-    base[key] = trimmed;
-  }
-
-  const missing = THEME_REQUIRED_FIELDS.filter((key) => !base[key] || !String(base[key]).trim());
-  if (missing.length) {
-    throw new Error(`[themes] Missing values for ${missing.join(', ')} in ${sourceName}.`);
-  }
-
-  const result = {
-    primary: base.primary,
-    accent: base.accent,
-    background: base.background,
-    fontSerif: base.fontSerif,
-    fontScript: base.fontScript,
-  };
-
-  // Add optional fields if present
-  THEME_OPTIONAL_FIELDS.forEach((key) => {
-    if (base[key] && String(base[key]).trim()) {
-      result[key] = base[key];
-    }
-  });
-
-  return result;
-}
-
-function normalizeThemeMode(value) {
-  return value === 'dawn' ? 'dawn' : 'midnight';
-}
-
-function toTitleCase(value) {
-  return String(value || '')
-    .replace(/[-_]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
 // ---------- DOWNLOADS ----------
 async function listDownloads() {
   const base = path.join(CWD, 'content', 'downloads');
@@ -2548,6 +2054,93 @@ async function withRequestBoundary(req, res, handler) {
   }
 }
 
+// Palette ingestion is a dev-only, token-gated addition; it never activates kits.
+function validatePaletteIngest(payload) {
+  const invalid = (message) => { const error = new Error(message); error.status = 400; throw error; };
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) invalid('JSON object required');
+  const css = payload.css;
+  if (typeof css !== 'string' || !css.trim()) invalid('CSS text required');
+  const raw = typeof payload.manifest === 'string' ? payload.manifest : JSON.stringify(payload.manifest);
+  if (!raw || Buffer.byteLength(raw) > 512 * 1024 || Buffer.byteLength(css) > 256 * 1024) invalid('Palette exceeds manifest (512 KiB) or CSS (256 KiB) limit');
+  let manifest;
+  try { manifest = JSON.parse(raw); } catch { invalid('Invalid manifest JSON'); }
+  if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest)) invalid('Manifest object required');
+  if (manifest.schemaVersion !== '1.0.0' || manifest.contractVersion !== '1.0.0') invalid('Unsupported schemaVersion or contractVersion; expected 1.0.0');
+  if (typeof manifest.kitId !== 'string' || !/^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$/.test(manifest.kitId) || manifest.kitId.length > 100) invalid('Invalid kitId');
+  if (typeof manifest.version !== 'string' || !/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[a-z0-9]+(?:[.-][a-z0-9]+)*)?$/.test(manifest.version) || manifest.version.length > 64) invalid('Invalid immutable version');
+  if (manifest.cssFile !== 'kit.css' || manifest.namespace !== '--wc-kit-') invalid('cssFile must be kit.css and namespace must be --wc-kit-');
+  const modes = manifest.supportedModes;
+  if (!Array.isArray(modes) || !modes.length || modes.length > 8 || modes.some(mode => typeof mode !== 'string' || !/^[a-z][a-z0-9-]*$/.test(mode)) || new Set(modes).size !== modes.length) invalid('Invalid supportedModes');
+  if (manifest.integrity?.algorithm !== 'SHA-256' || !/^[a-f0-9]{64}$/.test(manifest.integrity?.sha256 || '') || createHash('sha256').update(css).digest('hex') !== manifest.integrity.sha256) invalid('CSS integrity hash mismatch');
+  if (!Array.isArray(manifest.roles) || !manifest.roles.length || manifest.roles.length > 1000 || !Array.isArray(manifest.contrasts) || !Array.isArray(manifest.missingContrastPairs) || !Array.isArray(manifest.excludedWitchClickConcerns) || typeof manifest.provenance?.note !== 'string') invalid('Missing manifest catalogue or provenance fields');
+  const roleIds = new Set();
+  for (const role of manifest.roles) {
+    if (!role || typeof role.id !== 'string' || !/^[a-z][a-z0-9.-]*$/.test(role.id) || roleIds.has(role.id) || !['required', 'optional'].includes(role.requirement) || !['required', 'optional', 'missing'].includes(role.status) || !role.modes || typeof role.modes !== 'object') invalid('Invalid role catalogue');
+    roleIds.add(role.id);
+    for (const mode of modes) {
+      const value = role.modes[mode];
+      if (!value || !['present', 'missing'].includes(value.status)) invalid(`Role ${role.id} needs explicit status in ${mode}`);
+      if (value.status === 'present' && (typeof value.variable !== 'string' || !/^--wc-kit-[a-z0-9-]+$/.test(value.variable) || typeof value.value !== 'string')) invalid(`Invalid present role ${role.id}`);
+      if (value.status === 'missing' && (typeof value.reason !== 'string' || !value.reason.trim())) invalid(`Missing role ${role.id} needs a reason`);
+    }
+  }
+  let parsed;
+  try { parsed = postcss.parse(css); } catch { invalid('Invalid CSS syntax'); }
+  const declared = new Map();
+  const hosts = new Set();
+  const number = '[+-]?(?:\\d*\\.)?\\d+(?:%|deg)?';
+  const alpha = '[+-]?(?:\\d*\\.)?\\d+%?';
+  const color = new RegExp(`^(?:#[a-f0-9]{3,4}|#[a-f0-9]{6}|#[a-f0-9]{8}|transparent|(?:rgb|rgba|hsl|hsla)\\(\\s*${number}\\s*,\\s*${number}\\s*,\\s*${number}(?:\\s*,\\s*${alpha})?\\s*\\)|(?:rgb|rgba|hsl|hsla|oklab|oklch|lab|lch)\\(\\s*${number}\\s+${number}\\s+${number}(?:\\s*/\\s*${alpha})?\\s*\\)|color\\(srgb\\s+${number}\\s+${number}\\s+${number}(?:\\s*/\\s*${alpha})?\\s*\\))$`, 'i');
+  for (const node of parsed.nodes) {
+    if (node.type === 'comment') continue;
+    if (node.type !== 'rule') invalid('Only namespaced mode rules are allowed; no imports or at-rules');
+    const selector = /^\.(wc-kit-[a-z0-9-]+)\[data-wc-kit-mode="([a-z][a-z0-9-]*)"\]$/.exec(node.selector);
+    if (!selector || !modes.includes(selector[2]) || declared.has(selector[2])) invalid('Only one namespaced class/mode selector per declared mode is allowed');
+    hosts.add(selector[1]);
+    const variables = new Map();
+    for (const declaration of node.nodes) {
+      if (declaration.type === 'comment') continue;
+      if (declaration.type !== 'decl' || !/^--wc-kit-[a-z0-9-]+$/.test(declaration.prop) || declaration.important || variables.has(declaration.prop) || !color.test(declaration.value)) invalid('Only unique namespaced literal colour declarations are allowed; no layout, fonts, recipes or network values');
+      variables.set(declaration.prop, declaration.value);
+    }
+    declared.set(selector[2], variables);
+  }
+  if (hosts.size !== 1 || declared.size !== modes.length) invalid('CSS must define every supported mode on one kit host');
+  for (const role of manifest.roles) for (const mode of modes) {
+    const value = role.modes[mode];
+    if (value.status === 'present' && declared.get(mode).get(value.variable) !== value.value) invalid(`CSS disagrees with role ${role.id} in ${mode}`);
+  }
+  return { manifest, manifestText: typeof payload.manifest === 'string' ? payload.manifest : `${JSON.stringify(manifest, null, 2)}\n`, css };
+}
+
+async function ingestPalette(payload) {
+  const validated = validatePaletteIngest(payload);
+  const { manifest, css, manifestText } = validated;
+  return withLock(`palette:${manifest.kitId}:${manifest.version}`, async () => {
+    // Reject symlinked ancestors: a valid id must not escape the repository on disk.
+    for (const directory of ['src', 'src/theme-kits', `src/theme-kits/${manifest.kitId}`]) {
+      const target = path.join(CWD, directory);
+      if (fs.existsSync(target) && fs.lstatSync(target).isSymbolicLink()) throw Object.assign(new Error('Palette destination cannot use symlinks'), { status: 400 });
+    }
+    const parent = path.join(CWD, 'src', 'theme-kits', manifest.kitId);
+    const destination = path.join(parent, manifest.version);
+    if (discoverIngestedPalettes(CWD).some(palette => palette.manifest.kitId === manifest.kitId && palette.manifest.version === manifest.version)) throw Object.assign(new Error('Kit version already exists; refusing to overwrite'), { status: 409 });
+    if (fs.existsSync(destination)) throw Object.assign(new Error('Kit version already exists; refusing to overwrite'), { status: 409 });
+    await fsp.mkdir(parent, { recursive: true });
+    const staging = await fsp.mkdtemp(path.join(parent, '.ingesting-'));
+    try {
+      await fsp.writeFile(path.join(staging, 'kit.css'), css, { flag: 'wx' });
+      await fsp.writeFile(path.join(staging, 'manifest.json'), manifestText, { flag: 'wx' });
+      if (fs.existsSync(destination)) throw Object.assign(new Error('Kit version already exists'), { status: 409 });
+      await fsp.rename(staging, destination);
+    } finally {
+      await fsp.rm(staging, { recursive: true, force: true });
+    }
+    const summary = summarizePalette(manifest, css);
+    return { kitId: manifest.kitId, version: manifest.version, path: path.relative(CWD, destination).replaceAll('\\', '/'), requiredSemantics: summary.requiredSemantics, missingCount: summary.missing.length, missingRequiredCount: summary.missingRequired.length, status: 'Ingested', message: 'Shelved, not active. Refresh or restart the dev server if the shelf has not updated.' };
+  });
+}
+
 // ---------- HTTP SERVER ----------
   const server = http.createServer(async (req, res) => {
     await withRequestBoundary(req, res, async () => {
@@ -2567,12 +2160,30 @@ async function withRequestBoundary(req, res, handler) {
       return send(res, 403, { ok: false, error: 'Forbidden origin' });
     }
     res._wcCorsOrigin = allowedCorsOrigin;
+    if (req.method === 'OPTIONS' && pathname === '/palettes/ingest') {
+      res.writeHead(204, {
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Witchclick-Admin-Secret',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        ...(allowedCorsOrigin ? { 'Access-Control-Allow-Origin': allowedCorsOrigin, Vary: 'Origin' } : {}),
+      });
+      return res.end();
+    }
     if (req.method === 'OPTIONS') return send(res, 204, { ok: true });
 
     const isPublicEndpoint = PUBLIC_ENDPOINTS.has(pathname);
     const loopback = remote === '127.0.0.1' || remote === '::1' || remote.startsWith('::ffff:127.');
 
-    if (!isPublicEndpoint) {
+    // Only palette ingestion uses the shared admin-token guard; no loopback bypass.
+    if (pathname === '/palettes/ingest') {
+      if (IS_PRODUCTION) return send(res, 404, { ok: false, error: 'Not found' });
+      const headers = new Headers();
+      for (const name of ['authorization', 'x-witchclick-admin-secret']) {
+        const value = req.headers[name];
+        if (typeof value === 'string') headers.set(name, value);
+      }
+      const denied = requireAdminAuth(new Request(requestUrl, { headers }));
+      if (denied) return send(res, denied.status, await denied.json());
+    } else if (!isPublicEndpoint) {
       if (!loopback && !DEV_API_TOKEN) {
         return send(res, 403, { ok: false, error: 'Forbidden (dev API is loopback-only without DEV_API_TOKEN)' });
       }
@@ -2592,6 +2203,14 @@ async function withRequestBoundary(req, res, handler) {
         error: 'Rate limit exceeded',
         resetAt: new Date(rateResult.resetAt).toISOString(),
       });
+    }
+
+    if (req.method === 'POST' && pathname === '/palettes/ingest') {
+      try {
+        return send(res, 200, { ok: true, ...await ingestPalette(await parseBody(req)) });
+      } catch (error) {
+        return send(res, error.status || 400, { ok: false, error: error.message || 'Palette ingestion failed' });
+      }
     }
 
     if (req.method === 'POST' && req.url === '/ping') {
@@ -2883,10 +2502,22 @@ async function withRequestBoundary(req, res, handler) {
       }
     }
 
-    if (req.method === 'POST' && (req.url === '/staging/list' || pathname === '/staging/list')) {
+    const stagingActions = {
+      '/staging/list': 'listStagingDrafts',
+      '/staging/preview': 'previewStagingDraft',
+      '/staging/publish': 'publishStagingDraft',
+      '/staging/delete': 'deleteStagingDraft',
+    };
+    if (req.method === 'POST' && Object.hasOwn(stagingActions, pathname)) {
+      // The existing dev API loopback/optional-token guard above already ran.
+      // These local operations are never enabled in production.
+      if (IS_PRODUCTION) return send(res, 404, { ok: false, error: 'Not found' });
       try {
-        const drafts = await listDraftPosts();
-        return send(res, 200, { ok: true, drafts });
+        const body = await parseBody(req);
+        const operations = await getStagingOperations();
+        const request = new Request(requestUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+        const result = await operations[stagingActions[pathname]](request);
+        return send(res, result.status, await result.json());
       } catch (e) {
         return send(res, 500, { ok: false, error: e?.message || String(e) });
       }
@@ -3179,124 +2810,6 @@ async function withRequestBoundary(req, res, handler) {
      * 3) Static serving:
      *    - Astro serves files from /public. These will be accessible at /downloads/<slug>/... in production.
      */
-
-    if (req.method === 'POST' && req.url === '/color-tokens/get') {
-      try {
-        const data = await loadColorTokens();
-        return send(res, 200, { ok: true, tokens: data.tokens, updatedAt: data.updatedAt });
-      } catch (e) {
-        return send(res, 500, { ok: false, error: e?.message || String(e) });
-      }
-    }
-
-    if (req.method === 'POST' && req.url === '/color-tokens/save') {
-      try {
-        const body = await parseBody(req);
-        const state = await saveColorTokens(body || {});
-        return send(res, 200, { ok: true, tokens: state.tokens, updatedAt: state.updatedAt });
-      } catch (e) {
-        return send(res, 400, { ok: false, error: e?.message || String(e) });
-      }
-    }
-
-    // ---- Themes
-    if (req.method === 'POST' && req.url === '/themes/list') {
-      try {
-        const data = await listThemes();
-        return send(res, 200, { ok: true, ...data });
-      } catch (e) {
-        return send(res, 500, { ok: false, error: e?.message || String(e) });
-      }
-    }
-
-    if (req.method === 'POST' && req.url === '/themes/save') {
-      try {
-        const body = await parseBody(req);
-        const theme = await saveThemeRecord(body || {});
-        return send(res, 200, { ok: true, theme });
-      } catch (e) {
-        return send(res, 400, { ok: false, error: e?.message || String(e) });
-      }
-    }
-
-    if (req.method === 'POST' && req.url === '/themes/set-active') {
-      try {
-        const body = await parseBody(req);
-        const data = await setActiveThemeRecord(body || {});
-        return send(res, 200, { ok: true, ...data });
-      } catch (e) {
-        return send(res, 400, { ok: false, error: e?.message || String(e) });
-      }
-    }
-
-    if (req.method === 'POST' && req.url === '/themes/delete') {
-      try {
-        const body = await parseBody(req);
-        const data = await deleteThemeRecord(body || {});
-        return send(res, 200, { ok: true, ...data });
-      } catch (e) {
-        return send(res, 400, { ok: false, error: e?.message || String(e) });
-      }
-    }
-
-    if (req.method === 'POST' && req.url === '/upload/theme-background') {
-      try {
-        const body = await parseBody(req);
-        if (!body || typeof body !== 'object') {
-          return send(res, 400, { ok: false, error: 'Invalid JSON body' });
-        }
-        const parsed = parseImageDataUrl(body.contentBase64);
-        if (!parsed) {
-          return send(res, 400, { ok: false, error: 'contentBase64 must be a data:image/... URL' });
-        }
-        const fallbackExt = MIME_EXTENSION_MAP[parsed.mime];
-        if (!fallbackExt) {
-          return send(res, 400, { ok: false, error: 'Unsupported image mime type' });
-        }
-        const sanitized = sanitizeHeroFilename(body.filename, fallbackExt);
-        const base = sanitized.base;
-        const ext = fallbackExt;
-        const buffer = decodeBase64Payload(parsed.base64);
-        if (!buffer) {
-          return send(res, 400, { ok: false, error: 'Image data was invalid or empty' });
-        }
-        if (buffer.length > MAX_UPLOAD_BYTES) {
-          return send(res, 413, { ok: false, error: `Image exceeds limit (${buffer.length} > ${MAX_UPLOAD_BYTES})` });
-        }
-        if (!hasMatchingFileHeader(buffer, parsed.mime)) {
-          return send(res, 400, { ok: false, error: 'Image header mismatch' });
-        }
-        ensureDir(THEME_BACKGROUNDS_ROOT);
-        const finalName = ensureUniqueFilename(THEME_BACKGROUNDS_ROOT, base, ext);
-        const filePath = path.join(THEME_BACKGROUNDS_ROOT, finalName);
-        const relativePath = `/images/theme-backgrounds/${finalName}`.replace(/\\+/g, '/');
-        await fsp.writeFile(filePath, buffer);
-        return send(res, 200, { ok: true, path: relativePath });
-      } catch (e) {
-        return send(res, 500, { ok: false, error: e?.message || String(e) });
-      }
-    }
-
-    if (req.method === 'POST' && req.url === '/themes/list-backgrounds') {
-      try {
-        ensureDir(THEME_BACKGROUNDS_ROOT);
-        let files = [];
-        try {
-          files = fs.readdirSync(THEME_BACKGROUNDS_ROOT);
-        } catch {
-          files = [];
-        }
-        const backgrounds = files
-          .filter((f) => /\.(jpg|jpeg|png|webp)$/i.test(f))
-          .map((f) => ({
-            filename: f,
-            path: `/images/theme-backgrounds/${f}`.replace(/\\+/g, '/')
-          }));
-        return send(res, 200, { ok: true, backgrounds });
-      } catch (e) {
-        return send(res, 500, { ok: false, error: e?.message || String(e) });
-      }
-    }
 
     // ---- Downloads
     if (req.method === 'POST' && req.url === '/downloads/list') {
@@ -3754,10 +3267,6 @@ export {
   parsePastedMarkdownDraft,
   replacePostStubWithDraft,
   adminPipelineHelpers,
-  listThemes,
-  saveThemeRecord,
-  setActiveThemeRecord,
-  deleteThemeRecord,
   attachHeroToPost,
   getEntity,
   parseBody,

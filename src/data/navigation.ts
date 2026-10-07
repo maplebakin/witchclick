@@ -81,7 +81,7 @@ export const adminNavSections: AdminNavSection[] = [
       { href: "/admin/calendar", label: "Seasonal calendar", description: "Configure seasons, anchors, and rituals" },
       { href: "/admin/partners", label: "Partners & community", description: "Configure partner sections and affiliate highlights" },
       { href: "/admin/products", label: "Affiliate products", description: "Configure the affiliate product catalogue" },
-      { href: "/admin/theme", label: "Themes & typography", description: "Configure palettes, fonts, and theme scopes" },
+      { href: "/admin/theme", label: "Palettes", description: "Ingested colour palettes and semantic coverage" },
     ]
   },
   {

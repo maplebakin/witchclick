@@ -184,17 +184,6 @@ export interface AdminThemeListing {
   };
 }
 
-export declare function listThemes(): Promise<AdminThemeListing>;
-export declare function saveThemeRecord(payload: Record<string, unknown>): Promise<AdminThemeRecord>;
-export declare function setActiveThemeRecord(
-  payload: Record<string, unknown>,
-): Promise<{ active: AdminThemeListing["active"]; theme: AdminThemeRecord }>;
-
-export declare function deleteThemeRecord(payload: Record<string, unknown>): Promise<{
-  slug: string;
-  mode: AdminThemeMode;
-  active: AdminThemeListing["active"];
-}>;
 export declare function attachHeroToPost(options: {
   slug: string;
   heroImage: string;

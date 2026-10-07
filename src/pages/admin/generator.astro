@@ -1,5 +1,6 @@
 --- 
 /* Admin: Prompt → JSON → Preview → Ingest */
+import HeroWorkflow from "@/components/admin/HeroWorkflow.astro";
 import Base from "../../layouts/Base.astro";
 import { readSettings, buildCanonicalUrl } from "../../utils/settings";
 import generatorStyles from "../../../server/lib/generatorStyles.js";
@@ -163,6 +164,12 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             </div>
           </section>
         </div>
+
+        <section data-panel="posts" data-generator-hero class="my-6 space-y-4 rounded-2xl border border-line-neutral bg-surface-base p-4">
+          <h2 class="text-xl font-semibold">Step 3 — Hero image</h2>
+          <p class="text-sm text-body-muted">Optional artwork for the last saved post. Editing JSON does not change this target.</p>
+          <HeroWorkflow mode="embedded" devApi={DEV_API} devKey={DEV_KEY} lockedMessage="Locked — available after this post is saved." />
+        </section>
 
         <details class="rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm" data-panel="posts" data-post-history>
           <summary class="cursor-pointer py-2 font-semibold">Recent Posts — templates and editor links</summary>
@@ -1236,6 +1243,12 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               return;
             }
             var slug = data.slug || result.spec.slug || '';
+            // Only the endpoint's final persisted slug may activate the hero workflow.
+            var heroRoot = root.querySelector('[data-generator-hero] [data-hero-workflow]');
+            if (heroRoot && typeof data.slug === 'string' && data.slug.trim()) {
+              heroRoot.setAttribute('data-hero-slug', data.slug);
+              heroRoot.dispatchEvent(new CustomEvent('hero-workflow:set-post', { detail: { slug: data.slug } }));
+            }
             savedJSON = result.snapshot;
             invalidateValidation();
             var message = draft ? 'Saved draft “' + slug + '”. It is not publicly eligible.' : 'Saved “' + slug + '”. It is publicly eligible locally; the site has not been deployed.';

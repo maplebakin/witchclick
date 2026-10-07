@@ -1,0 +1,134 @@
+/* WitchClick inert colour kit; no runtime import in this version.
+ * kit-id: witchclick.autumn-window
+ * contract-version: 1.0.0
+ * version: 1.0.0
+ * namespace: --wc-kit-
+ * modes: midnight, dawn
+ * Values are literal colors resolved from the current Autumn Window token and application layers.
+ */
+
+.wc-kit-autumn-window[data-wc-kit-mode="midnight"] {
+  --wc-kit-surface-base: #242120;
+  --wc-kit-surface-panel: #2A2624;
+  --wc-kit-surface-card: #2A2624;
+  --wc-kit-surface-elevated: #302B28;
+  --wc-kit-surface-hover: #302B28;
+  --wc-kit-surface-muted: #2A2624;
+  --wc-kit-border-subtle: #504640;
+  --wc-kit-border-strong: #84766B;
+  --wc-kit-text-strong: #F0E8DD;
+  --wc-kit-text-body: #E8DED1;
+  --wc-kit-text-muted: #BFB2A3;
+  --wc-kit-link-foreground: #B98F9D;
+  --wc-kit-action-background: #2A2624;
+  --wc-kit-action-foreground: #B98F9D;
+  --wc-kit-action-border: #84766B;
+  --wc-kit-action-hover-background: #302B28;
+  --wc-kit-action-hover-border: #B98F9D;
+  --wc-kit-card-background: #2A2624;
+  --wc-kit-card-hover-background: #302B28;
+  --wc-kit-card-foreground: #E8DED1;
+  --wc-kit-card-heading: #F0E8DD;
+  --wc-kit-card-muted: #BFB2A3;
+  --wc-kit-card-border: #504640;
+  --wc-kit-card-border-strong: #84766B;
+  --wc-kit-tag-background: #2A2624;
+  --wc-kit-tag-foreground: #BFB2A3;
+  --wc-kit-tag-border: #504640;
+  --wc-kit-header-background: #2A2624;
+  --wc-kit-header-border: #504640;
+  --wc-kit-header-foreground: #E8DED1;
+  --wc-kit-header-heading: #F0E8DD;
+  --wc-kit-header-link: #B98F9D;
+  --wc-kit-footer-background: #2A2624;
+  --wc-kit-footer-border: #504640;
+  --wc-kit-footer-foreground: #E8DED1;
+  --wc-kit-footer-muted: #BFB2A3;
+  --wc-kit-footer-link: #B98F9D;
+  --wc-kit-entity-surface-top: #2A2624;
+  --wc-kit-entity-action: #B98F9D;
+  --wc-kit-entity-action-hover: #B98F9D;
+  --wc-kit-entity-surface-bottom: #2A2624;
+  --wc-kit-entity-highlight: transparent;
+  --wc-kit-entity-glow: transparent;
+  --wc-kit-entity-heading: #F0E8DD;
+  --wc-kit-entity-foreground: #E8DED1;
+  --wc-kit-entity-muted: #BFB2A3;
+  --wc-kit-focus-foreground: #A8BBC3;
+  --wc-kit-focus-base: #242120;
+  --wc-kit-comfort-surface: #2A2624;
+  --wc-kit-comfort-foreground: #E8DED1;
+  --wc-kit-comfort-foreground-strong: #F0E8DD;
+  --wc-kit-comfort-input-background: #2A2624;
+  --wc-kit-comfort-input-hover-background: #302B28;
+  --wc-kit-comfort-input-border: #84766B;
+  --wc-kit-comfort-input-focus: #A8BBC3;
+  --wc-kit-brand-mulberry: #B98F9D;
+  --wc-kit-brand-window-blue: #A8BBC3;
+  --wc-kit-spoon-low: #AABA96;
+  --wc-kit-spoon-medium: #CEAF78;
+  --wc-kit-spoon-high: #D3A080;
+}
+
+.wc-kit-autumn-window[data-wc-kit-mode="dawn"] {
+  --wc-kit-surface-base: #F2EADF;
+  --wc-kit-surface-panel: #EDE3D6;
+  --wc-kit-surface-card: #EDE3D6;
+  --wc-kit-surface-elevated: #E6DBCC;
+  --wc-kit-surface-hover: #E6DBCC;
+  --wc-kit-surface-muted: #EDE3D6;
+  --wc-kit-border-subtle: #C8B8A5;
+  --wc-kit-border-strong: #8B7764;
+  --wc-kit-text-strong: #302724;
+  --wc-kit-text-body: #382F2A;
+  --wc-kit-text-muted: #65584F;
+  --wc-kit-link-foreground: #754452;
+  --wc-kit-action-background: #EDE3D6;
+  --wc-kit-action-foreground: #754452;
+  --wc-kit-action-border: #8B7764;
+  --wc-kit-action-hover-background: #E6DBCC;
+  --wc-kit-action-hover-border: #754452;
+  --wc-kit-card-background: #EDE3D6;
+  --wc-kit-card-hover-background: #E6DBCC;
+  --wc-kit-card-foreground: #382F2A;
+  --wc-kit-card-heading: #302724;
+  --wc-kit-card-muted: #65584F;
+  --wc-kit-card-border: #C8B8A5;
+  --wc-kit-card-border-strong: #8B7764;
+  --wc-kit-tag-background: #EDE3D6;
+  --wc-kit-tag-foreground: #65584F;
+  --wc-kit-tag-border: #C8B8A5;
+  --wc-kit-header-background: #EDE3D6;
+  --wc-kit-header-border: #C8B8A5;
+  --wc-kit-header-foreground: #382F2A;
+  --wc-kit-header-heading: #302724;
+  --wc-kit-header-link: #754452;
+  --wc-kit-footer-background: #EDE3D6;
+  --wc-kit-footer-border: #C8B8A5;
+  --wc-kit-footer-foreground: #382F2A;
+  --wc-kit-footer-muted: #65584F;
+  --wc-kit-footer-link: #754452;
+  --wc-kit-entity-surface-top: #EDE3D6;
+  --wc-kit-entity-action: #754452;
+  --wc-kit-entity-action-hover: #754452;
+  --wc-kit-entity-surface-bottom: #EDE3D6;
+  --wc-kit-entity-highlight: transparent;
+  --wc-kit-entity-glow: transparent;
+  --wc-kit-entity-heading: #302724;
+  --wc-kit-entity-foreground: #382F2A;
+  --wc-kit-entity-muted: #65584F;
+  --wc-kit-focus-foreground: #426575;
+  --wc-kit-focus-base: #F2EADF;
+  --wc-kit-comfort-surface: #EDE3D6;
+  --wc-kit-comfort-foreground: #382F2A;
+  --wc-kit-comfort-foreground-strong: #302724;
+  --wc-kit-comfort-input-background: #EDE3D6;
+  --wc-kit-comfort-input-hover-background: #E6DBCC;
+  --wc-kit-comfort-input-border: #8B7764;
+  --wc-kit-comfort-input-focus: #426575;
+  --wc-kit-brand-mulberry: #754452;
+  --wc-kit-brand-window-blue: #426575;
+  --wc-kit-spoon-low: #4F6544;
+  --wc-kit-spoon-medium: #705829;
+  --wc-kit-spoon-high: #825236;
+}

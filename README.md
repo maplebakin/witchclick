@@ -86,8 +86,8 @@ Open the site at `http://localhost:4321` unless Astro chooses a different port.
 - `npm run curses` — generate curse prompts via the CLI.
 - `npm run ingest:curses` — ingest curse JSON.
 - `npm run export:curses` — export curse cards/print files.
-- `npm run themes:build` — generate theme CSS once.
-- `npm run themes:watch` — watch and regenerate theme CSS.
+- `npm run themes:lint` — validate retained historical theme presets.
+- Preset generation is retired from build/dev startup. WitchClick now consumes the Autumn Window kit; the legacy generator and outputs remain unhooked for later removal.
 - `npm run tools:export:install` — install Playwright Chromium for export tooling.
 - `npm run ship -- "message"` — project helper to run checks, commit, and push.
 - `npm run zip` — create a backup zip of the repo, excluding `node_modules`, `.git`, and `dist`.
@@ -199,7 +199,7 @@ Nothing here is strictly required for basic local development if you are happy w
 
 ### Common admin variables
 
-- `PUBLIC_DEV_API` — override the admin UI's dev API base URL. Default is `http://localhost:8787`.
+- `PUBLIC_DEV_API` — override the admin UI's dev API base URL. During local development the origin is derived from `DEV_API_HOST`/`DEV_API_PORT` (default `http://127.0.0.1:8787`); an override must point to that separate server, with no `/api` path.
 - `PUBLIC_DEV_API_KEY` — dev API key the admin UI sends as `X-WC-Dev-Key`. If `DEV_API_TOKEN` is set on `dev-api.js`, this value must match it for admin write actions to succeed.
 - `PUBLIC_ADMIN_KEY` — optional query-string gate for hosted admin pages, used as `?key=...`.
 
@@ -208,7 +208,7 @@ Nothing here is strictly required for basic local development if you are happy w
 - `DEV_API_HOST` — bind host for `dev-api.js`. Default `127.0.0.1`.
 - `DEV_API_PORT` — port for `dev-api.js`. Default `8787`.
 - `DEV_API_TOKEN` — enables authenticated non-loopback access to the dev API.
-- `DEV_API_CORS_ORIGIN` — CORS origin for the dev API. Default `*`.
+- `DEV_API_CORS_ORIGIN` — CORS origin for the dev API. Defaults to loopback browser origins only.
 - `DEV_API_LOG` — set to `false` to silence dev API request logging.
 - `DEV_API_MAX_BODY_BYTES` — override the JSON body limit.
 - `DEV_API_MAX_UPLOAD_BYTES` — override the upload limit used by the dev API.

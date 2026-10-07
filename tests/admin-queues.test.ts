@@ -23,10 +23,16 @@ describe("admin work queue classification", () => {
   it.each(["needs-human-decision", "human-decision", "template-section-artifact", "template-artifact", "editorial-seed", "possible-delete-merge-candidate", "possible-delete-merge", "strong-article-candidate", "support-reference-candidate", "pop-culture-review", ""])("separates stub triage %s from real drafts", (triage) => {
     const queues = classifyAdminQueues([complete("stub", { artwork: undefined })], [{ slug: "stub", stubTriageStatus: triage }], now);
     expect(queues.decision).toHaveLength(1);
-    expect(queues.decision[0]).toMatchObject({ state: "Placeholder / stub", href: "/admin/stubs", action: "Open Post Stub Forge" });
+    expect(queues.decision[0]).toMatchObject({ state: "Placeholder / stub", href: "/admin/stubs?slug=stub", action: "Open Post Stub Forge" });
     expect(queues.decision[0]!.blockers).toContain("Missing hero image");
     expect(allItems(queues)).toHaveLength(1);
     expect(queues.ready).toHaveLength(0);
+  });
+  it("URL-encodes the exact stub slug in the Dashboard action", () => {
+    const slug = "idea with spaces/&";
+    const item = classifyAdminQueues([complete(slug)], [{ slug }], now).decision[0]!;
+    expect(item.href).toBe(`/admin/stubs?slug=${encodeURIComponent(slug)}`);
+    expect(item.action).toBe("Open Post Stub Forge");
   });
   it.each(["stub", "placeholder"])("recognizes %s tags even without a detector entry", (tag) => {
     expect(classify(complete("tagged", { data: { ...complete().data, tags: [tag] } })).decision).toHaveLength(1);
