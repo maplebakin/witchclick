@@ -75,6 +75,15 @@ class StubDashboard {
   private triageFilter = 'all';
   private parsedDraft: ParsedDraft | null = null;
   private validation: ValidationState = { passed: false, input: '', fingerprint: '', successes: [], warnings: [], errors: [] };
+  private revision = 0;
+  private validating = false;
+  private replacing = false;
+  private fetching = false;
+  private loadState: 'loading' | 'ready' | 'error' = 'loading';
+  private validatedPath = '';
+  private noticeEl: HTMLElement;
+  private resultEl: HTMLElement;
+  private guidanceEl: HTMLElement;
   private activeTab: 'edit' | 'preview' | 'validation' = 'edit';
 
   private listEl: HTMLElement | null = null;
@@ -125,12 +134,26 @@ class StubDashboard {
     this.jsonHeaders = { 'Content-Type': 'application/json', ...this.baseHeaders };
     this.bootstrapData();
     this.cacheElements();
+    this.noticeEl = document.createElement('div');
+    this.noticeEl.setAttribute('data-forge-notice', '');
+    this.noticeEl.setAttribute('role', 'status');
+    this.noticeEl.className = 'mb-4 space-y-2 text-sm text-body';
+    this.emptyState?.before(this.noticeEl);
+    this.resultEl = document.createElement('div');
+    this.resultEl.setAttribute('data-replacement-result', '');
+    this.resultEl.setAttribute('role', 'status');
+    this.resultEl.className = 'mb-4 space-y-2 text-sm text-body';
+    this.noticeEl.before(this.resultEl);
+    this.guidanceEl = document.createElement('div');
+    this.guidanceEl.setAttribute('data-stub-guidance', '');
+    this.guidanceEl.className = 'mt-4 space-y-2 text-sm text-body';
+    this.overviewTriageStatusEl?.closest('dl')?.after(this.guidanceEl);
     this.attachEvents();
     this.applySearchFilter();
     this.updateCounts();
     this.renderValidationResults();
     this.updateActionState();
-    this.fetchStubs(false);
+    this.fetchStubs();
   }
 
   private apiFetch(path: string, options: RequestInit = {}) {
@@ -152,12 +175,24 @@ class StubDashboard {
     return { data, errors, warnings };
   }
 
+  private readEntries(value: unknown): StubEntry[] {
+    if (!Array.isArray(value) || value.some(item => !item || typeof item !== 'object' || typeof item.slug !== 'string' || !item.slug.trim())) {
+      throw new Error('Malformed post stub payload. Expected a list of posts with slugs.');
+    }
+    return value.map(item => this.mapStub(item));
+  }
+
+  private invalidateValidation() {
+    this.revision += 1;
+    this.validation = this.emptyValidation();
+    this.validatedPath = '';
+  }
+
   private bootstrapData() {
     try {
       const rawPosts = this.root.getAttribute('data-post-stubs') || '[]';
       const parsedPosts = JSON.parse(rawPosts);
-      const postEntries = Array.isArray(parsedPosts) ? parsedPosts : [];
-      this.postStubs = postEntries.map((item) => this.mapStub(item));
+      this.postStubs = this.readEntries(parsedPosts);
       this.filtered = [...this.postStubs];
     } catch {
       this.postStubs = [];
@@ -257,7 +292,7 @@ class StubDashboard {
     this.draftInput?.addEventListener('input', () => this.handleDraftInput());
     this.validateBtn?.addEventListener('click', () => this.handleValidate());
     this.saveBtn?.addEventListener('click', () => this.openConfirmModal());
-    this.refreshBtn?.addEventListener('click', () => this.fetchStubs());
+    this.refreshBtn?.addEventListener('click', () => { if (!this.replacing) this.fetchStubs(); });
     this.root.querySelectorAll<HTMLButtonElement>('[data-tab-button]').forEach((button) => {
       button.addEventListener('click', () => {
         const tab = button.getAttribute('data-tab-button');
@@ -291,8 +326,16 @@ class StubDashboard {
 
   private renderList() {
     if (!this.listEl) return;
+    if (this.loadState !== 'ready') {
+      this.listEl.textContent = this.loadState === 'loading' ? 'Loading post stub data…' : 'Post stub data could not be loaded. Use Retry loading in the workspace.';
+      if (this.emptyState) this.emptyState.innerHTML = this.loadState === 'loading'
+        ? '<p class="text-lg font-semibold text-body-strong">Preparing the post stub queue…</p><p class="text-sm">Selection and replacement are unavailable until the current data loads.</p>'
+        : '<p class="text-lg font-semibold text-body-strong">Post stub queue unavailable.</p><p class="text-sm">Use Retry loading to prepare the queue again. No files were changed by this load failure.</p>';
+      this.updateCounts();
+      return;
+    }
     if (!this.filtered.length) {
-      this.listEl.innerHTML = '<p class="px-2 py-3 text-sm text-body-muted">No stub posts match your search.</p>';
+      this.listEl.textContent = this.postStubs.length ? 'No post stubs match this filter or search. Try another category or clear the search.' : 'No placeholder post stubs remain. Nothing needs triage here.';
       return;
     }
 
@@ -327,15 +370,24 @@ class StubDashboard {
   }
 
   private updateCounts() {
+    if (this.loadState !== 'ready') {
+      if (this.countEl) this.countEl.textContent = '—';
+      if (this.triageCountsEl) this.triageCountsEl.textContent = '';
+      return;
+    }
     if (this.countEl) this.countEl.textContent = String(this.postStubs.length);
     this.renderTriageCounts();
+    if (this.emptyState && this.loadState === 'ready') {
+      this.emptyState.innerHTML = `<p class="text-lg font-semibold text-body-strong">${this.postStubs.length ? 'Select a placeholder post stub to review.' : 'No placeholder post stubs remain.'}</p><p class="text-sm">${this.postStubs.length ? `${this.postStubs.length} post stubs in this queue. Select one to review its triage category, source context, and next action. Editing and validation do not write files.` : 'Nothing needs triage here. Refresh to check for new placeholder posts.'}</p>`;
+    }
   }
 
   private selectStub(key: string) {
+    if (this.replacing || this.loadState !== 'ready') return;
     const entry = this.postStubs.find((stub) => stub.key === key);
     this.selectedKey = entry ? entry.key : null;
     this.parsedDraft = null;
-    this.validation = this.emptyValidation();
+    this.invalidateValidation();
     if (this.draftInput) this.draftInput.value = '';
     this.setStatus('');
 
@@ -360,6 +412,17 @@ class StubDashboard {
     this.setText(this.overviewDraftEl, entry.draft ? 'draft: true' : 'Not marked draft');
     this.setText(this.overviewTagsEl, entry.tags?.length ? entry.tags.join(', ') : 'No tags recorded');
     this.setText(this.overviewTriageStatusEl, entry.stubTriageStatus ? formatLabel(entry.stubTriageStatus) : 'Not recorded');
+    const actions: Record<string, string> = {
+      'strong-article-candidate': 'Write the full draft.',
+      'support-reference-candidate': 'Use as a support reference.',
+      'editorial-seed': 'Treat as an editorial seed.',
+      'pop-culture-review': 'Human decision needed before writing a full draft.',
+      'template-section-artifact': 'Human decision needed: review this template artifact.',
+      'needs-human-decision': 'Human decision needed.',
+      'possible-delete-merge-candidate': 'Review as a delete/merge candidate; no automatic action is taken.',
+    };
+    const reason = entry.stubTriageNotes || entry.stubReason || entry.stubRationale;
+    this.guidanceEl.innerHTML = `<p><strong>Triage:</strong> ${escapeHtml(entry.stubTriageStatus ? formatLabel(entry.stubTriageStatus) : 'Not recorded')}</p>${reason ? `<p><strong>Recorded reason:</strong> ${escapeHtml(reason)}</p>` : '<p>No specific classification reason is recorded.</p>'}<p><strong>Suggested next action:</strong> ${escapeHtml(actions[entry.stubTriageStatus || ''] || entry.stubSuggestedAction || 'Human decision needed: review this untriaged post stub.')}</p>`;
     this.setText(this.overviewPathEl, entry.filePath || '-');
     this.setText(this.overviewFrontmatterEl, this.formatExistingFrontmatter(entry));
     if (this.promptTextArea) {
@@ -418,7 +481,7 @@ class StubDashboard {
       }).join('\n')
       : '- No saved source context. Use the selected stub metadata only.';
 
-    return `Write one complete WitchClick draft for manual paste back into Stub Forge.
+    return `Write one complete WitchClick draft for manual paste back into Post Stub Forge.
 
 Output rules - follow exactly:
 - Return only the completed markdown file.
@@ -583,7 +646,8 @@ Write the full article here with the required sections.
   }
 
   private handleDraftInput() {
-    this.validation = this.emptyValidation();
+    this.invalidateValidation();
+    this.setStatus('Markdown changed. Validate the current draft before replacement.', 'info');
     this.parsedDraft = null;
     const raw = this.draftInput?.value || '';
     if (raw.trim()) {
@@ -602,6 +666,10 @@ Write the full article here with the required sections.
   }
 
   private async handleValidate() {
+    if (this.validating || this.replacing || this.loadState !== 'ready') return;
+    this.invalidateValidation();
+    this.updateActionState();
+    const revision = this.revision;
     const entry = this.getSelectedEntry();
     if (!entry) {
       this.setStatus('Choose a stub to begin.', 'error');
@@ -638,10 +706,11 @@ Write the full article here with the required sections.
       this.setStatus(localError, 'error');
       return;
     }
-    const markdown = parsed.draft.markdown;
+    const markdown = raw;
     const fingerprint = this.getValidationFingerprint(entry.slug, markdown);
 
-    if (this.validateBtn) this.validateBtn.disabled = true;
+    this.validating = true;
+    this.updateActionState();
     this.setStatus('Validating pasted draft with dryRun=true...', 'info');
     try {
       const response = await this.apiFetch('/posts/replace-stub?dryRun=true', {
@@ -649,7 +718,12 @@ Write the full article here with the required sections.
         headers: this.jsonHeaders,
         body: JSON.stringify({ stubSlug: entry.slug, markdown, dryRun: true }),
       });
-      const { errors, warnings } = await this.readApiResponse(response, 'Validation found blocking issues. Fix the pasted draft before ingesting.');
+      const { data, errors, warnings } = await this.readApiResponse(response, 'Validation found blocking issues. Fix the pasted draft before ingesting.');
+      if (!data || data.ok !== true) errors.push('Validation returned an unrecognized response. Validate again before replacement.');
+      // A response is usable only for the exact text and selection that requested it.
+      // The revision also rejects edits that were subsequently undone.
+      if (revision !== this.revision || this.selectedKey !== entry.key || this.draftInput?.value !== raw) return;
+      this.validatedPath = typeof data?.path === 'string' ? data.path : '';
       this.validation = {
         passed: errors.length === 0,
         input: markdown,
@@ -669,12 +743,14 @@ Write the full article here with the required sections.
       );
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Validation found blocking issues. Fix the pasted draft before ingesting.';
+      if (revision !== this.revision || this.selectedKey !== entry.key || this.draftInput?.value !== raw) return;
       this.validation = this.emptyValidation([message]);
       this.renderValidationResults();
       this.updateActionState();
       this.setStatus(message, 'error');
     } finally {
-      if (this.validateBtn) this.validateBtn.disabled = false;
+      this.validating = false;
+      this.updateActionState();
     }
   }
 
@@ -688,7 +764,7 @@ Write the full article here with the required sections.
     if (!entry) return;
     this.setText(this.confirmTitleEl, entry.title || entry.name);
     this.setText(this.confirmSlugEl, entry.slug);
-    this.setText(this.confirmPathEl, entry.filePath || '-');
+    this.setText(this.confirmPathEl, this.validatedPath || entry.filePath || 'Not provided by the tooling');
     this.confirmModal?.classList.remove('hidden');
     this.confirmModal?.classList.add('flex');
   }
@@ -699,6 +775,7 @@ Write the full article here with the required sections.
   }
 
   private async handleReplaceAfterConfirm() {
+    if (this.replacing) return;
     const guard = this.getReplaceGuard();
     if (!guard.ok) {
       this.closeConfirmModal();
@@ -707,7 +784,9 @@ Write the full article here with the required sections.
       return;
     }
     const { entry, markdown } = guard;
-    if (this.confirmReplaceBtn) this.confirmReplaceBtn.disabled = true;
+    this.invalidateValidation();
+    this.replacing = true;
+    this.updateActionState();
     this.setStatus('Replacing stub with pasted draft...', 'info');
     try {
       const response = await this.apiFetch('/posts/replace-stub', {
@@ -715,17 +794,20 @@ Write the full article here with the required sections.
         headers: this.jsonHeaders,
         body: JSON.stringify({ stubSlug: entry.slug, markdown }),
       });
-      const { errors } = await this.readApiResponse(response, 'Failed to replace post stub');
+      const { data, errors } = await this.readApiResponse(response, 'Failed to replace post stub');
+      if (!data || data.ok !== true) errors.push('Replacement response could not be confirmed. Inspect Posts before retrying.');
       if (errors.length) throw new Error(errors[0]);
       this.closeConfirmModal();
-      this.setStatus('Stub replaced successfully.', 'success');
+      this.invalidateValidation();
+      this.resultEl.innerHTML = `<p>Placeholder replaced with a draft. The result is forced to draft and has not been published.${typeof data?.path === 'string' ? ` Destination: ${escapeHtml(data.path)}.` : ''}</p><p><a class="underline" href="/admin/posts?slug=${encodeURIComponent(entry.slug)}">Open draft in Posts</a> · <a class="underline" href="/admin/staging">Review drafts in Staging</a></p>`;
       this.removeStub(entry.slug);
-      await this.fetchStubs(false);
+      await this.fetchStubs();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to replace post stub';
       this.setStatus(message, 'error');
     } finally {
-      if (this.confirmReplaceBtn) this.confirmReplaceBtn.disabled = false;
+      this.replacing = false;
+      this.updateActionState();
     }
   }
 
@@ -768,6 +850,9 @@ Write the full article here with the required sections.
 
   private updateActionState() {
     const helper = this.getIngestBlocker();
+    if (this.validateBtn) this.validateBtn.disabled = this.validating || this.replacing || this.loadState !== 'ready';
+    if (this.refreshBtn) this.refreshBtn.disabled = this.replacing || this.loadState === 'loading';
+    if (this.draftInput) this.draftInput.disabled = this.replacing;
     if (this.saveBtn) this.saveBtn.disabled = helper !== '';
     if (this.confirmReplaceBtn) this.confirmReplaceBtn.disabled = helper !== '';
     if (helper) this.closeConfirmModal();
@@ -800,7 +885,10 @@ Write the full article here with the required sections.
   private getIngestBlocker(): string {
     const entry = this.getSelectedEntry();
     const raw = this.draftInput?.value || '';
-    const markdown = this.parsedDraft?.markdown || normalizePastedMarkdown(raw);
+    const markdown = raw;
+    if (this.replacing) return 'Replacement in progress…';
+    if (this.validating) return 'Validation in progress…';
+    if (this.loadState !== 'ready') return 'Load the current post stub data before replacing a draft.';
     if (!entry) return 'Choose a stub to begin.';
     if (!raw.trim()) return 'Paste the completed markdown draft here after using the copied prompt in your external LLM.';
     if (!this.parsedDraft) return this.validation.errors[0] || 'Could not parse the pasted markdown/frontmatter.';
@@ -841,7 +929,7 @@ Write the full article here with the required sections.
         ? 'The pasted draft slug does not match the selected stub. Ingestion is blocked.'
         : localError,
     };
-    const markdown = parsed.draft.markdown;
+    const markdown = raw;
     const fingerprint = this.getValidationFingerprint(entry.slug, markdown);
     if (!this.validation.passed || this.validation.input !== markdown || this.validation.fingerprint !== fingerprint) {
       return { ok: false, reason: 'Validate the current pasted draft before ingestion.' };
@@ -879,37 +967,54 @@ Write the full article here with the required sections.
     this.postStubs = this.postStubs.filter((entry) => entry.key !== key);
     this.filtered = this.filtered.filter((entry) => entry.key !== key);
     this.selectedKey = null;
+    this.invalidateValidation();
+    this.parsedDraft = null;
+    if (this.draftInput) this.draftInput.value = '';
     this.detailPanel?.classList.add('hidden');
     this.emptyState?.classList.remove('hidden');
     this.applySearchFilter();
     this.updateActionState();
   }
 
-  private async fetchStubs(setStatus = true) {
+  private async fetchStubs() {
+    if (this.fetching) return;
+    this.fetching = true;
+    this.loadState = 'loading';
+    this.invalidateValidation();
+    this.updateActionState();
+    this.renderList();
+    this.root.setAttribute('aria-busy', 'true');
     if (this.refreshBtn) this.refreshBtn.disabled = true;
-    if (setStatus) this.setStatus('Refreshing stub list...', 'info');
+    this.noticeEl.textContent = 'Loading post stub data…';
     try {
-      const response = await this.apiFetch('/posts/stubs', {
-        method: 'POST',
-        headers: this.jsonHeaders,
-      });
+      const response = await this.apiFetch('/posts/stubs', { method: 'POST', headers: this.jsonHeaders });
       const data = await response.json();
-      if (!response.ok || data?.ok === false) {
-        throw new Error(data?.error || 'Failed to load stub prompts');
-      }
-      const entries = Array.isArray(data.stubs) ? data.stubs : [];
-      this.postStubs = entries.map((item: any) => this.mapStub(item));
+      if (!response.ok || data?.ok === false) throw new Error(data?.error || 'Failed to load post stub data');
+      this.postStubs = this.readEntries(data?.stubs);
+      this.loadState = 'ready';
+      this.selectedKey = null;
+      this.detailPanel?.classList.add('hidden');
+      this.emptyState?.classList.remove('hidden');
       this.applySearchFilter();
-      if (this.postStubs.length === 0) {
-        this.detailPanel?.classList.add('hidden');
-        this.emptyState?.classList.remove('hidden');
-      }
-      if (setStatus) this.setStatus('Stub list refreshed.', 'success');
+      this.noticeEl.textContent = '';
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to refresh stubs';
-      this.setStatus(message === 'Failed to fetch' ? 'Admin access is required for this action.' : message, 'error');
+      this.loadState = 'error';
+      this.detailPanel?.classList.add('hidden');
+      this.emptyState?.classList.remove('hidden');
+      const message = error instanceof Error ? error.message : 'Failed to load post stub data';
+      this.noticeEl.textContent = `Post stub data could not be loaded: ${message} `;
+      const retry = document.createElement('button');
+      retry.type = 'button';
+      retry.className = 'admin-btn-secondary px-3 py-2';
+      retry.textContent = 'Retry loading';
+      retry.addEventListener('click', () => this.fetchStubs());
+      this.noticeEl.append(retry);
+      this.renderList();
     } finally {
+      this.fetching = false;
+      this.root.setAttribute('aria-busy', 'false');
       if (this.refreshBtn) this.refreshBtn.disabled = false;
+      this.updateActionState();
     }
   }
 

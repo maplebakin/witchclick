@@ -62,7 +62,7 @@ const postStubEntries = serializePostStubEntries(postStubData.entries).map((entr
 }));
 const postStubPayload = JSON.stringify(postStubEntries);
 ---
-<Base title="Stub Prompt + Ingestion Dashboard" description="Copy external prompts, paste drafts, validate, and replace stubs safely." canon={canonical} wide noindex>
+<Base title="Post Stub Forge" description="Copy external prompts, paste drafts, validate, and replace stubs safely." canon={canonical} wide noindex>
   <HeadSlot slot="head">
     <meta name="robots" content="noindex" />
   </HeadSlot>
@@ -73,10 +73,10 @@ const postStubPayload = JSON.stringify(postStubEntries);
 
       <section class="rounded-2xl border border-line-subtle bg-surface-base p-6 shadow-sm">
         <div class="space-y-2">
-          <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-primary">Stub Prompt + Ingestion Dashboard</p>
-          <h1 class="text-2xl font-semibold text-body-strong">Stub Forge</h1>
+          <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-primary">Post Stub Forge</p>
+          <h1 class="text-2xl font-semibold text-body-strong">Post Stub Forge</h1>
           <p class="max-w-3xl text-sm text-body-muted">
-            Copy a prompt, paste the finished draft, validate it, then ingest it safely.
+            Triage and completion for placeholder post stubs. Copy a prompt, paste a full draft, validate it, then replace the placeholder.
           </p>
         </div>
       </section>
@@ -141,9 +141,9 @@ const postStubPayload = JSON.stringify(postStubEntries);
         </section>
 
         <section class="rounded-2xl border border-line-subtle bg-surface-base p-4 shadow-sm lg:col-span-8">
-          <div data-empty-state class="flex min-h-[50vh] flex-col items-center justify-center gap-2 text-center text-body-muted">
-            <p class="text-lg font-semibold text-body-strong">Choose a stub to begin.</p>
-            <p class="text-sm">Prompt creation, pasted draft editing, and validation do not write files.</p>
+          <div data-empty-state class="flex min-h-[16rem] flex-col items-center justify-center gap-2 text-center text-body-muted">
+            <p class="text-lg font-semibold text-body-strong">Select a placeholder post stub to review.</p>
+            <p class="text-sm">Review its triage category and source context, then decide whether to complete a draft or keep it for editorial review. Prompt creation, editing, and validation do not write files.</p>
           </div>
 
           <div data-detail-panel class="hidden space-y-6">
@@ -243,11 +243,11 @@ const postStubPayload = JSON.stringify(postStubEntries);
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p class="text-[0.8rem] font-semibold uppercase tracking-wide text-danger">Final Action</p>
-                  <h3 class="text-lg font-semibold text-body-strong">Ingest & Replace Stub</h3>
+                  <h3 class="text-lg font-semibold text-body-strong">Replace Draft</h3>
                   <p class="text-[0.8rem] text-body-muted" data-ingest-helper>Validate the pasted draft before ingestion.</p>
                 </div>
                 <button type="button" data-save-post class="admin-btn-primary px-4 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50" disabled>
-                  Ingest & Replace Stub
+                  Replace Draft
                 </button>
               </div>
             </section>
@@ -269,9 +269,9 @@ const postStubPayload = JSON.stringify(postStubEntries);
               <p class="leading-6"><strong class="text-body-strong">Title:</strong> <span data-confirm-title>-</span></p>
               <p class="leading-6"><strong class="text-body-strong">Slug:</strong> <span data-confirm-slug>-</span></p>
               <p class="break-all leading-6"><strong class="text-body-strong">File path:</strong> <span data-confirm-path>-</span></p>
-              <p>This will overwrite the existing stub file.</p>
+              <p>This will overwrite the existing placeholder post file.</p>
               <p>The slug must remain unchanged.</p>
-              <p>The post should remain <code>draft: true</code>.</p>
+              <p>The replacement is forced to <code>draft: true</code>; it is not published.</p>
             </div>
             <div class="mt-6 flex flex-wrap justify-end gap-3 border-t border-line-subtle pt-4">
               <button type="button" class="admin-btn-secondary px-4 py-2 text-sm font-semibold" data-confirm-cancel>Cancel</button>

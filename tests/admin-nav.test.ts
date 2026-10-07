@@ -29,7 +29,7 @@ function navigation(currentPath: string) {
 const expectedSections = [
   ["Dashboard", [["/admin", "Work queues"]]],
   ["Create", [["/admin/generator", "Generate a post"], ["/admin/write", "Write a post"], ["/admin/curses", "Generate a curse"]]],
-  ["Review", [["/admin/staging", "Review drafts"], ["/admin/stubs", "Triage post stubs"], ["/admin/hero", "Complete hero images"]]],
+  ["Review", [["/admin/staging", "Review drafts"], ["/admin/stubs", "Post Stub Forge"], ["/admin/hero", "Complete hero images"]]],
   ["Library", [["/admin/posts", "Posts"], ["/admin/entities", "Entities"], ["/admin/curses/archive", "Curse archive & editor"], ["/admin/downloads", "Downloads"], ["/admin/authors", "Authors"]]],
   ["Site", [["/admin/home", "Homepage"], ["/admin/calendar", "Seasonal calendar"], ["/admin/partners", "Partners & community"], ["/admin/products", "Affiliate products"], ["/admin/theme", "Themes & typography"]]],
   ["System", [["/admin/settings", "Site settings"]]],
