@@ -127,25 +127,18 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
             <textarea id="spec" class="h-56 w-full admin-btn-secondary px-3 py-2 font-mono text-[0.8rem]" placeholder="Paste the returned PostSpec v2 JSON here…"></textarea>
 
-            <div class="mt-3 space-y-4 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] lg:gap-6">
+            <div class="mt-3 space-y-4">
               <div class="space-y-3">
                 <div class="flex flex-col gap-2">
-                  <div class="flex flex-wrap items-center gap-2 text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">
-                    <span>Save mode</span>
-                    <div class="inline-flex rounded-full border border-line-neutral bg-surface-neutral-soft p-1" data-save-mode>
-                      <button type="button" data-mode="publish" class="rounded-full px-3 py-1 text-[0.8rem] font-semibold text-body bg-surface-base shadow-sm">Publish</button>
-                      <button type="button" data-mode="draft" class="rounded-full px-3 py-1 text-[0.8rem] font-semibold text-body-muted">Save draft</button>
-                    </div>
-                  </div>
                   <div class="flex flex-wrap gap-2">
                     <button id="validateBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">✓ Validate</button>
                     <button id="previewBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">Preview</button>
                     <button id="ingestBtn" class="admin-btn-primary px-4 py-2 text-sm font-semibold">Save Draft</button>
-                    <button id="ingestPublishBtn" class="admin-btn-primary px-4 py-2 text-sm font-semibold">Publish</button>
+                    <button id="ingestPublishBtn" class="admin-btn-primary px-4 py-2 text-sm font-semibold" disabled>Make publicly eligible locally</button>
                     <button id="clearBtn" class="admin-btn-secondary px-4 py-2 text-sm font-medium">Clear</button>
                   </div>
                   <div class="text-[0.8rem] text-body-muted rounded-lg border border-dashed border-line-subtle bg-surface-base/60 px-3 py-2">
-                    <strong>💡 Tip:</strong> Validate first to check for errors, Preview to see the rendered flow. Use the save mode toggle to store drafts without publishing. <a href="/admin/staging" class="text-primary hover:underline">View staged drafts →</a>
+                    <strong>💡 Tip:</strong> Validate first to check for errors, Preview to see the rendered flow. Save Draft always keeps content private. Validate the current JSON to enable local publication; this does not deploy the site. <a href="/admin/staging" class="text-primary hover:underline">View staged drafts →</a>
                   </div>
                 </div>
                 <div class="flex flex-col gap-3">
@@ -158,28 +151,39 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
                     class="rounded-lg border border-line-neutral bg-surface-neutral-soft p-3 text-[0.8rem] text-body-muted"
                   ></div>
                 </div>
+                <p id="saveOutcome" class="text-sm text-body" role="status"></p>
+                <p id="bundleStatus" class="text-sm text-body" role="status"></p>
+                <details id="bundleDetails" hidden>
+                  <summary class="cursor-pointer py-2 text-sm">Bundle error details</summary>
+                  <pre id="bundleError" class="max-w-full whitespace-pre-wrap break-words text-sm"></pre>
+                </details>
+                <button id="retryBundleBtn" type="button" class="admin-btn-secondary px-4 py-2 text-sm font-semibold" hidden>Retry bundle only</button>
                 <div id="preview" class="prose prose-neutral mt-4 max-w-none border-t pt-4"></div>
               </div>
-              <aside class="mt-6 space-y-3 rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm lg:mt-0" data-recent-panel>
-                <div class="flex items-start justify-between gap-3">
-                  <div>
-                    <h3 class="text-sm font-semibold text-body-strong">Recent Posts</h3>
-                    <p class="text-[0.8rem] text-body-muted">Quick links to the latest ingestions.</p>
-                  </div>
-                  <button type="button" data-recent-refresh class="admin-btn-secondary px-3 py-1 text-[0.8rem] font-semibold">↻ Refresh</button>
-                </div>
-                <label class="flex items-center gap-2 text-[0.8rem] text-body-muted">
-                  <span class="sr-only">Filter recent posts</span>
-                  <input type="search" data-recent-filter class="w-full admin-btn-secondary px-3 py-1.5 text-sm" placeholder="Filter posts…" />
-                </label>
-                <div class="space-y-2" data-recent-list>
-                  <div class="rounded-lg border border-dashed border-line-subtle p-3 text-[0.8rem] text-body-muted">Fetching recent posts…</div>
-                </div>
-                <p class="text-[0.8rem] text-body-muted">Select a post to insert a JSON stub or jump to the editor.</p>
-              </aside>
             </div>
           </section>
         </div>
+
+        <details class="rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm" data-panel="posts" data-post-history>
+          <summary class="cursor-pointer py-2 font-semibold">Recent Posts — templates and editor links</summary>
+          <aside class="mt-3 space-y-3" data-recent-panel>
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h3 class="text-sm font-semibold text-body-strong">Recent Posts</h3>
+                <p class="text-[0.8rem] text-body-muted">Quick links to the latest ingestions.</p>
+              </div>
+              <button type="button" data-recent-refresh class="admin-btn-secondary px-3 py-1 text-[0.8rem] font-semibold">↻ Refresh</button>
+            </div>
+            <label class="flex items-center gap-2 text-[0.8rem] text-body-muted">
+              <span class="sr-only">Filter recent posts</span>
+              <input type="search" data-recent-filter class="w-full admin-btn-secondary px-3 py-1.5 text-sm" placeholder="Filter posts…" />
+            </label>
+            <div class="space-y-2" data-recent-list>
+              <div class="rounded-lg border border-dashed border-line-subtle p-3 text-[0.8rem] text-body-muted">Fetching recent posts…</div>
+            </div>
+            <p class="text-[0.8rem] text-body-muted">Copy metadata as a template for NEW content, or open the source editor. Saves create a unique slug and never replace the source.</p>
+          </aside>
+        </details>
 
         <div id="cursesPanel" data-panel="curses" class="hidden">
           <div class="rounded-2xl border border-line-subtle bg-surface-base p-4 shadow-sm space-y-3">
@@ -226,8 +230,11 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
         var rawCurseTypes = root?.getAttribute('data-curse-types') || '[]';
         var rawCurseTargets = root?.getAttribute('data-curse-targets') || '[]';
         var rawCurseTones = root?.getAttribute('data-curse-tones') || '[]';
-        var saveModeContainer = root?.querySelector('[data-save-mode]');
-        var currentSaveMode = 'publish';
+        var validatedJSON = null;
+        var savedJSON = '';
+        var operationBusy = false;
+        var lastPublishedSlug = '';
+        var bundlePending = false;
         var recentPanel = root?.querySelector('[data-recent-panel]');
         var recentListEl = root?.querySelector('[data-recent-list]');
         var recentRefreshBtn = root?.querySelector('[data-recent-refresh]');
@@ -272,15 +279,6 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
         });
 
         showPanel('posts');
-        if (saveModeContainer) {
-          saveModeContainer.addEventListener('click', function(event){
-            var target = event.target.closest('[data-mode]');
-            if (!target) return;
-            var mode = target.getAttribute('data-mode') || 'publish';
-            setSaveMode(mode);
-          });
-          setSaveMode(currentSaveMode);
-        }
         function setStatus(msg, ok, warnings, notes, errors, postStubs, slug){
           var el=$('status');
           if (!el) return;
@@ -412,10 +410,28 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             el.textContent='Ready for CurseSpec JSON.';
           }
         }
-        function busy(on){
-          ['genPrompt','validateBtn','previewBtn','ingestBtn','ingestPublishBtn','copyPrompt']
-            .forEach(function(id){ var b=$(id); if(b){ b.disabled=!!on; b.style.opacity = on ? .6 : 1; }});
+        function updateWriteControls(){
+          $('ingestBtn').disabled = operationBusy;
+          $('ingestPublishBtn').disabled = operationBusy || validatedJSON === null || validatedJSON !== $('spec').value;
+          $('retryBundleBtn').disabled = operationBusy || !bundlePending;
         }
+        function invalidateValidation(){
+          validatedJSON = null;
+          updateWriteControls();
+        }
+        function busy(on){
+          operationBusy = !!on;
+          ['genPrompt','validateBtn','previewBtn','copyPrompt','clearBtn']
+            .forEach(function(id){ var b=$(id); if(b) b.disabled=operationBusy; });
+          $('spec').readOnly = operationBusy;
+          root.querySelectorAll('[data-recent-insert]').forEach(function(button){ button.disabled = operationBusy; });
+          updateWriteControls();
+        }
+        $('spec').addEventListener('input', function(){
+          invalidateValidation();
+          setStatus('JSON changed. Validate again before making it publicly eligible.', null);
+        });
+        updateWriteControls();
 
         function curseBusy(on){
           ['curseGenPrompt','curseValidateBtn','curseIngestBtn','curseCopyPrompt']
@@ -871,24 +887,6 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           return Array.isArray(value) ? value : [];
         }
 
-        function updateSaveModeUI(){
-          if (!saveModeContainer) return;
-          var buttons = saveModeContainer.querySelectorAll('[data-mode]');
-          buttons.forEach(function(button){
-            var mode = button.getAttribute('data-mode') === 'draft' ? 'draft' : 'publish';
-            var active = mode === currentSaveMode;
-            button.classList.toggle('bg-surface-base', active);
-            button.classList.toggle('text-body', active);
-            button.classList.toggle('text-body-muted', !active);
-            button.classList.toggle('shadow-sm', active);
-          });
-        }
-
-        function setSaveMode(mode){
-          currentSaveMode = mode === 'draft' ? 'draft' : 'publish';
-          updateSaveModeUI();
-        }
-
         function parseDateValue(value){
           if (typeof value !== 'string' || !value.trim()) return null;
           var parsed = Date.parse(value);
@@ -903,6 +901,8 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
         }
 
         function insertStubForPost(post){
+          if (operationBusy) return;
+          if ($('spec').value.trim() && $('spec').value !== savedJSON && !confirm('Replace the unsaved JSON workspace with a template for new content?')) return;
           var editor = $('spec');
           if (!editor) return;
           var stub = {
@@ -927,9 +927,10 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             heroImagePrompt: post?.heroImagePrompt || ''
           };
           editor.value = JSON.stringify(stub, null, 2);
+          invalidateValidation();
           editor.focus();
           editor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          setStatus('Inserted JSON stub for “' + (post?.title || post?.slug || 'post') + '”. Fill in the outline and sections before validating.', null);
+          setStatus('Copied metadata from “' + (post?.title || post?.slug || 'post') + '” as a template for NEW content. Complete the outline and sections. Saving creates a unique slug; the source is never replaced.', null);
         }
 
         function renderRecentPosts(){
@@ -960,7 +961,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
                 <span class="text-[0.8rem] font-semibold uppercase tracking-wide text-body-muted">${dateLabel}</span>
               </div>
               <div class="mt-2 flex flex-wrap gap-2">
-                <button type="button" class="rounded-lg border border-line-neutral px-2 py-1 text-[0.8rem] font-semibold hover:bg-surface-base" data-recent-insert data-slug="${safeSlugAttr}">Infuse stub</button>
+                <button type="button" class="rounded-lg border border-line-neutral px-2 py-1 text-[0.8rem] font-semibold hover:bg-surface-base" data-recent-insert data-slug="${safeSlugAttr}">Copy as new-post template</button>
                 <a class="rounded-lg border border-line-neutral px-2 py-1 text-[0.8rem] font-semibold text-primary hover:bg-surface-base" href="/admin/posts?slug=${encodeURIComponent(post.slug || '')}" target="_blank" rel="noopener">Edit</a>
               </div>
             `;
@@ -1088,24 +1089,31 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           setCurseStatus((err && err.message) || 'Unexpected error', false, errors);
         }
 
+        async function validateCurrentJSON(draft){
+          var snapshot = $('spec').value;
+          invalidateValidation();
+          var spec = parseSpec();
+          // The action owns persistence intent; pasted _draft flags never choose it.
+          spec._draft = draft === true;
+          var data = await postSpec(spec, { dryRun: true });
+          if ($('spec').value !== snapshot) throw new Error('JSON changed during validation. Validate again. Nothing was saved.');
+          if (data.ok !== true || extractArray(data.errors).length) {
+            throw buildError(data.error || 'Validation errors found. Nothing was saved.', 'validation', { data: data });
+          }
+          validatedJSON = snapshot;
+          var finalSpec = normalizeResponseSpec(data.spec, spec);
+          finalSpec._draft = draft === true;
+          renderSpecSummary(finalSpec);
+          return { spec: finalSpec, data: data, snapshot: snapshot };
+        }
         $('validateBtn').addEventListener('click', async function(){
-          try{
-            busy(true); setStatus('Verifying runes…', null);
-            var spec = parseSpec();
-            var data = await postSpec(spec, { dryRun: true });
-            var finalSpec = normalizeResponseSpec(data.spec, spec);
-            renderSpecSummary(finalSpec);
-            var warnings = extractArray(data.warnings);
-            var notes = extractArray(data.normalizationReport);
-            var errors = extractArray(data.errors);
-            var postStubs = extractArray(data.postStubs);
-            if (data.ok === false) {
-              setStatus(data.error || 'Validation errors found.', false, warnings, notes, errors, postStubs);
-              return;
-            }
-            setStatus('Valid ✓', true, warnings, notes, errors, postStubs);
-          }catch(e){ handleSpecError(e); }
-          finally{ busy(false); }
+          if (operationBusy) return;
+          try {
+            busy(true); setStatus('Validating current JSON…', null);
+            var result = await validateCurrentJSON(false);
+            setStatus('Current JSON validated. Final review is still needed before local publication.', true, extractArray(result.data.warnings), extractArray(result.data.normalizationReport));
+          } catch (e) { handleSpecError(e); }
+          finally { busy(false); }
         });
 
         function wordCount(md){
@@ -1173,116 +1181,89 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
         }
 
         $('previewBtn').addEventListener('click', async function(){
-          try{
-            busy(true); setStatus('Validating for preview…', null);
-            var spec = parseSpec();
-            var data = await postSpec(spec, { dryRun: true });
-            var finalSpec = normalizeResponseSpec(data.spec, spec);
-            renderSpecSummary(finalSpec);
-            var warnings = extractArray(data.warnings);
-            var notes = extractArray(data.normalizationReport);
-            var errors = extractArray(data.errors);
-            var postStubs = extractArray(data.postStubs);
-            if (data.ok === false) {
-              setStatus(data.error || 'Validation errors found.', false, warnings, notes, errors, postStubs);
-              return;
-            }
-            renderPreview(finalSpec);
-            setStatus('Preview ✓', true, warnings, notes, errors, postStubs);
-          }catch(e){ handleSpecError(e); }
-          finally{ busy(false); }
+          if (operationBusy) return;
+          try {
+            busy(true); setStatus('Validating current JSON for preview…', null);
+            var result = await validateCurrentJSON(false);
+            renderPreview(result.spec);
+            setStatus('Current JSON validated and previewed. Final review is still needed.', true, extractArray(result.data.warnings), extractArray(result.data.normalizationReport));
+          } catch (e) { handleSpecError(e); }
+          finally { busy(false); }
         });
 
-        $('ingestBtn').addEventListener('click', async function(){
-          try{
-            busy(true); setStatus('Verifying runes…', null);
-            var spec = parseSpec();
-            var dryRun = await postSpec(spec, { dryRun: true });
-            var finalSpec = normalizeResponseSpec(dryRun.spec, spec);
-            var isDraftMode = currentSaveMode === 'draft';
-            finalSpec._draft = isDraftMode;
-            renderSpecSummary(finalSpec);
-            var warnings = extractArray(dryRun.warnings);
-            var notes = extractArray(dryRun.normalizationReport);
-            var errors = extractArray(dryRun.errors);
-            var postStubs = extractArray(dryRun.postStubs);
-            if (dryRun.ok === false) {
-              setStatus(dryRun.error || 'Validation errors found.', false, warnings, notes, errors, postStubs);
-              return;
+        async function runBundle(){
+          $('bundleStatus').textContent = 'Saved “' + lastPublishedSlug + '” is publicly eligible locally (not deployed). Bundle running…';
+          $('retryBundleBtn').hidden = true;
+          $('bundleDetails').hidden = true;
+          $('bundleDetails').open = false;
+          $('bundleError').textContent = '';
+          try {
+            var response = await apiFetch('/bundle', { method: 'POST' });
+            var result = await response.json();
+            if (!response.ok || result.ok !== true) {
+              throw new Error(extractArray(result.steps).map(function(step){ return step.err; }).filter(Boolean).join('\n') || result.error || 'Bundle request failed (' + response.status + ').');
             }
-            setStatus(finalSpec._draft ? 'Validation passed. Securing draft in grimoire…' : 'Validation passed. Infusing into the archive…', null, warnings, notes, errors, postStubs);
-            var data = await postSpec(finalSpec, { dryRun: false });
-            if (data.ok === false) {
-              setStatus(data.error || 'Ingest failed.', false, extractArray(data.warnings), extractArray(data.normalizationReport), extractArray(data.errors), extractArray(data.postStubs));
-              return;
-            }
-            var ingestWarnings = extractArray(data.warnings);
-            var ingestNotes = extractArray(data.normalizationReport);
-            var mergedWarnings = ingestWarnings.length ? ingestWarnings : warnings;
-            var mergedNotes = ingestNotes.length ? ingestNotes : notes;
-            var createdPosts = extractArray(data.createdPosts);
-            var location = data.path || ('src/content/posts/' + (data.slug || finalSpec.slug || 'post') + '.md');
-            var slug = data.slug || (finalSpec && finalSpec.slug) || '';
-            var msg;
-            if (data.saved === false) {
-              msg = finalSpec._draft ? 'Draft verified (dry run) → ' + location : 'Infused (dry run) → ' + location;
-            } else {
-              msg = (finalSpec._draft ? 'Draft secured ✓' : 'Infused ✓') + ' → ' + location;
-            }
-            if (createdPosts.length) {
-              msg += ' • Created ' + createdPosts.length + ' stub post' + (createdPosts.length === 1 ? '' : 's');
-            }
-            if (finalSpec._draft) {
-              msg += ' • <a href="/admin/staging" class="underline">View staging →</a>';
-            }
-            setStatus(msg, true, mergedWarnings, mergedNotes, extractArray(data.errors), createdPosts.map(function(p){ return {path: p}; }), slug);
-          }catch(e){ handleSpecError(e); }
-          finally{ busy(false); }
-        });
+            bundlePending = false;
+            $('bundleStatus').textContent = 'Bundle completed for saved “' + lastPublishedSlug + '”. The site has not been deployed.';
+          } catch (error) {
+            bundlePending = true;
+            var detail = String(error.message || error);
+            var brief = detail.split('\n').filter(function(line){ return line.trim(); })[0] || 'Unknown bundle error';
+            $('bundleStatus').textContent = 'Saved “' + lastPublishedSlug + '” remains publicly eligible locally (not deployed). Bundle failed: ' + brief.slice(0, 240) + ' Retry bundle only; do not save again.';
+            $('bundleError').textContent = detail;
+            $('bundleDetails').hidden = false;
+            $('retryBundleBtn').hidden = false;
+          }
+          updateWriteControls();
+        }
 
-        $('ingestPublishBtn').addEventListener('click', async function(){
-          try{
-            setSaveMode('publish');
-            busy(true); setStatus('Verifying runes…', null);
-            var spec = parseSpec();
-            var dryRun = await postSpec(spec, { dryRun: true });
-            var finalSpec = normalizeResponseSpec(dryRun.spec, spec);
-            finalSpec._draft = false;
-            renderSpecSummary(finalSpec);
-            var warnings = extractArray(dryRun.warnings);
-            var notes = extractArray(dryRun.normalizationReport);
-            var errors = extractArray(dryRun.errors);
-            var postStubs = extractArray(dryRun.postStubs);
-            if (dryRun.ok === false) {
-              setStatus(dryRun.error || 'Validation errors found.', false, warnings, notes, errors, postStubs);
+        async function saveCurrentJSON(draft){
+          if (operationBusy) return;
+          if (!draft && (validatedJSON === null || validatedJSON !== $('spec').value)) {
+            invalidateValidation();
+            setStatus('Validate the current JSON before making it publicly eligible. Nothing was saved.', false);
+            return;
+          }
+          try {
+            busy(true); setStatus('Validating the exact current JSON before saving…', null);
+            var result = await validateCurrentJSON(draft);
+            if ($('spec').value !== result.snapshot) throw new Error('JSON changed. Nothing was saved. Validate again.');
+            var data = await postSpec(result.spec, { dryRun: false });
+            if (data.ok !== true || extractArray(data.errors).length) throw buildError(data.error || 'Save request failed.', 'http', { data: data });
+            if (data.saved !== true) {
+              setStatus('The endpoint did not confirm persistence. No successful save is reported; no bundle was started.', false);
+              invalidateValidation();
               return;
             }
-            setStatus('Validation passed. Infusing into the archive…', null, warnings, notes, errors, postStubs);
-            var data = await postSpec(finalSpec, { dryRun: false });
-            if (data.ok === false) {
-              setStatus(data.error || 'Ingest failed.', false, extractArray(data.warnings), extractArray(data.normalizationReport), extractArray(data.errors), extractArray(data.postStubs));
-              return;
+            var slug = data.slug || result.spec.slug || '';
+            savedJSON = result.snapshot;
+            invalidateValidation();
+            var message = draft ? 'Saved draft “' + slug + '”. It is not publicly eligible.' : 'Saved “' + slug + '”. It is publicly eligible locally; the site has not been deployed.';
+            $('saveOutcome').textContent = message;
+            setStatus(message, true, extractArray(data.warnings), extractArray(data.normalizationReport), [], extractArray(data.createdPosts).map(function(p){ return { path: p }; }), draft ? '' : slug);
+            if (!draft) {
+              lastPublishedSlug = slug;
+              bundlePending = true;
+              await runBundle();
             }
-            var ingestWarnings = extractArray(data.warnings);
-            var ingestNotes = extractArray(data.normalizationReport);
-            var createdPosts = extractArray(data.createdPosts);
-            var slug = data.slug || (finalSpec && finalSpec.slug) || '';
-            setStatus('Ingested. Publishing…', true, ingestWarnings.length ? ingestWarnings : warnings, ingestNotes.length ? ingestNotes : notes, extractArray(data.errors), createdPosts.map(function(p){ return {path: p}; }));
-            var r = await apiFetch('/bundle', { method:'POST' });
-            var b = await r.json();
-            if (!b.ok) throw new Error((b.steps && b.steps.map(function(s){return s.err;}).filter(Boolean).join('\n')) || b.error || 'bundle failed');
-            var slug = data.slug || (finalSpec && finalSpec.slug) || '';
-            var publishMsg = 'Unveiled ✓';
-            if (createdPosts.length) {
-              publishMsg += ' • Created ' + createdPosts.length + ' stub post' + (createdPosts.length === 1 ? '' : 's');
-            }
-            setStatus(publishMsg, true, ingestWarnings.length ? ingestWarnings : warnings, ingestNotes.length ? ingestNotes : notes, extractArray(data.errors), createdPosts.map(function(p){ return {path: p}; }), slug);
-          }catch(e){ handleSpecError(e); }
-          finally{ busy(false); }
+          } catch (error) {
+            invalidateValidation();
+            handleSpecError(error);
+            // A failed save never starts a bundle or alters the last confirmed save.
+          } finally { busy(false); }
+        }
+        $('ingestBtn').addEventListener('click', function(){ saveCurrentJSON(true); });
+        $('ingestPublishBtn').addEventListener('click', function(){ saveCurrentJSON(false); });
+        $('retryBundleBtn').addEventListener('click', async function(){
+          if (operationBusy || !bundlePending || !lastPublishedSlug) return;
+          try { busy(true); await runBundle(); }
+          finally { busy(false); }
         });
-
         $('clearBtn').addEventListener('click', function(){
-          $('spec').value=''; $('preview').innerHTML=''; renderSpecSummary(null); setStatus('Cleared. Ready for new JSON.', null);
+          if (operationBusy) return;
+          if ($('spec').value.trim() && $('spec').value !== savedJSON && !confirm('Clear meaningful unsaved JSON? This cannot be undone.')) return;
+          $('spec').value = ''; $('preview').innerHTML = '';
+          invalidateValidation(); renderSpecSummary(null); setStatus('Cleared. Ready for new JSON.', null);
         });
 
         if (recentRefreshBtn) {

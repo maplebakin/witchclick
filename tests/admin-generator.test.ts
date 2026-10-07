@@ -1,8 +1,197 @@
-import fs from "node:fs/promises";
-import path from "node:path";
+import fs from "node:fs";
+import fsp from "node:fs/promises";
 import os from "node:os";
-
+import path from "node:path";
+import { JSDOM } from "jsdom";
+import matter from "gray-matter";
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
+import { executeIngest } from "../server/lib/ingestExecutor.js";
+import { normalizeDraftSpec } from "../src/scripts/normalizeDraftSpec.js";
+import { createPostSpec } from "./postSpecTestUtils";
+
+const source = fs.readFileSync(new URL("../src/pages/admin/generator.astro", import.meta.url), "utf8");
+const script = source.match(/<script is:inline>([\s\S]*?)<\/script>/)![1]!;
+interface Request { url: URL; body: Record<string, any>; dry: boolean }
+const doms: JSDOM[] = [];
+const directories: string[] = [];
+afterEach(() => {
+  doms.splice(0).forEach((dom) => dom.window.close());
+  directories.splice(0).forEach((directory) => fs.rmSync(directory, { recursive: true, force: true }));
+});
+const response = (data: unknown, ok = true) => ({ ok, status: ok ? 200 : 400, text: async () => JSON.stringify(data), json: async () => data });
+function setup(handler?: (request: Request) => Promise<ReturnType<typeof response> | undefined> | ReturnType<typeof response> | undefined) {
+  const dom = new JSDOM(`<div data-panel-root data-dev-api="http://fixture.local"><div data-panel="posts"></div>
+    <textarea id="spec"></textarea><div id="status"></div><div id="specSummary"></div><div id="preview"></div>
+    <p id="saveOutcome"></p><p id="bundleStatus"></p><details id="bundleDetails"><pre id="bundleError"></pre></details>
+    ${["validateBtn", "previewBtn", "ingestBtn", "ingestPublishBtn", "clearBtn", "retryBundleBtn", "genPrompt", "copyPrompt"].map((id) => `<button id="${id}"></button>`).join("")}
+    <details data-post-history><aside data-recent-panel><div data-recent-list></div><button data-recent-refresh></button><input data-recent-filter /></aside></details>
+    </div>`, { runScripts: "outside-only" });
+  doms.push(dom);
+  const window = dom.window;
+  window.HTMLElement.prototype.scrollIntoView = () => {};
+  Object.assign(window, { WitchClick: { normalizeDraftSpec } });
+  window.confirm = vi.fn(() => true);
+  const requests: Request[] = [];
+  window.fetch = vi.fn(async (url, options) => {
+    const request = { url: new URL(String(url)), body: JSON.parse(String(options?.body || "{}")), dry: String(url).includes("dryRun=true") };
+    requests.push(request);
+    const custom = handler && await handler(request);
+    if (custom) return custom as Response;
+    if (request.url.pathname === "/posts/list") return response({ ok: true, items: [{ title: "Source post", slug: "source-post", tags: ["source"] }] }) as Response;
+    if (request.url.pathname === "/bundle") return response({ ok: true }) as Response;
+    return response({ ok: true, spec: request.body, saved: !request.dry, slug: request.body.slug, warnings: [], errors: [] }) as Response;
+  });
+  window.eval(script);
+  const element = <T extends HTMLElement = HTMLElement>(id: string) => window.document.getElementById(id) as T;
+  const edit = (value: unknown) => {
+    element<HTMLTextAreaElement>("spec").value = typeof value === "string" ? value : JSON.stringify(value);
+    element("spec").dispatchEvent(new window.Event("input"));
+  };
+  const click = (id: string) => element<HTMLButtonElement>(id).click();
+  const idle = async () => vi.waitFor(() => expect(element<HTMLButtonElement>("ingestBtn").disabled).toBe(false));
+  return { window, requests, element, edit, click, idle, writes: () => requests.filter((request) => request.url.pathname === "/ingest" && !request.dry) };
+}
+
+describe("Generator action model", () => {
+  it("removes the mode toggle and retains one explicit publication action", () => {
+    expect(source).not.toMatch(/data-save-mode|currentSaveMode|setSaveMode|Infuse stub/);
+    expect(source.match(/id="ingestPublishBtn"/g)).toHaveLength(1);
+    expect(source).toContain("Make publicly eligible locally");
+    expect(source).toContain("data-post-history");
+    expect(source.indexOf("data-post-history")).toBeGreaterThan(source.indexOf('id="preview"'));
+    expect(source).not.toContain("lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]");
+  });
+  it("Save Draft forces draft intent for both validation and persistence", async () => {
+    const ui = setup(); ui.edit(createPostSpec({ _draft: false })); ui.click("ingestBtn"); await ui.idle();
+    const ingest = ui.requests.filter((request) => request.url.pathname === "/ingest");
+    expect(ingest).toHaveLength(2);
+    expect(ingest.map((request) => request.dry)).toEqual([true, false]);
+    expect(ingest.every((request) => request.url.searchParams.get("draft") === "true" && request.body._draft === true)).toBe(true);
+    expect(ui.element("saveOutcome").textContent).toContain("not publicly eligible");
+    expect(ui.requests.some((request) => request.url.pathname === "/bundle")).toBe(false);
+  });
+  it("does not write malformed JSON", async () => {
+    const ui = setup(); ui.edit("{broken"); ui.click("ingestBtn"); await ui.idle();
+    expect(ui.writes()).toHaveLength(0);
+    expect(ui.element("status").textContent).toContain("Invalid JSON");
+  });
+  it("does not write schema-invalid JSON", async () => {
+    const ui = setup((request) => request.url.pathname === "/ingest" ? response({ ok: false, errors: ["Missing sections"], error: "Invalid content" }, false) : undefined);
+    ui.edit({ title: "Missing content" }); ui.click("ingestBtn"); await ui.idle();
+    expect(ui.writes()).toHaveLength(0);
+    expect(ui.element("status").textContent).toContain("Missing sections");
+  });
+  it("blocks publication until the current JSON is validated, and again after editing", async () => {
+    const ui = setup(); ui.edit(createPostSpec());
+    expect(ui.element<HTMLButtonElement>("ingestPublishBtn").disabled).toBe(true);
+    ui.click("validateBtn"); await ui.idle();
+    expect(ui.element<HTMLButtonElement>("ingestPublishBtn").disabled).toBe(false);
+    ui.edit(createPostSpec({ title: "Changed" }));
+    expect(ui.element<HTMLButtonElement>("ingestPublishBtn").disabled).toBe(true);
+    ui.element("ingestPublishBtn").dispatchEvent(new ui.window.Event("click")); await ui.idle();
+    expect(ui.writes()).toHaveLength(0);
+    expect(ui.element("status").textContent).toContain("Validate the current JSON");
+  });
+  it("checks the value itself even when a programmatic change omits an input event", async () => {
+    const ui = setup(); ui.edit(createPostSpec()); ui.click("validateBtn"); await ui.idle();
+    ui.element<HTMLTextAreaElement>("spec").value += " "; ui.click("ingestPublishBtn"); await ui.idle();
+    expect(ui.writes()).toHaveLength(0);
+  });
+  it("revalidates publication immediately before writing and owns the public intent", async () => {
+    const ui = setup(); ui.edit(createPostSpec({ _draft: true })); ui.click("validateBtn"); await ui.idle();
+    ui.click("ingestPublishBtn"); await ui.idle();
+    const ingest = ui.requests.filter((request) => request.url.pathname === "/ingest");
+    expect(ingest.map((request) => request.dry)).toEqual([true, true, false]);
+    expect(ingest.every((request) => request.body._draft === false && !request.url.searchParams.has("draft"))).toBe(true);
+    expect(ui.element("saveOutcome").textContent).toContain("publicly eligible locally");
+    expect(ui.element("bundleStatus").textContent).toContain("not been deployed");
+    expect(ui.element<HTMLButtonElement>("ingestPublishBtn").disabled).toBe(true);
+  });
+  it("disables writes in flight and rejects changes made during async validation", async () => {
+    let release!: () => void;
+    const wait = new Promise<void>((resolve) => { release = resolve; });
+    const ui = setup(async (request) => {
+      if (request.url.pathname === "/ingest" && request.dry) { await wait; return response({ ok: true, spec: request.body }); }
+      return undefined;
+    });
+    ui.edit(createPostSpec()); ui.click("ingestBtn");
+    expect(ui.element<HTMLButtonElement>("ingestBtn").disabled).toBe(true);
+    expect(ui.element<HTMLButtonElement>("ingestPublishBtn").disabled).toBe(true);
+    expect(ui.element<HTMLTextAreaElement>("spec").readOnly).toBe(true);
+    ui.edit(createPostSpec({ title: "Changed while validating" })); release(); await ui.idle();
+    expect(ui.writes()).toHaveLength(0);
+    expect(ui.element("status").textContent).toContain("changed during validation");
+  });
+  it("keeps a save success separate from bundle failure; retry only reruns the bundle", async () => {
+    let bundles = 0;
+    const ui = setup((request) => request.url.pathname === "/bundle" ? response(++bundles === 1 ? { ok: false, error: "Linker failed" } : { ok: true }, bundles > 1) : undefined);
+    ui.edit(createPostSpec()); ui.click("validateBtn"); await ui.idle(); ui.click("ingestPublishBtn"); await ui.idle();
+    expect(ui.element("saveOutcome").textContent).toContain("Saved");
+    expect(ui.element("status").textContent).not.toContain("failed");
+    expect(ui.element("bundleStatus").textContent).toContain("Bundle failed: Linker failed");
+    expect(ui.element<HTMLButtonElement>("retryBundleBtn").hidden).toBe(false);
+    const writes = ui.writes().length;
+    ui.click("retryBundleBtn"); await ui.idle();
+    expect(ui.writes()).toHaveLength(writes);
+    expect(bundles).toBe(2);
+    expect(ui.element("bundleStatus").textContent).toContain("Bundle completed");
+  });
+  it("never starts a bundle when saving fails", async () => {
+    const ui = setup((request) => request.url.pathname === "/ingest" && !request.dry ? response({ ok: false, error: "Disk write failed" }, false) : undefined);
+    ui.edit(createPostSpec()); ui.click("validateBtn"); await ui.idle(); ui.click("ingestPublishBtn"); await ui.idle();
+    expect(ui.element("saveOutcome").textContent).toBe("");
+    expect(ui.element("status").textContent).toContain("Disk write failed");
+    expect(ui.requests.some((request) => request.url.pathname === "/bundle")).toBe(false);
+  });
+  it("does not claim a save or run a bundle for an unconfirmed/dry-run response", async () => {
+    const ui = setup((request) => request.url.pathname === "/ingest" && !request.dry ? response({ ok: true, saved: false }) : undefined);
+    ui.edit(createPostSpec()); ui.click("validateBtn"); await ui.idle(); ui.click("ingestPublishBtn"); await ui.idle();
+    expect(ui.element("saveOutcome").textContent).toBe("");
+    expect(ui.requests.some((request) => request.url.pathname === "/bundle")).toBe(false);
+  });
+  it("confirms clearing meaningful unsaved content and respects cancel", () => {
+    const ui = setup(); ui.edit(createPostSpec()); ui.window.confirm = vi.fn(() => false);
+    ui.click("clearBtn"); expect(ui.element<HTMLTextAreaElement>("spec").value).not.toBe("");
+    expect(ui.window.confirm).toHaveBeenCalledOnce();
+    ui.window.confirm = vi.fn(() => true); ui.click("clearBtn");
+    expect(ui.element<HTMLTextAreaElement>("spec").value).toBe("");
+    expect(ui.element<HTMLButtonElement>("ingestPublishBtn").disabled).toBe(true);
+  });
+  it("clears empty or confirmed-saved JSON without an unsaved-content prompt", async () => {
+    const ui = setup(); ui.click("clearBtn"); expect(ui.window.confirm).not.toHaveBeenCalled();
+    ui.edit(createPostSpec()); ui.click("ingestBtn"); await ui.idle(); ui.click("clearBtn");
+    expect(ui.window.confirm).not.toHaveBeenCalled();
+  });
+  it("copies source metadata as an unvalidated template for new content", async () => {
+    const ui = setup();
+    await vi.waitFor(() => expect(ui.window.document.querySelector("[data-recent-insert]")).not.toBeNull());
+    const button = ui.window.document.querySelector<HTMLButtonElement>("[data-recent-insert]")!;
+    expect(button.textContent).toBe("Copy as new-post template"); button.click();
+    expect(JSON.parse(ui.element<HTMLTextAreaElement>("spec").value).slug).toBe("source-post");
+    expect(ui.element("status").textContent).toContain("source is never replaced");
+    expect(ui.element<HTMLButtonElement>("ingestPublishBtn").disabled).toBe(true);
+    expect(ui.writes()).toHaveLength(0);
+  });
+  it("uses existing ingestion to persist a draft under a unique slug without overwriting the source", async () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "wc-generator-test-")); directories.push(directory);
+    const postsDir = path.join(directory, "src/content/posts"); fs.mkdirSync(postsDir, { recursive: true });
+    const original = "---\ntitle: Original\nslug: source-post\n---\nUntouched source.\n";
+    fs.writeFileSync(path.join(postsDir, "source-post.md"), original);
+    const ui = setup(async (request) => {
+      if (request.url.pathname !== "/ingest") return undefined;
+      const { _draft, ...spec } = request.body;
+      const result = await executeIngest(spec, { cwd: directory, postsDirectories: [postsDir], dryRun: request.dry, draft: _draft === true, forceCategory: "ritual" });
+      return response({ ok: true, saved: !request.dry, slug: result.prepared.spec.slug, spec: result.prepared.spec });
+    });
+    ui.edit(createPostSpec({ slug: "source-post", _draft: false })); ui.click("ingestBtn"); await ui.idle();
+    expect(fs.readFileSync(path.join(postsDir, "source-post.md"), "utf8")).toBe(original);
+    const writes = ui.writes(); expect(writes).toHaveLength(1);
+    const saved = matter(fs.readFileSync(path.join(postsDir, `${writes[0]!.body.slug}.md`), "utf8"));
+    expect(saved.data.draft).toBe(true);
+    expect(saved.data.slug).not.toBe("source-post");
+    expect(ui.element("saveOutcome").textContent).toContain("Saved draft");
+  });
+});
 
 let tempDir: string;
 let cwdSpy: MockInstance<() => string> | undefined;
@@ -15,9 +204,9 @@ let persistPreparedSpec: (
 ) => Promise<{ postPath: string; createdEntities: string[] }>;
 
 async function prepareTempDir() {
-  tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "wc-admin-generator-"));
-  await fs.mkdir(path.join(tempDir, "src", "content", "posts"), { recursive: true });
-  await fs.mkdir(path.join(tempDir, "content", "posts"), { recursive: true });
+  tempDir = await fsp.mkdtemp(path.join(os.tmpdir(), "wc-admin-generator-"));
+  await fsp.mkdir(path.join(tempDir, "src", "content", "posts"), { recursive: true });
+  await fsp.mkdir(path.join(tempDir, "content", "posts"), { recursive: true });
   cwdSpy = vi.spyOn(process, "cwd");
   cwdSpy.mockReturnValue(tempDir);
 }
@@ -25,7 +214,7 @@ async function prepareTempDir() {
 async function cleanupTempDir() {
   if (cwdSpy) cwdSpy.mockRestore();
   if (tempDir) {
-    await fs.rm(tempDir, { recursive: true, force: true });
+    await fsp.rm(tempDir, { recursive: true, force: true });
   }
 }
 
@@ -43,7 +232,7 @@ describe("admin post generator pipeline", () => {
 
   it("normalizes specs, reports adjustments, and persists markdown", async () => {
     const postsDir = path.join(tempDir, "src", "content", "posts");
-    await fs.writeFile(path.join(postsDir, "cozy-focus-tea.md"), "# existing\n", "utf8");
+    await fsp.writeFile(path.join(postsDir, "cozy-focus-tea.md"), "# existing\n", "utf8");
 
     const rawSpec = {
       specVersion: "1",
@@ -140,15 +329,15 @@ describe("admin post generator pipeline", () => {
 
     await persistPreparedSpec(prepared);
 
-    const saved = await fs.readFile(path.join(postsDir, "cozy-focus-tea-2.md"), "utf8");
+    const saved = await fsp.readFile(path.join(postsDir, "cozy-focus-tea-2.md"), "utf8");
     expect(saved).toBe(prepared.post.contents);
     expect(saved).toContain('heroImagePrompt: "A cozy desk with tea."');
 
-    const herbStub = await fs.readFile(
+    const herbStub = await fsp.readFile(
       path.join(tempDir, "content", "entities", "herb", "peppermint.json"),
       "utf8",
     );
-    const crystalStub = await fs.readFile(
+    const crystalStub = await fsp.readFile(
       path.join(tempDir, "content", "entities", "crystal", "fluorite.json"),
       "utf8",
     );
