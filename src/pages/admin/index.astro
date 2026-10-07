@@ -1,581 +1,164 @@
 ---
+import fs from "node:fs";
+import path from "node:path";
 import Base from "../../layouts/Base.astro";
 import { readSettings, buildCanonicalUrl } from "../../utils/settings";
 import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
+import { listCanonicalPostFiles, readPostFile, resolveCanonicalPostsDirectory } from "../../utils/postFiles";
+import { extractHeroImage } from "../../utils/posts";
+import { classifyAdminQueues, queueDefinitions, type QueuePost } from "../../utils/adminQueues";
+import * as stubPromptGenerator from "../../../server/lib/stubPromptGenerator.js";
 
+const { generatePostStubPrompts } = stubPromptGenerator as typeof stubPromptGenerator & {
+  generatePostStubPrompts: (options?: { cwd?: string }) => { entries: Array<{ slug: string; title?: string; stubTriageStatus?: string }> };
+};
 const settings = readSettings();
 const canonical = buildCanonicalUrl(settings, { path: "/admin" });
-
-const isDev = import.meta.env.DEV;
 const ADMIN_KEY = import.meta.env.PUBLIC_ADMIN_KEY;
 const url = new URL(Astro.request.url);
-const keyOk = ADMIN_KEY && url.searchParams.get("key") === ADMIN_KEY;
-const canUse = isDev || !!keyOk;
-
-const DEV_API = import.meta.env.PUBLIC_DEV_API || "http://localhost:8787";
-const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADMIN_KEY || "";
+const canUse = import.meta.env.DEV || !!(ADMIN_KEY && url.searchParams.get("key") === ADMIN_KEY);
+const posts: QueuePost[] = [];
+let sourceError = "";
+let queues = classifyAdminQueues([], []);
+if (canUse) {
+  try {
+    const postsDir = resolveCanonicalPostsDirectory();
+    if (!fs.existsSync(postsDir)) throw new Error("Canonical posts directory unavailable");
+    for (const fileName of listCanonicalPostFiles(postsDir)) {
+      const fallbackSlug = fileName.replace(/\.md$/, "");
+      try {
+        const record = readPostFile(path.join(postsDir, fileName));
+        const hero = extractHeroImage(record.data);
+        let availability: "present" | "missing" | "unknown" = "unknown";
+        if (hero.src?.startsWith("/") && !hero.src.startsWith("//")) {
+          const publicDir = path.resolve(process.cwd(), "public");
+          const heroPath = path.resolve(publicDir, `.${decodeURIComponent(hero.src.split(/[?#]/)[0]!)}`);
+          if (heroPath.startsWith(`${publicDir}${path.sep}`)) {
+            availability = fs.existsSync(heroPath) && fs.statSync(heroPath).isFile() ? "present" : "missing";
+          }
+        }
+        posts.push({ slug: record.slug ?? fallbackSlug, data: record.data, content: record.content, artwork: { ...hero, availability } });
+      } catch {
+        posts.push({ slug: fallbackSlug, readError: "Unknown: post source could not be read or parsed" });
+      }
+    }
+    queues = classifyAdminQueues(posts, generatePostStubPrompts({ cwd: process.cwd() }).entries);
+  } catch {
+    sourceError = "Readiness is unknown: local post data or the stub detector could not be loaded. Reload the page after checking the local files.";
+  }
+}
+const snapshotTime = new Date().toISOString();
+const queueGroups = Object.fromEntries(queueDefinitions.map(({ id }) => {
+  const items = id === "recent" ? queues[id].slice(0, 10) : queues[id];
+  return [id, [items.slice(0, 5), items.slice(5)].filter((group) => group.length)];
+}));
 ---
 
-<Base
-  title="WitchClick — Admin Dashboard"
-  description="Admin overview, recent work, and quick actions."
-  canon={canonical}
-  wide={true}
-  noindex={true}
->
-  <HeadSlot slot="head">
-    <meta name="robots" content="noindex" />
-  </HeadSlot>
-
+<Base title="WitchClick — Admin Dashboard" description="Work queues and next actions." canon={canonical} wide noindex>
+  <HeadSlot slot="head"><meta name="robots" content="noindex" /></HeadSlot>
   {canUse ? (
-    <div
-      class="admin-dashboard space-y-6"
-      data-dashboard-root
-      data-dev-api={DEV_API}
-      data-dev-key={DEV_KEY}
-    >
+    <div class="admin-dashboard space-y-6" data-dashboard-root>
       <AdminNav currentPath="/admin" />
-
       <section class="admin-dashboard__hero rounded-2xl border border-line-subtle p-6 shadow-sm">
-        <div class="space-y-3">
-          <div>
-            <h1 class="text-2xl font-semibold text-body-strong">Dashboard</h1>
-            <p class="mt-1 text-sm text-body-muted">
-              One place to see content status, jump into common workflows, and open a post or
-              entity fast.
-            </p>
-          </div>
-          <div class="admin-dashboard__actions grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-            <a
-              href="/admin/write"
-              class="admin-dashboard__action admin-dashboard__action--primary admin-btn-primary px-4 py-3 text-center text-sm font-semibold"
-            >
-              New Post
-            </a>
-            <a
-              href="/admin/staging"
-              class="admin-dashboard__action admin-dashboard__action--secondary admin-btn-secondary px-4 py-3 text-center text-sm font-semibold"
-            >
-              Staging
-            </a>
-            <a
-              href="/admin/generator"
-              class="admin-dashboard__action admin-dashboard__action--secondary admin-btn-secondary px-4 py-3 text-center text-sm font-semibold"
-            >
-              Generator
-            </a>
-            <a
-              href="/admin/hero"
-              class="admin-dashboard__action admin-dashboard__action--secondary admin-btn-secondary px-4 py-3 text-center text-sm font-semibold"
-            >
-              Hero
-            </a>
-            <a
-              href="/admin/entities"
-              class="admin-dashboard__action admin-dashboard__action--secondary admin-btn-secondary px-4 py-3 text-center text-sm font-semibold"
-            >
-              Entities
-            </a>
-            <a
-              href="/admin/stubs"
-              class="admin-dashboard__action admin-dashboard__action--secondary admin-btn-secondary px-4 py-3 text-center text-sm font-semibold"
-            >
-              Stub Dashboard
-            </a>
-          </div>
+        <h1 class="text-2xl font-semibold text-body-strong">Work queues</h1>
+        <p class="mt-2 text-body-muted">One next step per post. Secondary blockers stay with its primary queue.</p>
+        <div class="mt-4 flex flex-wrap gap-3">
+          <a class="admin-btn-primary px-4 py-3 font-semibold" href="/admin/generator">Generate a post</a>
+          <a class="admin-btn-secondary px-4 py-3 font-semibold" href="/admin/write">Write a post</a>
         </div>
       </section>
-
       <section class="admin-dashboard__panel rounded-2xl border border-line-neutral p-4 shadow-sm">
-        <div class="mb-3">
-          <h2 class="text-lg font-semibold text-body-strong">Open by Slug</h2>
-          <p class="text-sm text-body-muted">Jump straight to the post or entity editor.</p>
-        </div>
-        <form class="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_auto]" data-open-slug-form>
-          <input
-            type="text"
-            name="slug"
-            class="admin-btn-secondary px-3 py-2 text-sm"
-            placeholder="rose-quartz or full-moon-release-ritual"
-            autocomplete="off"
-          />
-          <button
-            type="submit"
-            name="target"
-            value="post"
-            class="admin-btn-primary px-4 py-2 text-sm font-semibold"
-          >
-            Open Post
-          </button>
-          <button
-            type="submit"
-            name="target"
-            value="entity"
-            class="admin-btn-secondary px-4 py-2 text-sm font-semibold"
-          >
-            Open Entity
-          </button>
+        <h2 class="text-lg font-semibold text-body-strong">Open by Slug</h2>
+        <form class="mt-3 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_auto]" data-open-slug-form>
+          <label class="min-w-0"><span class="sr-only">Post or entity slug</span><input class="w-full px-3 py-3" type="text" name="slug" placeholder="rose-quartz or full-moon-release-ritual" autocomplete="off" required /></label>
+          <button class="admin-btn-primary px-4 py-3 font-semibold" type="submit" name="target" value="post">Open Post</button>
+          <button class="admin-btn-secondary px-4 py-3 font-semibold" type="submit" name="target" value="entity">Open Entity</button>
         </form>
-        <p class="mt-2 text-[0.8rem] text-body-muted" data-open-slug-status></p>
+        <p class="mt-2 text-sm text-body-muted" data-open-slug-status role="status"></p>
       </section>
-
-      <section class="grid gap-4 lg:grid-cols-2">
-        <div class="admin-dashboard__panel rounded-2xl border border-line-neutral p-4 shadow-sm">
-          <div class="admin-dashboard__section-heading mb-4 flex items-center justify-between gap-3">
-            <div>
-              <h2 class="text-lg font-semibold text-body-strong">Posts</h2>
-              <p class="text-sm text-body-muted">Published, drafts, and missing hero coverage.</p>
-            </div>
-            <a href="/admin/posts" class="text-sm font-semibold text-primary hover:underline">
-              Open posts
-            </a>
+      <p class="text-sm text-body-muted">Read-only snapshot at <time datetime={snapshotTime}>{snapshotTime.replace("T", " ").slice(0, 19)} UTC</time>. Reload after editing. Checks measure preparation, not editorial approval; remote artwork is unverified.</p>
+      <div data-queue-status role="status" aria-live="polite">Loading work queues…</div>
+      <div data-queue-host aria-busy="true"></div>
+      <div hidden data-queue-template data-source-error={sourceError}>
+        {sourceError ? <p class="admin-dashboard__panel rounded-xl border border-line-neutral p-4" role="alert">{sourceError}</p> : (
+          <div class="space-y-5">
+            {queueDefinitions.map((definition) => (
+              <section class="admin-dashboard__panel rounded-2xl border border-line-neutral p-4 shadow-sm" data-queue={definition.id}>
+                <h2 class="text-lg font-semibold text-body-strong">{definition.title} <span data-queue-count>({queues[definition.id].length})</span></h2>
+                {definition.id === "decision" && <p class="mt-2 text-sm text-body-muted">Placeholders are separate from real drafts. Candidate and untriaged stubs also need their next step confirmed.</p>}
+                {definition.id === "work" && <p class="mt-2 text-sm text-body-muted">Draft preparation problems, scheduling decisions, and items whose readiness is unknown.</p>}
+                {definition.id === "recent" && <p class="mt-2 text-sm text-body-muted">Latest public-eligible posts, after artwork queues. Showing up to 10.</p>}
+                {queues[definition.id].length === 0 ? <p class="mt-3 text-body-muted" data-queue-empty>{definition.empty}</p> : (
+                  queueGroups[definition.id]!.map((group, groupIndex) => {
+                    const Wrapper = groupIndex === 0 ? "div" : "details";
+                    return (
+                    <Wrapper class="mt-3">
+                    {groupIndex > 0 && <summary class="dashboard-show-more">Show {group.length} more items</summary>}
+                    <ul class="mt-3 space-y-3">
+                    {group.map((item) => (
+                      <li class="admin-dashboard__list-item rounded-xl border border-line-neutral p-4" data-queue-slug={item.slug}>
+                        <div class="dashboard-queue-row">
+                          <div class="min-w-0">
+                            <h3 class="font-semibold text-body-strong">{item.title}</h3>
+                            <p class="mt-1 text-sm text-body-muted">{item.contentType} · {item.state}</p>
+                            <p class="mt-2 text-body-base">{item.reason}</p>
+                            {item.blockers.length > 0 && <ul class="mt-2 flex flex-wrap gap-2" aria-label="Secondary blockers">{item.blockers.map((blocker) => <li class="dashboard-blocker">{blocker}</li>)}</ul>}
+                          </div>
+                          <a class="admin-btn-secondary dashboard-next-action px-4 py-3 font-semibold" href={item.href}>{item.action}</a>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  </Wrapper>
+                  );
+                  })
+                )}
+              </section>
+            ))}
           </div>
-          <div class="grid gap-3 sm:grid-cols-3">
-            <div class="admin-dashboard__stat admin-dashboard__stat--success rounded-xl border p-4">
-              <div class="admin-dashboard__stat-label text-[0.8rem] uppercase tracking-wide">Published</div>
-              <div
-                class="admin-dashboard__stat-value mt-2 text-body-strong"
-                data-post-count="published"
-              >
-                -
-              </div>
-            </div>
-            <div class="admin-dashboard__stat admin-dashboard__stat--neutral rounded-xl border p-4">
-              <div class="admin-dashboard__stat-label text-[0.8rem] uppercase tracking-wide">Drafts</div>
-              <div class="admin-dashboard__stat-value mt-2 text-body-strong" data-post-count="drafts">
-                -
-              </div>
-            </div>
-            <div class="admin-dashboard__stat admin-dashboard__stat--warning rounded-xl border p-4">
-              <div class="admin-dashboard__stat-label text-[0.8rem] uppercase tracking-wide">Missing Hero</div>
-              <div
-                class="admin-dashboard__stat-value mt-2 text-body-strong"
-                data-post-count="missingHero"
-              >
-                -
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="admin-dashboard__panel rounded-2xl border border-line-neutral p-4 shadow-sm">
-          <div class="admin-dashboard__section-heading mb-4 flex items-center justify-between gap-3">
-            <div>
-              <h2 class="text-lg font-semibold text-body-strong">Entities</h2>
-              <p class="text-sm text-body-muted">Complete entries and remaining stubs.</p>
-            </div>
-            <a href="/admin/entities" class="text-sm font-semibold text-primary hover:underline">
-              Open entities
-            </a>
-          </div>
-          <div class="grid gap-3 sm:grid-cols-2">
-            <div class="admin-dashboard__stat admin-dashboard__stat--success rounded-xl border p-4">
-              <div class="admin-dashboard__stat-label text-[0.8rem] uppercase tracking-wide">Published</div>
-              <div
-                class="admin-dashboard__stat-value mt-2 text-body-strong"
-                data-entity-count="published"
-              >
-                -
-              </div>
-            </div>
-            <div class="admin-dashboard__stat admin-dashboard__stat--accent rounded-xl border p-4">
-              <div class="admin-dashboard__stat-label text-[0.8rem] uppercase tracking-wide">Stubs</div>
-              <div class="admin-dashboard__stat-value mt-2 text-body-strong" data-entity-count="stubs">
-                -
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="admin-dashboard__columns grid gap-4 xl:grid-cols-3">
-        <div class="admin-dashboard__panel admin-dashboard__panel--column rounded-2xl border border-line-neutral p-4 shadow-sm">
-          <div class="admin-dashboard__section-heading mb-4 flex items-center justify-between gap-3">
-            <div>
-              <h2 class="text-lg font-semibold text-body-strong">Recent Posts</h2>
-              <p class="text-sm text-body-muted">Last 5 published posts with edit links.</p>
-            </div>
-            <a href="/admin/posts" class="text-sm font-semibold text-primary hover:underline">
-              All posts
-            </a>
-          </div>
-          <div class="space-y-2" data-dashboard-list="recentPosts">
-            <div class="rounded-lg border border-dashed border-line-subtle p-3 text-sm text-body-muted">
-              Loading recent posts…
-            </div>
-          </div>
-        </div>
-
-        <div class="admin-dashboard__panel admin-dashboard__panel--column rounded-2xl border border-line-neutral p-4 shadow-sm">
-          <div class="admin-dashboard__section-heading mb-4 flex items-center justify-between gap-3">
-            <div>
-              <h2 class="text-lg font-semibold text-body-strong">Drafts Needing Publish</h2>
-              <p class="text-sm text-body-muted">Up to 5 drafts with direct staging links.</p>
-            </div>
-            <a href="/admin/staging" class="text-sm font-semibold text-primary hover:underline">
-              Open staging
-            </a>
-          </div>
-          <div class="space-y-2" data-dashboard-list="drafts">
-            <div class="rounded-lg border border-dashed border-line-subtle p-3 text-sm text-body-muted">
-              Loading drafts…
-            </div>
-          </div>
-        </div>
-
-        <div class="admin-dashboard__panel admin-dashboard__panel--column rounded-2xl border border-line-neutral p-4 shadow-sm">
-          <div class="admin-dashboard__section-heading mb-4 flex items-center justify-between gap-3">
-            <div>
-              <h2 class="text-lg font-semibold text-body-strong">Posts Missing Hero</h2>
-              <p class="text-sm text-body-muted">Up to 5 posts that still need hero images.</p>
-            </div>
-            <a href="/admin/hero" class="text-sm font-semibold text-primary hover:underline">
-              Open hero
-            </a>
-          </div>
-          <div class="space-y-2" data-dashboard-list="missingHero">
-            <div class="rounded-lg border border-dashed border-line-subtle p-3 text-sm text-body-muted">
-              Loading hero coverage…
-            </div>
-          </div>
-        </div>
-      </section>
+        )}
+      </div>
+      <noscript><p>JavaScript is needed to display these work queues. You can still use the navigation above to review content.</p></noscript>
     </div>
-  ) : (
-    <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
-      <h1 class="mb-2 text-xl font-semibold">Admin is locked</h1>
-      <p class="text-body-muted">
-        These tools only run in <strong>development</strong> (or with a temporary key when hosted
-        on a server adapter).
-      </p>
-      <ol class="mx-auto mt-4 list-decimal space-y-2 text-left text-sm text-body-muted">
-        <li>Run <code>npm run dev</code> locally.</li>
-        <li>Use the generator at <code>/admin/generator</code> for prompt and ingest work.</li>
-        <li>
-          If you later switch to serverless, set <code>PUBLIC_ADMIN_KEY</code> and visit
-          <code>/admin?key=…</code>.
-        </li>
-      </ol>
-    </section>
-  )}
-
-  {canUse && (
-    <script is:inline>
-      (function () {
-        var root = document.querySelector('[data-dashboard-root]');
-        if (!root) return;
-
-        var DEV_API = root.getAttribute('data-dev-api') || 'http://localhost:8787';
-        var DEV_KEY = root.getAttribute('data-dev-key') || '';
-
-        function escapeHtml(value) {
-          return String(value || '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
-        }
-
-        function withDevKey(options) {
-          var headers = options && options.headers ? Object.assign({}, options.headers) : {};
-          if (DEV_KEY) headers['X-WC-Dev-Key'] = DEV_KEY;
-          return Object.assign({}, options || {}, { headers: headers });
-        }
-
-        function apiFetch(path, options) {
-          return fetch(DEV_API + path, withDevKey(options));
-        }
-
-        function formatDate(value) {
-          if (!value) return 'No date';
-          var date = new Date(value);
-          if (Number.isNaN(date.getTime())) return 'No date';
-          return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        }
-
-        function isStubSummary(summary) {
-          var text = typeof summary === 'string' ? summary.trim() : '';
-          return !text || /stub/i.test(text);
-        }
-
-        function setCount(group, key, value) {
-          var el = root.querySelector('[data-' + group + '-count="' + key + '"]');
-          if (el) el.textContent = String(value);
-        }
-
-        function renderList(key, items, emptyText, hrefBuilder, metaBuilder) {
-          var container = root.querySelector('[data-dashboard-list="' + key + '"]');
-          if (!container) return;
-          if (!items.length) {
-            container.innerHTML = '<div class="admin-dashboard__list-state rounded-lg border border-dashed border-line-subtle p-3 text-sm text-body-muted">' + escapeHtml(emptyText) + '</div>';
-            return;
-          }
-          container.innerHTML = items.map(function (item) {
-            var href = hrefBuilder(item);
-            var meta = metaBuilder(item);
-            return '' +
-              '<div class="admin-dashboard__list-item rounded-lg border border-line-subtle p-3">' +
-                '<div class="flex items-start justify-between gap-3">' +
-                  '<div class="min-w-0">' +
-                    '<div class="font-semibold text-body-strong">' + escapeHtml(item.title || item.name || item.slug) + '</div>' +
-                    '<div class="admin-dashboard__list-meta mt-1 text-[0.8rem] text-body-muted">' + escapeHtml(meta) + '</div>' +
-                  '</div>' +
-                  '<a class="admin-dashboard__list-open shrink-0 text-sm font-semibold text-primary hover:underline" href="' + href + '">Open</a>' +
-                '</div>' +
-              '</div>';
-          }).join('');
-        }
-
-        function initOpenBySlug() {
-          var form = root.querySelector('[data-open-slug-form]');
-          var status = root.querySelector('[data-open-slug-status]');
-          if (!form || !(form instanceof HTMLFormElement)) return;
-          form.addEventListener('submit', function (event) {
-            event.preventDefault();
-            var submitter = event.submitter;
-            var slugField = form.elements.namedItem('slug');
-            var slug = slugField && 'value' in slugField ? String(slugField.value || '').trim().toLowerCase() : '';
-            var target = submitter && 'value' in submitter ? String(submitter.value || '') : 'post';
-            if (!slug) {
-              if (status) status.textContent = 'Enter a slug first.';
-              return;
-            }
-            if (status) status.textContent = '';
-            if (target === 'entity') {
-              window.location.href = '/admin/entities?slug=' + encodeURIComponent(slug);
-              return;
-            }
-            window.location.href = '/admin/posts?slug=' + encodeURIComponent(slug);
-          });
-        }
-
-        async function loadDashboard() {
-          try {
-            var responses = await Promise.all([
-              apiFetch('/posts/list', { method: 'POST' }),
-              apiFetch('/entities/list', { method: 'POST' }),
-              apiFetch('/staging/list', { method: 'POST' })
-            ]);
-            var postsData = await responses[0].json();
-            var entitiesData = await responses[1].json();
-            var draftsData = await responses[2].json();
-
-            if (!postsData.ok) throw new Error(postsData.error || 'Failed to load posts');
-            if (!entitiesData.ok) throw new Error(entitiesData.error || 'Failed to load entities');
-            if (!draftsData.ok) throw new Error(draftsData.error || 'Failed to load drafts');
-
-            var posts = Array.isArray(postsData.items) ? postsData.items.slice() : [];
-            var drafts = Array.isArray(draftsData.drafts) ? draftsData.drafts.slice() : [];
-            var draftSlugs = new Set(drafts.map(function (draft) { return String(draft.slug || ''); }));
-            var publishedPosts = posts.filter(function (post) { return !draftSlugs.has(String(post.slug || '')); });
-            var missingHeroPosts = posts.filter(function (post) { return !String(post.heroImage || '').trim(); });
-
-            var entityGroups = entitiesData.items || {};
-            var entities = Object.values(entityGroups).flat();
-            var stubEntities = entities.filter(function (entity) { return isStubSummary(entity.summary); });
-            var completeEntities = entities.filter(function (entity) { return !isStubSummary(entity.summary); });
-
-            publishedPosts.sort(function (a, b) {
-              var aDate = new Date(a.publishedAt || a.pubDate || a.createdAt || 0).getTime();
-              var bDate = new Date(b.publishedAt || b.pubDate || b.createdAt || 0).getTime();
-              return bDate - aDate;
-            });
-            drafts.sort(function (a, b) {
-              return new Date(b.publishedAt || 0).getTime() - new Date(a.publishedAt || 0).getTime();
-            });
-            missingHeroPosts.sort(function (a, b) {
-              var aDate = new Date(a.publishedAt || a.pubDate || a.createdAt || 0).getTime();
-              var bDate = new Date(b.publishedAt || b.pubDate || b.createdAt || 0).getTime();
-              return bDate - aDate;
-            });
-
-            setCount('post', 'published', publishedPosts.length);
-            setCount('post', 'drafts', drafts.length);
-            setCount('post', 'missingHero', missingHeroPosts.length);
-            setCount('entity', 'published', completeEntities.length);
-            setCount('entity', 'stubs', stubEntities.length);
-
-            renderList(
-              'recentPosts',
-              publishedPosts.slice(0, 5),
-              'No published posts yet.',
-              function (post) { return '/admin/posts?slug=' + encodeURIComponent(post.slug || ''); },
-              function (post) { return (post.slug || '') + ' • ' + formatDate(post.publishedAt || post.pubDate || post.createdAt); }
-            );
-            renderList(
-              'drafts',
-              drafts.slice(0, 5),
-              'No drafts waiting in staging.',
-              function (draft) { return '/admin/staging?slug=' + encodeURIComponent(draft.slug || ''); },
-              function (draft) { return (draft.slug || '') + ' • ' + formatDate(draft.publishedAt); }
-            );
-            renderList(
-              'missingHero',
-              missingHeroPosts.slice(0, 5),
-              'Every listed post already has a hero image.',
-              function (post) { return '/admin/hero?post=' + encodeURIComponent(post.slug || ''); },
-              function (post) { return (post.slug || '') + ' • ' + formatDate(post.publishedAt || post.pubDate || post.createdAt); }
-            );
-          } catch (error) {
-            var message = error && error.message ? error.message : String(error);
-            ['recentPosts', 'drafts', 'missingHero'].forEach(function (key) {
-              var container = root.querySelector('[data-dashboard-list="' + key + '"]');
-              if (container) {
-                container.innerHTML = '<div class="admin-dashboard__list-state rounded-lg border border-dashed border-line-subtle p-3 text-sm text-danger">Error: ' + escapeHtml(message) + '</div>';
-              }
-            });
-          }
-        }
-
-        initOpenBySlug();
-        loadDashboard();
-      })();
-    </script>
-  )}
-
-  <style is:inline>
-    .admin-dashboard {
-      --dashboard-surface: color-mix(in srgb, var(--admin-surface-base) 76%, var(--admin-surface-muted) 24%);
-      --dashboard-surface-strong: color-mix(in srgb, var(--admin-surface-muted) 68%, var(--admin-surface-base) 32%);
-      --dashboard-surface-elevated: color-mix(in srgb, var(--admin-surface-base) 52%, var(--admin-surface-muted) 48%);
-      --dashboard-border: color-mix(in srgb, var(--admin-border-subtle) 82%, transparent 18%);
-      --dashboard-border-strong: color-mix(in srgb, var(--admin-border-strong) 76%, transparent 24%);
-      --dashboard-shadow: var(--glass-shadow-soft, 0 18px 42px -28px color-mix(in srgb, var(--admin-text-strong) 18%, transparent 82%));
-    }
-
-    .admin-dashboard__hero,
-    .admin-dashboard__panel {
-      background:
-        radial-gradient(circle at top left, color-mix(in srgb, var(--admin-accent) 10%, transparent 90%), transparent 68%),
-        var(--dashboard-surface);
-      border-color: var(--dashboard-border) !important;
-      box-shadow: var(--dashboard-shadow);
-    }
-
-    .admin-dashboard__hero {
-      background:
-        radial-gradient(circle at top left, color-mix(in srgb, var(--admin-accent) 14%, transparent 86%), transparent 60%),
-        linear-gradient(160deg, color-mix(in srgb, var(--dashboard-surface) 84%, var(--dashboard-surface-elevated) 16%) 0%, var(--dashboard-surface-strong) 100%);
-    }
-
-    .admin-dashboard__actions {
-      align-items: stretch;
-    }
-
-    .admin-dashboard__action {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 3.5rem;
-      border-radius: 1rem;
-      letter-spacing: 0.01em;
-      box-shadow: var(--dashboard-shadow);
-      text-decoration: none;
-      transition: transform 180ms ease, box-shadow 180ms ease;
-    }
-
-    .admin-dashboard__action:hover,
-    .admin-dashboard__action:focus-visible {
-      transform: translateY(-1px);
-    }
-
-    .admin-dashboard__action--secondary {
-      background:
-        linear-gradient(160deg, color-mix(in srgb, var(--dashboard-surface-strong) 88%, var(--admin-accent) 12%) 0%, var(--dashboard-surface-elevated) 100%) !important;
-    }
-
-    .admin-dashboard__section-heading {
-      padding-inline-start: 1rem;
-      border-inline-start: 3px solid color-mix(in srgb, var(--admin-accent) 72%, var(--admin-border-strong) 28%);
-    }
-
-    .admin-dashboard__section-heading h2 {
-      color: var(--admin-text-strong);
-    }
-
-    .admin-dashboard__section-heading p {
-      color: var(--admin-text-muted);
-    }
-
-    .admin-dashboard__stat {
-      background: var(--dashboard-surface-strong);
-      border-color: var(--dashboard-border-strong) !important;
-      box-shadow: inset 0 1px 0 color-mix(in srgb, var(--admin-surface-base) 55%, transparent 45%);
-    }
-
-    .admin-dashboard__stat--success {
-      background: linear-gradient(160deg, color-mix(in srgb, var(--success) 18%, var(--dashboard-surface-strong) 82%) 0%, var(--dashboard-surface-elevated) 100%);
-      border-color: color-mix(in srgb, var(--success) 36%, transparent 64%) !important;
-    }
-
-    .admin-dashboard__stat--neutral {
-      background: linear-gradient(160deg, color-mix(in srgb, var(--admin-border-strong) 14%, var(--dashboard-surface-strong) 86%) 0%, var(--dashboard-surface-elevated) 100%);
-      border-color: color-mix(in srgb, var(--admin-border-strong) 30%, transparent 70%) !important;
-    }
-
-    .admin-dashboard__stat--warning {
-      background: linear-gradient(160deg, color-mix(in srgb, var(--warning) 18%, var(--dashboard-surface-strong) 82%) 0%, var(--dashboard-surface-elevated) 100%);
-      border-color: color-mix(in srgb, var(--warning) 38%, transparent 62%) !important;
-    }
-
-    .admin-dashboard__stat--accent {
-      background: linear-gradient(160deg, color-mix(in srgb, var(--admin-accent) 16%, var(--dashboard-surface-strong) 84%) 0%, var(--dashboard-surface-elevated) 100%);
-      border-color: color-mix(in srgb, var(--admin-accent) 34%, transparent 66%) !important;
-    }
-
-    .admin-dashboard__stat-label {
-      color: var(--admin-text-muted);
-      font-weight: 700;
-    }
-
-    .admin-dashboard__stat-value {
-      font-size: clamp(2rem, 3vw, 2.6rem);
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: -0.04em;
-    }
-
-    .admin-dashboard__stat--success .admin-dashboard__stat-value {
-      color: color-mix(in srgb, var(--success) 72%, var(--admin-text-strong) 28%) !important;
-    }
-
-    .admin-dashboard__stat--neutral .admin-dashboard__stat-value {
-      color: var(--admin-text-strong) !important;
-    }
-
-    .admin-dashboard__stat--warning .admin-dashboard__stat-value {
-      color: color-mix(in srgb, var(--warning) 78%, var(--admin-text-strong) 22%) !important;
-    }
-
-    .admin-dashboard__stat--accent .admin-dashboard__stat-value {
-      color: color-mix(in srgb, var(--admin-accent) 74%, var(--admin-text-strong) 26%) !important;
-    }
-
-    .admin-dashboard__columns {
-      align-items: stretch;
-    }
-
-    .admin-dashboard__panel--column {
-      background:
-        radial-gradient(circle at top left, color-mix(in srgb, var(--admin-accent) 8%, transparent 92%), transparent 68%),
-        linear-gradient(180deg, var(--dashboard-surface) 0%, var(--dashboard-surface-strong) 100%);
-      min-height: 100%;
-    }
-
-    :global(.admin-dashboard__list-item) {
-      background: color-mix(in srgb, var(--dashboard-surface-elevated) 78%, var(--admin-surface-base) 22%);
-      border-color: var(--dashboard-border) !important;
-    }
-
-    :global(.admin-dashboard__list-meta),
-    :global(.admin-dashboard__list-state) {
-      color: var(--admin-text-muted) !important;
-    }
-
-    :global(.admin-dashboard__list-open) {
-      color: color-mix(in srgb, var(--admin-accent) 78%, var(--admin-text-strong) 22%) !important;
-    }
-  </style>
+  ) : <p>Local admin only. Use the development server or a valid admin key.</p>}
 </Base>
+
+<script is:inline>
+  (() => {
+    const root = document.querySelector('[data-dashboard-root]');
+    if (!root) return;
+    const host = root.querySelector('[data-queue-host]');
+    const status = root.querySelector('[data-queue-status]');
+    const template = root.querySelector('[data-queue-template]');
+    try {
+      if (!host || !template || !status) throw new Error('Queue snapshot unavailable');
+      host.replaceChildren(...template.childNodes);
+      template.remove();
+      host.setAttribute('aria-busy', 'false');
+      status.textContent = template.dataset.sourceError ? 'Queues unavailable. Readiness is unknown.' : '';
+    } catch {
+      if (host) host.setAttribute('aria-busy', 'false');
+      if (status) status.textContent = 'Queues could not be displayed. Readiness is unknown. Reload to try again.';
+    }
+    const form = root.querySelector('[data-open-slug-form]');
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const slug = String(new FormData(form).get('slug') || '').trim().toLowerCase();
+      const message = root.querySelector('[data-open-slug-status]');
+      if (!slug) { if (message) message.textContent = 'Enter a slug to open its editor.'; return; }
+      const target = event.submitter?.value === 'entity' ? 'entities' : 'posts';
+      window.location.href = `/admin/${target}?slug=${encodeURIComponent(slug)}`;
+    });
+  })();
+</script>
+
+<style>
+  .dashboard-queue-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+  .dashboard-queue-row h3, .dashboard-queue-row p, .dashboard-blocker { overflow-wrap: anywhere; }
+  .dashboard-next-action { flex-shrink: 0; text-align: center; min-height: 2.75rem; }
+  .dashboard-blocker { border: 1px solid var(--admin-border-subtle); border-radius: .5rem; padding: .25rem .5rem; font-size: .875rem; color: var(--admin-text-muted); }
+  .dashboard-show-more { cursor: pointer; min-height: 2.75rem; padding: .75rem; color: var(--admin-text-primary); }
+  .dashboard-show-more:focus-visible { outline: 2px solid var(--admin-focus); outline-offset: 2px; }
+  @media (max-width: 640px) { .dashboard-queue-row { flex-direction: column; } .dashboard-next-action { width: 100%; } }
+</style>
