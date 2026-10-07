@@ -87,6 +87,7 @@ import Input from "@/components/ui/Input.astro";
         </button>
         <span class="text-sm text-neutral-500" data-upload-status></span>
       </div>
+      <div data-pending-uploads class="space-y-2 text-sm text-body" role="status"></div>
       <div
         class="hidden rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800"
         data-upload-warning
@@ -126,6 +127,9 @@ import Input from "@/components/ui/Input.astro";
 
     let selectedFile: File | null = null;
     let previewUrl = '';
+    let fileToken = -1;
+    let uploadAttempt = 0;
+    let uploading = false;
 
     function apiFetch(path: string, options: RequestInit = {}) {
       const headers = { ...baseHeaders, ...(options.headers || {}) };
@@ -196,7 +200,10 @@ import Input from "@/components/ui/Input.astro";
     }
 
     function updateFileState(file: File | null) {
+      if (uploading) return;
       selectedFile = file;
+      fileToken = getState().selectionToken;
+      setState({ filePending: Boolean(file) });
       clearMessage(uploadError);
       clearMessage(uploadWarning);
       setState({
@@ -282,9 +289,13 @@ import Input from "@/components/ui/Input.astro";
     }
 
     async function uploadSelectedFile() {
+      if (uploading || ['saving', 'verifying'].includes(getState().attachStatus)) return;
       const state = getState();
       const slug = typeof state.selectedSlug === 'string' ? state.selectedSlug : '';
-      const error = validateFile(selectedFile);
+      const token = state.selectionToken;
+      const file = selectedFile;
+      const error = validateFile(file);
+      if (fileToken !== token) { showMessage(uploadError, 'Choose artwork for this post before uploading.'); return; }
       if (!slug) {
         showMessage(uploadError, 'Select a post before uploading artwork.');
         return;
@@ -298,11 +309,18 @@ import Input from "@/components/ui/Input.astro";
         return;
       }
 
+      const attempt = ++uploadAttempt;
+      const pendingId = `${slug}:${token}:${attempt}`;
+      const current = () => getState().selectionToken === token && getState().selectedSlug === slug && uploadAttempt === attempt;
       try {
+        uploading = true;
+        if (fileInput) fileInput.disabled = true;
         if (uploadButton) uploadButton.disabled = true;
         if (uploadStatus) uploadStatus.textContent = 'Uploading artwork…';
         clearMessage(uploadError);
-        const contentBase64 = await readFileAsDataUrl(selectedFile);
+        const contentBase64 = await readFileAsDataUrl(file!);
+        if (!current()) return;
+        setState({ uploadStatus: 'uploading', pendingUploads: [...(getState().pendingUploads || []), { id: pendingId, slug, filename: file!.name, path: '' }] });
         const response = await apiFetch('/upload/hero', {
           method: 'POST',
           headers: {
@@ -311,11 +329,12 @@ import Input from "@/components/ui/Input.astro";
           },
           body: JSON.stringify({
             slug,
-            filename: selectedFile.name,
+            filename: file!.name,
             contentBase64,
           }),
         });
         const data = await response.json();
+        if (!current()) return;
         if (!response.ok || !data?.ok || !data?.path) {
           throw new Error(data?.error || 'Upload failed.');
         }
@@ -324,20 +343,27 @@ import Input from "@/components/ui/Input.astro";
           uploadStatus: 'success',
           attachStatus: 'idle',
           altText: altInput?.value.trim() || '',
+          filePending: false,
+          pendingUploads: [...(getState().pendingUploads || []).filter((item: any) => item.id !== pendingId), { slug, path: data.path }],
         });
-        if (uploadStatus) uploadStatus.textContent = `Uploaded to ${data.path}`;
+        if (uploadStatus) uploadStatus.textContent = `Uploaded — not attached yet: ${data.path}`;
         const attachCard = document.querySelector('[data-submit]')?.closest('li');
         if (attachCard instanceof HTMLElement) {
           attachCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       } catch (error: any) {
+        if (!current()) return;
         setState({
           uploadedImagePath: '',
           uploadStatus: 'error',
+          pendingUploads: (getState().pendingUploads || []).filter((item: any) => item.id !== pendingId),
         });
         if (uploadStatus) uploadStatus.textContent = '';
         showMessage(uploadError, error?.message || 'Upload failed.');
       } finally {
+        if (!current()) return;
+        uploading = false;
+        if (fileInput) fileInput.disabled = !getState().selectedSlug;
         if (uploadButton) {
           uploadButton.disabled = Boolean(validateFile(selectedFile));
         }
@@ -347,6 +373,7 @@ import Input from "@/components/ui/Input.astro";
     altInput?.addEventListener('input', () => {
       setState({
         altText: altInput.value.trim(),
+        attachStatus: 'idle',
       });
     });
 
@@ -384,22 +411,48 @@ import Input from "@/components/ui/Input.astro";
     });
 
     document.addEventListener('post-selected', () => {
+      uploadAttempt += 1;
+      uploading = false;
+      selectedFile = null;
+      fileToken = -1;
+      if (fileInput) fileInput.value = '';
+      if (fileInfo) fileInfo.textContent = '';
+      if (uploadStatus) uploadStatus.textContent = '';
+      if (uploadButton) uploadButton.disabled = true;
+      clearMessage(uploadWarning);
+      clearMessage(uploadError);
+      resetPreview();
       syncForSelection();
     });
 
     document.addEventListener('hero-state-changed', () => {
       const state = getState();
-      if (altInput && document.activeElement !== altInput) {
-        altInput.value = state.altText || '';
+      const saving = ['saving', 'verifying'].includes(state.attachStatus);
+      if (altInput) altInput.disabled = !state.selectedSlug || saving;
+      if (fileInput) fileInput.disabled = !state.selectedSlug || saving || uploading;
+      if (uploadButton) uploadButton.disabled = saving || uploading || fileToken !== state.selectionToken || Boolean(validateFile(selectedFile));
+      const pendingEl = card.querySelector('[data-pending-uploads]');
+      if (pendingEl) {
+        pendingEl.replaceChildren();
+        for (const upload of state.pendingUploads || []) {
+          const notice = document.createElement('p');
+          notice.style.overflowWrap = 'anywhere';
+          notice.textContent = upload.path ? `Uploaded — not attached yet. Post: ${upload.slug}. Image: ${upload.path}`
+            : `Upload may still finish — attachment not confirmed. Post: ${upload.slug}. Filename: ${upload.filename}. If you switched posts during upload, check that post before uploading again.`;
+          pendingEl.append(notice);
+        }
       }
-      if (state.uploadStatus === 'success' && state.uploadedImagePath && uploadStatus) {
-        uploadStatus.textContent = `Uploaded to ${state.uploadedImagePath}`;
-      }
-      if (state.uploadStatus === 'idle' && !state.uploadedImagePath && selectedFile == null && uploadStatus) {
-        uploadStatus.textContent = '';
+      if (uploadStatus) {
+        uploadStatus.textContent = state.attachStatus === 'success' ? 'Artwork attached and verified on the post.'
+          : state.attachStatus === 'unverified' ? 'Saved but not verified. Retry verification in Step 4.'
+          : state.attachStatus === 'verifying' ? 'Saved — verifying on the post…'
+          : state.attachStatus === 'saving' ? 'Attaching the selected artwork…'
+          : state.uploadStatus === 'success' && state.uploadedImagePath ? `Uploaded — not attached yet: ${state.uploadedImagePath}`
+          : uploading ? 'Uploading artwork…' : '';
       }
     });
 
+    document.addEventListener('hero-verified', () => syncForSelection());
     syncForSelection();
   });
 </script>

@@ -229,22 +229,6 @@ import Button from "@/components/ui/Button.astro";
         selectedPostDisplay.classList.remove('hidden');
       }
 
-      const resolvedAlt = typeof post?.heroAlt === 'string' && post.heroAlt.trim()
-        ? post.heroAlt.trim()
-        : typeof post?.heroImageAlt === 'string' && post.heroImageAlt.trim()
-          ? post.heroImageAlt.trim()
-          : '';
-      const setState = (window as any).setHeroUploaderState;
-      if (typeof setState === 'function') {
-        setState({
-          selectedSlug: slug,
-          altText: resolvedAlt,
-          uploadedImagePath: '',
-          uploadStatus: 'idle',
-          attachStatus: 'idle',
-        });
-      }
-
       const changeEvent = new Event('change', { bubbles: true });
       select.dispatchEvent(changeEvent);
 
@@ -262,17 +246,6 @@ import Button from "@/components/ui/Button.astro";
         selectedPostDisplay.classList.add('hidden');
       }
 
-      const setState = (window as any).setHeroUploaderState;
-      if (typeof setState === 'function') {
-        setState({
-          selectedSlug: '',
-          altText: '',
-          uploadedImagePath: '',
-          uploadStatus: 'idle',
-          attachStatus: 'idle',
-        });
-      }
-      
       const changeEvent = new Event('change', { bubbles: true });
       select.dispatchEvent(changeEvent);
     }
@@ -341,6 +314,18 @@ import Button from "@/components/ui/Button.astro";
         clearSelection();
       });
     }
+
+    document.addEventListener('hero-verified', (event: Event) => {
+      const { slug, path, alt } = (event as CustomEvent).detail;
+      const post = posts.find(item => item.slug === slug);
+      if (!post) return;
+      post.heroImage = path;
+      post.heroImageAlt = alt;
+      post.heroAlt = alt;
+      missingCandidates = posts.filter(item => !item.heroImage).sort((a, b) => (a.title || a.slug).localeCompare(b.title || b.slug));
+      renderRecentList();
+      renderMissingList();
+    });
 
     loadPosts();
   });

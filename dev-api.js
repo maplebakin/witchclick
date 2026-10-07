@@ -909,6 +909,15 @@ async function attachHeroToPost({ slug, heroImage, heroAlt }) {
   }
 
   const heroAltText = heroAlt == null ? '' : String(heroAlt).trim();
+  // Match the shared reader's path-like alt guard; a filename is not a description.
+  if (!heroAltText || /^(?:[/\\]|[a-z]:[/\\])/i.test(heroAltText) || /^(?:https?:)?\/\//i.test(heroAltText)
+      || /(?:^|\/)(?:images|hero-images)(?:\/|$)|chatgpt-image/i.test(heroAltText)
+      || /(?:^|\/)[^/]+\.(?:avif|gif|jpe?g|png|svg|webp)(?:[?#]|$)/i.test(heroAltText)
+      || heroAltText.toLowerCase() === path.basename(heroPath).toLowerCase()) {
+    const err = new Error('Provide descriptive alt text, not an empty value, image path, or filename.');
+    err.code = 'INVALID_ALT';
+    throw err;
+  }
   const heroDiskPath = path.join(CWD, 'public', heroPath.replace(/^\//, ''));
   if (!fs.existsSync(heroDiskPath)) {
     const err = new Error('Hero image file was not found on disk');
@@ -962,7 +971,6 @@ async function attachHeroToPost({ slug, heroImage, heroAlt }) {
   // Prepare the hero field lines to insert/update
   const heroImageLine = `heroImage: ${yq(heroPath)}`;
   const heroImageSrcLine = `heroImageSrc: ${yq(heroPath)}`;
-  const heroAltLine = `heroAlt: ${yq(heroAltText)}`;
 
   function indentOf(line) {
     const match = typeof line === 'string' ? /^\s*/.exec(line) : null;
@@ -993,14 +1001,18 @@ async function attachHeroToPost({ slug, heroImage, heroAlt }) {
     heroImageSrcIndex = baseIndex;
   }
 
-  let heroAltIndex = lines.findIndex((line) => typeof line === 'string' && line.trim().startsWith('heroAlt:'));
-  const heroAltIndent = heroAltIndex !== -1 ? indentOf(lines[heroAltIndex]) : heroImageIndent;
-  if (heroAltIndex !== -1) {
-    lines[heroAltIndex] = `${heroAltIndent}${heroAltLine}`;
-  } else {
-    const insertIndex = heroImageSrcIndex >= 0 ? heroImageSrcIndex + 1 : (specIndex === -1 ? lines.length : specIndex);
-    lines.splice(insertIndex, 0, `${heroAltIndent}${heroAltLine}`);
-    heroAltIndex = insertIndex;
+  // The shared reader prefers heroImageAlt. Synchronize heroAlt for legacy consumers.
+  for (const field of ['heroImageAlt', 'heroAlt']) {
+    const index = lines.findIndex(line => line.trim().startsWith(`${field}:`));
+    if (index < 0) {
+      lines.push(`${field}: ${yq(heroAltText)}`);
+      continue;
+    }
+    const indent = indentOf(lines[index]);
+    let end = index + 1;
+    // Replace folded/literal and indented multiline alt values as one YAML field.
+    while (end < lines.length && (!lines[end].trim() || indentOf(lines[end]).length > indent.length)) end += 1;
+    lines.splice(index, end - index, `${indent}${field}: ${yq(heroAltText)}`);
   }
 
   const updatedFrontmatter = lines.join(newline);
@@ -1028,6 +1040,11 @@ async function attachHeroToPost({ slug, heroImage, heroAlt }) {
   // If remainder doesn't start with newline, add one to separate frontmatter from content
   const cleanRemainder = remainder.startsWith('\n') || remainder.startsWith('\r') ? remainder : `${newline}${remainder}`;
   const next = `${nextBlock}${cleanRemainder}`;
+
+  const verifiedFrontmatter = parseFrontmatter(next).data;
+  if (verifiedFrontmatter.heroImageAlt !== heroAltText || verifiedFrontmatter.heroAlt !== heroAltText) {
+    throw new Error('Hero alt metadata could not be serialized safely. Nothing was written.');
+  }
 
   if (next !== raw) {
     await withLock(`post:${normalizedSlug}`, () => writeFileAtomic(found.file, next, 'utf8'));
