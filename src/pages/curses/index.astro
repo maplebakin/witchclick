@@ -10,6 +10,16 @@ import { normalizeSpoonLevel, summarizeMarkdown } from "../../utils/augment";
 const settings = readSettings();
 const canonical = buildCanonicalUrl(settings, { path: "/curses" });
 const curses = loadAllCurses();
+const ritualIntents = [
+  { value: "reveal", label: "Reveal", need: "Name what has been hidden" },
+  { value: "return", label: "Return", need: "Give responsibility back" },
+  { value: "mirror", label: "Mirror", need: "Reflect a harmful pattern" },
+  { value: "sever", label: "Sever", need: "End an attachment" },
+  { value: "echo", label: "Echo", need: "Let your truth be heard" },
+  { value: "smoke", label: "Smoke", need: "Release lingering influence" },
+  { value: "threshold", label: "Threshold", need: "Walk into what comes next" },
+  { value: "knife", label: "Knife", need: "Make a precise boundary" },
+];
 const breadcrumbs = [
   { label: "Home", href: "/" },
   { label: "Clean Cursing" },
@@ -34,7 +44,7 @@ const breadcrumbs = [
     </header>
 
     {curses.length > 0 && (
-      <form class="curse-filters grid gap-4 rounded-2xl border border-line-subtle bg-surface-base p-4 sm:grid-cols-[minmax(0,1fr)_12rem_auto]" data-curse-filters>
+      <form class="curse-filters grid gap-4 rounded-2xl border border-line-subtle bg-surface-base p-4 sm:grid-cols-2" data-curse-filters>
         <label class="grid gap-1 text-sm font-semibold text-body-strong">
           Find a working
           <input
@@ -59,10 +69,17 @@ const breadcrumbs = [
             <option value="high">High spoons</option>
           </select>
         </label>
+        <label class="grid gap-1 text-sm font-semibold text-body-strong">
+          What do you need?
+          <select class="min-h-11 rounded-lg border border-line-neutral bg-surface-card px-3 py-2 text-body-strong" name="intent" data-curse-intent>
+            <option value="">Any intention</option>
+            {ritualIntents.map((intent) => <option value={intent.value}>{intent.label}: {intent.need}</option>)}
+          </select>
+        </label>
         <button class="min-h-11 self-end rounded-lg border border-line-neutral px-4 py-2 font-semibold text-body-strong hover:bg-surface-soft" type="reset">
           Clear
         </button>
-        <p class="text-sm text-body-muted sm:col-span-3" aria-live="polite" aria-atomic="true" data-curse-status>
+        <p class="text-sm text-body-muted sm:col-span-2" aria-live="polite" aria-atomic="true" data-curse-status>
           Showing all {curses.length} workings.
         </p>
       </form>
@@ -90,6 +107,7 @@ const breadcrumbs = [
               class="rounded-2xl border border-line-subtle bg-surface-base p-5 shadow-sm transition hover:shadow-md"
               data-curse-card
               data-curse-spoon={spoonLevel ?? ""}
+              data-curse-intent={String(curse.frontmatter?.generator?.type ?? "").toLowerCase()}
               data-curse-search={`${curse.title} ${curse.invocation} ${summaryText} ${curse.tags.join(" ")}`.toLowerCase()}
             >
               <h2 class="text-xl font-semibold text-primary">
@@ -138,21 +156,24 @@ const breadcrumbs = [
     const form = document.querySelector('[data-curse-filters]');
     if (!(form instanceof HTMLFormElement)) return;
     const queryInput = form.querySelector('[data-curse-query]');
+    const intentInput = form.querySelector("[data-curse-intent]");
     const spoonsInput = form.querySelector('[data-curse-spoons]');
     const status = form.querySelector('[data-curse-status]');
     const cards = Array.from(document.querySelectorAll('[data-curse-card]'));
     const empty = document.querySelector('[data-curse-empty]');
-    if (!(queryInput instanceof HTMLInputElement) || !(spoonsInput instanceof HTMLSelectElement)) return;
+    if (!(queryInput instanceof HTMLInputElement) || !(spoonsInput instanceof HTMLSelectElement) || !(intentInput instanceof HTMLSelectElement)) return;
 
     const update = () => {
       const query = queryInput.value.trim().toLowerCase();
       const spoons = spoonsInput.value;
+      const intent = intentInput.value;
       let visible = 0;
       cards.forEach((card) => {
         if (!(card instanceof HTMLElement)) return;
         const matchesQuery = !query || (card.dataset.curseSearch || '').includes(query);
         const matchesSpoons = !spoons || card.dataset.curseSpoon === spoons;
-        card.hidden = !(matchesQuery && matchesSpoons);
+        const matchesIntent = !intent || card.dataset.curseIntent === intent;
+        card.hidden = !(matchesQuery && matchesSpoons && matchesIntent);
         if (!card.hidden) visible += 1;
       });
       if (empty instanceof HTMLElement) empty.hidden = visible !== 0;

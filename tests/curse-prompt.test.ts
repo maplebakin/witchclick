@@ -19,6 +19,22 @@ describe('buildCursePrompt', () => {
     expect(prompt).toContain('CurseSpec v1');
   });
 
+  it('uses distinctive mechanics for different ritual intentions', () => {
+    const common = { target: 'person', tone: 'restrained' } as const;
+    const sever = buildCursePrompt({ ...common, type: 'sever' });
+    const echo = buildCursePrompt({ ...common, type: 'echo' });
+    expect(sever).toContain('separate from a draining obligation');
+    expect(echo).toContain('give a silenced truth words');
+    expect(sever).not.toContain('Echo: give a silenced truth words');
+  });
+
+  it('requires non-visual alternatives and avoids guaranteed resolution', () => {
+    const prompt = buildCursePrompt({ type: 'knife', target: 'dynamic', tone: 'gentle' });
+    expect(prompt).toContain('equally valid non-visual alternative');
+    expect(prompt).toContain('Do not promise emotional resolution');
+    expect(prompt).toContain('no actual blade is necessary');
+  });
+
   it('lists canonical tags', () => {
     const prompt = buildCursePrompt({
       type: 'return',
