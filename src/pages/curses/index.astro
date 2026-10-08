@@ -44,6 +44,24 @@ const breadcrumbs = [
     </header>
 
     {curses.length > 0 && (
+      <nav class="space-y-3" aria-label="Browse by intention">
+        <div class="space-y-1">
+          <h2 class="text-xl font-semibold text-primary">Start with what you need</h2>
+          <p class="text-sm text-muted">Choose a doorway, not a diagnosis. You can change your mind, or browse everything below.</p>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2" data-intent-paths>
+          {ritualIntents.map((intent) => (
+            <button type="button" class="curse-intent-path rounded-xl border border-line-subtle bg-surface-base p-4 text-left transition hover:bg-surface-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current" data-intent-path={intent.value} aria-pressed="false" aria-controls="curse-list">
+              <span class="block text-base font-semibold text-primary">{intent.label}</span>
+              <span class="mt-1 block text-sm text-muted">{intent.need}</span>
+            </button>
+          ))}
+        </div>
+        <button type="button" class="text-sm font-semibold text-secondary underline underline-offset-4" data-intent-all>Show all workings</button>
+      </nav>
+    )}
+
+    {curses.length > 0 && (
       <form class="curse-filters grid gap-4 rounded-2xl border border-line-subtle bg-surface-base p-4 sm:grid-cols-2" data-curse-filters>
         <label class="grid gap-1 text-sm font-semibold text-body-strong">
           Find a working
@@ -85,7 +103,7 @@ const breadcrumbs = [
       </form>
     )}
 
-    <div class="grid gap-6" data-curse-list>
+    <div id="curse-list" class="grid gap-6" data-curse-list>
       {curses.length ? (
         curses.map((curse) => {
           const spoonLevel = normalizeSpoonLevel(
@@ -161,12 +179,19 @@ const breadcrumbs = [
     const status = form.querySelector('[data-curse-status]');
     const cards = Array.from(document.querySelectorAll('[data-curse-card]'));
     const empty = document.querySelector('[data-curse-empty]');
+    const pathButtons = Array.from(document.querySelectorAll('[data-intent-path]'));
+    const allButton = document.querySelector('[data-intent-all]');
     if (!(queryInput instanceof HTMLInputElement) || !(spoonsInput instanceof HTMLSelectElement) || !(intentInput instanceof HTMLSelectElement)) return;
 
     const update = () => {
       const query = queryInput.value.trim().toLowerCase();
       const spoons = spoonsInput.value;
       const intent = intentInput.value;
+      pathButtons.forEach((button) => {
+        if (button instanceof HTMLButtonElement) {
+          button.setAttribute('aria-pressed', String(Boolean(intent) && button.dataset.intentPath === intent));
+        }
+      });
       let visible = 0;
       cards.forEach((card) => {
         if (!(card instanceof HTMLElement)) return;
@@ -184,12 +209,37 @@ const breadcrumbs = [
       }
     };
 
+    pathButtons.forEach((button) => {
+      if (!(button instanceof HTMLButtonElement)) return;
+      button.addEventListener('click', () => {
+        intentInput.value = intentInput.value === button.dataset.intentPath ? '' : (button.dataset.intentPath || '');
+        update();
+        document.getElementById('curse-list')?.scrollIntoView({ behavior: 'auto', block: 'start' });
+      });
+    });
+    if (allButton instanceof HTMLButtonElement) {
+      allButton.addEventListener('click', () => {
+        intentInput.value = '';
+        update();
+      });
+    }
     form.addEventListener('input', update);
     form.addEventListener('reset', () => window.setTimeout(update, 0));
+    update();
   })();
 </script>
 
 <style>
+  .curse-intent-path[aria-pressed="true"] {
+    border-color: var(--theme-color-iris, currentColor);
+    background: var(--theme-surface-muted, var(--theme-surface-card));
+    box-shadow: inset 0 0 0 1px var(--theme-color-iris, currentColor);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .curse-intent-path { transition: none; }
+  }
+
   .curses-card__link {
     color: inherit;
   }
