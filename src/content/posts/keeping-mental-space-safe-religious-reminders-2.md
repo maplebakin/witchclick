@@ -37,9 +37,9 @@ Use this version when you have almost no capacity. You do not need special objec
 
 1. **Name the intrusion.** In one sentence, say what happened: 'That song pulled me back into church language,' or 'That joke made an old fear flare up.' Keep it plain. You are identifying the thing, not building a case against yourself.
 
-2. **Change one sensory input.** Lower the volume. Look away from the screen. Put both feet on the floor. Hold a mug, sleeve, blanket, or cool glass. If you want more options, gentle grounding practices can give you a few small ways to return attention to the room you are actually in.
+2. **Change one sensory input.** Lower the volume. Look away from the screen. Put both feet on the floor. Hold a mug, sleeve, blanket, or cool glass. If you want more options, [a gentle pause ritual](/post/when-life-feels-on-pause) can give you a few small ways to return attention to the room you are actually in.
 
-3. **Choose contact on purpose.** Decide: continue, skip, mute, leave, or save it for another day. None of those choices is a moral test. Sometimes permission to rest means refusing to turn every reminder into a personal growth assignment.
+3. **Choose contact on purpose.** Decide: continue, skip, mute, leave, or save it for another day. None of those choices is a moral test. Sometimes [permission to rest](/post/when-to-let-yourself-rest) means refusing to turn every reminder into a personal growth assignment.
 
 4. **Mark the boundary.** Try one sentence: 'This belongs to that story, not to me.' Or: 'I can hear this without taking it home.' Then do the next ordinary thing available to you, even if that thing is drinking water or opening a different tab.
 
@@ -98,4 +98,4 @@ Religious reminders in popular culture are difficult partly because they are ord
 
 Keeping your mental space safe does not require perfect avoidance or perfect neutrality. It can be as small as muting a song, noticing an old rule, choosing a different meaning, or walking away before the scene is over. The practice is not about winning against the past. It is about recognizing that the present belongs to you.
 
-If you want a quieter companion practice, quiet permission offers another way to make room for choice without turning your inner life into a project. Let this religious-reminders ritual stay simple: notice, choose, close, return.
+If you want a quieter companion practice, give yourself quiet permission to make room for choice without turning your inner life into a project. Let this religious-reminders ritual stay simple: notice, choose, close, return.
