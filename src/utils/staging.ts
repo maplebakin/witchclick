@@ -1,5 +1,6 @@
 // Shared staging operations. Each server applies its own access policy before calling these.
 import fs from 'node:fs';
+import path from 'node:path';
 import { getCanonicalPostDisplayPath, readAllPostRecords, resolveCanonicalPostsDirectory, findPostRecordBySlug } from './postFiles';
 import { json, jsonError, parseJsonBody, readValidatedSlug } from '../pages/api/_mutating';
 import { getStagingReadiness, getVisibilityBlockers, type StagingReadiness } from './adminQueues';
@@ -12,6 +13,7 @@ interface DraftPost extends StagingReadiness {
   wordCount: number;
   readingMinutes: number;
   publishedAt: string;
+  createdAt: string;
   filePath: string;
   promptMetadata?: {
     topic?: string;
@@ -42,6 +44,11 @@ function toFrontmatterYAML(obj: Record<string, unknown>) {
   return lines.join('\n');
 }
 
+function creationTimestamp(value: string) {
+  const timestamp = Date.parse(value);
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
 export async function listStagingDrafts() {
   try {
     const postsDir = resolveCanonicalPostsDirectory();
@@ -54,6 +61,35 @@ export async function listStagingDrafts() {
 
       // Only include drafts
       if (data.draft === true) {
+        const filePath = path.join(postsDir, fileName);
+        const creationDateCandidates = [
+          data.createdAt,
+          data.generatedAt,
+          data.promptMetadata?.generatedAt,
+        ];
+        let createdAt = '';
+        for (const candidate of creationDateCandidates) {
+          if (typeof candidate !== 'string' || !candidate.trim()) continue;
+          const timestamp = Date.parse(candidate);
+          if (!Number.isNaN(timestamp)) {
+            createdAt = new Date(timestamp).toISOString();
+            break;
+          }
+        }
+        if (!createdAt) {
+          try {
+            const stats = fs.statSync(filePath);
+            createdAt = new Date(stats.birthtimeMs || stats.mtimeMs).toISOString();
+          } catch {
+            createdAt = '';
+          }
+        }
+        if (!createdAt) {
+          const contentDate = [data.publishedAt, data.publishDate, data.date].find(
+            (candidate) => typeof candidate === 'string' && !Number.isNaN(Date.parse(candidate)),
+          );
+          if (typeof contentDate === 'string') createdAt = new Date(Date.parse(contentDate)).toISOString();
+        }
         drafts.push({
           ...readiness.get(slug)!,
           slug,
@@ -62,15 +98,17 @@ export async function listStagingDrafts() {
           tags: Array.isArray(data.tags) ? data.tags : [],
           wordCount: data.wordCount || 0,
           readingMinutes: data.readingMinutes || 1,
-          publishedAt: data.publishedAt || new Date().toISOString(),
+          publishedAt: typeof data.publishedAt === 'string' ? data.publishedAt : '',
+          createdAt,
           filePath: getCanonicalPostDisplayPath(fileName),
           promptMetadata: data.promptMetadata,
         });
       }
     }
 
-    // Sort by publishedAt descending (newest first)
-    drafts.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+    // Sort by article creation time, with missing dates after timestamped drafts.
+    drafts.sort((a, b) => creationTimestamp(b.createdAt) - creationTimestamp(a.createdAt)
+      || a.title.localeCompare(b.title));
 
     return json({ ok: true, drafts });
   } catch (error: unknown) {
