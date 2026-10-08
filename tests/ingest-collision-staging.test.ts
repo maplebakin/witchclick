@@ -11,7 +11,7 @@ describe('slug collision publication boundary', () => {
     const postsDir = path.join(root, 'src', 'content', 'posts');
     try {
       fs.mkdirSync(postsDir, { recursive: true });
-      fs.writeFileSync(path.join(postsDir, 'quiet-working.md'), '---\\ntitle: Original\\n---\\n', 'utf8');
+      fs.writeFileSync(path.join(postsDir, 'quiet-working.md'), '---\ntitle: Original\n---\n', 'utf8');
       const prepared = prepareSpecForPersistence(
         createPostSpec({ slug: 'quiet-working', title: 'Quiet Working' }),
         { cwd: root, postsDirectories: [postsDir] },

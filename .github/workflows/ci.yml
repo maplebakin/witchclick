@@ -46,6 +46,25 @@ jobs:
           name: coverage-report
           path: coverage
 
+  content-audit:
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: SEO audit
+        run: npm run audit:seo
+
   integration:
     runs-on: ubuntu-latest
     needs: quality
@@ -69,17 +88,14 @@ jobs:
       - name: Type + astro checks
         run: npm run check
 
-      - name: SEO audit
-        run: npm run audit:seo
-
       - name: Build
         run: npm run build
 
-      - name: Internal link check
-        run: npm run linkcheck
-
       - name: Playwright smoke tests
         run: npm run test:e2e
+
+      - name: Internal link check
+        run: npm run linkcheck
 
       - name: Upload Playwright report
         if: failure()

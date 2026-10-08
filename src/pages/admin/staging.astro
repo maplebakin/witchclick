@@ -4,6 +4,7 @@ import Base from "../../layouts/Base.astro";
 import { readSettings, buildCanonicalUrl } from "../../utils/settings";
 import HeadSlot from "@/components/HeadSlot.astro";
 import AdminNav from "@/components/AdminNav.astro";
+import HeroWorkflow from "@/components/admin/HeroWorkflow.astro";
 
 const settings = readSettings();
 const canonical = buildCanonicalUrl(settings, { path: "/admin/staging" });
@@ -41,8 +42,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               <div>
                 <h1 class="text-2xl font-semibold text-body-strong">Staging</h1>
                 <p class="mt-1 text-sm text-body-muted">
-                  Review draft posts before publishing. Compare multiple versions and choose the best
-                  one.
+                  Review drafts from newest to oldest. Open a draft to read it, prepare its hero, then make it publicly eligible locally.
                 </p>
               </div>
               <button
@@ -66,8 +66,9 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           </div>
         </section>
 
-        <section class="rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm">
-          <div class="mb-4 flex items-center justify-between">
+        <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
+        <section class="rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm lg:col-span-4 lg:h-[calc(100vh-13rem)] lg:overflow-y-auto">
+          <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 class="text-xl font-semibold">Draft Posts</h2>
             <div class="flex items-center gap-3">
               <label class="inline-flex items-center gap-2 text-sm">
@@ -113,6 +114,12 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           </div>
         </section>
 
+        <div class="space-y-6 lg:col-span-8 lg:h-[calc(100vh-13rem)] lg:overflow-y-auto">
+        <section id="emptyReview" class="rounded-2xl border border-dashed border-line-neutral bg-surface-base p-10 text-center text-body-muted">
+          <h2 class="text-lg font-semibold text-body-strong">Choose an article to review</h2>
+          <p class="mt-2 text-sm">The article preview, hero prompt, and local publication action will appear here.</p>
+        </section>
+
         <section
           id="comparisonSection"
           class="hidden rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm"
@@ -134,13 +141,27 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           class="hidden rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm"
         >
           <div class="mb-4 flex items-center justify-between">
-            <h2 class="text-xl font-semibold">Preview</h2>
+            <h2 id="reviewTitle" class="text-xl font-semibold">Review draft</h2>
             <button id="closePreview" class="text-sm text-body-muted hover:text-body">
               Close
             </button>
           </div>
           <div id="previewContent" class="prose prose-neutral max-w-none" />
+          <section class="mt-6 space-y-3 border-t border-line-neutral pt-6" aria-labelledby="staging-hero-heading">
+            <h3 id="staging-hero-heading" class="text-lg font-semibold text-body-strong">Step 2 — Prepare the hero image</h3>
+            <p class="text-sm text-body-muted">Review the saved prompt, create or choose artwork, then attach it and confirm its alt text. The draft stays private while you work.</p>
+            <HeroWorkflow mode="embedded" devApi={DEV_API} devKey={DEV_KEY} lockedMessage="Open a draft to load its hero prompt here." />
+          </section>
+          <section class="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line-neutral pt-6" aria-labelledby="staging-publish-heading">
+            <div>
+              <h3 id="staging-publish-heading" class="font-semibold text-body-strong">Step 3 — Final review and publication</h3>
+              <p class="text-sm text-body-muted">This makes the draft publicly eligible locally. It does not build or deploy the site.</p>
+            </div>
+            <button id="publishSelectedBtn" class="admin-btn-primary px-4 py-2 text-sm font-semibold" disabled>Review a draft first</button>
+          </section>
         </section>
+        </div>
+        </div>
       </div>
     ) : (
       <section class="mx-auto max-w-3xl rounded-2xl border border-line-subtle bg-surface-base p-6 text-center shadow-sm">
@@ -159,8 +180,10 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 	        (function () {
 	          var root = document.querySelector("[data-staging-root]");
               if (!root) return;
-	          var requestedSlug = new URLSearchParams(window.location.search).get("slug") || "";
-	          var filteredDrafts = [];
+          var requestedSlug = new URLSearchParams(window.location.search).get("slug") || "";
+          var filteredDrafts = [];
+          var activeSlug = "";
+          var activeDraftPublished = false;
 	          var $ = function (id) {
 	            return document.getElementById(id);
 	          };
@@ -188,6 +211,30 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           function setPending(slug, on) {
             if (on) pending.add(slug); else pending.delete(slug);
             renderDrafts();
+          }
+
+          function creationTime(draft) {
+            var value = draft.createdAt || draft.publishedAt || (draft.promptMetadata && draft.promptMetadata.generatedAt) || '';
+            var timestamp = Date.parse(value);
+            return Number.isFinite(timestamp) ? timestamp : 0;
+          }
+
+          function updatePublishAction() {
+            var button = $('publishSelectedBtn');
+            if (!button) return;
+            if (activeDraftPublished) {
+              button.disabled = true;
+              button.textContent = 'Made publicly eligible locally';
+              return;
+            }
+            var draft = drafts.find(function(item){ return item.slug === activeSlug; });
+            if (!draft) {
+              button.disabled = true;
+              button.textContent = 'Review a draft first';
+              return;
+            }
+            button.disabled = pending.has(activeSlug) || !publishAllowed(draft);
+            button.textContent = pending.has(activeSlug) ? 'Working…' : publishAllowed(draft) ? 'Make publicly eligible locally' : 'Publication blocked';
           }
 
           function getSearchQuery() {
@@ -259,9 +306,12 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
               if (!data.ok) throw new Error(data.error || "Failed to load drafts");
 
-              drafts = data.drafts || [];
+              drafts = (data.drafts || []).slice().sort(function(a, b) {
+                return creationTime(b) - creationTime(a) || String(a.title || a.slug).localeCompare(String(b.title || b.slug));
+              });
               updateSearchUi();
               renderDrafts();
+              if (requestedSlug && !activeSlug && drafts.some(function(draft){ return draft.slug === requestedSlug; })) previewDraft(requestedSlug);
             } catch (e) {
               $("draftsList").textContent = 'Error: ' + (e.message || String(e));
             }
@@ -279,19 +329,23 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             if (!drafts.length) {
               list.innerHTML =
                 '<div class="py-8 text-center text-body-muted">No drafts found. Ingest posts with <code>?draft=true</code> to stage them here.</div>';
+              updatePublishAction();
               return;
             }
 
             if (!filteredDrafts.length) {
               list.innerHTML =
                 '<div class="py-8 text-center text-body-muted">No drafts match.</div>';
+              updatePublishAction();
               return;
             }
 
             if (grouped) {
               var groups = groupDraftsByTopic(filteredDrafts);
               var html = "";
-              var topics = Object.keys(groups).sort();
+              var topics = Object.keys(groups).sort(function(a, b) {
+                return creationTime(groups[b][0]) - creationTime(groups[a][0]) || a.localeCompare(b);
+              });
 
               for (var i = 0; i < topics.length; i++) {
                 var topic = topics[i];
@@ -327,13 +381,15 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               list.innerHTML = html;
             }
 
-	            if (requestedSlug) {
-	              var match = list.querySelector('[data-slug="' + requestedSlug.replace(/"/g, '&quot;') + '"]');
-	              if (match && typeof match.scrollIntoView === "function") {
-	                match.scrollIntoView({ block: "nearest" });
-	              }
-	            }
-	          }
+            if (requestedSlug) {
+              var match = list.querySelector('[data-slug="' + requestedSlug.replace(/"/g, '&quot;') + '"]');
+              if (match && typeof match.scrollIntoView === "function") {
+                match.scrollIntoView({ block: "nearest" });
+              }
+            }
+
+            updatePublishAction();
+          }
 
           function renderDraftCard(draft, compact) {
             var cardClass = compact
@@ -355,7 +411,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             html += '<span class="text-line-subtle">•</span>';
             html += "<span>" + draft.readingMinutes + " min read</span>";
             html += '<span class="text-line-subtle">•</span>';
-            html += "<span>" + formatDate(draft.publishedAt) + "</span>";
+            html += "<span>Added " + formatDate(draft.createdAt || draft.publishedAt) + "</span>";
             if (draft.promptMetadata && draft.promptMetadata.topic) {
               html += '<span class="text-line-subtle">•</span>';
               html +=
@@ -389,17 +445,11 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             html += "</div>";
 
             var disabled = pending.has(draft.slug) ? ' disabled' : '';
-            var publishDisabled = pending.has(draft.slug) || !publishAllowed(draft) ? ' disabled' : '';
-            var publishLabel = pending.has(draft.slug) ? 'Working…' : publishAllowed(draft) ? 'Make publicly eligible locally' : 'Publication blocked';
             html += '<div class="flex flex-shrink-0 flex-col gap-2">';
             html +=
               '<button class="preview-btn admin-btn-secondary px-3 py-1.5 text-[0.8rem] font-medium" data-slug="' +
               escapeHtml(draft.slug) +
-              '"' + disabled + '>Preview</button>';
-            html +=
-              '<button class="publish-btn ' + (publishAllowed(draft) ? 'admin-btn-primary' : 'admin-btn-secondary') + ' px-3 py-1.5 text-[0.8rem] font-semibold" data-slug="' +
-              escapeHtml(draft.slug) +
-              '"' + publishDisabled + '>' + publishLabel + '</button>';
+              '"' + disabled + '>Review &amp; prepare</button>';
             html +=
               '<button class="delete-btn admin-btn-secondary px-3 py-1.5 text-[0.8rem] font-medium text-danger" data-slug="' +
               escapeHtml(draft.slug) +
@@ -430,6 +480,16 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
           async function previewDraft(slug) {
             if (pending.has(slug)) return;
+            activeSlug = slug;
+            activeDraftPublished = false;
+            updatePublishAction();
+            $('reviewTitle').textContent = 'Loading draft…';
+            $('previewContent').textContent = '';
+            $('previewSection').classList.remove('hidden');
+            if ($('emptyReview')) $('emptyReview').classList.add('hidden');
+            $('comparisonSection').classList.add('hidden');
+            var heroRoot = root.querySelector('[data-hero-workflow]');
+            if (heroRoot) heroRoot.dispatchEvent(new CustomEvent('hero-workflow:reset'));
             setPending(slug, true);
             try {
               var res = await apiFetch("/staging/preview", {
@@ -443,10 +503,20 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               if (!data.ok) throw new Error(data.error || "Failed to load preview");
 
               renderPreview(data);
+              $('reviewTitle').textContent = 'Step 1 — ' + (data.frontmatter.title || slug);
+              if (heroRoot) {
+                heroRoot.setAttribute('data-hero-slug', slug);
+                heroRoot.dispatchEvent(new CustomEvent('hero-workflow:set-post', { detail: { slug: slug, expectedTitle: data.frontmatter.title, requireDraft: true } }));
+              }
               $("previewSection").classList.remove("hidden");
-              $("previewSection").scrollIntoView({ behavior: "smooth" });
+              if ($('emptyReview')) $('emptyReview').classList.add('hidden');
+              updatePublishAction();
             } catch (e) {
-              alert("Error loading preview: " + (e.message || String(e)));
+              activeSlug = '';
+              $('reviewTitle').textContent = 'Could not load draft';
+              $('previewContent').textContent = e.message || String(e);
+              if (heroRoot) heroRoot.dispatchEvent(new CustomEvent('hero-workflow:reset'));
+              updatePublishAction();
             } finally { setPending(slug, false); }
           }
 
@@ -459,7 +529,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             if (data.frontmatter.tags && data.frontmatter.tags.length) {
               html +=
                 '<p class="text-sm text-body-muted">Tags: ' +
-                data.frontmatter.tags.join(", ") +
+                data.frontmatter.tags.map(escapeHtml).join(", ") +
                 "</p>";
             }
 
@@ -510,7 +580,8 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               var results = await Promise.all(promises);
               renderComparison(results);
               $("comparisonSection").classList.remove("hidden");
-              $("comparisonSection").scrollIntoView({ behavior: "smooth" });
+              $("previewSection").classList.add("hidden");
+              if ($('emptyReview')) $('emptyReview').classList.add("hidden");
             } catch (e) {
               alert("Error loading comparison: " + (e.message || String(e)));
             }
@@ -563,7 +634,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
           async function publishDraft(slug) {
             var draft = drafts.find(function(item){ return item.slug === slug; });
-            if (!draft || pending.has(slug) || !publishAllowed(draft)) return;
+            if (!draft || activeSlug !== slug || pending.has(slug) || !publishAllowed(draft)) return;
             var noHero = draftState(draft) === 'missing-hero';
             var message = 'Make “' + draft.title + '” (' + slug + ') publicly eligible locally? This does not build or deploy the site.';
             if (noHero) message = 'You are publishing without a hero image or complete hero metadata.\n' + draftReasons(draft).join('; ') + '\n' + message;
@@ -584,9 +655,10 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               var result = data.message || 'Saved. Check local public eligibility; the site has not been built or deployed.';
               if (Array.isArray(data.warnings) && data.warnings.length) result += '\nArtwork warnings: ' + data.warnings.join('; ');
               $('stagingStatus').textContent = result;
+              activeDraftPublished = true;
+              updatePublishAction();
               await loadDrafts();
               $('comparisonSection').classList.add('hidden');
-              $('previewSection').classList.add('hidden');
             } catch (e) {
               $('stagingStatus').textContent = 'Publication rejected: ' + (e.message || String(e));
             } finally { setPending(slug, false); }
@@ -607,12 +679,21 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               $('stagingStatus').textContent = 'Draft file permanently removed: ' + data.title + ' (' + slug + ').';
               await loadDrafts();
               $('comparisonSection').classList.add('hidden'); $('previewSection').classList.add('hidden');
+              activeSlug = ''; activeDraftPublished = false;
+              var heroRoot = root.querySelector('[data-hero-workflow]');
+              if (heroRoot) heroRoot.dispatchEvent(new CustomEvent('hero-workflow:reset'));
+              if ($('emptyReview')) $('emptyReview').classList.remove('hidden');
             } catch (e) { $('stagingStatus').textContent = 'Deletion failed: ' + (e.message || String(e)); }
             finally { setPending(slug, false); }
           }
 
           // Event listeners
           $("refreshBtn").addEventListener("click", loadDrafts);
+          $("publishSelectedBtn").addEventListener("click", function(){ if (activeSlug) publishDraft(activeSlug); });
+          var stagingHeroRoot = root.querySelector('[data-hero-workflow]');
+          if (stagingHeroRoot) stagingHeroRoot.addEventListener('hero-workflow:verified', function(event) {
+            if (event.detail && event.detail.slug === activeSlug) loadDrafts();
+          });
           $("groupByTopic").addEventListener("change", renderDrafts);
           $("readinessFilter").addEventListener("change", renderDrafts);
           $("draftSearch").addEventListener("input", function () {
@@ -629,9 +710,12 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           });
           $("closePreview").addEventListener("click", function () {
             $("previewSection").classList.add("hidden");
+            if ($('emptyReview') && $('comparisonSection').classList.contains('hidden')) $('emptyReview').classList.remove('hidden');
           });
           $("closeCompare").addEventListener("click", function () {
             $("comparisonSection").classList.add("hidden");
+            if (activeSlug) $('previewSection').classList.remove('hidden');
+            else if ($('emptyReview')) $('emptyReview').classList.remove('hidden');
           });
 
           // Initial load
