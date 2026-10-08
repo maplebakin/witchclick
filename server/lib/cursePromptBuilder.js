@@ -21,6 +21,17 @@ const TONE_GUIDANCE = [
   '• Honor grief and anger while steering the reader toward grounded action and healing.',
 ];
 
+const TYPE_GUIDANCE = {
+  reveal: 'Reveal: identify concealed facts and name the concrete evidence; closure affirms what is known without claiming certainty about motives.',
+  return: 'Return: distinguish the reader’s responsibility from another person’s; perform a tangible giving-back gesture.',
+  mirror: 'Mirror: identify a repeating behaviour and reflect it clearly; do not wish confusion or suffering upon its source.',
+  sever: 'Sever: separate from a draining obligation through an explicit boundary decision and a physical symbol.',
+  echo: 'Echo: give a silenced truth words, sound, or written form; do not require confrontation with the other person.',
+  smoke: 'Smoke: let a persistent influence disperse through breath, movement, or clearing an object; physical smoke is unnecessary.',
+  threshold: 'Threshold: mark movement from one state to another with a small deliberate crossing and a concrete next step.',
+  knife: 'Knife: choose the exact boundary that needs to be cut, using words, paper, or a harmless symbol; no actual blade is necessary.',
+};
+
 const SAMPLE_LINES = [
   'SAMPLE LINES TO INSPIRE CADENCE (do not copy verbatim):',
   '• “May all energy released find its rightful origin, without distortion or delay.”',
@@ -70,6 +81,10 @@ export function buildCursePrompt(options) {
     '• Replace hexing language with boundary-setting and energetic mirroring.',
     '• Emphasize accountability: harm rebounds to its origin, clarity rises, truth clears the space.',
     '• Offer sensory details (candles, breath, texture) that stay gentle and accessible.',
+    '• Every visualization must have an equally valid non-visual alternative using words, movement, a tangible object, or touch.',
+    '• Never require closed eyes, imagined pictures, flames, or purchases to complete a working.',
+    '• Do not promise emotional resolution or imply that a ritual changes another person’s mind or behaviour.',
+    '• Different ritual types MUST have distinct mechanics; avoid defaulting every method to returning energy to source.',
     '• Invite optional altar work or journaling using provided inputs when present.',
     '• Encourage the practitioner to release bitterness while still refusing silence.',
     '• Weave the specified topic into the stakes, imagery, and aftercare without drifting into unrelated themes.',
@@ -78,6 +93,7 @@ export function buildCursePrompt(options) {
     '',
     'GENERATOR INPUTS (use these to shape imagery and stakes):',
     `• type: ${type}`,
+    `• type-specific mechanics: ${TYPE_GUIDANCE[type] ?? "Keep the practice grounded and specific."}`,
     `• target: ${target}`,
     `• tone: ${tone}`,
     topic ? `• topic: ${topic}` : null,
