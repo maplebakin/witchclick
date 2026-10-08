@@ -27,7 +27,7 @@ Let their patterns settle back into their origin.
 
 ## Method
 
-Place a small stone or weighted object before you, something that feels solid in your hand. Sit with your spine relaxed and breathe slowly until your thoughts quiet. Imagine their patterns—habits they repeat without awareness, choices made on autopilot, reactions carried from old wounds—gathering like small pebbles rolling across a floor toward the stone. With each exhale, picture those pebbles settling around it, drawn not by your effort but by the simple truth of where they belong. Lift your hand and hover your palm above the stone, acknowledging the boundary between your life and their cycles. Whisper that the weight they generated is no longer yours to lift or interpret. You are not returning harm; you are stepping aside so the gravity of their own behavior can meet them cleanly. When the image feels steady, rest both hands over your heart and breathe until your chest feels spacious again, no longer crowded by what does not belong to you.
+Take two small objects or scraps of paper. Let one stand for a responsibility that belongs to you, and the other for a consequence of someone else's choices. Name each out loud or in writing. Hold both for a moment and notice that carrying them together does not make them equally yours. Put your own object somewhere you can reach it. Place the other on a separate surface, or write 'not mine to manage' beneath it. Identify one concrete act you can stop doing on their behalf, if it is safe to do so. You do not need to predict whether they will change, suffer, apologize, or even notice. This return is the decision to stop doing the carrying; it does not control what happens to anyone else.
 
 ## Closure & Aftercare
 

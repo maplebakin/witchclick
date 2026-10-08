@@ -27,7 +27,7 @@ Let their returning pattern reflect only what is theirs.
 
 ## Method
 
-Place a mirror on a table where the light is dim and steady. Sit with your spine relaxed, letting the quiet hold you. Picture the behavior they repeated as a single thread stretching between past and present, frayed where it touched you before. With each slow breath, imagine that thread lifting away from your chest and hovering above the mirror’s surface. You do not tug it or sever it; you simply observe it without stepping back into the story it once carried. Lift your hand and trace a gentle arc around the mirror’s edge, marking the boundary between your life and their unresolved cycle. Whisper that this pattern returns to its rightful keeper, not through force but through truth’s simple gravity. Allow the mirror to catch the repetition as light rather than weight. Sit until the tension eases and the thread unspools back toward its source, leaving your field quiet.
+Set a mirror or a blank page on the table. Write two short lines: what they promised to stop, and one concrete example of what happened afterward. If writing is difficult, say the two statements aloud or mark them with two objects. Keep the facts separate from guesses about their motives. Look at the difference between promise and action; it is enough to see the pattern without trying to make them see it too. Name one boundary you can actually control, such as leaving a conversation when the pattern repeats. Turn the mirror over, fold the page, or set the objects aside to mark the end of observation. No imagined cord, confrontation, or forgiveness is required.
 
 ## Closure & Aftercare
 
