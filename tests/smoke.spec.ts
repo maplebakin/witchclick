@@ -487,3 +487,11 @@ test.describe("site smoke", () => {
     await expect(page.getByRole("button", { name: "Print / save PDF" })).toBeHidden();
   });
 });
+
+test("primary Search link leads to the search page without an orphan dialog", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("[data-search-panel]")).toHaveCount(0);
+  await page.locator(".site-nav").getByRole("link", { name: "Search", exact: true }).click();
+  await expect(page).toHaveURL(/\/search\/?$/);
+  await expect(page.getByRole("heading", { name: "Search", exact: true })).toBeVisible();
+});
