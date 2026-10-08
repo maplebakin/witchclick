@@ -487,3 +487,16 @@ test.describe("site smoke", () => {
     await expect(page.getByRole("button", { name: "Print / save PDF" })).toBeHidden();
   });
 });
+
+test("runtime debug query enables diagnostics on prerendered pages", async ({ page }) => {
+  const pageErrors: string[] = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+
+  await page.goto("/?debug=1");
+  await expect(page.locator(".wc-debug-panel")).toBeVisible();
+  await expect(page.getByText("Debug Panel")).toBeVisible();
+  expect(pageErrors).toEqual([]);
+
+  await page.goto("/");
+  await expect(page.locator(".wc-debug-panel")).toHaveCount(0);
+});
