@@ -603,6 +603,16 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
   const uniqueSlug = options.allowExistingSlug
     ? baseSlug
     : ensureUniqueSlug(baseSlug, postsDirectories, { fallback: 'post' });
+  // A new filename avoids overwriting an existing article, but it does not
+  // establish that another public copy should be published. Require the
+  // normal staging review when a suffix had to be generated.
+  const collisionRequiresReview = uniqueSlug !== baseSlug;
+  if (collisionRequiresReview) {
+    normalizationReport.push(`publication-review-required:${uniqueSlug}`);
+    combinedWarnings.push(
+      `A post already uses slug "${baseSlug}". Saved "${uniqueSlug}" as a draft for editorial review.`,
+    );
+  }
   if (uniqueSlug !== spec.slug) {
     normalizationReport.push(`slug→${uniqueSlug}`);
     spec.slug = uniqueSlug;
@@ -646,8 +656,8 @@ export function prepareSpecForPersistence(rawSpec, options = {}) {
     specVersion: 2,
   };
 
-  // Add draft field if specified
-  if (options.draft === true) {
+  // A collision-generated revision must pass explicit staging review.
+  if (options.draft === true || collisionRequiresReview) {
     frontmatter.draft = true;
   }
 
