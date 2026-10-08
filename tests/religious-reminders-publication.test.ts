@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import matter from 'gray-matter';
 
 const root = process.cwd();
-const posts = (slug) => matter(fs.readFileSync(path.join(root, 'src/content/posts', `${slug}.md`), 'utf8'));
+const posts = (slug: string) => matter(fs.readFileSync(path.join(root, 'src/content/posts', `${slug}.md`), 'utf8'));
 const base = 'keeping-mental-space-safe-religious-reminders';
 
 describe('religious reminder article publication boundary', () => {
