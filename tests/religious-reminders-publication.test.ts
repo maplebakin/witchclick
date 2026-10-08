@@ -19,7 +19,9 @@ describe('religious reminder article publication boundary', () => {
     // Retain the actual article, but retarget curated references to LIVE posts.
     expect(canonical.content).toContain('Religious reminders are woven through popular culture');
     expect(canonical.content).toContain('Keeping your mental space safe does not require perfect avoidance');
-    const links = [...canonical.content.matchAll(/\[[^\]]+\]\((\/post\/[^)]+)\)/g)].map((match) => match[1]);
+    const links = [...canonical.content.matchAll(/\[[^\]]+\]\((\/post\/[^)]+)\)/g)]
+      .map((match) => match[1])
+      .filter((url): url is string => typeof url === 'string');
     expect(links).toEqual([
       '/post/when-life-feels-on-pause',
       '/post/when-to-let-yourself-rest',
