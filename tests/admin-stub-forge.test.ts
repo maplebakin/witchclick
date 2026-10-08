@@ -188,6 +188,11 @@ describe('Post Stub Forge behavior', () => {
     ui.fetcher.mockImplementation(() => response({ stubs: [] }));
     resolve(new Response('{"ok":true,"path":"actual/alpha.md"}')); await tick(); await tick();
     expect(ui.q('[data-replacement-result]').textContent).toContain('has not been published');
+    expect(ui.q('[data-detail-panel]').classList.contains('hidden')).toBe(false);
+    expect(ui.q('[data-tab-panel="preview"]').classList.contains('hidden')).toBe(false);
+    expect(ui.q('[data-draft-preview]').textContent).toContain('Completed text.');
+    expect(ui.q('[data-forge-hero-step]').hidden).toBe(false);
+    expect(ui.q('[data-forge-hero-step]').previousElementSibling).toBe(ui.q('[data-detail-panel]'));
     expect(ui.q<HTMLAnchorElement>('[data-replacement-result] a').getAttribute('href')).toBe('/admin/posts?slug=alpha');
     expect(ui.q<HTMLButtonElement>('[data-save-post]').disabled).toBe(true);
     expect(ui.fetcher.mock.calls.every(call => !String(call[0]).includes('publish'))).toBe(true);

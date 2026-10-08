@@ -809,8 +809,11 @@ Write the full article here with the required sections.
       this.invalidateValidation();
       this.resultEl.innerHTML = `<p>Placeholder replaced with a draft. The result is forced to draft and has not been published.${typeof data?.path === 'string' ? ` Destination: ${escapeHtml(data.path)}.` : ''}</p><p><a class="underline" href="/admin/posts?slug=${encodeURIComponent(entry.slug)}">Open draft in Posts</a> · <a class="underline" href="/admin/staging">Review drafts in Staging</a></p>`;
       const title = this.parsedDraft?.title || entry.title || entry.name;
-      this.removeStub(entry.slug);
       this.heroContext = { slug: entry.slug, title };
+      this.removeStub(entry.slug, true);
+      this.setText(this.selectedNameEl, `Saved draft: ${title}`);
+      this.setStatus('Draft saved and kept open below. Its hero prompt is loading beneath the preview.', 'success');
+      this.setTab('preview');
       // Keep this completed draft tied to this history entry when returning from Hero.
       history.replaceState({ ...history.state, postStubHero: this.heroContext }, '');
       if (this.heroStep) this.heroStep.hidden = false;
@@ -976,16 +979,21 @@ Write the full article here with the required sections.
     if (this.activeTab === 'preview') this.renderDraftPreview();
   }
 
-  private removeStub(slug: string) {
+  private removeStub(slug: string, preserveDraft = false) {
     const key = `post:${slug}`;
     this.postStubs = this.postStubs.filter((entry) => entry.key !== key);
     this.filtered = this.filtered.filter((entry) => entry.key !== key);
-    this.selectedKey = null;
+    this.selectedKey = preserveDraft ? key : null;
     this.invalidateValidation();
-    this.parsedDraft = null;
-    if (this.draftInput) this.draftInput.value = '';
-    this.detailPanel?.classList.add('hidden');
-    this.emptyState?.classList.remove('hidden');
+    if (!preserveDraft) {
+      this.parsedDraft = null;
+      if (this.draftInput) this.draftInput.value = '';
+      this.detailPanel?.classList.add('hidden');
+      this.emptyState?.classList.remove('hidden');
+    } else {
+      this.detailPanel?.classList.remove('hidden');
+      this.emptyState?.classList.add('hidden');
+    }
     this.applySearchFilter();
     this.updateActionState();
   }
@@ -1025,6 +1033,7 @@ Write the full article here with the required sections.
 
   private async fetchStubs() {
     if (this.fetching) return;
+    const keepCompletedDraft = Boolean(this.heroContext && this.parsedDraft && this.draftInput?.value.trim());
     this.fetching = true;
     this.loadState = 'loading';
     this.invalidateValidation();
@@ -1039,9 +1048,11 @@ Write the full article here with the required sections.
       if (!response.ok || data?.ok === false) throw new Error(data?.error || 'Failed to load post stub data');
       this.postStubs = this.readEntries(data?.stubs);
       this.loadState = 'ready';
-      this.selectedKey = null;
-      this.detailPanel?.classList.add('hidden');
-      this.emptyState?.classList.remove('hidden');
+      if (!keepCompletedDraft) {
+        this.selectedKey = null;
+        this.detailPanel?.classList.add('hidden');
+        this.emptyState?.classList.remove('hidden');
+      }
       this.applySearchFilter();
       this.noticeEl.textContent = '';
       if (!this.heroContext) {
@@ -1055,8 +1066,10 @@ Write the full article here with the required sections.
       }
     } catch (error) {
       this.loadState = 'error';
-      this.detailPanel?.classList.add('hidden');
-      this.emptyState?.classList.remove('hidden');
+      if (!keepCompletedDraft) {
+        this.detailPanel?.classList.add('hidden');
+        this.emptyState?.classList.remove('hidden');
+      }
       const message = error instanceof Error ? error.message : 'Failed to load post stub data';
       this.noticeEl.textContent = `Post stub data could not be loaded: ${message} `;
       const retry = document.createElement('button');

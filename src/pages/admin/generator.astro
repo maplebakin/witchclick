@@ -160,16 +160,15 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
                 </details>
                 <button id="retryBundleBtn" type="button" class="admin-btn-secondary px-4 py-2 text-sm font-semibold" hidden>Retry bundle only</button>
                 <div id="preview" class="prose prose-neutral mt-4 max-w-none border-t pt-4"></div>
+                <section data-generator-hero class="mt-6 space-y-4 border-t border-line-neutral pt-6">
+                  <h2 class="text-xl font-semibold">Step 3 — Prepare the hero image</h2>
+                  <p class="text-sm text-body-muted">After this article is saved, it stays here and its hero prompt loads below. You can prepare the image before moving on to another article.</p>
+                  <HeroWorkflow mode="embedded" devApi={DEV_API} devKey={DEV_KEY} lockedMessage="Save this article to load its hero prompt here." />
+                </section>
               </div>
             </div>
           </section>
         </div>
-
-        <section data-panel="posts" data-generator-hero class="my-6 space-y-4 rounded-2xl border border-line-neutral bg-surface-base p-4">
-          <h2 class="text-xl font-semibold">Step 3 — Hero image</h2>
-          <p class="text-sm text-body-muted">Optional artwork for the last saved post. Editing JSON does not change this target.</p>
-          <HeroWorkflow mode="embedded" devApi={DEV_API} devKey={DEV_KEY} lockedMessage="Locked — available after this post is saved." />
-        </section>
 
         <details class="rounded-2xl border border-line-neutral bg-surface-base p-4 shadow-sm" data-panel="posts" data-post-history>
           <summary class="cursor-pointer py-2 font-semibold">Recent Posts — templates and editor links</summary>
@@ -1243,6 +1242,9 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
               return;
             }
             var slug = data.slug || result.spec.slug || '';
+            // Keep the just-saved article visible while its hero workflow loads below it.
+            var savedArticleSpec = Object.assign({}, result.spec, { slug: slug });
+            renderPreview(savedArticleSpec);
             // Only the endpoint's final persisted slug may activate the hero workflow.
             var heroRoot = root.querySelector('[data-generator-hero] [data-hero-workflow]');
             if (heroRoot && typeof data.slug === 'string' && data.slug.trim()) {
