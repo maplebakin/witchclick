@@ -250,9 +250,11 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
         <h2 id="home-pillars-heading" class="home-section__title">What can you do here?</h2>
       </div>
       <nav class="home-doorway-grid" aria-label="Main shelves">
-        {pillarCards.map((card) => (
-          <a class="home-text-link" href={card.href}>
-            {card.eyebrow}: {card.label} &rarr;
+        {pillarCards.map((card, index) => (
+          <a class="home-shelf-link focus-ring" href={card.href}>
+            <span class="home-shelf-link__eyebrow">{card.eyebrow}</span>
+            <span class="home-shelf-link__index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+            <span class="home-shelf-link__name">{card.label}<span class="home-shelf-link__arrow" aria-hidden="true">↗</span></span>
           </a>
         ))}
       </nav>
@@ -456,10 +458,86 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
     color: var(--theme-text-strong, var(--text-strong));
   }
 
+  /* The directory at the back of the journal: fine-ruled entries, not another card deck. */
   .home-doorway-grid {
     display: grid;
-    gap: 0.85rem;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(0.65rem, 2vw, 1.25rem);
+  }
+
+  .home-shelf-link {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto 1fr;
+    align-content: start;
+    align-items: start;
+    column-gap: 0.5rem;
+    row-gap: 0.7rem;
+    min-width: 0;
+    min-height: 6.75rem;
+    padding: clamp(0.9rem, 1.8vw, 1.35rem) clamp(0.8rem, 1.6vw, 1.15rem);
+    border-top: 1px solid color-mix(in srgb, var(--accent-mulberry) 42%, var(--theme-border-subtle, var(--border-subtle)));
+    color: var(--theme-text-strong, var(--text-strong));
+    text-decoration: none;
+    text-underline-offset: 0.3em;
+  }
+
+  .home-shelf-link__eyebrow {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--theme-text-muted, var(--text-muted));
+  }
+
+  .home-shelf-link__index {
+    font-family: var(--font-serif);
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--theme-text-accent-strong, var(--text-accent));
+    opacity: 0.78;
+  }
+
+  .home-shelf-link__name {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    grid-column: 1 / -1;
+    font-family: var(--font-heading);
+    font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .home-shelf-link__arrow {
+    flex: 0 0 auto;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--theme-text-accent-strong, var(--text-accent));
+    transition: transform 160ms ease;
+  }
+
+  .home-shelf-link:hover .home-shelf-link__name,
+  .home-shelf-link:focus-visible .home-shelf-link__name { text-decoration: underline; }
+
+  .home-shelf-link:hover .home-shelf-link__arrow,
+  .home-shelf-link:focus-visible .home-shelf-link__arrow { transform: translate(2px, -2px); }
+
+  @media (max-width: 960px) {
+    .home-doorway-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 520px) {
+    .home-doorway-grid { grid-template-columns: 1fr; gap: 0.25rem; }
+    .home-shelf-link { min-height: 0; padding-block: 1rem; }
+  }
+
+  :global(:root[data-comfort-mode="calm"]) .home-shelf-link__index,
+  :global(:root[data-comfort-mode="plain"]) .home-shelf-link__index { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-shelf-link__arrow { transition: none; }
   }
 
 
