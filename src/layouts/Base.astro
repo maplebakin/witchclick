@@ -21,6 +21,7 @@ import {
 import { readSettings, buildCanonicalUrl, toAbsoluteUrl, getFormEndpoint } from "@/utils/settings";
 import { buildAnalyticsInjection } from "@/utils/analytics";
 import { mixColors } from "@/utils/color";
+import { serializeJsonForScript } from "@/utils/serializeJson";
 import cardAnimationsModule from "@/scripts/card-animations.js?url";
 import revealAnimationsModule from "@/scripts/reveal-animations.js?url";
 
@@ -199,29 +200,25 @@ const adminSections = isDev ? adminNavSections : [];
 
 // Observability Configuration
 const observabilitySettings = settings.observability ?? { enabled: false };
-const debugQuery = Astro.url?.searchParams.get("debug") ?? "";
-const debugMode = debugQuery === "1";
 const siteEnvironment = observabilitySettings.environment ?? (isDev ? "development" : "production");
-const shouldLoadObservability = debugMode || (observabilitySettings.enabled && !isDev);
-
-const observabilityConfig = shouldLoadObservability
-  ? {
-      enabled: Boolean(observabilitySettings.enabled),
-      dsn: observabilitySettings.dsn ?? null,
-      environment: observabilitySettings.environment ?? null,
-      clientErrorEndpoint:
-        observabilitySettings.enabled && settings.clientErrorEndpoint
-          ? settings.clientErrorEndpoint
-          : null,
-      debug: debugMode,
-      siteEnvironment,
-      featureFlags: {
-        observability: Boolean(observabilitySettings.enabled),
-        analytics: Boolean(settings.analytics?.enabled),
-        ads: Boolean(settings.ads?.provider),
-      },
-    }
-  : null;
+// Static pages cannot observe a visitor's runtime ?debug=1 during prerender.
+// Build a data-only config; let the browser decide if diagnostics are needed.
+const observabilityConfig = {
+  enabled: Boolean(observabilitySettings.enabled && !isDev),
+  dsn: observabilitySettings.dsn ?? null,
+  environment: observabilitySettings.environment ?? null,
+  clientErrorEndpoint:
+    observabilitySettings.enabled && settings.clientErrorEndpoint
+      ? settings.clientErrorEndpoint
+      : null,
+  debug: false,
+  siteEnvironment,
+  featureFlags: {
+    observability: Boolean(observabilitySettings.enabled),
+    analytics: Boolean(settings.analytics?.enabled),
+    ads: Boolean(settings.ads?.provider),
+  },
+};
 
 // Theme Scope Detection
 // Determines which theme scope to apply based on the current route
@@ -660,14 +657,25 @@ const dawnThemeSlug = useAutumnWindow ? 'autumn-window' : ADMIN_COMPATIBILITY_TH
 		      })();
 		    </script>
 		    
-		    <!-- Observability -->
-		    {observabilityConfig && (
-	      <script type="module" is:inline define:vars={{ observabilityConfig }}>
-	        import { initObservability } from "@/utils/observability";
-        initObservability(observabilityConfig);
-      </script>
-    )}
-    
+		    <!-- Optional diagnostics, loaded only when enabled or ?debug=1 is requested. -->
+    <script id="wc-observability-config" type="application/json" set:html={serializeJsonForScript(observabilityConfig)} />
+    <script>
+      const configElement = document.getElementById("wc-observability-config");
+      const debug = new URL(window.location.href).searchParams.get("debug") === "1";
+      if (configElement) {
+        try {
+          const config = JSON.parse(configElement.textContent || "{}");
+          if (config.enabled || debug) {
+            import("@/utils/observability")
+              .then(({ initObservability }) => initObservability({ ...config, debug }))
+              .catch((error) => console.warn("[WitchClick] Diagnostics unavailable", error));
+          }
+        } catch (error) {
+          console.warn("[WitchClick] Invalid diagnostics configuration", error);
+        }
+      }
+    </script>
+
     <!-- Card Animations -->
     <script type="module" is:inline src={cardAnimationsModule}></script>
     
