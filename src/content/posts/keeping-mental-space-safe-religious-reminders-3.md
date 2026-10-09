@@ -18,6 +18,7 @@ internalLinks: []
 publishedAt: "2026-10-07T21:41:00.151Z"
 canonicalUrl: "https://witchclick.space/post/keeping-mental-space-safe-religious-reminders-3"
 specVersion: 2
+draft: true
 category: "ritual"
 contentType: "ritual"
 cluster: "rituals-practices"
