@@ -186,6 +186,9 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
                   />
                 )}
                 <div class:list={["home-posts__hero-content", !latestPostHasImage && "home-posts__hero-content--text-only"]}>
+                  {!latestPostHasImage && (
+                    <span class="home-posts__folio-overline" aria-hidden="true">From the reading desk</span>
+                  )}
                   <h3 class:list={["home-posts__hero-title", !latestPostHasImage && "home-posts__hero-title--text-only"]}>{latestPost.title}</h3>
                   <p class="home-posts__hero-description">{latestPost.tldr || latestPost.excerpt}</p>
                   <div class="home-posts__hero-meta">
@@ -194,6 +197,9 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
                       <SpoonsBadge level={latestPost.spoonLevel || latestPost.spoons} />
                     </span>
                   </div>
+                  {!latestPostHasImage && (
+                    <span class="home-posts__folio-action" aria-hidden="true">Open this working <span>→</span></span>
+                  )}
                 </div>
               </a>
             </article>
@@ -694,4 +700,119 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
       gap: 0.7rem;
     }
   }
+  /* The three doorways share a layout, but carry their own quiet ink accents. */
+  .home-state-card:nth-child(1) { --home-need-accent: #9cab9c; }
+  .home-state-card:nth-child(2) { --home-need-accent: #8eaebe; }
+  .home-state-card:nth-child(3) { --home-need-accent: var(--accent-mulberry); }
+
+  .home-state-card {
+    background:
+      radial-gradient(ellipse 95% 75% at 100% 0, color-mix(in srgb, var(--home-need-accent) 12%, transparent), transparent 75%),
+      color-mix(in srgb, var(--theme-surface-base, var(--surface-base)) 92%, var(--theme-text-accent, var(--text-accent)) 8%);
+  }
+
+  .home-state-card::before {
+    content: "";
+    position: absolute;
+    inset-block: 1.15rem;
+    inset-inline-start: 0;
+    width: 3px;
+    border-radius: 0 2px 2px 0;
+    background: var(--home-need-accent);
+    opacity: 0.85;
+    pointer-events: none;
+  }
+
+  .home-state-card__glyph { color: var(--home-need-accent, var(--accent-mulberry)); }
+  .home-state-card__label {
+    font-family: var(--font-heading);
+    font-size: clamp(1.15rem, 2vw, 1.38rem);
+    font-weight: 700;
+  }
+
+  /* An imageless article becomes a deliberate folio rather than a blank card. */
+  .home-posts__hero-content--text-only {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: clamp(18rem, 30vw, 24rem);
+    padding: clamp(2rem, 6vw, 4rem);
+    background:
+      radial-gradient(ellipse 65% 120% at 100% 48%, color-mix(in srgb, var(--accent-mulberry) 12%, transparent), transparent 82%),
+      linear-gradient(120deg, var(--theme-surface-panel, var(--surface-panel)), var(--theme-surface-base, var(--surface-base)));
+  }
+
+  .home-posts__hero-content--text-only::after {
+    content: "";
+    position: absolute;
+    inset-inline-end: clamp(2rem, 8vw, 9rem);
+    top: 50%;
+    width: clamp(7rem, 16vw, 12rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 1px solid color-mix(in srgb, var(--accent-mulberry) 28%, transparent);
+    box-shadow:
+      0 0 0 1.15rem color-mix(in srgb, var(--accent-mulberry) 4%, transparent),
+      0 0 0 2.4rem color-mix(in srgb, var(--accent-mulberry) 2%, transparent);
+    opacity: 0.65;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .home-posts__hero-content--text-only > * { position: relative; z-index: 1; }
+  .home-posts__folio-overline {
+    color: var(--theme-text-accent-strong, var(--text-accent));
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .home-posts__folio-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-top: 1.2rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid color-mix(in srgb, var(--accent-mulberry) 35%, transparent);
+    color: var(--theme-text-accent-strong, var(--text-accent));
+    font-size: 0.86rem;
+    font-weight: 700;
+  }
+  .home-posts__folio-action span { transition: transform 160ms ease; }
+  .home-posts__hero > a:hover .home-posts__folio-action span,
+  .home-posts__hero > a:focus-visible .home-posts__folio-action span { transform: translateX(3px); }
+  .home-posts__hero-content--text-only .home-posts__hero-description {
+    max-width: 62ch;
+    -webkit-line-clamp: 3;
+  }
+
+  /* Comfort is non-negotiable: calm/plain modes have no decoration or gradients. */
+  :global(:root[data-comfort-mode="calm"]) .home-state-card,
+  :global(:root[data-comfort-mode="plain"]) .home-state-card {
+    background: var(--theme-surface-base, var(--surface-base));
+    transition: none;
+  }
+  :global(:root[data-comfort-mode="calm"]) .home-state-card::before,
+  :global(:root[data-comfort-mode="plain"]) .home-state-card::before,
+  :global(:root[data-comfort-mode="calm"]) .home-posts__hero-content--text-only::after,
+  :global(:root[data-comfort-mode="plain"]) .home-posts__hero-content--text-only::after { display: none; }
+
+  :global(:root[data-comfort-mode="calm"]) .home-posts__hero-content--text-only,
+  :global(:root[data-comfort-mode="plain"]) .home-posts__hero-content--text-only { background: transparent; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-state-card,
+    .home-state-card__action span,
+    .home-posts__folio-action span { transition: none; }
+  }
+
+  @media (max-width: 719px) {
+    .home-posts__hero-content--text-only { min-height: 0; padding: clamp(1.65rem, 7vw, 2.25rem); }
+    .home-posts__hero-content--text-only::after { display: none; }
+  }
+
 </style>
