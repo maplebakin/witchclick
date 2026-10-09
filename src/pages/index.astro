@@ -286,13 +286,26 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
     margin-inline: auto;
   }
 
+  /* A mounted illustration, not an orphaned rectangular stock-photo slot. */
   .home-transition-art {
     position: relative;
+    isolation: isolate;
+    box-sizing: border-box;
     width: 100%;
     aspect-ratio: 5 / 4;
     margin: 0;
+    padding: clamp(0.35rem, 0.8vw, 0.65rem);
     overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--theme-text-accent, var(--text-accent)) 29%, var(--theme-border-subtle, var(--border-subtle)));
     border-radius: var(--radius-3, 1rem);
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--theme-surface-panel, var(--surface-panel)) 90%, var(--theme-text-accent, var(--text-accent)) 10%),
+      var(--theme-surface-base, var(--surface-base))
+    );
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--theme-surface-base, var(--surface-base)) 70%, transparent),
+      0 16px 32px -24px color-mix(in srgb, var(--theme-text-strong, var(--text-strong)) 40%, transparent);
     pointer-events: none;
   }
 
@@ -302,7 +315,39 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
     height: 100%;
     object-fit: cover;
     object-position: center 62%;
+    border-radius: calc(var(--radius-3, 1rem) - 0.3rem);
     filter: saturate(0.68) contrast(0.9) brightness(0.92) sepia(0.08);
+  }
+
+  .home-transition-art::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    inset: clamp(0.35rem, 0.8vw, 0.65rem);
+    border: 1px solid color-mix(in srgb, var(--theme-text-strong, var(--text-strong)) 12%, transparent);
+    border-radius: calc(var(--radius-3, 1rem) - 0.3rem);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--theme-surface-base, var(--surface-base)) 18%, transparent),
+      transparent 24% 74%,
+      color-mix(in srgb, var(--theme-surface-base, var(--surface-base)) 30%, transparent)
+    );
+    pointer-events: none;
+  }
+
+  /* A tiny ribbon bookmark links the illustration to the reading-desk motif. */
+  .home-transition-art::after {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    right: clamp(1.3rem, 3vw, 2rem);
+    width: 0.85rem;
+    height: clamp(2rem, 4.5vw, 3.25rem);
+    background: var(--accent-mulberry);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+    opacity: 0.9;
+    pointer-events: none;
   }
 
   .home-masthead::before {
@@ -671,8 +716,8 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
     }
 
     .home-transition-art {
-      aspect-ratio: 16 / 7;
-      max-height: 15rem;
+      aspect-ratio: 5 / 3;
+      max-height: 16rem;
     }
 
     .home-posts__hero > .home-posts__hero-link--illustrated {
@@ -815,4 +860,23 @@ const collectionSchema = latestPost ? createCollectionPageSchema(
     .home-posts__hero-content--text-only::after { display: none; }
   }
 
+  /* The accessible reading modes have no decorative photo frame or leftover empty column. */
+  :global(:root[data-comfort-mode="calm"]) .home-transition-art::before,
+  :global(:root[data-comfort-mode="calm"]) .home-transition-art::after,
+  :global(:root[data-comfort-mode="plain"]) .home-transition-art::before,
+  :global(:root[data-comfort-mode="plain"]) .home-transition-art::after {
+    display: none;
+  }
+
+  :global(:root[data-comfort-mode="calm"]) .home-transition-art {
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  :global(:root[data-comfort-mode="plain"]) .home-transition-art { display: none; }
+
+  :global(:root[data-comfort-mode="plain"]) .home-masthead {
+    grid-template-columns: minmax(0, 1fr);
+  }
 </style>
