@@ -488,6 +488,19 @@ test.describe("site smoke", () => {
   });
 });
 
+test("runtime debug query enables diagnostics on prerendered pages", async ({ page }) => {
+  const pageErrors: string[] = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+
+  await page.goto("/?debug=1");
+  await expect(page.locator(".wc-debug-panel")).toBeVisible();
+  await expect(page.getByText("Debug Panel")).toBeVisible();
+  expect(pageErrors).toEqual([]);
+
+  await page.goto("/");
+  await expect(page.locator(".wc-debug-panel")).toHaveCount(0);
+});
+
 test("primary Search link leads to the search page without an orphan dialog", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("[data-search-panel]")).toHaveCount(0);

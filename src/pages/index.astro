@@ -9,6 +9,7 @@ import { postsToCardData } from "@/utils/postTransforms";
 import { readSettings } from "@/utils/settings";
 import { createCollectionPageSchema } from "@/utils/structuredData";
 import type { CardPost } from "@/types/post";
+import { selectDistinctHomeStories } from "@/utils/homeReading";
 
 const title = "WitchClick — A living grimoire for symbolic self-work";
 
@@ -68,10 +69,10 @@ const stateCards = [
 // Transform to card data
 const cardPosts: CardPost[] = postsToCardData(ritualPosts);
 
-// Most recent post as section hero, then supporting grid posts
-const latestPost = cardPosts[0] ?? null;
+// Preserve chronological order, but do not advertise the same story twice
+// when the publishing pipeline has generated a suffixed duplicate slug.
+const { featured: latestPost, recent: gridPosts } = selectDistinctHomeStories(cardPosts, 6);
 const latestPostHasImage = Boolean(latestPost && (latestPost.heroImageSrc || latestPost.heroImage));
-const gridPosts = cardPosts.filter((post) => post.slug !== latestPost?.slug).slice(0, 6);
 
 // Create schema for the visible post collection without making the homepage only a feed.
 const collectionSchema = latestPost ? createCollectionPageSchema(

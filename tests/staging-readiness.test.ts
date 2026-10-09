@@ -146,7 +146,7 @@ function setupBrowser(drafts: any[], handler?: (url: string, body: any) => Promi
     <div id="draftsList"></div><span id="draftCount"></span><input id="draftSearch" /><button id="clearDraftSearch"></button><input type="checkbox" id="groupByTopic" />
     <select id="readinessFilter">${["all", "checks-passed", "needs-work", "missing-hero", "placeholder-stub", "unknown"].map((state) => `<option>${state}</option>`).join("")}</select>
     <p id="stagingStatus"></p><button id="refreshBtn"></button><button id="closeCompare"></button><button id="closePreview"></button>
-    <section id="comparisonSection" class="hidden"><div id="comparisonContent"></div></section><section id="previewSection" class="hidden"><div id="previewContent"></div></section>
+    <section id="comparisonSection" class="hidden"><div id="comparisonContent"></div></section><section id="previewSection" class="hidden"><h2 id="reviewTitle"></h2><div id="previewContent"></div><button id="publishSelectedBtn" disabled></button></section>
     </div>`, { runScripts: "outside-only", url: "http://localhost:4321/admin/staging" });
   windows.push(dom); dom.window.HTMLElement.prototype.scrollIntoView = () => {};
   dom.window.confirm = vi.fn(() => true); dom.window.alert = vi.fn();
@@ -172,9 +172,11 @@ describe("Staging browser actions and server annotation filters", () => {
     expect(ui.calls[0]!.url).toBe("http://127.0.0.1:8787/staging/list");
     for (const state of states) {
       ui.$<HTMLSelectElement>("readinessFilter").value = state; ui.$("readinessFilter").dispatchEvent(new ui.dom.window.Event("change"));
-      expect(ui.$("draftsList").querySelectorAll(".publish-btn")).toHaveLength(1);
+      expect(ui.$("draftsList").querySelectorAll(".publish-btn")).toHaveLength(0);
       expect(ui.$("draftsList").textContent).toContain(`Reason for ${state}`);
-      expect(ui.$("draftsList").querySelector<HTMLButtonElement>(".publish-btn")!.disabled).toBe(!["checks-passed", "missing-hero"].includes(state));
+      ui.$("draftsList").querySelector<HTMLButtonElement>(".preview-btn")!.click();
+      await vi.waitFor(() => expect(ui.$("reviewTitle").textContent).toContain("Step 1"));
+      expect(ui.$<HTMLButtonElement>("publishSelectedBtn").disabled).toBe(!["checks-passed", "missing-hero"].includes(state));
     }
     ui.$<HTMLInputElement>("draftSearch").value = "no match"; ui.$("draftSearch").dispatchEvent(new ui.dom.window.Event("input")); expect(ui.$("draftsList").textContent).toContain("No drafts match");
     ui.$<HTMLInputElement>("draftSearch").value = ""; ui.$<HTMLSelectElement>("readinessFilter").value = "all";
@@ -189,20 +191,23 @@ describe("Staging browser actions and server annotation filters", () => {
     await ui.loaded(); ui.$<HTMLInputElement>("groupByTopic").checked = true; ui.$("groupByTopic").dispatchEvent(new ui.dom.window.Event("change"));
     ui.$("draftsList").querySelector<HTMLButtonElement>(".compare-topic-btn")!.click(); await vi.waitFor(() => expect(ui.$("comparisonContent").children).toHaveLength(2));
     expect(ui.$("comparisonContent").querySelectorAll("button")).toHaveLength(0);
-    ui.$("draftsList").querySelector<HTMLButtonElement>('.publish-btn[data-slug="first"]')!.click();
-    const pendingButton = ui.$("draftsList").querySelector<HTMLButtonElement>('.publish-btn[data-slug="first"]')!;
+    ui.$("draftsList").querySelector<HTMLButtonElement>('.preview-btn[data-slug="first"]')!.click();
+    await vi.waitFor(() => expect(ui.$("reviewTitle").textContent).toContain("Step 1"));
+    ui.$<HTMLButtonElement>("publishSelectedBtn").click();
+    const pendingButton = ui.$<HTMLButtonElement>("publishSelectedBtn");
     expect(pendingButton.disabled).toBe(true); pendingButton.dispatchEvent(new ui.dom.window.Event("click", { bubbles: true }));
     expect(ui.$("draftsList").querySelector<HTMLButtonElement>('.delete-btn[data-slug="first"]')!.disabled).toBe(true);
-    expect(ui.$("draftsList").querySelector<HTMLButtonElement>('.publish-btn[data-slug="second"]')!.disabled).toBe(false);
+    expect(ui.$("draftsList").querySelectorAll(".publish-btn")).toHaveLength(0);
     expect(ui.calls.filter((call) => call.url.endsWith("/staging/publish"))).toHaveLength(1);
     release(); await vi.waitFor(() => expect(ui.$("stagingStatus").textContent).toContain("publicly eligible locally"));
     await ui.idle();
   });
   it("requires explicit no-hero confirmation and sends acknowledgment only after acceptance", async () => {
     const ui = setupBrowser([uiDraft("art", "missing-hero")]); await ui.loaded();
-    ui.dom.window.confirm = vi.fn(() => false); ui.$("draftsList").querySelector<HTMLButtonElement>(".publish-btn")!.click();
+    ui.$("draftsList").querySelector<HTMLButtonElement>(".preview-btn")!.click(); await vi.waitFor(() => expect(ui.$("reviewTitle").textContent).toContain("Step 1"));
+    ui.dom.window.confirm = vi.fn(() => false); ui.$<HTMLButtonElement>("publishSelectedBtn").click();
     expect(ui.dom.window.confirm).toHaveBeenCalledWith(expect.stringContaining("publishing without a hero image")); expect(ui.calls.filter((call) => call.url.endsWith("/staging/publish"))).toHaveLength(0);
-    ui.dom.window.confirm = vi.fn(() => true); ui.$("draftsList").querySelector<HTMLButtonElement>(".publish-btn")!.click();
+    ui.dom.window.confirm = vi.fn(() => true); ui.$<HTMLButtonElement>("publishSelectedBtn").click();
     await vi.waitFor(() => expect(ui.calls.find((call) => call.url.endsWith("/staging/publish"))?.body).toEqual({ slug: "art", acknowledgeMissingHero: true }));
     await ui.idle();
   });
@@ -214,6 +219,7 @@ describe("Staging browser actions and server annotation filters", () => {
   });
   it("shows Phase 3A's locked message for unauthorized publication", async () => {
     const ui = setupBrowser([uiDraft("locked")], (url) => url.endsWith("/staging/publish") ? new Response("{}", { status: 401 }) : undefined); await ui.loaded();
-    ui.$("draftsList").querySelector<HTMLButtonElement>(".publish-btn")!.click(); await vi.waitFor(() => expect(ui.$("stagingStatus").textContent).toContain("Staging actions are locked"));
+    ui.$("draftsList").querySelector<HTMLButtonElement>(".preview-btn")!.click(); await vi.waitFor(() => expect(ui.$("reviewTitle").textContent).toContain("Step 1"));
+    ui.$<HTMLButtonElement>("publishSelectedBtn").click(); await vi.waitFor(() => expect(ui.$("stagingStatus").textContent).toContain("Staging actions are locked"));
   });
 });
