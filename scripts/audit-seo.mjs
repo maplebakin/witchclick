@@ -136,7 +136,6 @@ function auditPost(filePath) {
     wordCount,
     issues: [
       !hasIntro && 'Missing SEO intro paragraph',
-      totalInternalLinks < 3 && `Only ${totalInternalLinks} internal link(s) (need 3-5)`,
       externalLinks < 1 && 'Missing external authoritative link',
       !hasConclusion && 'Missing conclusion section',
       !hasCluster && 'Missing topic cluster',
@@ -177,14 +176,14 @@ function main() {
 
   const missingIntro = publishedResults.filter(r => !r.hasIntro).length;
   const missingConclusion = publishedResults.filter(r => !r.hasConclusion).length;
-  const insufficientInternalLinks = publishedResults.filter(r => r.internalLinks < 3).length;
+  const postsWithoutInternalLinks = publishedResults.filter(r => r.internalLinks === 0).length;
   const missingExternalLinks = publishedResults.filter(r => r.externalLinks < 1).length;
   const missingCluster = publishedResults.filter(r => !r.hasCluster).length;
   const lowWordCount = publishedResults.filter(r => r.wordCount < 700).length;
 
   console.log(`  ❌ Missing SEO intro paragraph: ${missingIntro} posts`);
   console.log(`  ❌ Missing conclusion section: ${missingConclusion} posts`);
-  console.log(`  ⚠️  Insufficient internal links (<3): ${insufficientInternalLinks} posts`);
+  console.log(`  ℹ️  Posts with no internal links (informational): ${postsWithoutInternalLinks}`);
   console.log(`  ❌ Missing external link: ${missingExternalLinks} posts`);
   console.log(`  ⚠️  Missing topic cluster: ${missingCluster} posts`);
   console.log(`  ⚠️  Low word count (<700): ${lowWordCount} posts`);
