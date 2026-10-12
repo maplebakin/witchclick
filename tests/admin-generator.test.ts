@@ -29,7 +29,7 @@ afterEach(() => {
 const response = (data: unknown, ok = true) => ({ ok, status: ok ? 200 : 400, text: async () => JSON.stringify(data), json: async () => data });
 function setup(handler?: (request: Request) => Promise<ReturnType<typeof response> | undefined> | ReturnType<typeof response> | undefined) {
   const dom = new JSDOM(`<div data-panel-root data-dev-api="http://fixture.local"><div data-panel="posts"></div><section data-generator-hero data-panel="posts">${heroMarkup}</section><div data-panel="curses" class="hidden"></div><button data-panel-toggle="posts"></button><button data-panel-toggle="curses"></button>
-    <textarea id="spec"></textarea><div id="status"></div><div id="specSummary"></div><div id="preview"></div>
+    <textarea id="spec"></textarea><input id="words" type="number" value="1200" /><div id="status"></div><div id="specSummary"></div><div id="preview"></div>
     <p id="saveOutcome"></p><p id="bundleStatus"></p><details id="bundleDetails"><pre id="bundleError"></pre></details>
     ${["validateBtn", "previewBtn", "ingestBtn", "ingestPublishBtn", "clearBtn", "retryBundleBtn", "genPrompt", "copyPrompt"].map((id) => `<button id="${id}"></button>`).join("")}
     <details data-post-history><aside data-recent-panel><div data-recent-list></div><button data-recent-refresh></button><input data-recent-filter /></aside></details>
