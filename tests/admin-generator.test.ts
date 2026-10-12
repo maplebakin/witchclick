@@ -219,13 +219,14 @@ describe('Generator embedded hero target', () => {
     ui.window.document.querySelector<HTMLButtonElement>('[data-recent-insert]')!.click();
     expect(root.dataset.heroSlug).toBe('collision-resolved-slug');
     ui.click('ingestBtn'); await ui.idle(); expect(root.dataset.heroSlug).toBe('second-saved-slug');
-    expect(ui.requests.filter(r=>r.url.pathname==='/posts/load').map(r=>r.body.slug)).toEqual(['collision-resolved-slug','second-saved-slug']);
+    expect(ui.requests.filter(r=>r.url.pathname==='/posts/load')).toHaveLength(0); // Saved response carries the verified spec directly.
   });
-  it('keeps hero optional on a failed load and hides the entire step for curses', async () => {
+  it('keeps hero optional from the saved response and hides the entire step for curses', async () => {
     const ui = setup(request=>request.url.pathname==='/posts/load'?response({ok:false,error:'Unavailable'},false):undefined);
     ui.edit(createPostSpec()); ui.click('ingestBtn'); await ui.idle();
     expect(ui.element('saveOutcome').textContent).toContain('Saved draft');
-    await vi.waitFor(()=>expect(ui.window.document.querySelector('[data-workflow-status]')!.textContent).toContain('could not be loaded'));
+    await vi.waitFor(()=>expect(ui.window.document.querySelector('[data-workflow-status]')!.textContent).toContain('Hero missing.'));
+    expect(ui.requests.filter(r=>r.url.pathname==='/posts/load')).toHaveLength(0);
     ui.window.document.querySelector<HTMLButtonElement>('[data-panel-toggle="curses"]')!.click();
     expect(ui.window.document.querySelector('[data-generator-hero]')!.classList.contains('hidden')).toBe(true);
     expect(ui.element<HTMLButtonElement>('ingestBtn').disabled).toBe(false);
