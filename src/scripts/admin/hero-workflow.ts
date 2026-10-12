@@ -33,7 +33,11 @@ export class HeroWorkflow {
   private listeners = new AbortController();
   constructor(readonly root: HTMLElement) {
     const initialSlug = root.dataset.heroSlug || '';
-    this.on(root, 'hero-workflow:set-post', event => { void this.setPost((event as CustomEvent<HeroTarget>).detail); });
+    this.on(root, 'hero-workflow:set-post', event => {
+      const target = (event as CustomEvent<HeroTarget & { post?: Record<string, any> }>).detail;
+      if (target?.post && target.slug) this.showSavedPost({ ...target, post: target.post });
+      else void this.setPost(target);
+    });
     this.on(root, 'hero-workflow:reset', () => this.reset());
     this.on(this.el('[data-post-select]'), 'change', () => { void this.setPost({ slug: this.select.value }); });
     this.on(this.el('[data-post-search]'), 'input', () => this.renderPicker());
@@ -109,6 +113,14 @@ export class HeroWorkflow {
       this.status = 'error'; this.error(error);
       this.message(target.requireDraft ? `Draft replaced, but hero status could not be loaded for ${target.slug}. Retry loading.` : `Hero status could not be loaded for ${target.slug}. Retry loading.`); this.render();
     }
+  }
+  private showSavedPost(target: HeroTarget & { post: Record<string, any> }) {
+    this.reset();
+    this.target = { slug: target.slug, expectedTitle: target.expectedTitle, requireDraft: target.requireDraft };
+    this.root.dataset.heroSlug = target.slug;
+    this.select.value = target.slug;
+    this.applyPost({ ...target.post, slug: target.slug });
+    this.render();
   }
   private async readPost(target: HeroTarget): Promise<Record<string, any>> {
     const data = await this.request('/posts/load', { slug: target.slug });

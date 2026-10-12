@@ -237,11 +237,15 @@ export async function POST({ request }: { request: Request }) {
 
   try {
     const cwd = process.cwd();
+    const requestedTarget = Number(parsed.requestUrl.searchParams.get('targetWordCount'));
+    const targetWordCount = Number.isFinite(requestedTarget) && requestedTarget > 0 && requestedTarget <= 50000
+      ? requestedTarget
+      : 1200;
     const result = await executeIngest(parsed.input, {
       cwd,
       dryRun: parsed.isDryRun,
       draft: parsed.isDraftMode,
-      targetWordCount: 1200,
+      targetWordCount,
     });
 
     const prepared = result.prepared;

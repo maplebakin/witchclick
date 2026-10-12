@@ -1005,6 +1005,10 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           var params = [];
           if (dryRun === 'true') params.push('dryRun=true');
           if (spec && spec._draft === true) params.push('draft=true');
+          var targetWordCount = Number($('words').value || 1200);
+          if (Number.isFinite(targetWordCount) && targetWordCount > 0) {
+            params.push('targetWordCount=' + encodeURIComponent(String(targetWordCount)));
+          }
           // Use dev-api.js endpoint - Astro static mode can't handle POST bodies
           var url = DEV_API + '/ingest' + (params.length ? '?' + params.join('&') : '');
           var res;
@@ -1249,7 +1253,13 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             var heroRoot = root.querySelector('[data-generator-hero] [data-hero-workflow]');
             if (heroRoot && typeof data.slug === 'string' && data.slug.trim()) {
               heroRoot.setAttribute('data-hero-slug', data.slug);
-              heroRoot.dispatchEvent(new CustomEvent('hero-workflow:set-post', { detail: { slug: data.slug } }));
+              heroRoot.dispatchEvent(new CustomEvent('hero-workflow:set-post', { detail: {
+                slug: data.slug,
+                expectedTitle: data.spec?.title || result.spec.title,
+                requireDraft: draft === true,
+                post: data.spec || result.spec
+              } }));
+              heroRoot.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
             savedJSON = result.snapshot;
             invalidateValidation();

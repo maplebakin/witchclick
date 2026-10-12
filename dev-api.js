@@ -865,7 +865,8 @@ async function loadPostForEditor(slug) {
   }
   const relativePath = path.relative(CWD, found.file).replace(/\\/g, '/');
   const newline = /\r\n/.test(found.raw || '') ? '\r\n' : '\n';
-  const frontmatter = Array.isArray(found.lines) ? found.lines.join('\n') : '';
+  const frontmatterMatch = /^---[ \t]*\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(found.raw || '');
+  const frontmatter = frontmatterMatch?.[1] || '';
   const markdown = typeof found.rest === 'string' ? found.rest.replace(/\r\n?/g, '\n') : '';
   let stats = null;
   try {
@@ -2309,6 +2310,10 @@ async function ingestPalette(payload) {
           ? payload.dryRun === true || payload.dryRun === 'true'
           : false;
         const dryRun = queryDryRun || bodyDryRun;
+        const requestedTarget = Number(requestUrl.searchParams.get('targetWordCount'));
+        const targetWordCount = Number.isFinite(requestedTarget) && requestedTarget > 0 && requestedTarget <= 50000
+          ? requestedTarget
+          : 1200;
 
         const queryDraft = (() => {
           const flag = requestUrl.searchParams.get('draft');
@@ -2343,6 +2348,7 @@ async function ingestPalette(payload) {
             dryRun,
             draft: isDraft,
             forceCategory: 'ritual', // Generator posts are always ritual category
+            targetWordCount,
           });
           const { prepared, persistence } = ingestion;
           const relativePath = path.relative(CWD, prepared.post.filePath).replace(/\\/g, '/');

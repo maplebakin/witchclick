@@ -89,7 +89,6 @@ export function validateStructure(spec, contentWords) {
     patterns.some((pattern) => (pattern.test ? pattern.test(body) : body.includes(pattern)));
 
   const normalizedType = (() => {
-    if (contentType === 'guide') return 'ritual';
     if (contentType === 'spread') return 'tarotSpread';
     return contentType;
   })();
@@ -177,14 +176,7 @@ export function validateStructure(spec, contentWords) {
       }
       break;
     }
-    default: {
-      if (contentType === 'guide') {
-        if (!headingMatches([/checklist/, /summary/, /at a glance/])) {
-          errors.push('Guide posts require a Checklist/Summary section.');
-        }
-      }
-      break;
-    }
+    default: break;
   }
 
   if (!(typeof spec.heroImagePrompt === 'string' || spec.heroImagePrompt === null)) {

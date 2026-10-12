@@ -158,14 +158,14 @@ export function validatePostSpec(spec, options = {}) {
   }
 
   // Reflection prompts recommended for certain types
-  if (contentType === 'ritual' || contentType === 'reflection' || contentType === 'guide') {
+  if (contentType === 'ritual' || contentType === 'reflection') {
     if (!lowerHeadings.some((heading) => heading.includes('reflection prompt') || heading.includes('journaling prompt'))) {
       warnings.push('Consider adding a "Reflection Prompt" or "Journaling Prompts" section.');
     }
   }
 
   // Checklists only for ritual, guide, spellwork
-  if (contentType === 'ritual' || contentType === 'guide' || contentType === 'spellwork') {
+  if (contentType === 'ritual' || contentType === 'spellwork') {
     if (!lowerHeadings.some((heading) => heading.includes('checklist') || heading.includes('summary'))) {
       warnings.push('No section heading includes "Checklist" or "Summary".');
     }
