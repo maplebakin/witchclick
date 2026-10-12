@@ -48,7 +48,7 @@ It can also hold uncertainty. You may know that a great-grandmother existed and 
 
 That makes this kind of book useful even if your family history is incomplete, fractured, adopted, estranged, displaced, or deliberately private. You do not need a neat lineage to practice remembrance. You can document what is known, mark what is uncertain, and refuse to invent certainty just because a blank page feels uncomfortable.
 
-WitchClick's piece on [ancestral patterns](/post/ancestral-patterns) fits naturally beside this idea. A family story is not only a chain of people. It is also a chain of habits, silences, skills, warnings, jokes, fears, loyalties, ways of showing love, and ways of surviving. Some of those things deserve to be carried forward. Some deserve to be set down.
+Thinking about ancestral patterns fits naturally beside this idea. A family story is not only a chain of people. It is also a chain of habits, silences, skills, warnings, jokes, fears, loyalties, ways of showing love, and ways of surviving. Some of those things deserve to be carried forward. Some deserve to be set down.
 
 The book can become a place where both are visible.
 
@@ -68,7 +68,7 @@ A useful personal book may contain several kinds of memory at once:
 - things you do not know yet
 - things you may never know
 
-This is where a [personal myth](/post/personal-myth) can sit beside ordinary evidence without swallowing it. Myth, here, does not mean false. It means the meaning a story gathers as it is carried. You can keep the document and the interpretation on the same shelf while still knowing they are different things.
+This is where a personal myth can sit beside ordinary evidence without swallowing it. Myth, here, does not mean false. It means the meaning a story gathers as it is carried. You can keep the document and the interpretation on the same shelf while still knowing they are different things.
 
 The book does not have to be solemn either. The dead were not solemn all the time. They had ridiculous haircuts, petty arguments, favorite snacks, terrible jokes, unfinished chores, and opinions that would make you roll your eyes. If remembrance only preserves people at funeral-volume, it can sand away the ordinary texture that made them recognizable.
 
@@ -98,7 +98,7 @@ That last sentence belongs in remembrance too.
 
 If you come from a religious background that taught a specific relationship with death, ancestors, prayer, saints, heaven, hell, or forbidden spiritual practices, building this kind of book may bring old alarms with it. You do not have to force those alarms quiet. A practice can be secular and still feel emotionally loaded because your body learned the old meanings long before you chose new ones.
 
-The WitchClick guide on [keeping mental space safe](/post/keeping-mental-space-safe-religious-reminders) may be useful if remembrance starts bumping into inherited religious fear. You are allowed to choose language that feels less charged. 'Memorial book,' 'family archive,' 'remembrance notebook,' or even 'the dead people binder' can do the same work if 'Book of the Dead' makes the whole thing feel like you have accidentally summoned a committee.
+Keeping mental space safe may become important if remembrance starts bumping into inherited religious fear. You are allowed to choose language that feels less charged. 'Memorial book,' 'family archive,' 'remembrance notebook,' or even 'the dead people binder' can do the same work if 'Book of the Dead' makes the whole thing feel like you have accidentally summoned a committee.
 
 The same freedom applies to ancestor language. For some people, 'ancestor work' feels rich and connective. For others, it feels too spiritual, too genealogical, or too tangled with family relationships they do not want to romanticize. The practice does not collapse if you call it something else.
 
@@ -116,7 +116,7 @@ It also lets the living change their minds. A page written at twenty-five may no
 
 Revision is not disrespect. It is what living memory does.
 
-A [reflection journal](/post/reflection-journal) can help keep the more personal material separate from the factual record if you want that distinction. One section can hold what happened. Another can hold what you currently think it means. Neither has to impersonate the other.
+A reflection journal can help keep the more personal material separate from the factual record if you want that distinction. One section can hold what happened. Another can hold what you currently think it means. Neither has to impersonate the other.
 
 The book becomes safer when it is allowed to say, plainly, 'this is what I know,' 'this is what I was told,' and 'this is what I make of it now.'
 
@@ -142,7 +142,7 @@ You may notice how often women in the family moved for someone else's work. You 
 
 Those repetitions are not destiny. They are material.
 
-This is where [introspection](/post/introspection) can be more useful than certainty. You can observe without immediately deciding what a pattern means. You can let two explanations coexist. You can note that a story feels powerful without calling that feeling evidence.
+This is where introspection can be more useful than certainty. You can observe without immediately deciding what a pattern means. You can let two explanations coexist. You can note that a story feels powerful without calling that feeling evidence.
 
 That restraint matters especially when working with relatives you never knew. It is easy to build a personality from one photograph, one census record, one family anecdote, and a strong resemblance around the eyes. The imagination will happily supply the missing rooms.
 
@@ -158,7 +158,7 @@ Shadow work can also point forward. Once a pattern becomes visible, you can noti
 
 That is not a grand ancestral healing claim. It is a living person making choices.
 
-The WitchClick piece on [human connection](/post/human-connection) is useful here because inheritance is relational. We learn ourselves partly through other people, including people who are gone. A personal Book of the Dead can make those relationships visible without pretending the dead are directing the project.
+Human connection matters here because inheritance is relational. We learn ourselves partly through other people, including people who are gone. A personal Book of the Dead can make those relationships visible without pretending the dead are directing the project.
 
 For readers who do use spiritual language, the same structure still works. You might experience an ancestor as present, symbolic, remembered, imagined, spiritually real, or some mixture that changes from day to day. The book does not have to settle the metaphysics before it can hold the relationship.
 
@@ -246,7 +246,7 @@ That may be the most important line in the whole book.
 
 You can also begin with a page about yourself. Not because you are dead, obviously, which would complicate the editorial schedule, but because you are part of the chain you are documenting. Record what you currently know, what you currently believe about the family story, and what objects or practices matter to you now. Future versions of you may read that page very differently.
 
-If the material leaves you stirred up, switch from excavation to orientation. Drink water. Look around the room. Put the photographs away. Use [gentle grounding practices](/post/gentle-grounding-practices) if you want a soft landing. Remembrance does not become more meaningful because you push past your capacity.
+If the material leaves you stirred up, switch from excavation to orientation. Drink water. Look around the room. Put the photographs away. Use gentle grounding practices if you want a soft landing. Remembrance does not become more meaningful because you push past your capacity.
 
 You are allowed to close the book while the story is still open.
 
@@ -258,4 +258,4 @@ That can be enough for ancestor work. It can be enough for shadow work too. You 
 
 Return when something wants to be recorded. Leave when you have had enough. Let the book grow at the speed memory actually arrives.
 
-And when a page feels complete for now, [closing gratitude](/post/closing-gratitude) can offer a gentle way to mark the moment without pretending anything has been permanently resolved. The dead remain complicated. The living remain unfinished. The book can hold both.
+And when a page feels complete for now, closing gratitude can offer a gentle way to mark the moment without pretending anything has been permanently resolved. The dead remain complicated. The living remain unfinished. The book can hold both.
