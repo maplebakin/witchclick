@@ -39,6 +39,4 @@ const classes = [
 ].join(' ');
 ---
 
-<textarea class={classes} {...props}>
-  <slot />
-</textarea>
+<textarea class={classes} {...props} set:html={await Astro.slots.render('default')} />

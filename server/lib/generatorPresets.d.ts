@@ -21,3 +21,5 @@ export declare function getGeneratorPreset(value: unknown): GeneratorPreset | un
 
 declare const presets: Record<string, GeneratorPreset>;
 export default presets;
+
+export declare function resolveGeneratorApproach(value: unknown): { key: string; contentType: string; preset: GeneratorPreset } | null;

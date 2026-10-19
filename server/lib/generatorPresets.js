@@ -31,13 +31,13 @@ export function buildBaseFields() {
     '- excerpt — 35–55 words across 1–2 sentences.',
     '- outline — array of { heading, id } aligned to sections in the same order.',
     formatSectionsRequirement(),
-    '- internalLinkHints (internalLinks, linkHints) — array of 5–8 { anchor, slug, rationale }; anchors must appear verbatim in sections and each slug must be an exact value from existingPostSlugs.',
+    '- internalLinkHints (internalLinks, linkHints) — array of relevant { anchor, slug, rationale }; [] allowed; anchors must appear verbatim in sections and each slug must be an exact value from existingPostSlugs.',
     '- affiliateHints — array (≤1 per ~250 words) of { key, anchor, rationale }; [] allowed.',
     '- cta — object { type: "kofi"|"download"|"none", id? }.',
     '- adPlacements — array containing zero or more of "lead", "mid", "end" (or []).',
     '',
-    'Optional but recommended fields:',
-    '- specVersion — number 2.',
+    'Additional fields:',
+    '- specVersion — required number 2.',
     '- heroImagePrompt — a painterly, illustrative scene description (2–4 sentences) varying in setting, palette, and mood to match the post topic; or null.',
     '- altTexts — array of strings matching any described images; [] if none.',
     '- entities — array of { type, slug } if referenced.',
@@ -209,7 +209,7 @@ const DEFINITIONS = [
   {
     key: 'practicalWorking',
     label: 'Practical Working',
-    system: 'You are a careful, consent-first guide. Emphasize safety, optionality, and symbolic action as a way to choose a lens on purpose. Write like someone who has done this themselves and knows it doesn\'t always go perfectly — and that\'s fine.',
+    system: 'You are a careful, consent-first guide. Emphasize safety, optionality, and symbolic action as a way to choose a lens on purpose. Use practical detail without claiming personal experience.',
     goal: 'A practical guide to a ritual, spell, or working as reflective practice. Include both a quick/low-energy variant and a deep variant. Safety, consent, and substitutions are always acknowledged. No promised external outcomes.'
   },
   {
@@ -281,7 +281,7 @@ export function resolveGeneratorPresetKey(value) {
   if (typeof value !== 'string') return null;
   const trimmed = value.trim();
   if (!trimmed) return null;
-  if (presets[trimmed]) return trimmed;
+  if (Object.hasOwn(presets, trimmed)) return trimmed;
   const lower = trimmed.toLowerCase();
   for (const key of Object.keys(presets)) {
     if (key.toLowerCase() === lower) return key;
@@ -295,3 +295,11 @@ export function getGeneratorPreset(value) {
 }
 
 export default presets;
+
+// Resolve aliases to one specialist contract; template identifiers are never schema values.
+export function resolveGeneratorApproach(value) {
+  const key = resolveGeneratorPresetKey(value);
+  if (!key) return null;
+  const canonical = DEFINITIONS.find((definition) => presets[definition.key] === presets[key]).key;
+  return { key: canonical, contentType: key.toLowerCase() === 'spellwork' ? 'spellwork' : CONTENT_TYPE_BY_PRESET[canonical], preset: presets[key] };
+}

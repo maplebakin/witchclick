@@ -66,12 +66,12 @@ describe('validatePostSpec', () => {
     expect(result.errors[0]).toContain('Affiliate key');
   });
 
-  it('warns when internal link count outside range', () => {
+  it('allows a few relevant internal links without a quota warning', () => {
     const spec = createSpec();
     spec.internalLinkHints = spec.internalLinkHints.slice(0, 2);
     const result = validatePostSpec(spec, { allowedAffiliateKeys: [] });
     expect(result.valid).toBe(true);
-    expect(result.warnings.some((msg) => msg.includes('Expected 5–8 internalLinkHints'))).toBe(true);
+    expect(result.warnings.some((msg) => msg.includes('Expected 5–8 internalLinkHints'))).toBe(false);
   });
 
   it('warns when Quick/Deep headings missing', () => {

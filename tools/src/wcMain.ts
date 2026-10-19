@@ -44,8 +44,9 @@ function ensureDir(p: string) {
 // ---- Commands ----
 
 async function cmdGenprompt(flags: Flags) {
-  const topic = String(flags.topic ?? flags.t ?? 'tea ritual for focus');
-  const words = Number(flags.words ?? flags.w ?? 1200);
+  const topic = String(flags.topic ?? flags.t ?? '').trim();
+  if (!topic) throw new Error('Enter an article topic with --topic.');
+  const words = flags.words || flags.w ? Number(flags.words ?? flags.w) : undefined;
   const ads = String(flags.ads ?? 'off') === 'on' ? 'on' : 'off';
   const kofi = String(flags.kofi ?? 'on') === 'on' ? 'on' : 'off';
   const mode = typeof flags.mode === 'string' ? flags.mode : undefined;
@@ -56,7 +57,7 @@ async function cmdGenprompt(flags: Flags) {
     : Boolean(strictFlag);
 
   const mod = await import('./genprompt.js'); // compiled neighbor
-  const { prompt } = (mod as any).genprompt({ topic, words, ads, kofi, mode, style, strict });
+  const { prompt } = (mod as any).genprompt({ topic, words, ads, kofi, mode, style, strict, reflectionPrompts: typeof flags.reflectionPrompts === 'string' ? flags.reflectionPrompts.split('\n').filter(Boolean) : [], editorialInstructions: flags.instructions });
 
   const outDir = path.join(process.cwd(), 'tmp');
   ensureDir(outDir);

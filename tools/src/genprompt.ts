@@ -6,7 +6,9 @@ import { loadPromptContext } from '../../server/lib/promptContext.js';
 
 type GenpromptOptions = {
   topic: string;
-  words: number;
+  words?: number | null;
+  reflectionPrompts?: string[];
+  editorialInstructions?: string;
   ads: 'on' | 'off';
   kofi: 'on' | 'off';
   mode?: string | null;
@@ -24,6 +26,8 @@ export function genprompt({
   kofi,
   mode,
   style,
+  reflectionPrompts,
+  editorialInstructions,
   strict: _strict,
 }: GenpromptOptions) {
   const CWD = process.cwd();
@@ -46,6 +50,8 @@ export function genprompt({
   const prompt = buildMasterPrompt({
     topic,
     words,
+    reflectionPrompts,
+    editorialInstructions,
     contentType: resolvedModeKey || undefined,
     styleDirective,
     ads,

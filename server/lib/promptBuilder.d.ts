@@ -1,6 +1,9 @@
 export interface MasterPromptOptions {
   topic: string;
-  words: number;
+  words?: number | null;
+  mode?: string;
+  reflectionPrompts?: string[];
+  editorialInstructions?: string;
   contentType?: string;
   styleDirective?: string;
   ads: 'on' | 'off';

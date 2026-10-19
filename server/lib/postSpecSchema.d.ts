@@ -1,7 +1,9 @@
 import type { z } from 'zod';
 
 export const ENTITY_TYPES: ['crystal', 'herb', 'moonPhase', 'planet', 'tarot', 'spread', 'planetaryDay', 'ritual'];
-export const CONTENT_TYPES: ['ritual', 'guide', 'spread'];
+export const CONTENT_TYPES: ['ritual', 'guide', 'spread', 'reflection', 'story', 'tarotSpread', 'spellwork', 'crystals'];
+export const POST_CATEGORIES: ['ritual', 'meandering'];
+export const TOPIC_CLUSTERS: ['tarot-spreads', 'rituals-practices', 'clean-cursing', 'ai-narrative-magic', 'shadow-work', 'cozy-witchcraft', 'motherquest', 'spellcraft-theory', 'magical-productivity'];
 export const EntityTypeSchema: z.ZodEnum<typeof ENTITY_TYPES>;
 export const PostContentTypeSchema: z.ZodEnum<typeof CONTENT_TYPES>;
 export const PostSpecV2Schema: z.ZodObject<{

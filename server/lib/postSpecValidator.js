@@ -51,6 +51,7 @@ export function validatePostSpec(spec, options = {}) {
   const errors = [];
   const warnings = [];
 
+  const combinedMarkdown = spec.sections.map((section) => String(section.markdown || '')).join('\n');
   const totalWords = countWordsInSections(spec.sections);
   const tolerance = 0.15;
   const minWords = Math.round(targetWordCount * (1 - tolerance));
@@ -97,10 +98,6 @@ export function validatePostSpec(spec, options = {}) {
   if (!Array.isArray(spec.internalLinkHints)) {
     errors.push('internalLinkHints must be an array.');
   } else {
-    if (spec.internalLinkHints.length < 5 || spec.internalLinkHints.length > 8) {
-      warnings.push(`Expected 5–8 internalLinkHints, received ${spec.internalLinkHints.length}.`);
-    }
-    const combinedMarkdown = spec.sections.map((section) => String(section.markdown || '')).join('\n');
     for (let i = 0; i < spec.internalLinkHints.length; i++) {
       const hint = spec.internalLinkHints[i];
       const anchor = normalizeAnchor(hint?.anchor);
@@ -158,7 +155,7 @@ export function validatePostSpec(spec, options = {}) {
   }
 
   // Reflection prompts recommended for certain types
-  if (contentType === 'ritual' || contentType === 'reflection') {
+  if (contentType === 'ritual') {
     if (!lowerHeadings.some((heading) => heading.includes('reflection prompt') || heading.includes('journaling prompt'))) {
       warnings.push('Consider adding a "Reflection Prompt" or "Journaling Prompts" section.');
     }
@@ -201,21 +198,9 @@ export function validatePostSpec(spec, options = {}) {
   }
 
   // 3. External link
-  const combinedMarkdown = spec.sections.map((section) => String(section.markdown || '')).join('\n');
   const hasExternalLink = /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/.test(combinedMarkdown);
   if (!hasExternalLink) {
     warnings.push('SEO: Missing external authoritative link. Add one external reference (e.g., Wikipedia article) in a "Further Reading" section.');
-  }
-
-  // 4. Word count minimum for SEO
-  if (totalWords < 700) {
-    warnings.push(`SEO: Word count ${totalWords} is below recommended minimum of 700 words for search ranking.`);
-  }
-
-  // 5. Internal links count
-  const internalLinkCount = (combinedMarkdown.match(/\[([^\]]+)\]\(\/[^)]+\)/g) || []).length;
-  if (internalLinkCount < 3) {
-    warnings.push(`SEO: Only ${internalLinkCount} internal link(s) found in content. Target 3-5 internal links for better site interconnection.`);
   }
 
   return {

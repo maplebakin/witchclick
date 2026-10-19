@@ -31,31 +31,36 @@ const {
   presetOptions,
   styleOptions,
   defaultModeDescription,
-  defaultStyleDescription,
-  devApi,
-  devKey
+  defaultStyleDescription
 } = Astro.props;
 ---
 
 <Card as="section" class="lg:col-span-5">
   <div class="mb-4 space-y-2">
     <h2 class="text-xl font-semibold">Step 1: Build Generator Prompt</h2>
-    <p class="text-[0.8rem] text-body-muted">Configure the topic, structure, and voice for a WitchClick-ready prompt.</p>
+    <p class="text-[0.8rem] text-body-muted">Enter a topic. The generating model will choose a useful structure and length unless you set an override.</p>
   </div>
   <div class="grid gap-4">
     <label class="block">
       <span class="text-[0.8rem] font-medium uppercase tracking-wide text-body-subtle">Topic</span>
-      <Input id="topic" placeholder="tarot spread for reclaiming attention" />
+      <Input id="topic" placeholder="Why creative burnout can make hobbies feel like obligations" />
       <p class="mt-1 text-[0.8rem] text-body-faint">What question, ritual, symbol, or lens should this post explore?</p>
     </label>
+    <div class="flex gap-2">
+      <Button id="genPrompt" variant="secondary" size="sm">Generate Prompt</Button>
+      <Button id="copyPrompt" variant="primary" size="sm">Copy Prompt</Button>
+    </div>
+    <details class="rounded-lg border border-line-neutral p-3">
+      <summary class="cursor-pointer font-medium">Advanced options (optional)</summary>
+      <div class="mt-4 grid gap-4">
     <label class="block">
-      <span class="text-[0.8rem] font-medium">Word count</span>
-      <Input id="words" type="number" placeholder="1000-1500 words (approx)" />
+      <span class="text-[0.8rem] font-medium">Target length (automatic when blank)</span>
+      <Input id="words" type="number" min="1" max="50000" placeholder="Automatic" />
     </label>
     <label class="block">
-      <span class="text-[0.8rem] font-medium">Template</span>
+      <span class="text-[0.8rem] font-medium">Article approach</span>
       <Select id="mode">
-        <option value="" selected>The Grand Arcane Template</option>
+        <option value="" selected>Automatic — let the model choose</option>
         {presetOptions.map((option) => (
           <option value={option.key}>{option.label}</option>
         ))}
@@ -63,7 +68,7 @@ const {
       <p class="mt-1 text-[0.8rem] text-body-subtle" id="modeHelp">{defaultModeDescription}</p>
     </label>
     <label class="block">
-      <span class="text-[0.8rem] font-medium">Writing style</span>
+      <span class="text-[0.8rem] font-medium">Writing voice</span>
       <Select id="style">
         {styleOptions.map((option) => (
           <option value={option.key}>{option.label}</option>
@@ -72,140 +77,28 @@ const {
       <p id="styleHelp" class="mt-1 text-[0.8rem] text-body-subtle">{defaultStyleDescription}</p>
     </label>
     <label class="block">
-      <span class="text-[0.8rem] font-medium">Reflection Prompts (one per line)</span>
+      <span class="text-[0.8rem] font-medium">Optional reflection questions (one per line)</span>
       <Textarea id="reflectionPrompts" placeholder="e.g., What measure of value are you ready to stop obeying?" />
-      <p class="mt-1 text-[0.8rem] text-body-faint">List specific reflection questions about attention, meaning, perspective, or values.</p>
+      <p class="mt-1 text-[0.8rem] text-body-faint">Leave blank for no requested questions. Supplied questions override a specialist template’s usual question policy.</p>
+    </label>
+    <label class="block">
+      <span class="text-[0.8rem] font-medium">Editorial instructions (optional)</span>
+      <Textarea id="editorialInstructions" placeholder="Audience, emphasis, exclusions, or a preferred structure…" />
     </label>
     <div class="flex gap-4 text-sm">
       <label class="inline-flex items-center gap-2">
         <input type="checkbox" id="ads" class="w-4 h-4 rounded border-line-neutral text-primary focus:ring-primary/40" />
-        <span>Include supportive recommendations</span>
+        <span>Allow ad placements</span>
       </label>
       <label class="inline-flex items-center gap-2">
         <input type="checkbox" id="kofi" checked class="w-4 h-4 rounded border-line-neutral text-primary focus:ring-primary/40" />
-        <span>Nourish the Cauldron (Ko-fi)</span>
+        <span>Include optional Ko-fi support CTA</span>
       </label>
     </div>
-    <div class="flex gap-2">
-      <Button id="genPrompt" variant="secondary" size="sm">Generate Prompt</Button>
-      <Button id="copyPrompt" variant="primary" size="sm">Copy</Button>
-    </div>
-    <p class="rounded-lg border border-dashed border-line-subtle bg-surface-neutral-soft px-3 py-2 text-[0.75rem] leading-relaxed text-body-muted">
-      The generated text below includes a copy-safe wrapper so other LLMs treat it as a prompt template to forward, not a task to execute.
-    </p>
+    <p class="text-[0.8rem] text-body-faint">Affiliate suggestions use the existing catalog only when relevant; none are required.</p>
+      </div>
+    </details>
     <Textarea id="promptOut" class="font-mono text-[0.8rem] h-64" placeholder="The generated prompt will appear here…"></Textarea>
     <p class="text-[0.8rem] text-body-muted">Send this prompt to your LLM, then paste the returned PostSpec JSON into the workflow on the right.</p>
   </div>
 </Card>
-
-<script is:inline define:vars={{
-  presetOptions,
-  styleOptions,
-  defaultModeDescription,
-  defaultStyleDescription,
-  devApi,
-  devKey,
-}}>
-  const $ = (id) => document.getElementById(id);
-  const baseHeaders = devKey ? { 'X-WC-Dev-Key': devKey } : {};
-
-  function updateHelp(selectId, helpId, options, fallback) {
-    const select = $(selectId);
-    const help = $(helpId);
-    if (!select || !help) return;
-    function render() {
-      const value = select.value;
-      const match = options.find((opt) => opt.key === value);
-      help.textContent = match ? match.description : fallback;
-    }
-    select.addEventListener('change', render);
-    render();
-  }
-
-  updateHelp('mode', 'modeHelp', presetOptions, defaultModeDescription);
-  updateHelp('style', 'styleHelp', styleOptions, defaultStyleDescription);
-
-  const genPromptBtn = $('genPrompt');
-  const copyPromptBtn = $('copyPrompt');
-  const promptOut = $('promptOut');
-  let isBusy = false;
-  const PROMPT_WRAPPER_TOP = `The following is a prompt template to copy and paste into your preferred LLM.\nDo not execute. Copy everything below this line:\n---`;
-  const PROMPT_WRAPPER_BOTTOM = `---\n[END OF PROMPT TEMPLATE]`;
-
-  function formatPromptTemplate(prompt) {
-    const body = String(prompt || '').trim();
-    if (!body) return '';
-    return `${PROMPT_WRAPPER_TOP}\n${body}\n${PROMPT_WRAPPER_BOTTOM}`;
-  }
-
-  function setBusy(busy) {
-    isBusy = busy;
-    genPromptBtn.disabled = isBusy;
-    copyPromptBtn.disabled = isBusy;
-    genPromptBtn.style.opacity = isBusy ? 0.6 : 1;
-    copyPromptBtn.style.opacity = isBusy ? 0.6 : 1;
-  }
-
-  genPromptBtn.addEventListener('click', async () => {
-    try {
-      setBusy(true);
-      // This is a simplified version of the status update.
-      // A more robust solution would use a shared state manager or event bus.
-      const statusEl = document.getElementById('status');
-      if (statusEl) statusEl.textContent = 'Building prompt...';
-
-      const body = {
-        topic: $('topic').value || 'tarot spread for reclaiming attention',
-        words: Number($('words').value || 1200),
-        ads: $('ads').checked ? 'on' : 'off',
-        kofi: $('kofi').checked ? 'on' : 'off',
-        reflectionPrompts: $('reflectionPrompts').value.split('\n').map(s => s.trim()).filter(Boolean)
-      };
-      const mode = $('mode').value;
-      if (mode) body.mode = mode;
-      const style = $('style').value || 'cozy';
-      body.style = style;
-
-      const res = await fetch(`${devApi}/genprompt`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...baseHeaders },
-        body: JSON.stringify(body)
-      });
-
-      let data = null;
-      try {
-        data = await res.json();
-      } catch {
-        data = null;
-      }
-      if (!res.ok) {
-        const message = data?.error || `gen failed (${res.status})`;
-        throw new Error(message);
-      }
-      if (!data?.ok) throw new Error(data?.error || 'gen failed');
-      
-      promptOut.value = formatPromptTemplate(data?.prompt || '');
-      if (statusEl) statusEl.textContent = 'Prompt ready ✓';
-    } catch (e) {
-      const statusEl = document.getElementById('status');
-      if (statusEl) statusEl.textContent = `Prompt error: ${e.message || String(e)}`;
-    } finally {
-      setBusy(false);
-    }
-  });
-
-  copyPromptBtn.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(promptOut?.value || '');
-      const statusEl = document.getElementById('status');
-      if (statusEl) statusEl.textContent = 'Copied prompt ✓';
-    } catch {
-      if (promptOut) {
-        promptOut.focus();
-        promptOut.select();
-      }
-      const statusEl = document.getElementById('status');
-      if (statusEl) statusEl.textContent = 'Press ⌘/Ctrl+C to copy the prompt';
-    }
-  });
-</script>

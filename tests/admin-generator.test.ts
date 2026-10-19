@@ -29,7 +29,7 @@ afterEach(() => {
 const response = (data: unknown, ok = true) => ({ ok, status: ok ? 200 : 400, text: async () => JSON.stringify(data), json: async () => data });
 function setup(handler?: (request: Request) => Promise<ReturnType<typeof response> | undefined> | ReturnType<typeof response> | undefined) {
   const dom = new JSDOM(`<div data-panel-root data-dev-api="http://fixture.local"><div data-panel="posts"></div><section data-generator-hero data-panel="posts">${heroMarkup}</section><div data-panel="curses" class="hidden"></div><button data-panel-toggle="posts"></button><button data-panel-toggle="curses"></button>
-    <textarea id="spec"></textarea><input id="words" type="number" value="1200" /><div id="status"></div><div id="specSummary"></div><div id="preview"></div>
+    <input id="topic" /><select id="mode"><option value=""></option></select><select id="style"><option value="cozy"></option></select><textarea id="reflectionPrompts"></textarea><textarea id="editorialInstructions"></textarea><input id="ads" type="checkbox" /><input id="kofi" type="checkbox" /><textarea id="promptOut"></textarea><textarea id="spec"></textarea><input id="words" type="number" value="1200" /><div id="status"></div><div id="specSummary"></div><div id="preview"></div>
     <p id="saveOutcome"></p><p id="bundleStatus"></p><details id="bundleDetails"><pre id="bundleError"></pre></details>
     ${["validateBtn", "previewBtn", "ingestBtn", "ingestPublishBtn", "clearBtn", "retryBundleBtn", "genPrompt", "copyPrompt"].map((id) => `<button id="${id}"></button>`).join("")}
     <details data-post-history><aside data-recent-panel><div data-recent-list></div><button data-recent-refresh></button><input data-recent-filter /></aside></details>
@@ -65,6 +65,20 @@ function setup(handler?: (request: Request) => Promise<ReturnType<typeof respons
 }
 
 describe("Generator action model", () => {
+  it('sends a topic-only request with automatic length and optional instructions through one handler', async () => {
+    const ui = setup(request => request.url.pathname === '/genprompt' ? response({ok:true,prompt:'Executable generation prompt'}) : undefined);
+    ui.element<HTMLInputElement>('topic').value = 'Why hobbies feel obligatory';
+    ui.element<HTMLInputElement>('words').value = '';
+    ui.element<HTMLTextAreaElement>('reflectionPrompts').value = 'What still feels playful?';
+    ui.element<HTMLTextAreaElement>('editorialInstructions').value = 'Avoid productivity advice.';
+    ui.click('genPrompt'); await ui.idle();
+    const requests = ui.requests.filter(request => request.url.pathname === '/genprompt');
+    expect(requests).toHaveLength(1);
+    expect(requests[0]!.body).toMatchObject({words:null,reflectionPrompts:['What still feels playful?'],editorialInstructions:'Avoid productivity advice.'});
+    expect(requests[0]!.body.mode).toBeUndefined();
+    expect(ui.element<HTMLTextAreaElement>('promptOut').value).toBe('Executable generation prompt');
+  });
+
   it("removes the mode toggle and retains one explicit publication action", () => {
     expect(source).not.toMatch(/data-save-mode|currentSaveMode|setSaveMode|Infuse stub/);
     expect(source.match(/id="ingestPublishBtn"/g)).toHaveLength(1);

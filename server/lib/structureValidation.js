@@ -108,9 +108,6 @@ export function validateStructure(spec, contentWords) {
       break;
     }
     case 'reflection': {
-      if (!headingMatches([/journal/, /prompt/])) {
-        errors.push('Reflection essays require a Journaling Prompts section.');
-      }
       if (!headingMatches([/gentle closing/, /closing/, /integration/, /takeaway/, /aftercare/])) {
         errors.push('Reflection essays require a Gentle Closing section.');
       }
@@ -181,10 +178,6 @@ export function validateStructure(spec, contentWords) {
 
   if (!(typeof spec.heroImagePrompt === 'string' || spec.heroImagePrompt === null)) {
     errors.push('heroImagePrompt must be string or null');
-  }
-
-  if (!Array.isArray(spec.internalLinkHints) || spec.internalLinkHints.length < 3) {
-    warnings.push('internalLinkHints are sparse (aim 5–8).');
   }
 
   const prose = body.toLowerCase();

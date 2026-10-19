@@ -27,7 +27,7 @@ const presetOptions = generatorPresetOptions;
 const styleOptions = Object.entries(generatorStyles)
   .map(([key, description]) => ({
     key,
-    label: key === "cozy" ? "Cozy (default)" : toLabel(key),
+    label: key === "cozy" ? "WitchClick default" : toLabel(key),
     description,
   }))
   .sort((a, b) => {
@@ -37,7 +37,7 @@ const styleOptions = Object.entries(generatorStyles)
   });
 
 const defaultModeDescription =
-  "Use the master prompt for the full ritual + reflection flow, or choose a template for a focused article shape.";
+  "The external generating model will infer reader intent and choose structure and length. Select a specialist approach only to override that choice.";
 const defaultStyleDescription =
   styleOptions.find((option) => option.key === "cozy")?.description ??
   "Write with warmth, grounding, and a little strangeness: emotionally useful, clear, never bland.";
@@ -60,6 +60,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
   wide={true}
   noindex={true}
 >
+  <script is:inline id="generatorOptions" type="application/json" set:html={JSON.stringify({ presets: presetOptions, styles: styleOptions }).replace(/</g, '\\u003c')} />
   <HeadSlot slot="head">
     <meta name="robots" content="noindex" />
   </HeadSlot>
@@ -80,7 +81,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             <div class="font-semibold mb-2">📝 How it works:</div>
             <ol class="space-y-2 ml-4 list-decimal">
               <li><strong>Choose content type:</strong> Select Posts for articles or Curses for printable boundary rituals</li>
-              <li><strong>Generate prompt:</strong> Fill in topic, structure, and voice preferences for a WitchClick-ready prompt</li>
+              <li><strong>Generate prompt:</strong> Enter a topic; advanced overrides are optional</li>
               <li><strong>Get JSON from AI:</strong> Paste the prompt into your preferred LLM and receive structured JSON</li>
               <li><strong>Validate & Preview:</strong> Check the JSON structure and preview how it'll look</li>
               <li><strong>Ingest:</strong> Save to your content directory as markdown files</li>
@@ -637,16 +638,26 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           if (spec.safetyNotes) appendSection('Safety Notes', spec.safetyNotes);
         }
 
+        const approachOptions = JSON.parse(document.getElementById('generatorOptions')?.textContent || '{"presets":[],"styles":[]}');
+        [['mode','modeHelp',approachOptions.presets], ['style','styleHelp',approachOptions.styles]].forEach(function([id,helpId,options]) {
+          const select = $(id), help = $(helpId);
+          if (!select || !help) return;
+          const fallback = help.textContent;
+          select.addEventListener('change', function() { help.textContent = options.find(option => option.key === select.value)?.description || fallback; });
+        });
+
         $('genPrompt').addEventListener('click', async function(){
           try{
             busy(true); setStatus('Building prompt...', null);
             var body = {
-              topic: $('topic').value || 'tarot spread for reclaiming attention',
-              words: Number($('words').value || 1200),
+              topic: $('topic').value.trim(),
+              words: $('words').value ? Number($('words').value) : null,
               ads: $('ads').checked ? 'on' : 'off',
               kofi: $('kofi').checked ? 'on' : 'off',
-              reflectionPrompts: $('reflectionPrompts').value.split('\n').map(s => s.trim()).filter(Boolean)
+              reflectionPrompts: $('reflectionPrompts').value.split('\n').map(s => s.trim()).filter(Boolean),
+              editorialInstructions: $('editorialInstructions').value.trim()
             };
+            if (!body.topic) throw new Error('Enter an article topic.');
             var mode = $('mode').value;
             if (mode) body.mode = mode;
             var style = $('style').value || 'cozy';
@@ -1005,7 +1016,7 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
           var params = [];
           if (dryRun === 'true') params.push('dryRun=true');
           if (spec && spec._draft === true) params.push('draft=true');
-          var targetWordCount = Number($('words').value || 1200);
+          var targetWordCount = Number($('words').value || (spec.sections || []).map(function(section){ return section.markdown || ''; }).join(' ').split(/\s+/).filter(Boolean).length);
           if (Number.isFinite(targetWordCount) && targetWordCount > 0) {
             params.push('targetWordCount=' + encodeURIComponent(String(targetWordCount)));
           }

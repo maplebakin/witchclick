@@ -40,7 +40,7 @@ import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { pushToTumblr } from './tools/tumblr-push.js';
 
-import { resolveGeneratorPresetKey } from './server/lib/generatorPresets.js';
+import { resolveGeneratorApproach, resolveGeneratorPresetKey } from './server/lib/generatorPresets.js';
 import generatorStyles from './server/lib/generatorStyles.js';
 import { buildMasterPrompt } from './server/lib/promptBuilder.js';
 import { buildCursePrompt } from './server/lib/cursePromptBuilder.js';
@@ -1497,7 +1497,7 @@ function assertMaxLen(label, value, max) {
 }
 
 // ---------- GENPROMPT (shared with CLI) ----------
-function buildGenprompt({ topic, words, ads, kofi, contentType, styleDirective, mode, style }) {
+function buildGenprompt({ topic, words, ads, kofi, contentType, styleDirective, mode, style, reflectionPrompts, editorialInstructions }) {
   const context = loadPromptContext({ cwd: CWD });
   const allowed = Array.isArray(context.allowedAffiliateKeys)
     ? context.allowedAffiliateKeys
@@ -1517,6 +1517,8 @@ function buildGenprompt({ topic, words, ads, kofi, contentType, styleDirective, 
     topic,
     words,
     contentType: resolvedContentType,
+    reflectionPrompts,
+    editorialInstructions,
     styleDirective: resolvedStyleDirective,
     ads,
     kofi,
@@ -2220,9 +2222,9 @@ async function ingestPalette(payload) {
 
     if (req.method === 'POST' && req.url === '/genprompt') {
       const body = (await parseBody(req)) || {};
-      const topic = String(body.topic || 'tea ritual for focus').trim();
-      const rawWords = Number(body.words || 1200);
-      const words = Number.isFinite(rawWords) ? Math.max(600, Math.min(4000, Math.round(rawWords))) : 1200;
+      const topic = String(body.topic || '').trim();
+      if (!topic) return send(res, 400, { ok: false, error: 'Enter an article topic.' });
+      const words = body.words;
       const ads = String(body.ads || 'off') === 'on' ? 'on' : 'off';
       const kofi = String(body.kofi || 'on') === 'on' ? 'on' : 'off';
       const rawMode = typeof body.mode === 'string' ? body.mode.trim() : '';
@@ -2238,6 +2240,8 @@ async function ingestPalette(payload) {
         ads,
         kofi,
         contentType: resolvedModeKey || undefined,
+        reflectionPrompts: body.reflectionPrompts,
+        editorialInstructions: body.editorialInstructions,
         styleDirective,
       });
 
@@ -2247,7 +2251,7 @@ async function ingestPalette(payload) {
       return send(res, 200, {
         ok: true,
         prompt,
-        options: { topic, mode: rawMode || null, style: resolvedStyleKey, strict, contentType: resolvedModeKey || null }
+        options: { topic, mode: rawMode || null, style: resolvedStyleKey, strict, contentType: resolveGeneratorApproach(resolvedModeKey)?.contentType || null }
       });
     }
 

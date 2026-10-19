@@ -102,7 +102,7 @@ const DOC_LINES = [
   '  "altTexts": string[],',
   '  "internalLinkHints": { "anchor": string, "slug": string, "rationale": string }[] (slug must match an existingPostSlugs value exactly),',
   '  "affiliateHints": { "key": string, "anchor": string, "rationale": string }[],',
-  '  "externalLink": { "url": string, "anchor": string, "description": string } (required for generated specs; mirrors the authoritative link used in markdown; url stays plain and separate from anchor text),',
+  '  "externalLink": { "url": string, "anchor": string, "description": string } (optional when a reliable reference is known; mirrors the authoritative link used in markdown; url stays plain and separate from anchor text),',
   '  "cta": { "type": "kofi"|"download"|"none", "id"?: string },',
   '  "adPlacements": ("lead"|"mid"|"end")[]',
   '}',
