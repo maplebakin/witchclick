@@ -1,218 +1,144 @@
-// server/lib/promptFragments.js
-// Shared prompt fragments for buildMasterPrompt.
-
-import { buildBaseFields, resolveGeneratorApproach, STRUCTURE_REQUIREMENTS } from './generatorPresets.js';
-import { CONTENT_TYPES, POST_CATEGORIES, TOPIC_CLUSTERS } from './postSpecSchema.js';
-import { ANTI_GENERIC_OUTPUT_RULES, SOURCE_CONTEXT_USAGE_RULES, WITCHCLICK_IDENTITY_BLOCK, buildContentIntentBlock } from './editorialPromptBlocks.js';
-
-function formatScore(score) {
-  if (typeof score !== 'number' || Number.isNaN(score)) return null;
-  const fixed = score.toFixed(2);
-  return fixed.replace(/\.0+$/, '').replace(/0+$/, '');
-}
-
-function formatTagSignal(signal) {
-  if (!signal) return null;
-  const tag = String(signal.tag || signal.name || signal.value || '').trim();
-  if (!tag) return null;
-  const details = [];
-  const score = formatScore(signal.score ?? signal.weight ?? signal.priority ?? null);
-  if (score) details.push(`score ${score}`);
-  const recency = Number.isFinite(signal.recencyDays) ? Math.round(signal.recencyDays) : null;
-  if (typeof recency === 'number' && recency > 0) {
-    details.push(`${recency}d since feature`);
-  }
-  const note = String(signal.reason || signal.note || signal.notes || '').trim();
-  if (note) details.push(note);
-  return details.length ? `${tag} (${details.join(' — ')})` : tag;
-}
-
-function formatEntitySignal(signal) {
-  if (!signal) return null;
-  const slug = String(signal.slug || signal.id || '').trim();
-  const label = String(signal.name || signal.label || slug).trim();
-  const type = String(signal.type || signal.kind || '').trim();
-  if (!slug && !label) return null;
-  const head = type ? `${type}: ${label || slug}` : (label || slug);
-  const details = [];
-  const score = formatScore(signal.score ?? signal.weight ?? signal.priority ?? null);
-  if (score) details.push(`score ${score}`);
-  const recency = Number.isFinite(signal.recencyDays) ? Math.round(signal.recencyDays) : null;
-  if (typeof recency === 'number' && recency > 0) {
-    details.push(`${recency}d since mention`);
-  }
-  const note = String(signal.reason || signal.note || signal.notes || '').trim();
-  if (note) details.push(note);
-  const appendix = details.length ? ` (${details.join(' — ')})` : '';
-  return `${head}${appendix}`;
-}
+// Shared instructions for the copied article-generation prompt.
+import { resolveGeneratorApproach, STRUCTURE_REQUIREMENTS } from './generatorPresets.js';
+import { POST_CATEGORIES, TOPIC_CLUSTERS, PostSpecV2Schema } from './postSpecSchema.js';
 
 export function buildHeaderFragment({ brandName }) {
-  const safeBrand = brandName || 'WitchClick';
   return [
     'WITCHCLICK POSTSPEC GENERATOR — MASTER PROMPT',
-    '(Role, rules, inputs, and JSON contract. Paste this whole thing into a fresh chat, then edit the INPUTS block.)',
+    `Write one useful article answering INPUTS.topic for ${JSON.stringify(brandName || 'WitchClick')}, returned as a complete PostSpec v2 JSON object.`,
+    'The topic determines the purpose; site identity, catalog context and voice must not change what the reader is asking.',
     '',
-    `You are a content author for "${safeBrand}". Your job is to produce a single, honest, production-ready article spec that helps readers make meaning, choose perspective on purpose, and reclaim attention outside systems that measure people poorly. SEO structure, internal linking, and affiliate placement are built into the process below, but they are scaffolding, not the identity of the work.`,
-    ...WITCHCLICK_IDENTITY_BLOCK,
+  ];
+}
+
+export function buildProcessFragment() {
+  return [
+    'DECISION ORDER',
+    '1. Identify what the reader is asking, before choosing any WitchClick framing.',
+    '2. Choose the editorial approach that answers that need; honor an explicit specialist override when supplied.',
+    '3. Select a compatible PostSpec contentType, category and cluster using the rules below.',
+    '4. Apply WitchClick voice and the requested writing style without changing the article purpose.',
+    '5. Draft substantive, non-repetitive prose: explain distinctions, reasons, limitations and relevant examples instead of restating the introduction.',
+    '6. Populate the JSON contract from the finished article and perform the final self-check.',
     '',
-    ...buildContentIntentBlock({
-      purpose: 'Create one editorially useful WitchClick article, not merely schema-valid JSON.',
-      readerNeed: 'Meet a real reader state: confusion, overwhelm, curiosity, grief, boundary pressure, symbolic exploration, or low-capacity practice.',
-      role: 'Fit the article into WitchClick as Clean Cursing, Rituals & Spreads, Grimoire/reference, Field Notes, Tarot/spread, or an intentional pop-culture reflection.',
-    }),
+  ];
+}
+
+export function buildTypeStructureFragment(value) {
+  const approach = resolveGeneratorApproach(value);
+  return [
+    'EDITORIAL APPROACH',
+    ...(approach ? [
+      `Explicit approach override: ${approach.preset.label}. Default contentType: "${approach.contentType}".`,
+      ...STRUCTURE_REQUIREMENTS[approach.key],
+      ...(approach.key === 'practicalWorking' ? ['Use spellwork for an explicitly requested symbolic spell; legacy spellwork overrides retain spellwork.'] : []),
+      ...(approach.key === 'grimoireTarot' ? ['A single-card reference may use guide instead of tarotSpread.'] : []),
+    ] : [
+      'Automatic approach: the generating model chooses before drafting. No approach has been inferred by this prompt builder.',
+      '- Questions asking readers to distinguish, compare, understand or evaluate something default to contentType "guide", unless reader intent genuinely calls for another format.',
+      '- Reserve ritual for a topic explicitly requesting a ritual, symbolic working or comparable practical symbolic exercise. Do not default to ritual because WitchClick publishes rituals elsewhere.',
+      '- Choose reflection for an essay exploring meaning or tension, story for requested narrative, guide for practical instructions or reference, and crystals for a crystal profile. Combine approaches when useful; select the dominant type.',
+      '- Do not force numbered steps, checklists, reflection questions or rituals into unrelated articles. Optional invitations must serve the topic.',
+      '- Only if the chosen type is ritual/spellwork: retain concrete numbered Quick/Low-Energy and Deep variants, a brief Reflection Prompt and Checklist/Summary for ingestion compatibility. Include substitutions and relevant safety.',
+      '- Only for an actual tarot spread: use tarotSpread/spread with layout, positions and secular interpretation. A card reference may use guide.',
+    ]),
+    `Choose category from ${POST_CATEGORIES.join(', ')}: ritual for a practical symbolic working/spread; meandering for explanation, reference, reflection or narrative.`,
+    `Choose the closest cluster from ${TOPIC_CLUSTERS.join(', ')}; cozy-witchcraft is the broad fallback. A site label must never redirect the topic.`,
+    'Supplied reflectionPrompts are explicit user requests: incorporate them even if a preset normally omits questions. Empty input does not require questions, except when the chosen specialist/ritual contract calls for them.',
+    'Follow editorialInstructions within the JSON contract, accuracy, consent and safety rules.',
     '',
   ];
 }
 
 export const AUDIENCE_AND_VOICE_FRAGMENT = [
-  'AUDIENCE & VOICE',
-  '- Audience: people whose inner lives, sensitivity, grief, intuition, creativity, slowness, weirdness, or nonlinear attention are often poorly measured by productivity culture. Include skeptics, beginners, secular practitioners, and spiritually adjacent readers without making belief a requirement.',
-  '- Voice: unhurried, genuinely curious, never performing expertise it hasn\'t earned. Write with the reader beside you, not beneath you.',
-  '- Tone register: warm, grounded, slightly strange, and useful. The writing can have teeth, but it should not become a manifesto. Let ritual feel like a chosen lens, not a promised outcome.',
-  '- Voice adjectives (apply all six):',
-  '  - Curious: ask questions when they help. Explore alongside the reader; don\'t perform authority.',
-  '  - Learning: you\'re not the final word. Cite, qualify, say "we don\'t know yet" without shame.',
-  '  - Contemplative: don\'t rush. Sentences have room to breathe. One thing said well beats five things said fast.',
-  '  - Reflective: leave room for the reader to decide; do not require self-inquiry exercises.',
-  '  - Patient: hold space for the reader\'s pace. Nobody is behind. Nobody needs to catch up.',
-  '  - Generous: give without expectation. Meet people where they are without demanding they come up to you first.',
-  '- Tone rules:',
-  '  - Practical, kind, and honest. Admit uncertainty. Invite adaptation.',
-  '  - Treat rituals, tarot, and symbolic objects as reflective practices for attention, meaning, and perspective-shifting.',
-  '  - Avoid absolutes, predictions, and supernatural guarantees; empower reader choice.',
-  '  - Do not lead with what WitchClick is against. Write toward the value the reader is making for themselves.',
-  '- Reading level: Grade 6–8 (simple sentences; concrete verbs; short paragraphs).',
+  'VOICE & EDITORIAL STANDARDS',
+  '- Warm, grounded, curious, emotionally precise, practical and welcoming to skeptics. Slight strangeness is welcome when natural; never add artificial mystical language to an ordinary explanatory topic.',
+  '- Use clear, concrete language, short paragraphs and descriptive headings; lists only when useful. Respect neurodivergent readers and low-capacity options. Avoid academic distance, generic wellness filler, compulsory therapy-speak, manifestos and keyword padding.',
+  '- Respect reader autonomy and consent: no pressure, gatekeeping, diagnoses, predictions, medical promises or supernatural guarantees. Ritual, tarot and astrology are symbolic/reflective practices, not predictive science.',
+  '- Qualify uncertainty and factual claims. For reference topics, separate scientific facts from traditional symbolism; include physical care and relevant safety rather than treating symbolic uses as evidence.',
+  '- Do not invent personal experiences, present hypothetical examples as real events, or assume details about real individuals from a general topic. Label hypothetical examples and fictional narratives, including first-person fiction.',
+  '- For faith transition, respect the original tradition and the reader\'s pace. For Clean Cursing, keep accountability symbolic: no revenge, coercion or harassment.',
+  '- Include a concise safety note when physical/medical risks warrant it, including heat, blades, smoke or herb preparation/consumption; never assume a substance is safe to ingest.',
   '',
 ];
 
-export const VOICE_EXAMPLES_FRAGMENT = [
-  'VOICE EXAMPLES',
-  '- Good: "A slow shuffle can offer a pause to notice which question keeps returning."',
-  '- Good: "Think of this as a small lens change. You can pause, tweak, or skip steps based on your capacity today."',
-  '- Good: "There is something in the way this card keeps appearing — not urgent, not prophetic, just persistent enough to ask what you keep dismissing."',
-  '- Good: "This will not fix the system around you. It can still give you a room inside the day where your attention belongs to you."',
-  '- Bad: "This ritual guarantees abundance if you follow every instruction exactly."',
-  '- Bad: "Only true witches will understand the power of this spread."',
-  '- Bad: "Welcome, beautiful soul! Today we\'re going to unlock your highest self!" (performing warmth instead of being warm)',
-  '- Bad: Rushing to conclusions. Every section should feel like it has room to land.',
-  '',
-];
-
-export const SECULAR_TAROT_FRAGMENT = [
-  'SECULAR TAROT CLAUSE',
-  '• When writing about tarot: treat it as a tool for reflection and creativity, not prediction.',
-  '• Present cards as prompts, archetypes, mirrors, or characters. If traditional meanings appear, pair them with open-ended interpretations.',
-  '• Avoid implying divine insight or supernatural accuracy; focus on noticing feelings, options, values, and narratives.',
-  '',
-];
-
-export const NON_NEGOTIABLES_FRAGMENT = [
-  'NON-NEGOTIABLES',
-  '• Markdown-only (no raw HTML).',
-  '• All section content must be markdown strings inside the JSON object — not a separate markdown document.',
-  '• Accessibility-first: short paragraphs, scannable lists; use lists only when useful.',
-  '• Avoid medical/health claims; add a gentle safety note if content could be misconstrued as medical/therapeutic or if fire/sharp objects are involved.',
-  '• Faith transition and deconstruction topics: Write with extra care. Acknowledge that leaving or questioning a religious tradition can be emotionally complex. Never mock or minimize the original tradition. Center the reader\'s autonomy and pace. Avoid triumphalist "I escaped religion" framing; prefer curious, tender, non-prescriptive language.',
-  '• Use inclusive language; no gendered assumptions; no gatekeeping.',
-  '• Respect reader autonomy and consent. Invite adaptation, pauses or opting out; no manipulation, pressure, diagnoses or promised outcomes.',
-  '• For Clean Cursing topics, keep accountability symbolic: no revenge, harassment, coercion or supernatural harm.',
-  '• For herbs, distinguish botanical facts from folk use; include preparation/consumption cautions and never assume ingestion or smoke is safe.',
-  '• Keep outline and section ordering aligned so each heading maps cleanly.',
-  '',
-  ...ANTI_GENERIC_OUTPUT_RULES.map((line) => `• ${line.replace(/^- /, '')}`),
-  '',
-  ...SOURCE_CONTEXT_USAGE_RULES.map((line) => `• ${line.replace(/^- /, '')}`),
-  '',
-];
-
-export const SEO_REQUIREMENTS_FRAGMENT = [
-  'DISCOVERABILITY & SOURCES',
-  '- Open with a clear, topic-specific introduction. The compatibility heading Opening Reflection does not require introspection or questions.',
-  '- Use natural keywords, clear headings, a concise title and meta description, and 4–7 tags. Never pad for rankings.',
-  '- Internal links are optional: use only relevant exact existingPostSlugs, with anchors appearing in prose. No minimum quota; [] is valid.',
-  '- Use authoritative references for factual claims. Never invent citations or URLs. When a reliable external reference is known, include it in markdown and externalLink with separate url, anchor, description fields. Otherwise omit externalLink rather than fabricate.',
-  '- Close in a way appropriate to the article; no fixed paragraph count or keyword quota.',
-  '',
-];
-
-export function buildBaseValidationFragment() {
-  return [
-    'BASE VALIDATION (applies to every PostSpec):',
-    ...buildBaseFields(),
-    '- heroImagePrompt may be null; altTexts only required when images appear in markdown.',
-    '',
-  ];
-}
-
-export const BASE_VALIDATION_FRAGMENT = buildBaseValidationFragment();
-
-export function buildTypeStructureFragment(value) {
-  const approach = resolveGeneratorApproach(value);
-  return [
-    'EDITORIAL PLANNING — performed by the generating model before drafting, not by the prompt builder',
-    approach ? `Explicit approach override: ${approach.preset.label}. Set contentType: "${approach.contentType}".` : 'Automatic approach: infer reader intent from the topic. No approach has been inferred by this prompt builder.',
-    ...(approach ? [approach.preset.system, approach.preset.goal, ...STRUCTURE_REQUIREMENTS[approach.key]] : [
-      '- Choose explanation (guide), reflection (reflection), practical instruction (guide), narrative (story), or reference (guide; crystals for crystal profiles). Combine approaches when helpful and choose the dominant valid contentType.',
-      '- For explanatory or comparison topics, clarify distinctions, offer labeled hypothetical examples and acknowledge limits; never add unrelated rituals or diagnose real people.',
-      '- For an actual ritual topic, retain concrete numbered instructions, substitutions, consent and safety. For ritual/spellwork use Quick/Low-Energy and Deep variants, a brief Reflection Prompt and Checklist/Summary to satisfy ingestion.',
-      '- For factual or symbolic reference, separate scientific facts from traditional symbolism, include physical care and relevant safety, and avoid medical or supernatural claims.',
-      '- For reflective questions about ordinary life, explore tensions and context with nuance and optional ways forward; no compulsory journaling or therapy-speak.',
-      '- Use tarotSpread/spread for actual tarot spreads, with layout, positions and secular interpretation. Use spellwork only for an explicitly symbolic working.',
-      '- Do not default to ritual. Do not force numbered steps, checklists, reflection questions or rituals into unrelated articles.',
-    ]),
-    ...(approach?.key === 'practicalWorking' ? ['- Practical Working may use spellwork for an explicitly requested spell. Legacy spellwork overrides retain spellwork.'] : []),
-    ...(approach?.key === 'grimoireTarot' ? ['- Grimoire Entry — Tarot may use guide for a single-card reference rather than a spread.'] : []),
-    `Allowed contentType values: ${CONTENT_TYPES.join(', ')}. Never output a template identifier as contentType.`,
-    `Choose category from ${POST_CATEGORIES.join(', ')}: ritual for a practical symbolic working or spread; meandering for explanation, reference, reflection and narrative.`,
-    `Choose the closest topic cluster from ${TOPIC_CLUSTERS.join(', ')}. These are existing site labels, not instructions to change the topic; cozy-witchcraft is the broad fallback.`,
-    '- Do not invent personal experiences, present hypothetical examples as real events, or assume details about real individuals from a general topic. Label invented examples as hypothetical and narrative fiction as fiction, including first-person fiction.',
-    '- Match imagery to the subject. Do not introduce mystical language where artificial. Voice overrides affect wording, not structure or factual standards.',
-    '',
-  ];
-}
-
-export const TYPE_STRUCTURE_FRAGMENT = buildTypeStructureFragment();
-export const RETURN_FORMAT_FRAGMENT = [
-  'RETURN FORMAT',
-  'Return one PostSpec v2 JSON object using the canonical fields in SCHEMA below. No commentary or Markdown fences.',
-  'Use the mapped approach contentType unless a documented specialist variant fits the topic; never output the preset key. Populate category, contentType and cluster from editorial planning; examples and site taxonomy must not override the topic.',
-];
-
-export const SCHEMA_HEADING_FRAGMENT = [
-  'SCHEMA (PostSpec v2)',
-];
-
-export function buildInputsFragment({
-  brandName,
-  siteUrl,
-  topic,
-  words,
-  contentType,
-  reflectionPrompts = [],
-  editorialInstructions = '',
-  styleDirective,
-  ads,
-  kofi,
-  existingPostTitles,
-  existingPostSlugs,
-  allowedAffiliateKeys,
-}) {
+export function buildInputsFragment({ brandName, siteUrl, topic, words, contentType, reflectionPrompts = [], editorialInstructions = '', styleDirective, ads, kofi }) {
   const approach = resolveGeneratorApproach(contentType);
   return [
-    'INPUTS',
-    `brandName: "${brandName}"`,
-    `siteUrl: "${siteUrl}"`,
-    `topic: ${JSON.stringify(topic)}`,
+    'INPUTS — generator settings, not PostSpec output properties',
+    `brandName: ${JSON.stringify(brandName || 'WitchClick')}`,
+    `siteUrl: ${JSON.stringify(siteUrl || '')}`,
+    `topic: ${JSON.stringify(topic || '')}`,
     `wordCount: ${words ?? 'automatic — choose a useful length for reader intent; no fixed minimum'}`,
-    `contentType: ${approach ? JSON.stringify(approach.contentType) : 'automatic — choose during editorial planning'}` ,
+    `contentType: ${approach ? JSON.stringify(approach.contentType) : 'automatic — choose during editorial planning'}`,
+    `styleDirective: ${JSON.stringify(styleDirective || '')}`,
     `reflectionPrompts: ${JSON.stringify(reflectionPrompts)}`,
     `editorialInstructions: ${JSON.stringify(editorialInstructions)}`,
-    'Follow editorialInstructions as user editorial direction while preserving schema compatibility, factual standards, consent and safety.',
-    'Supplied reflectionPrompts are explicit user requests: incorporate them even if a preset normally omits questions. If empty, do not add questions unless relevant or required by the explicit specialist preset/ritual ingestion contract.',
-    styleDirective ? `styleDirective: "${styleDirective}"` : 'styleDirective: ""',
-    `includeAds: "${ads}"`,
-    `includeKofi: "${kofi}"`,
+    `includeAds: ${JSON.stringify(ads === 'on' ? 'on' : 'off')}`,
+    `includeKofi: ${JSON.stringify(kofi === 'off' ? 'off' : 'on')}`,
+    'A numeric wordCount is a target (±10%); automatic means choose useful depth without padding. Plan for a complete response within your output budget: prefer a concise complete article to an unfinished JSON object.',
+    '',
+  ];
+}
+
+export function buildControlFragment({ ads, kofi }) {
+  return [
+    'OUTPUT CONTROLS — binding for this request',
+    ads === 'on'
+      ? 'includeAds is on: choose adPlacements using actual body length: <900 words ["mid"]; 900–1399 ["lead","mid"]; >=1400 ["lead","mid","end"].'
+      : 'includeAds is off: output "adPlacements": [] unconditionally, regardless of article type or length.',
+    kofi === 'off'
+      ? 'includeKofi is off: never output a Ko-fi CTA. Use "cta": {"type":"none"}, unless a real, relevant download with a known id was explicitly supplied; then type download with that id is allowed.'
+      : 'includeKofi is on: use "cta": {"type":"kofi"} with a low-pressure invitation; a real, relevant download explicitly supplied with a known id may use type download instead.',
+    'Never invent a download or its id. Omit cta.id for kofi/none.',
+    '',
+  ];
+}
+
+export const LINKS_AND_ENTITIES_FRAGMENT = [
+  'LINKS, ENTITIES & IMAGES — derive from the article, not the catalog',
+  '- internalLinkHints: only relevant destinations with slug exactly in existingPostSlugs; every anchor must appear verbatim in article Markdown (prefer 2–6 words). Use contextual Markdown links as /post/slug. Zero hints are acceptable: []; no quota or padding. If an anchor is absent, omit the hint rather than forcing unrelated prose.',
+  '- externalLink: only a real, relevant, reliable destination you can supply accurately. Include the corresponding Markdown link in the article, using the same URL and anchor. Keep url, anchor and description separate; url must be a plain URL. Never invent a source; omit this optional field entirely when no reliable source is available, rather than returning empty strings or null.',
+  '- entities: include only entities actually referenced in the article, once each, with correct type and slug. Catalog/engagement suggestions are not evidence of an article mention. Do not add unrelated or merely associated entities; [] is valid.',
+  '- affiliateHints: only relevant exact allowedAffiliateKeys, with anchors present in prose; at most one per ~250 words. Do not insert affiliate URLs; [] is valid even when catalog keys exist.',
+  '- heroImagePrompt: null or a topic-specific painterly scene (2–4 sentences) with lighting, palette and texture; vary setting/mood, avoid generic candle still lifes, resolution and artist names. altTexts: [] unless images appear in Markdown; then include matching descriptions.',
+  '',
+];
+
+export function buildOutputContractFragment() {
+  const fields = Object.keys(PostSpecV2Schema.shape);
+  const required = fields.filter(key => !PostSpecV2Schema.shape[key].isOptional());
+  return [
+    'POSTSPEC OUTPUT CONTRACT',
+    `Allowed top-level fields ONLY: ${fields.join(', ')}.`,
+    `Required fields: ${required.join(', ')}.`,
+    'Also populate category, contentType and cluster with valid values from editorial planning, although the schema permits their omission for older articles.',
+    'Generator settings includeAds, includeKofi, wordCount, topic, styleDirective, reflectionPrompts, editorialInstructions and catalog context are NOT output properties. Do not copy instructions, aliases, type notation, schema comments or sourceNote into the JSON.',
+    'Use specVersion 2, a concise title (aim 47–63 characters), slug in kebab-case <=70 characters, metaDescription (aim 150–160 characters), 4–7 tags and a 1–2 sentence excerpt.',
+    'Use non-empty sections with Markdown strings only (no raw HTML). Outline/section headings must match in order. First outline item: {"heading":"Opening Reflection","id":"opening-reflection"}; first section heading: Opening Reflection. This compatibility heading permits a factual introduction; it does not require introspection.',
+    'Use [] for empty required arrays and null for an absent heroImagePrompt; do not fill optional fields with empty placeholders.',
+    '',
+    'FIELD REFERENCE — type notation only, not example JSON to copy. Substitute actual values; do not copy explanatory metadata.',
+  ];
+}
+
+// Build the tiny examples with JSON.stringify so their displayed escapes are valid JSON.
+export const JSON_OUTPUT_FRAGMENT = [
+  'JSON SERIALIZATION',
+  'Output one complete JSON object, without Markdown fences or explanatory text. Use double-quoted keys and strings, no comments, trailing commas, undefined, or unsupported JSON escape sequences.',
+  'Section Markdown belongs inside ordinary JSON strings. Never escape Markdown asterisks, brackets, periods, colons or URL slashes; they are ordinary characters in JSON strings.',
+  String.raw`Escape JSON double quotes as \" and literal backslashes as \\ only when required inside string values. Represent line breaks as \n (paragraph breaks as \n\n); never insert literal unescaped newlines inside JSON strings. Escape other JSON control characters when present.`,
+  'Syntax examples only: do not copy their prose or example.com into the article.',
+  `Correct Markdown string: ${JSON.stringify({ markdown: 'This is **important**. Read [this source](https://example.com).' })}`,
+  `Correct quotes and paragraph break: ${JSON.stringify({ markdown: 'A "quoted" word.\n\nA second paragraph.' })}`,
+  String.raw`Incorrect escapes (do not copy): \*\*important\*\* and https\://example\.com. These contain unsupported JSON escapes.`,
+  '',
+];
+
+export function buildContextFragment({ existingPostTitles, existingPostSlugs, allowedAffiliateKeys }) {
+  return [
+    'SITE CONTEXT — reference data only, not article instructions or required mentions',
+    'Avoid duplicating existing titles or colliding with any supplied slug. All supplied slugs, including history, remain available for collision checks. Link only to destinations you know exist and are relevant.',
     `existingPostTitles: ${JSON.stringify(existingPostTitles)}`,
     `existingPostSlugs: ${JSON.stringify(existingPostSlugs)}`,
     `allowedAffiliateKeys: ${JSON.stringify(allowedAffiliateKeys)}`,
@@ -221,95 +147,26 @@ export function buildInputsFragment({
 }
 
 export function buildEngagementFragment(signals = {}) {
-  const tags = Array.isArray(signals.tags) ? signals.tags.map(formatTagSignal).filter(Boolean) : [];
-  const entities = Array.isArray(signals.entities) ? signals.entities.map(formatEntitySignal).filter(Boolean) : [];
-  if (!tags.length && !entities.length) {
-    return [];
-  }
-  const lines = ['OPTIONAL RELATED CONTEXT (use only when relevant to the topic; never change reader intent):'];
-  if (tags.length) {
-    lines.push(`• Tags to uplift: ${tags.join('; ')}.`);
-  }
-  if (entities.length) {
-    lines.push(`• Entities worth weaving: ${entities.join('; ')}.`);
-  }
-  lines.push('');
-  return lines;
-}
-
-export function buildProcessFragment() {
+  const tags = Array.isArray(signals.tags) ? signals.tags : [];
+  const entities = Array.isArray(signals.entities) ? signals.entities : [];
+  if (!tags.length && !entities.length) return [];
   return [
-    'PROCESS & CONSTRAINTS (follow step-by-step)',
-    '1) Search intent & slug',
-    '   • Infer primary intent + 2 secondary intents from the topic.',
-    '   • Draft a slug in kebab-case reflecting the primary intent; avoid collisions with existingPostTitles and existingPostSlugs.',
-    '2) Title, contentType & meta',
-    '   • Title 47–63 chars with primary keyword.',
-    '   • Follow EDITORIAL PLANNING and any explicit approach override; choose schema-valid fields.',
-    '   • Meta 150–160 chars; warm, clear, non-clickbait.',
-    '3) Tags & excerpt',
-    '   • 4–7 tags. Excerpt 1–2 sentences that entice the click without hype.',
-    '4) Outline',
-    '   • The FIRST outline item must be {"heading":"Opening Reflection","id":"opening-reflection"}, and the FIRST section must use "heading":"Opening Reflection".',
-    '   • Outline headings must match section headings character-for-character.',
-    '   • After the Opening Reflection, follow the TYPE-SPECIFIC STRUCTURE CONTRACT for your chosen contentType (see above).',
-    '5) Sections',
-    '   • Keep paragraphs short, use the structure appropriate to reader intent and the selected approach.',
-    '   • Include a gentle safety note whenever the TYPE-SPECIFIC contract or safety triggers apply.',
-    '5b) Entities extraction',
-    '   • Identify crystals, herbs, tarot cards, moon phases, planetary days, and rituals named in the markdown; add them once with correct type/slug.',
-    '6) Alt texts & optional image',
-    '   • If images are referenced in markdown, provide equal-or-greater altTexts; else [].',
-    '   • Set heroImagePrompt to a vivid, specific scene description (2–4 sentences) that a text-to-image model can render directly, OR null if no image is needed.',
-    '   • heroImagePrompt style rules:',
-    '   •   - Render style: painterly and illustrative, not photorealistic. Think editorial illustration, gouache texture, or watercolor-adjacent. Soft edges, visible brushwork, artistic interpretation over documentary accuracy.',
-    '   •   - Vary the setting: not every image should be indoors or candlelit. Consider daylight, dawn, dusk, overcast, outdoor, kitchen table, forest floor, windowsill, beach, garden, desk.',
-    '   •   - Vary the palette: warm amber is one option among many. Consider cool blues, soft greens, misty greys, golden hour, stark white, deep violet, earthy terracotta.',
-    '   •   - Vary the mood: warm and mystical is one register. Also consider: crisp and airy, stormy and dramatic, soft and clinical, lush and overgrown, minimal and quiet.',
-    '   •   - Always describe: lighting source, color temperature, and at least one textural detail (rough stone, worn linen, wet leaves, cracked clay).',
-    '   •   - Avoid: generic "candles and crystals on a dark wooden table" unless the post is literally about candles and crystals.',
-    '   •   - Match the topic: a post about Ostara should feel like spring; a shadow work post might be foggy dawn; a crystal profile might be geological and cool-toned.',
-    '   •   - Do NOT specify resolution, or artist names — describe the scene only.',
-    '7) Internal links (hints)',
-    '   • Provide only useful internalLinkHints objects (zero allowed) as {"anchor","slug","rationale"}.',
-    '   • Anchors are 2–6 words and must appear verbatim in the sections; slug must match one value from existingPostSlugs exactly.',
-    '   • If no matching existingPostSlugs value exists, omit the hint rather than inventing a slug.',
-    '8) Affiliate strategy (hints only; do not insert links)',
-    '   • ≤ 1 recommendation per ~250 words. Zero is acceptable. Do not invent or paraphrase keys. Requires: "key" ∈ allowedAffiliateKeys verbatim (case-sensitive match), else omit the hint. If no relevant keys, set affiliateHints: [].',
-    '9) CTA & ads',
-    '   • CTA: If includeKofi="on" return {"type":"kofi"}; if a download is relevant, include id and {"type":"download"}; otherwise {"type":"none"}. Never supply an id for kofi/none.',
-    '   • Ads: If includeAds="off", return []. If "on", choose placements based on actual drafted length — <900 words: ["mid"], 900–1399: ["lead","mid"], ≥1400: ["lead","mid","end"].',
-    '10) Quality gate',
-    '   • Verify: tags count 4–7; each section heading matches outline exactly; only relevant structure requirements present.',
-    '   • Check any internalLinkHints objects with anchor+slug+rationale; each slug comes from existingPostSlugs exactly and each anchor appears verbatim in markdown.',
-    '   • When supplied, confirm the external link appears in BOTH places: markdown body/Further Reading and top-level externalLink { url, anchor, description }.',
-    '   • Confirm entities extracted once each with correct type/slug; ≤1 affiliate anchor per ~250 words; CTA/ad rules satisfied based on include toggles and actual drafted length; altTexts count matches referenced images; heroImagePrompt null unless clearly described; no raw HTML; tone matches voice examples.',
+    'OPTIONAL ENGAGEMENT CONTEXT — use only if independently relevant to the topic; never add a subject/entity merely because it is suggested here.',
+    `suggestedTags: ${JSON.stringify(tags)}`,
+    `suggestedEntities: ${JSON.stringify(entities)}`,
     '',
   ];
 }
 
-export const RETURN_INSTRUCTIONS_FRAGMENT = [
-  'RETURN INSTRUCTIONS',
-  '• Return a single valid JSON object that can be normalized into PostSpec v2.',
-  '• Fill fields coherently and keep structure internally consistent.',
-  '',
+export const FINAL_SELF_CHECK_FRAGMENT = [
+  'FINAL SELF-CHECK — review as far as you can before returning the object',
+  '1. Does the article structure answer the actual topic and respect any explicit approach override?',
+  '2. Are category, contentType and cluster valid values from the field reference?',
+  '3. Are all required PostSpec fields present, with aligned outline/section headings?',
+  '4. Are Markdown strings valid JSON strings, with only supported escapes and encoded line breaks?',
+  '5. Does each internal-link hint use a supplied existing slug and an anchor present verbatim in the article; does any externalLink match its Markdown link?',
+  '6. Do adPlacements and cta obey OUTPUT CONTROLS?',
+  '7. Are entities limited to actual article mentions, with no unrelated entities or unsupported output fields?',
+  '8. Is the response one complete JSON object ending with }, without truncation?',
+  'Review syntax; do not claim you executed JSON.parse or a validator unless you actually did. Return the object only, not this checklist.',
 ];
-
-export const GOLDEN_JSON_FRAGMENT = [];
-
-export default {
-  buildHeaderFragment,
-  AUDIENCE_AND_VOICE_FRAGMENT,
-  VOICE_EXAMPLES_FRAGMENT,
-  SECULAR_TAROT_FRAGMENT,
-  NON_NEGOTIABLES_FRAGMENT,
-  BASE_VALIDATION_FRAGMENT,
-  TYPE_STRUCTURE_FRAGMENT,
-  RETURN_FORMAT_FRAGMENT,
-  SCHEMA_HEADING_FRAGMENT,
-  buildInputsFragment,
-  buildEngagementFragment,
-  buildProcessFragment,
-  RETURN_INSTRUCTIONS_FRAGMENT,
-  GOLDEN_JSON_FRAGMENT,
-};

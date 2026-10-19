@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { buildMasterPrompt } from '../server/lib/promptBuilder.js';
 import { genprompt } from '../tools/src/genprompt';
 import { adminPipelineHelpers } from '../dev-api';
 import { POST } from '../src/pages/api/genprompt.json';
@@ -24,7 +25,7 @@ describe('topic-first editorial generation', () => {
     expect(prompt).toContain('contentType: automatic');
     expect(prompt).toContain('Do not default to ritual');
     expect(prompt).toContain('Do not force numbered steps, checklists, reflection questions or rituals into unrelated articles');
-    expect(prompt).toContain('For an actual ritual topic, retain concrete numbered instructions');
+    expect(prompt).toContain('Only if the chosen type is ritual/spellwork: retain concrete numbered');
     expect(prompt).toContain('separate scientific facts from traditional symbolism');
     expect(prompt).toContain('Do not invent personal experiences');
     expect(prompt).toContain('hypothetical examples as real events');
@@ -79,5 +80,136 @@ describe('topic-first editorial generation', () => {
       sections:[{heading:'Opening Reflection',markdown:'An ordinary tension deserves a careful explanation.'},{heading:'Closing',markdown:'Readers can choose their own next step.'}],internalLinkHints:[],affiliateHints:[]});
     expect(PostSpecV2Schema.safeParse(spec).success).toBe(true);
     expect(validateStructure(spec,100).errors).toEqual([]);
+  });
+});
+
+
+// These tests inspect the prompt and its tiny examples; they do not simulate LLM compliance.
+describe('first-pass PostSpec prompt contract', () => {
+  const topic = topics[0]!;
+  const build = (options: Record<string, unknown> = {}) => buildMasterPrompt({
+    topic, ...defaults, brandName:'WitchClick', siteUrl:'https://witchclick.space', ...options,
+  });
+
+  it('puts the reader question before voice, drafting and JSON population', () => {
+    const prompt = build();
+    const steps = [
+      '1. Identify what the reader is asking', '2. Choose the editorial approach',
+      '3. Select a compatible PostSpec', '4. Apply WitchClick voice',
+      '5. Draft substantive, non-repetitive prose', '6. Populate the JSON contract',
+    ];
+    const positions = steps.map(step => prompt.indexOf(step));
+    expect(positions.every(position => position >= 0)).toBe(true);
+    expect(positions).toEqual([...positions].sort((a,b) => a-b));
+    expect(prompt.indexOf('DECISION ORDER')).toBeLessThan(prompt.indexOf('VOICE & EDITORIAL STANDARDS'));
+    expect(prompt).toContain('distinguish, compare, understand or evaluate something default to contentType "guide"');
+    expect(prompt).toContain('Reserve ritual for a topic explicitly requesting a ritual');
+    expect(prompt).not.toContain('Headings MUST explicitly include "Quick"');
+    expect(prompt).not.toContain('Journaling Prompts: 3–5');
+  });
+
+  it('includes exactly two parseable minimal examples, with literal Markdown/URLs and encoded paragraphs', () => {
+    const prompt = build();
+    const examples = prompt.split('\n').filter(line => line.startsWith('Correct '))
+      .map(line => line.slice(line.indexOf(': ') + 2));
+    expect(examples).toHaveLength(2);
+    const parsed = examples.map(example => JSON.parse(example));
+    expect(parsed).toEqual([
+      {markdown:'This is **important**. Read [this source](https://example.com).'},
+      {markdown:'A "quoted" word.\n\nA second paragraph.'},
+    ]);
+    expect(examples[1]).toContain(String.raw`\"quoted\"`);
+    expect(examples[1]).toContain(String.raw`\n\n`);
+    expect(prompt).toContain('Never escape Markdown asterisks, brackets, periods, colons or URL slashes');
+    expect(prompt).toContain('never insert literal unescaped newlines inside JSON strings');
+    expect(prompt).toContain(String.raw`\*\*important\*\* and https\://example\.com`);
+    for (const bad of [String.raw`\*`,String.raw`\:`,String.raw`\.`]) {
+      expect(() => JSON.parse(`{"markdown":"${bad}"}`)).toThrow();
+    }
+  });
+
+  it.each([
+    ['off','off'],['off','on'],['on','off'],['on','on'],
+  ] as const)('emits binding request-specific controls for ads=%s kofi=%s', (ads,kofi) => {
+    const prompt = build({ads,kofi});
+    expect(prompt).toContain(`includeAds: "${ads}"`);
+    expect(prompt).toContain(`includeKofi: "${kofi}"`);
+    const controls = prompt.split('OUTPUT CONTROLS — binding for this request\n')[1]!.split('\n\n')[0]!;
+    expect(controls).toContain(ads === 'off'
+      ? 'output "adPlacements": [] unconditionally'
+      : 'choose adPlacements using actual body length');
+    expect(controls).not.toContain(ads === 'off' ? 'includeAds is on' : 'includeAds is off');
+    expect(controls).toContain(kofi === 'off'
+      ? 'never output a Ko-fi CTA. Use "cta": {"type":"none"}'
+      : 'use "cta": {"type":"kofi"}');
+    expect(controls).toContain('Never invent a download or its id');
+    expect(controls).not.toContain(kofi === 'off' ? 'includeKofi is on' : 'includeKofi is off');
+  });
+
+  it('separates generator-only inputs from the one canonical output contract', () => {
+    const prompt = build();
+    const allowed = prompt.match(/^Allowed top-level fields ONLY: (.+)\.$/m)![1]!.split(', ');
+    expect(allowed).toEqual(Object.keys(PostSpecV2Schema.shape));
+    const required = prompt.match(/^Required fields: (.+)\.$/m)![1]!.split(', ');
+    const expected = ['specVersion','title','slug','metaDescription','tags','excerpt','outline','sections',
+      'entities','heroImagePrompt','altTexts','internalLinkHints','affiliateHints','cta','adPlacements'];
+    expect(required).toEqual(expected);
+    for (const input of ['includeAds','includeKofi','wordCount','topic','styleDirective','reflectionPrompts','editorialInstructions']) {
+      expect(allowed).not.toContain(input);
+      expect(required).not.toContain(input);
+    }
+    expect(required).not.toContain('externalLink');
+    expect(required).toEqual(expect.arrayContaining(['specVersion','entities','altTexts','internalLinkHints','affiliateHints','heroImagePrompt']));
+    expect(prompt).toContain('are NOT output properties');
+    expect(prompt).toContain('not example JSON to copy');
+    expect(prompt).not.toContain('markdown|content');
+    expect(prompt).not.toContain('title (name, headline)');
+    expect(prompt).not.toContain('can be normalized');
+    expect(prompt.match(/^POSTSPEC OUTPUT CONTRACT$/gm)).toHaveLength(1);
+  });
+
+  it('preserves all supplied collision/link context without encouraging catalog filler', () => {
+    const titles = ['Ordinary conflicts','A reference entry','A draft title'];
+    const slugs = ['ordinary-conflicts','reference-entry','draft-title','historical-slug'];
+    const prompt = build({existingPostTitles:titles,existingPostSlugs:slugs,allowedAffiliateKeys:['journal'],
+      engagementSignals:{entities:[{type:'herb',slug:'unrelated-herb',reason:'Under-served'}]}});
+    const readArray = (name: string) => JSON.parse(prompt.match(new RegExp(`^${name}: (.+)$`,'m'))![1]!);
+    expect(readArray('existingPostTitles')).toEqual(titles);
+    expect(readArray('existingPostSlugs')).toEqual(slugs);
+    expect(readArray('allowedAffiliateKeys')).toEqual(['journal']);
+    expect(prompt).toContain('every anchor must appear verbatim in article Markdown');
+    expect(prompt).toContain('Zero hints are acceptable: []; no quota or padding');
+    expect(prompt).toContain('Include the corresponding Markdown link in the article, using the same URL and anchor');
+    expect(prompt).toContain('omit this optional field entirely when no reliable source is available');
+    expect(prompt).toContain('include only entities actually referenced in the article');
+    expect(prompt).toContain('never add a subject/entity merely because it is suggested here');
+    expect(prompt).not.toContain('Entities worth weaving');
+    expect(prompt).not.toContain('may and should use the provided topic, post titles, and slugs');
+  });
+
+  it('ends with one eight-point self-check without claiming parser execution', () => {
+    const prompt = build();
+    expect(prompt.match(/^FINAL SELF-CHECK/gm)).toHaveLength(1);
+    const checks = prompt.split('FINAL SELF-CHECK')[1]!;
+    expect(checks.match(/^[1-8]\. /gm)).toHaveLength(8);
+    for (const phrase of ['actual topic','category, contentType and cluster','required PostSpec fields',
+      'valid JSON strings','anchor present verbatim','obey OUTPUT CONTROLS','unsupported output fields','complete JSON object']) {
+      expect(checks).toContain(phrase);
+    }
+    expect(checks).toContain('do not claim you executed JSON.parse or a validator unless you actually did');
+    expect(prompt.endsWith('Return the object only, not this checklist.')).toBe(true);
+    expect(prompt).toContain('prefer a concise complete article to an unfinished JSON object');
+    expect(prompt).not.toContain('Infer primary intent + 2 secondary intents');
+    expect(prompt).not.toContain('GOLDEN JSON EXAMPLE');
+    expect(prompt).not.toContain('match the selected template/content type unless');
+    expect(prompt).not.toContain('imagine running JSON.parse');
+  });
+
+  it('keeps specialist tarot links optional and requests only its own structure', () => {
+    const prompt = build({mode:'grimoireTarot'});
+    expect(prompt).toContain('an internal link only if relevant');
+    expect(prompt).not.toContain('and one internal link');
+    expect(prompt).toContain('A single-card reference may use guide');
+    expect(prompt).not.toContain('Quick / Low-Energy Variant: 3–5');
   });
 });

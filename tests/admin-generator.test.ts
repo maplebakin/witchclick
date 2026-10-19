@@ -11,6 +11,7 @@ import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } fr
 import { executeIngest } from "../server/lib/ingestExecutor.js";
 import { normalizeDraftSpec } from "../src/scripts/normalizeDraftSpec.js";
 import { createPostSpec } from "./postSpecTestUtils";
+import { genprompt } from "../tools/src/genprompt";
 
 const source = fs.readFileSync(new URL("../src/pages/admin/generator.astro", import.meta.url), "utf8");
 const script = source.match(/<script is:inline>([\s\S]*?)<\/script>/)![1]!;
@@ -65,6 +66,23 @@ function setup(handler?: (request: Request) => Promise<ReturnType<typeof respons
 }
 
 describe("Generator action model", () => {
+  it('copies the generated prompt unchanged, preserving JSON escape examples and control rules', async () => {
+    const topic = 'How to tell ordinary relationship disagreements from fundamental incompatibility';
+    const prompt = genprompt({topic,ads:'off',kofi:'off'}).prompt;
+    const ui = setup(request => request.url.pathname === '/genprompt' ? response({ok:true,prompt}) : undefined);
+    const writeText = vi.fn(async (_text: string) => {});
+    Object.defineProperty(ui.window.navigator, 'clipboard', {value:{writeText}, configurable:true});
+    ui.element<HTMLInputElement>('topic').value = topic;
+    ui.element<HTMLInputElement>('words').value = '';
+    ui.click('genPrompt'); await ui.idle();
+    ui.click('copyPrompt');
+    await vi.waitFor(() => expect(writeText).toHaveBeenCalledWith(prompt));
+    expect(ui.element<HTMLTextAreaElement>('promptOut').value).toBe(prompt);
+    expect(writeText.mock.calls[0]![0]).toContain('JSON SERIALIZATION');
+    expect(writeText.mock.calls[0]![0]).toContain('output "adPlacements": [] unconditionally');
+    expect(ui.requests.filter(request => request.url.pathname === '/genprompt')).toHaveLength(1);
+  });
+
   it('sends a topic-only request with automatic length and optional instructions through one handler', async () => {
     const ui = setup(request => request.url.pathname === '/genprompt' ? response({ok:true,prompt:'Executable generation prompt'}) : undefined);
     ui.element<HTMLInputElement>('topic').value = 'Why hobbies feel obligatory';

@@ -105,7 +105,7 @@ export const STRUCTURE_REQUIREMENTS = {
     '2. Position Meanings or Interpretive Depth: detailed explanation (3–7 positions for spreads)',
     '3. Reading Tips: how to interpret connections, perspectives, or tensions in the card',
     '4. Reflection Questions: 2–3 questions to deepen the reading without treating it as prediction',
-    '5. Gentle Closing: 1–2 paragraphs with integration thoughts and one internal link',
+    '5. Gentle Closing: 1–2 paragraphs with integration thoughts; an internal link only if relevant',
     '- Keep interpretations secular-friendly and archetypal',
     '- Focus on self-reflection rather than prediction',
   ],
