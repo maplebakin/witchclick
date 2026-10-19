@@ -42,13 +42,18 @@ function setup(handler?: (request: Request) => Promise<ReturnType<typeof respons
   Object.assign(window, { parseYaml, stringifyYaml, buildFallbackHeroPrompt });
   window.confirm = vi.fn(() => true);
   const requests: Request[] = [];
+  const savedRecords = new Map<string, Record<string, any>>();
   window.fetch = vi.fn(async (url, options) => {
     const request = { url: new URL(String(url)), body: JSON.parse(String(options?.body || "{}")), dry: String(url).includes("dryRun=true") };
     requests.push(request);
     const custom = handler && await handler(request);
+    if (request.url.pathname === '/ingest' && !request.dry) {
+      const data = custom ? await custom.json() as Record<string, any> : {saved:true,slug:request.body.slug};
+      if (data.saved && data.slug) savedRecords.set(data.slug, {...request.body,...data.spec,slug:data.slug,draft:request.body._draft === true});
+    }
     if (custom) return custom as Response;
     if (request.url.pathname === "/posts/list") return response({ ok: true, items: [{ title: "Source post", slug: "source-post", tags: ["source"] }] }) as Response;
-    if (request.url.pathname === "/posts/load") return response({ ok: true, slug: request.body.slug, frontmatter: stringifyYaml({slug: request.body.slug, title: "Saved post", draft: true, tags: ["cozy"]}) }) as Response;
+    if (request.url.pathname === "/posts/load") return response({ ok: true, slug: request.body.slug, frontmatter: stringifyYaml(savedRecords.get(request.body.slug) || {slug: request.body.slug, title: "Saved post", draft: true, tags: ["cozy"]}) }) as Response;
     if (request.url.pathname === "/bundle") return response({ ok: true }) as Response;
     return response({ ok: true, spec: request.body, saved: !request.dry, slug: request.body.slug, warnings: [], errors: [] }) as Response;
   });
@@ -238,6 +243,27 @@ describe("Generator action model", () => {
 });
 
 describe('Generator embedded hero target', () => {
+  it('keeps JSON, input values and preview intact without navigation after a draft save',async()=>{
+    const ui=setup(); const json=JSON.stringify(createPostSpec());
+    ui.element<HTMLInputElement>('topic').value='Keep this topic'; ui.edit(json); ui.click('previewBtn'); await ui.idle();
+    const preview=ui.element('preview').textContent;
+    ui.click('ingestBtn'); await ui.idle();
+    expect(ui.element<HTMLTextAreaElement>('spec').value).toBe(json);
+    expect(ui.element<HTMLInputElement>('topic').value).toBe('Keep this topic');
+    expect(ui.element('preview').textContent).toBe(preview);
+    expect(ui.window.location.href).toBe('about:blank');
+  });
+  it('locks the previous hero target if a new save response lacks its persisted slug',async()=>{
+    let saves=0;
+    const ui=setup(request=>request.url.pathname==='/ingest'&&!request.dry?response(++saves===1?{ok:true,saved:true,slug:'first-saved'}:{ok:true,saved:true}):undefined);
+    ui.edit(createPostSpec());ui.click('ingestBtn');await ui.idle();
+    await vi.waitFor(()=>expect(ui.window.document.querySelector<HTMLElement>('[data-workspace]')!.hidden).toBe(false));
+    ui.click('ingestBtn');await ui.idle();
+    expect(ui.window.document.querySelector<HTMLElement>('[data-workspace]')!.hidden).toBe(true);
+    expect(ui.window.document.querySelector<HTMLElement>('[data-hero-workflow]')!.dataset.heroSlug).toBe('');
+    expect(ui.window.document.querySelector('[data-workflow-status]')!.textContent).toContain('final slug');
+  });
+
   it('starts locked, activates only the final saved slug, and ignores JSON edits and copy-as-template', async () => {
     let saved = 0;
     const ui = setup(request => request.url.pathname === '/ingest' && !request.dry ? response({ok:true,saved:true,slug:++saved === 1 ? 'collision-resolved-slug' : 'second-saved-slug'}) : undefined);
@@ -251,14 +277,18 @@ describe('Generator embedded hero target', () => {
     ui.window.document.querySelector<HTMLButtonElement>('[data-recent-insert]')!.click();
     expect(root.dataset.heroSlug).toBe('collision-resolved-slug');
     ui.click('ingestBtn'); await ui.idle(); expect(root.dataset.heroSlug).toBe('second-saved-slug');
-    expect(ui.requests.filter(r=>r.url.pathname==='/posts/load')).toHaveLength(0); // Saved response carries the verified spec directly.
+    await vi.waitFor(() => expect(ui.requests.filter(r=>r.url.pathname==='/posts/load')).toHaveLength(2)); // Incomplete save metadata is reread using the final slug.
   });
   it('keeps hero optional from the saved response and hides the entire step for curses', async () => {
-    const ui = setup(request=>request.url.pathname==='/posts/load'?response({ok:false,error:'Unavailable'},false):undefined);
+    let unavailable = true;
+    const ui = setup(request=>request.url.pathname==='/posts/load' && unavailable ?response({ok:false,error:'Unavailable'},false):undefined);
     ui.edit(createPostSpec()); ui.click('ingestBtn'); await ui.idle();
     expect(ui.element('saveOutcome').textContent).toContain('Saved draft');
+    await vi.waitFor(()=>expect(ui.window.document.querySelector('[data-workflow-status]')!.textContent).toContain('could not be loaded'));
+    const writes = ui.writes().length; unavailable = false;
+    ui.window.document.querySelector<HTMLButtonElement>('[data-load-retry]')!.click();
     await vi.waitFor(()=>expect(ui.window.document.querySelector('[data-workflow-status]')!.textContent).toContain('Hero missing.'));
-    expect(ui.requests.filter(r=>r.url.pathname==='/posts/load')).toHaveLength(0);
+    expect(ui.writes()).toHaveLength(writes);
     ui.window.document.querySelector<HTMLButtonElement>('[data-panel-toggle="curses"]')!.click();
     expect(ui.window.document.querySelector('[data-generator-hero]')!.classList.contains('hidden')).toBe(true);
     expect(ui.element<HTMLButtonElement>('ingestBtn').disabled).toBe(false);

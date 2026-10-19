@@ -68,6 +68,9 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
   {canUse ? (
     <div class="space-y-6">
       <AdminNav currentPath="/admin/generator" />
+      <p data-dev-update-notice hidden role="status" class="rounded-lg border border-line-neutral p-3 text-sm">
+        Development files changed. Your workspace is kept open. Public previews still update; refresh this page when you are ready to load code changes.
+      </p>
 
       <section class="rounded-2xl border border-line-subtle bg-surface-base p-6 shadow-sm">
         <div class="space-y-3">
@@ -219,6 +222,9 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
 
   {canUse && (
     <>
+      <script>
+        import '../../scripts/admin/generator-dev-session';
+      </script>
       <script type="module" is:inline src={normalizeDraftSpecScript}></script>
       <script is:inline>
       (function(){
@@ -1264,13 +1270,18 @@ const DEV_KEY = import.meta.env.PUBLIC_DEV_API_KEY || import.meta.env.PUBLIC_ADM
             var heroRoot = root.querySelector('[data-generator-hero] [data-hero-workflow]');
             if (heroRoot && typeof data.slug === 'string' && data.slug.trim()) {
               heroRoot.setAttribute('data-hero-slug', data.slug);
+              // The component's module may still be loading on a fast first save.
+              heroRoot.dataset.pendingHeroTarget = JSON.stringify({ slug: data.slug, expectedTitle: data.spec?.title || result.spec.title, requireDraft: draft === true });
               heroRoot.dispatchEvent(new CustomEvent('hero-workflow:set-post', { detail: {
                 slug: data.slug,
                 expectedTitle: data.spec?.title || result.spec.title,
                 requireDraft: draft === true,
-                post: data.spec || result.spec
+                post: data.spec
               } }));
               heroRoot.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else if (heroRoot) {
+              heroRoot.dispatchEvent(new CustomEvent('hero-workflow:reset'));
+              heroRoot.querySelector('[data-workflow-status]').textContent = 'Saved, but the endpoint did not return the final slug. Hero assignment is locked to avoid targeting another article. Do not ingest again to retry artwork.';
             }
             savedJSON = result.snapshot;
             invalidateValidation();

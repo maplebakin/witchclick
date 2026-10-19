@@ -33,7 +33,10 @@ export class HeroWorkflow {
   private listeners = new AbortController();
   constructor(readonly root: HTMLElement) {
     const initialSlug = root.dataset.heroSlug || '';
+    let initialTarget: HeroTarget | null = null;
+    try { initialTarget = JSON.parse(root.dataset.pendingHeroTarget || 'null'); } catch { /* No queued save target. */ }
     this.on(root, 'hero-workflow:set-post', event => {
+      delete root.dataset.pendingHeroTarget;
       const target = (event as CustomEvent<HeroTarget & { post?: Record<string, any> }>).detail;
       if (target?.post && target.slug) this.showSavedPost({ ...target, post: target.post });
       else void this.setPost(target);
@@ -65,7 +68,9 @@ export class HeroWorkflow {
     this.on(this.el('[data-save-prompt]'), 'click', () => { void this.savePrompt(); });
     this.reset();
     if (root.dataset.mode === 'picker') void this.loadPicker();
+    else if (initialTarget?.slug) void this.setPost(initialTarget);
     else if (initialSlug) void this.setPost({ slug: initialSlug });
+    root.dataset.heroMounted = 'true';
   }
   private el<T extends HTMLElement = HTMLElement>(selector: string): T { return this.root.querySelector<T>(selector)!; }
   private get input() { return this.el<HTMLInputElement>('[data-file-input]'); }
@@ -90,6 +95,7 @@ export class HeroWorkflow {
   reset() {
     this.token += 1; this.target = null; this.post = null; this.file = null; this.fileToken = -1;
     this.uploadedPath = ''; this.saved = null; this.busy = false; this.status = 'locked'; this.variation = 0;
+    delete this.root.dataset.pendingHeroTarget;
     this.root.dataset.heroSlug = ''; this.input.value = ''; this.alt.value = ''; this.prompt.value = '';
     if (this.previewUrl) URL.revokeObjectURL(this.previewUrl);
     this.previewUrl = ''; this.el<HTMLImageElement>('[data-preview]').removeAttribute('src'); this.el('[data-preview]').hidden = true;
@@ -97,7 +103,7 @@ export class HeroWorkflow {
     this.el('[data-file-info]').textContent = ''; this.el('[data-prompt-status]').textContent = '';
     this.hideSuccess(); this.clearError(); this.message(this.root.dataset.lockedMessage || 'Select a post to prepare its hero image.'); this.render();
   }
-  dispose() { this.reset(); this.disposed = true; this.listeners.abort(); instances.delete(this.root); }
+  dispose() { delete this.root.dataset.heroMounted; this.reset(); this.disposed = true; this.listeners.abort(); instances.delete(this.root); }
   async setPost(target: HeroTarget) {
     this.reset();
     if (!target?.slug) return;
@@ -115,6 +121,14 @@ export class HeroWorkflow {
     }
   }
   private showSavedPost(target: HeroTarget & { post: Record<string, any> }) {
+    const post = target.post;
+    // A PostSpec is not persisted frontmatter: it normally lacks draft/hero state.
+    if (post.slug !== target.slug || !text(post.title) || typeof post.draft !== 'boolean'
+      || (target.expectedTitle && post.title !== target.expectedTitle)
+      || (typeof target.requireDraft === 'boolean' && post.draft !== target.requireDraft)
+      || !Object.prototype.hasOwnProperty.call(post, 'heroImagePrompt')) {
+      void this.setPost(target); return;
+    }
     this.reset();
     this.target = { slug: target.slug, expectedTitle: target.expectedTitle, requireDraft: target.requireDraft };
     this.root.dataset.heroSlug = target.slug;
@@ -127,7 +141,8 @@ export class HeroWorkflow {
     if (data.slug !== target.slug || typeof data.frontmatter !== 'string') throw new Error('The reread post identity could not be confirmed.');
     const post = parseYaml(data.frontmatter) as Record<string, any>;
     if (!post || typeof post !== 'object' || !text(post.title) || (post.slug != null && post.slug !== target.slug)
-      || (target.expectedTitle && post.title !== target.expectedTitle) || (target.requireDraft && (post.draft !== true || post.slug !== target.slug))) {
+      || (target.expectedTitle && post.title !== target.expectedTitle) || (target.requireDraft && (post.draft !== true || post.slug !== target.slug))
+      || (target.requireDraft === false && post.draft === true)) {
       throw new Error('The reread title, slug, or draft state does not match the saved post.');
     }
     return { ...post, slug: target.slug };
@@ -143,9 +158,12 @@ export class HeroWorkflow {
   }
   private showLinks() {
     const success = this.el('[data-success]'); success.replaceChildren();
+    const confirmation = document.createElement('p');
+    confirmation.textContent = `Confirmed hero for ${this.post!.title} (${this.target!.slug}). Image: ${this.path}. Alt text: ${this.alt.value.trim()}. ${this.post?.draft === true ? 'Draft remains private.' : 'Public eligibility is unchanged.'} Nothing was deployed.`;
+    success.append(confirmation);
     const links = [{ label: 'Open in Posts', href: `/admin/posts?slug=${encodeURIComponent(this.target!.slug)}` }];
     if (this.post?.draft === true) links.push({ label: 'Review in Staging', href: `/admin/staging?slug=${encodeURIComponent(this.target!.slug)}` });
-    else links.push({ label: 'View live post', href: `/post/${encodeURIComponent(this.target!.slug)}` });
+    else links.push({ label: 'View local post', href: `/post/${encodeURIComponent(this.target!.slug)}` });
     for (const item of links) { const a = document.createElement('a'); a.href = item.href; a.textContent = item.label; a.className = 'mr-4 underline'; success.append(a); }
     success.hidden = false;
   }
@@ -208,9 +226,12 @@ export class HeroWorkflow {
   private async attach() {
     if (this.el<HTMLButtonElement>('[data-submit]').disabled || this.busy || !this.target) return;
     const snapshot = { slug: this.target.slug, token: this.token, path: this.path, alt: this.alt.value.trim() };
+    const existingImage = text(this.post?.heroImage) || text(this.post?.heroImageSrc) || text(this.post?.heroImageUrl);
+    if (existingImage && snapshot.path !== existingImage
+      && !window.confirm(`Replace the existing hero for ${this.post!.title} (${snapshot.slug})?\nCurrent: ${existingImage}\nNew: ${snapshot.path}`)) return;
     this.busy = true; this.clearError(); this.hideSuccess(); this.message('Saving the hero shown in this summary…'); this.render();
     try {
-      await this.request('/posts/attach-hero', { slug: snapshot.slug, heroImage: snapshot.path, heroAlt: snapshot.alt });
+      await this.request('/posts/attach-hero', { slug: snapshot.slug, heroImage: snapshot.path, heroAlt: snapshot.alt, expectedHeroImage: existingImage });
       if (!this.matches(snapshot)) return;
       this.saved = snapshot; this.pending = this.pending.filter(item => item.slug !== snapshot.slug || item.path !== snapshot.path);
       await this.verify(snapshot);
@@ -232,9 +253,17 @@ export class HeroWorkflow {
     finally { if (this.current(snapshot.token)) { this.busy = false; this.render(); } }
   }
   private async refresh() {
-    if (!this.target || this.busy || this.uploadedPath || this.file) { this.message('Attach or clear the selected artwork before refreshing.'); return; }
+    if (!this.target || this.busy) return;
     const token = this.token; this.busy = true; this.message('Refreshing hero status…'); this.render();
-    try { const post = await this.readPost(this.target); if (this.current(token)) this.applyPost(post); }
+    try {
+      const post = await this.readPost(this.target);
+      if (this.current(token)) {
+        if (this.file || this.uploadedPath) {
+          this.post = post; this.saved = null; this.status = 'idle'; this.hideSuccess(); this.clearError();
+          this.message('Hero status refreshed. Selected artwork and alt text kept; review any replacement before attaching.');
+        } else this.applyPost(post);
+      }
+    }
     catch (error) { if (this.current(token)) { this.post = null; this.saved = null; this.status = 'error'; this.hideSuccess(); this.error(error); this.message(this.target?.requireDraft ? 'Draft replaced, but hero status could not be loaded. Retry loading.' : 'Hero status could not be loaded. Retry loading.'); } }
     finally { if (this.current(token)) { this.busy = false; this.render(); } }
   }
@@ -251,7 +280,7 @@ export class HeroWorkflow {
       if (!this.current(token)) return;
       if (data.slug !== target.slug || typeof data.frontmatter !== 'string') throw new Error('The post could not be confirmed for prompt saving.');
       const post = parseYaml(data.frontmatter); post.heroImagePrompt = prompt;
-      await this.request('/posts/update', { originalSlug: target.slug, frontmatter: stringifyYaml(post), markdown: data.markdown || '' });
+      await this.request('/posts/update', { originalSlug: target.slug, frontmatter: stringifyYaml(post, { defaultStringType: 'QUOTE_DOUBLE', defaultKeyType: 'PLAIN' }), markdown: data.markdown || '' });
       if (this.current(token)) { this.post!.heroImagePrompt = prompt; this.el('[data-prompt-status]').textContent = 'Hero prompt saved to this post.'; }
     } catch (error) { if (this.current(token)) this.error(error); }
     finally { if (this.current(token)) { this.busy = false; this.render(); } }

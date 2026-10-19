@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { JSDOM } from 'jsdom';
+import matter from 'gray-matter';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { buildFallbackHeroPrompt } from '../src/utils/heroPrompt';
 import ts from 'typescript';
@@ -14,7 +15,7 @@ const markup = read('components/admin/HeroWorkflow.astro').split('\n---\n')[1]!.
   .replace(/data-dev-api=\{devApi\}/g, 'data-dev-api="http://localhost:8787"').replace(/data-dev-key=\{devKey\}/g, 'data-dev-key=""');
 const script = ts.transpileModule(read('scripts/admin/hero-workflow.ts').replace(/^import .*;$/gm, '').replace(/^export /gm, ''), { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None } }).outputText;
 const entries = [
-  { slug: 'alpha', title: 'Alpha draft', draft: true },
+  { slug: 'alpha', title: 'Alpha draft', draft: true, promptMetadata: { generatedAt:'2026-10-19T12:00:00.000Z' } },
   { slug: 'beta', title: 'Beta draft', draft: true, heroImage: '/images/hero/beta/existing.png', heroImageAlt: 'Old legacy text', heroAlt: 'Other old text' },
 ];
 const windows: JSDOM[] = [];
@@ -51,11 +52,53 @@ async function setup(handler?: Handler, mode = 'picker') {
 }
 
 describe('Shared instance-scoped hero workflow',()=>{
+ it('requires confirmation before replacing existing artwork, and cancellation preserves it',async()=>{
+  const ui = await setup(); await ui.select('beta'); ui.choose(); await ui.upload(); ui.alt('A garden path beside a stone wall');
+  ui.dom.window.confirm = vi.fn(() => false); ui.click('[data-submit]'); await tick();
+  expect(ui.calls.some(call=>call.url.endsWith('/posts/attach-hero'))).toBe(false);
+  expect(ui.records.find(post=>post.slug==='beta')!.heroImage).toBe('/images/hero/beta/existing.png');
+  ui.dom.window.confirm = vi.fn(() => true); ui.click('[data-submit]');
+  await vi.waitFor(()=>expect(ui.q('[data-success]').hidden).toBe(false));
+  expect(ui.calls.find(call=>call.url.endsWith('/posts/attach-hero'))!.body.expectedHeroImage).toBe('/images/hero/beta/existing.png');
+ });
+ it.each(['upload','attach'])('recovers from a failed %s without ingesting or losing the selected artwork',async phase=>{
+  let fail = true;
+  const ui = await setup(url => fail && url.endsWith(phase === 'upload' ? '/upload/hero' : '/posts/attach-hero') ? response({ok:false,error:'Temporary failure'},500) : undefined);
+  ui.choose(); ui.alt('A blue garden gate with warm sunlight');
+  if (phase === 'upload') { ui.click('[data-upload-confirm]'); await vi.waitFor(()=>expect(ui.q('[data-workflow-error]').hidden).toBe(false)); fail = false; await ui.upload(); }
+  else { await ui.upload(); ui.click('[data-submit]'); await vi.waitFor(()=>expect(ui.q('[data-workflow-error]').hidden).toBe(false)); fail=false; }
+  ui.click('[data-submit]'); await vi.waitFor(()=>expect(ui.q('[data-success]').hidden).toBe(false));
+  expect(ui.records.find(post=>post.slug==='alpha')!.draft).toBe(true);
+  expect(ui.calls.some(call=>/ingest|bundle/.test(call.url))).toBe(false);
+  expect(ui.q('[data-success]').textContent).toContain('Draft remains private');
+ });
+
  it('preserves standalone URL preselection and clears file, preview, alt and uploaded path on selection',async()=>{
   const ui=await setup();expect(ui.root.dataset.heroSlug).toBe('alpha');ui.choose();ui.alt('A candle beside a notebook');await ui.upload();
   await ui.select('beta');expect(ui.q<HTMLInputElement>('[data-file-input]').value).toBe('');expect(ui.q('[data-preview]').hidden).toBe(true);
   expect(ui.q<HTMLInputElement>('[data-alt-input]').value).toBe('Old legacy text');expect(ui.q<HTMLButtonElement>('[data-upload-confirm]').disabled).toBe(true);
   expect(ui.q('[data-attach-summary]').textContent).not.toContain('/alpha/');expect(ui.q('[data-pending-uploads]').textContent).toContain('alpha');
+ });
+
+ it('rereads incomplete saved metadata and rejects a mismatched persisted title before enabling writes',async()=>{
+  const ui = await setup(undefined,'embedded');
+  ui.root.dispatchEvent(new ui.dom.window.CustomEvent('hero-workflow:set-post',{detail:{slug:'alpha',expectedTitle:'Alpha draft',requireDraft:true,post:{slug:'alpha',title:'Alpha draft',heroImagePrompt:'Submitted prompt'}}}));
+  await vi.waitFor(()=>expect(ui.q('[data-workspace]').hidden).toBe(false));
+  expect(ui.calls.filter(call=>call.url.endsWith('/posts/load'))).toHaveLength(1);
+  expect(ui.q<HTMLTextAreaElement>('[data-hero-prompt]').value).not.toBe('Submitted prompt');
+  ui.root.dispatchEvent(new ui.dom.window.CustomEvent('hero-workflow:set-post',{detail:{slug:'beta',expectedTitle:'Wrong title',requireDraft:true,post:{slug:'beta',title:'Wrong title'}}}));
+  await vi.waitFor(()=>expect(ui.q('[data-workflow-status]').textContent).toContain('could not be loaded'));
+  expect(ui.q('[data-workspace]').hidden).toBe(true);
+ });
+ it('refreshes stale hero state while retaining uploaded artwork for an explicitly confirmed replacement',async()=>{
+  const ui = await setup(); ui.choose(); await ui.upload(); ui.alt('A gate opening onto a green garden');
+  Object.assign(ui.records.find(post=>post.slug==='alpha')!,{heroImage:'/images/hero/alpha/elsewhere.png',heroImageAlt:'Another image',heroAlt:'Another image'});
+  ui.click('[data-refresh-hero]'); await vi.waitFor(()=>expect(ui.q('[data-workflow-status]').textContent).toContain('Selected artwork and alt text kept'));
+  expect(ui.q('[data-attach-summary]').textContent).toContain('/images/hero/alpha/art.png');
+  expect(ui.q<HTMLInputElement>('[data-alt-input]').value).toBe('A gate opening onto a green garden');
+  ui.dom.window.confirm=vi.fn(()=>true); ui.click('[data-submit]');
+  await vi.waitFor(()=>expect(ui.q('[data-success]').hidden).toBe(false));
+  expect(ui.calls.find(call=>call.url.endsWith('/posts/attach-hero'))!.body.expectedHeroImage).toBe('/images/hero/alpha/elsewhere.png');
  });
  it('cannot upload artwork selected under A into B, including late responses',async()=>{
   let resolve!:(r:Response)=>void;
@@ -84,7 +127,7 @@ describe('Shared instance-scoped hero workflow',()=>{
    if(url.endsWith('/posts/load')&&afterAttach) return response({ok:true,slug:body.slug,frontmatter:stringifyYaml({slug:body.slug,title:'Beta draft',draft:false,heroImage:'/images/hero/beta/existing.png',heroImageAlt:mismatch?'Stale alt':'A candle on a table',heroAlt:'A candle on a table'})});
   });
   await ui.select('beta');ui.alt('A candle on a table');ui.click('[data-submit]');await vi.waitFor(()=>expect(ui.q('[data-workflow-status]').textContent).toContain('Saved but not verified'));
-  expect(ui.q('[data-success]').hidden).toBe(true);mismatch=false;ui.click('[data-retry-verification]');await vi.waitFor(()=>expect(ui.q('[data-success]').textContent).toContain('View live post'));
+  expect(ui.q('[data-success]').hidden).toBe(true);mismatch=false;ui.click('[data-retry-verification]');await vi.waitFor(()=>expect(ui.q('[data-success]').textContent).toContain('View local post'));
   expect(ui.calls.filter(c=>c.url.endsWith('/posts/attach-hero'))).toHaveLength(1);
  });
  it.each(['attach','reread'])('ignores late %s responses after the host slug changes',async phase=>{
@@ -111,7 +154,10 @@ describe('Shared instance-scoped hero workflow',()=>{
   const copy=vi.fn().mockResolvedValue(undefined);Object.defineProperty(ui.dom.window.navigator,'clipboard',{value:{writeText:copy}});
   ui.click('[data-copy-hero-prompt]');await tick();expect(copy).toHaveBeenCalledWith(prompt);
   ui.click('[data-save-prompt]');await vi.waitFor(()=>expect(ui.q('[data-prompt-status]').textContent).toContain('saved'));
-  expect(ui.calls.find(c=>c.url.endsWith('/posts/update'))!.body.originalSlug).toBe('alpha');
+  const update = ui.calls.find(c=>c.url.endsWith('/posts/update'))!.body;
+  expect(update.originalSlug).toBe('alpha');
+  expect(update.frontmatter).toMatch(/^slug: /m);
+  expect(matter(`---\n${update.frontmatter}---\nBody`).data.promptMetadata.generatedAt).toBe('2026-10-19T12:00:00.000Z');
  });
 });
 describe('Canonical hero alt persistence', () => {

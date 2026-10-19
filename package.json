@@ -29,6 +29,7 @@
     "check:affiliates": "node ./scripts/check-affiliate-ids.mjs",
     "themes:lint": "node ./scripts/themes-lint.mjs",
     "test:e2e": "playwright test",
+    "test:e2e:generator": "playwright test --config playwright.generator.config.ts",
     "linkcheck": "node ./scripts/check-internal-links.mjs",
     "genprompt": "node ./tools/wc.js genprompt",
     "ingest": "node ./scripts/ingest.mjs",

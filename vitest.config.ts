@@ -8,7 +8,7 @@ export default defineConfig({
     },
   },
   test: {
-    exclude: [...configDefaults.exclude, "tests/smoke.spec.ts"],
+    exclude: [...configDefaults.exclude, "tests/smoke.spec.ts", "tests/generator-dev.spec.ts"],
     pool: "forks",
     coverage: {
       provider: "v8",

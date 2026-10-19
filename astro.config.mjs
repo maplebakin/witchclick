@@ -5,6 +5,7 @@ import fs from "node:fs";
 import { loadEnv } from "vite";
 import { resolveLocalDevApi } from "./scripts/lib/dev-api-config.mjs";
 import path from "node:path";
+import { generatorDevSession } from "./scripts/lib/generator-dev-session.mjs";
 import { fileURLToPath } from 'node:url';
 
 /** -------- Read settings with safe fallback -------- */
@@ -76,7 +77,7 @@ export default defineConfig({
 
   // ✅ Vite alias so `@/…` resolves to `src/…`
   vite: {
-    plugins: [{
+    plugins: [generatorDevSession(), {
       name: 'witchclick-local-admin-api',
       apply: 'serve',
       config(_config, { mode }) {
@@ -92,7 +93,9 @@ export default defineConfig({
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
-    // optimizeDeps: { include: [] },
+    // Prebundle the shared hero editor dependency before a generator tab subscribes.
+    // A lazy optimizer restart can otherwise leave its first yaml import stale.
+    optimizeDeps: { include: ['yaml'] },
     // ssr: { external: [] },
   },
 });

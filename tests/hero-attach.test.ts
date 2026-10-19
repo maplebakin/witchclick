@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } fr
 let tempDir: string;
 let cwdSpy: MockInstance<() => string> | undefined;
 let attachHeroToPost: (
-  payload: { slug: string; heroImage: string; heroAlt?: string | null },
+  payload: { slug: string; heroImage: string; heroAlt?: string | null; expectedHeroImage?: string },
 ) => Promise<{ path: string }>;
 let handleRequest:
   | ((req: MockRequest, res: MockResponse) => Promise<void> | void)
@@ -132,6 +132,17 @@ describe("attachHeroToPost", () => {
     expect(parsed.data.heroImage).toBe(heroPath);
     expect(parsed.data.heroImageSrc).toBe(heroPath);
     expect(parsed.data.heroAlt).toBe("Soft glow");
+  });
+
+  it('rejects a stale hero expectation without overwriting the post', async () => {
+    const slug = 'changed-hero';
+    const post = path.join(tempDir, 'src/content/posts', `${slug}.md`);
+    const imageDir = path.join(tempDir, 'public/images/hero', slug);
+    await fs.mkdir(imageDir, {recursive:true}); await fs.writeFile(path.join(imageDir,'new.png'),'fixture');
+    const raw = `---\ntitle: Changed hero\nslug: ${slug}\ndraft: true\nheroImage: /images/hero/${slug}/someone-elses.png\n---\nOriginal body.\n`;
+    await fs.writeFile(post,raw);
+    await expect(attachHeroToPost({slug,heroImage:`/images/hero/${slug}/new.png`,heroAlt:'A garden gate in morning light',expectedHeroImage:''})).rejects.toMatchObject({code:'POST_CHANGED'});
+    expect(await fs.readFile(post,'utf8')).toBe(raw);
   });
 
   it("lists posts from the canonical posts directory", async () => {

@@ -663,7 +663,7 @@ async function getStagingOperations() {
   return stagingOperations;
 }
 
-async function attachHeroToPost({ slug, heroImage, heroAlt }) {
+async function attachHeroToPost({ slug, heroImage, heroAlt, expectedHeroImage }) {
   const normalizedSlug = String(slug || '').trim();
   if (!isValidSlug(normalizedSlug)) {
     const err = new Error('Invalid slug');
@@ -817,7 +817,16 @@ async function attachHeroToPost({ slug, heroImage, heroAlt }) {
   }
 
   if (next !== raw) {
-    await withLock(`post:${normalizedSlug}`, () => writeFileAtomic(found.file, next, 'utf8'));
+    await withLock(`post:${normalizedSlug}`, async () => {
+      const latest = await fsp.readFile(found.file, 'utf8');
+      const metadata = parseFrontmatter(latest).data;
+      const currentHero = String(metadata.heroImage || metadata.heroImageSrc || metadata.heroImageUrl || '').trim();
+      if (latest !== raw || (expectedHeroImage !== undefined && currentHero !== expectedHeroImage)) {
+        const err = new Error('The saved post or hero changed. Refresh hero status and review before attaching again.');
+        err.code = 'POST_CHANGED'; throw err;
+      }
+      await writeFileAtomic(found.file, next, 'utf8');
+    });
   }
 
   return { path: path.relative(CWD, found.file).replace(/\\/g, '/') };
@@ -2704,12 +2713,15 @@ async function ingestPalette(payload) {
           slug: body.slug,
           heroImage: body.heroImage,
           heroAlt: body.heroAlt,
+          expectedHeroImage: body.expectedHeroImage,
         });
         return send(res, 200, { ok: true, path: result.path });
       } catch (e) {
         const code = e?.code;
         const status =
-          code === 'NOT_FOUND'
+          code === 'POST_CHANGED'
+            ? 409
+            : code === 'NOT_FOUND'
             ? 404
             : code === 'INVALID_SLUG' || code === 'INVALID_IMAGE' || code === 'MISSING_FILE'
               ? 400
